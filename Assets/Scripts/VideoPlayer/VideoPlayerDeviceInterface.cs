@@ -15,6 +15,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class VideoPlayerDeviceInterface : componentInterface {
 
@@ -22,7 +23,7 @@ public class VideoPlayerDeviceInterface : componentInterface {
   public Renderer videoSurface;
   public GameObject vidQuad;
   AudioSource source;
-  MovieTexture movieTexture;
+  UnityEngine.Video.VideoPlayer movieTexture;
   VideoPlayerUI vidUI;
 
   bool loading = false;
@@ -90,25 +91,7 @@ public class VideoPlayerDeviceInterface : componentInterface {
   }
 
   IEnumerator movieRoutine() {
-    loading = true;
-    WWW www = new WWW("file:///" + Application.streamingAssetsPath + System.IO.Path.DirectorySeparatorChar + vidFilename);
-    movieTexture = www.movie;
-    while (!movieTexture.isReadyToPlay) {
+//TODO: need to switch to new Unity VideoPlayer interface
       yield return null;
     }
-
-    videoSurface.material.mainTexture = movieTexture;
-    source.clip = movieTexture.audioClip;
-    if (playing) {
-      vidQuad.SetActive(true);
-
-      movieTexture.Play();
-      source.Play();
-      masterControl.instance.toggleInstrumentVolume(false);
-    } else {
-      vidQuad.SetActive(false);
-    }
-    loading = false;
-    loaded = true;
-  }
 }
