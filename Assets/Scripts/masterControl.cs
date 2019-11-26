@@ -81,10 +81,10 @@ public class masterControl : MonoBehaviour {
       muteEnvToggle.isOn = true;
     }
 
-    SaveDir = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar + "SoundStage";
+    SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "SoundStage";
     ReadFileLocConfig();
     Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
-    Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Samples");
+    Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");
 
     beatUpdateEvent += beatUpdateEventLocal;
     beatResetEvent += beatResetEventLocal;
@@ -100,8 +100,8 @@ public class masterControl : MonoBehaviour {
 
 
   void ReadFileLocConfig() {
-    if(File.Exists(Application.dataPath + Path.DirectorySeparatorChar + "fileloc.cfg")) {
-      string _txt = File.ReadAllText(Application.dataPath + Path.DirectorySeparatorChar + "fileloc.cfg");
+    if(File.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "fileloc.cfg")) {
+      string _txt = File.ReadAllText(Application.persistentDataPath + Path.DirectorySeparatorChar + "fileloc.cfg");
       if (_txt != @"x:/put/custom/dir/here" && _txt != "") {
         _txt = Path.GetFullPath(_txt);
         if (Directory.Exists(_txt)) SaveDir = _txt;
@@ -228,11 +228,11 @@ public class masterControl : MonoBehaviour {
   }
 
   public void openRecordings() {
-    System.Diagnostics.Process.Start("explorer.exe", "/root," + SaveDir + Path.DirectorySeparatorChar + "Samples" + Path.DirectorySeparatorChar + "Recordings" + Path.DirectorySeparatorChar);
+//    System.Diagnostics.Process.Start("explorer.exe", "/root," + SaveDir + Path.DirectorySeparatorChar + "Samples" + Path.DirectorySeparatorChar + "Recordings" + Path.DirectorySeparatorChar);
   }
 
   public void openSavedScenes() {
-    System.Diagnostics.Process.Start("explorer.exe", "/root," + SaveDir + Path.DirectorySeparatorChar + "Saves" + Path.DirectorySeparatorChar);
+//    System.Diagnostics.Process.Start("explorer.exe", "/root," + SaveDir + Path.DirectorySeparatorChar + "Saves" + Path.DirectorySeparatorChar);
   }
 
   public void openVideoTutorials() {
