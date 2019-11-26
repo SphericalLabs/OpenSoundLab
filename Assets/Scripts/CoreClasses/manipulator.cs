@@ -330,9 +330,20 @@ public class manipulator : MonoBehaviour {
   }
 
   void updateProngs() {
-/*
     float val = 0;
-    if (masterControl.instance.currentPlatform == masterControl.platform.Vive) val = SteamVR_Controller.Input(controllerIndex).GetAxis(EVRButtonId.k_EButton_Axis1).x;
+//    if (masterControl.instance.currentPlatform == masterControl.platform.Vive) val = SteamVR_Controller.Input(controllerIndex).GetAxis(EVRButtonId.k_EButton_Axis1).x;
+            if (controllerIndex == 0)
+            {
+                val = Input.GetAxis("triggerR");
+            }
+            else if (controllerIndex == 1)
+            {
+                val = Input.GetAxis("triggerL");
+            }
+            else
+            {
+                val = 0;
+            }
 
     if (!usingOculus) {
       triggerTrans.localRotation = Quaternion.Euler(Mathf.Lerp(0, 45, val), 180, 0);
@@ -341,7 +352,6 @@ public class manipulator : MonoBehaviour {
     }
     tipL.localPosition = new Vector3(Mathf.Lerp(-.005f, 0, val), -.005f, -.018f);
     tipR.localPosition = new Vector3(Mathf.Lerp(.004f, -.001f, val), -.005f, -.018f);
-*/
   }
 
   bool showingTips = true;
@@ -428,11 +438,11 @@ public class manipulator : MonoBehaviour {
 //      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
                 if (controllerIndex == 0)
                 {
-                    secondaryDown = Input.GetButtonDown("Fire2");
+                    secondaryDown = Input.GetButtonDown("secondaryButtonR");
                 }
                 else if (controllerIndex == 1)
                 {
-                    secondaryDown = Input.GetButtonDown("Fire4");
+                    secondaryDown = Input.GetButtonDown("secondaryButtonL");
                 }
                 else
                 {
@@ -441,11 +451,11 @@ public class manipulator : MonoBehaviour {
 
                 if (controllerIndex == 0)
                 {
-                    secondaryUp = Input.GetButtonUp("Fire2");
+                    secondaryUp = Input.GetButtonUp("secondaryButtonR");
                 }
                 else if (controllerIndex == 1)
                 {
-                    secondaryUp = Input.GetButtonUp("Fire4");
+                    secondaryUp = Input.GetButtonUp("secondaryButtonL");
                 }
                 else
                 {
@@ -524,11 +534,11 @@ public class manipulator : MonoBehaviour {
 //        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
                 if (controllerIndex == 0)
                 {
-                    menuButtonDown = Input.GetButtonDown("Fire1");
+                    menuButtonDown = Input.GetButtonDown("menuButtonR");
                 }
                 else if (controllerIndex == 1)
                 {
-                    menuButtonDown = Input.GetButtonDown("Fire3");
+                    menuButtonDown = Input.GetButtonDown("menuButtonL");
                 }
                 else
                 {
@@ -543,11 +553,11 @@ public class manipulator : MonoBehaviour {
 //        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(EVRButtonId.k_EButton_A);
                 if (controllerIndex == 0)
                 {
-                    menuButtonDown = Input.GetButtonDown("Fire1");
+                    menuButtonDown = Input.GetButtonDown("menuButtonR");
                 }
                 else if (controllerIndex == 1)
                 {
-                    menuButtonDown = Input.GetButtonDown("Fire3");
+                    menuButtonDown = Input.GetButtonDown("menuButtonL");
                 }
                 else
                 {
