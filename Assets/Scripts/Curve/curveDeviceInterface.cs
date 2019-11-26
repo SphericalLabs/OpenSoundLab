@@ -31,7 +31,7 @@ public class curveDeviceInterface : deviceInterface {
 
   void setupLine() {
     int nodes = 65;
-    lr.numPositions = nodes;
+    lr.positionCount = nodes;
     Vector3[] points = new Vector3[nodes];
     for (int i = 0; i < nodes; i++) {
       float per = (float)i / (nodes - 1);

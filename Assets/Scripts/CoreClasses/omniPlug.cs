@@ -138,7 +138,7 @@ public class omniPlug : manipObject {
 
   void Update() {
     if (otherPlug == null) {
-      if (lr) lr.numPositions = 0;
+      if (lr) lr.positionCount = 0;
       Destroy(gameObject);
       return;
     }
@@ -295,19 +295,19 @@ public class omniPlug : manipObject {
   bool forcedWireShow = false;
   void updateLineVerts(bool justLast = false) {
     if (wireType == masterControl.WireMode.Curved) {
-      lr.numPositions = plugPath.Count;
+      lr.positionCount = plugPath.Count;
       if (justLast) lr.SetPosition(plugPath.Count - 1, plugPath.Last());
       else lr.SetPositions(plugPath.ToArray());
     } else if (wireType == masterControl.WireMode.Straight && plugPath.Count > 2) {
-      lr.numPositions = 2;
+      lr.positionCount = 2;
       lr.SetPosition(0, plugPath[0]);
       lr.SetPosition(1, plugPath.Last());
     } else if (forcedWireShow) {
-      lr.numPositions = 2;
+      lr.positionCount = 2;
       lr.SetPosition(0, plugPath[0]);
       lr.SetPosition(1, plugPath.Last());
     } else {
-      lr.numPositions = 0;
+      lr.positionCount = 0;
     }
   }
 
@@ -334,7 +334,7 @@ public class omniPlug : manipObject {
   public void Release() {
     foreach (omniJack j in targetJackList) j.flash(Color.black);
     if (connected == null) {
-      if (lr) lr.numPositions = 0;
+      if (lr) lr.positionCount = 0;
       otherPlug.Destruct();
       Destroy(gameObject);
     } else {
