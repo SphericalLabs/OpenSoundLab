@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // This is a placeholder script so that SoundStage runs without Sonic Ether Natural Bloom & Dirty Lens from the Unity Asset Store
 // You can purchase the asset here: http://u3d.as/7v5
 
@@ -46,7 +48,7 @@ Category {
 			v2f vert (appdata_t v)
 			{
 				v2f o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.color = v.color;
 				o.texcoord = TRANSFORM_TEX(v.texcoord,_MainTex);
 				return o;
