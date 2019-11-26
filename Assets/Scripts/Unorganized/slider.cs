@@ -44,9 +44,9 @@ public class slider : manipObject {
 
     if (labelsPresent) {
       labels = new Material[3];
-      labels[0] = transform.parent.FindChild("Label1").GetComponent<Renderer>().material;
-      labels[1] = transform.parent.FindChild("Label2").GetComponent<Renderer>().material;
-      labels[2] = transform.parent.FindChild("Label3").GetComponent<Renderer>().material;
+      labels[0] = transform.parent.Find("Label1").GetComponent<Renderer>().material;
+      labels[1] = transform.parent.Find("Label2").GetComponent<Renderer>().material;
+      labels[2] = transform.parent.Find("Label3").GetComponent<Renderer>().material;
 
       for (int i = 0; i < 2; i++) {
         labels[i].SetColor("_TintColor", labelColor);

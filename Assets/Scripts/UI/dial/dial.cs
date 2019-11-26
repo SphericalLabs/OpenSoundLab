@@ -31,18 +31,18 @@ public class dial : manipObject {
 
   public override void Awake() {
     base.Awake();
-    littleDisk = transform.FindChild("littleDisk").gameObject;
+    littleDisk = transform.Find("littleDisk").gameObject;
 
     mats = new Material[3];
     mats[0] = littleDisk.GetComponent<Renderer>().material;
-    mats[1] = transform.parent.FindChild("glowDisk").GetComponent<Renderer>().material;
-    mats[2] = transform.parent.FindChild("Label").GetComponent<Renderer>().material;
+    mats[1] = transform.parent.Find("glowDisk").GetComponent<Renderer>().material;
+    mats[2] = transform.parent.Find("Label").GetComponent<Renderer>().material;
 
     customColor = Color.HSVToRGB(hue, 227 / 255f, 206 / 255f);
 
     setGlowState(manipState.none);
 
-    dialFeedback = transform.parent.FindChild("glowDisk").GetComponent<glowDisk>();
+    dialFeedback = transform.parent.Find("glowDisk").GetComponent<glowDisk>();
   }
 
   void setGlowState(manipState s) {

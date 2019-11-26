@@ -126,7 +126,7 @@ public class menuItem : manipObject {
         seq.transform.Translate(Vector3.right * .081f, Space.Self);
         seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
       }
-      Destroy(g.transform.FindChild("stretchNode").gameObject);
+      Destroy(g.transform.Find("stretchNode").gameObject);
     }
 
     if (item == deviceType.Tapes) {
