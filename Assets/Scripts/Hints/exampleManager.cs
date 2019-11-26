@@ -97,7 +97,7 @@ public class exampleManager : MonoBehaviour {
   }
 
   void firstLoad() {
-    SaveLoadInterface.instance.Load(System.IO.Directory.GetParent(Application.dataPath).FullName + System.IO.Path.DirectorySeparatorChar + "examples" + System.IO.Path.DirectorySeparatorChar + "startExample.xml", true);
+    SaveLoadInterface.instance.Load(System.IO.Directory.GetParent(Application.persistentDataPath).FullName + System.IO.Path.DirectorySeparatorChar + "examples" + System.IO.Path.DirectorySeparatorChar + "startExample.xml", true);
 
     GameObject exampleParent = new GameObject("exampleParent");
     exampleParent.transform.position = new Vector3(-.5f, .5f, 0);
@@ -154,7 +154,7 @@ public class exampleManager : MonoBehaviour {
     GameObject prevParent = GameObject.Find("exampleParent");
     if (prevParent != null) Destroy(prevParent);
 
-    SaveLoadInterface.instance.Load(System.IO.Directory.GetParent(Application.dataPath).FullName + System.IO.Path.DirectorySeparatorChar + "examples" + System.IO.Path.DirectorySeparatorChar + s + ".xml", true);
+    SaveLoadInterface.instance.Load(System.IO.Directory.GetParent(Application.persistentDataPath).FullName + System.IO.Path.DirectorySeparatorChar + "examples" + System.IO.Path.DirectorySeparatorChar + s + ".xml", true);
 
     Vector3 avg = Vector3.zero;
     int objectCount = 0;
