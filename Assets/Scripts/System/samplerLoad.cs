@@ -148,7 +148,10 @@ public class samplerLoad : MonoBehaviour {
   }
 
   void OnDestroy() {
-    m_ClipHandle.Free();
+        if (m_ClipHandle.IsAllocated)
+        {
+            m_ClipHandle.Free();
+        }
   }
 
   public string[] queuedSample = new string[] { "", "" };
