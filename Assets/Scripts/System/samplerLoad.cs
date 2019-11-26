@@ -98,7 +98,10 @@ public class samplerLoad : MonoBehaviour {
       if (miniSpeaker != null) miniSpeaker.updateSecondary(false);
 
       // unallocate memory
+      if (m_ClipHandle.IsAllocated)
+      {
       m_ClipHandle.Free();
+      }
       for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
     }
   }
