@@ -53,7 +53,7 @@ public class sampleManager : MonoBehaviour {
 
     if (f.Substring(0, 3) == "APP") {
       f = f.Remove(0, 3);
-      f = f.Insert(0, Directory.GetParent(Application.dataPath).FullName + Path.DirectorySeparatorChar + "samples");
+      f = f.Insert(0, Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "samples");
     } else if (f.Substring(0, 3) == "DOC") {
       f = f.Remove(0, 3);
       f = f.Insert(0, masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples");
@@ -139,7 +139,7 @@ public class sampleManager : MonoBehaviour {
     instance = this;
     sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
 
-    string dir = Directory.GetParent(Application.dataPath).FullName + Path.DirectorySeparatorChar + "samples";
+    string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "samples";
     loadSampleDictionary(dir, "APP");
 
 
