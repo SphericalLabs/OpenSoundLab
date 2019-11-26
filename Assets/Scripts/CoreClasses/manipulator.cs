@@ -15,8 +15,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Valve.VR;
+//using System.Linq;
+//using Valve.VR;
 
 public class manipulator : MonoBehaviour {
   int controllerIndex = -1;
@@ -173,8 +173,8 @@ public class manipulator : MonoBehaviour {
   }
 
   public void hapticPulse(ushort hapticPower = 750) {
-    if (masterControl.instance.currentPlatform == masterControl.platform.Vive) SteamVR_Controller.Input(controllerIndex).TriggerHapticPulse(hapticPower);
-    else if (masterControl.instance.currentPlatform == masterControl.platform.Oculus) bigHaptic(hapticPower, .05f);
+   // if (masterControl.instance.currentPlatform == masterControl.platform.Vive) SteamVR_Controller.Input(controllerIndex).TriggerHapticPulse(hapticPower);
+  //  else if (masterControl.instance.currentPlatform == masterControl.platform.Oculus) bigHaptic(hapticPower, .05f);
   }
 
   Coroutine _hapticCoroutine;
@@ -330,6 +330,7 @@ public class manipulator : MonoBehaviour {
   }
 
   void updateProngs() {
+/*
     float val = 0;
     if (masterControl.instance.currentPlatform == masterControl.platform.Vive) val = SteamVR_Controller.Input(controllerIndex).GetAxis(EVRButtonId.k_EButton_Axis1).x;
 
@@ -340,6 +341,7 @@ public class manipulator : MonoBehaviour {
     }
     tipL.localPosition = new Vector3(Mathf.Lerp(-.005f, 0, val), -.005f, -.018f);
     tipR.localPosition = new Vector3(Mathf.Lerp(.004f, -.001f, val), -.005f, -.018f);
+*/
   }
 
   bool showingTips = true;
@@ -378,6 +380,7 @@ public class manipulator : MonoBehaviour {
 
   bool touchpadActive = false;
   public void viveTouchpadUpdate() {
+/*
     bool tOn = SteamVR_Controller.Input(controllerIndex).GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad);
     bool tOff = SteamVR_Controller.Input(controllerIndex).GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad);
 
@@ -413,6 +416,7 @@ public class manipulator : MonoBehaviour {
       if (controllerVisible) _touchpad.setPress(false);
       if (activeManipObj) selectedObject.setPress(false);
     }
+*/
   }
 
   void secondaryOculusButtonUpdate() {
@@ -420,10 +424,34 @@ public class manipulator : MonoBehaviour {
     bool secondaryUp = false;
 
     if (masterControl.instance.currentPlatform == masterControl.platform.Vive) {
-      secondaryDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
-      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
-    }
+//      secondaryDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
+//      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
+                if (controllerIndex == 0)
+                {
+                    secondaryDown = Input.GetButtonDown("Fire2");
+                }
+                else if (controllerIndex == 1)
+                {
+                    secondaryDown = Input.GetButtonDown("Fire4");
+                }
+                else
+                {
+                    secondaryDown = false;
+                }
 
+                if (controllerIndex == 0)
+                {
+                    secondaryUp = Input.GetButtonUp("Fire2");
+                }
+                else if (controllerIndex == 1)
+                {
+                    secondaryUp = Input.GetButtonUp("Fire4");
+                }
+                else
+                {
+                    secondaryUp = false;
+                }
+    }
     if (controllerVisible) {
       if (secondaryDown) {
         if (copyEnabled) SetCopy(true);
@@ -450,17 +478,81 @@ public class manipulator : MonoBehaviour {
     bool triggerButtonDown, triggerButtonUp, menuButtonDown;
 
     if (masterControl.instance.currentPlatform == masterControl.platform.Vive) {
-      triggerButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger);
-      triggerButtonUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Trigger);
+//      triggerButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger);
+//      triggerButtonUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Trigger);
+        if (!triggerDown)
+        {
+                if (controllerIndex == 0)
+                {
+                    triggerButtonDown = Input.GetAxis("triggerR") > 0.75;
+                }
+                else if (controllerIndex == 1)
+                {
+                    triggerButtonDown = Input.GetAxis("triggerL") > 0.75;
+                }
+                else
+                {
+                    triggerButtonDown = false;
+                }
+        }
+        else
+        {
+            triggerButtonDown = false;
+        }
+        if (triggerDown)
+        {
+                if (controllerIndex == 0)
+                {
+                    triggerButtonUp = Input.GetAxis("triggerR") < 0.25;
+                }
+                else if (controllerIndex == 1)
+                {
+                    triggerButtonUp = Input.GetAxis("triggerL") < 0.25;
+                }
+                else
+                {
+                    triggerButtonUp = false;
+                }
+        }
+        else
+        {
+            triggerButtonUp = false;
+        }
 
       if (!usingOculus) {
         viveTouchpadUpdate();
-        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
+//        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
+                if (controllerIndex == 0)
+                {
+                    menuButtonDown = Input.GetButtonDown("Fire1");
+                }
+                else if (controllerIndex == 1)
+                {
+                    menuButtonDown = Input.GetButtonDown("Fire3");
+                }
+                else
+                {
+                    menuButtonDown = false;
+                }
       } else {
+/*
         Vector2 pos = SteamVR_Controller.Input(controllerIndex).GetAxis();
         if (grabbing && selectedObject != null) selectedObject.updateTouchPos(pos);
+*/
         secondaryOculusButtonUpdate();
-        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(EVRButtonId.k_EButton_A);
+//        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(EVRButtonId.k_EButton_A);
+                if (controllerIndex == 0)
+                {
+                    menuButtonDown = Input.GetButtonDown("Fire1");
+                }
+                else if (controllerIndex == 1)
+                {
+                    menuButtonDown = Input.GetButtonDown("Fire3");
+                }
+                else
+                {
+                    menuButtonDown = false;
+                }
       }
     } else {
       triggerButtonDown = triggerButtonUp = menuButtonDown = false;
