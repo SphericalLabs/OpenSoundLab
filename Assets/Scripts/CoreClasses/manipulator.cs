@@ -575,10 +575,22 @@ public class manipulator : MonoBehaviour {
                     menuButtonDown = false;
                 }
       } else {
-/*
-        Vector2 pos = SteamVR_Controller.Input(controllerIndex).GetAxis();
-        if (grabbing && selectedObject != null) selectedObject.updateTouchPos(pos);
-*/
+                Vector2 pos; // = SteamVR_Controller.Input(controllerIndex).GetAxis();
+                if (controllerIndex == 0)
+                {
+                    pos = new Vector2(Input.GetAxis("touchAxisXR"), Input.GetAxis("touchAxisYR"));
+                }
+                else if (controllerIndex == 1)
+                {
+                    pos = new Vector2(Input.GetAxis("touchAxisXL"), Input.GetAxis("touchAxisYL"));
+                }
+                else
+                {
+                    pos = new Vector2(0.5f, 0.5f);
+                }
+
+                if (grabbing && selectedObject != null) selectedObject.updateTouchPos(pos);
+
         secondaryOculusButtonUpdate();
 //        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(EVRButtonId.k_EButton_A);
                 if (controllerIndex == 0)
