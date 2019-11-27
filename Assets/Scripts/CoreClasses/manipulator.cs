@@ -390,13 +390,32 @@ public class manipulator : MonoBehaviour {
 
   bool touchpadActive = false;
   public void viveTouchpadUpdate() {
-/*
-    bool tOn = SteamVR_Controller.Input(controllerIndex).GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad);
-    bool tOff = SteamVR_Controller.Input(controllerIndex).GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad);
 
-    bool pOn = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Touchpad);
-    bool pOff = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Touchpad);
 
+    bool tOn; // = SteamVR_Controller.Input(controllerIndex).GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad);
+    bool tOff; // = SteamVR_Controller.Input(controllerIndex).GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad);
+
+    bool pOn; // = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Touchpad);
+    bool pOff; // = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Touchpad);
+
+        if (controllerIndex == 0)
+        {
+            tOn = Input.GetButtonDown("touchR");
+            tOff = Input.GetButtonUp("touchR");
+            pOn = Input.GetButtonDown("pressR");
+            pOff = Input.GetButtonUp("pressR");
+        }
+        else if (controllerIndex == 1)
+        {
+            tOn = Input.GetButtonDown("touchL");
+            tOff = Input.GetButtonUp("touchL");
+            pOn = Input.GetButtonDown("pressL");
+            pOff = Input.GetButtonUp("pressL");
+        }
+        else
+        {
+            tOn = tOff = pOn = pOff = false;
+        }
     bool activeManipObj = (grabbing && selectedObject != null);
 
     if (tOn) {
@@ -412,7 +431,19 @@ public class manipulator : MonoBehaviour {
 
     if (!touchpadActive) return;
 
-    Vector2 pos = SteamVR_Controller.Input(controllerIndex).GetAxis();
+    Vector2 pos; // = SteamVR_Controller.Input(controllerIndex).GetAxis();
+        if (controllerIndex == 0)
+        {
+            pos = new Vector2(Input.GetAxis("touchAxisXR"), Input.GetAxis("touchAxisYR"));
+        }
+        else if (controllerIndex == 1)
+        {
+            pos = new Vector2(Input.GetAxis("touchAxisXL"), Input.GetAxis("touchAxisYL"));
+        }
+        else
+        {
+            pos = new Vector2(0.5f, 0.5f);
+        }
     if (controllerVisible) _touchpad.updateTouchPos(pos);
     if (activeManipObj) selectedObject.updateTouchPos(pos);
 
@@ -426,7 +457,6 @@ public class manipulator : MonoBehaviour {
       if (controllerVisible) _touchpad.setPress(false);
       if (activeManipObj) selectedObject.setPress(false);
     }
-*/
   }
 
   void secondaryOculusButtonUpdate() {
