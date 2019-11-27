@@ -1,6 +1,6 @@
 The original project is no longer actively developed or maintained.
 
-Trying to port it to and updated Unity, SteamVR and Oculus Engines and get it to run on an Oculus Quest.
+Trying to port it to an updated Unity, SteamVR and Oculus Engines and get it to run on an Oculus Quest.
 
 # SoundStage VR
 
