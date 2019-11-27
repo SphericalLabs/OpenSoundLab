@@ -1,4 +1,6 @@
-This project is no longer actively developed or maintained.
+The original project is no longer actively developed or maintained.
+
+Trying to port it to and updated Unity, SteamVR and Oculus Engines and get it to run on an Oculus Quest.
 
 # SoundStage VR
 
@@ -7,22 +9,22 @@ SoundStage VR is a virtual reality music sandbox built specifically for room-sca
 This is not an officially supported Google product.
 
 ## Requirements
-* An HTC Vive or Oculus Touch running SteamVR
-* Unity 5.5.5f1 if you'd like to modify the project
+* An SteamVR or Oculus running on a PC 
+* Unity 2019.2.13.f1 if you'd like to modify the project
 
 ## Setup
 The Unity project can run without any additional components - just open the main scene to get started. 
 
 That being said, the project is missing two third-party components available in the Unity Asset Store:
 
-* [SE Natural Bloom & Dirty Lens](http://u3d.as/7v5) creates the glow and bloom effects seen in the released software
+* [SE Natural Bloom & Dirty Lens] (https://github.com/sonicether/SE-Natural-Bloom-Dirty-Lens) creates the glow and bloom effects seen in the released software, no longer available on Unity (http://u3d.as/7v5)
 * [Runtime AudioClip Loader](http://u3d.as/hEP) enables MP3 sample loading and improves the performance of all sample loading
 
 To use each of these assets, add the full asset package to the *third_party* folder. If they are not automatically replaced, remove the corresponding placeholder scripts in that same folder.
 
 A full build of the project with the third-party components is included in the *bin* folder.
 
-### Credits
+### Original Credits
 ###### CREATED BY
 Logan Olson
 
