@@ -9,7 +9,7 @@ SoundStage VR is a virtual reality music sandbox built specifically for room-sca
 This is not an officially supported Google product.
 
 ## Requirements
-* An SteamVR or Oculus running on a PC 
+* An SteamVR or Oculus running on a PC or Oculus Quest
 * Unity 2019.2.13.f1 if you'd like to modify the project
 
 ## Setup
