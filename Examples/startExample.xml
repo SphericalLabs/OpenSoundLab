@@ -1171,15 +1171,15 @@
       <rowSamples>
         <ArrayOfString>
           <string>909 Kick 2</string>
-          <string>APP/909 Drums/909 Kick 2.wav</string>
+          <string>APP\909 Drums\909 Kick 2.wav</string>
         </ArrayOfString>
         <ArrayOfString>
           <string>808 HH Closed</string>
-          <string>APP/808 Drums/808 HH Closed.wav</string>
+          <string>APP\808 Drums\808 HH Closed.wav</string>
         </ArrayOfString>
         <ArrayOfString>
           <string>808 Snare 2</string>
-          <string>APP/808 Drums/808 Snare 2.wav</string>
+          <string>APP\808 Drums\808 Snare 2.wav</string>
         </ArrayOfString>
         <ArrayOfString>
           <string />
@@ -1366,7 +1366,7 @@
       <jackOutSampID>-324680</jackOutSampID>
       <jackOutSigID>-324522</jackOutSigID>
       <tapeLabel>Rock Snare</tapeLabel>
-      <tapeFile>APP/Rock/Rock Snare.wav</tapeFile>
+      <tapeFile>APP\Rock\Rock Snare.wav</tapeFile>
     </Instruments>
     <Instruments xsi:type="DrumData">
       <ID>-324056</ID>
@@ -1395,7 +1395,7 @@
       <jackOutSampID>-324284</jackOutSampID>
       <jackOutSigID>-324126</jackOutSigID>
       <tapeLabel>Rock Tom 1</tapeLabel>
-      <tapeFile>APP/Rock/Rock Tom 1.wav</tapeFile>
+      <tapeFile>APP\Rock\Rock Tom 1.wav</tapeFile>
     </Instruments>
     <Instruments xsi:type="DrumData">
       <ID>-323644</ID>
@@ -1424,7 +1424,7 @@
       <jackOutSampID>-323872</jackOutSampID>
       <jackOutSigID>-323714</jackOutSigID>
       <tapeLabel>Rock Crash 1</tapeLabel>
-      <tapeFile>APP/Rock/Rock Crash 1.wav</tapeFile>
+      <tapeFile>APP\Rock\Rock Crash 1.wav</tapeFile>
     </Instruments>
   </Instruments>
   <Plugs />
