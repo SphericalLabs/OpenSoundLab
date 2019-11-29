@@ -43,7 +43,7 @@ public class platformSetup : MonoBehaviour {
   }
 
   void oculusSwitch() {
-//    manips[0].invertScale();
+    manips[0].invertScale(); // this actually makes the controller model L and R handed.
     manips[0].changeHW("oculus");
     manips[1].changeHW("oculus");
   }
