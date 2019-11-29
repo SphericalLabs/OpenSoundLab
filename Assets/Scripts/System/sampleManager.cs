@@ -51,7 +51,7 @@ public class sampleManager : MonoBehaviour {
 
     if (f == "") return "";
 
-    if (f.Substring(0, 3) == "APP") {
+        if (f.Substring(0, 3) == "APP") {
       f = f.Remove(0, 3);
       f = f.Insert(0, Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "samples");
     } else if (f.Substring(0, 3) == "DOC") {
@@ -117,8 +117,12 @@ public class sampleManager : MonoBehaviour {
     if (Directory.Exists(dir)) {
       string[] subdirs = Directory.GetDirectories(dir);
       for (int i = 0; i < subdirs.Length; i++) {
-        string s = subdirs[i].Replace(dir + "\\", "");
-        sampleDictionary[s] = new Dictionary<string, string>();
+#if UNITY_ANDROID
+               string s = subdirs[i].Replace(dir + "/", "");
+#elif UNITY_STANDALONE_WIN
+               string s = subdirs[i].Replace(dir + "\\", "");
+#endif
+                sampleDictionary[s] = new Dictionary<string, string>();
 
         for (int i2 = 0; i2 < 3; i2++) {
           string[] subdirFiles = Directory.GetFiles(subdirs[i], fileEndings[i2]);
