@@ -173,26 +173,63 @@ public class manipulator : MonoBehaviour {
   }
 
   public void hapticPulse(ushort hapticPower = 750) {
-   // if (masterControl.instance.currentPlatform == masterControl.platform.Vive) SteamVR_Controller.Input(controllerIndex).TriggerHapticPulse(hapticPower);
-  //  else if (masterControl.instance.currentPlatform == masterControl.platform.Oculus) bigHaptic(hapticPower, .05f);
-  }
+        // if (masterControl.instance.currentPlatform == masterControl.platform.Vive) SteamVR_Controller.Input(controllerIndex).TriggerHapticPulse(hapticPower);
+        //  else if (masterControl.instance.currentPlatform == masterControl.platform.Oculus) bigHaptic(hapticPower, .05f);
+        List<UnityEngine.XR.InputDevice> devices = new List<UnityEngine.XR.InputDevice>();
 
-  Coroutine _hapticCoroutine;
-  public void bigHaptic(ushort hapticPower = 750, float dur = .1f) {
-    if (_hapticCoroutine != null) StopCoroutine(_hapticCoroutine);
-    _hapticCoroutine = StartCoroutine(hapticCoroutine(hapticPower, dur));
-  }
+        if (controllerIndex == 0)
+        {
+            UnityEngine.XR.InputDevices.GetDevicesWithRole(UnityEngine.XR.InputDeviceRole.LeftHanded, devices);
+        }
+        else if (controllerIndex == 1)
+        {
+            UnityEngine.XR.InputDevices.GetDevicesWithRole(UnityEngine.XR.InputDeviceRole.RightHanded, devices);
+        }
 
-  IEnumerator hapticCoroutine(ushort hapticPower, float dur) {
-    if (masterControl.instance.currentPlatform == masterControl.platform.Vive) {
-      float t = 0;
-      while (t < dur) {
-        t += Time.deltaTime;
-        hapticPulse(hapticPower);
-        yield return null;
-      }
+        foreach (var device in devices)
+        {
+            UnityEngine.XR.HapticCapabilities capabilities;
+            if (device.TryGetHapticCapabilities(out capabilities))
+            {
+                if (capabilities.supportsImpulse)
+                {
+                    uint channel = 0;
+                    float amplitude = hapticPower / 3999.0f;
+                    float duration = 0.05f;
+                    device.SendHapticImpulse(channel, amplitude, duration);
+                }
+            }
+        }
     }
-  }
+    
+    public void bigHaptic(ushort hapticPower = 750, float dur = 0.1f) {
+        //   if (_hapticCoroutine != null) StopCoroutine(_hapticCoroutine);
+        //   _hapticCoroutine = StartCoroutine(hapticCoroutine(hapticPower, dur));
+        List<UnityEngine.XR.InputDevice> devices = new List<UnityEngine.XR.InputDevice>();
+
+        if (controllerIndex == 0)
+        {
+            UnityEngine.XR.InputDevices.GetDevicesWithRole(UnityEngine.XR.InputDeviceRole.LeftHanded, devices);
+        }
+        else if (controllerIndex == 1)
+        {
+            UnityEngine.XR.InputDevices.GetDevicesWithRole(UnityEngine.XR.InputDeviceRole.RightHanded, devices);
+        }
+
+        foreach (var device in devices)
+        {
+            UnityEngine.XR.HapticCapabilities capabilities;
+            if (device.TryGetHapticCapabilities(out capabilities))
+            {
+                if (capabilities.supportsImpulse)
+                {
+                    uint channel = 0;
+                    float amplitude = hapticPower / 3999.0f;
+                    device.SendHapticImpulse(channel, amplitude, dur);
+                }
+            }
+        }
+    }
 
   void LateUpdate() {
     if (grabbing) return;
