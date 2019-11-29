@@ -35,7 +35,7 @@ public class platformSetup : MonoBehaviour {
       manips[0].transform.parent.localPosition = Vector3.zero;
       manips[1].transform.parent.localPosition = Vector3.zero;
 
-//      if (SteamVR.instance.hmd_TrackingSystemName == "oculus") oculusSwitch();
+      if (UnityEngine.XR.XRSettings.loadedDeviceName == "Oculus") oculusSwitch();
 
       manips[0].SetDeviceIndex(0);
       manips[1].SetDeviceIndex(1);
@@ -44,13 +44,12 @@ public class platformSetup : MonoBehaviour {
 
   void oculusSwitch() {
 //    manips[0].invertScale();
-//    manips[0].changeHW("oculus");
-//    manips[1].changeHW("oculus");
+    manips[0].changeHW("oculus");
+    manips[1].changeHW("oculus");
   }
 
   void Start() {
     manips[0].toggleTips(false);
-    //manips[1].toggleTips(false);
     }
 
 }
