@@ -117,10 +117,10 @@ public class sampleManager : MonoBehaviour {
     if (Directory.Exists(dir)) {
       string[] subdirs = Directory.GetDirectories(dir);
       for (int i = 0; i < subdirs.Length; i++) {
-#if UNITY_ANDROID
-               string s = subdirs[i].Replace(dir + "/", "");
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-               string s = subdirs[i].Replace(dir + "\\", "");
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                string s = subdirs[i].Replace(dir + "\\", "");
+#elif UNITY_ANDROID
+                string s = subdirs[i].Replace(dir + "/", "");
 #endif
                 sampleDictionary[s] = new Dictionary<string, string>();
 
