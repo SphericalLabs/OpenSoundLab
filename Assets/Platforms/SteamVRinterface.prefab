@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c12500f3afdeb24d9444042960a4cb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shader: {fileID: 4800000, guid: 6581f8d2f208b8340b8d59c7bf38cc9a, type: 3}
+  shader: {fileID: 4800000, guid: e14e8250c4a18584fba0b34b47553a9c, type: 3}
   bloomIntensity: 0.05
   bloomScatterFactor: 0.5
   lensDirtScatterFactor: 0.5
@@ -252,7 +252,7 @@ Skybox:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012732218472}
   m_Enabled: 1
-  m_CustomSkybox: {fileID: 2100000, guid: 8fc60139202ee3f4a9593110da628309, type: 2}
+  m_CustomSkybox: {fileID: 2100000, guid: 1ce746eab45682a42bbeeea21e016bbc, type: 2}
 --- !u!1 &1000013547997314
 GameObject:
   m_ObjectHideFlags: 0
