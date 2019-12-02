@@ -83,10 +83,10 @@ public class button : manipObject {
 
   public void Highlight(bool on) {
     if (on) {
-      glowMat.SetFloat("_EmissionGain", .9f);
+      glowMat.SetFloat("_EmissionGain", .9f - .1f);
       offMat.SetColor("_Color", glowColor);
     } else {
-      glowMat.SetFloat("_EmissionGain", .7f);
+      glowMat.SetFloat("_EmissionGain", .7f - .1f);
       offMat.SetColor("_Color", offColor);
     }
   }
