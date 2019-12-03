@@ -456,12 +456,12 @@ public class manipulator : MonoBehaviour {
     bool activeManipObj = (grabbing && selectedObject != null);
 
     if (tOn) {
-      touchpadActive = true;
+            touchpadActive = true;
       if (controllerVisible) _touchpad.setTouch(true);
       if (activeManipObj) selectedObject.setTouch(true);
     }
     if (tOff) {
-      touchpadActive = false;
+            touchpadActive = false;
       if (controllerVisible) _touchpad.setTouch(false);
       if (activeManipObj) selectedObject.setTouch(false);
     }
@@ -491,7 +491,7 @@ public class manipulator : MonoBehaviour {
     }
 
     if (pOff) {
-      if (controllerVisible) _touchpad.setPress(false);
+            if (controllerVisible) _touchpad.setPress(false);
       if (activeManipObj) selectedObject.setPress(false);
     }
   }
@@ -596,8 +596,8 @@ public class manipulator : MonoBehaviour {
             triggerButtonUp = false;
         }
 
-      if (!usingOculus) {
-        viveTouchpadUpdate();
+            viveTouchpadUpdate();
+            if (!usingOculus) {
 //        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
                 if (controllerIndex == 0)
                 {
