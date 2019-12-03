@@ -87,7 +87,7 @@ public class airhornUI : manipObject {
     highlightMat = r.material;
 
     highlight.transform.SetParent(transform, false);
-    highlight.transform.localScale = new Vector3(1.15f, 1.05f, 1.1f);
+    highlight.transform.localScale = new Vector3(1.05f, 1f, 1.05f);
     highlight.transform.position = canObject.transform.position;// new Vector3(0,-.0025f,0);
     highlightMat.SetColor("_TintColor", glowColor);
     highlightMat.SetFloat("_EmissionGain", .75f);
