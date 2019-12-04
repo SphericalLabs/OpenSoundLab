@@ -17,6 +17,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ICSharpCode.SharpZipLib.Tar;
+using ICSharpCode.SharpZipLib.GZip;
 
 public class sampleManager : MonoBehaviour {
   public static sampleManager instance;
@@ -137,10 +139,53 @@ public class sampleManager : MonoBehaviour {
     }
   }
 
-  string[] fileEndings = new string[] { "*.wav", "*.ogg", "*.mp3" };
+    string[] fileEndings = new string[] { "*.wav", "*.ogg", "*.mp3" };
 
   public void Init() {
-    instance = this;
+
+#if UNITY_STANDALONE_WIN
+                Debug.Log("unzipping to persistent data path (windows)");
+                Utility_SharpZipCommands.ExtractTGZ (Application.streamingAssetsPath + "/" + "Data.tgz",Application.persistentDataPath);
+#endif
+#if UNITY_ANDROID
+        //if Examples doesn't exist, extract default data...
+        if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples") == false)
+        {
+            Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples");
+            //copy tgz to directory where we can extract it
+            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Examples.tgz");
+            while (!www.isDone) { }
+            System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", www.bytes);
+            //extract it
+            Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples");
+            //delete tgz
+            File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz");
+        }
+        else
+        {
+            Debug.Log("Examples does exist, will not extract default data.");
+        }
+
+        //if Examples doesn't exist, extract default data...
+        if (File.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
+        {
+            Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
+            //copy tgz to directory where we can extract it
+            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+            while (!www.isDone) { }
+            System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
+            //extract it
+            Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
+            //delete tgz
+            File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
+        }
+        else
+        {
+            Debug.Log("Examples does exist, will not extract default data.");
+        }
+#endif
+
+        instance = this;
     sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
 
     string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "samples";
