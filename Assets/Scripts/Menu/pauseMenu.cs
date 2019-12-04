@@ -149,7 +149,15 @@ public class pauseMenu : MonoBehaviour {
     }
     if (t == itemType.confirmItem) {
       if (curItem == itemType.exitItem) {
-        Application.Quit();
+                
+        // avoid audio stuttering as Unity tries to shutdown
+        AudioSource[] allAudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+        foreach (AudioSource audioS in allAudioSources)
+        {
+            audioS.Stop();
+        }
+
+    Application.Quit();
         toggleMenu();
       } else if (curItem == itemType.newItem) {
         metronome m = FindObjectOfType<metronome>();
