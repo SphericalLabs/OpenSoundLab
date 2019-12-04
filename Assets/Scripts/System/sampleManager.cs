@@ -167,7 +167,7 @@ public class sampleManager : MonoBehaviour {
         }
 
         //if Examples doesn't exist, extract default data...
-        if (File.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
+        if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
         {
             Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
             //copy tgz to directory where we can extract it
@@ -188,7 +188,7 @@ public class sampleManager : MonoBehaviour {
         instance = this;
     sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
 
-    string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "samples";
+    string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";
     loadSampleDictionary(dir, "APP");
 
 
