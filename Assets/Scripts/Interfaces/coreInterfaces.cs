@@ -21,7 +21,11 @@ public class componentInterface : MonoBehaviour {
   public virtual void hit(bool on, int ID = -1) {
   }
 
-  public virtual void hit(bool on, int IDx, int IDy) {
+    public virtual void hit(bool on, int ID = -1, float velocity = 0.4f)
+    {
+    }
+
+    public virtual void hit(bool on, int IDx, int IDy) {
   }
 
   public virtual void onSelect(bool on, int ID = -1) {

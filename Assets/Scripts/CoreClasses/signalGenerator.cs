@@ -22,10 +22,9 @@ public class signalGenerator : MonoBehaviour
     protected double _sampleRate;
     protected double _sampleDuration;
     public double _phase;
-
     public bool useNativeIfAvailable = true;
 
-    float levelVal = 1;
+    public float levelVal = 1;
 
     protected const int MAX_BUFFER_LENGTH = 2048; // Very important to enforce this 
 
@@ -75,7 +74,7 @@ public class signalGenerator : MonoBehaviour
             double sample = Mathf.Sin((float)_phase * 2 * Mathf.PI);
 
             float frequency = 440;
-            float amplitude = 0.5f;
+            float amplitude = levelVal/2;
 
             _phase += frequency * _sampleDuration;
 

@@ -59,7 +59,7 @@ public class clipPlayerSimple : clipPlayer {
 
 
     floatingBufferCount = ClipSignalGenerator(buffer, speedBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, false, false, seqGen != null, floatingBufferCount, sampleBounds,
-   playbackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, true, false, _sampleDuration, bufferCount, ref active);
+   playbackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, seqGen.levelVal, true, false, _sampleDuration, bufferCount, ref active);
 
     _lastBuffer = floatingBufferCount;
   }
