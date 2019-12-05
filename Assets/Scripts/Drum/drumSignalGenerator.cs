@@ -34,14 +34,13 @@ public class drumSignalGenerator : signalGenerator
         hitdur = AudioSettings.outputSampleRate / 10;
     }
 
-    public void setKeyActive(bool on, int ID, float velocityHit)
+    public void setKeyActive(bool on, int ID)
     {
         if (on)
         {
             newSignal = true;
             signalOn = true;
             counter = hitdur;
-            levelVal = velocityHit;
         }
     }
 

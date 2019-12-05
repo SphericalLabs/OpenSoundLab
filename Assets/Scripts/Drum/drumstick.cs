@@ -105,10 +105,7 @@ public class drumstick : manipObject {
 
       if (posFlat.magnitude < .175f) {
         if (lastStickPos[i].y > -.004f && pos.y <= -.004f) {
-                    Rigidbody rb = sticktip.transform.GetComponent<Rigidbody>();
-                    float velocity = System.Math.Abs(lastStickPos[i].magnitude - pos.magnitude) * 100;
-                    pads[i].keyHit(true, velocity);
-                    
+          pads[i].keyHit(true);
           if (manipulatorObjScript != null) manipulatorObjScript.bigHaptic(3999, .1f);
         }
       }

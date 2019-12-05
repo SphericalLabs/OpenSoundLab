@@ -70,13 +70,13 @@ public class drumDeviceInterface : deviceInterface {
     samp.SetSample(data.tapeLabel, data.tapeFile);
   }
 
-  public override void hit(bool on, int ID = -1, float velocity = 0.4f) {
+  public override void hit(bool on, int ID = -1) {
     if (on) {
-      if (sigOut.near == null && sampOut.near == null && !samp.hasTape()) {    
-       defaultAudioSource.PlayOneShot(offClip, velocity);
+      if (sigOut.near == null && sampOut.near == null && !samp.hasTape()) {
+        defaultAudioSource.PlayOneShot(offClip, .4f);
       }
     }
-    drumSig.setKeyActive(on, ID, velocity);
+    drumSig.setKeyActive(on, ID);
   }
 }
 public class DrumData : InstrumentData {

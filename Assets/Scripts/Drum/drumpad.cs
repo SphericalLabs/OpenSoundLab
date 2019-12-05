@@ -41,16 +41,16 @@ public class drumpad : MonoBehaviour {
 
   IEnumerator offRoutine() {
     yield return new WaitForSeconds(0.1f);
-    _deviceInterface.hit(false, -1);
+    _deviceInterface.hit(false);
     rend.material = offMat;
   }
 
   Coroutine offCoroutine;
   public bool isHit = false;
-  public void keyHit(bool on, float velocity = 0.4f) {
+  public void keyHit(bool on) {
     isHit = on;
     if (on) {
-      _deviceInterface.hit(on, -1, velocity);
+      _deviceInterface.hit(on);
       rend.material = glowMat;
       if (offCoroutine != null) StopCoroutine(offRoutine());
       offCoroutine = StartCoroutine(offRoutine());
