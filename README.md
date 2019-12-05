@@ -50,7 +50,6 @@ A laundry list of things I could do, might do, maybe won't do, etc. and things t
 * Add scale support for keyboard and xylo roll
 * Add midi on Android
 * Remove mountain background and replace with static skyboard, make skyboxes selectable
-* Figure out what little white button on metronome does or is suppose to do
 * Improve performance
 * Improve graphics
 * Improve sound
@@ -58,7 +57,6 @@ A laundry list of things I could do, might do, maybe won't do, etc. and things t
 * Make velocity drumpads selectable or improve velocity detection to be more reliable from Jarity fork
 * Some combinations of connections result in no sound or garbled sound, figure out what those cases are and try and fix
 * Fix camera display
-* Metronome sometimes has decimals
 * Multiplayer
 
 
