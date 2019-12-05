@@ -143,30 +143,8 @@ public class sampleManager : MonoBehaviour {
 
   public void Init() {
 
-#if UNITY_STANDALONE_WIN
-                Debug.Log("unzipping to persistent data path (windows)");
-                Utility_SharpZipCommands.ExtractTGZ (Application.streamingAssetsPath + "/" + "Data.tgz",Application.persistentDataPath);
-#endif
 #if UNITY_ANDROID
-        //if Examples doesn't exist, extract default data...
-        if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples") == false)
-        {
-            Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples");
-            //copy tgz to directory where we can extract it
-            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Examples.tgz");
-            while (!www.isDone) { }
-            System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", www.bytes);
-            //extract it
-            Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples");
-            //delete tgz
-            File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz");
-        }
-        else
-        {
-            Debug.Log("Examples does exist, will not extract default data.");
-        }
-
-        //if Examples doesn't exist, extract default data...
+        //if Samples directory doesn't exist, extract default data...
         if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
         {
             Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
@@ -178,10 +156,6 @@ public class sampleManager : MonoBehaviour {
             Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
             //delete tgz
             File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
-        }
-        else
-        {
-            Debug.Log("Examples does exist, will not extract default data.");
         }
 #endif
 

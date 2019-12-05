@@ -39,8 +39,11 @@
                 //
                 string[] filenames = Directory.GetFiles(sourceDirectory);
                 foreach (string filename in filenames) {
-                    tarEntry = TarEntry.CreateEntryFromFile(filename);
-                    tarArchive.WriteEntry(tarEntry, true);
+            if (!filename.EndsWith(".meta"))
+            {
+                tarEntry = TarEntry.CreateEntryFromFile(filename);
+                tarArchive.WriteEntry(tarEntry, true);
+            }
                 }
      
                 if (recurse) {
