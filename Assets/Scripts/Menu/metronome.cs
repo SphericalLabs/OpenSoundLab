@@ -53,7 +53,7 @@ public class metronome : componentInterface {
     bpmpercent = (bpm - 40) / 160;
 
     bpmDial.setPercent(bpmpercent);
-    txt.text = bpm.ToString("N1");
+    txt.text = bpm.ToString();
   }
 
   bool rodDir = false;
