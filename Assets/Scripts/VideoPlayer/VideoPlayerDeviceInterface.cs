@@ -41,14 +41,14 @@ public class VideoPlayerDeviceInterface : componentInterface {
  //       vidPlayer = gameObject.AddComponent<UnityEngine.Video.VideoPlayer>();
 
         //vidFilename = vidFilename.Replace(".ogv", ".mp4");
-        vidPlayer.url = Application.streamingAssetsPath + "/" + vidFilename;
+ /*       vidPlayer.url = Application.streamingAssetsPath + "/" + vidFilename;
 
         vidPlayer.playOnAwake = false;
         vidPlayer.isLooping = false;
         vidPlayer.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
         vidPlayer.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
         vidPlayer.targetMaterialProperty = "_MainTex";
-        vidPlayer.Prepare();
+        vidPlayer.Prepare(); */
     }
 
     tooltips _tooltip;
@@ -73,6 +73,8 @@ public class VideoPlayerDeviceInterface : componentInterface {
 
     void endPlayback() {
         playing = false;
+        loading = false;
+        loaded = false;
         //movieTexture.Stop();
         vidPlayer.Stop();
         vidQuad.SetActive(false);
@@ -84,13 +86,20 @@ public class VideoPlayerDeviceInterface : componentInterface {
     public void togglePlay() {
         playing = !playing;
         if (playing) {
-            if (loaded) {
+            if (loaded)
+            {
                 vidQuad.SetActive(true);
                 //movieTexture.Play();
                 //source.Play();
                 vidPlayer.Play();
                 masterControl.instance.toggleInstrumentVolume(false);
-            } else if (!loading) StartCoroutine(movieRoutine());
+            }
+            else if (!loading)
+            {
+ //               loading = true;
+ //               loaded = false;
+                StartCoroutine(movieRoutine());
+            }
         } else if (loaded) {
             //movieTexture.Pause();
             vidPlayer.Pause();
@@ -101,7 +110,7 @@ public class VideoPlayerDeviceInterface : componentInterface {
     void OnDisable() {
         //   if (movieTexture != null) {
         endPlayback();
-        videoSurface.material.mainTexture = null;
+        //videoSurface.material.mainTexture = null;
         //      movieTexture = null;
         //    }
         loading = false;
@@ -123,11 +132,12 @@ public class VideoPlayerDeviceInterface : componentInterface {
         while (!vidPlayer.isPrepared) {
                 yield return new WaitForSeconds(.1f); ;
         }
-        loading = false;
-        loaded = true;
+        //loading = false;
+        //loaded = true;
 
-        vidPlayer.playOnAwake = false;
-        vidPlayer.isLooping = false;
+        //vidPlayer.waitForFirstFrame = true;
+        //vidPlayer.playOnAwake = false;
+        //vidPlayer.isLooping = false;
         vidPlayer.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
         vidPlayer.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
         vidPlayer.targetMaterialProperty = "_MainTex";
@@ -143,8 +153,8 @@ public class VideoPlayerDeviceInterface : componentInterface {
         } else {
             vidQuad.SetActive(false);
         }
-        //loading = false;
-        //loaded = true;
+        loading = false;
+        loaded = true;
 }
     private void VideoPlayer_errorReceived(VideoPlayer source, string message)
     {
