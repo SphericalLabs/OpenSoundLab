@@ -14,6 +14,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Video;
@@ -23,12 +24,10 @@ public class VideoPlayerDeviceInterface : componentInterface {
     public string vidFilename;
     public Renderer videoSurface;
     public GameObject vidQuad;
-    public GameObject controlQuad;
-    AudioSource source;
-    //UnityEngine.Video.VideoPlayer movieTexture;
-    //VideoPlayerUI vidUI;
-    VideoPlayer vidUI;
-    //   public VideoClip videoClip;
+    //AudioSource source;
+    //MovieTexture movieTexture;
+    VideoPlayer vidPlayer;
+    VideoPlayerUI vidUI;
 
     bool loading = false;
     bool loaded = false;
@@ -36,16 +35,20 @@ public class VideoPlayerDeviceInterface : componentInterface {
 
     void Awake() {
         //source = GetComponent<AudioSource>();
-        //vidUI = GetComponentInChildren<VideoPlayerUI>();
+        vidUI = GetComponentInChildren<VideoPlayerUI>();
 
-        vidUI = gameObject.AddComponent<UnityEngine.Video.VideoPlayer>();
-        vidUI.url = Application.streamingAssetsPath + "/" + vidFilename;
+        vidPlayer = GetComponentInChildren<VideoPlayer>();
+ //       vidPlayer = gameObject.AddComponent<UnityEngine.Video.VideoPlayer>();
 
-        vidUI.playOnAwake = false;
-        vidUI.isLooping = false;
-        vidUI.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
-        vidUI.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
-        vidUI.targetMaterialProperty = "_MainTex";
+        //vidFilename = vidFilename.Replace(".ogv", ".mp4");
+        vidPlayer.url = Application.streamingAssetsPath + "/" + vidFilename;
+
+        vidPlayer.playOnAwake = false;
+        vidPlayer.isLooping = false;
+        vidPlayer.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
+        vidPlayer.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
+        vidPlayer.targetMaterialProperty = "_MainTex";
+        vidPlayer.Prepare();
     }
 
     tooltips _tooltip;
@@ -54,15 +57,15 @@ public class VideoPlayerDeviceInterface : componentInterface {
         _tooltip = _t;
         vidFilename = file;
         togglePlay();
-        //controlQuad.GetComponent.updateControlQuad();
-        //controlQuad.SetActive(false);
-        //vidUI.controlRends[0].material.SetFloat("_EmissionGain", 0f);
+        vidUI.updateControlQuad();
+        vidUI.controlQuad.SetActive(false);
+        vidUI.controlRends[0].material.SetFloat("_EmissionGain", 0f);
     }
 
     void Update() {
         if (loaded && playing) {
             //if (!movieTexture.isPlaying) {
-            if (!vidUI.isPlaying) {
+            if (!vidPlayer.isPlaying) {
                 endPlayback();
             }
         }
@@ -70,10 +73,10 @@ public class VideoPlayerDeviceInterface : componentInterface {
 
     void endPlayback() {
         playing = false;
-        vidUI.Stop();
+        //movieTexture.Stop();
+        vidPlayer.Stop();
         vidQuad.SetActive(false);
-        //vidUI.Reset();
-        vidUI.Stop();
+        vidUI.Reset();
         masterControl.instance.toggleInstrumentVolume(true);
         if (_tooltip != null) _tooltip.ToggleVideo(false);
     }
@@ -83,12 +86,14 @@ public class VideoPlayerDeviceInterface : componentInterface {
         if (playing) {
             if (loaded) {
                 vidQuad.SetActive(true);
-                vidUI.Play();
+                //movieTexture.Play();
                 //source.Play();
+                vidPlayer.Play();
                 masterControl.instance.toggleInstrumentVolume(false);
             } else if (!loading) StartCoroutine(movieRoutine());
         } else if (loaded) {
-            vidUI.Pause();
+            //movieTexture.Pause();
+            vidPlayer.Pause();
             masterControl.instance.toggleInstrumentVolume(true);
         }
     }
@@ -96,7 +101,7 @@ public class VideoPlayerDeviceInterface : componentInterface {
     void OnDisable() {
         //   if (movieTexture != null) {
         endPlayback();
-        //      videoSurface.material.mainTexture = null;
+        videoSurface.material.mainTexture = null;
         //      movieTexture = null;
         //    }
         loading = false;
@@ -105,39 +110,49 @@ public class VideoPlayerDeviceInterface : componentInterface {
         masterControl.instance.toggleInstrumentVolume(true);
     }
     
-    IEnumerator movieRoutine()
-    {
+    IEnumerator movieRoutine() {
         loading = true;
         //WWW www = new WWW("file:///" + Application.streamingAssetsPath + System.IO.Path.DirectorySeparatorChar + vidFilename);
-        vidUI.url = Application.streamingAssetsPath + "/" + vidFilename;
-        vidUI.Prepare();
         //movieTexture = www.movie;
-        //while (!movieTexture.isReadyToPlay)
-        while (!vidUI.isPrepared)
-        {
-                yield return null;
+        //vidFilename = vidFilename.Replace(".ogv", ".mp4");
+        vidPlayer.errorReceived += VideoPlayer_errorReceived;
+        vidPlayer.url = Application.streamingAssetsPath + "/" + vidFilename;
+        vidPlayer.Prepare();
+
+        //while (!movieTexture.isReadyToPlay) {
+        while (!vidPlayer.isPrepared) {
+                yield return new WaitForSeconds(.1f); ;
         }
         loading = false;
         loaded = true;
 
-        vidUI.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
-        vidUI.targetMaterialProperty = "_MainTex";
+        vidPlayer.playOnAwake = false;
+        vidPlayer.isLooping = false;
+        vidPlayer.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
+        vidPlayer.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
+        vidPlayer.targetMaterialProperty = "_MainTex";
         //videoSurface.material.mainTexture = movieTexture;.GetComponent<Renderer>();
         //source.clip = movieTexture.audioClip;
-        if (playing)
-        {
+        if (playing) {
             vidQuad.SetActive(true);
 
-            masterControl.instance.toggleInstrumentVolume(false);
-            vidUI.Play();
+            //movieTexture.Play();
             //source.Play();
-        }
-        else
-        {
+            vidPlayer.Play();
+            masterControl.instance.toggleInstrumentVolume(false);
+        } else {
             vidQuad.SetActive(false);
         }
-        loading = false;
-        loaded = true;
+        //loading = false;
+        //loaded = true;
 }
-}
+    private void VideoPlayer_errorReceived(VideoPlayer source, string message)
+    {
+        /// So that I can see the debug message in the headset in my case
+        //_debugText.text += message;
 
+        /// To avoid memory leaks, unsubscribe from the event
+        /// otherwise it could continuously send this message
+        vidPlayer.errorReceived -= VideoPlayer_errorReceived;
+    }
+}
