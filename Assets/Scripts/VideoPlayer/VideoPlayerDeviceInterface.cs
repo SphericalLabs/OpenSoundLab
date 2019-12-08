@@ -36,19 +36,7 @@ public class VideoPlayerDeviceInterface : componentInterface {
     void Awake() {
         //source = GetComponent<AudioSource>();
         vidUI = GetComponentInChildren<VideoPlayerUI>();
-
         vidPlayer = GetComponentInChildren<VideoPlayer>();
- //       vidPlayer = gameObject.AddComponent<UnityEngine.Video.VideoPlayer>();
-
-        //vidFilename = vidFilename.Replace(".ogv", ".mp4");
- /*       vidPlayer.url = Application.streamingAssetsPath + "/" + vidFilename;
-
-        vidPlayer.playOnAwake = false;
-        vidPlayer.isLooping = false;
-        vidPlayer.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
-        vidPlayer.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
-        vidPlayer.targetMaterialProperty = "_MainTex";
-        vidPlayer.Prepare(); */
     }
 
     tooltips _tooltip;
@@ -86,20 +74,13 @@ public class VideoPlayerDeviceInterface : componentInterface {
     public void togglePlay() {
         playing = !playing;
         if (playing) {
-            if (loaded)
-            {
+            if (loaded) {
                 vidQuad.SetActive(true);
                 //movieTexture.Play();
                 //source.Play();
                 vidPlayer.Play();
                 masterControl.instance.toggleInstrumentVolume(false);
-            }
-            else if (!loading)
-            {
- //               loading = true;
- //               loaded = false;
-                StartCoroutine(movieRoutine());
-            }
+            } else if (!loading) StartCoroutine(movieRoutine());
         } else if (loaded) {
             //movieTexture.Pause();
             vidPlayer.Pause();
@@ -123,8 +104,7 @@ public class VideoPlayerDeviceInterface : componentInterface {
         loading = true;
         //WWW www = new WWW("file:///" + Application.streamingAssetsPath + System.IO.Path.DirectorySeparatorChar + vidFilename);
         //movieTexture = www.movie;
-        //vidFilename = vidFilename.Replace(".ogv", ".mp4");
-        vidPlayer.errorReceived += VideoPlayer_errorReceived;
+        vidFilename = vidFilename.Replace(".ogv", ".mp4");
         vidPlayer.url = Application.streamingAssetsPath + "/" + vidFilename;
         vidPlayer.Prepare();
 
@@ -132,12 +112,7 @@ public class VideoPlayerDeviceInterface : componentInterface {
         while (!vidPlayer.isPrepared) {
                 yield return new WaitForSeconds(.1f); ;
         }
-        //loading = false;
-        //loaded = true;
 
-        //vidPlayer.waitForFirstFrame = true;
-        //vidPlayer.playOnAwake = false;
-        //vidPlayer.isLooping = false;
         vidPlayer.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
         vidPlayer.targetMaterialRenderer = vidQuad.GetComponent<Renderer>();
         vidPlayer.targetMaterialProperty = "_MainTex";
@@ -156,13 +131,4 @@ public class VideoPlayerDeviceInterface : componentInterface {
         loading = false;
         loaded = true;
 }
-    private void VideoPlayer_errorReceived(VideoPlayer source, string message)
-    {
-        /// So that I can see the debug message in the headset in my case
-        //_debugText.text += message;
-
-        /// To avoid memory leaks, unsubscribe from the event
-        /// otherwise it could continuously send this message
-        vidPlayer.errorReceived -= VideoPlayer_errorReceived;
-    }
 }
