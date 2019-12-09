@@ -1421,7 +1421,7 @@ MonoBehaviour:
   lensDirtIntensity: 0.05
   lensDirtTexture: {fileID: 0}
   inputIsHDR: 1
-  lowQuality: 0
+  lowQuality: 1
   depthBlending: 0
   depthBlendFunction: 0
   depthBlendFactor: 0.1
