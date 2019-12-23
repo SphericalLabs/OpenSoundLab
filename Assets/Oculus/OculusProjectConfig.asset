@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetDeviceTypes: 01000000
   handTrackingSupport: 1
-  disableBackups: 1
-  enableNSCConfig: 1
+  disableBackups: 0
+  enableNSCConfig: 0
