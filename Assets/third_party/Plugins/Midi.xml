@@ -1,0 +1,3257 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Midi</name>
+    </assembly>
+    <members>
+        <member name="T:Midi.ScalePattern">
+            <summary>
+            Description of a scale's pattern as it ascends through an octave.
+            </summary>
+            <remarks>
+            This class describes the general behavior of a scale as it ascends from a tonic up to
+            the next tonic.  It is described in terms of semitones relative to the tonic; to apply it to
+            a particular tonic, pass one of these to the constructor of <see cref="T:Midi.Scale"/>.
+            </remarks>
+        </member>
+        <member name="M:Midi.ScalePattern.#ctor(System.String,System.Int32[])">
+            <summary>
+            Constructs a scale pattern.
+            </summary>
+            <param name="name">The name of the scale pattern.</param>
+            <param name="ascent">The ascending pattern of the scale.  See the <see cref="P:Midi.ScalePattern.Ascent"/>
+            property for a detailed description and requirements.  This parameter is copied.</param>
+            <exception cref="T:System.ArgumentNullException">name or ascent is null.</exception>
+            <exception cref="T:System.ArgumentException">ascent is invalid.</exception>
+        </member>
+        <member name="M:Midi.ScalePattern.ToString">
+            <summary>
+            ToString returns the pattern name.
+            </summary>
+            <returns>The pattern's name, such as "Major" or "Melodic Minor (ascending)".</returns>
+        </member>
+        <member name="M:Midi.ScalePattern.op_Equality(Midi.ScalePattern,Midi.ScalePattern)">
+            <summary>
+            Equality operator does value equality.
+            </summary>
+        </member>
+        <member name="M:Midi.ScalePattern.op_Inequality(Midi.ScalePattern,Midi.ScalePattern)">
+            <summary>
+            Inequality operator does value inequality.
+            </summary>
+        </member>
+        <member name="M:Midi.ScalePattern.Equals(System.Object)">
+            <summary>
+            Value equality.
+            </summary>
+        </member>
+        <member name="M:Midi.ScalePattern.GetHashCode">
+            <summary>
+            Hash code.
+            </summary>
+        </member>
+        <member name="M:Midi.ScalePattern.AscentIsValid(System.Int32[])">
+            <summary>Returns true if ascent is valid.</summary>
+        </member>
+        <member name="P:Midi.ScalePattern.Name">
+            <summary>The name of the scale being described.</summary>
+        </member>
+        <member name="P:Midi.ScalePattern.Ascent">
+            <summary>The ascent of the scale.</summary>
+            <remarks>
+            <para>The ascent is expressed as a series of integers, each giving a semitone
+            distance above the tonic.  It must have at least two elements, start at zero (the
+            tonic), be monotonically increasing, and stay below 12 (the next tonic above).</para>
+            <para>The number of elements in the ascent tells us how many notes-per-octave in the
+            scale.  For example, a heptatonic scale will always have seven elements in the ascent.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Midi.Scale">
+            <summary>
+            A scale based on a pattern and a tonic note.
+            </summary>
+            <remarks>
+            <para>For our purposes, a scale is defined by a tonic and then the pattern that it uses to
+            ascend up to the next tonic.  The tonic is described with a <see cref="T:Midi.Note"/> because it is
+            not specific to any one octave.  The ascending pattern is provided by the
+            <see cref="T:Midi.ScalePattern"/> class.
+            </para>
+            <para>This class comes with a collection of predefined patterns, such as
+            <see cref="F:Midi.Scale.Major"/> and <see cref="F:Midi.Scale.HarmonicMinor"/>.</para>
+            </remarks>
+        </member>
+        <member name="M:Midi.Scale.#ctor(Midi.Note,Midi.ScalePattern)">
+            <summary>
+            Constructs a scale from its tonic and its pattern.
+            </summary>
+            <param name="tonic">The tonic note.</param>
+            <param name="pattern">The scale pattern.</param>
+            <exception cref="T:System.ArgumentNullException">tonic or pattern is null.</exception>
+        </member>
+        <member name="M:Midi.Scale.Contains(Midi.Pitch)">
+            <summary>
+            Returns true if pitch is in this scale.
+            </summary>
+            <param name="pitch">The pitch to test.</param>
+            <returns>True if pitch is in this scale.</returns>
+        </member>
+        <member name="M:Midi.Scale.ScaleDegree(Midi.Pitch)">
+            <summary>
+            Returns the scale degree of the given pitch in this scale.
+            </summary>
+            <param name="pitch">The pitch to test.</param>
+            <returns>The scale degree of pitch in this scale, where 1 is the tonic.  Returns -1
+            if pitch is not in this scale.</returns>
+        </member>
+        <member name="F:Midi.Scale.Major">
+            <summary>
+            Pattern for Major scales.
+            </summary>
+        </member>
+        <member name="F:Midi.Scale.NaturalMinor">
+            <summary>
+            Pattern for Natural Minor scales.
+            </summary>
+        </member>
+        <member name="F:Midi.Scale.HarmonicMinor">
+            <summary>
+            Pattern for Harmonic Minor scales.
+            </summary>
+        </member>
+        <member name="F:Midi.Scale.MelodicMinorAscending">
+            <summary>
+            Pattern for Melodic Minor scale as it ascends.
+            </summary>
+        </member>
+        <member name="F:Midi.Scale.MelodicMinorDescending">
+            <summary>
+            Pattern for Melodic Minor scale as it descends.
+            </summary>
+        </member>
+        <member name="F:Midi.Scale.Chromatic">
+            <summary>
+            Pattern for Chromatic scales.
+            </summary>
+        </member>
+        <member name="F:Midi.Scale.Patterns">
+            <summary>
+            Array of all the built-in scale patterns.
+            </summary>
+        </member>
+        <member name="M:Midi.Scale.ToString">
+            <summary>
+            ToString returns the scale's human-readable name.
+            </summary>
+            <returns>The scale's name, such as "G# Major" or "Eb Melodic Minor (ascending)".
+            </returns>
+        </member>
+        <member name="M:Midi.Scale.op_Equality(Midi.Scale,Midi.Scale)">
+            <summary>
+            Equality operator does value equality because Scale is immutable.
+            </summary>
+        </member>
+        <member name="M:Midi.Scale.op_Inequality(Midi.Scale,Midi.Scale)">
+            <summary>
+            Inequality operator does value inequality because Chord is immutable.
+            </summary>
+        </member>
+        <member name="M:Midi.Scale.Equals(System.Object)">
+            <summary>
+            Value equality.
+            </summary>
+        </member>
+        <member name="M:Midi.Scale.GetHashCode">
+            <summary>
+            Hash code.
+            </summary>
+        </member>
+        <member name="M:Midi.Scale.Build(Midi.Note,Midi.ScalePattern,System.Int32[],Midi.Note[],System.Int32@)">
+            <summary>
+            Builds a scale.
+            </summary>
+            <param name="tonic">The tonic.</param>
+            <param name="pattern">The scale pattern.</param>
+            <param name="positionInOctaveToSequenceIndex">Must have 12 elements, and is filled with
+            the 0-indexed scale position (or -1) for each position in the octave.</param>
+            <param name="noteSequence">Must have pattern.Ascent.Length elements, and is filled with
+            the notes for each scale degree.</param>
+            <param name="numAccidentals">Filled with the total number of accidentals in the built
+            scale.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:Midi.Scale.Name" -->
+        <member name="P:Midi.Scale.Tonic">
+            <summary>The tonic of this scale.</summary>
+        </member>
+        <member name="P:Midi.Scale.Pattern">
+            <summary>The pattern of this scale.</summary>
+        </member>
+        <member name="P:Midi.Scale.NoteSequence">
+            <summary>
+            The sequence of notes in this scale.
+            </summary>
+            <remarks>
+            <para>This sequence begins at the tonic and ascends, stopping before the next tonic.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Midi.Message">
+            <summary>
+            Base class for all MIDI messages.
+            </summary>
+        </member>
+        <member name="M:Midi.Message.#ctor(System.Single)">
+            <summary>
+            Protected constructor.
+            </summary>
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.Message.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.Message.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="P:Midi.Message.Time">
+            <summary>
+            Milliseconds since the music started.
+            </summary>
+        </member>
+        <member name="T:Midi.DeviceMessage">
+            <summary>
+            Base class for messages relevant to a specific device.
+            </summary>
+        </member>
+        <member name="M:Midi.DeviceMessage.#ctor(Midi.DeviceBase,System.Single)">
+            <summary>
+            Protected constructor.
+            </summary>
+        </member>
+        <member name="P:Midi.DeviceMessage.Device">
+            <summary>
+            The device from which this message originated, or for which it is destined.
+            </summary>
+        </member>
+        <member name="T:Midi.ChannelMessage">
+            <summary>
+            Base class for messages relevant to a specific device channel.
+            </summary>
+        </member>
+        <member name="M:Midi.ChannelMessage.#ctor(Midi.DeviceBase,Midi.Channel,System.Single)">
+            <summary>
+            Protected constructor.
+            </summary>
+        </member>
+        <member name="P:Midi.ChannelMessage.Channel">
+            <summary>
+            Channel.
+            </summary>
+        </member>
+        <member name="T:Midi.NoteMessage">
+            <summary>
+            Base class for messages relevant to a specific note.
+            </summary>
+        </member>
+        <member name="M:Midi.NoteMessage.#ctor(Midi.DeviceBase,Midi.Channel,Midi.Pitch,System.Int32,System.Single)">
+            <summary>
+            Protected constructor.
+            </summary>
+        </member>
+        <member name="P:Midi.NoteMessage.Pitch">
+            <summary>The pitch for this note message.</summary>
+        </member>
+        <member name="P:Midi.NoteMessage.Velocity">
+            <summary>
+            Velocity, 0..127.
+            </summary>
+        </member>
+        <member name="T:Midi.NoteOnMessage">
+            <summary>
+            Note On message.
+            </summary>
+        </member>
+        <member name="M:Midi.NoteOnMessage.#ctor(Midi.DeviceBase,Midi.Channel,Midi.Pitch,System.Int32,System.Single)">
+            <summary>
+            Constructs a Note On message.
+            </summary>
+            <param name="device">The device associated with this message.</param>
+            <param name="channel">Channel, 0..15, 10 reserved for percussion.</param>
+            <param name="pitch">The pitch for this note message.</param>
+            <param name="velocity">Velocity, 0..127.</param>
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.NoteOnMessage.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.NoteOnMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="T:Midi.PercussionMessage">
+            <summary>
+            Percussion message.
+            </summary>
+            <remarks>
+            A percussion message is simply shorthand for sending a Note On message to Channel10 with a
+            percussion-specific note.  This message can be sent to an OutputDevice but will be received
+            by an InputDevice as a NoteOn message.
+            </remarks>
+        </member>
+        <member name="M:Midi.PercussionMessage.#ctor(Midi.DeviceBase,Midi.Percussion,System.Int32,System.Single)">
+            <summary>
+            Constructs a Percussion message.
+            </summary>
+            <param name="device">The device associated with this message.</param>
+            <param name="percussion">Percussion.</param>
+            <param name="velocity">Velocity, 0..127.</param>
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.PercussionMessage.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.PercussionMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="P:Midi.PercussionMessage.Percussion">
+            <summary>
+            Percussion.
+            </summary>
+        </member>
+        <member name="P:Midi.PercussionMessage.Velocity">
+            <summary>
+            Velocity, 0..127.
+            </summary>
+        </member>
+        <member name="T:Midi.NoteOffMessage">
+            <summary>
+            Note Off message.
+            </summary>
+        </member>
+        <member name="M:Midi.NoteOffMessage.#ctor(Midi.DeviceBase,Midi.Channel,Midi.Pitch,System.Int32,System.Single)">
+            <summary>
+            Constructs a Note Off message.
+            </summary>
+            <param name="device">The device associated with this message.</param>
+            <param name="channel">Channel, 0..15, 10 reserved for percussion.</param>
+            <param name="pitch">The pitch for this note message.</param>
+            <param name="velocity">Velocity, 0..127.</param>
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.NoteOffMessage.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.NoteOffMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="T:Midi.NoteOnOffMessage">
+            <summary>
+            A Note On message which schedules its own Note Off message when played.
+            </summary>
+        </member>
+        <member name="M:Midi.NoteOnOffMessage.#ctor(Midi.DeviceBase,Midi.Channel,Midi.Pitch,System.Int32,System.Single,Midi.Clock,System.Single)">
+            <summary>
+            Constructs a Note On/Off message.
+            </summary>
+            <param name="device">The device associated with this message.</param>
+            <param name="channel">Channel, 0..15, 10 reserved for percussion.</param>
+            <param name="pitch">The pitch for this note message.</param>
+            <param name="velocity">Velocity, 0..127.</param>
+            <param name="time">The timestamp for this message.</param>
+            <param name="clock">The clock that should schedule the off message.</param>
+            <param name="duration">Time delay between on message and off messasge.</param>
+        </member>
+        <member name="M:Midi.NoteOnOffMessage.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.NoteOnOffMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="P:Midi.NoteOnOffMessage.Clock">
+            <summary>
+            The clock used to schedule the follow-up message.
+            </summary>
+        </member>
+        <member name="P:Midi.NoteOnOffMessage.Duration">
+            <summary>
+            Time delay between the Note On and the Note Off.
+            </summary>
+        </member>
+        <member name="T:Midi.ControlChangeMessage">
+            <summary>
+            Control change message.
+            </summary>
+        </member>
+        <member name="M:Midi.ControlChangeMessage.#ctor(Midi.DeviceBase,Midi.Channel,Midi.Control,System.Int32,System.Single)">
+            <summary>
+            Construts a Control Change message.
+            </summary>
+            <param name="device">The device associated with this message.</param>
+            <param name="channel">Channel, 0..15, 10 reserved for percussion.</param>
+            <param name="control">Control, 0..119</param>
+            <param name="value">Value, 0..127.</param>
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.ControlChangeMessage.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.ControlChangeMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="P:Midi.ControlChangeMessage.Control">
+            <summary>
+            The control for this message.
+            </summary>
+        </member>
+        <member name="P:Midi.ControlChangeMessage.Value">
+            <summary>
+            Value, 0..127.
+            </summary>
+        </member>
+        <member name="T:Midi.PitchBendMessage">
+            <summary>
+            Pitch Bend message.
+            </summary>
+        </member>
+        <member name="M:Midi.PitchBendMessage.#ctor(Midi.DeviceBase,Midi.Channel,System.Int32,System.Single)">
+            <summary>
+            Constructs a Pitch Bend message.
+            </summary>
+            <param name="device">The device associated with this message.</param>
+            <param name="channel">Channel, 0..15, 10 reserved for percussion.</param>
+            <param name="value">Pitch bend value, 0..16383, 8192 is centered.</param>        
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.PitchBendMessage.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.PitchBendMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="P:Midi.PitchBendMessage.Value">
+            <summary>
+            Pitch bend value, 0..16383, 8192 is centered.
+            </summary>
+        </member>
+        <member name="T:Midi.ProgramChangeMessage">
+            <summary>
+            Program Change message.
+            </summary>
+        </member>
+        <member name="M:Midi.ProgramChangeMessage.#ctor(Midi.DeviceBase,Midi.Channel,Midi.Instrument,System.Single)">
+            <summary>
+            Constructs a Program Change message.
+            </summary>
+            <param name="device">The device associated with this message.</param>
+            <param name="channel">Channel.</param>
+            <param name="instrument">Instrument.</param>
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.ProgramChangeMessage.SendNow">
+            <summary>
+            Sends this message immediately.
+            </summary>
+        </member>
+        <member name="M:Midi.ProgramChangeMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="P:Midi.ProgramChangeMessage.Instrument">
+            <summary>
+            Instrument.
+            </summary>
+        </member>
+        <member name="T:Midi.CallbackMessage">
+            <summary>
+            Pseudo-MIDI message used to arrange for a callback at a certain time.
+            </summary>
+            <remarks>
+            <para>This message can be scheduled with <see cref="M:Midi.Clock.Schedule(Midi.Message)">
+            Clock.Schedule</see> just like any other message.  When its time comes and it
+            gets "sent", it invokes the callback provided in the constructor.</para>
+            <para>The idea is that you can embed callback points into the music you've
+            scheduled, so that (if the clock gets to that point in the music) your code has
+            an opportunity for some additional processing.</para>
+            <para>The callback is invoked on the MidiOutputDevice's worker thread.</para>
+            </remarks>
+        </member>
+        <member name="M:Midi.CallbackMessage.#ctor(Midi.CallbackMessage.CallbackType,System.Single)">
+            <summary>
+            Constructs a Callback message.
+            </summary>
+            <param name="callback">The callback to invoke when this message is "sent".</param>
+            <param name="time">The timestamp for this message.</param>
+        </member>
+        <member name="M:Midi.CallbackMessage.SendNow">
+            <summary>
+            Sends this message immediately, ignoring the beatTime.
+            </summary>
+        </member>
+        <member name="M:Midi.CallbackMessage.MakeTimeShiftedCopy(System.Single)">
+            <summary>
+            Returns a copy of this message, shifted in time by the specified amount.
+            </summary>
+        </member>
+        <member name="P:Midi.CallbackMessage.Callback">
+            <summary>
+            The callback to invoke when this message is "sent".
+            </summary>
+        </member>
+        <member name="T:Midi.CallbackMessage.CallbackType">
+            <summary>
+            Delegate called when a CallbackMessage is sent.
+            </summary>
+            <param name="time">The time at which this event was scheduled.</param>
+            <returns>Additional messages which should be scheduled as a result of this callback,
+            or null.</returns>
+        </member>
+        <member name="T:Midi.DeviceBase">
+            <summary>
+            Common base class for input and output devices.
+            </summary>
+            This base class exists mainly so that input and output devices can both go into the same
+            kinds of MidiMessages.
+        </member>
+        <member name="M:Midi.DeviceBase.#ctor(System.String)">
+            <summary>
+            Protected constructor.
+            </summary>
+            <param name="name">The name of this device.</param>
+        </member>
+        <member name="P:Midi.DeviceBase.Name">
+            <summary>
+            The name of this device.
+            </summary>
+        </member>
+        <member name="T:Midi.DeviceException">
+            <summary>
+            Exception thrown when an operation on a MIDI device cannot be satisfied.
+            </summary>
+        </member>
+        <member name="M:Midi.DeviceException.#ctor(System.String)">
+            <summary>
+            Constructs exception with a specific error message.
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="T:Midi.ChordPattern">
+            <summary>
+            Description of a chord's pattern starting at the root note.
+            </summary>
+            <remarks>
+            This class describes the ascending sequence of notes included in a chord, starting with
+            the root note.  It is described in terms of semitones relative to root and letters
+            relative to the root.  To apply it to particular tonic, pass one of these to the
+            constructor of <see cref="T:Midi.Chord"/>.
+            </remarks>
+        </member>
+        <member name="M:Midi.ChordPattern.#ctor(System.String,System.String,System.Int32[],System.Int32[])">
+            <summary>
+            Constructs a chord pattern.
+            </summary>
+            <param name="name">The name of the chord pattern.</param>
+            <param name="abbreviation">The abbreviation for the chord.  See the
+            <see cref="P:Midi.ChordPattern.Abbreviation"/> property for details.</param>
+            <param name="ascent">Array encoding the notes in the chord.  See the
+            <see cref="P:Midi.ChordPattern.Ascent"/> property for details.</param>
+            <param name="letterOffsets">Array encoding the sequence of letters in the chord.
+            Must be the same length as ascent.  See the <see cref="P:Midi.ChordPattern.LetterOffsets"/> property for
+            details.</param>
+            <exception cref="T:System.ArgumentException">ascent or letterOffsets is invalid, or they have
+            different lengths.</exception>
+            <exception cref="T:System.ArgumentNullException">an argument is null.</exception>
+        </member>
+        <member name="M:Midi.ChordPattern.ToString">
+            <summary>
+            ToString returns the pattern name.
+            </summary>
+            <returns>The pattern's name, such as "Major" or "Minor".</returns>
+        </member>
+        <member name="M:Midi.ChordPattern.op_Equality(Midi.ChordPattern,Midi.ChordPattern)">
+            <summary>
+            Equality operator does value equality.
+            </summary>
+        </member>
+        <member name="M:Midi.ChordPattern.op_Inequality(Midi.ChordPattern,Midi.ChordPattern)">
+            <summary>
+            Inequality operator does value inequality.
+            </summary>
+        </member>
+        <member name="M:Midi.ChordPattern.Equals(System.Object)">
+            <summary>
+            Value equality.
+            </summary>
+        </member>
+        <member name="M:Midi.ChordPattern.GetHashCode">
+            <summary>
+            Hash code.
+            </summary>
+        </member>
+        <member name="M:Midi.ChordPattern.IsSequenceValid(System.Int32[])">
+            <summary>
+            Returns true if sequence has at least two elements, starts at zero, and is monotonically
+            increasing.
+            </summary>
+        </member>
+        <member name="P:Midi.ChordPattern.Name">
+            <summary>
+            The name of the chord pattern.
+            </summary>
+        </member>
+        <member name="P:Midi.ChordPattern.Abbreviation">
+            <summary>
+            Abbreviation for this chord pattern.
+            </summary>
+            <remarks>
+            This is the string used in the abbreviated name for a chord, placed immediately
+            after the tonic and before the slashed inversion (if there is one).  For example,
+            for minor chords the abbreviation is "m", as in "Am".
+            </remarks>
+        </member>
+        <member name="P:Midi.ChordPattern.Ascent">
+            <summary>
+            The ascending note sequence of the chord, in semitones-above-the-root.
+            </summary>
+            <remarks>
+            <para>This sequence starts at zero (for the root) and is monotonically
+            increasing, each element representing a pitch in semitones above the root.</para>
+            </remarks>
+        </member>
+        <member name="P:Midi.ChordPattern.LetterOffsets">
+            <summary>
+            The sequence of letters in the chord.
+            </summary>
+            <remarks>
+            <para>This array describes what sequence of letters appears in this chord.  Each
+            element is a "letter offset", a positive integer that tell you how many letters to
+            move up from the root for that note.  It must start at zero, representing the
+            letter for the root note.</para>
+            </remarks>
+        </member>
+        <member name="T:Midi.Chord">
+            <summary>
+            A chord.
+            </summary>
+            <remarks>
+            <para>A chord is defined by its root note, the sequence of semitones, the sequence of
+            letters, and the inversion.  The root note is described with a <see cref="T:Midi.Note"/>
+            because we want to be able to talk about the chord independent of any one octave.  The
+            pattern of semitones and letters is given by the <see cref="P:Midi.Chord.Pattern"/> nested class.  The
+            inversion is an integer indicating how many rotations the pattern has undergone.
+            </para>
+            <para>This class comes with a collection of predefined chord patterns, such as
+            <see cref="F:Midi.Chord.Major"/> and <see cref="F:Midi.Chord.Minor"/>.</para>
+            </remarks>
+        </member>
+        <member name="M:Midi.Chord.#ctor(Midi.Note,Midi.ChordPattern,System.Int32)">
+            <summary>
+            Constructs a chord from its root note, pattern, and inversion.
+            </summary>
+            <param name="root">The root note of the chord.</param>
+            <param name="pattern">The chord pattern.</param>
+            <param name="inversion">The inversion, in [0..N-1] where N is the number of notes
+            in pattern.</param>
+            <exception cref="T:System.ArgumentNullException">pattern is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">inversion is out of range.</exception>
+        </member>
+        <member name="M:Midi.Chord.#ctor(System.String)">
+            <summary>
+            Constructs a chord from a string.
+            </summary>
+            <param name="name">The name to parse.  This is the same format as the Name property:
+            a letter in ['A'..'G'], an optional series of accidentals (#'s or b's), then an
+            optional inversion specified as a '/' followed by another note name.  If the
+            inversion is present it must be one of the notes in the chord.</param>
+            <exception cref="T:System.ArgumentNullException">name is null.</exception>
+            <exception cref="T:System.ArgumentException">cannot parse a chord from name.</exception>
+        </member>
+        <member name="M:Midi.Chord.FindMatchingChords(System.Collections.Generic.List{Midi.Pitch})">
+            <summary>
+            Returns a list of chords which match the set of input pitches.
+            </summary>
+            <param name="pitches">Notes being analyzed.</param>
+            <returns>A (possibly empty) list of chords.</returns>
+        </member>
+        <member name="M:Midi.Chord.Contains(Midi.Pitch)">
+            <summary>
+            Returns true if this chord contains the specified pitch.
+            </summary>
+            <param name="pitch">The pitch to test.</param>
+            <returns>True if this chord contains the pitch.</returns>
+        </member>
+        <member name="F:Midi.Chord.Major">
+            <summary>
+            Pattern for Major chords.
+            </summary>
+        </member>
+        <member name="F:Midi.Chord.Minor">
+            <summary>
+            Pattern for Minor chords.
+            </summary>
+        </member>
+        <member name="F:Midi.Chord.Seventh">
+            <summary>
+            Pattern for Seventh chords.
+            </summary>
+        </member>
+        <member name="F:Midi.Chord.Augmented">
+            <summary>
+            Pattern for Augmented chords.
+            </summary>
+        </member>
+        <member name="F:Midi.Chord.Diminished">
+            <summary>
+            Pattern for Diminished chords.
+            </summary>
+        </member>
+        <member name="F:Midi.Chord.Patterns">
+            <summary>
+            Array of all the built-in chord patterns.
+            </summary>
+        </member>
+        <member name="M:Midi.Chord.ToString">
+            <summary>
+            ToString returns the chord name.
+            </summary>
+            <returns>The chord's name.</returns>
+        </member>
+        <member name="M:Midi.Chord.op_Equality(Midi.Chord,Midi.Chord)">
+            <summary>
+            Equality operator does value equality because Chord is immutable.
+            </summary>
+        </member>
+        <member name="M:Midi.Chord.op_Inequality(Midi.Chord,Midi.Chord)">
+            <summary>
+            Inequality operator does value inequality because Chord is immutable.
+            </summary>
+        </member>
+        <member name="M:Midi.Chord.Equals(System.Object)">
+            <summary>
+            Value equality.
+            </summary>
+        </member>
+        <member name="M:Midi.Chord.GetHashCode">
+            <summary>
+            Hash code.
+            </summary>
+        </member>
+        <member name="M:Midi.Chord.RotateArrayLeft(System.Array,System.Array,System.Int32)">
+            <summary>
+            Fills dest with a rotated version of source.
+            </summary>
+            <param name="source">The source array.</param>
+            <param name="dest">The dest array, which must have the same length and underlying type
+            as source.</param>
+            <param name="rotation">The number of elements to rotate to the left by.</param>
+        </member>
+        <member name="P:Midi.Chord.Name">
+            <summary>
+            The name of this chord.
+            </summary>
+        </member>
+        <member name="P:Midi.Chord.Root">
+            <summary>The root note of this chord.</summary>
+        </member>
+        <member name="P:Midi.Chord.Bass">
+            <summary>The bass note of this chord.</summary>
+        </member>
+        <member name="P:Midi.Chord.Pattern">
+            <summary>The pattern of this chord.</summary>
+        </member>
+        <member name="P:Midi.Chord.Inversion">
+            <summary>The inversion of this chord.</summary>
+        </member>
+        <member name="P:Midi.Chord.NoteSequence">
+            <summary>
+            The sequence of notes in this chord.
+            </summary>
+        </member>
+        <member name="T:Midi.Instrument">
+            <summary>
+            General MIDI instrument, used in Program Change messages.
+            </summary>
+            <remarks>
+            <para>The MIDI protocol defines a Program Change message, which can be used to switch a
+            device among "presets".  The General MIDI specification further standardizes those presets
+            into the specific instruments in this enum.  General-MIDI-compliant devices will
+            have these particular instruments; non-GM devices may have other instruments.</para>
+            <para>MIDI instruments are one-indexed in the spec, but they're zero-indexed in code, so
+            we have them zero-indexed here.</para>
+            <para>This enum has extension methods, such as <see cref="M:Midi.InstrumentExtensionMethods.Name(Midi.Instrument)"/>
+            and <see cref="M:Midi.InstrumentExtensionMethods.IsValid(Midi.Instrument)"/>, defined in
+            <see cref="T:Midi.InstrumentExtensionMethods"/>.</para>
+            </remarks>
+        </member>
+        <member name="F:Midi.Instrument.AcousticGrandPiano">
+            <summary>General MIDI instrument 0 ("Acoustic Grand Piano").</summary>
+        </member>
+        <member name="F:Midi.Instrument.BrightAcousticPiano">
+            <summary>General MIDI instrument 1 ("Bright Acoustic Piano").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricGrandPiano">
+            <summary>General MIDI instrument 2 ("Electric Grand Piano").</summary>
+        </member>
+        <member name="F:Midi.Instrument.HonkyTonkPiano">
+            <summary>General MIDI instrument 3 ("Honky Tonk Piano").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricPiano1">
+            <summary>General MIDI instrument 4 ("Electric Piano 1").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricPiano2">
+            <summary>General MIDI instrument 5 ("Electric Piano 2").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Harpsichord">
+            <summary>General MIDI instrument 6 ("Harpsichord").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Clavinet">
+            <summary>General MIDI instrument 7 ("Clavinet").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Celesta">
+            <summary>General MIDI instrument 8 ("Celesta").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Glockenspiel">
+            <summary>General MIDI instrument 9 ("Glockenspiel").</summary>
+        </member>
+        <member name="F:Midi.Instrument.MusicBox">
+            <summary>General MIDI instrument 10 ("Music Box").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Vibraphone">
+            <summary>General MIDI instrument 11 ("Vibraphone").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Marimba">
+            <summary>General MIDI instrument 12 ("Marimba").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Xylophone">
+            <summary>General MIDI instrument 13 ("Xylophone").</summary>
+        </member>
+        <member name="F:Midi.Instrument.TubularBells">
+            <summary>General MIDI instrument 14 ("Tubular Bells").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Dulcimer">
+            <summary>General MIDI instrument 15 ("Dulcimer").</summary>
+        </member>
+        <member name="F:Midi.Instrument.DrawbarOrgan">
+            <summary>General MIDI instrument 16 ("Drawbar Organ").</summary>
+        </member>
+        <member name="F:Midi.Instrument.PercussiveOrgan">
+            <summary>General MIDI instrument 17 ("Percussive Organ").</summary>
+        </member>
+        <member name="F:Midi.Instrument.RockOrgan">
+            <summary>General MIDI instrument 18 ("Rock Organ").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ChurchOrgan">
+            <summary>General MIDI instrument 19 ("Church Organ").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ReedOrgan">
+            <summary>General MIDI instrument 20 ("Reed Organ").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Accordion">
+            <summary>General MIDI instrument 21 ("Accordion").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Harmonica">
+            <summary>General MIDI instrument 22 ("Harmonica").</summary>
+        </member>
+        <member name="F:Midi.Instrument.TangoAccordion">
+            <summary>General MIDI instrument 23 ("Tango Accordion").</summary>
+        </member>
+        <member name="F:Midi.Instrument.AcousticGuitarNylon">
+            <summary>General MIDI instrument 24 ("Acoustic Guitar (nylon)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.AcousticGuitarSteel">
+            <summary>General MIDI instrument 25 ("Acoustic Guitar (steel)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricGuitarJazz">
+            <summary>General MIDI instrument 26 ("Electric Guitar (jazz)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricGuitarClean">
+            <summary>General MIDI instrument 27 ("Electric Guitar (clean)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricGuitarMuted">
+            <summary>General MIDI instrument 28 ("Electric Guitar (muted)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.OverdrivenGuitar">
+            <summary>General MIDI instrument 29 ("Overdriven Guitar").</summary>
+        </member>
+        <member name="F:Midi.Instrument.DistortionGuitar">
+            <summary>General MIDI instrument 30 ("Distortion Guitar").</summary>
+        </member>
+        <member name="F:Midi.Instrument.GuitarHarmonics">
+            <summary>General MIDI instrument 31 ("Guitar Harmonics").</summary>
+        </member>
+        <member name="F:Midi.Instrument.AcousticBass">
+            <summary>General MIDI instrument 32 ("Acoustic Bass").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricBassFinger">
+            <summary>General MIDI instrument 33 ("Electric Bass (finger)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ElectricBassPick">
+            <summary>General MIDI instrument 34 ("Electric Bass (pick)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FretlessBass">
+            <summary>General MIDI instrument 35 ("Fretless Bass").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SlapBass1">
+            <summary>General MIDI instrument 36 ("Slap Bass 1").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SlapBass2">
+            <summary>General MIDI instrument 37 ("Slap Bass 2").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthBass1">
+            <summary>General MIDI instrument 38 ("Synth Bass 1").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthBass2">
+            <summary>General MIDI instrument 39("Synth Bass 2").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Violin">
+            <summary>General MIDI instrument 40 ("Violin").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Viola">
+            <summary>General MIDI instrument 41 ("Viola").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Cello">
+            <summary>General MIDI instrument 42 ("Cello").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Contrabass">
+            <summary>General MIDI instrument 43 ("Contrabass").</summary>
+        </member>
+        <member name="F:Midi.Instrument.TremoloStrings">
+            <summary>General MIDI instrument 44 ("Tremolo Strings").</summary>
+        </member>
+        <member name="F:Midi.Instrument.PizzicatoStrings">
+            <summary>General MIDI instrument 45 ("Pizzicato Strings").</summary>
+        </member>
+        <member name="F:Midi.Instrument.OrchestralHarp">
+            <summary>General MIDI instrument 46 ("Orchestral Harp").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Timpani">
+            <summary>General MIDI instrument 47 ("Timpani").</summary>
+        </member>
+        <member name="F:Midi.Instrument.StringEnsemble1">
+            <summary>General MIDI instrument 48 ("String Ensemble 1").</summary>
+        </member>
+        <member name="F:Midi.Instrument.StringEnsemble2">
+            <summary>General MIDI instrument 49 ("String Ensemble 2").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthStrings1">
+            <summary>General MIDI instrument 50 ("Synth Strings 1").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthStrings2">
+            <summary>General MIDI instrument 51 ("Synth Strings 2").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ChoirAahs">
+            <summary>General MIDI instrument 52 ("Choir Aahs").</summary>
+        </member>
+        <member name="F:Midi.Instrument.VoiceOohs">
+            <summary>General MIDI instrument 53 ("Voice oohs").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthVoice">
+            <summary>General MIDI instrument 54 ("Synth Voice").</summary>
+        </member>
+        <member name="F:Midi.Instrument.OrchestraHit">
+            <summary>General MIDI instrument 55 ("Orchestra Hit").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Trumpet">
+            <summary>General MIDI instrument 56 ("Trumpet").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Trombone">
+            <summary>General MIDI instrument 57 ("Trombone").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Tuba">
+            <summary>General MIDI instrument 58 ("Tuba").</summary>
+        </member>
+        <member name="F:Midi.Instrument.MutedTrumpet">
+            <summary>General MIDI instrument 59 ("Muted Trumpet").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FrenchHorn">
+            <summary>General MIDI instrument 60 ("French Horn").</summary>
+        </member>
+        <member name="F:Midi.Instrument.BrassSection">
+            <summary>General MIDI instrument 61 ("Brass Section").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthBrass1">
+            <summary>General MIDI instrument 62 ("Synth Brass 1").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthBrass2">
+            <summary>General MIDI instrument 63 ("Synth Brass 2").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SopranoSax">
+            <summary>General MIDI instrument 64 ("Soprano Sax").</summary>
+        </member>
+        <member name="F:Midi.Instrument.AltoSax">
+            <summary>General MIDI instrument 65 ("Alto Sax").</summary>
+        </member>
+        <member name="F:Midi.Instrument.TenorSax">
+            <summary>General MIDI instrument 66 ("Tenor Sax").</summary>
+        </member>
+        <member name="F:Midi.Instrument.BaritoneSax">
+            <summary>General MIDI instrument 67 ("Baritone Sax").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Oboe">
+            <summary>General MIDI instrument 68 ("Oboe").</summary>
+        </member>
+        <member name="F:Midi.Instrument.EnglishHorn">
+            <summary>General MIDI instrument 69 ("English Horn").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Bassoon">
+            <summary>General MIDI instrument 70 ("Bassoon").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Clarinet">
+            <summary>General MIDI instrument 71 ("Clarinet").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Piccolo">
+            <summary>General MIDI instrument 72 ("Piccolo").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Flute">
+            <summary>General MIDI instrument 73 ("Flute").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Recorder">
+            <summary>General MIDI instrument 74 ("Recorder").</summary>
+        </member>
+        <member name="F:Midi.Instrument.PanFlute">
+            <summary>General MIDI instrument 75 ("PanFlute").</summary>
+        </member>
+        <member name="F:Midi.Instrument.BlownBottle">
+            <summary>General MIDI instrument 76 ("Blown Bottle").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Shakuhachi">
+            <summary>General MIDI instrument 77 ("Shakuhachi").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Whistle">
+            <summary>General MIDI instrument 78 ("Whistle").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Ocarina">
+            <summary>General MIDI instrument 79 ("Ocarina").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead1Square">
+            <summary>General MIDI instrument 80 ("Lead 1 (square)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead2Sawtooth">
+            <summary>General MIDI instrument 81 ("Lead 2 (sawtooth)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead3Calliope">
+            <summary>General MIDI instrument 82 ("Lead 3 (calliope)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead4Chiff">
+            <summary>General MIDI instrument 83 ("Lead 4 (chiff)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead5Charang">
+            <summary>General MIDI instrument 84 ("Lead 5 (charang)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead6Voice">
+            <summary>General MIDI instrument 85 ("Lead 6 (voice)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead7Fifths">
+            <summary>General MIDI instrument 86 ("Lead 7 (fifths)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Lead8BassPlusLead">
+            <summary>General MIDI instrument 87 ("Lead 8 (bass + lead)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad1NewAge">
+            <summary>General MIDI instrument 88 ("Pad 1 (new age)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad2Warm">
+            <summary>General MIDI instrument 89 ("Pad 2 (warm)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad3Polysynth">
+            <summary>General MIDI instrument 90 ("Pad 3 (polysynth)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad4Choir">
+            <summary>General MIDI instrument 91 ("Pad 4 (choir)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad5Bowed">
+            <summary>General MIDI instrument 92 ("Pad 5 (bowed)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad6Metallic">
+            <summary>General MIDI instrument 93 ("Pad 6 (metallic)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad7Halo">
+            <summary>General MIDI instrument 94 ("Pad 7 (halo)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Pad8Sweep">
+            <summary>General MIDI instrument 95 ("Pad 8 (sweep)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX1Rain">
+            <summary>General MIDI instrument 96 ("FX 1 (rain)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX2Soundtrack">
+            <summary>General MIDI instrument 97 ("FX 2 (soundtrack)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX3Crystal">
+            <summary>General MIDI instrument 98 ("FX 3 (crystal)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX4Atmosphere">
+            <summary>General MIDI instrument 99 ("FX 4 (atmosphere)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX5Brightness">
+            <summary>General MIDI instrument 100 ("FX 5 (brightness)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX6Goblins">
+            <summary>General MIDI instrument 101 ("FX 6 (goblins)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX7Echoes">
+            <summary>General MIDI instrument 102 ("FX 7 (echoes)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.FX8SciFi">
+            <summary>General MIDI instrument 103 ("FX 8 (sci-fi)").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Sitar">
+            <summary>General MIDI instrument 104 ("Sitar").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Banjo">
+            <summary>General MIDI instrument 105 ("Banjo").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Shamisen">
+            <summary>General MIDI instrument 106 ("Shamisen").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Koto">
+            <summary>General MIDI instrument 107 ("Koto").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Kalimba">
+            <summary>General MIDI instrument 108 ("Kalimba").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Bagpipe">
+            <summary>General MIDI instrument 109 ("Bagpipe").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Fiddle">
+            <summary>General MIDI instrument 110 ("Fiddle").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Shanai">
+            <summary>General MIDI instrument 111 ("Shanai").</summary>
+        </member>
+        <member name="F:Midi.Instrument.TinkleBell">
+            <summary>General MIDI instrument 112 ("Tinkle Bell").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Agogo">
+            <summary>General MIDI instrument 113 (Agogo"").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SteelDrums">
+            <summary>General MIDI instrument 114 ("Steel Drums").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Woodblock">
+            <summary>General MIDI instrument 115 ("Woodblock").</summary>
+        </member>
+        <member name="F:Midi.Instrument.TaikoDrum">
+            <summary>General MIDI instrument 116 ("Taiko Drum").</summary>
+        </member>
+        <member name="F:Midi.Instrument.MelodicTom">
+            <summary>General MIDI instrument 117 ("Melodic Tom").</summary>
+        </member>
+        <member name="F:Midi.Instrument.SynthDrum">
+            <summary>General MIDI instrument 118 ("Synth Drum").</summary>
+        </member>
+        <member name="F:Midi.Instrument.ReverseCymbal">
+            <summary>General MIDI instrument 119 ("Reverse Cymbal").</summary>
+        </member>
+        <member name="F:Midi.Instrument.GuitarFretNoise">
+            <summary>General MIDI instrument 120 ("Guitar Fret Noise").</summary>
+        </member>
+        <member name="F:Midi.Instrument.BreathNoise">
+            <summary>General MIDI instrument 121 ("Breath Noise").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Seashore">
+            <summary>General MIDI instrument 122 ("Seashore").</summary>
+        </member>
+        <member name="F:Midi.Instrument.BirdTweet">
+            <summary>General MIDI instrument 123 ("Bird Tweet").</summary>
+        </member>
+        <member name="F:Midi.Instrument.TelephoneRing">
+            <summary>General MIDI instrument 124 ("Telephone Ring").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Helicopter">
+            <summary>General MIDI instrument 125 ("Helicopter").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Applause">
+            <summary>General MIDI instrument 126 ("Applause").</summary>
+        </member>
+        <member name="F:Midi.Instrument.Gunshot">
+            <summary>General MIDI instrument 127 ("Gunshot").</summary>
+        </member>
+        <member name="T:Midi.InstrumentExtensionMethods">
+            <summary>
+            Extension methods for the Instrument enum.
+            </summary>
+        </member>
+        <member name="M:Midi.InstrumentExtensionMethods.IsValid(Midi.Instrument)">
+            <summary>
+            Returns true if the specified instrument is valid.
+            </summary>
+            <param name="instrument">The instrument to test.</param>
+        </member>
+        <member name="M:Midi.InstrumentExtensionMethods.Validate(Midi.Instrument)">
+            <summary>
+            Throws an exception if instrument is not valid.
+            </summary>
+            <param name="instrument">The instrument to validate.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The instrument is out-of-range.
+            </exception>
+        </member>
+        <member name="F:Midi.InstrumentExtensionMethods.InstrumentNames">
+            <summary>
+            General Midi instrument names, used by GetInstrumentName().
+            </summary>
+        </member>
+        <member name="M:Midi.InstrumentExtensionMethods.Name(Midi.Instrument)">
+            <summary>
+            Returns the human-readable name of a MIDI instrument.
+            </summary>
+            <param name="instrument">The instrument.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The instrument is out-of-range.
+            </exception>
+        </member>
+        <member name="T:Midi.ShortMsg">
+            <summary>
+            Utility functions for encoding and decoding short messages.
+            </summary>
+        </member>
+        <member name="M:Midi.ShortMsg.IsNoteOn(System.UIntPtr,System.UIntPtr)">
+            <summary>
+            Returns true if the given short message describes a Note On message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+        </member>
+        <member name="M:Midi.ShortMsg.DecodeNoteOn(System.UIntPtr,System.UIntPtr,Midi.Channel@,Midi.Pitch@,System.Int32@,System.UInt32@)">
+            <summary>
+            Decodes a Note On short message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+            <param name="channel">Filled in with the channel.</param>
+            <param name="pitch">Filled in with the pitch.</param>
+            <param name="velocity">Filled in with the velocity, 0.127</param>
+            <param name="timestamp">Filled in with the timestamp in microseconds since
+            midiInStart().</param>
+        </member>
+        <member name="M:Midi.ShortMsg.EncodeNoteOn(Midi.Channel,Midi.Pitch,System.Int32)">
+            <summary>
+            Encodes a Note On short message.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="pitch">The pitch.</param>
+            <param name="velocity">The velocity 0..127.</param>
+            <returns>A value that can be passed to midiOutShortMsg.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">pitch is not in MIDI range.</exception>
+        </member>
+        <member name="M:Midi.ShortMsg.IsNoteOff(System.UIntPtr,System.UIntPtr)">
+            <summary>
+            Returns true if the given short message describes a Note Off message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+        </member>
+        <member name="M:Midi.ShortMsg.DecodeNoteOff(System.UIntPtr,System.UIntPtr,Midi.Channel@,Midi.Pitch@,System.Int32@,System.UInt32@)">
+            <summary>
+            Decodes a Note Off short message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+            <param name="channel">Filled in with the channel.</param>
+            <param name="pitch">Filled in with the pitch.</param>
+            <param name="velocity">Filled in with the velocity, 0.127</param>
+            <param name="timestamp">Filled in with the timestamp in microseconds since
+            midiInStart().</param>
+        </member>
+        <member name="M:Midi.ShortMsg.EncodeNoteOff(Midi.Channel,Midi.Pitch,System.Int32)">
+            <summary>
+            Encodes a Note Off short message.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="pitch">The pitch.</param>
+            <param name="velocity">The velocity 0..127.</param>
+            <returns>A value that can be passed to midiOutShortMsg.</returns>
+        </member>
+        <member name="M:Midi.ShortMsg.IsControlChange(System.UIntPtr,System.UIntPtr)">
+            <summary>
+            Returns true if the given short message describes a Control Change message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+        </member>
+        <member name="M:Midi.ShortMsg.DecodeControlChange(System.UIntPtr,System.UIntPtr,Midi.Channel@,Midi.Control@,System.Int32@,System.UInt32@)">
+            <summary>
+            Decodes a Control Change short message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+            <param name="channel">Filled in with the channel.</param>
+            <param name="control">Filled in with the control.</param>
+            <param name="value">Filled in with the value, 0-127.</param>
+            <param name="timestamp">Filled in with the timestamp in microseconds since
+            midiInStart().</param>
+        </member>
+        <member name="M:Midi.ShortMsg.EncodeControlChange(Midi.Channel,Midi.Control,System.Int32)">
+            <summary>
+            Encodes a Control Change short message.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="control">The control.</param>
+            <param name="value">The new value 0..127.</param>
+            <returns>A value that can be passed to midiOutShortMsg.</returns>
+        </member>
+        <member name="M:Midi.ShortMsg.IsProgramChange(System.UIntPtr,System.UIntPtr)">
+            <summary>
+            Returns true if the given short message a Program Change message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+        </member>
+        <member name="M:Midi.ShortMsg.DecodeProgramChange(System.UIntPtr,System.UIntPtr,Midi.Channel@,Midi.Instrument@,System.UInt32@)">
+            <summary>
+            Decodes a Program Change short message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+            <param name="channel">Filled in with the channel, 0-15.</param>
+            <param name="instrument">Filled in with the instrument, 0-127</param>
+            <param name="timestamp">Filled in with the timestamp in microseconds since
+            midiInStart().</param>
+        </member>
+        <member name="M:Midi.ShortMsg.EncodeProgramChange(Midi.Channel,Midi.Instrument)">
+            <summary>
+            Encodes a Program Change short message.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="instrument">The instrument.</param>
+            <returns>A value that can be passed to midiOutShortMsg.</returns>
+        </member>
+        <member name="M:Midi.ShortMsg.IsPitchBend(System.UIntPtr,System.UIntPtr)">
+            <summary>
+            Returns true if the given MidiInProc params describe a Pitch Bend message.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+        </member>
+        <member name="M:Midi.ShortMsg.DecodePitchBend(System.UIntPtr,System.UIntPtr,Midi.Channel@,System.Int32@,System.UInt32@)">
+            <summary>
+            Decodes a Pitch Bend message based on MidiInProc params.
+            </summary>
+            <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
+            <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
+            <param name="channel">Filled in with the channel, 0-15.</param>
+            <param name="value">Filled in with the pitch bend value, 0..16383, 8192 is centered.
+            </param>
+            <param name="timestamp">Filled in with the timestamp in microseconds since
+            midiInStart().</param>
+        </member>
+        <member name="M:Midi.ShortMsg.EncodePitchBend(Midi.Channel,System.Int32)">
+            <summary>
+            Encodes a Pitch Bend short message.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="value">The pitch bend value, 0..16383, 8192 is centered.</param>
+            <returns>A value that can be passed to midiOutShortMsg.</returns>
+        </member>
+        <member name="T:Midi.Pitch">
+            <summary>
+            Pitches supported by MIDI.
+            </summary>
+            <remarks>
+            <para>MIDI defines 127 distinct pitches, in semitone intervals, ranging from C five octaves
+            below middle C, up to G five octaves above middle C.  This covers several octaves above and
+            below the range of a normal 88-key piano.</para>
+            <para>These 127 pitches are the only ones directly expressible in MIDI. Precise
+            variations in frequency can be achieved with <see cref="M:Midi.OutputDevice.SendPitchBend(Midi.Channel,System.Int32)">Pitch
+            Bend</see> messages, though Pitch Bend messages apply to the whole channel at once.</para>
+            <para>In this enum, pitches are given C Major note names (eg "F", "GSharp") followed
+            by the octave number.  Octaves use standard piano terminology: Middle C is in
+            octave 4.  (Note that this is different from "MIDI octaves", which have Middle C in
+            octave 0.)</para>
+            <para>This enum has extension methods, such as
+            <see cref="M:Midi.PitchExtensionMethods.NotePreferringSharps(Midi.Pitch)"/> and
+            <see cref="M:Midi.PitchExtensionMethods.IsInMidiRange(Midi.Pitch)"/>, defined in
+            <see cref="T:Midi.PitchExtensionMethods"/>.
+            </para>
+            </remarks>
+            <seealso cref="T:Midi.Note"/>
+            <seealso cref="T:Midi.Interval"/>
+        </member>
+        <member name="F:Midi.Pitch.CNeg1">
+            <summary>C in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharpNeg1">
+            <summary>C# in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DNeg1">
+            <summary>D in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharpNeg1">
+            <summary>D# in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ENeg1">
+            <summary>E in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FNeg1">
+            <summary>F in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharpNeg1">
+            <summary>F# in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GNeg1">
+            <summary>G in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharpNeg1">
+            <summary>G# in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ANeg1">
+            <summary>A in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharpNeg1">
+            <summary>A# in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.BNeg1">
+            <summary>B in octave -1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C0">
+            <summary>C in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp0">
+            <summary>C# in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D0">
+            <summary>D in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp0">
+            <summary>D# in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E0">
+            <summary>E in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F0">
+            <summary>F in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp0">
+            <summary>F# in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G0">
+            <summary>G in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp0">
+            <summary>G# in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A0">
+            <summary>A in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp0">
+            <summary>A# in octave 0, usually the lowest key on an 88-key keyboard.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B0">
+            <summary>B in octave 0.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C1">
+            <summary>C in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp1">
+            <summary>C# in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D1">
+            <summary>D in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp1">
+            <summary>D# in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E1">
+            <summary>E in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F1">
+            <summary>F in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp1">
+            <summary>F# in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G1">
+            <summary>G in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp1">
+            <summary>G# in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A1">
+            <summary>A in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp1">
+            <summary>A# in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B1">
+            <summary>B in octave 1.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C2">
+            <summary>C in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp2">
+            <summary>C# in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D2">
+            <summary>D in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp2">
+            <summary>D# in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E2">
+            <summary>E in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F2">
+            <summary>F in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp2">
+            <summary>F# in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G2">
+            <summary>G in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp2">
+            <summary>G# in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A2">
+            <summary>A in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp2">
+            <summary>A# in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B2">
+            <summary>B in octave 2.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C3">
+            <summary>C in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp3">
+            <summary>C# in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D3">
+            <summary>D in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp3">
+            <summary>D# in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E3">
+            <summary>E in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F3">
+            <summary>F in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp3">
+            <summary>F# in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G3">
+            <summary>G in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp3">
+            <summary>G# in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A3">
+            <summary>A in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp3">
+            <summary>A# in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B3">
+            <summary>B in octave 3.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C4">
+            <summary>C in octave 4, also known as Middle C.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp4">
+            <summary>C# in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D4">
+            <summary>D in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp4">
+            <summary>D# in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E4">
+            <summary>E in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F4">
+            <summary>F in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp4">
+            <summary>F# in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G4">
+            <summary>G in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp4">
+            <summary>G# in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A4">
+            <summary>A in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp4">
+            <summary>A# in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B4">
+            <summary>B in octave 4.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C5">
+            <summary>C in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp5">
+            <summary>C# in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D5">
+            <summary>D in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp5">
+            <summary>D# in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E5">
+            <summary>E in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F5">
+            <summary>F in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp5">
+            <summary>F# in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G5">
+            <summary>G in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp5">
+            <summary>G# in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A5">
+            <summary>A in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp5">
+            <summary>A# in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B5">
+            <summary>B in octave 5.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C6">
+            <summary>C in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp6">
+            <summary>C# in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D6">
+            <summary>D in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp6">
+            <summary>D# in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E6">
+            <summary>E in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F6">
+            <summary>F in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp6">
+            <summary>F# in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G6">
+            <summary>G in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp6">
+            <summary>G# in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A6">
+            <summary>A in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp6">
+            <summary>A# in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B6">
+            <summary>B in octave 6.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C7">
+            <summary>C in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp7">
+            <summary>C# in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D7">
+            <summary>D in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp7">
+            <summary>D# in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E7">
+            <summary>E in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F7">
+            <summary>F in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp7">
+            <summary>F# in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G7">
+            <summary>G in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp7">
+            <summary>G# in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A7">
+            <summary>A in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp7">
+            <summary>A# in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B7">
+            <summary>B in octave 7.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C8">
+            <summary>C in octave 8, usually the highest key on an 88-key keyboard.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp8">
+            <summary>C# in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D8">
+            <summary>D in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp8">
+            <summary>D# in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E8">
+            <summary>E in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F8">
+            <summary>F in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp8">
+            <summary>F# in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G8">
+            <summary>G in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.GSharp8">
+            <summary>G# in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.A8">
+            <summary>A in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.ASharp8">
+            <summary>A# in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.B8">
+            <summary>B in octave 8.</summary>
+        </member>
+        <member name="F:Midi.Pitch.C9">
+            <summary>C in octave 9.</summary>
+        </member>
+        <member name="F:Midi.Pitch.CSharp9">
+            <summary>C# in octave 9.</summary>
+        </member>
+        <member name="F:Midi.Pitch.D9">
+            <summary>D in octave 9.</summary>
+        </member>
+        <member name="F:Midi.Pitch.DSharp9">
+            <summary>D# in octave 9.</summary>
+        </member>
+        <member name="F:Midi.Pitch.E9">
+            <summary>E in octave 9.</summary>
+        </member>
+        <member name="F:Midi.Pitch.F9">
+            <summary>F in octave 9.</summary>
+        </member>
+        <member name="F:Midi.Pitch.FSharp9">
+            <summary>F# in octave 9.</summary>
+        </member>
+        <member name="F:Midi.Pitch.G9">
+            <summary>G in octave 9.</summary>
+        </member>
+        <member name="T:Midi.PitchExtensionMethods">
+            <summary>
+            Extension methods for the Pitch enum.
+            </summary>
+        </member>
+        <member name="M:Midi.PitchExtensionMethods.IsInMidiRange(Midi.Pitch)">
+            <summary>
+            Returns true if pitch is in the MIDI range [1..127].
+            </summary>
+            <param name="pitch">The pitch to test.</param>
+            <returns>True if the pitch is in [0..127].</returns>
+        </member>
+        <member name="M:Midi.PitchExtensionMethods.Octave(Midi.Pitch)">
+            <summary>
+            Returns the octave containing this pitch.
+            </summary>
+            <param name="pitch">The pitch.</param>
+            <returns>The octave, where octaves begin at each C, and Middle C is the first pitch in
+            octave 4.</returns>
+        </member>
+        <member name="M:Midi.PitchExtensionMethods.PositionInOctave(Midi.Pitch)">
+            <summary>
+            Returns the position of this pitch in its octave.
+            </summary>
+            <param name="pitch">The pitch.</param>
+            <returns>The pitch's position in its octave, where octaves start at each C, so C's
+            position is 0, C#'s position is 1, etc.</returns>
+        </member>
+        <member name="F:Midi.PitchExtensionMethods.PositionInOctaveToNotesPreferringSharps">
+            <summary>Maps PositionInOctave() to a Note preferring sharps.</summary>
+        </member>
+        <member name="F:Midi.PitchExtensionMethods.PositionInOctaveToNotesPreferringFlats">
+            <summary>Maps PositionInOctave() to a Note preferring flats.</summary>
+        </member>
+        <member name="M:Midi.PitchExtensionMethods.NotePreferringSharps(Midi.Pitch)">
+            <summary>
+            Returns the simplest note that resolves to this pitch, preferring sharps where needed.
+            </summary>
+            <param name="pitch">The pitch.</param>
+            <returns>The simplest note for that pitch.  If that pitch is a "white key", the note
+            is simply a letter with no accidentals (and is the same as
+            <see cref="M:Midi.PitchExtensionMethods.NotePreferringFlats(Midi.Pitch)"/>).  Otherwise the note has a sharp.</returns>
+        </member>
+        <member name="M:Midi.PitchExtensionMethods.NotePreferringFlats(Midi.Pitch)">
+            <summary>
+            Returns the simplest note that resolves to this pitch, preferring flats where needed.
+            </summary>
+            <param name="pitch">The pitch.</param>
+            <returns>The simplest note for that pitch.  If that pitch is a "white key", the note
+            is simply a letter with no accidentals (and is the same as
+            <see cref="M:Midi.PitchExtensionMethods.NotePreferringSharps(Midi.Pitch)"/>).  Otherwise the note has a flat.</returns>
+        </member>
+        <member name="M:Midi.PitchExtensionMethods.NoteWithLetter(Midi.Pitch,System.Char)">
+            <summary>
+            Returns the note that would name this pitch if it used the given letter.
+            </summary>
+            <param name="pitch">The pitch being named.</param>
+            <param name="letter">The letter to use in the name, in ['A'..'G'].</param>
+            <returns>The note for pitch with letter.  The result may have a large number of
+            accidentals if pitch is not easily named by letter.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">letter is out of range.</exception>
+        </member>
+        <member name="T:Midi.MessageQueue">
+            <summary>
+            A time-sorted queue of MIDI messages.
+            </summary>
+            Messages can be added in any order, and can be popped off in timestamp order.
+        </member>
+        <member name="M:Midi.MessageQueue.#ctor">
+            <summary>
+            Constructs an empty message queue.
+            </summary>
+        </member>
+        <member name="M:Midi.MessageQueue.AddMessage(Midi.Message)">
+            <summary>
+            Adds a message to the queue.
+            </summary>
+            <param name="message">The message to add to the queue.</param>
+            The message must have a valid timestamp (not MidiMessage.Now), but other than that
+            there is no restriction on the timestamp.  For example, it is legal to add a message with
+            a timestamp earlier than some other message which was previously removed from the queue.
+            Such a message would become the new "earliest" message, and so would be be the first message
+            returned by PopEarliest().
+        </member>
+        <member name="M:Midi.MessageQueue.Clear">
+            <summary>
+            Discards all messages in the queue.
+            </summary>
+        </member>
+        <member name="M:Midi.MessageQueue.PopEarliest">
+            <summary>
+            Removes and returns the message(s) in the queue that have the earliest timestamp.
+            </summary>
+        </member>
+        <member name="P:Midi.MessageQueue.IsEmpty">
+            <summary>
+            True if the queue is empty.
+            </summary>
+        </member>
+        <member name="P:Midi.MessageQueue.EarliestTimestamp">
+            <summary>
+            The timestamp of the earliest messsage(s) in the queue.
+            </summary>
+            Throws an exception if the queue is empty.
+        </member>
+        <member name="T:Midi.Percussion">
+            <summary>
+            General MIDI percussion note.
+            </summary>
+            <remarks>
+            <para>
+            In General MIDI, notes played on <see cref="F:Midi.Channel.Channel10"/> make the following
+            percussion sounds, regardless of any <see cref="M:Midi.OutputDevice.SendProgramChange(Midi.Channel,Midi.Instrument)">Program
+            Change</see> messages on that channel.
+            </para>
+            <para>
+            This enum is used with <see cref="M:Midi.OutputDevice.SendPercussion(Midi.Percussion,System.Int32)">OutputDevice.SendPercussion
+            </see> and <see cref="T:Midi.PercussionMessage"/>.  Equivalently, when cast to <see cref="T:Midi.Note"/>
+            it can be used with <see cref="M:Midi.OutputDevice.SendNoteOn(Midi.Channel,Midi.Pitch,System.Int32)">OutputDevice.SendNoteOn</see> and
+            <see cref="T:Midi.NoteOnMessage"/> on <see cref="F:Midi.Channel.Channel10"/>.</para>
+            <para>This enum has extension methods, such as <see cref="M:Midi.PercussionExtensionMethods.Name(Midi.Percussion)"/>
+            and <see cref="M:Midi.PercussionExtensionMethods.IsValid(Midi.Percussion)"/>, defined in
+            <see cref="T:Midi.PercussionExtensionMethods"/>. </para>
+            </remarks>
+        </member>
+        <member name="F:Midi.Percussion.BassDrum2">
+            <summary>General MIDI percussion 35 ("Bass Drum 2").</summary>
+        </member>
+        <member name="F:Midi.Percussion.BassDrum1">
+            <summary>General MIDI percussion 36 ("Bass Drum 1").</summary>
+        </member>
+        <member name="F:Midi.Percussion.SideStick">
+            <summary>General MIDI percussion 37 ("Side Stick").</summary>
+        </member>
+        <member name="F:Midi.Percussion.SnareDrum1">
+            <summary>General MIDI percussion 38 ("Snare Drum 1").</summary>
+        </member>
+        <member name="F:Midi.Percussion.HandClap">
+            <summary>General MIDI percussion 39 ("Hand Clap").</summary>
+        </member>
+        <member name="F:Midi.Percussion.SnareDrum2">
+            <summary>General MIDI percussion 40 ("Snare Drum 2").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LowTom2">
+            <summary>General MIDI percussion 41 ("Low Tom 2").</summary>
+        </member>
+        <member name="F:Midi.Percussion.ClosedHiHat">
+            <summary>General MIDI percussion 42 ("Closed Hi-hat").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LowTom1">
+            <summary>General MIDI percussion 43 ("Low Tom 1").</summary>
+        </member>
+        <member name="F:Midi.Percussion.PedalHiHat">
+            <summary>General MIDI percussion 44 ("Pedal Hi-hat").</summary>
+        </member>
+        <member name="F:Midi.Percussion.MidTom2">
+            <summary>General MIDI percussion 45 ("Mid Tom 2").</summary>
+        </member>
+        <member name="F:Midi.Percussion.OpenHiHat">
+            <summary>General MIDI percussion 46 ("Open Hi-hat").</summary>
+        </member>
+        <member name="F:Midi.Percussion.MidTom1">
+            <summary>General MIDI percussion 47 ("Mid Tom 1").</summary>
+        </member>
+        <member name="F:Midi.Percussion.HighTom2">
+            <summary>General MIDI percussion 48 ("High Tom 2").</summary>
+        </member>
+        <member name="F:Midi.Percussion.CrashCymbal1">
+            <summary>General MIDI percussion 49 ("Crash Cymbal 1").</summary>
+        </member>
+        <member name="F:Midi.Percussion.HighTom1">
+            <summary>General MIDI percussion 50 ("High Tom 1").</summary>
+        </member>
+        <member name="F:Midi.Percussion.RideCymbal1">
+            <summary>General MIDI percussion 51 ("Ride Cymbal 1").</summary>
+        </member>
+        <member name="F:Midi.Percussion.ChineseCymbal">
+            <summary>General MIDI percussion 52 ("Chinese Cymbal").</summary>
+        </member>
+        <member name="F:Midi.Percussion.RideBell">
+            <summary>General MIDI percussion 53 ("Ride Bell").</summary>
+        </member>
+        <member name="F:Midi.Percussion.Tambourine">
+            <summary>General MIDI percussion 54 ("Tambourine").</summary>
+        </member>
+        <member name="F:Midi.Percussion.SplashCymbal">
+            <summary>General MIDI percussion 55 ("Splash Cymbal").</summary>
+        </member>
+        <member name="F:Midi.Percussion.Cowbell">
+            <summary>General MIDI percussion 56 ("Cowbell").</summary>
+        </member>
+        <member name="F:Midi.Percussion.CrashCymbal2">
+            <summary>General MIDI percussion 57 ("Crash Cymbal 2").</summary>
+        </member>
+        <member name="F:Midi.Percussion.VibraSlap">
+            <summary>General MIDI percussion 58 ("Vibra Slap").</summary>
+        </member>
+        <member name="F:Midi.Percussion.RideCymbal2">
+            <summary>General MIDI percussion 59 ("Ride Cymbal 2").</summary>
+        </member>
+        <member name="F:Midi.Percussion.HighBongo">
+            <summary>General MIDI percussion 60 ("High Bongo").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LowBongo">
+            <summary>General MIDI percussion 61 ("Low Bongo").</summary>
+        </member>
+        <member name="F:Midi.Percussion.MuteHighConga">
+            <summary>General MIDI percussion 62 ("Mute High Conga").</summary>
+        </member>
+        <member name="F:Midi.Percussion.OpenHighConga">
+            <summary>General MIDI percussion 63 ("Open High Conga").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LowConga">
+            <summary>General MIDI percussion 64 ("Low Conga").</summary>
+        </member>
+        <member name="F:Midi.Percussion.HighTimbale">
+            <summary>General MIDI percussion 65 ("High Timbale").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LowTimbale">
+            <summary>General MIDI percussion 66 ("Low Timbale").</summary>
+        </member>
+        <member name="F:Midi.Percussion.HighAgogo">
+            <summary>General MIDI percussion 67 ("High Agogo").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LowAgogo">
+            <summary>General MIDI percussion 68 ("Low Agogo").</summary>
+        </member>
+        <member name="F:Midi.Percussion.Cabasa">
+            <summary>General MIDI percussion 69 ("Cabasa").</summary>
+        </member>
+        <member name="F:Midi.Percussion.Maracas">
+            <summary>General MIDI percussion 70 ("Maracas").</summary>
+        </member>
+        <member name="F:Midi.Percussion.ShortWhistle">
+            <summary>General MIDI percussion 71 ("Short Whistle").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LongWhistle">
+            <summary>General MIDI percussion 72 ("Long Whistle").</summary>
+        </member>
+        <member name="F:Midi.Percussion.ShortGuiro">
+            <summary>General MIDI percussion 73 ("Short Guiro").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LongGuiro">
+            <summary>General MIDI percussion 74 ("Long Guiro").</summary>
+        </member>
+        <member name="F:Midi.Percussion.Claves">
+            <summary>General MIDI percussion 75 ("Claves").</summary>
+        </member>
+        <member name="F:Midi.Percussion.HighWoodBlock">
+            <summary>General MIDI percussion 76 ("High Wood Block").</summary>
+        </member>
+        <member name="F:Midi.Percussion.LowWoodBlock">
+            <summary>General MIDI percussion 77 ("Low Wood Block").</summary>
+        </member>
+        <member name="F:Midi.Percussion.MuteCuica">
+            <summary>General MIDI percussion 78 ("Mute Cuica").</summary>
+        </member>
+        <member name="F:Midi.Percussion.OpenCuica">
+            <summary>General MIDI percussion 79 ("Open Cuica").</summary>
+        </member>
+        <member name="F:Midi.Percussion.MuteTriangle">
+            <summary>General MIDI percussion 80 ("Mute Triangle").</summary>
+        </member>
+        <member name="F:Midi.Percussion.OpenTriangle">
+            <summary>General MIDI percussion 81 ("Open Triangle").</summary>
+        </member>
+        <member name="T:Midi.PercussionExtensionMethods">
+            <summary>
+            Extension methods for the Percussion enum.
+            </summary>
+            Be sure to "using midi" if you want to use these as extension methods.
+        </member>
+        <member name="M:Midi.PercussionExtensionMethods.IsValid(Midi.Percussion)">
+            <summary>
+            Returns true if the specified percussion is valid.
+            </summary>
+            <param name="percussion">The percussion to test.</param>
+        </member>
+        <member name="M:Midi.PercussionExtensionMethods.Validate(Midi.Percussion)">
+            <summary>
+            Throws an exception if percussion is not valid.
+            </summary>
+            <param name="percussion">The percussion to validate.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The percussion is out-of-range.
+            </exception>
+        </member>
+        <member name="M:Midi.PercussionExtensionMethods.Name(Midi.Percussion)">
+            <summary>
+            Returns the human-readable name of a MIDI percussion.
+            </summary>
+            <param name="percussion">The percussion.</param>
+        </member>
+        <member name="T:Midi.Note">
+            <summary>
+            A letter and accidental, which together form an octave-independent note.
+            </summary>
+            <remarks>
+            <para>This class lets you define a note by combining a letters A-G with accidentals
+            (sharps and flats).  Examples of notes are D, B#, and Gbb.  This is the conventional
+            way to refer to notes in an octave independent way.</para>
+            <para>Each note unambiguously identifies a pitch (modulo octave), but each pitch has
+            potentially many notes.  For example, the notes F, E#, D###, and Gbb all resolve to the
+            same pitch, though the last two names are unlikely to be used in practice.</para>
+            </remarks>
+        </member>
+        <member name="F:Midi.Note.DoubleFlat">
+            <summary>Double-flat accidental value.</summary>
+        </member>
+        <member name="F:Midi.Note.Flat">
+            <summary>Flat accidental value.</summary>
+        </member>
+        <member name="F:Midi.Note.Natural">
+            <summary>Natural accidental value.</summary>
+        </member>
+        <member name="F:Midi.Note.Sharp">
+            <summary>Sharp accidental value.</summary>
+        </member>
+        <member name="F:Midi.Note.DoubleSharp">
+            <summary>Double-sharp accidental value.</summary>
+        </member>
+        <member name="M:Midi.Note.#ctor(System.Char)">
+            <summary>
+            Constructs a note from a letter.
+            </summary>
+            <param name="letter">The letter, which must be in ['A'..'G'].</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">letter is out of range.</exception>
+        </member>
+        <member name="M:Midi.Note.#ctor(System.String)">
+            <summary>
+            Constructs a note from a string.
+            </summary>
+            <param name="name">The name to parse.  Must begin with a letter in ['A'..'G'],
+            then optionally be followed by a series of '#' (sharps) or a series of 'b' (flats).
+            </param>
+            <exception cref="T:System.ArgumentNullException">name is null.</exception>
+            <exception cref="T:System.ArgumentException">name cannot be parsed.</exception>
+        </member>
+        <member name="M:Midi.Note.#ctor(System.Char,System.Int32)">
+            <summary>
+            Constructs a note name from a letter and accidental.
+            </summary>
+            <param name="letter">The letter, which must be in ['A'..'G'].</param>
+            <param name="accidental">The accidental.  Zero means natural, positive values are
+            sharp by that many semitones, and negative values are flat by that many semitones.
+            Likely values are <see cref="F:Midi.Note.Natural"/> (0), <see cref="F:Midi.Note.Sharp"/> (1),
+            <see cref="F:Midi.Note.DoubleSharp"/> (2), <see cref="F:Midi.Note.Flat"/> (-1), and <see cref="F:Midi.Note.DoubleFlat"/>
+            (-2).</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">letter is out of range.</exception>
+        </member>
+        <member name="M:Midi.Note.ToString">
+            <summary>
+            ToString returns the note name.
+            </summary>
+            <returns>The note name with '#' for sharp and 'b' for flat.  For example, "G", "A#",
+            "Cb", "Fbb".</returns>
+        </member>
+        <member name="M:Midi.Note.ParseNote(System.String,System.Int32@)">
+            <summary>
+            Parses a Note from s, starting at position pos.
+            </summary>
+            <param name="s">The string to parse from.</param>
+            <param name="pos">The position to start at.  On success, advances pos to after the
+            end of the note.</param>
+            <returns>The note.</returns>
+            <exception cref="T:System.ArgumentException">A note cannot be parsed.</exception>
+            <remarks>
+            <para>This function must find a valid letter at s[pos], and then optionally a
+            sequence of '#' (sharps) or 'b' (flats).  It finds as many of the accidental as it can
+            and then stops at the first character that can't be part of the accidental.</para>
+            </remarks>
+        </member>
+        <member name="M:Midi.Note.IsEharmonicWith(Midi.Note)">
+            <summary>
+            Returns true if this note name is enharmonic with otherNote.
+            </summary>
+            <param name="otherNote">Another note.</param>
+            <returns>True if the names can refer to the same pitch.</returns>
+        </member>
+        <member name="M:Midi.Note.PitchInOctave(System.Int32)">
+            <summary>
+            Returns the pitch for this note in the specified octave.
+            </summary>
+            <param name="octave">The octave, where octaves begin at each C and Middle C is the
+            first note in octave 4.</param>
+            <returns>The pitch with this name in the specified octave.</returns>
+        </member>
+        <member name="M:Midi.Note.PitchAtOrAbove(Midi.Pitch)">
+            <summary>
+            Returns the pitch for this note that is at or above nearPitch.
+            </summary>
+            <param name="nearPitch">The pitch from which the search is based.</param>
+            <returns>The pitch for this note at or above nearPitch.</returns>
+        </member>
+        <member name="M:Midi.Note.PitchAtOrBelow(Midi.Pitch)">
+            <summary>
+            Returns the pitch for this note that is at or below nearPitch.
+            </summary>
+            <param name="nearPitch">The pitch from which the search is based.</param>
+            <returns>The pitch for this note at or below nearPitch.</returns>
+        </member>
+        <member name="M:Midi.Note.SemitonesUpTo(Midi.Note)">
+            <summary>
+            Returns the number of semitones it takes to move up to the next otherNote.
+            </summary>
+            <param name="otherNote">The other note.</param>
+            <returns>The number of semitones.</returns>
+        </member>
+        <member name="M:Midi.Note.SemitonesDownTo(Midi.Note)">
+            <summary>
+            Returns the number of semitones it takes to move down to the next otherNote.
+            </summary>
+            <param name="otherNote">The other note.</param>
+            <returns>The number of semitones.</returns>
+        </member>
+        <member name="M:Midi.Note.op_Equality(Midi.Note,Midi.Note)">
+            <summary>Equality operator does value comparison.</summary>
+        </member>
+        <member name="M:Midi.Note.op_Inequality(Midi.Note,Midi.Note)">
+            <summary>Inequality operator does value comparison.</summary>
+        </member>
+        <member name="M:Midi.Note.Equals(System.Object)">
+            <summary>
+            Value equality for Note.
+            </summary>
+        </member>
+        <member name="M:Midi.Note.GetHashCode">
+            <summary>
+            Hash code.
+            </summary>
+        </member>
+        <member name="F:Midi.Note.LetterToNote">
+            <summary>
+            Table mapping (letter-'A') to the Note in octave -1, used to compute positionInOctave.
+            </summary>
+        </member>
+        <member name="P:Midi.Note.Letter">
+            <summary>The letter for this note name, in ['A'..'G'].</summary>
+        </member>
+        <member name="P:Midi.Note.Accidental">
+            <summary>The accidental for this note name.</summary>
+            <remarks>
+            <para>Zero means natural, positive values are
+            sharp by that many semitones, and negative values are flat by that many semitones.
+            Likely values are <see cref="F:Midi.Note.Natural"/> (0), <see cref="F:Midi.Note.Sharp"/> (1),
+            <see cref="F:Midi.Note.DoubleSharp"/> (2), <see cref="F:Midi.Note.Flat"/> (-1), and <see cref="F:Midi.Note.DoubleFlat"/>
+            (-2).</para>
+            </remarks>
+        </member>
+        <member name="P:Midi.Note.PositionInOctave">
+            <summary>This note's position in the octave, where octaves start at each C.</summary>
+        </member>
+        <member name="T:Midi.OutputDevice">
+            <summary>
+            A MIDI output device.
+            </summary>
+            <remarks>
+            <para>Each instance of this class describes a MIDI output device installed on the system.
+            You cannot create your own instances, but instead must go through the
+            <see cref="P:Midi.OutputDevice.InstalledDevices"/> property to find which devices are available.  You may wish
+            to examine the <see cref="P:Midi.DeviceBase.Name"/> property of each one and present the user with
+            a choice of which device to use.
+            </para>
+            <para>Open an output device with <see cref="M:Midi.OutputDevice.Open"/> and close it with <see cref="M:Midi.OutputDevice.Close"/>.
+            While it is open, you may send MIDI messages with functions such as
+            <see cref="M:Midi.OutputDevice.SendNoteOn(Midi.Channel,Midi.Pitch,System.Int32)"/>, <see cref="M:Midi.OutputDevice.SendNoteOff(Midi.Channel,Midi.Pitch,System.Int32)"/> and <see cref="M:Midi.OutputDevice.SendProgramChange(Midi.Channel,Midi.Instrument)"/>.
+            All notes may be silenced on the device by calling <see cref="M:Midi.OutputDevice.SilenceAllNotes"/>.</para>
+            <para>Note that the above methods send their messages immediately.  If you wish to arrange
+            for a message to be sent at a specific future time, you'll need to instantiate some subclass
+            of <see cref="T:Midi.Message"/> (eg <see cref="T:Midi.NoteOnMessage"/>) and then pass it to
+            <see cref="M:Midi.Clock.Schedule(Midi.Message)">Clock.Schedule</see>.
+            </para>
+            </remarks>
+            <threadsafety static="true" instance="true"/>
+            <seealso cref="T:Midi.Clock"/>
+            <seealso cref="T:Midi.InputDevice"/>
+        </member>
+        <member name="M:Midi.OutputDevice.Open">
+            <summary>
+            Opens this output device.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The device is already open.</exception>
+            <exception cref="T:Midi.DeviceException">The device cannot be opened.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.Close">
+            <summary>
+            Closes this output device.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The device cannot be closed.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.SilenceAllNotes">
+            <summary>
+            Silences all notes on this output device.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The message cannot be sent.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.SendNoteOn(Midi.Channel,Midi.Pitch,System.Int32)">
+            <summary>
+            Sends a Note On message to this MIDI output device.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="pitch">The pitch.</param>
+            <param name="velocity">The velocity 0..127.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">channel, pitch, or velocity is
+            out-of-range.</exception>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The message cannot be sent.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.SendNoteOff(Midi.Channel,Midi.Pitch,System.Int32)">
+            <summary>
+            Sends a Note Off message to this MIDI output device.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="pitch">The pitch.</param>
+            <param name="velocity">The velocity 0..127.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">channel, note, or velocity is
+            out-of-range.</exception>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The message cannot be sent.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.SendPercussion(Midi.Percussion,System.Int32)">
+            <summary>
+            Sends a Note On message to Channel10 of this MIDI output device.
+            </summary>
+            <param name="percussion">The percussion.</param>
+            <param name="velocity">The velocity 0..127.</param>
+            <remarks>This is simply shorthand for a Note On message on Channel10 with a
+            percussion-specific note, so there is no corresponding message to receive from an input
+            device.</remarks>
+            <exception cref="T:System.ArgumentOutOfRangeException">percussion or velocity is out-of-range.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The message cannot be sent.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.SendControlChange(Midi.Channel,Midi.Control,System.Int32)">
+            <summary>
+            Sends a Control Change message to this MIDI output device.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="control">The control.</param>
+            <param name="value">The new value 0..127.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">channel, control, or value is
+            out-of-range.</exception>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The message cannot be sent.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.SendPitchBend(Midi.Channel,System.Int32)">
+            <summary>
+            Sends a Pitch Bend message to this MIDI output device.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="value">The pitch bend value, 0..16383, 8192 is centered.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">channel or value is out-of-range.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The message cannot be sent.</exception>
+        </member>
+        <member name="M:Midi.OutputDevice.SendProgramChange(Midi.Channel,Midi.Instrument)">
+            <summary>
+            Sends a Program Change message to this MIDI output device.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="instrument">The instrument.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">channel or instrument is out-of-range.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">The device is not open.</exception>
+            <exception cref="T:Midi.DeviceException">The message cannot be sent.</exception>
+            <remarks>
+            A Program Change message is used to switch among instrument settings, generally
+            instrument voices.  An instrument conforming to General Midi 1 will have the
+            instruments described in the <see cref="T:Midi.Instrument"/> enum; other instruments
+            may have different instrument sets.
+            </remarks>
+        </member>
+        <member name="M:Midi.OutputDevice.CheckReturnCode(Midi.Win32API.MMRESULT)">
+            <summary>
+            Makes sure rc is MidiWin32Wrapper.MMSYSERR_NOERROR.  If not, throws an exception with an
+            appropriate error message.
+            </summary>
+            <param name="rc"></param>
+        </member>
+        <member name="M:Midi.OutputDevice.CheckOpen">
+            <summary>
+            Throws a MidiDeviceException if this device is not open.
+            </summary>
+        </member>
+        <member name="M:Midi.OutputDevice.CheckNotOpen">
+            <summary>
+            Throws a MidiDeviceException if this device is open.
+            </summary>
+        </member>
+        <member name="M:Midi.OutputDevice.#ctor(System.UIntPtr,Midi.Win32API.MIDIOUTCAPS)">
+            <summary>
+            Private Constructor, only called by the getter for the InstalledDevices property.
+            </summary>
+            <param name="deviceId">Position of this device in the list of all devices.</param>
+            <param name="caps">Win32 Struct with device metadata</param>
+        </member>
+        <member name="M:Midi.OutputDevice.MakeDeviceList">
+            <summary>
+            Private method for constructing the array of MidiOutputDevices by calling the Win32 api.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Midi.OutputDevice.InstalledDevices">
+            <summary>
+            List of devices installed on this system.
+            </summary>
+        </member>
+        <member name="P:Midi.OutputDevice.IsOpen">
+            <summary>
+            True if this device is open.
+            </summary>
+        </member>
+        <member name="T:Midi.Control">
+            <summary>
+            MIDI Control, used in Control Change messages.
+            </summary>
+            <remarks>
+            <para>In MIDI, Control Change messages are used to influence various auxiliary "controls"
+            on a device, such as knobs, levers, and pedals.  Controls are specified with
+            integers in [0..127].  This enum provides an incomplete list of controls, because
+            most controls are too obscure to document effetively here.  Even for the ones listed
+            here, the details of how the value is interpreted are arcane.  Please see the MIDI spec for
+            details.</para>
+            <para>The most commonly used control is SustainPedal, which is considered off when &lt; 64,
+            on when &gt; 64.</para>
+            <para>This enum has extension methods, such as <see cref="M:Midi.ControlExtensionMethods.Name(Midi.Control)"/>
+            and <see cref="M:Midi.ControlExtensionMethods.IsValid(Midi.Control)"/>, defined in
+            <see cref="T:Midi.ControlExtensionMethods"/>.</para>
+            </remarks>
+        </member>
+        <member name="F:Midi.Control.ModulationWheel">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.DataEntryMSB">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.Volume">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.Pan">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.Expression">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.DataEntryLSB">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.SustainPedal">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.ReverbLevel">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.TremoloLevel">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.ChorusLevel">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.CelesteLevel">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.PhaserLevel">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.NonRegisteredParameterLSB">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.NonRegisteredParameterMSB">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.RegisteredParameterNumberLSB">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.RegisteredParameterNumberMSB">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.AllControllersOff">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="F:Midi.Control.AllNotesOff">
+            <summary>General MIDI Control--See MIDI spec for details.</summary>
+        </member>
+        <member name="T:Midi.ControlExtensionMethods">
+            <summary>
+            Extension methods for the Control enum.
+            </summary>
+            Be sure to "using midi" if you want to use these as extension methods.
+        </member>
+        <member name="M:Midi.ControlExtensionMethods.IsValid(Midi.Control)">
+            <summary>
+            Returns true if the specified control is valid.
+            </summary>
+            <param name="control">The Control to test.</param>
+        </member>
+        <member name="M:Midi.ControlExtensionMethods.Validate(Midi.Control)">
+            <summary>
+            Throws an exception if control is not valid.
+            </summary>
+            <param name="control">The control to validate.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The control is out-of-range.</exception>
+        </member>
+        <member name="F:Midi.ControlExtensionMethods.ControlNames">
+            <summary>
+            Table of control names.
+            </summary>
+        </member>
+        <member name="M:Midi.ControlExtensionMethods.Name(Midi.Control)">
+            <summary>
+            Returns the human-readable name of a MIDI control.
+            </summary>
+            <param name="control">The control.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The control is out-of-range.</exception>
+        </member>
+        <member name="T:Midi.Win32API">
+             <summary>
+             C# wrappers for the Win32 MIDI API.
+             </summary>
+             Because .NET does not provide MIDI support itself, in C# we must use P/Invoke to wrap the
+             Win32 API.  That API consists of the MMSystem.h C header and the winmm.dll library.  The API
+             is described in detail here: http://msdn.microsoft.com/en-us/library/ms712733(VS.85).aspx.
+             The P/Invoke interop mechanism is described here:
+             http://msdn.microsoft.com/en-us/library/aa288468(VS.71).aspx.
+            
+             This file covers the subset of the MIDI protocol needed to manage input and output devices
+             and send and receive Note On/Off, Control Change, Pitch Bend and Program Change messages.
+             Other portions of the MIDI protocol (such as sysex events) are supported in the Win32 API
+             but are not wrapped here.
+            
+             Some of the C functions are not typesafe when wrapped, so those wrappers are made private
+             and typesafe variants are provided.
+        </member>
+        <member name="F:Midi.Win32API.MAXPNAMELEN">
+            <summary>
+            Max length of a manufacturer name in the Win32 API.
+            </summary>
+        </member>
+        <member name="M:Midi.Win32API.midiOutGetNumDevs">
+            <summary>
+            Returns the number of MIDI output devices on this system.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711627(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiOutGetDevCaps(System.UIntPtr,Midi.Win32API.MIDIOUTCAPS@)">
+             <summary>
+             Fills in the capabilities struct for a specific output device.
+             </summary>
+             NOTE: This is adapted from the original Win32 function in order to make it typesafe.
+            
+             Win32 docs: http://msdn.microsoft.com/en-us/library/ms711621(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiOutOpen(Midi.Win32API.HMIDIOUT@,System.UIntPtr,Midi.Win32API.MidiOutProc,System.UIntPtr)">
+             <summary>
+             Opens a MIDI output device.
+             </summary>
+             NOTE: This is adapted from the original Win32 function in order to make it typesafe.
+            
+             Win32 docs: http://msdn.microsoft.com/en-us/library/ms711632(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiOutReset(Midi.Win32API.HMIDIOUT)">
+            <summary>
+            Turns off all notes and sustains on a MIDI output device.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/dd798479(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiOutClose(Midi.Win32API.HMIDIOUT)">
+            <summary>
+            Closes a MIDI output device.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711620(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiOutShortMsg(Midi.Win32API.HMIDIOUT,System.UInt32)">
+            <summary>
+            Sends a short MIDI message (anything but sysex or stream).
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711640(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiOutGetErrorText(Midi.Win32API.MMRESULT,System.Text.StringBuilder)">
+             <summary>
+             Gets the error text for a return code related to an output device.
+             </summary>
+             NOTE: This is adapted from the original Win32 function in order to make it typesafe.
+            
+             Win32 docs: http://msdn.microsoft.com/en-us/library/ms711622(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInGetNumDevs">
+            <summary>
+            Returns the number of MIDI input devices on this system.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711608(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInGetDevCaps(System.UIntPtr,Midi.Win32API.MIDIINCAPS@)">
+             <summary>
+             Fills in the capabilities struct for a specific input device.
+             </summary>
+             NOTE: This is adapted from the original Win32 function in order to make it typesafe.
+            
+             Win32 docs: http://msdn.microsoft.com/en-us/library/ms711604(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInOpen(Midi.Win32API.HMIDIIN@,System.UIntPtr,Midi.Win32API.MidiInProc,System.UIntPtr)">
+             <summary>
+             Opens a MIDI input device.
+             </summary>
+             NOTE: This is adapted from the original Win32 function in order to make it typesafe.
+            
+             Win32 docs: http://msdn.microsoft.com/en-us/library/ms711610(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInStart(Midi.Win32API.HMIDIIN)">
+            <summary>
+            Starts input on a MIDI input device.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711614(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInStop(Midi.Win32API.HMIDIIN)">
+            <summary>
+            Stops input on a MIDI input device.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711615(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInReset(Midi.Win32API.HMIDIIN)">
+            <summary>
+            Resets input on a MIDI input device.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711613(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInClose(Midi.Win32API.HMIDIIN)">
+            <summary>
+            Closes a MIDI input device.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711602(VS.85).aspx
+        </member>
+        <member name="M:Midi.Win32API.midiInGetErrorText(Midi.Win32API.MMRESULT,System.Text.StringBuilder)">
+             <summary>
+             Gets the error text for a return code related to an input device.
+             </summary>
+             NOTE: This is adapted from the original Win32 function in order to make it typesafe.
+            
+             Win32 docs: http://msdn.microsoft.com/en-us/library/ms711605(VS.85).aspx
+        </member>
+        <member name="T:Midi.Win32API.MMRESULT">
+            <summary>
+            Status type returned from most functions in the Win32 API.
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.MidiOpenFlags">
+            <summary>
+            Flags passed to midiInOpen() and midiOutOpen().
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.MidiDeviceType">
+            <summary>
+            Values for wTechnology field of MIDIOUTCAPS structure.
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.MidiExtraFeatures">
+            <summary>
+            Flags for dwSupport field of MIDIOUTCAPS structure.
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.MidiOutMessage">
+            <summary>
+            "Midi Out Messages", passed to wMsg param of MidiOutProc.
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.MidiInMessage">
+            <summary>
+            "Midi In Messages", passed to wMsg param of MidiInProc.
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.HMIDIOUT">
+            <summary>
+            Win32 handle for a MIDI output device.
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.HMIDIIN">
+            <summary>
+            Win32 handle for a MIDI input device.
+            </summary>
+        </member>
+        <member name="T:Midi.Win32API.MIDIOUTCAPS">
+            <summary>
+            Struct representing the capabilities of an output device. 
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711619(VS.85).aspx
+        </member>
+        <member name="T:Midi.Win32API.MIDIINCAPS">
+            <summary>
+            Struct representing the capabilities of an input device. 
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711596(VS.85).aspx
+        </member>
+        <member name="T:Midi.Win32API.MidiOutProc">
+            <summary>
+            Callback invoked when a MIDI output device is opened, closed, or finished with a buffer.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711637(VS.85).aspx
+        </member>
+        <member name="T:Midi.Win32API.MidiInProc">
+            <summary>
+            Callback invoked when a MIDI event is received from an input device.
+            </summary>
+            Win32 docs: http://msdn.microsoft.com/en-us/library/ms711612(VS.85).aspx
+        </member>
+        <member name="T:Midi.Interval">
+            <summary>
+            Interval measuring the relationship between pitches.
+            </summary>
+            <remarks>
+            <para>This enum is simply for making interval operations more explicit.  When adding to or
+            subtracting from the <see cref="T:Midi.Pitch"/> enum, one can either use ints...</para>
+            <code>Pitch p = Pitch.C4 + 5;</code>
+            <para>...or use the Interval enum, cast to int...</para>
+            <code>Pitch p = Pitch.C4 + (int)Interval.PerfectFourth;</code>
+            <para>These two examples are equivalent.  The benefit of the latter is simply that it makes
+            the intention more explicit.</para>
+            <para>This enum has extension methods, such as <see cref="M:Midi.IntervalExtensionMethods.Name(Midi.Interval)"/>,
+            defined in <see cref="T:Midi.IntervalExtensionMethods"/>.</para>
+            </remarks>
+            <seealso cref="T:Midi.Note"/>
+        </member>
+        <member name="F:Midi.Interval.Unison">
+            <summary>Unison interval, 0 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.Semitone">
+            <summary>Semitone interval, 1 semitone</summary>
+        </member>
+        <member name="F:Midi.Interval.WholeTone">
+            <summary>Whole Tone interval, 2 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.MinorThird">
+            <summary>Minor Third interval, 3 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.MajorThird">
+            <summary>Major Third interval, 4 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.PerfectFourth">
+            <summary>Perfect Fourth interval, 5 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.Tritone">
+            <summary>Tritone interval, 6 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.PerfectFifth">
+            <summary>Perfect Fifth interval, 7 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.MinorSixth">
+            <summary>Minor Sixth interval, 8 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.MajorSixth">
+            <summary>Major Sixth interval, 9 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.MinorSeventh">
+            <summary>Minor seventh interval, 10 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.MajorSeventh">
+            <summary>Major Seventh interval, 11 semitones</summary>
+        </member>
+        <member name="F:Midi.Interval.Octave">
+            <summary>Octave interval, 12 semitones</summary>
+        </member>
+        <member name="T:Midi.IntervalExtensionMethods">
+            <summary>
+            Extension methods for the Interval enum.
+            </summary>
+        </member>
+        <member name="F:Midi.IntervalExtensionMethods.IntervalNames">
+            <summary>
+            Table of interval names.
+            </summary>
+        </member>
+        <member name="M:Midi.IntervalExtensionMethods.Name(Midi.Interval)">
+            <summary>
+            Returns the human-readable name of an interval.
+            </summary>
+            <param name="interval">The interval.</param>
+            <returns>The human-readable name.  If the interval is less than an octave, it gives
+            the standard term (eg, "Major third").  If the interval is more than an octave, it
+            gives the number of semitones in the interval.</returns>
+        </member>
+        <member name="T:Midi.InputDevice">
+            <summary>
+            A MIDI input device.
+            </summary>
+            <remarks>
+            <para>Each instance of this class describes a MIDI input device installed on the system.
+            You cannot create your own instances, but instead must go through the
+            <see cref="P:Midi.InputDevice.InstalledDevices"/> property to find which devices are available.  You may wish
+            to examine the <see cref="P:Midi.DeviceBase.Name"/> property of each one and present the user with
+            a choice of which device(s) to use.</para>
+            <para>Open an input device with <see cref="M:Midi.InputDevice.Open"/> and close it with <see cref="M:Midi.InputDevice.Close"/>.
+            While it is open, you may arrange to start receiving messages with
+            <see cref="M:Midi.InputDevice.StartReceiving(Midi.Clock)"/> and then stop receiving them with <see cref="M:Midi.InputDevice.StopReceiving"/>.
+            An input device can only receive messages when it is both open and started.</para>
+            <para>Incoming messages are routed to the corresponding events, such as <see cref="E:Midi.InputDevice.NoteOn"/>
+            and <see cref="E:Midi.InputDevice.ProgramChange"/>.  The event handlers are invoked on a background thread
+            which is started in <see cref="M:Midi.InputDevice.StartReceiving(Midi.Clock)"/> and stopped in <see cref="M:Midi.InputDevice.StopReceiving"/>.
+            </para>
+            <para>As each message is received, it is assigned a timestamp in one of two ways.  If
+            <see cref="M:Midi.InputDevice.StartReceiving(Midi.Clock)"/> is called with a <see cref="T:Midi.Clock"/>, then each message is
+            assigned a time by querying the clock's <see cref="P:Midi.Clock.Time"/> property.  If
+            <see cref="M:Midi.InputDevice.StartReceiving(Midi.Clock)"/> is called with null, then each message is assigned a time
+            based on the number of seconds since <see cref="M:Midi.InputDevice.StartReceiving(Midi.Clock)"/> was called.</para>
+            </remarks>
+            <threadsafety static="true" instance="true"/>
+            <seealso cref="T:Midi.Clock"/>
+            <seealso cref="T:Midi.InputDevice"/>
+        </member>
+        <member name="M:Midi.InputDevice.RemoveAllEventHandlers">
+            <summary>
+            Removes all event handlers from the input events on this device.
+            </summary>
+        </member>
+        <member name="M:Midi.InputDevice.Open">
+            <summary>
+            Opens this input device.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The device is already open.</exception>
+            <exception cref="T:Midi.DeviceException">The device cannot be opened.</exception>
+            <remarks>Note that Open() establishes a connection to the device, but no messages will
+            be received until <see cref="M:Midi.InputDevice.StartReceiving(Midi.Clock)"/> is called.</remarks>
+        </member>
+        <member name="M:Midi.InputDevice.Close">
+            <summary>
+            Closes this input device.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The device is not open or is still
+            receiving.</exception>
+            <exception cref="T:Midi.DeviceException">The device cannot be closed.</exception>
+        </member>
+        <member name="M:Midi.InputDevice.StartReceiving(Midi.Clock)">
+            <summary>
+            Starts this input device receiving messages.
+            </summary>
+            <param name="clock">If non-null, the clock's <see cref="P:Midi.Clock.Time"/> property will
+            be used to assign a timestamp to each incoming message.  If null, timestamps will be in
+            seconds since StartReceiving() was called.</param>
+            <exception cref="T:System.InvalidOperationException">The device is not open or is already
+            receiving.
+            </exception>
+            <exception cref="T:Midi.DeviceException">The device cannot start receiving.</exception>
+            <remarks>
+            <para>This method launches a background thread to listen for input events, and as events
+            are received, the event handlers are invoked on that background thread.  Event handlers
+            should be written to work from a background thread.  (For example, if they want to
+            update the GUI, they may need to BeginInvoke to arrange for GUI updates to happen on
+            the correct thread.)</para>
+            <para>The background thread which is created by this method is joined (shut down) in
+            <see cref="M:Midi.InputDevice.StopReceiving"/>.</para>
+            </remarks>
+        </member>
+        <member name="M:Midi.InputDevice.StopReceiving">
+            <summary>
+            Stops this input device from receiving messages.
+            </summary>
+            <remarks>
+            <para>This method waits for all in-progress input event handlers to finish, and then
+            joins (shuts down) the background thread that was created in
+            <see cref="M:Midi.InputDevice.StartReceiving(Midi.Clock)"/>.  Thus, when this function returns you can be sure that no
+            more event handlers will be invoked.</para>
+            <para>It is illegal to call this method from an input event handler (ie, from the
+            background thread), and doing so throws an exception. If an event handler really needs
+            to call this method, consider using BeginInvoke to schedule it on another thread.</para>
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">The device is not open; is not receiving;
+            or called from within an event handler (ie, from the background thread).</exception>
+            <exception cref="T:Midi.DeviceException">The device cannot start receiving.</exception>
+        </member>
+        <member name="M:Midi.InputDevice.CheckReturnCode(Midi.Win32API.MMRESULT)">
+            <summary>
+            Makes sure rc is MidiWin32Wrapper.MMSYSERR_NOERROR.  If not, throws an exception with an
+            appropriate error message.
+            </summary>
+            <param name="rc"></param>
+        </member>
+        <member name="M:Midi.InputDevice.CheckOpen">
+            <summary>
+            Throws a MidiDeviceException if this device is not open.
+            </summary>
+        </member>
+        <member name="M:Midi.InputDevice.CheckNotOpen">
+            <summary>
+            Throws a MidiDeviceException if this device is open.
+            </summary>
+        </member>
+        <member name="M:Midi.InputDevice.CheckReceiving">
+            <summary>
+            Throws a MidiDeviceException if this device is not receiving.
+            </summary>
+        </member>
+        <member name="M:Midi.InputDevice.CheckNotReceiving">
+            <summary>
+            Throws a MidiDeviceException if this device is receiving.
+            </summary>
+        </member>
+        <member name="M:Midi.InputDevice.#ctor(System.UIntPtr,Midi.Win32API.MIDIINCAPS)">
+            <summary>
+            Private Constructor, only called by the getter for the InstalledDevices property.
+            </summary>
+            <param name="deviceId">Position of this device in the list of all devices.</param>
+            <param name="caps">Win32 Struct with device metadata</param>
+        </member>
+        <member name="M:Midi.InputDevice.MakeDeviceList">
+            <summary>
+            Private method for constructing the array of MidiInputDevices by calling the Win32 api.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Midi.InputDevice.InputCallback(Midi.Win32API.HMIDIIN,Midi.Win32API.MidiInMessage,System.UIntPtr,System.UIntPtr,System.UIntPtr)">
+            <summary>
+            The input callback for midiOutOpen.
+            </summary>
+        </member>
+        <member name="F:Midi.InputDevice.isInsideInputHandler">
+            <summary>
+            Thread-local, set to true when called by an input handler, false in all other threads.
+            </summary>
+        </member>
+        <member name="E:Midi.InputDevice.NoteOn">
+            <summary>
+            Event called when an input device receives a Note On message.
+            </summary>
+        </member>
+        <member name="E:Midi.InputDevice.NoteOff">
+            <summary>
+            Event called when an input device receives a Note Off message.
+            </summary>
+        </member>
+        <member name="E:Midi.InputDevice.ControlChange">
+            <summary>
+            Event called when an input device receives a Control Change message.
+            </summary>
+        </member>
+        <member name="E:Midi.InputDevice.ProgramChange">
+            <summary>
+            Event called when an input device receives a Program Change message.
+            </summary>
+        </member>
+        <member name="E:Midi.InputDevice.PitchBend">
+            <summary>
+            Event called when an input device receives a Pitch Bend message.
+            </summary>
+        </member>
+        <member name="P:Midi.InputDevice.InstalledDevices">
+            <summary>
+            List of input devices installed on this system.
+            </summary>
+        </member>
+        <member name="P:Midi.InputDevice.IsOpen">
+            <summary>
+            True if this device has been successfully opened.
+            </summary>
+        </member>
+        <member name="P:Midi.InputDevice.IsReceiving">
+            <summary>
+            True if this device is receiving messages.
+            </summary>
+        </member>
+        <member name="T:Midi.InputDevice.NoteOnHandler">
+            <summary>
+            Delegate called when an input device receives a Note On message.
+            </summary>
+        </member>
+        <member name="T:Midi.InputDevice.NoteOffHandler">
+            <summary>
+            Delegate called when an input device receives a Note Off message.
+            </summary>
+        </member>
+        <member name="T:Midi.InputDevice.ControlChangeHandler">
+            <summary>
+            Delegate called when an input device receives a Control Change message.
+            </summary>
+        </member>
+        <member name="T:Midi.InputDevice.ProgramChangeHandler">
+            <summary>
+            Delegate called when an input device receives a Program Change message.
+            </summary>
+        </member>
+        <member name="T:Midi.InputDevice.PitchBendHandler">
+            <summary>
+            Delegate called when an input device receives a Pitch Bend message.
+            </summary>
+        </member>
+        <member name="T:Midi.Channel">
+            <summary>
+            A MIDI Channel.
+            </summary>
+            <remarks>
+            <para>Each MIDI device has 16 independent channels.  Channels are named starting at 1, but
+            are encoded programmatically starting at 0.</para>
+            <para>All of the channels are general-purpose except for Channel10, which is the
+            dedicated percussion channel.  Any notes sent to that channel will play
+            <see cref="T:Midi.Percussion">percussion notes</see>, regardless of any
+            <see cref="M:Midi.OutputDevice.SendProgramChange(Midi.Channel,Midi.Instrument)">Program Change</see> messages sent on that
+            channel.</para>
+            <para>This enum has extension methods, such as <see cref="M:Midi.ChannelExtensionMethods.Name(Midi.Channel)"/>
+            and <see cref="M:Midi.ChannelExtensionMethods.IsValid(Midi.Channel)"/>, defined in
+            <see cref="T:Midi.ChannelExtensionMethods"/>. </para>
+            </remarks>
+        </member>
+        <member name="F:Midi.Channel.Channel1">
+            <summary> MIDI Channel 1. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel2">
+            <summary> MIDI Channel 2. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel3">
+            <summary> MIDI Channel 3. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel4">
+            <summary> MIDI Channel 4. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel5">
+            <summary> MIDI Channel 5. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel6">
+            <summary> MIDI Channel 6. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel7">
+            <summary> MIDI Channel 7. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel8">
+            <summary> MIDI Channel 8. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel9">
+            <summary> MIDI Channel 9. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel10">
+            <summary> MIDI Channel 10, the dedicated percussion channel. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel11">
+            <summary> MIDI Channel 11. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel12">
+            <summary> MIDI Channel 12. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel13">
+            <summary> MIDI Channel 13. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel14">
+            <summary> MIDI Channel 14. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel15">
+            <summary> MIDI Channel 15. </summary>
+        </member>
+        <member name="F:Midi.Channel.Channel16">
+            <summary> MIDI Channel 16. </summary>
+        </member>
+        <member name="T:Midi.ChannelExtensionMethods">
+            <summary>
+            Extension methods for the Channel enum.
+            </summary>
+        </member>
+        <member name="M:Midi.ChannelExtensionMethods.IsValid(Midi.Channel)">
+            <summary>
+            Returns true if the specified channel is valid.
+            </summary>
+            <param name="channel">The channel to test.</param>
+        </member>
+        <member name="M:Midi.ChannelExtensionMethods.Validate(Midi.Channel)">
+            <summary>
+            Throws an exception if channel is not valid.
+            </summary>
+            <param name="channel">The channel to validate.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The channel is out-of-range.</exception>
+        </member>
+        <member name="F:Midi.ChannelExtensionMethods.ChannelNames">
+            <summary>
+            Table of channel names.
+            </summary>
+        </member>
+        <member name="M:Midi.ChannelExtensionMethods.Name(Midi.Channel)">
+            <summary>
+            Returns the human-readable name of a MIDI channel.
+            </summary>
+            <param name="channel">The channel.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The channel is out-of-range.</exception>
+        </member>
+        <member name="T:Midi.Clock">
+            <summary>
+            A clock for scheduling MIDI messages in a rate-adjustable, pausable timeline.
+            </summary>
+            <remarks>
+            <para>Clock is used for scheduling MIDI messages.  Though you can always send messages
+            synchronously with the various <see cref="T:Midi.OutputDevice"/>.Send* methods, doing so
+            requires your code to be "ready" at the precise moment each message needs to
+            be sent.  In most cases, and especially in interactive programs, it's more convenient
+            to describe messages that <i>will</i> be sent at specified points in the future, and then
+            rely on a scheduler to make it happen.  Clock is such a scheduler.</para>
+            <h3>Basic usage</h3>
+            <para> In the simplest case, Clock can be used to schedule a sequence of messages which is
+            known in its entirety ahead of time.  For example, this code snippet schedules two notes to
+            play one after the other:</para>
+            <code>
+            Clock clock(120);  // beatsPerMinute=120
+            OutputDevice outputDevice = ...;
+            clock.Schedule(new NoteOnMessage(outputDevice, Channel.Channel1, Note.E4, 80, 0));
+            clock.Schedule(new NoteOffMessage(outputDevice, Channel.Channel1, Note.E4, 80, 1));
+            clock.Schedule(new NoteOnMessage(outputDevice, Channel.Channel1, Note.D4, 80, 1));
+            clock.Schedule(new NoteOffMessage(outputDevice, Channel.Channel1, Note.D4, 80, 2));
+            </code>
+            <para>At this point, four messages have been scheduled, but they haven't been sent because
+            the clock has not started.  We can start the clock with <see cref="M:Midi.Clock.Start"/>, pause it with
+            <see cref="M:Midi.Clock.Stop"/>, and reset it with <see cref="M:Midi.Clock.Reset"/>.  We can change the
+            beats-per-minute at any time, even as the sequence is playing.  And the playing happens
+            in a background thread, so your client code can focus on arranging the notes and controlling
+            the clock.</para>
+            <para>You can even schedule new notes as the clock is playing.  Generally you should
+            schedule messages for times in the future; scheduling a message with a time in the past
+            simply causes it to play immediately, which is probably not what you wanted.</para>
+            <h3>NoteOnOffMessage and Self-Propagating Messages</h3>
+            <para>In the above example, we wanted to play two notes but had to schedule four messages.
+            This case is so common that we provide a convenience class, <see cref="T:Midi.NoteOnOffMessage"/>,
+            which encapsulates a Note On message and its corresponding Note Off message in a single
+            unit.  We could rewrite the above example as follows:</para>
+            <code>
+            Clock clock(120);  // beatsPerMinute=120
+            OutputDevice outputDevice = ...;
+            clock.Schedule(new NoteOnOffMessage(outputDevice, Channel.Channel1, Note.E4, 80, 0, 1));
+            clock.Schedule(new NoteOnOffMessage(outputDevice, Channel.Channel1, Note.D4, 80, 1, 1));
+            </code>
+            <para>This works because each NoteOnOffMessage, when it is actually sent, does two things:
+            it sends the Note On message to the output device, and <i>also</i> schedules the
+            correponding Note Off message for the appropriate time in the future.  This is an example
+            of a <i>self-propagating message</i>: a message which, when triggered, schedules additional
+            events for the future.</para>
+            <para>You can design your own self-propagating messages by subclassing from
+            <see cref="T:Midi.Message"/>.  For example, you could make a self-propagating MetronomeMessage
+            which keeps a steady beat by always scheduling the <i>next</i> MetronomeMessage when it
+            plays the current beat.  However, subclassing can be tedious, and it is usually preferable
+            to use <see cref="T:Midi.CallbackMessage"/> to call-out to your own code instead.</para>
+            </remarks>
+            <threadsafety static="true" instance="true"/>
+        </member>
+        <member name="M:Midi.Clock.#ctor(System.Single)">
+            <summary>
+            Constructs a midi clock with a given beats-per-minute.
+            </summary>
+            <param name="beatsPerMinute">The initial beats-per-minute, which can be changed later.
+            </param>
+            <remarks>
+            <para>When constructed, the clock is not running, and so <see cref="P:Midi.Clock.Time"/> will
+            return zero.  Call <see cref="M:Midi.Clock.Start"/> when you are ready for the clock to start
+            progressing (and scheduled messages to actually trigger).
+            </para>
+            </remarks>
+            <exception cref="T:System.ArgumentOutOfRangeException">beatsPerMinute is non-positive</exception>
+        </member>
+        <member name="M:Midi.Clock.Start">
+            <summary>
+            Starts or resumes the clock.
+            </summary>
+            <remarks>
+            <para>This method causes the clock to start progressing at the rate given in the
+            <see cref="P:Midi.Clock.BeatsPerMinute"/> property.  It may only be called when the clock is
+            not yet rnuning.</para>
+            <para>If this is the first time Start is called,
+            the clock starts at time zero and progresses from there.  If the clock was previously
+            started, stopped, and not reset, then Start effectively "unpauses" the clock, picking up
+            at the left-off time, and resuming scheduling of any as-yet-unsent messages.</para>
+            <para>This method creates a new thread which runs in the background and sends
+            messages at the appropriate times.  All
+            <see cref="M:Midi.Message.SendNow">Message.SendNow</see> methods and
+            <see cref="T:Midi.CallbackMessage"/>s will be called in that thread.</para>
+            <para>The scheduler thread is joined (shut down) in <see cref="M:Midi.Clock.Stop"/>.</para>
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">Clock is already running.</exception>
+            <seealso cref="M:Midi.Clock.Stop"/>
+            <seealso cref="M:Midi.Clock.Reset"/>
+        </member>
+        <member name="M:Midi.Clock.Stop">
+            <summary>
+            Stops the clock (but does not reset its time or discard pending events).
+            </summary>
+            <remarks>
+            <para>This method stops the progression of the clock.  It may only be called when
+            the clock is running.</para>
+            <para>Any scheduled but as-yet-unsent messages remain in the queue.  A consecutive call
+            to <see cref="M:Midi.Clock.Start"/> can re-start the progress of the clock, or <see cref="M:Midi.Clock.Reset"/>
+            can discard pending messages and reset the clock to zero.</para>
+            <para>This method waits for any in-progress messages to be processed and joins
+            (shuts down) the scheduler thread before returning, so when it returns you can be sure
+            that no more messages will be sent or callbacks invoked.</para>
+            <para>It is illegal to call Stop from the scheduler thread (ie, from any
+            <see cref="M:Midi.Message.SendNow">Message.SendNow</see> method or
+            <see cref="T:Midi.CallbackMessage"/>.  If a callback really needs to stop the clock,
+            consider using BeginInvoke to arrange for it to happen in another thread.</para>
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">Clock is not running or Stop was invoked
+            from the scheduler thread.</exception>
+            <seealso cref="M:Midi.Clock.Start"/>
+            <seealso cref="M:Midi.Clock.Reset"/>
+        </member>
+        <member name="M:Midi.Clock.Reset">
+            <summary>
+            Resets the clock to zero and discards pending messages.
+            </summary>
+            <remarks>
+            <para>This method resets the clock to zero and discards any scheduled but
+            as-yet-unsent messages.  It may only be called when the clock is not running.</para>
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">Clock is running.</exception>
+            <seealso cref="M:Midi.Clock.Start"/>
+            <seealso cref="M:Midi.Clock.Stop"/>
+        </member>
+        <member name="M:Midi.Clock.Schedule(Midi.Message)">
+            <summary>
+            Schedules a single message based on its beatTime.
+            </summary>
+            <param name="message">The message to schedule.</param>
+            <remarks>
+            <para>This method schedules a message to be sent at the time indicated in the message's
+            <see cref="P:Midi.Message.Time"/> property.  It may be called at any time, whether
+            the clock is running or not.  The message will not be sent until the clock progresses
+            to the specified time.  (If the clock is never started, or is paused before that time
+            and not re-started, then the message will never be sent.)</para>
+            <para>If a message is scheduled for a time that has already passed, then the scheduler
+            will send the message at the first opportunity.</para>
+            </remarks>
+        </member>
+        <member name="M:Midi.Clock.Schedule(System.Collections.Generic.List{Midi.Message},System.Single)">
+            <summary>
+            Schedules a collection of messages, applying an optional time delta to the scheduled
+            beatTime.
+            </summary>
+            <param name="messages">The message to send</param>
+            <param name="beatTimeDelta">The delta to apply (or zero).</param>
+        </member>
+        <member name="M:Midi.Clock.MillisecondsUntil(System.Single)">
+            <summary>
+            Returns the number of milliseconds from now until the specified beat time.
+            </summary>
+            <param name="beatTime">The beat time.</param>
+            <returns>The positive number of milliseconds, or 0 if beatTime is in the past.</returns>
+        </member>
+        <member name="M:Midi.Clock.ThreadRun">
+            <summary>
+            Worker thread function.
+            </summary>
+        </member>
+        <member name="F:Midi.Clock.isSchedulerThread">
+            <summary>
+            Thread-local, set to true in the scheduler thread, false in all other threads.
+            </summary>
+        </member>
+        <member name="P:Midi.Clock.Time">
+            <summary>
+            This clock's current time in beats.
+            </summary>
+            <remarks>
+            <para>Normally, this method polls the clock's current time, and thus changes from
+            moment to moment as long as the clock is running.  However, when called from the
+            scheduler thread (that is, from a <see cref="M:Midi.Message.SendNow">Message.SendNow</see>
+            method or a <see cref="T:Midi.CallbackMessage"/>), it returns the precise time at which the
+            message was scheduled.</para>
+            <para>For example, suppose a callback was scheduled for time T, and the scheduler
+            managed to call that callback at time T+delta.  In the callback, Time will
+            return T for the duration of the callback.  In any other thread, Time would
+            return approximately T+delta.</para>
+            </remarks>
+        </member>
+        <member name="P:Midi.Clock.BeatsPerMinute">
+            <summary>
+            Beats per minute property.
+            </summary>
+            <remarks>
+            <para>Setting this property changes the rate at which the clock progresses.  If the
+            clock is currently running, the new rate is effectively immediately.</para>
+            </remarks>
+        </member>
+        <member name="P:Midi.Clock.IsRunning">
+            <summary>
+            Returns true if this clock is currently running.
+            </summary>
+        </member>
+    </members>
+</doc>
