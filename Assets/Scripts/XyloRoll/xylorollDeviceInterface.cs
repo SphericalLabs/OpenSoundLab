@@ -384,7 +384,9 @@ public class xylorollDeviceInterface : deviceInterface {
     }
     data.timelineEvents = tempevents.ToArray();
 
-    return data;
+       data.selectedKeys = selectedKeys;
+
+        return data;
   }
 
   public override void Load(InstrumentData d) {
@@ -433,7 +435,13 @@ public class xylorollDeviceInterface : deviceInterface {
     } else {
       if (data.seqInID != 0) _timeline.playInput.ID = data.seqInID;
     }
+        selectedKeys = data.selectedKeys;
 
+        // restore the selected keys highlight states
+        for (int i = 0; i < selectedKeys.Count; i++)
+        {
+            keys[selectedKeys[i]].phantomHit(true);
+        }
   }
 
 }
@@ -469,4 +477,5 @@ public class XyloRollData : InstrumentData {
   public TimelineComponentData timelineData;
   public timelineEvent.eventData[] timelineEvents;
   public float timelineHeight;
+  public List<int> selectedKeys = new List<int>();
 }
