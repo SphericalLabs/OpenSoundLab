@@ -42,7 +42,22 @@ public class platformSetup : MonoBehaviour {
     }
   }
 
-  void oculusSwitch() {
+    void Update()
+    {
+        OVRPlugin.Controller control = OVRPlugin.GetActiveController(); //get current controller scheme
+        if ((OVRPlugin.Controller.Hands == control) || (OVRPlugin.Controller.LHand == control) || (OVRPlugin.Controller.RHand == control))
+        { //if current controller is hands disable the controllers
+            manips[0].gameObject.SetActive(false);
+            manips[1].gameObject.SetActive(false);
+        }
+        else
+        {
+            manips[0].gameObject.SetActive(true);
+            manips[1].gameObject.SetActive(true);
+        }
+    }
+
+    void oculusSwitch() {
     manips[0].invertScale(); // this actually makes the controller model L and R handed.
     manips[0].changeHW("oculus");
     manips[1].changeHW("oculus");
