@@ -128,8 +128,8 @@ namespace OculusSampleFramework
 
 			var hand = IsRightHandedTool ? Hands.Instance.RightHand : Hands.Instance.LeftHand;
 			var pointer = hand.Pointer;
-			transform.position = pointer.PointerPosition;
-			transform.rotation = pointer.PointerOrientation;
+			transform.localPosition = pointer.PointerPosition;
+			transform.localRotation = pointer.PointerOrientation;
 
 			var prevPosition = InteractionPosition;
 			var currPosition = transform.position;

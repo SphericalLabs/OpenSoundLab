@@ -66,7 +66,7 @@ namespace OculusSampleFramework
 
 		private void AttachToolToHandTransform(Transform tool, bool isRightHanded)
 		{
-			var newTool = Instantiate(tool).transform;
+			var newTool = Instantiate(tool, transform.parent).transform;
 			newTool.localPosition = Vector3.zero;
 			var toolComp = newTool.GetComponent<InteractableTool>();
 			toolComp.IsRightHandedTool = isRightHanded;

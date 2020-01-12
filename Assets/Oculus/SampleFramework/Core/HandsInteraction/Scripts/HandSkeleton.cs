@@ -52,8 +52,8 @@ namespace OculusSampleFramework
 			{
 				_skeleton = new GameObject("Skeleton");
 				_skeleton.transform.SetParent(transform);
-				_skeleton.transform.position = Vector3.zero;
-				_skeleton.transform.rotation = Quaternion.identity;
+				_skeleton.transform.localPosition = Vector3.zero;
+				_skeleton.transform.localRotation = Quaternion.identity;
 			}
 		}
 
@@ -142,8 +142,8 @@ namespace OculusSampleFramework
 
 			if (_hand.IsTracked)
 			{
-				transform.position = pose.RootPose.Position.FromFlippedZVector3f();
-				transform.rotation = pose.RootPose.Orientation.FromFlippedZQuatf();
+				transform.localPosition = pose.RootPose.Position.FromFlippedZVector3f();
+				transform.localRotation = pose.RootPose.Orientation.FromFlippedZQuatf();
 				for (var i = 0; i < _bones.Count; ++i)
 				{
 					_bones[i].localRotation = pose.BoneRotations[i].FromFlippedZQuatf();
