@@ -569,6 +569,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1000010757786888, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1000011372789156, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -639,6 +643,11 @@ PrefabInstance:
       propertyPath: m_CustomSkybox
       value: 
       objectReference: {fileID: 2100000, guid: 7c4a0618bb47f2547adaf93ab1bccfa9, type: 2}
+    - target: {fileID: 81000012145161834, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 92000012743797078, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
         type: 3}
       propertyPath: m_Enabled
@@ -1469,7 +1478,7 @@ MonoBehaviour:
   lensDirtScatterFactor: 0.5
   lensDirtIntensity: 0.05
   lensDirtTexture: {fileID: 0}
-  inputIsHDR: 0
+  inputIsHDR: 1
   lowQuality: 1
   depthBlending: 0
   depthBlendFunction: 0

@@ -15,6 +15,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using static OVRHand;
+using OculusSampleFramework;
 //using System.Linq;
 //using Valve.VR;
 
@@ -550,26 +552,49 @@ public class manipulator : MonoBehaviour {
   }
 
   public bool triggerDown = false;
-  void Update() {
+    static OVRPlugin.Controller lastControl = OVRPlugin.Controller.None;
+    void Update() {
+ 
     updateProngs();
     bool triggerButtonDown, triggerButtonUp, menuButtonDown;
 
-    if (masterControl.instance.currentPlatform == masterControl.platform.Vive) {
+        OVRPlugin.Controller currentControl = OVRPlugin.GetActiveController(); //get current controller scheme
+        bool currentControlHands = false;
+        bool currentControlChanged = false;
+        float pinchStrength = 0;
+        if ((OVRPlugin.Controller.Hands == currentControl) || (OVRPlugin.Controller.LHand == currentControl) || (OVRPlugin.Controller.RHand == currentControl))
+        {
+            currentControlHands = true;
+            pinchStrength = Hands.Instance.RightHand.PinchStrength(OVRPlugin.HandFinger.Index);
+        }
+        if (currentControl != lastControl)
+        {
+            currentControlChanged = true;
+            lastControl = currentControl;
+        }
+        if (masterControl.instance.currentPlatform == masterControl.platform.Vive) {
 //      triggerButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger);
 //      triggerButtonUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Trigger);
         if (!triggerDown)
         {
-                if (controllerIndex == 0)
+                if (currentControlHands)
                 {
-                    triggerButtonDown = Input.GetAxis("triggerR") > 0.75;
-                }
-                else if (controllerIndex == 1)
-                {
-                    triggerButtonDown = Input.GetAxis("triggerL") > 0.75;
+                     triggerButtonDown = pinchStrength > 0.85;
                 }
                 else
                 {
-                    triggerButtonDown = false;
+                    if (controllerIndex == 0)
+                    {
+                        triggerButtonDown = Input.GetAxis("triggerR") > 0.75;
+                    }
+                    else if (controllerIndex == 1)
+                    {
+                        triggerButtonDown = Input.GetAxis("triggerL") > 0.75;
+                    }
+                    else
+                    {
+                        triggerButtonDown = false;
+                    }
                 }
         }
         else
@@ -578,18 +603,32 @@ public class manipulator : MonoBehaviour {
         }
         if (triggerDown)
         {
-                if (controllerIndex == 0)
-                {
-                    triggerButtonUp = Input.GetAxis("triggerR") < 0.25;
+                if (currentControlHands)
+                { 
+                    triggerButtonUp = pinchStrength < 0.50;
                 }
-                else if (controllerIndex == 1)
+                else if (!currentControlHands && currentControlChanged)
                 {
-                    triggerButtonUp = Input.GetAxis("triggerL") < 0.25;
+                    // force an trigger button up when we lose hands
+                    triggerButtonUp = true;
                 }
                 else
                 {
-                    triggerButtonUp = false;
+                    if (controllerIndex == 0)
+                    {
+                        triggerButtonUp = Input.GetAxis("triggerR") < 0.25;
+                    }
+                    else if (controllerIndex == 1)
+                    {
+                        triggerButtonUp = Input.GetAxis("triggerL") < 0.25;
+                    }
+                    else
+                    {
+                        triggerButtonUp = false;
+                    }
                 }
+
+
         }
         else
         {
