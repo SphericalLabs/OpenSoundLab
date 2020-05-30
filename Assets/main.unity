@@ -716,12 +716,35 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1093965894}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1093965897 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1000011372789156, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
+    type: 3}
+  m_PrefabInstance: {fileID: 1093965894}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1093965899 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1000012732218472, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
     type: 3}
   m_PrefabInstance: {fileID: 1093965894}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1093965900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093965897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87739316d13453344b3fc21b7f22df92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxSpeed: 1
+  horizontalAxisName: Oculus_GearVR_LThumbstickX
+  verticalAxisName: Oculus_GearVR_LThumbstickY
+  threeDMovement: 0
+  offhandMovementHand: {fileID: 1516804425}
 --- !u!114 &1093965901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1264,6 +1287,12 @@ PrefabInstance:
 --- !u!4 &1516804424 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1516804423}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1516804425 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 482130, guid: 126d619cf4daa52469682f85c1378b4a,
     type: 3}
   m_PrefabInstance: {fileID: 1516804423}
   m_PrefabAsset: {fileID: 0}
