@@ -12,19 +12,25 @@ public class ArtificialVRMovement : MonoBehaviour
     [Header("Required Scene/Child References")]
     public Transform offhandMovementHand;
 
+    [Header("Debug settings")]
+    public bool logErrorsAfterInitialFailure = false;
+
+    private bool hasThrownError;
+
     // Update is called once per frame
     void Update()
     {
         if (!offhandMovementHand)
         {
-            return;
+            LogError();
         }
 
         Vector3 verticalMovementVector = offhandMovementHand.forward;
 
         if (!threeDMovement)
         {
-            // Project offhandMovementHand forward axis onto floor plane (so that lifting controller up and down does not affect magnitude)
+            // Project offhandMovementHand forward axis onto floor plane so that the player doesn't fly
+            // Also, normalize (so that lifting controller up and down does not affect magnitude)
             verticalMovementVector = Vector3.ProjectOnPlane(verticalMovementVector, Vector3.up).normalized;
         }
 
@@ -32,5 +38,15 @@ public class ArtificialVRMovement : MonoBehaviour
 
         transform.position += verticalMovementVector * Input.GetAxis(verticalAxisName) * Time.deltaTime;
         transform.position += horizontalMovementVector * Input.GetAxis(horizontalAxisName) * Time.deltaTime;
+    }
+
+    void LogError()
+    {
+        if(logErrorsAfterInitialFailure || !hasThrownError)
+        {
+            Debug.LogError("offhandMovementHand reference not set!");
+            hasThrownError = true;
+        }
+        return;
     }
 }
