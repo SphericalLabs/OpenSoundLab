@@ -45,7 +45,7 @@ public class ArtificialVRMovement : MonoBehaviour
     {
         if(logErrorsAfterInitialFailure || !hasThrownError)
         {
-            Debug.LogError("offhandMovementHand reference not set!");
+            Debug.LogError("offhandMovementHand reference not set!", gameObject);
             hasThrownError = true;
         }
         return;
