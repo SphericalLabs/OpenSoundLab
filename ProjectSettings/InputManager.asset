@@ -275,7 +275,7 @@ InputManager:
     snap: 0
     invert: 0
     type: 2
-    axis: 2
+    axis: 16
     joyNum: 0
   - serializedVersion: 3
     m_Name: Oculus_GearVR_RThumbstickY
@@ -291,7 +291,7 @@ InputManager:
     snap: 0
     invert: 1
     type: 2
-    axis: 3
+    axis: 17
     joyNum: 0
   - serializedVersion: 3
     m_Name: Oculus_GearVR_DpadX
