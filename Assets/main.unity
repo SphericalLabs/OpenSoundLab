@@ -743,7 +743,7 @@ MonoBehaviour:
   maxSpeed: 1
   horizontalAxisName: Oculus_GearVR_LThumbstickX
   verticalAxisName: Oculus_GearVR_LThumbstickY
-  threeDMovement: 1
+  threeDMovement: 0
   offhandMovementHand: {fileID: 1516804425}
 --- !u!114 &1093965901
 MonoBehaviour:
