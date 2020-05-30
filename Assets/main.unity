@@ -738,7 +738,7 @@ MonoBehaviour:
   horizontalAxisName: Oculus_GearVR_RThumbstickX
   verticalAxisName: Oculus_GearVR_RThumbstickY
   threeDMovement: 1
-  offhandMovementHand: {fileID: 1516804425}
+  offhandMovementHand: {fileID: 1516804426}
 --- !u!1 &1093965899 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1000012732218472, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
@@ -1310,6 +1310,12 @@ Transform:
 --- !u!4 &1516804425 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 482130, guid: 126d619cf4daa52469682f85c1378b4a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1516804423}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1516804426 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 487254, guid: 126d619cf4daa52469682f85c1378b4a,
     type: 3}
   m_PrefabInstance: {fileID: 1516804423}
   m_PrefabAsset: {fileID: 0}
