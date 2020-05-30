@@ -23,6 +23,7 @@ public class ArtificialVRMovement : MonoBehaviour
         if (!offhandMovementHand)
         {
             LogError();
+            return;
         }
 
         Vector3 verticalMovementVector = offhandMovementHand.forward;
