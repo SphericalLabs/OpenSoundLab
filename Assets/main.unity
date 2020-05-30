@@ -722,6 +722,23 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1093965894}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1093965898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093965897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87739316d13453344b3fc21b7f22df92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxSpeed: 1
+  horizontalAxisName: Oculus_GearVR_RThumbstickX
+  verticalAxisName: Oculus_GearVR_RThumbstickY
+  threeDMovement: 1
+  offhandMovementHand: {fileID: 1516804425}
 --- !u!1 &1093965899 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1000012732218472, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
