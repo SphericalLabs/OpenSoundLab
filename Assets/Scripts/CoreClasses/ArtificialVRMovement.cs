@@ -25,7 +25,7 @@ public class ArtificialVRMovement : MonoBehaviour
         if (!threeDMovement)
         {
             // Project offhandMovementHand forward axis onto floor plane (so that lifting controller up and down does not affect magnitude)
-            verticalMovementVector = Vector3.ProjectOnPlane(verticalMovementVector, Vector3.up);
+            verticalMovementVector = Vector3.ProjectOnPlane(verticalMovementVector, Vector3.up).normalized;
         }
 
         Vector3 horizontalMovementVector = Vector3.Cross(verticalMovementVector,-Vector3.up);
