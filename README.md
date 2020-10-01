@@ -1,4 +1,10 @@
-This project is no longer actively developed or maintained.
+# The New Normal
+
+See https://www.ludwigzeller.net/projects/the-new-normal/ for more information.
+
+------
+
+This project is no longer actively developed or maintained by Logan Olson.
 
 # SoundStage VR
 
