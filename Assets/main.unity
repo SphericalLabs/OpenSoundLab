@@ -192,11 +192,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
-    - target: {fileID: 114000011033016336, guid: 18cf3d2689374974b9759fb81f9d23e8,
-        type: 2}
-      propertyPath: startToggled
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 18cf3d2689374974b9759fb81f9d23e8, type: 2}
   m_IsPrefabParent: 0
