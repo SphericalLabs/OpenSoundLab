@@ -69,13 +69,13 @@ public class adsrInterface : MonoBehaviour {
       posClamp();
     }
 
-    durations[0] = xyHandles[0].percent.x;
+    durations[0] = xyHandles[0].percent.x * 7f;
     volumes[0] = xyHandles[0].percent.y;
 
     durations[1] = xyHandles[1].percent.x - xyHandles[0].percent.x;
     volumes[1] = xyHandles[1].percent.y;
 
-    durations[2] = (1 - xyHandles[2].percent.x);
+    durations[2] = (1 - xyHandles[2].percent.x) * 7f;
   }
 
   void posClamp() {
