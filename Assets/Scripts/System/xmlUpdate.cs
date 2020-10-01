@@ -40,6 +40,9 @@ public class xmlUpdate {
             case "Speaker":
               serializer = new XmlSerializer(typeof(SpeakerData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
+            case "Funktion":
+              serializer = new XmlSerializer(typeof(FunktionData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;      
             case "Drums":
               serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;

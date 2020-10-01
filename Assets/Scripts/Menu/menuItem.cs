@@ -31,8 +31,10 @@ public class menuItem : manipObject {
   bool disabled = false;
 
   public enum deviceType {
+    Dog, 
     Oscillator,
     Speaker,
+    Funktion,
     Sampler,
     Recorder,
     Mixer,
@@ -126,7 +128,7 @@ public class menuItem : manipObject {
         seq.transform.Translate(Vector3.right * .081f, Space.Self);
         seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
       }
-      Destroy(g.transform.FindChild("stretchNode").gameObject);
+      Destroy(g.transform.Find("stretchNode").gameObject);
     }
 
     if (item == deviceType.Tapes) {
@@ -177,7 +179,7 @@ public class menuItem : manipObject {
       Destroy(g.transform.Find("screenFrame").gameObject);
     }
 
-    if (item == deviceType.Keyboard) {
+        if (item == deviceType.Keyboard) {
       g.transform.localPosition = new Vector3(0.013f, 0, .026f);
       g.transform.localScale = Vector3.one * .08f;
       Destroy(g.transform.Find("KeyboardTimeline").gameObject);

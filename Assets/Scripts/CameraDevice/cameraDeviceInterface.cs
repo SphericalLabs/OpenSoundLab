@@ -41,7 +41,6 @@ public class cameraDeviceInterface : deviceInterface {
     recLight.SetActive(false);
     recMessage.SetActive(false);
     camSetup();
-
   }
 
   void Start() {
@@ -53,9 +52,13 @@ public class cameraDeviceInterface : deviceInterface {
     }
     realCam.GetComponent<Skybox>().enabled = sky;
     activated = true;
+
+    GameObject.Find("Main Camera (ears)").GetComponent<AudioListener>().enabled = false; // turn off head ears while external camera is present, will only work for one cam setups
+    gameObject.AddComponent(typeof(AudioListener));
   }
 
   void OnDestroy() {
+    GameObject.Find("Main Camera (ears)").GetComponent<AudioListener>().enabled = true;
     if (screenTrans != null && activated) Destroy(screenTrans.gameObject);
   }
 

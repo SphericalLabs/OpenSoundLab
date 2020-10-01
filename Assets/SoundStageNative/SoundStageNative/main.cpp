@@ -467,6 +467,7 @@ extern "C" {
 		for (int i = 0; i < length; ++i)
 		{
 			buf[i] += (buf1[i] + buf2[i]) * .3f;
+
 		}
 	}
 
@@ -525,7 +526,8 @@ extern "C" {
 			if (_phase > 1.0) _phase -= 1.0;
 
 			//final buffer
-			buffer[i] = buffer[i + 1] = (float)sample * endAmplitude;
+			//buffer[i] = buffer[i + 1] = (float)sample * endAmplitude;
+			buffer[i] = buffer[i + 1] = 0f;
 
 			//dsptime update
 			dspTime += _sampleDuration;

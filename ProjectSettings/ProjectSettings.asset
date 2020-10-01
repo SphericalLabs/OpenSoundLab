@@ -55,7 +55,7 @@ PlayerSettings:
   androidShowActivityIndicatorOnLoading: -1
   tizenShowActivityIndicatorOnLoading: -1
   iosAppInBackgroundBehavior: 0
-  displayResolutionDialog: 2
+  displayResolutionDialog: 1
   iosAllowHTTPDownload: 1
   allowedAutorotateToPortrait: 1
   allowedAutorotateToPortraitUpsideDown: 1
@@ -74,7 +74,7 @@ PlayerSettings:
   usePlayerLog: 1
   bakeCollisionMeshes: 0
   forceSingleInstance: 0
-  resizableWindow: 1
+  resizableWindow: 0
   useMacAppStoreValidation: 0
   gpuSkinning: 1
   graphicsJobs: 0
@@ -84,7 +84,7 @@ PlayerSettings:
   xboxEnableKinectAutoTracking: 0
   xboxEnableFitness: 0
   visibleInBackground: 1
-  allowFullscreenSwitch: 1
+  allowFullscreenSwitch: 0
   graphicsJobMode: 0
   macFullscreenMode: 2
   d3d9FullscreenMode: 1
@@ -117,7 +117,7 @@ PlayerSettings:
     4:3: 1
     5:4: 1
     16:10: 1
-    16:9: 1
+    16:9: 0
     Others: 1
   bundleIdentifier: com.oculus.UnitySample
   bundleVersion: 1.0

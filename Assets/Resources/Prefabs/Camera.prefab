@@ -791,7 +791,7 @@ Camera:
     height: 1
   near clip plane: 0.08
   far clip plane: 100
-  field of view: 60
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: 1
@@ -1751,10 +1751,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bloomIntensity: 0.05
-  shader: {fileID: 4800000, guid: 6581f8d2f208b8340b8d59c7bf38cc9a, type: 3}
-  lensDirtTexture: {fileID: 0}
-  lensDirtIntensity: 0.05
-  inputIsHDR: 1
 --- !u!114 &114000011982396672
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1790,10 +1786,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bloomIntensity: 0.05
-  shader: {fileID: 4800000, guid: 6581f8d2f208b8340b8d59c7bf38cc9a, type: 3}
-  lensDirtTexture: {fileID: 0}
-  lensDirtIntensity: 0.05
-  inputIsHDR: 1
 --- !u!114 &114000012706604774
 MonoBehaviour:
   m_ObjectHideFlags: 1
