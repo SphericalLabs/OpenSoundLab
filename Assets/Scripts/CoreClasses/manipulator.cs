@@ -64,7 +64,7 @@ public class manipulator : MonoBehaviour {
   bool controllerVisible = true;
   public void toggleController(bool on) {
     controllerVisible = on;
-    controllerRep.SetActive(on);
+    //controllerRep.SetActive(on); // comment out so that oculus assets stay disabled
   }
 
   public void SetDeviceIndex(int index) {
