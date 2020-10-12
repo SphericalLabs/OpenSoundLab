@@ -2,6 +2,8 @@
 
 See https://www.ludwigzeller.net/projects/the-new-normal/ for more information.
 
+Credits: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A
+
 ------
 
 This project is no longer actively developed or maintained by Logan Olson.
