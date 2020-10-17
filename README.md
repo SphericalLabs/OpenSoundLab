@@ -2,7 +2,7 @@
 
 See https://www.ludwigzeller.net/projects/the-new-normal/ for more information.
 
-Credits: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A
+Credits: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles' by bariacg.
 
 ------
 
