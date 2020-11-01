@@ -31,7 +31,7 @@ public class menuItem : manipObject {
   bool disabled = false;
 
   public enum deviceType {
-    Dog, 
+    SARSCov2, 
     Oscillator,
     Speaker,
     Funktion,
