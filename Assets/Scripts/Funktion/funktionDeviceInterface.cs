@@ -19,7 +19,6 @@ public class funktionDeviceInterface : deviceInterface {
   public int ID = -1;
   public omniJack input;
   funktion output;
-  public GameObject speakerRim;
   public AudioSource audio;
 
   FunktionData data;
@@ -28,8 +27,6 @@ public class funktionDeviceInterface : deviceInterface {
     base.Awake();
     output = GetComponent<funktion>();
     input = GetComponentInChildren<omniJack>();
-    speakerRim.GetComponent<Renderer>().material.SetFloat("_EmissionGain", .45f);
-    speakerRim.SetActive(false);
   }
 
   void Start() {
@@ -46,8 +43,6 @@ public class funktionDeviceInterface : deviceInterface {
   void Update() {
     if (output.incoming != input.signal) {
       output.incoming = input.signal;
-      if (output.incoming == null) speakerRim.SetActive(false);
-      else speakerRim.SetActive(true);
     }
 
     if (output.incoming != null) {

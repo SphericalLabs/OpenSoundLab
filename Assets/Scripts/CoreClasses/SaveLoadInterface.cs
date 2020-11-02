@@ -163,6 +163,7 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
+[XmlInclude(typeof(FunktionData))]
 [XmlInclude(typeof(OscillatorData))]
 [XmlInclude(typeof(SpeakerData))]
 [XmlInclude(typeof(CameraData))]
@@ -190,6 +191,8 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(MIDIoutData))]
 [XmlInclude(typeof(TimelineData))]
 [XmlInclude(typeof(ADSRData))]
+
+
 public class InstrumentData {
   public int ID;
   public menuItem.deviceType deviceType;

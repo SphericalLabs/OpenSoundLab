@@ -31,6 +31,9 @@ public class xmlUpdate {
         foreach (XmlNode xmlNode in xmlNodeParent) {
           XmlSerializer serializer;
           switch (xmlNode.Name) {
+            case "Funktion":
+              serializer = new XmlSerializer(typeof(FunktionData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             case "Oscillator":
               serializer = new XmlSerializer(typeof(OscillatorData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -39,10 +42,7 @@ public class xmlUpdate {
               break;
             case "Speaker":
               serializer = new XmlSerializer(typeof(SpeakerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
-            case "Funktion":
-              serializer = new XmlSerializer(typeof(FunktionData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;      
+              break;    
             case "Drums":
               serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -107,6 +107,9 @@ public class xmlUpdate {
           data.Add((InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode)));
 
           switch (xmlNode.Name) {
+            case "Funktion":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Funktion;
+              break;
             case "Oscillators":
               data[data.Count - 1].deviceType = menuItem.deviceType.Oscillator;
               break;

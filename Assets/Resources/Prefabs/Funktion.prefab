@@ -27,9 +27,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 417776}
-  - component: {fileID: 11406176}
   - component: {fileID: 8299576}
-  - component: {fileID: 11456868}
+  - component: {fileID: 114246248228181092}
+  - component: {fileID: 114570887042825684}
   m_Layer: 9
   m_Name: Funktion
   m_TagString: instrument
@@ -268,19 +268,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &11406176
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 139084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c7784f2c5c78ac4d8ed0395f6d19393, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  volume: 1
-  incoming: {fileID: 0}
 --- !u!114 &11425646
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -304,22 +291,6 @@ MonoBehaviour:
   ID: 0
   trashReady: 0
   curTrash: {fileID: 0}
---- !u!114 &11456868
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 139084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7840825ca0a7593489b4cd0de966a5fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useNativeIfAvailable: 1
-  ID: -1
-  input: {fileID: 114000010890722710}
-  speakerRim: {fileID: 185836}
-  audio: {fileID: 8299576}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -2488,6 +2459,21 @@ MonoBehaviour:
   ID: 0
   trashReady: 0
   curTrash: {fileID: 0}
+--- !u!114 &114246248228181092
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 139084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a48a3fd2e98d04499d04f1f725cdf28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useNativeIfAvailable: 1
+  ID: -1
+  input: {fileID: 114000010890722710}
+  audio: {fileID: 8299576}
 --- !u!114 &114272506193845154
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2511,6 +2497,19 @@ MonoBehaviour:
   ID: 1
   trashReady: 0
   curTrash: {fileID: 0}
+--- !u!114 &114570887042825684
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 139084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad4109e93263844ba29276384bb37f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volume: 1
+  incoming: {fileID: 0}
 --- !u!135 &135000013984031436
 SphereCollider:
   m_ObjectHideFlags: 1
