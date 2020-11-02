@@ -8,7 +8,7 @@ Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles'
 
 --
 
-## Notes for making new MenuItems copiable and save/loadable
+### Notes for making new MenuItems copiable and save/loadable
 
 - add / copy yourDeviceInterface.cs 
 - define YourData, implement (de)serialization 
