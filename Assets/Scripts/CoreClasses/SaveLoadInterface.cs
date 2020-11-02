@@ -163,6 +163,8 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
+[XmlInclude(typeof(ConferenceCallData))]
+[XmlInclude(typeof(SARSCov2Data))]
 [XmlInclude(typeof(FunktionData))]
 [XmlInclude(typeof(OscillatorData))]
 [XmlInclude(typeof(SpeakerData))]
