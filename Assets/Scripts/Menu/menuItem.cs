@@ -31,6 +31,7 @@ public class menuItem : manipObject {
   bool disabled = false;
 
   public enum deviceType {
+    ConferenceCall,
     SARSCov2, 
     Oscillator,
     Speaker,
