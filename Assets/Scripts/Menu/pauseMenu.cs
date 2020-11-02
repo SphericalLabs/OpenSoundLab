@@ -86,7 +86,7 @@ public class pauseMenu : MonoBehaviour {
   public void saveFile(string s) {
     if (s == "[new file]") {
       s = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Saves" + Path.DirectorySeparatorChar +
-          string.Format("{0:MM-dd_hh-mm-ss-tt}.xml",
+          string.Format("{0:yyyy-MM-dd_HH-mm-ss}.xml",
           DateTime.Now);
     }
 
