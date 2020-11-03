@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.02508, g: 0.0275, b: 0.02926, a: 0.22}
   m_AmbientGroundColor: {r: 0.01034, g: 0.00946, b: 0.0077, a: 0.22}
   m_AmbientIntensity: 0.22
-  m_AmbientMode: 3
+  m_AmbientMode: 0
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -50,8 +50,8 @@ LightmapSettings:
     m_AlbedoBoost: 1
     m_TemporalCoherenceThreshold: 1
     m_EnvironmentLightingMode: 0
-    m_EnableBakedLightmaps: 1
-    m_EnableRealtimeLightmaps: 1
+    m_EnableBakedLightmaps: 0
+    m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
     serializedVersion: 4
     m_Resolution: 2
@@ -215,6 +215,11 @@ Prefab:
     - target: {fileID: 1000011372789156, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4, type: 2}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 20000011574839304, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
+        type: 2}
+      propertyPath: m_HDR
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4, type: 2}
@@ -399,7 +404,7 @@ Camera:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294965247
-  m_RenderingPath: 1
+  m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 0
@@ -465,6 +470,25 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a0ab4fa46d6d8bd46ac8d425f3bb2110, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1567510913 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1000012983180942, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+    type: 2}
+  m_PrefabInternal: {fileID: 1609445184}
+--- !u!114 &1567510922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1567510913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7569426a90f002644ac14b7e62d9137a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 10000
+  height: 10000
+  scale: 1
 --- !u!1001 &1609445184
 Prefab:
   m_ObjectHideFlags: 0
