@@ -120,7 +120,7 @@ public class cameraDeviceInterface : deviceInterface {
       rtCam.targetTexture.Release();
     }
     int mult = hires ? 32 : 16;
-    rtCam.targetTexture = new RenderTexture(16 * mult, 9 * mult, 16);
+    rtCam.targetTexture = new RenderTexture(4 * 16 * mult, 4 * 9 * mult, 16);
     rtQuad.GetComponent<Renderer>().material.mainTexture = rtCam.targetTexture;
   }
 
