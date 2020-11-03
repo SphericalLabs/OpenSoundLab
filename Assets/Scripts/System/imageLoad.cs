@@ -31,7 +31,7 @@ public class imageLoad : MonoBehaviour {
   public void createPano(string path) {
     if (!File.Exists(path)) return;
 
-    panosphereDeviceInterface p = (Instantiate(panoSphere, Vector3.up + Vector3.right * panos.Count * .2f, Quaternion.identity) as GameObject).GetComponent<panosphereDeviceInterface>();
+    panosphereDeviceInterface p = (Instantiate(panoSphere, Vector3.up, Quaternion.identity) as GameObject).GetComponent<panosphereDeviceInterface>();
     panos.Add(p);
     p.loadImage(path);
 
