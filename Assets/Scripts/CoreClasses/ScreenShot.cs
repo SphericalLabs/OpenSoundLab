@@ -80,7 +80,7 @@ public class ScreenShot : MonoBehaviour
     string saveDir = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + sep + "SoundStage" + sep + "ScreenShots";
     Directory.CreateDirectory(saveDir);
 
-    strPath = string.Format("{0}/screen_{1}x{2}_{3}.png",
+    strPath = string.Format("{0}/screen_{3}_{1}x{2}.png",
                          saveDir,
                          width, height,
                                    System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
