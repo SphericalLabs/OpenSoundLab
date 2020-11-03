@@ -13,7 +13,8 @@ public class ScreenShot : MonoBehaviour
   // Use this for initialization
   void Start()
   {
-
+    // windowCam
+    // realCam
   }
 
 
@@ -32,10 +33,19 @@ public class ScreenShot : MonoBehaviour
 
   void takeScreenShot() 
   {
+    GameObject obj = GameObject.Find("realCam");
+    Camera cam = null;
+    if (obj != null && obj.activeInHierarchy) {
+      cam = obj.GetComponent<Camera>();
+    }
+    if(cam == null) {
+      cam = Camera.main; // fallback to windowCam
+    }
+
     int resWidthN = width * scale;
     int resHeightN = height * scale;
     RenderTexture rt = new RenderTexture(resWidthN, resHeightN, 24);
-    Camera.main.targetTexture = rt;
+    cam.targetTexture = rt;
     //QualitySettings.antiAliasing = 8; // not working
 
     TextureFormat tFormat;
@@ -43,13 +53,13 @@ public class ScreenShot : MonoBehaviour
 
 
     Texture2D screenShot = new Texture2D(resWidthN, resHeightN, tFormat, false);
-    Camera.main.Render();
+    cam.Render();
     RenderTexture.active = rt;
 
 
     screenShot.ReadPixels(new Rect(0, 0, resWidthN, resHeightN), 0, 0);
 
-    Camera.main.targetTexture = null;
+    cam.targetTexture = null;
     RenderTexture.active = null;
 
     byte[] bytes = screenShot.EncodeToPNG();
@@ -72,7 +82,7 @@ public class ScreenShot : MonoBehaviour
 
     strPath = string.Format("{0}/screen_{1}x{2}_{3}.png",
                          saveDir,
-                         width*scale, height*scale,
+                         width, height,
                                    System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
     return strPath;
   }

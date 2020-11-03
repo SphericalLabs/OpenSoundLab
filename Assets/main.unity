@@ -342,7 +342,7 @@ GameObject:
   - component: {fileID: 1336667595}
   - component: {fileID: 1336667594}
   m_Layer: 11
-  m_Name: PCCam
+  m_Name: windowCam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -397,7 +397,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000.72
-  field of view: 80
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -486,9 +486,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7569426a90f002644ac14b7e62d9137a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 10000
-  height: 10000
-  scale: 1
+  width: 1600
+  height: 900
+  scale: 5
 --- !u!1001 &1609445184
 Prefab:
   m_ObjectHideFlags: 0
