@@ -74,7 +74,7 @@ public class menuManager : MonoBehaviour {
     active = on;
   }
 
-  int rowLength = 6;
+  int rowLength = 8;
 
   void loadMenu() {
     menuItems = new GameObject[(int)menuItem.deviceType.Max];
@@ -89,7 +89,7 @@ public class menuManager : MonoBehaviour {
 
     int tempCount = 0;
     float h = 0;
-    float arc = 37.5f * 6 / 5; // depending on rowLength?
+    float arc = 37.5f * rowLength / 5; // depending on rowLength?
 
     //Debug.Log(menuItems.Length);
     while (tempCount < menuItems.Length) {
