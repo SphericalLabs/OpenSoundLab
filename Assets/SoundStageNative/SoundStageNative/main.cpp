@@ -214,23 +214,23 @@ extern "C" {
 		if (!incoming)
 		{
 			//float endAmp = 4 * amp - 2;//(amp - .5f) * 2;
-			if (!bControlSig)
+			if (!bControlSig) // act as CV generator (but beware non-linear, assymetrical behaviour of dial.cs... 0 at 9' clock, -2/+2 at 6' clock)
 			{		
 				float endAmp = 4 * amp - 2;
 				for (int i = 0; i < length; i++) buffer[i] = endAmp;// endAmp;
 			}
-			else
+			else // act as attenverter for cv input? 
 			{
 				for (int i = 0; i < length; i++)
 				{
-					buffer[i] = amp * 2 * (controlBuffer[i]+1) - 1.0f;
+					buffer[i] = amp * 2 * (controlBuffer[i]+1) - 1.0f; 
 				}
 			}
 		}
 		else
 		{
 			float endAmp = amp * 2;
-			if (!bControlSig)
+			if (!bControlSig) // act as attenuator/gain for audio 
 			{
 				
 				for (int i = 0; i < length; i++)
@@ -238,7 +238,7 @@ extern "C" {
 					buffer[i] *= endAmp;
 				}
 			}
-			else
+			else // act as a VCA
 			{
 				for (int i = 0; i < length; i++)
 				{

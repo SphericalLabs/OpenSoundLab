@@ -15,56 +15,53 @@
 using UnityEngine;
 using System.Collections;
 
-public class ValveDeviceInterface : deviceInterface {
-  public omniJack input, output, controlInput;
+public class gainDeviceInterface : deviceInterface {
+  public omniJack input, output;
   dial ampDial;
-  basicSwitch activeSwitch;
-  valveSignalGenerator signal;
+  gainSignalGenerator signal;
 
   public override void Awake() {
     base.Awake();
     ampDial = GetComponentInChildren<dial>();
-    activeSwitch = GetComponentInChildren<basicSwitch>();
-    signal = GetComponent<valveSignalGenerator>();
+//    activeSwitch = GetComponentInChildren<basicSwitch>();
+    signal = GetComponent<gainSignalGenerator>();
   }
 
   void Update() {
-    //signal.amp = 1 + ampDial.percent * 16; // 16 equals how many dB?
-    signal.amp = ampDial.percent;
-    signal.active = activeSwitch.switchVal;
+    
+    signal.amp = 1f + ampDial.percent * 32; // 30db! 6 db per duplication, sqrt(32) * 6 = 5 * 6 = 30
+    
+//    signal.active = activeSwitch.switchVal;
     if (signal.incoming != input.signal) signal.incoming = input.signal;
-    if (signal.controlSig != controlInput.signal) signal.controlSig = controlInput.signal;
   }
 
   public override InstrumentData GetData() {
-    ValveData data = new ValveData();
-    data.deviceType = menuItem.deviceType.Valve;
+    GainData data = new GainData();
+    data.deviceType = menuItem.deviceType.Gain;
     GetTransformData(data);
 
     data.dialState = ampDial.percent;
-    data.switchState = activeSwitch.switchVal;
+//    data.switchState = activeSwitch.switchVal;
 
     data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
-    data.jackControlID = controlInput.transform.GetInstanceID();
 
     return data;
   }
 
   public override void Load(InstrumentData d) {
-    ValveData data = d as ValveData;
+    GainData data = d as GainData;
     base.Load(data);
 
     input.ID = data.jackInID;
     output.ID = data.jackOutID;
-    controlInput.ID = data.jackControlID;
 
     ampDial.setPercent(data.dialState);
-    activeSwitch.setSwitch(data.switchState);
+//    activeSwitch.setSwitch(data.switchState);
   }
 }
 
-public class ValveData : InstrumentData {
+public class GainData : InstrumentData {
   public float dialState;
   public bool switchState;
   public int jackOutID;
