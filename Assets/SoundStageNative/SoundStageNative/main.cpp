@@ -526,8 +526,8 @@ extern "C" {
 			if (_phase > 1.0) _phase -= 1.0;
 
 			//final buffer
-			//buffer[i] = buffer[i + 1] = (float)sample * endAmplitude;
-			buffer[i] = buffer[i + 1] = 0f;
+			buffer[i] = buffer[i + 1] = (float)sample * endAmplitude;
+			//buffer[i] = buffer[i + 1] = 0.f;
 
 			//dsptime update
 			dspTime += _sampleDuration;
