@@ -101,7 +101,7 @@ public class menuItem : manipObject {
     symbol.material.SetTexture("_MainTex", tex);
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
-    if (item == deviceType.Valve) label.text = "Gate";
+    if (item == deviceType.Valve) label.text = "VCA/Fader/CVGen";
     if (item == deviceType.MIDIIN) label.text = "MIDI IN";
     if (item == deviceType.MIDIOUT) label.text = "MIDI OUT";
     if (item == deviceType.Sequencer) label.text = "Drum Machine";
