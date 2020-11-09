@@ -209,7 +209,7 @@ public class masterControl : MonoBehaviour {
 
   int lastBeat = -1;
   void Update() {
-    if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) {
+    if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { // metronome plays bound to screen updates! Jitter and prone to CPU hanging! Do not trust the metronome!
       metronomeClick.Play();
       lastBeat = Mathf.FloorToInt(curCycle * 8f);
     }
