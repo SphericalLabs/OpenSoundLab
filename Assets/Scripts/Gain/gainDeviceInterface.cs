@@ -63,7 +63,7 @@ public class gainDeviceInterface : deviceInterface {
 
 public class GainData : InstrumentData {
   public float dialState;
-  public bool switchState;
+  //public bool switchState;
   public int jackOutID;
   public int jackInID;
   public int jackControlID;
