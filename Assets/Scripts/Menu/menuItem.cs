@@ -33,6 +33,7 @@ public class menuItem : manipObject {
   public enum deviceType {
     Glide,
     Gain,
+    Valve,
     ConferenceCall,
     SARSCov2, 
     Oscillator,
@@ -48,7 +49,6 @@ public class menuItem : manipObject {
     ControlCube,
     Tapes,
     Splitter,
-    Valve,
     TouchPad,
     XyloRoll,
     Reverb,
@@ -102,7 +102,9 @@ public class menuItem : manipObject {
     symbol.material.SetTexture("_MainTex", tex);
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
-    if (item == deviceType.Valve) label.text = "VCA/Fader/CVGen";
+    if (item == deviceType.Valve) label.text = "VCA/Atten";
+    if (item == deviceType.Glide) label.text = "Glide/DC";
+    if (item == deviceType.Gain) label.text = "Gain/Mute";
     if (item == deviceType.MIDIIN) label.text = "MIDI IN";
     if (item == deviceType.MIDIOUT) label.text = "MIDI OUT";
     if (item == deviceType.Sequencer) label.text = "Drum Machine";
