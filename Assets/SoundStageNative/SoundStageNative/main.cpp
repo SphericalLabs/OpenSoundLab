@@ -27,7 +27,7 @@ extern "C" {
 
 	void SetArrayToFixedValue(float buf[], int length, float value)
 	{
-		for (int i = 0; i < length; ++i)
+		for (int i = 0; i < length; ++i) // how pre-increment? clicks?
 			buf[i] = value;
 	}
 

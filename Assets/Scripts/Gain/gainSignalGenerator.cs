@@ -20,24 +20,20 @@ public class gainSignalGenerator : signalGenerator {
 
   public signalGenerator incoming;
   public bool active = true;
-  public float amp = 1f;
+  public float amp = 0f;
 
-  [DllImport("SoundStageNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")] public static extern void GateProcessBuffer(float[] buffer, int length, int channels, bool incoming, float[] controlBuffer, bool bControlSig, float amp);
+  float fader = 0f;
+  
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    if (!active) {
-      SetArrayToSingleValue(buffer, buffer.Length, -1f);
-      return;
-    }
 
     if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
 
-    //GateProcessBuffer(buffer, buffer.Length, channels, (incoming != null), controlBuffer, (controlSig != null), amp);
-
     for(int n = 0; n < buffer.Length; n++) 
     {
-      buffer[n] = Mathf.Clamp(buffer[n] * amp, -1f, 1f);
+      fader = Mathf.Clamp01(fader + ( (!active || incoming == null) ? -0.005f : 0.005f)); // fade out or in
+      buffer[n] = Mathf.Clamp(buffer[n] * amp, -1f, 1f) * fader;
     }
+
   }
 }

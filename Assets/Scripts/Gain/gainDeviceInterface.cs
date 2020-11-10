@@ -19,11 +19,12 @@ public class gainDeviceInterface : deviceInterface {
   public omniJack input, output;
   dial ampDial;
   gainSignalGenerator signal;
+  basicSwitch activeSwitch;
 
   public override void Awake() {
     base.Awake();
     ampDial = GetComponentInChildren<dial>();
-//    activeSwitch = GetComponentInChildren<basicSwitch>();
+    activeSwitch = GetComponentInChildren<basicSwitch>();
     signal = GetComponent<gainSignalGenerator>();
   }
 
@@ -31,7 +32,7 @@ public class gainDeviceInterface : deviceInterface {
     
     signal.amp = 1f + ampDial.percent * 32; // 30db! 6 db per duplication, sqrt(32) * 6 = 5 * 6 = 30
     
-//    signal.active = activeSwitch.switchVal;
+    signal.active = activeSwitch.switchVal;
     if (signal.incoming != input.signal) signal.incoming = input.signal;
   }
 
@@ -41,7 +42,7 @@ public class gainDeviceInterface : deviceInterface {
     GetTransformData(data);
 
     data.dialState = ampDial.percent;
-//    data.switchState = activeSwitch.switchVal;
+    data.switchState = activeSwitch.switchVal;
 
     data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
@@ -57,13 +58,13 @@ public class gainDeviceInterface : deviceInterface {
     output.ID = data.jackOutID;
 
     ampDial.setPercent(data.dialState);
-//    activeSwitch.setSwitch(data.switchState);
+    activeSwitch.setSwitch(data.switchState);
   }
 }
 
 public class GainData : InstrumentData {
   public float dialState;
-  //public bool switchState;
+  public bool switchState;
   public int jackOutID;
   public int jackInID;
   public int jackControlID;
