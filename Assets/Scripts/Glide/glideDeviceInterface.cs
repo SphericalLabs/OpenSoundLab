@@ -15,59 +15,55 @@
 using UnityEngine;
 using System.Collections;
 
-public class ValveDeviceInterface : deviceInterface {
-  public omniJack input, output, controlInput;
-  dial ampDial;
-  basicSwitch activeSwitch;
-  valveSignalGenerator signal;
+public class glideDeviceInterface : deviceInterface {
+  public omniJack input, output;
+  dial valueDial;
+  glideSignalGenerator signal;
 
   public override void Awake() {
     base.Awake();
-    ampDial = GetComponentInChildren<dial>();
-    activeSwitch = GetComponentInChildren<basicSwitch>();
-    signal = GetComponent<valveSignalGenerator>();
+    valueDial = GetComponentInChildren<dial>();
+//    activeSwitch = GetComponentInChildren<basicSwitch>();
+    signal = GetComponent<glideSignalGenerator>();
   }
 
   void Update() {
-    //signal.amp = 1 + valueDial.percent * 16; // 16 equals how many dB?
-    signal.amp = ampDial.percent;
-    signal.active = activeSwitch.switchVal;
+    
+    signal.time = valueDial.percent; // 0 to 1?
+    
+//    signal.active = activeSwitch.switchVal;
     if (signal.incoming != input.signal) signal.incoming = input.signal;
-    if (signal.controlSig != controlInput.signal) signal.controlSig = controlInput.signal;
   }
 
   public override InstrumentData GetData() {
-    ValveData data = new ValveData();
-    data.deviceType = menuItem.deviceType.Valve;
+    GlideData data = new GlideData();
+    data.deviceType = menuItem.deviceType.Glide;
     GetTransformData(data);
 
-    data.dialState = ampDial.percent;
-    data.switchState = activeSwitch.switchVal;
+    data.dialState = valueDial.percent;
+//    data.switchState = activeSwitch.switchVal;
 
     data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
-    data.jackControlID = controlInput.transform.GetInstanceID();
 
     return data;
   }
 
   public override void Load(InstrumentData d) {
-    ValveData data = d as ValveData;
+    GlideData data = d as GlideData;
     base.Load(data);
 
     input.ID = data.jackInID;
     output.ID = data.jackOutID;
-    controlInput.ID = data.jackControlID;
 
-    ampDial.setPercent(data.dialState);
-    activeSwitch.setSwitch(data.switchState);
+    valueDial.setPercent(data.dialState);
+//    activeSwitch.setSwitch(data.switchState);
   }
 }
 
-public class ValveData : InstrumentData {
+public class GlideData : InstrumentData {
   public float dialState;
-  public bool switchState;
+  //public bool switchState;
   public int jackOutID;
   public int jackInID;
-  public int jackControlID;
 }

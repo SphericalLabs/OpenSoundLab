@@ -31,6 +31,9 @@ public class xmlUpdate {
         foreach (XmlNode xmlNode in xmlNodeParent) {
           XmlSerializer serializer;
           switch (xmlNode.Name) {
+            case "Glide":
+              serializer = new XmlSerializer(typeof(GlideData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             case "Gain":
               serializer = new XmlSerializer(typeof(GainData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -116,6 +119,9 @@ public class xmlUpdate {
           data.Add((InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode)));
 
           switch (xmlNode.Name) {
+            case "Glide":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Glide;
+              break;
             case "Gain":
               data[data.Count - 1].deviceType = menuItem.deviceType.Gain;
               break;
