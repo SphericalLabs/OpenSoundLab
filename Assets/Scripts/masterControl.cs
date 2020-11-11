@@ -214,7 +214,7 @@ public class masterControl : MonoBehaviour {
     // Do not trust the metronome! Build your own one!
     // Other sequencers avoid Update calls, continue even if Update call stack hangs
     if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { 
-      metronomeClick.Play();
+      //metronomeClick.Play();
       lastBeat = Mathf.FloorToInt(curCycle * 8f);
     }
   }
