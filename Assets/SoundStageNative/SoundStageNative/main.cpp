@@ -398,10 +398,10 @@ extern "C" {
 
 	void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int semitone, float keyMultConst, float& filteredVal)
 	{
-		float val = pow(keyMultConst, semitone) - 1;
+		float val = pow(keyMultConst, semitone) - 1; // - 1 here means transpose down one octave?
 		for (int i = 0; i < length; i += channels)
 		{
-			buffer[i] = buffer[i + 1] = filteredVal = lerp(val, filteredVal, .9f);
+			buffer[i] = buffer[i + 1] = filteredVal = lerp(val, filteredVal, .9f); // lerp as eased follower
 		}
 	}
 

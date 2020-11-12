@@ -17,11 +17,12 @@ using System.Collections;
 using System.Runtime.InteropServices;
 
 public class keyFrequencySignalGenerator : signalGenerator {
-  float keyMultConst = Mathf.Pow(2, 1f / 12);
+  
+  float keyMultConst = Mathf.Pow(2, 1f / 12); // relative difference between two keys as multiplier
 
   public int octave = 0;
   int curKey = -1;
-  int semitone = 0;
+  int semitone = 0; // as key number, not in hertz
 
   [DllImport("SoundStageNative")]
   public static extern void KeyFrequencySignalGenerator(float[] buffer, int length, int channels, int semitone, float keyMultConst, ref float filteredVal);
@@ -31,7 +32,7 @@ public class keyFrequencySignalGenerator : signalGenerator {
     semitone = k - 9 + octave * 12;
   }
 
-  public float getMult(int k) {
+  public float getMult(int k) { // only used in xyloroll
     semitone = k - 9 + octave * 12;
     return Mathf.Pow(keyMultConst, semitone);
   }

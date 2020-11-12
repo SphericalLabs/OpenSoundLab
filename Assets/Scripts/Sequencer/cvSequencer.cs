@@ -30,7 +30,7 @@ public class cvSequencer : signalGenerator {
   {
     //newSignal = true;
     //signalOn = on;
-    outVal = f;
+    outVal = f * 3.5f - 0.5f; // same range as keyboard?
   }
 
   float outVal = 0f;
