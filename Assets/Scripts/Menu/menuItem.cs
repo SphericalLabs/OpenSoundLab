@@ -45,6 +45,7 @@ public class menuItem : manipObject {
     Drum,
     Keyboard,
     Sequencer,
+    CVSequencer,
     Maracas,
     ControlCube,
     Tapes,
@@ -129,6 +130,26 @@ public class menuItem : manipObject {
         }
 
         GameObject seq = Instantiate(g.GetComponent<sequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
+        seq.transform.parent = g.transform;
+        seq.transform.Translate(Vector3.right * .081f, Space.Self);
+        seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+      }
+      Destroy(g.transform.Find("stretchNode").gameObject);
+    }
+
+    if (item == deviceType.CVSequencer)
+    {
+      for (int i = 0; i < 2; i++)
+      {
+        for (int i2 = 0; i2 < 4; i2++)
+        {
+          GameObject cube = Instantiate(g.GetComponent<cvSequencerDeviceInterface>().touchDialPrefab, transform.position, transform.rotation) as GameObject;
+          cube.transform.parent = g.transform;
+          cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
+          cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+        }
+
+        GameObject seq = Instantiate(g.GetComponent<cvSequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
         seq.transform.parent = g.transform;
         seq.transform.Translate(Vector3.right * .081f, Space.Self);
         seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);

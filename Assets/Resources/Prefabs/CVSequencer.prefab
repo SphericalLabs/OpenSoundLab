@@ -275,10 +275,10 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4000011047401768}
-  - component: {fileID: 114000012260190240}
   - component: {fileID: 82000011234211416}
+  - component: {fileID: 114790924756963406}
   m_Layer: 9
-  m_Name: Sequencer
+  m_Name: CVSequencer
   m_TagString: instrument
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -460,7 +460,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1000013582970990
 GameObject:
   m_ObjectHideFlags: 1
@@ -2411,38 +2411,6 @@ MonoBehaviour:
   - {fileID: 1000010417902430}
   - {fileID: 1000010897273028}
   titleLabel: {fileID: 0}
---- !u!114 &114000012260190240
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012113822842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3cc30d82d850dd41b4b3b2b065d4172, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useNativeIfAvailable: 1
-  touchCubePrefab: {fileID: 1000013574761334, guid: bf32c10c31b6a1e4b9180b121dc0db9f,
-    type: 2}
-  jackOutPrefab: {fileID: 190860, guid: 76db78828b3ee2a46a6a4374d7b8afee, type: 2}
-  samplerPrefab: {fileID: 1000013735183428, guid: 77cdd02b4a4c97240931d5bb675dce04,
-    type: 2}
-  stretchNode: {fileID: 4000013409575508}
-  stepSelect: {fileID: 114000012285081508}
-  running: 1
-  dimensions: 0100000001000000
-  jackList: []
-  seqList: []
-  samplerList: []
-  rowMute: 
-  beatSlider: {fileID: 114000012190995366}
-  controlInput: {fileID: 114000010336139522}
-  playButton: {fileID: 114000010763487664}
-  dimensionDisplays:
-  - {fileID: 102000013518395380}
-  - {fileID: 102000013255618616}
-  silent: 0
 --- !u!114 &114000012285081508
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2521,7 +2489,7 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   usingGlowMat: 1
   usePercent: 0
-  _interface: {fileID: 114000012260190240}
+  _interface: {fileID: 0}
 --- !u!114 &114000014247751836
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2545,6 +2513,41 @@ MonoBehaviour:
   ID: 1
   trashReady: 0
   curTrash: {fileID: 0}
+--- !u!114 &114790924756963406
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012113822842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 408b856d43d1a154ebea638267b01b86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useNativeIfAvailable: 1
+  jackOutPrefab: {fileID: 190860, guid: 76db78828b3ee2a46a6a4374d7b8afee, type: 2}
+  cvJackOutPrefab: {fileID: 190860, guid: 2805668e4f40fcd4b901978d38fb3dc0, type: 2}
+  touchDialPrefab: {fileID: 1000013574761334, guid: ee63b3cfcbc5e8d44b6318ca7ecd09b8,
+    type: 2}
+  samplerPrefab: {fileID: 1000013735183428, guid: 77cdd02b4a4c97240931d5bb675dce04,
+    type: 2}
+  stretchNode: {fileID: 4000013409575508}
+  stepSelect: {fileID: 114000012285081508}
+  running: 1
+  dimensions: 0100000001000000
+  jackList: []
+  cvJackList: []
+  seqList: []
+  cvSeqList: []
+  samplerList: []
+  rowMute: 
+  beatSlider: {fileID: 114000012190995366}
+  controlInput: {fileID: 114000010336139522}
+  playButton: {fileID: 114000010763487664}
+  dimensionDisplays:
+  - {fileID: 102000013518395380}
+  - {fileID: 102000013255618616}
+  silent: 0
 --- !u!114 &114958728916465078
 MonoBehaviour:
   m_ObjectHideFlags: 1

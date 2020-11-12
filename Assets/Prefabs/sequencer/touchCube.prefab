@@ -28,11 +28,11 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 4000011366489740}
-  - 33: {fileID: 33000010811489128}
-  - 23: {fileID: 23000012513556418}
+  - component: {fileID: 4000011366489740}
+  - component: {fileID: 33000010811489128}
+  - component: {fileID: 23000012513556418}
   m_Layer: 0
   m_Name: roundedCube
   m_TagString: Untagged
@@ -45,13 +45,13 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 4000010119408432}
-  - 33: {fileID: 33000013728032928}
-  - 23: {fileID: 23000013635633818}
-  - 65: {fileID: 6508672}
-  - 114: {fileID: 114000012562423038}
+  - component: {fileID: 4000010119408432}
+  - component: {fileID: 33000013728032928}
+  - component: {fileID: 23000013635633818}
+  - component: {fileID: 6508672}
+  - component: {fileID: 114000012562423038}
   m_Layer: 0
   m_Name: touchCube
   m_TagString: Untagged
@@ -68,11 +68,11 @@ Transform:
   m_LocalRotation: {x: 0, y: 1, z: 0, w: -0.00000016292068}
   m_LocalPosition: {x: 0.0043, y: 1.0635, z: -0.444}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 4000011366489740}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4000011366489740
 Transform:
   m_ObjectHideFlags: 1
@@ -82,10 +82,10 @@ Transform:
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1.01, y: 1.01, z: 1.01}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 4000010119408432}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23000012513556418
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -100,7 +100,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 4facae5d7d7c7ed4ea278211c291812d, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
@@ -108,7 +110,7 @@ MeshRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_SelectedWireframeHidden: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -129,7 +131,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 968aff1bdb7797449b200e80168986c7, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
@@ -137,7 +141,7 @@ MeshRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_SelectedWireframeHidden: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -171,14 +175,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   curState: 0
   manipulatorObj: {fileID: 0}
+  selectObj: {fileID: 0}
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
+  canBeDeleted: 0
   isToggle: 1
   toggleKey: 0
   buttonID: 0
   button2DID: 0000000000000000
   glowMatOnToggle: 1
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  onMat: {fileID: 2100000, guid: ef818fb4c0dff8741b977ff7910ce6b0, type: 2}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 1000011125891866}
   glowHue: 0
