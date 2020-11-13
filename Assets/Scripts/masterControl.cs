@@ -93,8 +93,8 @@ public class masterControl : MonoBehaviour {
 
     GetComponent<sampleManager>().Init();
 
-    OVRPlugin.fixedFoveatedRenderingLevel = OVRPlugin.FixedFoveatedRenderingLevel.High; // it's the maximum foveation level
-    
+    OVRManager.fixedFoveatedRenderingLevel = OVRManager.FixedFoveatedRenderingLevel.High; // it's the maximum foveation level
+    OVRManager.useDynamicFixedFoveatedRendering = true;
   }
 
   public void toggleInstrumentVolume(bool on) {

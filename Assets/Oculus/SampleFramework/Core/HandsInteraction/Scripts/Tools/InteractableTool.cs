@@ -10,6 +10,7 @@ language governing permissions and limitations under the license.
 ************************************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace OculusSampleFramework
@@ -24,7 +25,6 @@ namespace OculusSampleFramework
 		None = 0,
 		Ray = 1 << 0,
 		Poke = 1 << 2,
-		Pinch = 1 << 3,
 		All = ~0
 	}
 
@@ -60,34 +60,34 @@ namespace OculusSampleFramework
 	/// <summary>
 	/// A tool that can engage interactables.
 	/// </summary>
-	public interface InteractableTool
+	public abstract class InteractableTool : MonoBehaviour
 	{
-		Transform ToolTransform { get; }
-		bool IsRightHandedTool { get; set; }
+		public Transform ToolTransform { get { return this.transform; } }
+		public bool IsRightHandedTool { get; set; }
 
-		Dictionary<Interactable, InteractableCollisionInfo> CurrInteractableToCollisionInfos
-		{ get; set; }
-		Dictionary<Interactable, InteractableCollisionInfo> PrevInteractableToCollisionInfos
-		{ get; set; }
+		public abstract InteractableToolTags ToolTags { get; }
 
-		InteractableToolTags ToolTags { get; }
+		public abstract ToolInputState ToolInputState { get; }
 
-		ToolInputState ToolInputState { get; }
+		public abstract bool IsFarFieldTool { get; }
 
-		bool IsFarFieldTool { get; }
-
-		Vector3 Velocity { get; }
+		public Vector3 Velocity { get; protected set; }
 
 		/// <summary>
 		/// Sometimes we want the position of a tool for stuff like pokes.
 		/// </summary>
-		Vector3 InteractionPosition { get; }
+		public Vector3 InteractionPosition { get; protected set; }
 
 		/// <summary>
-		/// Finds and returns objects that interact with this tool.
-		/// Whether it is via cast, poking, pinching, etc.
+		/// List of objects that intersect tool.
 		/// </summary>
-		List<InteractableCollisionInfo> GetIntersectingObjects();
+		protected List<InteractableCollisionInfo> _currentIntersectingObjects =
+			new List<InteractableCollisionInfo>();
+		public List<InteractableCollisionInfo> GetCurrentIntersectingObjects()
+		{
+			return _currentIntersectingObjects;
+		}
+		public abstract List<InteractableCollisionInfo> GetNextIntersectingObjects();
 
 		/// <summary>
 		/// Used to tell the tool to "focus" on a specific object, if
@@ -95,14 +95,116 @@ namespace OculusSampleFramework
 		/// </summary>
 		/// <param name="focusedInteractable">Interactable to focus.</param>
 		/// <param name="colliderZone">Collider zone of interactable.</param>
-		void FocusOnInteractable(Interactable focusedInteractable,
-		  ColliderZone colliderZone);
+		public abstract void FocusOnInteractable(Interactable focusedInteractable,
+			ColliderZone colliderZone);
 
-		void Initialize();
+		public abstract void DeFocus();
 
-		void DeFocus();
+		public abstract bool EnableState { get; set; }
 
-		bool EnableState { get; set; }
+		// lists created once so that they don't need to be created per frame
+		private List<Interactable> _addedInteractables = new List<Interactable>();
+		private List<Interactable> _removedInteractables = new List<Interactable>();
+		private List<Interactable> _remainingInteractables = new List<Interactable>();
+
+		private Dictionary<Interactable, InteractableCollisionInfo> _currInteractableToCollisionInfos
+			= new Dictionary<Interactable, InteractableCollisionInfo>();
+		private Dictionary<Interactable, InteractableCollisionInfo> _prevInteractableToCollisionInfos
+			= new Dictionary<Interactable, InteractableCollisionInfo>();
+
+		public abstract void Initialize();
+
+		public KeyValuePair<Interactable, InteractableCollisionInfo> GetFirstCurrentCollisionInfo()
+		{
+			return _currInteractableToCollisionInfos.First();
+		}
+
+		public void ClearAllCurrentCollisionInfos()
+		{
+			_currInteractableToCollisionInfos.Clear();
+		}
+
+		/// <summary>
+		/// For each intersecting interactable, update meta data to indicate deepest collision only.
+		/// </summary>
+		public virtual void UpdateCurrentCollisionsBasedOnDepth()
+		{
+			_currInteractableToCollisionInfos.Clear();
+			foreach (InteractableCollisionInfo interactableCollisionInfo in _currentIntersectingObjects)
+			{
+				var interactable = interactableCollisionInfo.InteractableCollider.ParentInteractable;
+				var depth = interactableCollisionInfo.CollisionDepth;
+				InteractableCollisionInfo collisionInfoFromMap = null;
+
+				if (!_currInteractableToCollisionInfos.TryGetValue(interactable, out collisionInfoFromMap))
+				{
+					_currInteractableToCollisionInfos[interactable] = interactableCollisionInfo;
+				}
+				else if (collisionInfoFromMap.CollisionDepth < depth)
+				{
+					collisionInfoFromMap.InteractableCollider = interactableCollisionInfo.InteractableCollider;
+					collisionInfoFromMap.CollisionDepth = depth;
+				}
+			}
+		}
+
+		/// <summary>
+		/// If our collision information changed per frame, make note of it.
+		/// Removed, added and remaining objects must get their proper events.
+		/// </summary>
+		public virtual void UpdateLatestCollisionData()
+		{
+			_addedInteractables.Clear();
+			_removedInteractables.Clear();
+			_remainingInteractables.Clear();
+
+			foreach (Interactable key in _currInteractableToCollisionInfos.Keys)
+			{
+				if (!_prevInteractableToCollisionInfos.ContainsKey(key))
+				{
+					_addedInteractables.Add(key);
+				}
+				else
+				{
+					_remainingInteractables.Add(key);
+				}
+			}
+
+			foreach (Interactable key in _prevInteractableToCollisionInfos.Keys)
+			{
+				if (!_currInteractableToCollisionInfos.ContainsKey(key))
+				{
+					_removedInteractables.Add(key);
+				}
+			}
+
+			// tell removed interactables that we are gone
+			foreach (Interactable removedInteractable in _removedInteractables)
+			{
+				removedInteractable.UpdateCollisionDepth(this,
+					_prevInteractableToCollisionInfos[removedInteractable].CollisionDepth,
+					InteractableCollisionDepth.None);
+			}
+
+			// tell added interactable what state we are now in
+			foreach (Interactable addedInteractableKey in _addedInteractables)
+			{
+				var addedInteractable = _currInteractableToCollisionInfos[addedInteractableKey];
+				var collisionDepth = addedInteractable.CollisionDepth;
+				addedInteractableKey.UpdateCollisionDepth(this, InteractableCollisionDepth.None,
+					collisionDepth);
+			}
+
+			// remaining interactables must be updated
+			foreach (Interactable remainingInteractableKey in _remainingInteractables)
+			{
+				var newDepth = _currInteractableToCollisionInfos[remainingInteractableKey].CollisionDepth;
+				var oldDepth = _prevInteractableToCollisionInfos[remainingInteractableKey].CollisionDepth;
+				remainingInteractableKey.UpdateCollisionDepth(this, oldDepth, newDepth);
+			}
+
+			_prevInteractableToCollisionInfos = new Dictionary<Interactable, InteractableCollisionInfo>(
+					_currInteractableToCollisionInfos);
+		}
 	}
-
 }

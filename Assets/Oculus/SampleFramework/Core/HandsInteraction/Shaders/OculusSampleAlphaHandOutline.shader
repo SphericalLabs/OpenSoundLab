@@ -56,19 +56,6 @@ Shader "Oculus Sample/Alpha Hand Outline"
     // view vector (less accurate but faster)
     #pragma surface surf BlinnPhong alpha:fade exclude_path:prepass noforwardadd halfasview nolightmap
 
-    inline fixed4
-    LightingBlinnPhong(SurfaceOutput s, fixed3 lightDir, fixed3 halfDir, fixed atten) {
-      fixed lambertianComp = max(0, dot(s.Normal, lightDir));
-      fixed nDotH = max(0, dot(s.Normal, halfDir));
-      fixed specularComp = pow(nDotH, s.Specular) * s.Gloss;
-
-      fixed4 finalColor;
-      finalColor.rgb =
-          (s.Albedo * _LightColor0.rgb * lambertianComp + _LightColor0.rgb * specularComp) * atten;
-      UNITY_OPAQUE_ALPHA(finalColor.a);
-      return finalColor;
-    }
-
     sampler2D _MainTex;
 
     struct Input {

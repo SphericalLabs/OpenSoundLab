@@ -13,12 +13,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-/// <summary>
-/// Ray tool used for far-field interactions.
-/// </summary>
 namespace OculusSampleFramework
 {
-	public class RayTool : MonoBehaviour, InteractableTool
+	/// <summary>
+	/// Ray tool used for far-field interactions.
+	/// </summary>
+	public class RayTool : InteractableTool
 	{
 		private const float MINIMUM_RAY_CAST_DISTANCE = 0.8f;
 		private const float COLLIDER_RADIUS = 0.01f;
@@ -30,15 +30,7 @@ namespace OculusSampleFramework
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
 		[SerializeField] private float _farFieldMaxDistance = 5f;
 
-		public Transform ToolTransform
-		{
-			get { return this.transform; }
-		}
-		public bool IsRightHandedTool { get; set; }
-		public Dictionary<Interactable, InteractableCollisionInfo> CurrInteractableToCollisionInfos { get; set; }
-		public Dictionary<Interactable, InteractableCollisionInfo> PrevInteractableToCollisionInfos { get; set; }
-
-		public InteractableToolTags ToolTags
+		public override InteractableToolTags ToolTags
 		{
 			get
 			{
@@ -49,7 +41,7 @@ namespace OculusSampleFramework
 		private PinchStateModule _pinchStateModule = new PinchStateModule();
 		private Interactable _focusedInteractable;
 
-		public ToolInputState ToolInputState
+		public override ToolInputState ToolInputState
 		{
 			get
 			{
@@ -70,15 +62,12 @@ namespace OculusSampleFramework
 			}
 		}
 
-		public bool IsFarFieldTool
+		public override bool IsFarFieldTool
 		{
 			get { return true; }
 		}
 
-		public Vector3 Velocity { get; private set; }
-		public Vector3 InteractionPosition { get; private set; }
-
-		public bool EnableState
+		public override bool EnableState
 		{
 			get
 			{
@@ -90,7 +79,6 @@ namespace OculusSampleFramework
 			}
 		}
 
-		private List<InteractableCollisionInfo> _intersectingObjects = new List<InteractableCollisionInfo>();
 		private Collider[] _collidersOverlapped = new Collider[NUM_COLLIDERS_TO_TEST];
 
 		private Interactable _currInteractableCastedAgainst = null;
@@ -100,11 +88,9 @@ namespace OculusSampleFramework
 		private Collider[] _secondaryOverlapResults = new Collider[NUM_MAX_SECONDARY_HITS];
 		private bool _initialized = false;
 
-		public void Initialize()
+		public override void Initialize()
 		{
 			Assert.IsNotNull(_rayToolView);
-			CurrInteractableToCollisionInfos = new Dictionary<Interactable, InteractableCollisionInfo>();
-			PrevInteractableToCollisionInfos = new Dictionary<Interactable, InteractableCollisionInfo>();
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
 			_rayToolView.InteractableTool = this;
 			_coneAngleReleaseDegrees = _coneAngleDegrees * 1.2f;
@@ -121,15 +107,15 @@ namespace OculusSampleFramework
 
 		private void Update()
 		{
-			if (!Hands.Instance.IsInitialized() || !_initialized)
+			if (!HandsManager.Instance || !HandsManager.Instance.IsInitialized() || !_initialized)
 			{
 				return;
 			}
 
-			var hand = IsRightHandedTool ? Hands.Instance.RightHand : Hands.Instance.LeftHand;
-			var pointer = hand.Pointer;
-			transform.localPosition = pointer.PointerPosition;
-			transform.localRotation = pointer.PointerOrientation;
+			var hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
+			var pointer = hand.PointerPose;
+			transform.position = pointer.position;
+			transform.rotation = pointer.rotation;
 
 			var prevPosition = InteractionPosition;
 			var currPosition = transform.position;
@@ -138,7 +124,7 @@ namespace OculusSampleFramework
 
 			_pinchStateModule.UpdateState(hand, _focusedInteractable);
 			_rayToolView.ToolActivateState = _pinchStateModule.PinchSteadyOnFocusedObject ||
-			  _pinchStateModule.PinchDownOnFocusedObject;
+				_pinchStateModule.PinchDownOnFocusedObject;
 		}
 
 		/// <summary>
@@ -150,11 +136,11 @@ namespace OculusSampleFramework
 			return transform.position + MINIMUM_RAY_CAST_DISTANCE * transform.forward;
 		}
 
-		public List<InteractableCollisionInfo> GetIntersectingObjects()
+		public override List<InteractableCollisionInfo> GetNextIntersectingObjects()
 		{
 			if (!_initialized)
 			{
-				return _intersectingObjects;
+				return _currentIntersectingObjects;
 			}
 
 			// if we already have focused on something, keep it until the angle between
@@ -169,7 +155,7 @@ namespace OculusSampleFramework
 			// Find target interactable if we haven't found one before.
 			if (_currInteractableCastedAgainst == null)
 			{
-				_intersectingObjects.Clear();
+				_currentIntersectingObjects.Clear();
 				_currInteractableCastedAgainst = FindTargetInteractable();
 
 				// If we have found one, query collision zones.
@@ -196,19 +182,19 @@ namespace OculusSampleFramework
 						}
 
 						InteractableCollisionInfo collisionInfo = new InteractableCollisionInfo(colliderZone,
-						  colliderZone.CollisionDepth, this);
-						_intersectingObjects.Add(collisionInfo);
+							colliderZone.CollisionDepth, this);
+						_currentIntersectingObjects.Add(collisionInfo);
 					}
 
 					// clear intersecting object if no collisions were found
-					if (_intersectingObjects.Count == 0)
+					if (_currentIntersectingObjects.Count == 0)
 					{
 						_currInteractableCastedAgainst = null;
 					}
 				}
 			}
 
-			return _intersectingObjects;
+			return _currentIntersectingObjects;
 		}
 
 		private bool HasRayReleasedInteractable(Interactable focusedInteractable)
@@ -304,9 +290,9 @@ namespace OculusSampleFramework
 			float coneRadius = Mathf.Tan(halfAngle) * _farFieldMaxDistance;
 
 			int numColliders = Physics.OverlapBoxNonAlloc(
-			  rayOrigin + rayDirection * _farFieldMaxDistance * 0.5f, // center
-			  new Vector3(coneRadius, coneRadius, _farFieldMaxDistance * 0.5f), //half extents
-			  _secondaryOverlapResults, transform.rotation);
+				rayOrigin + rayDirection * _farFieldMaxDistance * 0.5f, // center
+				new Vector3(coneRadius, coneRadius, _farFieldMaxDistance * 0.5f), //half extents
+				_secondaryOverlapResults, transform.rotation);
 
 			for (int i = 0; i < numColliders; i++)
 			{
@@ -346,14 +332,14 @@ namespace OculusSampleFramework
 			return targetInteractable;
 		}
 
-		public void FocusOnInteractable(Interactable focusedInteractable,
+		public override void FocusOnInteractable(Interactable focusedInteractable,
 		  ColliderZone colliderZone)
 		{
 			_rayToolView.SetFocusedInteractable(focusedInteractable);
 			_focusedInteractable = focusedInteractable;
 		}
 
-		public void DeFocus()
+		public override void DeFocus()
 		{
 			_rayToolView.SetFocusedInteractable(null);
 			_focusedInteractable = null;

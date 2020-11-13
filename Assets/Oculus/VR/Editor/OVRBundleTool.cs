@@ -1,4 +1,4 @@
-#if UNITY_EDITOR_WIN
+#if UNITY_EDITOR_WIN && UNITY_ANDROID
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -21,50 +21,36 @@ namespace OculusSampleFramework
 	/// Poke tool used for near-field (touching) interactions. Assumes that it will be placed on
 	/// finger tips.
 	/// </summary>
-	public class FingerTipPokeTool : MonoBehaviour, InteractableTool
+	public class FingerTipPokeTool : InteractableTool
 	{
 		private const int NUM_VELOCITY_FRAMES = 10;
 
 		[SerializeField] private FingerTipPokeToolView _fingerTipPokeToolView = null;
 		[SerializeField] private OVRPlugin.HandFinger _fingerToFollow = OVRPlugin.HandFinger.Index;
 
-		public bool IsRightHandedTool { get; set; }
-		public Dictionary<Interactable, InteractableCollisionInfo> CurrInteractableToCollisionInfos
-		{ get; set; }
-		public Dictionary<Interactable, InteractableCollisionInfo> PrevInteractableToCollisionInfos
-		{ get; set; }
-		public Vector3 Velocity { get; private set; }
-		public Vector3 InteractionPosition { get; private set; }
-
-		public InteractableToolTags ToolTags
+		public override InteractableToolTags ToolTags
 		{
 			get
 			{
 				return InteractableToolTags.Poke;
 			}
 		}
-		public ToolInputState ToolInputState
+		public override ToolInputState ToolInputState
 		{
 			get
 			{
 				return ToolInputState.Inactive;
 			}
 		}
-		public bool IsFarFieldTool
+		public override bool IsFarFieldTool
 		{
 			get
 			{
 				return false;
 			}
 		}
-		public Transform ToolTransform
-		{
-			get
-			{
-				return this.transform;
-			}
-		}
-		public bool EnableState
+
+		public override bool EnableState
 		{
 			get
 			{
@@ -80,20 +66,16 @@ namespace OculusSampleFramework
 		private int _currVelocityFrame = 0;
 		private bool _sampledMaxFramesAlready;
 		private Vector3 _position;
-		private List<InteractableCollisionInfo> _intersectingObjects = new List<InteractableCollisionInfo>();
 
 		private BoneCapsuleTriggerLogic[] _boneCapsuleTriggerLogic;
 
 		private float _lastScale = 1.0f;
 		private bool _isInitialized = false;
-		private CapsuleInfo _capsuleToTrack;
+		private OVRBoneCapsule _capsuleToTrack;
 
-		public void Initialize()
+		public override void Initialize()
 		{
 			Assert.IsNotNull(_fingerTipPokeToolView);
-
-			CurrInteractableToCollisionInfos = new Dictionary<Interactable, InteractableCollisionInfo>();
-			PrevInteractableToCollisionInfos = new Dictionary<Interactable, InteractableCollisionInfo>();
 
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
 			_fingerTipPokeToolView.InteractableTool = this;
@@ -106,44 +88,38 @@ namespace OculusSampleFramework
 
 		private IEnumerator AttachTriggerLogic()
 		{
-			while (!Hands.Instance.IsInitialized())
+			while (!HandsManager.Instance || !HandsManager.Instance.IsInitialized())
 			{
 				yield return null;
 			}
 
-			Hand properHand = IsRightHandedTool ? Hands.Instance.RightHand : Hands.Instance.LeftHand;
-			HandPhysics handPhysics = properHand.Physics;
+			OVRSkeleton handSkeleton = IsRightHandedTool ? HandsManager.Instance.RightHandSkeleton : HandsManager.Instance.LeftHandSkeleton;
 
-			while (!handPhysics.IsInitialized)
-			{
-				yield return null;
-			}
-
-			OVRPlugin.BoneId boneToTestCollisions = OVRPlugin.BoneId.Hand_Pinky3;
+			OVRSkeleton.BoneId boneToTestCollisions = OVRSkeleton.BoneId.Hand_Pinky3;
 			switch (_fingerToFollow)
 			{
 				case OVRPlugin.HandFinger.Thumb:
-					boneToTestCollisions = OVRPlugin.BoneId.Hand_Thumb3;
+					boneToTestCollisions = OVRSkeleton.BoneId.Hand_Thumb3;
 					break;
 				case OVRPlugin.HandFinger.Index:
-					boneToTestCollisions = OVRPlugin.BoneId.Hand_Index3;
+					boneToTestCollisions = OVRSkeleton.BoneId.Hand_Index3;
 					break;
 				case OVRPlugin.HandFinger.Middle:
-					boneToTestCollisions = OVRPlugin.BoneId.Hand_Middle3;
+					boneToTestCollisions = OVRSkeleton.BoneId.Hand_Middle3;
 					break;
 				case OVRPlugin.HandFinger.Ring:
-					boneToTestCollisions = OVRPlugin.BoneId.Hand_Ring3;
+					boneToTestCollisions = OVRSkeleton.BoneId.Hand_Ring3;
 					break;
 				default:
-					boneToTestCollisions = OVRPlugin.BoneId.Hand_Pinky3;
+					boneToTestCollisions = OVRSkeleton.BoneId.Hand_Pinky3;
 					break;
 			}
 
 			List<BoneCapsuleTriggerLogic> boneCapsuleTriggerLogic = new List<BoneCapsuleTriggerLogic>();
-			List<CapsuleInfo> boneCapsules = handPhysics.GetCapsulesPerBone(boneToTestCollisions);
+			List<OVRBoneCapsule> boneCapsules = HandsManager.GetCapsulesPerBone(handSkeleton, boneToTestCollisions);
 			foreach (var ovrCapsuleInfo in boneCapsules)
 			{
-				var boneCapsuleTrigger = ovrCapsuleInfo.gameObject.AddComponent<BoneCapsuleTriggerLogic>();
+				var boneCapsuleTrigger = ovrCapsuleInfo.CapsuleRigidbody.gameObject.AddComponent<BoneCapsuleTriggerLogic>();
 				ovrCapsuleInfo.CapsuleCollider.isTrigger = true;
 				boneCapsuleTrigger.ToolTags = ToolTags;
 				boneCapsuleTriggerLogic.Add(boneCapsuleTrigger);
@@ -161,32 +137,28 @@ namespace OculusSampleFramework
 
 		private void Update()
 		{
-			if (!Hands.Instance.IsInitialized() || !_isInitialized || _capsuleToTrack == null)
+			if (!HandsManager.Instance || !HandsManager.Instance.IsInitialized() || !_isInitialized || _capsuleToTrack == null)
 			{
 				return;
 			}
 
-			Hand hand = IsRightHandedTool ? Hands.Instance.RightHand : Hands.Instance.LeftHand;
-			float currentScale = hand.State.HandScale;
+			OVRHand hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
+			float currentScale = hand.HandScale;
 			// push tool into the tip based on how wide it is. so negate the direction
-			Transform capsuleTransform = _capsuleToTrack.transform;
-			Vector3 capsuleDirection = (IsRightHandedTool ? -capsuleTransform.right : capsuleTransform.right);
-			Vector3 trackedPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 0.5f
+			Transform capsuleTransform = _capsuleToTrack.CapsuleCollider.transform;
+			// NOTE: use time settings 0.0111111/0.02 to make collisions work correctly!
+			Vector3 capsuleDirection = capsuleTransform.right;
+			Vector3 capsuleTipPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 0.5f
 			  * capsuleDirection;
-			Vector3 sphereRadiusOffset = currentScale * _fingerTipPokeToolView.SphereRadius *
+			Vector3 toolSphereRadiusOffsetFromTip = currentScale * _fingerTipPokeToolView.SphereRadius *
 			  capsuleDirection;
 			// push tool back so that it's centered on transform/bone
-			Vector3 toolPosition = trackedPosition + sphereRadiusOffset;
+			Vector3 toolPosition = capsuleTipPosition + toolSphereRadiusOffsetFromTip;
 			transform.position = toolPosition;
 			transform.rotation = capsuleTransform.rotation;
-			InteractionPosition = trackedPosition;
+			InteractionPosition = capsuleTipPosition;
 
 			UpdateAverageVelocity();
-
-			if (!Hands.Instance.IsInitialized())
-			{
-				return;
-			}
 
 			CheckAndUpdateScale();
 		}
@@ -221,8 +193,8 @@ namespace OculusSampleFramework
 
 		private void CheckAndUpdateScale()
 		{
-			float currentScale = IsRightHandedTool ? Hands.Instance.RightHand.State.HandScale
-			  : Hands.Instance.LeftHand.State.HandScale;
+			float currentScale = IsRightHandedTool ? HandsManager.Instance.RightHand.HandScale
+				: HandsManager.Instance.LeftHand.HandScale;
 			if (Mathf.Abs(currentScale - _lastScale) > Mathf.Epsilon)
 			{
 				transform.localScale = new Vector3(currentScale, currentScale, currentScale);
@@ -230,30 +202,30 @@ namespace OculusSampleFramework
 			}
 		}
 
-		public List<InteractableCollisionInfo> GetIntersectingObjects()
+		public override List<InteractableCollisionInfo> GetNextIntersectingObjects()
 		{
-			_intersectingObjects.Clear();
+			_currentIntersectingObjects.Clear();
 
 			foreach (var boneCapsuleTriggerLogic in _boneCapsuleTriggerLogic)
 			{
 				var collidersTouching = boneCapsuleTriggerLogic.CollidersTouchingUs;
 				foreach (ColliderZone colliderTouching in collidersTouching)
 				{
-					_intersectingObjects.Add(new InteractableCollisionInfo(colliderTouching,
-					  colliderTouching.CollisionDepth, this));
+					_currentIntersectingObjects.Add(new InteractableCollisionInfo(colliderTouching,
+						colliderTouching.CollisionDepth, this));
 				}
 			}
 
-			return _intersectingObjects;
+			return _currentIntersectingObjects;
 		}
 
-		public void FocusOnInteractable(Interactable focusedInteractable,
+		public override void FocusOnInteractable(Interactable focusedInteractable,
 		  ColliderZone colliderZone)
 		{
 			// no need for focus
 		}
 
-		public void DeFocus()
+		public override void DeFocus()
 		{
 			// no need for focus
 		}

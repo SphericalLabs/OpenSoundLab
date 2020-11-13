@@ -10,7 +10,6 @@ language governing permissions and limitations under the license.
 ************************************************************************************/
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace OculusSampleFramework
@@ -51,11 +50,6 @@ namespace OculusSampleFramework
 		private HashSet<InteractableTool> _leftHandFarTools = new HashSet<InteractableTool>();
 		private HashSet<InteractableTool> _rightHandNearTools = new HashSet<InteractableTool>();
 		private HashSet<InteractableTool> _rightHandFarTools = new HashSet<InteractableTool>();
-
-		// lists created once so that they don't need to be created per frame
-		private List<Interactable> _addedInteractables = new List<Interactable>();
-		private List<Interactable> _removedInteractables = new List<Interactable>();
-		private List<Interactable> _remainingInteractables = new List<Interactable>();
 
 		public void RegisterInteractableTool(InteractableTool interactableTool)
 		{
@@ -111,18 +105,17 @@ namespace OculusSampleFramework
 
 		private void Update()
 		{
-			if (!Hands.Instance.IsInitialized())
+			if (!HandsManager.Instance.IsInitialized())
 			{
 				return;
 			}
 
-			bool leftHandIsReliable = Hands.Instance.LeftHand.HandConfidence == Hand.HandTrackingConfidence.High;
-			bool rightHandIsReliable = Hands.Instance.RightHand.HandConfidence == Hand.HandTrackingConfidence.High;
-			// make sure hand is not being used for system gesture, and pointer is valid
-			bool leftHandProperlyTracked =
-			  (Hands.Instance.LeftHand.State.Status & OVRPlugin.HandStatus.InputStateValid) != 0;
-			bool rightHandProperlyTracked =
-			  (Hands.Instance.RightHand.State.Status & OVRPlugin.HandStatus.InputStateValid) != 0;
+			bool leftHandIsReliable = HandsManager.Instance.LeftHand.IsTracked &&
+				HandsManager.Instance.LeftHand.HandConfidence == OVRHand.TrackingConfidence.High;
+			bool rightHandIsReliable = HandsManager.Instance.RightHand.IsTracked &&
+				HandsManager.Instance.RightHand.HandConfidence == OVRHand.TrackingConfidence.High;
+			bool leftHandProperlyTracked = HandsManager.Instance.LeftHand.IsPointerPoseValid;
+			bool rightHandProperlyTracked = HandsManager.Instance.RightHand.IsPointerPoseValid;
 
 			bool encounteredNearObjectsLeftHand = UpdateToolsAndEnableState(_leftHandNearTools, leftHandIsReliable);
 			// don't interact with far field if near field is touching something
@@ -155,7 +148,8 @@ namespace OculusSampleFramework
 
 			foreach (InteractableTool currentInteractableTool in tools)
 			{
-				List<InteractableCollisionInfo> intersectingObjectsFound = currentInteractableTool.GetIntersectingObjects();
+				List<InteractableCollisionInfo> intersectingObjectsFound =
+					currentInteractableTool.GetNextIntersectingObjects();
 
 				if (intersectingObjectsFound.Count > 0 && !resetCollisionData)
 				{
@@ -165,12 +159,11 @@ namespace OculusSampleFramework
 					}
 
 					// create map that indicates the furthest collider encountered per interactable element
-					UpdateInteractableDeepestCollisionMap(intersectingObjectsFound,
-					  currentInteractableTool.CurrInteractableToCollisionInfos);
+					currentInteractableTool.UpdateCurrentCollisionsBasedOnDepth();
 
 					if (currentInteractableTool.IsFarFieldTool)
 					{
-						var firstInteractable = currentInteractableTool.CurrInteractableToCollisionInfos.First();
+						var firstInteractable = currentInteractableTool.GetFirstCurrentCollisionInfo();
 						// if our tool is activated, make sure depth is set to "action"
 						if (currentInteractableTool.ToolInputState == ToolInputState.PrimaryInputUp)
 						{
@@ -185,21 +178,16 @@ namespace OculusSampleFramework
 
 						// far field tools only can focus elements -- pick first (for now)
 						currentInteractableTool.FocusOnInteractable(firstInteractable.Key,
-						  firstInteractable.Value.InteractableCollider);
+							firstInteractable.Value.InteractableCollider);
 					}
 				}
 				else
 				{
 					currentInteractableTool.DeFocus();
-					currentInteractableTool.CurrInteractableToCollisionInfos.Clear();
+					currentInteractableTool.ClearAllCurrentCollisionInfos();
 				}
 
-				UpdateUsingOldNewCollisionData(currentInteractableTool,
-				  currentInteractableTool.PrevInteractableToCollisionInfos,
-				  currentInteractableTool.CurrInteractableToCollisionInfos);
-				currentInteractableTool.PrevInteractableToCollisionInfos =
-				  new Dictionary<Interactable, InteractableCollisionInfo>(
-					currentInteractableTool.CurrInteractableToCollisionInfos);
+				currentInteractableTool.UpdateLatestCollisionData();
 			}
 
 			return toolsEncounteredObjects;
@@ -213,93 +201,6 @@ namespace OculusSampleFramework
 				{
 					tool.EnableState = enableState;
 				}
-			}
-		}
-
-		/// <summary>
-		/// For each interactable, update meta data to indicate deepest collision only.
-		/// </summary>
-		/// <param name="allCollisions">All current collisions.</param>
-		/// <param name="interactableToCollisionInfo">Interactable->collision info map.</param>
-		private void UpdateInteractableDeepestCollisionMap(List<InteractableCollisionInfo> allCollisions,
-		  Dictionary<Interactable, InteractableCollisionInfo> interactableToCollisionInfo)
-		{
-			interactableToCollisionInfo.Clear();
-			foreach (InteractableCollisionInfo interactableCollisionInfo in allCollisions)
-			{
-				var interactable = interactableCollisionInfo.InteractableCollider.ParentInteractable;
-				var depth = interactableCollisionInfo.CollisionDepth;
-				InteractableCollisionInfo collisionInfoFromMap = null;
-
-				if (!interactableToCollisionInfo.TryGetValue(interactable, out collisionInfoFromMap))
-				{
-					interactableToCollisionInfo[interactable] = interactableCollisionInfo;
-				}
-				else if (collisionInfoFromMap.CollisionDepth < depth)
-				{
-					collisionInfoFromMap.InteractableCollider = interactableCollisionInfo.InteractableCollider;
-					collisionInfoFromMap.CollisionDepth = depth;
-				}
-			}
-		}
-
-		/// <summary>
-		/// If our collision information changed per frame, make note of it. Removed, added and remaining
-		/// objects must get their proper events.
-		/// </summary>
-		/// <param name="oldCollisionMap">Previous collision information.</param>
-		/// <param name="newCollisionMap">Current collision information.</param>
-		private void UpdateUsingOldNewCollisionData(InteractableTool interactableTool,
-		  Dictionary<Interactable, InteractableCollisionInfo> oldCollisionMap,
-		  Dictionary<Interactable, InteractableCollisionInfo> newCollisionMap)
-		{
-			_addedInteractables.Clear();
-			_removedInteractables.Clear();
-			_remainingInteractables.Clear();
-
-			foreach (Interactable key in newCollisionMap.Keys)
-			{
-				if (!oldCollisionMap.ContainsKey(key))
-				{
-					_addedInteractables.Add(key);
-				}
-				else
-				{
-					_remainingInteractables.Add(key);
-				}
-			}
-
-			foreach (Interactable key in oldCollisionMap.Keys)
-			{
-				if (!newCollisionMap.ContainsKey(key))
-				{
-					_removedInteractables.Add(key);
-				}
-			}
-
-			// tell removed interactables that we are gone
-			foreach (Interactable removedInteractable in _removedInteractables)
-			{
-				removedInteractable.UpdateCollisionDepth(interactableTool, oldCollisionMap[removedInteractable].CollisionDepth,
-				  InteractableCollisionDepth.None, oldCollisionMap[removedInteractable].CollidingTool);
-			}
-
-			// tell added interactable what state we are now in
-			foreach (Interactable addedInteractableKey in _addedInteractables)
-			{
-				var addedInteractable = newCollisionMap[addedInteractableKey];
-				var collisionDepth = addedInteractable.CollisionDepth;
-				addedInteractableKey.UpdateCollisionDepth(interactableTool, InteractableCollisionDepth.None,
-				  collisionDepth, newCollisionMap[addedInteractableKey].CollidingTool);
-			}
-
-			// remaining interactables must be updated
-			foreach (Interactable remainingInteractableKey in _remainingInteractables)
-			{
-				var newDepth = newCollisionMap[remainingInteractableKey].CollisionDepth;
-				var oldDepth = oldCollisionMap[remainingInteractableKey].CollisionDepth;
-				remainingInteractableKey.UpdateCollisionDepth(interactableTool, oldDepth, newDepth,
-				  newCollisionMap[remainingInteractableKey].CollidingTool);
 			}
 		}
 	}

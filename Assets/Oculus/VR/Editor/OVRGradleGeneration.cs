@@ -20,6 +20,12 @@ limitations under the License.
 ************************************************************************************/
 
 //#define BUILDSESSION
+
+#if USING_XR_MANAGEMENT && USING_XR_SDK_OCULUS
+#define USING_XR_SDK
+#endif
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -27,24 +33,25 @@ using System.Xml;
 using System.Diagnostics;
 using System.Threading;
 using UnityEditor;
-using UnityEditor.Android;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor.Build;
-#if UNITY_2018_1_OR_NEWER
 using UnityEditor.Build.Reporting;
+#if UNITY_ANDROID
+using UnityEditor.Android;
 #endif
-using System;
 
 [InitializeOnLoad]
 public class OVRGradleGeneration
-#if UNITY_2018_2_OR_NEWER
-	: IPreprocessBuildWithReport, IPostprocessBuildWithReport, IPostGenerateGradleAndroidProject
+	: IPreprocessBuildWithReport, IPostprocessBuildWithReport
+#if UNITY_ANDROID
+	, IPostGenerateGradleAndroidProject
+#endif
 {
 	public OVRADBTool adbTool;
 	public Process adbProcess;
 
-	public int callbackOrder { get { return 3; } }
+	public int callbackOrder { get { return 99999; } }
 	static private System.DateTime buildStartTime;
 	static private System.Guid buildGuid;
 
@@ -84,14 +91,14 @@ public class OVRGradleGeneration
 
 	public void OnPreprocessBuild(BuildReport report)
 	{
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !(USING_XR_SDK && UNITY_2019_3_OR_NEWER)
 		// Generate error when Vulkan is selected as the perferred graphics API, which is not currently supported in Unity XR
 		if (!PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android))
 		{
 			GraphicsDeviceType[] apis = PlayerSettings.GetGraphicsAPIs(BuildTarget.Android);
 			if (apis.Length >= 1 && apis[0] == GraphicsDeviceType.Vulkan)
 			{
-				throw new BuildFailedException("XR is currently not supported when using the Vulkan Graphics API. Please go to PlayerSettings and remove 'Vulkan' from the list of Graphics APIs.");
+				throw new BuildFailedException("The Vulkan Graphics API does not support XR in your configuration. To use Vulkan, you must use Unity 2019.3 or newer, and the XR Plugin Management.");
 			}
 		}
 #endif
@@ -128,43 +135,62 @@ public class OVRGradleGeneration
 		UnityEngine.Debug.Log("OVRGradleGeneration triggered.");
 
 		var targetOculusPlatform = new List<string>();
-		if (OVRDeviceSelector.isTargetDeviceGearVrOrGo)
-		{
-			targetOculusPlatform.Add("geargo");
-		}
-		if (OVRDeviceSelector.isTargetDeviceQuest)
+		if (OVRDeviceSelector.isTargetDeviceQuestFamily)
 		{
 			targetOculusPlatform.Add("quest");
 		}
 		OVRPlugin.AddCustomMetadata("target_oculus_platform", String.Join("_", targetOculusPlatform.ToArray()));
-		UnityEngine.Debug.LogFormat("  GearVR or Go = {0}  Quest = {1}", OVRDeviceSelector.isTargetDeviceGearVrOrGo, OVRDeviceSelector.isTargetDeviceQuest);
+		UnityEngine.Debug.LogFormat("QuestFamily = {0}: Quest = {1}, Quest2 = {2}", 
+			OVRDeviceSelector.isTargetDeviceQuestFamily,
+			OVRDeviceSelector.isTargetDeviceQuest,
+			OVRDeviceSelector.isTargetDeviceQuest2);
 
-		bool isQuestOnly = OVRDeviceSelector.isTargetDeviceQuest && !OVRDeviceSelector.isTargetDeviceGearVrOrGo;
+#if UNITY_2019_3_OR_NEWER
+		string gradleBuildPath = Path.Combine(path, "../launcher/build.gradle");
+#else
+		string gradleBuildPath = Path.Combine(path, "build.gradle");
+#endif
+		bool v2SigningEnabled = true;
 
-		if (isQuestOnly)
+		if (File.Exists(gradleBuildPath))
 		{
-			if (File.Exists(Path.Combine(path, "build.gradle")))
+			try
 			{
-				try
-				{
-					string gradle = File.ReadAllText(Path.Combine(path, "build.gradle"));
+				string gradle = File.ReadAllText(gradleBuildPath);
+				int v2Signingindex = gradle.IndexOf("v2SigningEnabled false");
 
-					int v2Signingindex = gradle.IndexOf("v2SigningEnabled false");
-					if (v2Signingindex != -1)
+				if (v2Signingindex != -1)
+				{
+					//v2 Signing flag found, ensure the correct value is set based on platform.
+					if (v2SigningEnabled)
 					{
 						gradle = gradle.Replace("v2SigningEnabled false", "v2SigningEnabled true");
-						System.IO.File.WriteAllText(Path.Combine(path, "build.gradle"), gradle);
+						System.IO.File.WriteAllText(gradleBuildPath, gradle);
 					}
 				}
-				catch (System.Exception e)
+				else
 				{
-					UnityEngine.Debug.LogWarningFormat("Unable to overwrite build.gradle, error {0}", e.Message);
+					//v2 Signing flag missing, add it right after the key store password and set the value based on platform.
+					int keyPassIndex = gradle.IndexOf("keyPassword");
+					if (keyPassIndex != -1)
+					{
+						int v2Index = gradle.IndexOf("\n", keyPassIndex) + 1;
+						if(v2Index != -1)
+						{
+							gradle = gradle.Insert(v2Index, "v2SigningEnabled " + (v2SigningEnabled ? "true" : "false") + "\n");
+							System.IO.File.WriteAllText(gradleBuildPath, gradle);
+						}
+					}
 				}
 			}
-			else
+			catch (System.Exception e)
 			{
-				UnityEngine.Debug.LogWarning("Unable to locate build.gradle");
+				UnityEngine.Debug.LogWarningFormat("Unable to overwrite build.gradle, error {0}", e.Message);
 			}
+		}
+		else
+		{
+			UnityEngine.Debug.LogWarning("Unable to locate build.gradle");
 		}
 
 		PatchAndroidManifest(path);
@@ -173,180 +199,61 @@ public class OVRGradleGeneration
 	public void PatchAndroidManifest(string path)
 	{
 		string manifestFolder = Path.Combine(path, "src/main");
-		try
+		string file = manifestFolder + "/AndroidManifest.xml";
+
+		bool patchedSecurityConfig = false;
+		// If Enable NSC Config, copy XML file into gradle project
+		OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
+		if (projectConfig != null)
 		{
-			// Load android manfiest file
-			XmlDocument doc = new XmlDocument();
-			doc.Load(manifestFolder + "/AndroidManifest.xml");
-
-			string androidNamepsaceURI;
-			XmlElement element = (XmlElement)doc.SelectSingleNode("/manifest");
-			if (element == null)
+			if (projectConfig.enableNSCConfig)
 			{
-				UnityEngine.Debug.LogError("Could not find manifest tag in android manifest.");
-				return;
-			}
-
-			// Get android namespace URI from the manifest
-			androidNamepsaceURI = element.GetAttribute("xmlns:android");
-			if (!string.IsNullOrEmpty(androidNamepsaceURI))
-			{
-				// Look for intent filter category and change LAUNCHER to INFO
-				XmlNodeList nodeList = doc.SelectNodes("/manifest/application/activity/intent-filter/category");
-				foreach (XmlElement e in nodeList)
+				// If no custom xml security path is specified, look for the default location in the integrations package.
+				string securityConfigFile = projectConfig.securityXmlPath;
+				if (string.IsNullOrEmpty(securityConfigFile))
 				{
-					string attr = e.GetAttribute("name", androidNamepsaceURI);
-					if (attr == "android.intent.category.LAUNCHER")
-					{
-						e.SetAttribute("name", androidNamepsaceURI, "android.intent.category.INFO");
-					}
+					securityConfigFile = GetOculusProjectNetworkSecConfigPath();
+				}
+				else
+				{
+					Uri configUri = new Uri(Path.GetFullPath(securityConfigFile));
+					Uri projectUri = new Uri(Application.dataPath);
+					Uri relativeUri = projectUri.MakeRelativeUri(configUri);
+					securityConfigFile = relativeUri.ToString();
 				}
 
-				//If Quest is the target device, add the headtracking manifest tag
-				if (OVRDeviceSelector.isTargetDeviceQuest)
+				string xmlDirectory = Path.Combine(path, "src/main/res/xml");
+				try
 				{
-					XmlNodeList manifestUsesFeatureNodes = doc.SelectNodes("/manifest/uses-feature");
-					bool foundHeadtrackingTag = false;
-					foreach (XmlElement e in manifestUsesFeatureNodes)
+					if (!Directory.Exists(xmlDirectory))
 					{
-						string attr = e.GetAttribute("name", androidNamepsaceURI);
-						if (attr == "android.hardware.vr.headtracking")
-							foundHeadtrackingTag = true;
+						Directory.CreateDirectory(xmlDirectory);
 					}
-					//If the tag already exists, don't patch with a new one. If it doesn't, we add it.
-					if (!foundHeadtrackingTag)
-					{
-						XmlNode manifestElement = doc.SelectSingleNode("/manifest");
-						XmlElement headtrackingTag = doc.CreateElement("uses-feature");
-						headtrackingTag.SetAttribute("name", androidNamepsaceURI, "android.hardware.vr.headtracking");
-						headtrackingTag.SetAttribute("version", androidNamepsaceURI, "1");
-						string tagRequired = OVRDeviceSelector.isTargetDeviceGearVrOrGo ? "false" : "true";
-						headtrackingTag.SetAttribute("required", androidNamepsaceURI, tagRequired);
-						manifestElement.AppendChild(headtrackingTag);
-					}
+					File.Copy(securityConfigFile, Path.Combine(xmlDirectory, "network_sec_config.xml"), true);
+					patchedSecurityConfig = true;
 				}
-
-				// If Quest is the target device, add the handtracking manifest tags if needed
-				// Mapping of project setting to manifest setting:
-				// OVRProjectConfig.HandTrackingSupport.ControllersOnly => manifest entry not present
-				// OVRProjectConfig.HandTrackingSupport.ControllersAndHands => manifest entry present and required=false
-				// OVRProjectConfig.HandTrackingSupport.HandsOnly => manifest entry present and required=true
-				if (OVRDeviceSelector.isTargetDeviceQuest)
+				catch (Exception e)
 				{
-					OVRProjectConfig.HandTrackingSupport targetHandTrackingSupport = OVRProjectConfig.GetProjectConfig().handTrackingSupport;
-					bool handTrackingEntryNeeded = (targetHandTrackingSupport != OVRProjectConfig.HandTrackingSupport.ControllersOnly);
-					if (handTrackingEntryNeeded)
-					{
-						// uses-feature: <uses-feature android:name="oculus.software.handtracking" android:required="false" />
-						XmlNodeList manifestUsesFeatureNodes = doc.SelectNodes("/manifest/uses-feature");
-						bool foundHandTrackingFeature = false;
-						foreach (XmlElement e in manifestUsesFeatureNodes)
-						{
-							string attr = e.GetAttribute("name", androidNamepsaceURI);
-							if (attr == "oculus.software.handtracking")
-								foundHandTrackingFeature = true;
-						}
-						//If the tag already exists, don't patch with a new one. If it doesn't, we add it.
-						if (!foundHandTrackingFeature)
-						{
-							XmlNode manifestElement = doc.SelectSingleNode("/manifest");
-							XmlElement handTrackingFeature = doc.CreateElement("uses-feature");
-							handTrackingFeature.SetAttribute("name", androidNamepsaceURI, "oculus.software.handtracking");
-							string tagRequired = (targetHandTrackingSupport == OVRProjectConfig.HandTrackingSupport.HandsOnly) ? "true" : "false";
-							handTrackingFeature.SetAttribute("required", androidNamepsaceURI, tagRequired);
-							manifestElement.AppendChild(handTrackingFeature);
-						}
-
-						// uses-permission: <uses-permission android:name="oculus.permission.handtracking" />
-						XmlNodeList manifestUsesPermissionNodes = doc.SelectNodes("/manifest/uses-permission");
-						bool foundHandTrackingPermission = false;
-						foreach (XmlElement e in manifestUsesPermissionNodes)
-						{
-							string attr = e.GetAttribute("name", androidNamepsaceURI);
-							if (attr == "oculus.permission.handtracking")
-								foundHandTrackingPermission = true;
-						}
-						//If the tag already exists, don't patch with a new one. If it doesn't, we add it.
-						if (!foundHandTrackingPermission)
-						{
-							XmlNode manifestElement = doc.SelectSingleNode("/manifest");
-							XmlElement handTrackingPermission = doc.CreateElement("uses-permission");
-							handTrackingPermission.SetAttribute("name", androidNamepsaceURI, "oculus.permission.handtracking");
-							manifestElement.AppendChild(handTrackingPermission);
-						}
-					}
+					UnityEngine.Debug.LogError(e.Message);
 				}
-
-				XmlElement applicationNode = (XmlElement)doc.SelectSingleNode("/manifest/application");
-				if(applicationNode != null)
-				{
-					// If android label and icon are missing from the xml, add them
-					if (applicationNode.GetAttribute("android:label") == null)
-					{
-						applicationNode.SetAttribute("label", androidNamepsaceURI, "@string/app_name");
-					}
-					if (applicationNode.GetAttribute("android:icon") == null)
-					{
-						applicationNode.SetAttribute("icon", androidNamepsaceURI, "@mipmap/app_icon");
-					}
-
-					// Check for VR tag, if missing, append it
-					bool vrTagFound = false;
-					XmlNodeList appNodeList = applicationNode.ChildNodes;
-					foreach (XmlElement e in appNodeList)
-					{
-						if (e.GetAttribute("android:name") == "com.samsung.android.vr.application.mode")
-						{
-							vrTagFound = true;
-							break;
-						}
-					}
-
-					if (!vrTagFound)
-					{
-						XmlElement vrTag = doc.CreateElement("meta-data");
-						vrTag.SetAttribute("name", androidNamepsaceURI, "com.samsung.android.vr.application.mode");
-						vrTag.SetAttribute("value", androidNamepsaceURI, "vr_only");
-						applicationNode.AppendChild(vrTag); ;
-					}
-
-					// Disable allowBackup in manifest and add Android NSC XML file
-					OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
-					if (projectConfig != null)
-					{
-						if (projectConfig.disableBackups)
-						{
-							applicationNode.SetAttribute("allowBackup", androidNamepsaceURI, "false");
-						}
-
-						if (projectConfig.enableNSCConfig)
-						{
-							applicationNode.SetAttribute("networkSecurityConfig", androidNamepsaceURI, "@xml/network_sec_config");
-
-							string securityConfigFile = Path.Combine(Application.dataPath, "Oculus/VR/Editor/network_sec_config.xml");
-							string xmlDirectory = Path.Combine(path, "src/main/res/xml");
-							try
-							{
-								if (!Directory.Exists(xmlDirectory))
-								{
-									Directory.CreateDirectory(xmlDirectory);
-								}
-								File.Copy(securityConfigFile, Path.Combine(xmlDirectory, "network_sec_config.xml"), true);
-							}
-							catch (Exception e)
-							{
-								UnityEngine.Debug.LogError(e.Message);
-							}
-						}
-					}
-				}
-				doc.Save(manifestFolder + "/AndroidManifest.xml");
 			}
 		}
-		catch (Exception e)
-		{
-			UnityEngine.Debug.LogError(e.Message);
-		}
+
+		OVRManifestPreprocessor.PatchAndroidManifest(file, enableSecurity: patchedSecurityConfig);
+	}
+
+	private static string GetOculusProjectNetworkSecConfigPath()
+	{
+		var so = ScriptableObject.CreateInstance(typeof(OVRPluginUpdaterStub));
+		var script = MonoScript.FromScriptableObject(so);
+		string assetPath = AssetDatabase.GetAssetPath(script);
+		string editorDir = Directory.GetParent(assetPath).FullName;
+		string configAssetPath = Path.GetFullPath(Path.Combine(editorDir, "network_sec_config.xml"));
+		Uri configUri = new Uri(configAssetPath);
+		Uri projectUri = new Uri(Application.dataPath);
+		Uri relativeUri = projectUri.MakeRelativeUri(configUri);
+
+		return relativeUri.ToString();
 	}
 
 	public void OnPostprocessBuild(BuildReport report)
@@ -523,8 +430,5 @@ public class OVRGradleGeneration
 			}
 		}
 	}
-#endif
-#else
-{
 #endif
 }

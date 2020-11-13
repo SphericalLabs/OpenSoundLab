@@ -60,9 +60,9 @@ namespace OculusSampleFramework
 			_firstFocusedInteractable = null;
 		}
 
-		public void UpdateState(Hand hand, Interactable currFocusedInteractable)
+		public void UpdateState(OVRHand hand, Interactable currFocusedInteractable)
 		{
-			float pinchStrength = hand.PinchStrength(OVRPlugin.HandFinger.Index);
+			float pinchStrength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
 			bool isPinching = Mathf.Abs(PINCH_STRENGTH_THRESHOLD - pinchStrength) < Mathf.Epsilon;
 			var oldPinchState = _currPinchState;
 
