@@ -9,7 +9,7 @@ This is not an officially supported Google product.
 
 ## Requirements
 * A SteamVR or Oculus setup running on a PC or an Oculus Quest
-* Unity 2019.2.15.f1 if you'd like to modify the project
+* Unity 2019.3.0f6 if you'd like to modify the project
 
 ## Setup
 The Unity project can run without any additional components - just open the main scene to get started. 

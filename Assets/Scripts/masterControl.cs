@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Oculus;
 
 public class masterControl : MonoBehaviour {
 
@@ -92,6 +93,9 @@ public class masterControl : MonoBehaviour {
     setBPM(120);
 
     GetComponent<sampleManager>().Init();
+
+    OVRPlugin.fixedFoveatedRenderingLevel = OVRPlugin.FixedFoveatedRenderingLevel.High; // it's the maximum foveation level
+    
   }
 
   public void toggleInstrumentVolume(bool on) {

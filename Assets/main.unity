@@ -631,6 +631,11 @@ PrefabInstance:
       propertyPath: m_CustomSkybox
       value: 
       objectReference: {fileID: 2100000, guid: 7c4a0618bb47f2547adaf93ab1bccfa9, type: 2}
+    - target: {fileID: 45000011867636070, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 81000012145161834, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
         type: 3}
       propertyPath: m_Enabled
@@ -670,6 +675,11 @@ PrefabInstance:
         type: 3}
       propertyPath: lowQuality
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012806960762, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114000013241876788, guid: 9e4cecaca80e2d14d8bc2b6e56198bb4,
         type: 3}
@@ -1573,6 +1583,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1000010623260944, guid: 5fcaa2781e944b041aead28e2f499fa3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1000011642857690, guid: 5fcaa2781e944b041aead28e2f499fa3, type: 3}
       propertyPath: m_Name
       value: Landscape
@@ -1580,6 +1594,18 @@ PrefabInstance:
     - target: {fileID: 1000011642857690, guid: 5fcaa2781e944b041aead28e2f499fa3, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000012769290684, guid: 5fcaa2781e944b041aead28e2f499fa3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000012928838572, guid: 5fcaa2781e944b041aead28e2f499fa3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000013200435400, guid: 5fcaa2781e944b041aead28e2f499fa3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4000012037659578, guid: 5fcaa2781e944b041aead28e2f499fa3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1613,6 +1639,16 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 23000013223496212, guid: 5fcaa2781e944b041aead28e2f499fa3,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 82000010985993262, guid: 5fcaa2781e944b041aead28e2f499fa3,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 108000010882476752, guid: 5fcaa2781e944b041aead28e2f499fa3,
         type: 3}
       propertyPath: m_Intensity
@@ -1622,6 +1658,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Intensity
       value: 6.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 108000011305424894, guid: 5fcaa2781e944b041aead28e2f499fa3,
+        type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 108000011579158192, guid: 5fcaa2781e944b041aead28e2f499fa3,
         type: 3}
