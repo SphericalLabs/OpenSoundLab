@@ -58,7 +58,6 @@ public class masterControl : MonoBehaviour {
   double _sampleDuration;
   double _measurePhase;
 
-  public SENaturalBloomAndDirtyLens mainGlowShader;
   public float glowVal = 1;
 
   public string SaveDir;
@@ -145,7 +144,6 @@ public class masterControl : MonoBehaviour {
   public void setGlowLevel(float t) {
     glowVal = t;
     PlayerPrefs.SetFloat("glowVal", glowVal);
-    mainGlowShader.bloomIntensity = Mathf.Lerp(0, .05f, t);
   }
 
   public bool tooltipsOn = true;
