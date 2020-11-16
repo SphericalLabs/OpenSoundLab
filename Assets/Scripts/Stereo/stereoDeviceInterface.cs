@@ -24,7 +24,7 @@ public class stereoDeviceInterface : deviceInterface {
   public override void Awake() {
     base.Awake();
     panDial = GetComponentInChildren<dial>();
-    signalL = GetComponent<stereoSignalGenerator>();
+    signal = GetComponent<stereoSignalGenerator>();
   }
 
   void Update() {
