@@ -20,6 +20,7 @@ public class speaker : MonoBehaviour {
 
   public float volume = 1;
   public signalGenerator incoming;
+  public bool leftOn = true;
 
   [DllImport("SoundStageNative")]
   public static extern void MultiplyArrayBySingleValue(float[] buffer, int length, float val);
@@ -28,6 +29,21 @@ public class speaker : MonoBehaviour {
     if (incoming == null) return;
     double dspTime = AudioSettings.dspTime;
     incoming.processBuffer(buffer, dspTime, channels);
-    if (volume != 1) MultiplyArrayBySingleValue(buffer, buffer.Length, volume);
+    // if (volume != 1) MultiplyArrayBySingleValue(buffer, buffer.Length, volume);
+    
+    // please note: unity only uses left channel if spatialize is on!
+    if(leftOn){
+      for (int n = 0; n < buffer.Length; n += 2)
+      {
+        buffer[n] = buffer[n] * volume;
+        // no need for dealing with right channel
+      }
+    } else {
+      for (int n = 0; n < buffer.Length; n += 2)
+      {
+        buffer[n] = buffer[n+1] * volume;
+        // no need for dealing with right channel
+      }
+    }
   }
 }

@@ -19,6 +19,7 @@ public class speakerDeviceInterface : deviceInterface {
   public int ID = -1;
   public omniJack input;
   speaker output;
+  public basicSwitch channelSwitcher;
   public GameObject speakerRim;
   public AudioSource audio;
 
@@ -56,6 +57,9 @@ public class speakerDeviceInterface : deviceInterface {
         output.volume = Mathf.Pow(lastScale + .2f, 2);
       }
     }
+
+    output.leftOn = channelSwitcher.switchVal;
+
   }
 
   public override InstrumentData GetData() {
