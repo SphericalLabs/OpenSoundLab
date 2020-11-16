@@ -16,7 +16,7 @@ using UnityEngine;
 using System.Collections;
 
 public class samplerDeviceInterface : deviceInterface {
-  public dial speedDial, volumeDial;
+  public dial speedDial, volumeDial, headTrimDial, tailTrimDial;
   public omniJack speedInput, volumeInput, controlInput, output;
   public omniJack headInput, tailInput;
   public basicSwitch dirSwitch, loopSwitch;
@@ -52,6 +52,9 @@ public class samplerDeviceInterface : deviceInterface {
 
     player.playbackSpeed = Mathf.Pow(speedDial.percent, 2) * 4 * mod;
     player.amplitude = volumeDial.percent * 2;
+
+    player.headTrim = headTrimDial.percent;
+    player.tailTrim = tailTrimDial.percent;
 
     if (loopSwitch.switchVal != player.looping) player.looping = loopSwitch.switchVal;
 
