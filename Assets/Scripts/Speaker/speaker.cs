@@ -32,6 +32,7 @@ public class speaker : MonoBehaviour {
     // if (volume != 1) MultiplyArrayBySingleValue(buffer, buffer.Length, volume);
     
     // please note: unity only uses left channel if spatialize is on!
+    // todo: how to handle non-spatialize settings?
     if(leftOn){
       for (int n = 0; n < buffer.Length; n += 2)
       {
