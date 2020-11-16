@@ -122,8 +122,8 @@ public class clipPlayerComplex : clipPlayer {
   public float tailOffset = 0f;
   public void updateTrackBounds() {
     if (!loaded) return;
-    sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01(trackBounds.x + headOffset ));
-    sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01(trackBounds.y + tailOffset ));
+    sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (headGen == null) ? trackBounds.x : headOffset ));
+    sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (tailGen == null) ? trackBounds.y : tailOffset ));
     if (sampleBounds[0] >= sampleBounds[1]) sampleBounds[0] = sampleBounds[1] - 10; // sanity check
   }
 
@@ -243,7 +243,7 @@ public class clipPlayerComplex : clipPlayer {
     if (headGen != null)
     {
       headGen.processBuffer(headBuffer, dspTime, channels);
-      headOffset = headBuffer[0]; 
+      headOffset = (headBuffer[0] + 1) * 0.5f; // -1,1 mapping 
     } else {
       headOffset = 0f;
     }
@@ -251,7 +251,7 @@ public class clipPlayerComplex : clipPlayer {
     if (tailGen != null)
     {
       tailGen.processBuffer(tailBuffer, dspTime, channels);
-      tailOffset = tailBuffer[0];
+      tailOffset = 1 - (tailBuffer[0] + 1) * 0.5f; // inverted -1,1 mapping
     }
     else
     {
