@@ -29,6 +29,7 @@ public class clipPlayerComplex : clipPlayer {
   Vector2 scrubRange = new Vector2(.2f, -.2f);
 
   public signalGenerator speedGen, ampGen, seqGen;
+  public signalGenerator headGen, tailGen;
   public float speedRange = 1;
 
   public bool active = true;
@@ -47,6 +48,8 @@ public class clipPlayerComplex : clipPlayer {
   float[] speedBuffer;
   float[] ampBuffer;
   float[] seqBuffer;
+  float[] headBuffer;
+  float[] tailBuffer;
 
   [DllImport("SoundStageNative")]
   public static extern float ClipSignalGenerator(float[] buffer, float[] speedBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
@@ -57,6 +60,8 @@ public class clipPlayerComplex : clipPlayer {
     speedBuffer = new float[MAX_BUFFER_LENGTH];
     ampBuffer = new float[MAX_BUFFER_LENGTH];
     seqBuffer = new float[MAX_BUFFER_LENGTH];
+    headBuffer = new float[MAX_BUFFER_LENGTH];
+    tailBuffer = new float[MAX_BUFFER_LENGTH];
   }
 
   void Start() {
@@ -113,10 +118,13 @@ public class clipPlayerComplex : clipPlayer {
     }
   }
 
+  public float headOffset = 0f;
+  public float tailOffset = 0f;
   public void updateTrackBounds() {
     if (!loaded) return;
-    sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * (trackBounds.x));
-    sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * (trackBounds.y));
+    sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01(trackBounds.x + headOffset ));
+    sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01(trackBounds.y + tailOffset ));
+    if (sampleBounds[0] >= sampleBounds[1]) sampleBounds[0] = sampleBounds[1] - 10; // sanity check
   }
 
   public override void DrawClipTex() {
@@ -222,10 +230,35 @@ public class clipPlayerComplex : clipPlayer {
     if (seqBuffer.Length != buffer.Length)
       System.Array.Resize(ref seqBuffer, buffer.Length);
 
+    if (headBuffer.Length != buffer.Length)
+      System.Array.Resize(ref headBuffer, buffer.Length);
+    if (tailBuffer.Length != buffer.Length)
+      System.Array.Resize(ref tailBuffer, buffer.Length);
+
 
     if (speedGen != null) speedGen.processBuffer(speedBuffer, dspTime, channels);
     if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
     if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
+
+    if (headGen != null)
+    {
+      headGen.processBuffer(headBuffer, dspTime, channels);
+      headOffset = headBuffer[0]; 
+    } else {
+      headOffset = 0f;
+    }
+
+    if (tailGen != null)
+    {
+      tailGen.processBuffer(tailBuffer, dspTime, channels);
+      tailOffset = tailBuffer[0];
+    }
+    else
+    {
+      tailOffset = 0f;
+    }
+
+    updateTrackBounds(); // might be overkill!
 
     if (!scrubGrabbed && !turntableGrabbed) {
       bool curActive = active;

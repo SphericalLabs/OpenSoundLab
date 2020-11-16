@@ -18,6 +18,7 @@ using System.Collections;
 public class samplerDeviceInterface : deviceInterface {
   public dial speedDial, volumeDial;
   public omniJack speedInput, volumeInput, controlInput, output;
+  public omniJack headInput, tailInput;
   public basicSwitch dirSwitch, loopSwitch;
   public button playButton, turntableButton;
   public sliderUneven headSlider, tailSlider;
@@ -57,6 +58,10 @@ public class samplerDeviceInterface : deviceInterface {
     if (player.speedGen != speedInput.signal) player.speedGen = speedInput.signal;
     if (player.ampGen != volumeInput.signal) player.ampGen = volumeInput.signal;
     if (player.seqGen != controlInput.signal) player.seqGen = controlInput.signal;
+
+    if (player.headGen != headInput.signal) player.headGen = headInput.signal;
+    if (player.tailGen != tailInput.signal) player.tailGen = tailInput.signal;
+
 
     if (seq != controlInput.signal) seq = controlInput.signal;
 
