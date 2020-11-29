@@ -22,19 +22,42 @@ public class valveSignalGenerator : signalGenerator {
   public bool active = true;
   public float amp = 1f;
 
-  [DllImport("SoundStageNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")] public static extern void GateProcessBuffer(float[] buffer, int length, int channels, bool incoming, float[] controlBuffer, bool bControlSig, float amp);
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    if (!active) {
-      SetArrayToSingleValue(buffer, buffer.Length, -1f);
-      return;
-    }
+
 
     float[] controlBuffer = new float[buffer.Length];
     if (controlSig != null) controlSig.processBuffer(controlBuffer, dspTime, channels);
     if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
 
-    GateProcessBuffer(buffer, buffer.Length, channels, (incoming != null), controlBuffer, (controlSig != null), amp);
+
+    if(incoming != null) 
+    { 
+      if(controlSig != null) 
+      {
+        for (int i = 0; i < buffer.Length; i++)
+        {
+          buffer[i] = buffer[i] * (controlBuffer[i] + 1) * 0.5f * amp; // map control buffer -1,1 -> 0,1
+        }
+      } else {
+        for (int i = 0; i < buffer.Length; i++)
+        {
+          buffer[i] = buffer[i] * amp;
+        }
+      }
+    } else {
+      if(controlSig != null) {
+        for (int i = 0; i < buffer.Length; i++)
+        {
+          buffer[i] = (controlBuffer[i] + 1) * 0.5f * amp;
+        }
+      } else {
+        for (int i = 0; i < buffer.Length; i++)
+        {
+          buffer[i] = 0;
+        }
+      }
+    }
+
   }
 }

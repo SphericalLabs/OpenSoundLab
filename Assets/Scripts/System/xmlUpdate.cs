@@ -31,6 +31,21 @@ public class xmlUpdate {
         foreach (XmlNode xmlNode in xmlNodeParent) {
           XmlSerializer serializer;
           switch (xmlNode.Name) {
+            case "Glide":
+              serializer = new XmlSerializer(typeof(GlideData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "Gain":
+              serializer = new XmlSerializer(typeof(GainData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "ConferenceCall":
+              serializer = new XmlSerializer(typeof(ConferenceCallData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "SARSCov2":
+              serializer = new XmlSerializer(typeof(SARSCov2Data), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "Funktion":
+              serializer = new XmlSerializer(typeof(FunktionData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             case "Oscillator":
               serializer = new XmlSerializer(typeof(OscillatorData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -39,7 +54,7 @@ public class xmlUpdate {
               break;
             case "Speaker":
               serializer = new XmlSerializer(typeof(SpeakerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
+              break;    
             case "Drums":
               serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -104,6 +119,21 @@ public class xmlUpdate {
           data.Add((InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode)));
 
           switch (xmlNode.Name) {
+            case "Glide":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Glide;
+              break;
+            case "Gain":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Gain;
+              break;
+            case "ConferenceCall":
+              data[data.Count - 1].deviceType = menuItem.deviceType.ConferenceCall;
+              break;
+            case "SARSCov2":
+              data[data.Count - 1].deviceType = menuItem.deviceType.SARSCov2;
+              break;
+            case "Funktion":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Funktion;
+              break;
             case "Oscillators":
               data[data.Count - 1].deviceType = menuItem.deviceType.Oscillator;
               break;

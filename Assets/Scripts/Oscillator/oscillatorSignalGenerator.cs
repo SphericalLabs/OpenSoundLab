@@ -30,6 +30,8 @@ public class oscillatorSignalGenerator : signalGenerator
     double lastIncomingDspTime = -1;
     float keyMultConst = Mathf.Pow(2, 1f / 12);
 
+    int counter = 0;
+
     float prevAmplitude;
     [DllImport("SoundStageNative")]
     public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float amplitude, float prevAmplitude
@@ -45,6 +47,8 @@ public class oscillatorSignalGenerator : signalGenerator
         if (freqGen != null) freqGen.processBuffer(frequencyBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
 
+        //if(counter%200 == 0) _phase = 0f;
+
         // operates on every buffer pair
         OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, amplitude, prevAmplitude, frequencyBuffer, amplitudeBuffer
             , freqGen != null, ampGen != null, _sampleDuration, ref dspTime);
@@ -54,5 +58,9 @@ public class oscillatorSignalGenerator : signalGenerator
 
         // memory for next go around
         prevAmplitude = amplitude;
+        //counter++;
     }
+
 }
+
+

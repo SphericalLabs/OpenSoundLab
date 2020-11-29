@@ -31,19 +31,26 @@ public class menuItem : manipObject {
   bool disabled = false;
 
   public enum deviceType {
+    Stereo,
+    Glide,
+    Gain,
+    Valve,
+    ConferenceCall,
+    SARSCov2, 
     Oscillator,
     Speaker,
+    Funktion,
     Sampler,
     Recorder,
     Mixer,
     Drum,
     Keyboard,
     Sequencer,
+    CVSequencer,
     Maracas,
     ControlCube,
     Tapes,
     Splitter,
-    Valve,
     TouchPad,
     XyloRoll,
     Reverb,
@@ -97,7 +104,9 @@ public class menuItem : manipObject {
     symbol.material.SetTexture("_MainTex", tex);
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
-    if (item == deviceType.Valve) label.text = "Gate";
+    if (item == deviceType.Valve) label.text = "VCA/Atten";
+    if (item == deviceType.Glide) label.text = "Glide/DC";
+    if (item == deviceType.Gain) label.text = "Gain/Mute";
     if (item == deviceType.MIDIIN) label.text = "MIDI IN";
     if (item == deviceType.MIDIOUT) label.text = "MIDI OUT";
     if (item == deviceType.Sequencer) label.text = "Drum Machine";
@@ -122,6 +131,26 @@ public class menuItem : manipObject {
         }
 
         GameObject seq = Instantiate(g.GetComponent<sequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
+        seq.transform.parent = g.transform;
+        seq.transform.Translate(Vector3.right * .081f, Space.Self);
+        seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+      }
+      Destroy(g.transform.Find("stretchNode").gameObject);
+    }
+
+    if (item == deviceType.CVSequencer)
+    {
+      for (int i = 0; i < 2; i++)
+      {
+        for (int i2 = 0; i2 < 4; i2++)
+        {
+          GameObject cube = Instantiate(g.GetComponent<cvSequencerDeviceInterface>().touchDialPrefab, transform.position, transform.rotation) as GameObject;
+          cube.transform.parent = g.transform;
+          cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
+          cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+        }
+
+        GameObject seq = Instantiate(g.GetComponent<cvSequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
         seq.transform.parent = g.transform;
         seq.transform.Translate(Vector3.right * .081f, Space.Self);
         seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
@@ -177,7 +206,7 @@ public class menuItem : manipObject {
       Destroy(g.transform.Find("screenFrame").gameObject);
     }
 
-    if (item == deviceType.Keyboard) {
+        if (item == deviceType.Keyboard) {
       g.transform.localPosition = new Vector3(0.013f, 0, .026f);
       g.transform.localScale = Vector3.one * .08f;
       Destroy(g.transform.Find("KeyboardTimeline").gameObject);

@@ -66,7 +66,7 @@ public class manipulator : MonoBehaviour {
   bool controllerVisible = true;
   public void toggleController(bool on) {
     controllerVisible = on;
-    controllerRep.SetActive(on);
+    //controllerRep.SetActive(on); // comment out so that oculus assets stay disabled
   }
 
   public void SetDeviceIndex(int index) {
@@ -393,8 +393,9 @@ public class manipulator : MonoBehaviour {
     tipR.localPosition = new Vector3(Mathf.Lerp(.004f, -.001f, val), -.005f, -.018f);
   }
 
-  bool showingTips = true;
+  bool showingTips = false;
   public void toggleTips(bool on) {
+     
     showingTips = on;
     for (int i = 0; i < tipTexts.Length; i++) {
       tipTexts[i].SetActive(showingTips);

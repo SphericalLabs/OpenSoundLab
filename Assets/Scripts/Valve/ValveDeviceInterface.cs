@@ -18,19 +18,18 @@ using System.Collections;
 public class ValveDeviceInterface : deviceInterface {
   public omniJack input, output, controlInput;
   dial ampDial;
-  basicSwitch activeSwitch;
+
   valveSignalGenerator signal;
 
   public override void Awake() {
     base.Awake();
     ampDial = GetComponentInChildren<dial>();
-    activeSwitch = GetComponentInChildren<basicSwitch>();
     signal = GetComponent<valveSignalGenerator>();
   }
 
   void Update() {
     signal.amp = ampDial.percent;
-    signal.active = activeSwitch.switchVal;
+
     if (signal.incoming != input.signal) signal.incoming = input.signal;
     if (signal.controlSig != controlInput.signal) signal.controlSig = controlInput.signal;
   }
@@ -41,7 +40,6 @@ public class ValveDeviceInterface : deviceInterface {
     GetTransformData(data);
 
     data.dialState = ampDial.percent;
-    data.switchState = activeSwitch.switchVal;
 
     data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
@@ -59,13 +57,13 @@ public class ValveDeviceInterface : deviceInterface {
     controlInput.ID = data.jackControlID;
 
     ampDial.setPercent(data.dialState);
-    activeSwitch.setSwitch(data.switchState);
+
   }
 }
 
 public class ValveData : InstrumentData {
   public float dialState;
-  public bool switchState;
+
   public int jackOutID;
   public int jackInID;
   public int jackControlID;

@@ -35,10 +35,10 @@ public class spectrumDisplay : MonoBehaviour {
 
     for (int i = 0; i < texpixels.Length; i++) texpixels[i] = new Color32(0, 0, 0, 255);
     tex.SetPixels32(texpixels);
-    tex.Apply(false);
+    tex.Apply(true);
 
     texrend.material.mainTexture = tex;
-    texrend.material.SetTexture(Shader.PropertyToID("_Illum"), tex);
+    texrend.material.SetTexture(Shader.PropertyToID("_MainTex"), tex);
     texrend.material.SetColor("_EmissionColor", Color.HSVToRGB(10 / 400f, 98 / 255f, 1f));
     texrend.material.SetFloat("_EmissionGain", .4f);
   }
@@ -50,6 +50,7 @@ public class spectrumDisplay : MonoBehaviour {
         byte s = 0;
         if (spectrum[i] * spectrumMult * texH >= i2) s = 255;
         texpixels[i2 * texW + i] = new Color32(s, s, s, 255);
+        //texpixels[i2 * texW + i] = new Color32(255, 0, 0, 255);
       }
     }
   }
@@ -59,7 +60,7 @@ public class spectrumDisplay : MonoBehaviour {
     if (!active) {
       for (int i = 0; i < texpixels.Length; i++) texpixels[i] = new Color32(0, 0, 0, 255);
       tex.SetPixels32(texpixels);
-      tex.Apply(false);
+      tex.Apply(true);
     }
   }
 
@@ -69,6 +70,6 @@ public class spectrumDisplay : MonoBehaviour {
     source.GetSpectrumData(spectrum, 0, FFTWindow.Rectangular);
     GenerateTex();
     tex.SetPixels32(texpixels);
-    tex.Apply(false);
+    tex.Apply(true);
   }
 }

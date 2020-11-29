@@ -163,6 +163,11 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
+[XmlInclude(typeof(GlideData))]
+[XmlInclude(typeof(GainData))]
+[XmlInclude(typeof(ConferenceCallData))]
+[XmlInclude(typeof(SARSCov2Data))]
+[XmlInclude(typeof(FunktionData))]
 [XmlInclude(typeof(OscillatorData))]
 [XmlInclude(typeof(SpeakerData))]
 [XmlInclude(typeof(CameraData))]
@@ -190,6 +195,8 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(MIDIoutData))]
 [XmlInclude(typeof(TimelineData))]
 [XmlInclude(typeof(ADSRData))]
+
+
 public class InstrumentData {
   public int ID;
   public menuItem.deviceType deviceType;

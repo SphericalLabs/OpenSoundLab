@@ -77,8 +77,8 @@ public class cameraPanel : manipObject {
   float origDist = 1;
   Vector3 origScale;
   public override void grabUpdate(Transform t) {
-    float dist = Vector3.Magnitude(masterObj.InverseTransformPoint(transform.position)) * 8;
-    float s = Mathf.Clamp(dist, 2f, 16);
-    transform.localScale = Vector3.one * s;
+    //float dist = Vector3.Magnitude(masterObj.InverseTransformPoint(transform.position)) * 8;
+    //float s = Mathf.Clamp(dist, 2f, 16);
+    //transform.localScale = Vector3.one * s;
   }
 }

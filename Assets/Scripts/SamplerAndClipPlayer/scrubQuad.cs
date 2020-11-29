@@ -44,6 +44,7 @@ public class scrubQuad : MonoBehaviour {
   }
 
   void OnCollisionEnter(Collision coll) {
+    return; // workaround for turning off broken scrubbing
     manipulator m = coll.transform.GetComponent<manipulator>();
     if (m == null) return;
     if (manips.ContainsKey(m)) manips[m].colliding = true;
@@ -57,6 +58,7 @@ public class scrubQuad : MonoBehaviour {
 
 
   void OnCollisionExit(Collision coll) {
+    return; // workaround for turning off broken scrubbing
     manipulator m = coll.transform.GetComponent<manipulator>();
     if (m == null) return;
     if (manips.ContainsKey(m)) {

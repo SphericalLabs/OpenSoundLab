@@ -32,8 +32,9 @@ public class ControlCubeDeviceInterface : deviceInterface {
 
   void Setup(Vector3 p) {
     percent = p;
-    cubeManip.updateLines(percent);
+    cubeManip.updateLines(percent); 
     updatePercent(percent);
+    //toggleMute(true);
   }
 
   public override void hit(bool on, int ID = -1) {

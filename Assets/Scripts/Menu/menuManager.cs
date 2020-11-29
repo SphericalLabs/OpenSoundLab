@@ -74,7 +74,7 @@ public class menuManager : MonoBehaviour {
     active = on;
   }
 
-  int rowLength = 5;
+  int rowLength = 8;
 
   void loadMenu() {
     menuItems = new GameObject[(int)menuItem.deviceType.Max];
@@ -89,7 +89,9 @@ public class menuManager : MonoBehaviour {
 
     int tempCount = 0;
     float h = 0;
-    float arc = 37.5f;
+    float arc = 37.5f * rowLength / 5; // depending on rowLength?
+
+    //Debug.Log(menuItems.Length);
     while (tempCount < menuItems.Length) {
       for (int i = 0; i < rowLength; i++) {
         if (tempCount < menuItems.Length) {
@@ -108,11 +110,11 @@ public class menuManager : MonoBehaviour {
   }
 
   public void SelectAudio() {
-    _audioSource.PlayOneShot(selectClip, .05f);
+    //_audioSource.PlayOneShot(selectClip, .05f);
   }
 
   public void GrabAudio() {
-    _audioSource.PlayOneShot(grabClip, .75f);
+    //_audioSource.PlayOneShot(grabClip, .75f);
   }
 
   public bool midiOutEnabled = false;
@@ -128,7 +130,7 @@ public class menuManager : MonoBehaviour {
   IEnumerator activationRoutine(bool on, Transform pad) {
     float timer = 0;
     if (on) {
-      _audioSource.PlayOneShot(openClip);
+      //_audioSource.PlayOneShot(openClip);
 
       rootNode.SetActive(true);
       trashNode.SetActive(false);
@@ -141,7 +143,7 @@ public class menuManager : MonoBehaviour {
         menuItemScripts[i].transform.localScale = Vector3.zero;
       }
       Vector3 startPos = transform.position = pad.position;
-
+      
       while (timer < 1) {
         timer = Mathf.Clamp01(timer + Time.deltaTime * 1.5f);
         for (int i = 0; i < menuItemScripts.Length; i++) {
@@ -162,7 +164,7 @@ public class menuManager : MonoBehaviour {
       settingsNode.SetActive(true);
       metronomeNode.SetActive(true);
     } else {
-      _audioSource.PlayOneShot(closeClip);
+      //_audioSource.PlayOneShot(closeClip);
       Vector3 startPos = transform.position;
       trashNode.SetActive(false);
       settingsNode.SetActive(false);
@@ -190,8 +192,8 @@ public class menuManager : MonoBehaviour {
     active = on;
     simpleMenu.toggleMenu();
 
-    if (on) _audioSource.PlayOneShot(simpleOpenClip);
-    else _audioSource.PlayOneShot(closeClip);
+    //if (on) _audioSource.PlayOneShot(simpleOpenClip);
+    //else _audioSource.PlayOneShot(closeClip);
     if (!active) return;
 
     transform.position = pad.position;

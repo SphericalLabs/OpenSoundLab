@@ -21,7 +21,7 @@ public class NoiseSignalGenerator : signalGenerator {
   float speedPercent = 1;
   int speedFrames = 1;
 
-  int maxLength = 11025; //  44100 / 2 - 1/4 second with sample rate of 44.1k
+  int maxLength = 11025 * 16; //  max length of one random value in samples
   int counter = 0;
 
   float curSample = -1.0f;
@@ -34,7 +34,7 @@ public class NoiseSignalGenerator : signalGenerator {
   public void updatePercent(float per) {
     if (speedPercent == per) return;
     speedPercent = per;
-    speedFrames = Mathf.RoundToInt(maxLength * (1 - per));
+    speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {

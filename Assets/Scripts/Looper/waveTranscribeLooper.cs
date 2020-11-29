@@ -164,7 +164,7 @@ public class waveTranscribeLooper : signalGenerator {
     if (bufferToWav.instance.savingInProgress) return;
     string audioFilename = masterControl.instance.SaveDir + System.IO.Path.DirectorySeparatorChar + "Samples" + System.IO.Path.DirectorySeparatorChar +
          "Recordings" + System.IO.Path.DirectorySeparatorChar +
-        string.Format("{0:MM-dd_hh-mm-ss-tt}.wav",
+        string.Format("{0:yyyy-MM-dd_HH-mm-ss}.wav",
         DateTime.Now);
     bufferToWav.instance.Save(audioFilename, sampleBuffer, 2, virtualBufferLength, saveText, this);
   }

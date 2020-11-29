@@ -42,7 +42,7 @@ public class NoiseDeviceInterface : deviceInterface {
 
     GenerateRandomTex();
     tex.SetPixels32(texpixels);
-    tex.Apply(false);
+    tex.Apply(true);
 
     texrend.material.mainTexture = tex;
     texrend.material.SetTexture(Shader.PropertyToID("_Illum"), tex);
@@ -65,7 +65,7 @@ public class NoiseDeviceInterface : deviceInterface {
       gen.updated = false;
       GenerateRandomTex();
       tex.SetPixels32(texpixels);
-      tex.Apply(false);
+      tex.Apply(true);
     }
 
     gen.updatePercent(speedDial.percent);

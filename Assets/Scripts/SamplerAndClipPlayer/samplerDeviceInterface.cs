@@ -16,8 +16,9 @@ using UnityEngine;
 using System.Collections;
 
 public class samplerDeviceInterface : deviceInterface {
-  public dial speedDial, volumeDial;
+  public dial speedDial, volumeDial, headTrimDial, tailTrimDial;
   public omniJack speedInput, volumeInput, controlInput, output;
+  public omniJack headInput, tailInput;
   public basicSwitch dirSwitch, loopSwitch;
   public button playButton, turntableButton;
   public sliderUneven headSlider, tailSlider;
@@ -52,25 +53,42 @@ public class samplerDeviceInterface : deviceInterface {
     player.playbackSpeed = Mathf.Pow(speedDial.percent, 2) * 4 * mod;
     player.amplitude = volumeDial.percent * 2;
 
+    player.headTrim = headTrimDial.percent;
+    player.tailTrim = tailTrimDial.percent;
+
     if (loopSwitch.switchVal != player.looping) player.looping = loopSwitch.switchVal;
 
     if (player.speedGen != speedInput.signal) player.speedGen = speedInput.signal;
     if (player.ampGen != volumeInput.signal) player.ampGen = volumeInput.signal;
     if (player.seqGen != controlInput.signal) player.seqGen = controlInput.signal;
-
     if (seq != controlInput.signal) seq = controlInput.signal;
 
-    if (tailSlider.percent != player.trackBounds.y) {
-      player.trackBounds.y = tailSlider.percent;
-      player.updateTrackBounds();
-    }
-    if (headSlider.percent != player.trackBounds.x) {
-      player.trackBounds.x = headSlider.percent;
-      player.updateTrackBounds();
+    if (player.headGen != headInput.signal) player.headGen = headInput.signal;
+    if (player.tailGen != tailInput.signal) player.tailGen = tailInput.signal;
+
+    if(headInput.signal == null){ // head cv not plugged in
+      if (headSlider.percent != player.trackBounds.x)
+      {
+        player.trackBounds.x = headSlider.percent;
+        player.updateTrackBounds();
+      }
+      headSlider.bounds.x = tailSlider.transform.localPosition.x;
+    } else {
+      headSlider.setPercent(Mathf.Clamp01(player.headOffset)); // map cv to slider
     }
 
-    tailSlider.bounds.y = headSlider.transform.localPosition.x;
-    headSlider.bounds.x = tailSlider.transform.localPosition.x;
+    if(tailInput.signal == null) { // tail cv not plugged in
+      if (tailSlider.percent != player.trackBounds.y)
+      {
+        player.trackBounds.y = tailSlider.percent;
+        player.updateTrackBounds();
+      }
+      tailSlider.bounds.y = tailSlider.transform.localPosition.y;
+    } else {
+      tailSlider.setPercent(Mathf.Clamp01(player.tailOffset)); // map cv to slider
+    }
+
+    
   }
 
   public override InstrumentData GetData() {
