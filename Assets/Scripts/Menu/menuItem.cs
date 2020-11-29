@@ -111,7 +111,7 @@ public class menuItem : manipObject {
     if (item == deviceType.MIDIOUT) label.text = "MIDI OUT";
     if (item == deviceType.Sequencer) label.text = "Drum Machine";
     if (item == deviceType.Timeline) label.text = "Sequencer";
-    label.gameObject.SetActive(false);
+    label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(false);
     GameObject g = Instantiate(itemPrefab, transform.position, transform.rotation) as GameObject;
     g.transform.parent = transform;
@@ -313,7 +313,7 @@ public class menuItem : manipObject {
     if (disabled) return;
 
     if (curState == manipState.none) {
-      label.gameObject.SetActive(false);
+      label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(false);
     } else if (curState == manipState.selected) {
       symbol.material.SetColor("_TintColor", normalColor);
