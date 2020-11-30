@@ -38,7 +38,7 @@ public class dial : manipObject {
     mats[1] = transform.parent.Find("glowDisk").GetComponent<Renderer>().material;
     mats[2] = transform.parent.Find("Label").GetComponent<Renderer>().material;
 
-    customColor = Color.HSVToRGB(hue, 227 / 255f, 206 / 255f);
+    customColor = Color.HSVToRGB(hue, 1f, 0.15f);
 
     setGlowState(manipState.none);
 
@@ -53,14 +53,14 @@ public class dial : manipObject {
         littleDisk.SetActive(false);
 
         for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", .1f);
+          mats[i].SetFloat("_EmissionGain", .0f);
           mats[i].SetColor("_TintColor", c);
         }
         break;
       case manipState.selected:
         littleDisk.SetActive(true);
         for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", .3f);
+          mats[i].SetFloat("_EmissionGain", .0f);
           mats[i].SetColor("_TintColor", c);
         }
         break;
@@ -68,8 +68,8 @@ public class dial : manipObject {
         littleDisk.SetActive(true);
 
         for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", .25f);
-          mats[i].SetColor("_TintColor", masterControl.instance.tipColor);
+          mats[i].SetFloat("_EmissionGain", .0f);
+          mats[i].SetColor("_TintColor", c);
         }
         break;
       default:
