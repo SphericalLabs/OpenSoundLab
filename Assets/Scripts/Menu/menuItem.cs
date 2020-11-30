@@ -24,6 +24,7 @@ public class menuItem : manipObject {
 
   Texture tex;
   GameObject itemPrefab;
+  GameObject g; // the instance of itemPrefab
   public Renderer symbol;
   TextMesh label;
   Material labelMat;
@@ -107,14 +108,20 @@ public class menuItem : manipObject {
     if (item == deviceType.Valve) label.text = "VCA/Atten";
     if (item == deviceType.Glide) label.text = "Glide/DC";
     if (item == deviceType.Gain) label.text = "Gain/Mute";
-    if (item == deviceType.MIDIIN) label.text = "MIDI IN";
-    if (item == deviceType.MIDIOUT) label.text = "MIDI OUT";
-    if (item == deviceType.Sequencer) label.text = "Drum Machine";
-    if (item == deviceType.Timeline) label.text = "Sequencer";
+    if (item == deviceType.MIDIIN) label.text = "MIDI In";
+    if (item == deviceType.MIDIOUT) label.text = "MIDI Out";
+    if (item == deviceType.Sequencer) label.text = "DrumSeq";
+    if (item == deviceType.Timeline) label.text = "NoteSeq";
+    if (item == deviceType.CVSequencer) label.text = "DualSeq";
+    if (item == deviceType.ControlCube) label.text = "CubeXYZ";
+    if (item == deviceType.Microphone) label.text = "Mic";
+    if (item == deviceType.ConferenceCall) label.text = "WebCam";
+
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(false);
-    GameObject g = Instantiate(itemPrefab, transform.position, transform.rotation) as GameObject;
+    g = Instantiate(itemPrefab, transform.position, transform.rotation) as GameObject;
     g.transform.parent = transform;
+    
 
     manager = transform.parent.parent.GetComponent<menuManager>();
 
@@ -261,6 +268,8 @@ public class menuItem : manipObject {
       g.transform.localRotation = Quaternion.Euler(60, 0, 0);
     }
 
+    g.SetActive(false);
+
     return g;
   }
 
@@ -315,16 +324,19 @@ public class menuItem : manipObject {
     if (curState == manipState.none) {
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(false);
+      g.SetActive(false);
     } else if (curState == manipState.selected) {
       symbol.material.SetColor("_TintColor", normalColor);
       labelMat.SetColor("_TintColor", normalColor);
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(true);
+      g.SetActive(true);
       manager.SelectAudio();
     } else if (curState == manipState.grabbed) {
       symbol.material.SetColor("_TintColor", Color.white);
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(true);
+      g.SetActive(true);
       labelMat.SetColor("_TintColor", Color.white);
       manager.GrabAudio();
       StartCoroutine(flash());
