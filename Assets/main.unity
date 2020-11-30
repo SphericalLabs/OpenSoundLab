@@ -1230,6 +1230,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 24100000, guid: 69a3764621178d84a968b8979649e7df,
         type: 2}
+    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: BinauralSetting
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: WireSetting
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
       propertyPath: hmdTargetVive
