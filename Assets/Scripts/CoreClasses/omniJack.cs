@@ -91,7 +91,7 @@ public class omniJack : manipObject {
     } else if (curState == manipState.selected) {
       if (dimCoroutine != null) StopCoroutine(dimCoroutine);
       jackColor = Color.HSVToRGB(findHue(), 0.8f, 0.2f);
-      jackRepRend.material.SetFloat("_EmissionGain", .3f);
+      jackRepRend.material.SetFloat("_EmissionGain", .1f);
       jackRepRend.material.SetColor("_TintColor", jackColor);
 
       if (near == null) plugRep.SetActive(true);
@@ -136,7 +136,7 @@ public class omniJack : manipObject {
     float t = 0;
     while (t < 1) {
       t = Mathf.Clamp01(t + Time.deltaTime * 2);
-      jackRepRend.material.SetFloat("_EmissionGain", Mathf.Lerp(.3f, 0, t));
+      jackRepRend.material.SetFloat("_EmissionGain", Mathf.Lerp(.1f, 0, t));
       jackRepRend.material.SetColor("_TintColor", Color.Lerp(jackColor, Color.black, t));
       yield return null;
     }

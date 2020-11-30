@@ -210,7 +210,7 @@ public class omniPlug : manipObject {
   void lrFlowEffect() {
     flowVal = Mathf.Repeat(flowVal - Time.deltaTime, 1);
     lr.material.mainTextureOffset = new Vector2(flowVal, 0);
-    lr.material.SetFloat("_EmissionGain", .6f);
+    lr.material.SetFloat("_EmissionGain", .1f);
   }
 
   Transform closestJack;
