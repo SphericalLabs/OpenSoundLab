@@ -70,9 +70,9 @@ public class menuItem : manipObject {
     Pano
   };
 
-  Color disabledColor = new Color(.25f, .25f, 1);
-  Color normalColor = new Color(.5f, .5f, 1);
-  Color selectColor = new Color(.85f, .85f, 1);
+  Color disabledColor;
+  Color normalColor;
+  Color selectColor;
 
   public void disable(bool on) {
     if (disabled == on) return;
@@ -86,10 +86,8 @@ public class menuItem : manipObject {
 
   public override void Awake() {
     base.Awake();
-    disabledColor = Color.HSVToRGB(.6f, .7f, .2f);
-    normalColor = Color.HSVToRGB(.6f, .7f, .9f);
-    selectColor = Color.HSVToRGB(.4f, .7f, .9f);
-
+    disabledColor = normalColor = selectColor = new Color(0.3f, 0.3f, 0.3f);
+    
     label = GetComponentInChildren<TextMesh>();
     labelMat = label.GetComponent<Renderer>().material;
     symbol.material.SetColor("_TintColor", normalColor);
@@ -118,7 +116,7 @@ public class menuItem : manipObject {
     if (item == deviceType.ConferenceCall) label.text = "WebCam";
 
     label.gameObject.SetActive(true);
-    symbol.gameObject.SetActive(false);
+    symbol.gameObject.SetActive(true);
     g = Instantiate(itemPrefab, transform.position, transform.rotation) as GameObject;
     g.transform.parent = transform;
     
@@ -323,7 +321,7 @@ public class menuItem : manipObject {
 
     if (curState == manipState.none) {
       label.gameObject.SetActive(true);
-      symbol.gameObject.SetActive(false);
+      symbol.gameObject.SetActive(true);
       g.SetActive(false);
     } else if (curState == manipState.selected) {
       symbol.material.SetColor("_TintColor", normalColor);
