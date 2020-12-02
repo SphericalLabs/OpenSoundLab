@@ -22,7 +22,8 @@ public class menuManager : MonoBehaviour {
   public GameObject trashNode;
   public GameObject settingsNode;
   public GameObject metronomeNode;
-  public GameObject[] menuItems;
+
+  public List<GameObject> menuItems;
 
   public Dictionary<menuItem.deviceType, GameObject> refObjects;
 
@@ -33,7 +34,7 @@ public class menuManager : MonoBehaviour {
   public AudioClip grabClip;
   public AudioClip simpleOpenClip;
 
-  menuItem[] menuItemScripts;
+  List<menuItem> menuItemScripts;
   public static menuManager instance;
 
   bool active = false;
@@ -74,17 +75,28 @@ public class menuManager : MonoBehaviour {
     active = on;
   }
 
-  int rowLength = 8;
+  int rowLength = 9;
 
   void loadMenu() {
-    menuItems = new GameObject[(int)menuItem.deviceType.Max];
-    menuItemScripts = new menuItem[menuItems.Length];
-    for (int i = 0; i < menuItems.Length; i++) {
-      menuItems[i] = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
-      menuItems[i].transform.parent = rootNode.transform;
-      menuItem m = menuItems[i].GetComponent<menuItem>();
+    menuItems = new List<GameObject>();
+    menuItemScripts = new List<menuItem>();
+    for (int i = 0; i < (int)menuItem.deviceType.Max; i++) {
+      // skip incompatible devices
+      if (Application.platform == RuntimePlatform.Android)
+      {
+        if ((menuItem.deviceType)i == menuItem.deviceType.ConferenceCall) continue;
+        if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
+      }
+      // skip unneeded devices
+      if ((menuItem.deviceType)i == menuItem.deviceType.Airhorn) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Stereo) continue; // remove completely?
+
+      GameObject tmpObj = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
+      tmpObj.transform.parent = rootNode.transform;
+      menuItems.Add(tmpObj);
+      menuItem m = tmpObj.GetComponent<menuItem>();
       refObjects[(menuItem.deviceType)i] = m.Setup((menuItem.deviceType)i);
-      menuItemScripts[i] = m;
+      menuItemScripts.Add(m);
     }
 
     int tempCount = 0;
@@ -92,9 +104,9 @@ public class menuManager : MonoBehaviour {
     float arc = 37.5f * rowLength / 5; // depending on rowLength?
 
     //Debug.Log(menuItems.Length);
-    while (tempCount < menuItems.Length) {
+    while (tempCount < menuItems.Count) {
       for (int i = 0; i < rowLength; i++) {
-        if (tempCount < menuItems.Length) {
+        if (tempCount < menuItems.Count) {
           menuItems[tempCount].transform.localPosition = Quaternion.Euler(0, (arc / rowLength) * (i - rowLength / 2f) + (arc / rowLength) / 2f, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f) + Vector3.up * h;
           menuItems[tempCount].transform.rotation = Quaternion.Euler(0, (arc / rowLength) * (i - rowLength / 2f) + (arc / rowLength) / 2f, 0);
         }
@@ -123,7 +135,7 @@ public class menuManager : MonoBehaviour {
     PlayerPrefs.SetInt("midiOut", on ? 1 : 0);
     midiOutEnabled = on;
     openSpeed = on ? 2 : 3;
-    menuItemScripts[menuItemScripts.Length - 1].Appear(on);
+    menuItemScripts[menuItemScripts.Count - 1].Appear(on);
   }
 
   Coroutine activationCoroutine;
@@ -138,7 +150,7 @@ public class menuManager : MonoBehaviour {
       metronomeNode.SetActive(false);
 
       List<int> remaining = new List<int>();
-      for (int i = 0; i < menuItemScripts.Length; i++) {
+      for (int i = 0; i < menuItemScripts.Count; i++) {
         remaining.Add(i);
         menuItemScripts[i].transform.localScale = Vector3.zero;
       }
@@ -146,7 +158,7 @@ public class menuManager : MonoBehaviour {
       
       while (timer < 1) {
         timer = Mathf.Clamp01(timer + Time.deltaTime * 1.5f);
-        for (int i = 0; i < menuItemScripts.Length; i++) {
+        for (int i = 0; i < menuItemScripts.Count; i++) {
           if (remaining.Contains(i)) {
             if (timer / openSpeed > Vector3.Distance(startPos, menuItemScripts[i].transform.position)) {
               menuItemScripts[i].Appear(on);
@@ -169,7 +181,7 @@ public class menuManager : MonoBehaviour {
       trashNode.SetActive(false);
       settingsNode.SetActive(false);
       metronomeNode.SetActive(false);
-      for (int i = 0; i < menuItems.Length; i++) {
+      for (int i = 0; i < menuItems.Count; i++) {
         menuItemScripts[i].Appear(on);
       }
 
