@@ -24,3 +24,12 @@ Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles'
 - Add testing users via Oculus email to testing channel
 - Basic info needs to be provided for app
 - App will show up store of companion app and headset, i.e. by search for string
+
+### Samples loading ###
+- \Android\data\unity.HardLightLabsLLC.SoundStage\Samples
+- You can upload samples here via USB (Windows Explorer, SideQuest, adb, etc)
+- Place aiff and wav samples here, prefer 44.1/48khz, 16bit, stereo!
+- Only one folder depth allowed
+
+- Place preset samples in /Assets/StreamingAssets as Samples.tgz
+- Will be unpacked on install
