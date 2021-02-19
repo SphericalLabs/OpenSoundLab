@@ -87,7 +87,10 @@ public class samplerDeviceInterface : deviceInterface {
     } else {
       tailSlider.setPercent(Mathf.Clamp01(player.tailOffset)); // map cv to slider
     }
-
+    
+    if (headSlider.percent >= tailSlider.percent) // maybe just suboptimal, how to deal with invalid head/tail values? seems to work for now
+      tailSlider.percent = headSlider.percent + 0.02f;
+    
     
   }
 

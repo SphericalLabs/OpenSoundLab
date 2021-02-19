@@ -245,7 +245,7 @@ public class clipPlayerComplex : clipPlayer {
     if (headGen != null)
     {
       headGen.processBuffer(headBuffer, dspTime, channels);
-      headOffset = (headBuffer[0] + 1) * 0.5f * headTrim; // -1,1 mapping 
+      headOffset = headBuffer[0] + headTrim; // use buffer for offset, take only first sample of buffer
     } else {
       headOffset = 0f;
     }
@@ -253,7 +253,7 @@ public class clipPlayerComplex : clipPlayer {
     if (tailGen != null)
     {
       tailGen.processBuffer(tailBuffer, dspTime, channels);
-      tailOffset = 1 - (tailBuffer[0] + 1) * 0.5f * tailTrim; // inverted -1,1 mapping
+      tailOffset = tailTrim - tailBuffer[0]; // use buffer for offset, take only first sample of buffer
     }
     else
     {
