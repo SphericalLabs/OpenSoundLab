@@ -129,7 +129,8 @@ public class tape : manipObject {
 
   void OnCollisionExit(Collision coll) {
     if (curState != manipState.grabbed) return;
-    if (deck == coll.transform) {
+    if (deck == coll.transform)
+    {
       deck.parent.GetComponent<samplerLoad>().UnloadTape(this);
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(500);
       deck = null;
@@ -204,18 +205,18 @@ public class tape : manipObject {
 
   public void Release() {
     if (deck == null) {
-      if (masterObj == null) Destroy(gameObject);
+      //if (masterObj == null) Destroy(gameObject);
 
       transform.parent = masterObj;
 
-      if (gameObject.activeInHierarchy) {
+      //if (gameObject.activeInHierarchy) {
 
-        if (returnRoutineID != null) StopCoroutine(returnRoutineID);
-        returnRoutineID = StartCoroutine(returnRoutine());
-      } else {
-        transform.localPosition = origPos;
-        transform.localRotation = origRot;
-      }
+      //  if (returnRoutineID != null) StopCoroutine(returnRoutineID);
+      //  returnRoutineID = StartCoroutine(returnRoutine());
+      //} else {
+      //  transform.localPosition = origPos;
+      //  transform.localRotation = origRot;
+      //}
     } else {
 
       tapeTrans.position = deck.transform.position;
