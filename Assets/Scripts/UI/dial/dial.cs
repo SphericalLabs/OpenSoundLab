@@ -116,9 +116,18 @@ public class dial : manipObject {
   float curRot = 0;
   float realRot = 0f;
   float prevShakeRot = 0f;
+  float fineMult = 5f;
+
   public override void grabUpdate(Transform t) {
     Vector2 temp = dialCoordinates(t.right);
+
+    // naughty hack, since grip button has to be pressed BEFORE starting gabbing... otherwise jumps
+    // also loops around too early
     curRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - deltaRot;
+
+
+    if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
+      curRot /= fineMult; 
 
     curRot = Mathf.Repeat(curRot, 360f);
     realRot = Mathf.Repeat(curRot * 2, 360f);
@@ -128,6 +137,7 @@ public class dial : manipObject {
       else realRot = 210;
     }
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
+    
 
     if (Mathf.Abs(realRot - prevShakeRot) > 10f) {
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(500);
@@ -172,7 +182,14 @@ public class dial : manipObject {
         _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
       }
       Vector2 temp = dialCoordinates(manipulatorObj.right);
-      deltaRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - curRot;
+
+      if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
+      {
+        deltaRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - curRot * fineMult;
+      } else {
+        deltaRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - curRot;
+      }
+      
     }
   }
 }
