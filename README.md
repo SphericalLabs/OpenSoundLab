@@ -19,11 +19,12 @@ Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles'
 ### Notes for deploying with Oculus
 - Project Settings -> Player -> Android -> Publishing Settings -> Keystore Manager
 - Add keys to .gitignore
-- Oculus -> Create store-compativle AndroidManifest.xml
+- Oculus -> Create store-compatible AndroidManifest.xml
 - Project Settings -> Player -> Android -> Other Settings -> Identification -> Minimum SDK Version 23
 - Add testing users via Oculus email to testing channel
 - Basic info needs to be provided for app
 - App will show up store of companion app and headset, i.e. by search for string
+- Optional: Add an automatic sign-in, see https://forum.unity.com/threads/android-keystore-passwords-not-saved-between-sessions.235213/#post-1737809
 
 ### Samples loading ###
 - \Android\data\unity.HardLightLabsLLC.SoundStage\Samples
@@ -38,3 +39,4 @@ Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles'
 - Download Android NDK from https://developer.android.com/ndk/downloads
 - Update path in /Assets/Plugins/Android/src/build_plugin.sh
 - Run build_plugin.sh
+- Rename libnative.so to libSoundStageNative.so
