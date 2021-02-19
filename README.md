@@ -33,3 +33,8 @@ Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles'
 
 - Place preset samples in /Assets/StreamingAssets as Samples.tgz
 - Will be unpacked on install
+
+### Compile native ARM code for Android ###
+- Download Android NDK from https://developer.android.com/ndk/downloads
+- Update path in /Assets/Plugins/Android/src/build_plugin.sh
+- Run build_plugin.sh
