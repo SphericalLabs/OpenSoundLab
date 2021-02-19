@@ -455,7 +455,7 @@ extern "C" {
 
 
 				buffer[i] = clipdata[bufferCount * clipChannels] * endAmplitude;
-				if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * amplitude;
+				if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * endAmplitude;
 				else buffer[i + 1] = buffer[i];
 			}
 		}
