@@ -126,7 +126,7 @@ public class clipPlayerComplex : clipPlayer {
     if (!loaded) return;
     sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (headGen == null) ? trackBounds.x : headOffset ));
     sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (tailGen == null) ? trackBounds.y : tailOffset ));
-    if (sampleBounds[0] >= sampleBounds[1]) sampleBounds[0] = sampleBounds[1] - 10; // sanity check
+    if (sampleBounds[0] >= sampleBounds[1]) sampleBounds[0] = sampleBounds[1] - 10; // minimum 10 samples distance... (careful, could get below 0?)
   }
 
   public override void DrawClipTex() {

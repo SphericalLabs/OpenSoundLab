@@ -83,7 +83,7 @@ public class samplerDeviceInterface : deviceInterface {
         player.trackBounds.y = tailSlider.percent;
         player.updateTrackBounds();
       }
-      tailSlider.bounds.y = tailSlider.transform.localPosition.y;
+      tailSlider.bounds.y = headSlider.transform.localPosition.x;
     } else {
       tailSlider.setPercent(Mathf.Clamp01(player.tailOffset)); // map cv to slider
     }
