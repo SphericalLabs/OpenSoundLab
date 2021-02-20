@@ -219,6 +219,17 @@ public class masterControl : MonoBehaviour {
       //metronomeClick.Play();
       lastBeat = Mathf.FloorToInt(curCycle * 8f);
     }
+
+
+    if(OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch)){
+      nextWireSetting();
+    }
+
+    if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
+    {
+      nextBinauralSetting();
+    }
+
   }
 
   private void OnAudioFilterRead(float[] buffer, int channels) {
@@ -291,5 +302,15 @@ public class masterControl : MonoBehaviour {
     for (int i = 0; i < plugs.Length; i++) {
       plugs[i].updateLineType(WireSetting);
     }
+  }
+
+  public void nextWireSetting()
+  {
+    updateWireSetting((WireSetting.GetHashCode() + 1) % 3); // modolo for sneaky wrapping
+  }
+
+  public void nextBinauralSetting()
+  {
+    updateBinaural((BinauralSetting.GetHashCode() + 1 ) % 3); 
   }
 }
