@@ -16,35 +16,44 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class speaker : MonoBehaviour {
+public class speaker : MonoBehaviour
+{
 
-  public float volume = 1;
-  public signalGenerator incoming;
-  public bool leftOn = true;
+    public float volume = 1;
+    public signalGenerator incoming;
+    public bool monoMode = false;
+    public bool leftOn = true;
 
-  [DllImport("SoundStageNative")]
-  public static extern void MultiplyArrayBySingleValue(float[] buffer, int length, float val);
+    [DllImport("SoundStageNative")]
+    public static extern void MultiplyArrayBySingleValue(float[] buffer, int length, float val);
 
-  private void OnAudioFilterRead(float[] buffer, int channels) {
-    if (incoming == null) return;
-    double dspTime = AudioSettings.dspTime;
-    incoming.processBuffer(buffer, dspTime, channels);
-    // if (volume != 1) MultiplyArrayBySingleValue(buffer, buffer.Length, volume);
-    
-    // please note: unity only uses left channel if spatialize is on!
-    // todo: how to handle non-spatialize settings?
-    if(leftOn){
-      for (int n = 0; n < buffer.Length; n += 2)
-      {
-        buffer[n] = buffer[n + 1] = buffer[n] * volume;
-        // no need for dealing with right channel
-      }
-    } else {
-      for (int n = 0; n < buffer.Length; n += 2)
-      {
-        buffer[n] = buffer[n + 1] = buffer[n+1] * volume;
-        // no need for dealing with right channel
-      }
+    private void OnAudioFilterRead(float[] buffer, int channels)
+    {
+        if (incoming == null) return;
+        double dspTime = AudioSettings.dspTime;
+        incoming.processBuffer(buffer, dspTime, channels);
+        // if (volume != 1) MultiplyArrayBySingleValue(buffer, buffer.Length, volume);
+
+        if (monoMode)
+        {
+            // please note: unity only uses left channel if spatialize is on!
+            // todo: how to handle non-spatialize settings?
+            if (leftOn)
+            {
+                for (int n = 0; n < buffer.Length; n += 2)
+                {
+                    buffer[n] = buffer[n + 1] = buffer[n] * volume;
+                    // no need for dealing with right channel
+                }
+            }
+            else
+            {
+                for (int n = 0; n < buffer.Length; n += 2)
+                {
+                    buffer[n] = buffer[n + 1] = buffer[n + 1] * volume;
+                    // no need for dealing with right channel
+                }
+            }
+        }
     }
-  }
 }
