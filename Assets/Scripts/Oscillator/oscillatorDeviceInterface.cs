@@ -72,8 +72,16 @@ public class oscillatorDeviceInterface : deviceInterface {
 
   void UpdateFreq() {
     freqPercent = freqDial.percent;
-    if (lfo) signal.frequency = Mathf.Pow(freqPercent, 4) * 10 + 1.0f / 120.0f; // 120s, 0.1s
-    else signal.frequency = Mathf.Clamp(3520.00f * Mathf.Pow(freqDial.percent, 2), 27.50f, Mathf.Infinity);// Mathf.Pow(freqDial.percent, 2); //signal.frequency = 40 + 10000 * Mathf.Pow(freqDial.percent, 2);
+    if (lfo)
+    {
+        signal.frequency = Mathf.Pow(freqPercent, 4) * 10 + 1.0f / 120.0f; // 120s, 0.1s
+        GetComponentInChildren<AudioSource>().volume = 0f;
+    }
+    else
+    {
+        signal.frequency = Mathf.Clamp(3520.00f * Mathf.Pow(freqDial.percent, 2), 27.50f, Mathf.Infinity);// Mathf.Pow(freqDial.percent, 2); //signal.frequency = 40 + 10000 * Mathf.Pow(freqDial.percent, 2);
+        GetComponentInChildren<AudioSource>().volume = 1f;
+    }
   }
 
   void UpdateAmp() {
