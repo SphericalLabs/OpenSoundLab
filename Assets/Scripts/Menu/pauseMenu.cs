@@ -42,7 +42,7 @@ public class pauseMenu : MonoBehaviour {
 
   List<pauseMenuItem> menuItems;
 
-  const int optionCount = 7;
+  const int optionCount = 2;
   void Awake() {
     menuItems = new List<pauseMenuItem>();
     for (int i = 0; i < items.Length; i++) {

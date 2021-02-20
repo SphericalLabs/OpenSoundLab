@@ -29,9 +29,9 @@ public class wirePanelComponentInterface : componentInterface {
   Color colorRed = Color.HSVToRGB(0f, 230f / 255, 118f / 255);
 
   void Start() {
-    midipanel.newColor(colorGreen);
-    jackpanel.newColor(colorGreen);
-    handlepanel.newColor(colorGreen);
+    //midipanel.newColor(colorGreen);
+    //jackpanel.newColor(colorGreen);
+    //handlepanel.newColor(colorGreen);
 
     glowSlider.setPercent(masterControl.instance.glowVal);
     for (int i = 0; i < panels.Length; i++) {
