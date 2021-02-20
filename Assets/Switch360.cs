@@ -4,19 +4,26 @@ using UnityEngine;
 
 public class Switch360 : MonoBehaviour
 {
-    public List<Texture> environments;
-    public float lastPointer = 0;
-    float newPointer = 0f;
-    int pointer = 0;
+    public List<Texture> imgs;
+    public List<AudioClip> snds;
+    //public float lastPointer = 0;
+    //float newPointer = 0f;
+    int imgPointer = 0;
+    int sndPointer = 0;
     Material mat;
-    Vector2 leftStick;
+    AudioSource src;
+    Vector2 leftStick, rightStick;
     Vector3 rotation;
-
+    float srcVolume = 0.2f;
+    
     void Start()
     {
         mat = GetComponent<Renderer>().materials[0];
-        mat.mainTexture = environments[0];
+        mat.mainTexture = imgs[imgPointer];
         rotation = new Vector3(0f, 0f, 0f);
+
+        src = GetComponent<AudioSource>();
+        src.clip = snds[sndPointer];
     }
 
     void Update()
@@ -26,7 +33,7 @@ public class Switch360 : MonoBehaviour
         // rotate 360 sphere around y-axis
         if (leftStick.x != 0f)
         {
-            rotation.y = -1 * Mathf.Sign(leftStick.x) * Mathf.Abs(Mathf.Pow(leftStick.x, 4) * 1f);
+            rotation.y = -1 * Mathf.Sign(leftStick.x) * Mathf.Abs(Mathf.Pow(leftStick.x, 4));
             transform.Rotate(rotation);
         }
 
@@ -48,15 +55,39 @@ public class Switch360 : MonoBehaviour
 
         //}
 
+        // flip through equirectangulars
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstickUp, OVRInput.Controller.LTouch))
         {
-            pointer = mod(pointer + 1, environments.Count);
-            mat.mainTexture = environments[pointer];
+            imgPointer = mod(imgPointer + 1, imgs.Count);
+            mat.mainTexture = imgs[imgPointer];
         }
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstickDown, OVRInput.Controller.LTouch))
         {
-            pointer = mod(pointer - 1, environments.Count);
-            mat.mainTexture = environments[pointer];
+            imgPointer = mod(imgPointer - 1, imgs.Count);
+            mat.mainTexture = imgs[imgPointer];
+        }
+
+        rightStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+
+        // adjust volume of ambisonics bus
+        if (rightStick.x != 0f)
+        {
+            srcVolume = Mathf.Clamp01(srcVolume + Mathf.Sign(rightStick.x) * Mathf.Abs(Mathf.Pow(rightStick.x, 4) * 0.005f));
+            src.volume = Mathf.Pow(srcVolume, 2);
+        }
+
+        // flip through ambisonics
+        if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstickUp, OVRInput.Controller.RTouch))
+        {
+            sndPointer = mod(sndPointer + 1, snds.Count);
+            src.clip = snds[sndPointer];
+            src.Play();
+        }
+        if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstickDown, OVRInput.Controller.RTouch))
+        {
+            sndPointer = mod(sndPointer - 1, snds.Count);
+            src.clip = snds[sndPointer];
+            src.Play();
         }
 
     }
