@@ -18,14 +18,25 @@ using System.Collections;
 public class miniSamplerComponentInterface : componentInterface {
   clipPlayerSimple player;
   public button muteButton;
-  public omniJack jackout;
+  public omniJack jackout, speedInput, volumeInput;
+  public dial speedDial, volumeDial;
+
   void Awake() {
     player = GetComponent<clipPlayerSimple>();
-    muteButton = GetComponentInChildren<button>();
-    jackout = GetComponentInChildren<omniJack>();
   }
 
-  public override void hit(bool on, int ID = -1) {
+    void Update()
+    {
+        player.playbackSpeed = speedDial.percent * 4;
+        player.amplitude = volumeDial.percent * 2;
+
+        if (player.speedGen != speedInput.signal) player.speedGen = speedInput.signal;
+        if (player.ampGen != volumeInput.signal) player.ampGen = volumeInput.signal;
+
+        player.seqMuted = muteButton.isHit;
+    }
+
+    public override void hit(bool on, int ID = -1) {
     player.amplitude = on ? 0 : 1;
   }
 }
