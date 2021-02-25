@@ -5,7 +5,7 @@ include $(CLEAR_VARS)
 
 LOCAL_ARM_MODE  := arm
 LOCAL_PATH      := $(NDK_PROJECT_PATH)
-LOCAL_MODULE    := libnative
+LOCAL_MODULE    := libSoundStageNative
 LOCAL_CFLAGS    := -Werror
 LOCAL_SRC_FILES := main.cpp Filter.cpp
 LOCAL_LDLIBS    := -llog
