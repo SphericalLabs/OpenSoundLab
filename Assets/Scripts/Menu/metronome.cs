@@ -84,6 +84,6 @@ public class metronome : componentInterface {
     bpmpercent = bpmDial.percent;
     bpm = bpmpercent * 160 + 40;
     masterControl.instance.setBPM(bpm);
-    txt.text = bpm.ToString("N0");
+    txt.text = bpm.ToString("N1");
   }
 }
