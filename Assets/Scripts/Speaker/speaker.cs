@@ -32,7 +32,6 @@ public class speaker : MonoBehaviour
         if (incoming == null) return;
         double dspTime = AudioSettings.dspTime;
         incoming.processBuffer(buffer, dspTime, channels);
-        // if (volume != 1) MultiplyArrayBySingleValue(buffer, buffer.Length, volume);
 
         if (monoMode)
         {
@@ -40,6 +39,8 @@ public class speaker : MonoBehaviour
             // todo: how to handle non-spatialize settings?
             if (leftOn)
             {
+                
+                //NATIVE!
                 for (int n = 0; n < buffer.Length; n += 2)
                 {
                     buffer[n] = buffer[n + 1] = buffer[n] * volume;
@@ -48,12 +49,16 @@ public class speaker : MonoBehaviour
             }
             else
             {
+                //NATIVE!
                 for (int n = 0; n < buffer.Length; n += 2)
                 {
                     buffer[n] = buffer[n + 1] = buffer[n + 1] * volume;
                     // no need for dealing with right channel
                 }
             }
+        } else {
+            if(volume != 1)
+                MultiplyArrayBySingleValue(buffer, buffer.Length, volume);
         }
     }
 }
