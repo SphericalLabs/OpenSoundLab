@@ -37,6 +37,9 @@ public class clipPlayerSimple : clipPlayer
     public static extern float ClipSignalGenerator(float[] buffer, float[] speedBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
        , int[] sampleBounds, float playbackSpeed, System.IntPtr clip, int clipChannels, float amplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
 
+    [DllImport("SoundStageNative")]
+    public static extern void SetArrayToFixedValue(float[] buffer, int length, float value);
+
     float[] speedBuffer = new float[0];
     float[] ampBuffer = new float[0];
     float[] seqBuffer = new float[0];
@@ -74,7 +77,7 @@ public class clipPlayerSimple : clipPlayer
         {
             if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
         } else {
-            seqBuffer = new float[buffer.Length]; // otherwise repeating trigs while muted?
+            SetArrayToFixedValue(seqBuffer, buffer.Length, -1f);
         }
         if (speedGen != null) speedGen.processBuffer(speedBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);

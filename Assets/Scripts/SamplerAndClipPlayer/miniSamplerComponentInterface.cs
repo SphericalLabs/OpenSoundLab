@@ -15,15 +15,17 @@
 using UnityEngine;
 using System.Collections;
 
-public class miniSamplerComponentInterface : componentInterface {
-  clipPlayerSimple player;
-  public button muteButton;
-  public omniJack jackout, speedInput, volumeInput;
-  public dial speedDial, volumeDial;
+public class miniSamplerComponentInterface : componentInterface
+{
+    clipPlayerSimple player;
+    public button muteButton;
+    public omniJack jackout, speedInput, volumeInput;
+    public dial speedDial, volumeDial;
 
-  void Awake() {
-    player = GetComponent<clipPlayerSimple>();
-  }
+    void Awake()
+    {
+        player = GetComponent<clipPlayerSimple>();
+    }
 
     void Update()
     {
@@ -36,7 +38,8 @@ public class miniSamplerComponentInterface : componentInterface {
         player.seqMuted = muteButton.isHit;
     }
 
-    public override void hit(bool on, int ID = -1) {
-    player.amplitude = on ? 0 : 1;
-  }
+    public override void hit(bool on, int ID = -1)
+    {
+        player.amplitude = on ? 0 : 1;
+    }
 }
