@@ -30,7 +30,7 @@ struct FilterData
 extern "C"
 {
 	//filter
-	void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB);
+    SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB);
 }
 
 
