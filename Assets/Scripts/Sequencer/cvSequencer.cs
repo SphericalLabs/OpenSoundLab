@@ -18,46 +18,23 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System;
 
-public class cvSequencer : signalGenerator {
+public class cvSequencer : signalGenerator
+{
 
-  //bool newSignal = false;
-  //bool signalOn = false;
+    float outVal = 0f;
 
-  //[DllImport("SoundStageNative")]
-  //public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+    [DllImport("SoundStageNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-  public void setSignal(float f)
-  {
-    //newSignal = true;
-    //signalOn = on;
-    outVal = f * 3.5f - 0.5f; // same range as keyboard?
-  }
-
-  float outVal = 0f;
-
-  double sigTime = -1;  // note: sigTime stuff will probably be necessary for tightness, also for cvSeq! Or not???
-
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    //float val = signalOn ? 1.0f : -1.0f;
-    //SetArrayToSingleValue(buffer, buffer.Length, val);
-
-    //if (newSignal) {
-    //  if (sigTime == -1 || sigTime == dspTime) {
-    //    sigTime = dspTime;
-    //    buffer[0] = buffer[1] = -1;
-    //  } else {
-    //    newSignal = false;
-    //    sigTime = -1;
-    //  }
-    //}
-    for(int i = 0; i < buffer.Length; i++) 
+    public void setSignal(float f)
     {
-      buffer[i] = outVal;
+        outVal = (f - 0.5f) * 3f; // -3,3
     }
-    
-    
 
-  }
+    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    {
+        SetArrayToSingleValue(buffer, buffer.Length, outVal);
+    }
 
 }
 
