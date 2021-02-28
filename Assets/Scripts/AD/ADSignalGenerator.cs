@@ -43,10 +43,14 @@ public class ADSignalGenerator : signalGenerator
     public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
 
     [DllImport("SoundStageNative")]
+    public static extern bool IsPulse(float[] buffer, int length);
+
+    [DllImport("SoundStageNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
+        // wird zu oft aufgerufen!
         attackLength = attackVal * 44100 * 5; // 3 seconds
         releaseLength = releaseVal * 44100 * 5; // 3 seconds
 
@@ -57,17 +61,20 @@ public class ADSignalGenerator : signalGenerator
 
             incoming.processBuffer(pulseBuffer, dspTime, channels);
 
-            isTrigger = GetBinaryState(pulseBuffer, pulseBuffer.Length, channels, ref lastBuffer);
+            isTrigger = ((pulseBuffer[0] > -1f) && (pulseBuffer[1] > -1f));
+        } else {
+            isTrigger = false;
         }
 
-        if (isTrigger && !lastTrigger)
-        { // play, reset
+        // play, reset
+        if (isTrigger)
+        {
             counter = 0;
             stage = 0;
             isRunning = true;
         }
 
-        lastTrigger = isTrigger;
+        //lastTrigger = isTrigger;
 
         for (int n = 0; n < buffer.Length; n += 2)
         {
