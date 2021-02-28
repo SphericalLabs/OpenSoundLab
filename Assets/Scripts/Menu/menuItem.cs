@@ -62,6 +62,7 @@ public class menuItem : manipObject {
     Looper,
     Airhorn,
     Timeline,
+    AD,
     ADSR,
     MIDIIN,
     MIDIOUT,
