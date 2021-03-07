@@ -17,8 +17,8 @@ using System.Collections;
 
 public class ADDeviceInterface : deviceInterface
 {
-    public omniJack input, output;
-    public dial attackDial, releaseDial;
+    public omniJack input, output, attackInput, releaseInput;
+    public dial attackDial, releaseDial, linearityDial;
     ADSignalGenerator signal;
 
     public override void Awake()
@@ -30,8 +30,12 @@ public class ADDeviceInterface : deviceInterface
     void Update()
     {
         if (signal.incoming != input.signal) signal.incoming = input.signal;
-        signal.attackVal = Mathf.Pow(attackDial.percent, 3);
-        signal.releaseVal = Mathf.Pow(releaseDial.percent, 3);
+        if (signal.attackInput != attackInput.signal) signal.attackInput = attackInput.signal;
+        if (signal.releaseInput != releaseInput.signal) signal.releaseInput = releaseInput.signal;
+
+        signal.setAttack(Mathf.Pow(attackDial.percent, 3));
+        signal.setRelease(Mathf.Pow(releaseDial.percent, 3));
+        signal.setLinearity(linearityDial.percent);
     }
 
     public override InstrumentData GetData()
@@ -46,6 +50,9 @@ public class ADDeviceInterface : deviceInterface
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
 
+        data.jackAttackInID = attackInput.transform.GetInstanceID();
+        data.jackReleaseInID = releaseInput.transform.GetInstanceID();
+
         return data;
     }
 
@@ -56,6 +63,8 @@ public class ADDeviceInterface : deviceInterface
 
         input.ID = data.jackInID;
         output.ID = data.jackOutID;
+        attackInput.ID = data.jackAttackInID;
+        releaseInput.ID = data.jackReleaseInID;
 
         attackDial.setPercent(data.attackState);
         releaseDial.setPercent(data.releaseState);
@@ -69,5 +78,7 @@ public class ADData : InstrumentData
 
     public int jackOutID;
     public int jackInID;
+    public int jackAttackInID;
+    public int jackReleaseInID;
 
 }

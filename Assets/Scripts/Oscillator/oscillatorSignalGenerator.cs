@@ -30,6 +30,10 @@ public class oscillatorSignalGenerator : signalGenerator
     double lastIncomingDspTime = -1;
     float keyMultConst = Mathf.Pow(2, 1f / 12);
 
+    float[] frequencyBuffer = new float[0];
+    float[] amplitudeBuffer = new float[0];
+
+
     int counter = 0;
 
     float prevAmplitude;
@@ -40,16 +44,15 @@ public class oscillatorSignalGenerator : signalGenerator
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
         lastIncomingDspTime = dspTime;
-    
-        float[] frequencyBuffer = new float[buffer.Length];
-        float[] amplitudeBuffer = new float[buffer.Length];
+
+        if (frequencyBuffer.Length != buffer.Length)
+            System.Array.Resize(ref frequencyBuffer, buffer.Length);
+        if (amplitudeBuffer.Length != buffer.Length)
+            System.Array.Resize(ref amplitudeBuffer, buffer.Length);
 
         if (freqGen != null) freqGen.processBuffer(frequencyBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
 
-        //if(counter%200 == 0) _phase = 0f;
-
-        // operates on every buffer pair
         OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, amplitude, prevAmplitude, frequencyBuffer, amplitudeBuffer
             , freqGen != null, ampGen != null, _sampleDuration, ref dspTime);
 
