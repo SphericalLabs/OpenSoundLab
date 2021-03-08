@@ -20,8 +20,7 @@ public class ADSignalGenerator : signalGenerator
 {
 
     public signalGenerator incoming, attackInput, releaseInput;
-    //float attackVal = 0; // 0,1
-    //float releaseVal = 0;
+
     int attackLength = 0;
     int releaseLength = 0;
     int attackLengthFinal = 0;
@@ -34,14 +33,12 @@ public class ADSignalGenerator : signalGenerator
     int counter = 0;
 
     bool isRunning = false;
-    bool isTrigger = false;
 
     float[] pulseBuffer = new float[] { -1, -1 };
     float[] attackBuffer = new float[] { -1, -1 };
     float[] releaseBuffer = new float[] { -1, -1 };
-
-    //bool lastTrigger = false;
-    //float lastBuffer = -1; // what is this for?
+    
+    float lastPulseFloat = -1f;
 
     public void Awake()
     {
@@ -86,12 +83,6 @@ public class ADSignalGenerator : signalGenerator
                 System.Array.Resize(ref pulseBuffer, buffer.Length);
 
             incoming.processBuffer(pulseBuffer, dspTime, channels);
-
-            isTrigger = ((pulseBuffer[0] > -1f) && (pulseBuffer[1] > -1f));
-        }
-        else
-        {
-            isTrigger = false;
         }
 
         if (attackInput != null)
@@ -120,25 +111,30 @@ public class ADSignalGenerator : signalGenerator
             releaseLengthFinal = releaseLength;
         }
 
-        // play, reset
-        if (isTrigger)
-        {
-            counter = 0;
-            stage = 0;
-            isRunning = true;
-        }
 
         for (int n = 0; n < buffer.Length; n += 2)
         {
+
+            // NATIVE
+            if(incoming != null){
+                // this trigger implementation is good practice, carry over to other modules
+                if (pulseBuffer[n] > 0f && lastPulseFloat <= 0f){ // left only
+                    counter = 0;
+                    stage = 0;
+                    isRunning = true;
+                }
+                lastPulseFloat = pulseBuffer[n];
+            } 
+
+            // NATIVE
             if (isRunning)
             {
 
                 if (stage == 0)
                 {
+                    // need speed up with pre-calculated lookups at some point?
                     buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / (float)attackLengthFinal, linearity) * 2f - 1f;
-                    //buffer[n] = buffer[n + 1] = Utils.lerp(-1f, 1f, counter / attackLengthFinal);
                     counter++;
-                    //Debug.Log(buffer[n] + " in stage 0");
                     if (counter > attackLengthFinal)
                     {
                         stage = 1;
@@ -148,9 +144,7 @@ public class ADSignalGenerator : signalGenerator
                 else if (stage == 1)
                 {
                     buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / (float)releaseLengthFinal, linearity) * 2f - 1f;
-                    //buffer[n] = buffer[n + 1] = Utils.lerp(1f, -1f, counter / releaseLengthFinal);
                     counter++;
-                    //Debug.Log(buffer[n] + " in stage 1");
                     if (counter > releaseLengthFinal)
                     {
                         stage = 0;
@@ -162,11 +156,10 @@ public class ADSignalGenerator : signalGenerator
             }
             else
             {
-                buffer[n] = buffer[n + 1] = -1f;
-                //Debug.Log(buffer[n] + " in stage 2");
+                SetArrayToSingleValue(buffer, buffer.Length, -1f);
             }
 
-            // hotfix for occasional NaNs that crash other devices. occur when linearity != 1
+            // hotfix for occasional NaNs that crash other devices. occurs when linearity != 1
             if (System.Single.IsNaN(buffer[n]))
             {
                 buffer[n] = buffer[n + 1] = -1f;
@@ -177,10 +170,6 @@ public class ADSignalGenerator : signalGenerator
             }
 
         }
-
-        //for(int i = 0; i < buffer.Length; i += 2){
-        //    Debug.Log(buffer[n]);
-        //}
 
     }
 
