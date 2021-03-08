@@ -86,10 +86,21 @@ public class menuManager : MonoBehaviour {
       {
         if ((menuItem.deviceType)i == menuItem.deviceType.ConferenceCall) continue;
         if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
+        if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
+        if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
       }
       // skip unneeded devices
       if ((menuItem.deviceType)i == menuItem.deviceType.Airhorn) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Stereo) continue; // remove completely?
+      if ((menuItem.deviceType)i == menuItem.deviceType.ADSR) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Maracas) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Drum) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Timeline) continue;
+
+
+      // might want to reactivate these for Windows builds at a later point
+      if ((menuItem.deviceType)i == menuItem.deviceType.ConferenceCall) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
 
       GameObject tmpObj = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
       tmpObj.transform.parent = rootNode.transform;
