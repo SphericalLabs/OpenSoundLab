@@ -938,11 +938,11 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 13ad4ebde2e64234196dd2d3c26efab1, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 1
   Mute: 0
-  Spatialize: 1
+  Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
@@ -1034,7 +1034,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb001ad917b86f148a2c85acdd0d5c6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useVirtualSpeakers: 0
+  useVirtualSpeakers: 1
 --- !u!1 &1425485837
 GameObject:
   m_ObjectHideFlags: 0

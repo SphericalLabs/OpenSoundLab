@@ -72,8 +72,8 @@ public class Switch360 : MonoBehaviour
         // adjust volume of ambisonics bus
         if (rightStick.x != 0f)
         {
-            srcVolume = Mathf.Clamp01(srcVolume + Mathf.Sign(rightStick.x) * Mathf.Abs(Mathf.Pow(rightStick.x, 4) * 0.005f));
-            src.volume = Mathf.Pow(srcVolume, 2);
+            srcVolume += Mathf.Sign(rightStick.x) * Mathf.Abs(Mathf.Pow(rightStick.x, 4) * 0.005f);
+            src.volume = Mathf.Pow(Mathf.Clamp01(srcVolume), 2);
         }
 
         // flip through ambisonics
