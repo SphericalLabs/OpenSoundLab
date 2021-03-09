@@ -36,6 +36,7 @@ public class menuItem : manipObject {
     Glide,
     Gain,
     Valve,
+    SampleHold,
     ConferenceCall,
     SARSCov2, 
     Oscillator,
@@ -115,6 +116,7 @@ public class menuItem : manipObject {
     if (item == deviceType.ControlCube) label.text = "CubeXYZ";
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.ConferenceCall) label.text = "WebCam";
+    if (item == deviceType.SampleHold) label.text = "S&H";
 
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(true);
