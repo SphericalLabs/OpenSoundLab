@@ -91,7 +91,7 @@ public class ADSignalGenerator : signalGenerator
                 System.Array.Resize(ref attackBuffer, buffer.Length);
 
             attackInput.processBuffer(attackBuffer, dspTime, channels);
-            attackLengthFinal = attackLength + Mathf.RoundToInt(attackBuffer[0] * length); // left only
+            attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + attackBuffer[0] * length, 0, length * 2)); // left only
         }
         else
         {
@@ -104,7 +104,7 @@ public class ADSignalGenerator : signalGenerator
                 System.Array.Resize(ref releaseBuffer, buffer.Length);
 
             releaseInput.processBuffer(releaseBuffer, dspTime, channels);
-            releaseLengthFinal = releaseLength + Mathf.RoundToInt(releaseBuffer[0] * length); // left only
+            releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + releaseBuffer[0] * length, 0, length * 2)); // left only
         }
         else
         {
