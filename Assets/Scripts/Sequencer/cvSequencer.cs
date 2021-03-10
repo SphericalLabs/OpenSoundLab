@@ -21,19 +21,25 @@ using System;
 public class cvSequencer : signalGenerator
 {
 
+
     float outVal = 0f;
+    float rangeMultiplier = 1f;
 
     [DllImport("SoundStageNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
+    public void setRange(float f)
+    {
+        rangeMultiplier = f;
+    }
     public void setSignal(float f)
     {
-        outVal = (f - 0.5f) * 3f; // -3,3
+        outVal = f;
     }
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
-        SetArrayToSingleValue(buffer, buffer.Length, outVal);
+        SetArrayToSingleValue(buffer, buffer.Length, outVal * rangeMultiplier);
     }
 
 }
