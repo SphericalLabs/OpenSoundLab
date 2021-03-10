@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 public class oscillatorSignalGenerator : signalGenerator
 {
-    public signalGenerator freqGen, ampGen;
+    public signalGenerator freqGen, ampGen, syncGen;
     public waveViz viz;
 
     public bool lfo = false;
@@ -32,6 +32,8 @@ public class oscillatorSignalGenerator : signalGenerator
 
     float[] frequencyBuffer = new float[0];
     float[] amplitudeBuffer = new float[0];
+    float[] syncBuffer = new float[0];
+    float lastSyncValue = -1f;
 
 
     int counter = 0;
@@ -49,9 +51,21 @@ public class oscillatorSignalGenerator : signalGenerator
             System.Array.Resize(ref frequencyBuffer, buffer.Length);
         if (amplitudeBuffer.Length != buffer.Length)
             System.Array.Resize(ref amplitudeBuffer, buffer.Length);
+        if (syncBuffer.Length != buffer.Length)
+            System.Array.Resize(ref syncBuffer, buffer.Length);
 
         if (freqGen != null) freqGen.processBuffer(frequencyBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
+        if (syncGen != null)
+        {
+            syncGen.processBuffer(syncBuffer, dspTime, channels);
+            for(int n = 0; n < syncBuffer.Length; n++){
+                if (syncBuffer[n] > 0f && lastSyncValue <= 0f)
+                    _phase = 0d;
+                lastSyncValue = syncBuffer[n];
+            }
+            
+        }
 
         OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, amplitude, prevAmplitude, frequencyBuffer, amplitudeBuffer
             , freqGen != null, ampGen != null, _sampleDuration, ref dspTime);
