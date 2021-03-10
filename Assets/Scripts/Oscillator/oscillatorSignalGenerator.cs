@@ -40,8 +40,8 @@ public class oscillatorSignalGenerator : signalGenerator
 
     float prevAmplitude;
     [DllImport("SoundStageNative")]
-    public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float amplitude, float prevAmplitude
-                                , float[] frequencyBuffer, float[] amplitudeBuffer, bool bFreqGen, bool bAmpGen, double _sampleDuration, ref double dspTime);
+    public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
+                                float[] frequencyBuffer, float[] amplitudeBuffer, float[] syncBuffer, bool bFreqGen, bool bAmpGen, bool bSyncGen, double _sampleDuration, ref double dspTime);
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
@@ -56,20 +56,12 @@ public class oscillatorSignalGenerator : signalGenerator
 
         if (freqGen != null) freqGen.processBuffer(frequencyBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
-        if (syncGen != null)
-        {
-            syncGen.processBuffer(syncBuffer, dspTime, channels);
-            for(int n = 0; n < syncBuffer.Length; n++){
-                if (syncBuffer[n] > 0f && lastSyncValue <= 0f)
-                    _phase = 0d;
-                lastSyncValue = syncBuffer[n];
-            }
-            
-        }
+        if (syncGen != null) syncGen.processBuffer(syncBuffer, dspTime, channels);
 
-        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, amplitude, prevAmplitude, frequencyBuffer, amplitudeBuffer
-            , freqGen != null, ampGen != null, _sampleDuration, ref dspTime);
+        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyBuffer, amplitudeBuffer, syncBuffer,
+            freqGen != null, ampGen != null, syncGen != null, _sampleDuration, ref dspTime);
 
+        
         // wave viz if there
         if (viz != null) viz.UpdateViz(buffer);
 
