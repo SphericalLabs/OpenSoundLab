@@ -28,6 +28,7 @@ public class oscillatorDeviceInterface : deviceInterface
     public waveViz viz;
     public omniJack signalOutput, freqInput, ampInput, syncInput;
     public slider waveSlider;
+    public AudioSource speaker;
 
     // current values
     float freqPercent, ampPercent, wavePercent;
@@ -73,6 +74,7 @@ public class oscillatorDeviceInterface : deviceInterface
         viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
         signal.lfo = lfo;
         UpdateFreq();
+        speaker.volume = lfo ? 0f : 1f;
     }
 
     void UpdateFreq()
@@ -81,12 +83,10 @@ public class oscillatorDeviceInterface : deviceInterface
         if (lfo)
         {
             signal.frequency = Mathf.Pow(freqPercent, 4) * 10 + 1.0f / 120.0f; // 120s, 0.1s
-            GetComponentInChildren<AudioSource>().volume = 0f;
         }
         else
         {
             signal.frequency = Mathf.Clamp(3520.00f * Mathf.Pow(freqDial.percent, 2), 27.50f, Mathf.Infinity);// Mathf.Pow(freqDial.percent, 2); //signal.frequency = 40 + 10000 * Mathf.Pow(freqDial.percent, 2);
-            GetComponentInChildren<AudioSource>().volume = 1f;
         }
     }
 
