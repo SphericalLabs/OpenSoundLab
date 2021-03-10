@@ -29,6 +29,9 @@ public class SampleHoldSignalGenerator : signalGenerator
     [DllImport("SoundStageNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
+    [DllImport("SoundStageNative")]
+    public static extern void CopyArray(float[] from, float[] to, int length);
+
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
 
@@ -45,7 +48,7 @@ public class SampleHoldSignalGenerator : signalGenerator
 
             if (trigSig == null) // signal, but no hold, just passthru
             {
-                buffer = incomingBuffer; 
+                CopyArray(incomingBuffer, buffer, buffer.Length);
             }
             else // sample and hold mode
             {
