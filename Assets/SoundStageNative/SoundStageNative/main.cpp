@@ -482,7 +482,12 @@ extern "C" {
     void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float amplitude, float prevAmplitude, float prevSyncValue,
         float frequencyBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime)
     {
+
+        float sine = 0.f;
         float square = 0.f;
+        float saw = 0.f;
+        float tri = 0.f;
+        float sample = 0.f;
 
         for (int i = 0; i < length; i += channels)
         {
@@ -495,32 +500,58 @@ extern "C" {
                 prevSyncValue = syncBuffer[i];
             }
 
-            //create signal based on wave form
-            double sample = sin((float)_phase * 2 * PI); //assuming sine wave
-            if (analogWave > 0.95f)
-            {
-                sample = _phase * 2.0 - 1.0;
+            // sine needed
+            if (analogWave <= 0.33f) {
+                sine = sin((float)_phase * 2 * PI);
             }
-            else if (analogWave > 0.05f)
-            {
+
+            // square needed
+            if (analogWave <= 0.66f) {
                 if (bPwmGen) {
                     square = _phase >= (pwmBuffer[i] + 1) / 2.f ? 1.f : -1.f; // expects value range -1,1f
                 }
-                else 
+                else
                 {
                     square = _phase >= 0.5f ? 1.f : -1.f;
                 }
-
-                if (analogWave <= 0.5f)
-                {
-                    sample = (sample * (0.5f - analogWave) + square * analogWave) * 2;
-                }
-                else
-                {
-
-                    sample = (square * (1 - analogWave) + (_phase * 2.0 - 1.0) * (analogWave - .5f)) * 2;
-                }
             }
+
+            // saw needed
+            if (analogWave > 0.33f) {
+                saw = _phase * 2 - 1;
+            }
+
+            // tri needed
+            if (analogWave > 0.66f) {
+                if (_phase <= 0.25f) {
+                    tri = _phase * 4;
+                }
+                else if (_phase > 0.25f && _phase <= 0.5f)
+                {
+                    tri = 1 - (_phase - 0.25f) * 4;
+                }
+                else if (_phase > 0.5f && _phase <= 0.75f) {
+                    tri = (_phase - 0.5f) * 4;
+                }
+                else if (_phase > 0.75f) {
+                    tri = 1 - (_phase - 0.75f) * 4;
+                }
+                tri = tri * 2 - 1; // -1,1
+            }
+
+            // do the blending
+            if (analogWave <= 0.33f) // sin <-> square
+            {
+                sample = (sine * (0.33f - analogWave) + square * analogWave) * 3; // time 3 is for normalizing the blend to -1,1
+            }
+            else if (analogWave > 0.33f && analogWave <= 0.66f) // square <-> saw
+            {
+                sample = (square * (0.66f - analogWave) + saw * (analogWave - 0.33f)) * 3;
+            }
+            else { // saw <-> tri
+                sample = ( saw * (1 - analogWave) + tri * (analogWave - 0.66f) ) * 3;
+            }
+
 
             //frequency compute
             float endFrequency = frequency;
@@ -545,7 +576,6 @@ extern "C" {
 
             //final buffer
             buffer[i] = buffer[i + 1] = (float)sample * endAmplitude;
-            //buffer[i] = buffer[i + 1] = 0.f;
 
             //dsptime update
             dspTime += _sampleDuration;
