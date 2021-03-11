@@ -26,7 +26,7 @@ public class oscillatorDeviceInterface : deviceInterface
     public basicSwitch lfoSwitch;
     public dial freqDial, ampDial;
     public waveViz viz;
-    public omniJack signalOutput, freqInput, ampInput, syncInput;
+    public omniJack signalOutput, freqInput, ampInput, syncInput, pwmInput;
     public slider waveSlider;
     public AudioSource speaker;
 
@@ -65,6 +65,7 @@ public class oscillatorDeviceInterface : deviceInterface
         if (signal.freqGen != freqInput.signal) signal.freqGen = freqInput.signal;
         if (signal.ampGen != ampInput.signal) signal.ampGen = ampInput.signal;
         if (signal.syncGen != syncInput.signal) signal.syncGen = syncInput.signal;
+        if (signal.pwmGen != pwmInput.signal) signal.pwmGen = pwmInput.signal;
     }
 
     void UpdateLFO()
@@ -117,6 +118,7 @@ public class oscillatorDeviceInterface : deviceInterface
         data.jackInAmpID = ampInput.transform.GetInstanceID();
         data.jackInFreqID = freqInput.transform.GetInstanceID();
         data.jackInSyncID = syncInput.transform.GetInstanceID();
+        data.jackInPwmID = pwmInput.transform.GetInstanceID();
 
         return data;
     }
@@ -136,6 +138,7 @@ public class oscillatorDeviceInterface : deviceInterface
         ampInput.ID = data.jackInAmpID;
         freqInput.ID = data.jackInFreqID;
         syncInput.ID = data.jackInSyncID;
+        pwmInput.ID = data.jackInPwmID;
     }
 }
 
@@ -149,5 +152,6 @@ public class OscillatorData : InstrumentData
     public int jackInAmpID;
     public int jackInFreqID;
     public int jackInSyncID;
+    public int jackInPwmID;
 }
 

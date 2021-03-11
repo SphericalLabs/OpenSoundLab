@@ -480,8 +480,10 @@ extern "C" {
     }
 
     void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float amplitude, float prevAmplitude, float prevSyncValue,
-        float frequencyBuffer[], float amplitudeBuffer[], float syncBuffer[], bool bFreqGen, bool bAmpGen, bool bSyncGen, double _sampleDuration, double &dspTime)
+        float frequencyBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime)
     {
+        float square = 0.f;
+
         for (int i = 0; i < length; i += channels)
         {
 
@@ -501,15 +503,22 @@ extern "C" {
             }
             else if (analogWave > 0.05f)
             {
-                float sign = sample >= 0 ? 1.f : -1.f;
+                if (bPwmGen) {
+                    square = _phase >= (pwmBuffer[i] + 1) / 2.f ? 1.f : -1.f; // expects value range -1,1f
+                }
+                else 
+                {
+                    square = _phase >= 0.5f ? 1.f : -1.f;
+                }
+
                 if (analogWave <= 0.5f)
                 {
-                    sample = (sample * (0.5f - analogWave) + sign * analogWave) * 2;
+                    sample = (sample * (0.5f - analogWave) + square * analogWave) * 2;
                 }
                 else
                 {
 
-                    sample = (sign * (1 - analogWave) + (_phase * 2.0 - 1.0) * (analogWave - .5f)) * 2;
+                    sample = (square * (1 - analogWave) + (_phase * 2.0 - 1.0) * (analogWave - .5f)) * 2;
                 }
             }
 
