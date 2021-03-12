@@ -58,7 +58,7 @@ public class button : manipObject {
 
     rend = GetComponent<Renderer>();
     offMat = rend.material;
-    offColor = offMat.GetColor("_Color");
+    //offColor = offMat.GetColor("_Color");
     glowMat = new Material(onMat);
     glowMat.SetFloat("_EmissionGain", glowEmission);
     glowMat.SetColor("_TintColor", glowColor);
@@ -84,10 +84,10 @@ public class button : manipObject {
   public void Highlight(bool on) {
     if (on) {
       glowMat.SetFloat("_EmissionGain", .9f - .1f);
-      offMat.SetColor("_Color", glowColor);
+      //offMat.SetColor("_Color", glowColor);
     } else {
       glowMat.SetFloat("_EmissionGain", .7f - .1f);
-      offMat.SetColor("_Color", offColor);
+      //offMat.SetColor("_Color", offColor);
     }
   }
 
