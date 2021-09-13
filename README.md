@@ -1,8 +1,6 @@
 # SoundStage Pro
 
-Please checkout the [project info](https://www.ludwigzeller.net/projects/the-new-normal/).
-
-Forked from Logan Olson's magnificent [SoundStage VR](https://github.com/googlearchive/soundstagevr).
+SoundStage Pro is a fork of Logan Olson's magnificent [SoundStage VR](https://github.com/googlearchive/soundstagevr). The intention of my project is to enhance the original version so that it is better suited for teaching and performing in the context of experimental electronic music, to make it feel less like a game and more like an actual sound laboratory. Feel free to get in touch if that sounds interesting to you. Binaries will soon be made available on SideQuest, Oculus App Lab and maybe the Oculus Quest Store as well. The project is currently funded by an educational grant of the University of Northwestern Switzerland, where I am a lecturer.
 
 Initial Oculus Quest port by [James Surine](https://github.com/plaidpants/soundstagevr). 
 
