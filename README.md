@@ -1,5 +1,7 @@
 # SoundStage Pro
 
+Please checkout the [project info](https://www.ludwigzeller.net/projects/the-new-normal/).
+
 Forked from Logan Olson's magnificent [SoundStage VR](https://github.com/googlearchive/soundstagevr).
 
 Initial Oculus Quest port by [James Surine](https://github.com/plaidpants/soundstagevr). 
