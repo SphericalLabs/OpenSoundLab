@@ -5,8 +5,7 @@ SoundStage Pro is a fork of Logan Olson's magnificent [SoundStage VR](https://gi
 Binaries will soon be made available on SideQuest, Oculus App Lab and maybe the Oculus Quest Store as well. The project is currently funded by an educational grant of the University of Applied Sciences Northwestern Switzerland (FHNW).
 
 Project team:
-Hannes Barfuss
-Ludwig Zeller
+Hannes Barfuss, Ludwig Zeller
 
 Initial Oculus Quest port by [James Surine](https://github.com/plaidpants/soundstagevr). 
 
