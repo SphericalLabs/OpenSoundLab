@@ -164,11 +164,16 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
-[XmlInclude(typeof(GlideData))]
-[XmlInclude(typeof(GainData))]
-[XmlInclude(typeof(ConferenceCallData))]
-[XmlInclude(typeof(SARSCov2Data))]
-[XmlInclude(typeof(FunktionData))]
+  [XmlInclude(typeof(ADData))]
+  [XmlInclude(typeof(cvSequencerData))] // update?
+  [XmlInclude(typeof(SampleHoldData))]
+
+  [XmlInclude(typeof(GlideData))]
+  [XmlInclude(typeof(GainData))]
+  [XmlInclude(typeof(ConferenceCallData))] 
+  [XmlInclude(typeof(SARSCov2Data))]
+  [XmlInclude(typeof(FunktionData))]
+
 [XmlInclude(typeof(OscillatorData))]
 [XmlInclude(typeof(SpeakerData))]
 [XmlInclude(typeof(CameraData))]
@@ -188,7 +193,7 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(RecorderData))]
 [XmlInclude(typeof(SamplerData))]
 [XmlInclude(typeof(KeyboardData))]
-[XmlInclude(typeof(SequencerData))]
+[XmlInclude(typeof(SequencerData))] // update?
 [XmlInclude(typeof(XyloRollData))]
 [XmlInclude(typeof(AirhornData))]
 [XmlInclude(typeof(PanoData))]
@@ -196,6 +201,8 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(MIDIoutData))]
 [XmlInclude(typeof(TimelineData))]
 [XmlInclude(typeof(ADSRData))]
+
+ 
 
 
 public class InstrumentData {
