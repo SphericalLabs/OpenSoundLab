@@ -71,6 +71,7 @@ public class SaveLoadInterface : MonoBehaviour {
       t.localPosition = data.position;
       t.localRotation = data.rotation;
       t.localScale = data.scale;
+      t.gameObject.SetActive(true);
     }
 
     ClearSynthSetList();

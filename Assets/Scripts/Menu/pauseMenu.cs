@@ -42,7 +42,7 @@ public class pauseMenu : MonoBehaviour {
 
   List<pauseMenuItem> menuItems;
 
-  const int optionCount = 2;
+  const int optionCount = 4; // one before confirmCancel, has to be avoided, otherwise always visible
   void Awake() {
     menuItems = new List<pauseMenuItem>();
     for (int i = 0; i < items.Length; i++) {
