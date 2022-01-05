@@ -2440,7 +2440,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4000011249774720
 Transform:
   m_ObjectHideFlags: 0
@@ -4089,6 +4089,10 @@ PrefabInstance:
     - target: {fileID: 100004, guid: 813c5bfb217c0a947b39d65b38549440, type: 3}
       propertyPath: m_Name
       value: rubber-glove
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: 813c5bfb217c0a947b39d65b38549440, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 813c5bfb217c0a947b39d65b38549440, type: 3}
       propertyPath: m_LocalPosition.x
