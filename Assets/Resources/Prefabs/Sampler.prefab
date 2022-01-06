@@ -336,7 +336,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0.5
+  percent: 1
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0.65
@@ -704,6 +704,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   volume: 1
   incoming: {fileID: 0}
+  monoMode: 0
   leftOn: 1
 --- !u!1 &125392
 GameObject:
@@ -5657,7 +5658,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0.5
+  percent: 0
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0.65

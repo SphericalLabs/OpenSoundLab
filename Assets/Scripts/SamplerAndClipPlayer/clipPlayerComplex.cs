@@ -253,7 +253,7 @@ public class clipPlayerComplex : clipPlayer {
     if (tailGen != null)
     {
       tailGen.processBuffer(tailBuffer, dspTime, channels);
-      tailOffset = tailTrim - tailBuffer[0]; // use buffer for offset, take only first sample of buffer
+      tailOffset = tailBuffer[0] + tailTrim; // use buffer for offset, take only first sample of buffer
     }
     else
     {

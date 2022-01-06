@@ -38,8 +38,8 @@ public class button : manipObject {
 
   Renderer labelRend;
   public Color labelColor = new Color(0.75f, .75f, 1f);
-  public float labelEmission = .4f;
-  public float glowEmission = .5f;
+  public float labelEmission = .0f;
+  public float glowEmission = .3f;
 
   Queue<bool> hits = new Queue<bool>();
   public bool startToggled = false;
@@ -83,10 +83,10 @@ public class button : manipObject {
 
   public void Highlight(bool on) {
     if (on) {
-      glowMat.SetFloat("_EmissionGain", .9f - .1f);
+      glowMat.SetFloat("_EmissionGain", .3f);
       //offMat.SetColor("_Color", glowColor);
     } else {
-      glowMat.SetFloat("_EmissionGain", .7f - .1f);
+      glowMat.SetFloat("_EmissionGain", .0f);
       //offMat.SetColor("_Color", offColor);
     }
   }

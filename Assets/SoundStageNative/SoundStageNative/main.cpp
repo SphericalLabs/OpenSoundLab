@@ -443,7 +443,7 @@ extern "C" {
             if (endOfSample)
             {
                 if (!looping) active = false;
-                else if (seqGen && lastSeqGen[1] != 1) active = false;
+                //else if (seqGen && lastSeqGen[1] != 1) active = false;
             }
 
             float endAmplitude = amplitude;
