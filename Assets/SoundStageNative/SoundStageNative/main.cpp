@@ -144,6 +144,7 @@ extern "C" {
                 if (!samePercent) p = lerp(lastpercent, sliderPercent, (float)i / length) * modB + modA;
                 buffer[i] *= p;
                 buffer[i + 1] *= p;
+                // should be converted to equal power-crossfade: https://dsp.stackexchange.com/a/36778
             }
         }
     }
