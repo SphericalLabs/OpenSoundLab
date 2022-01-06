@@ -38,11 +38,11 @@ public class basicSwitch : manipObject {
       labelMats[0] = onLabel.GetComponent<Renderer>().material;
       labelMats[1] = offLabel.GetComponent<Renderer>().material;
 
-      labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, .9f));
-      labelMats[0].SetFloat("_EmissionGain", .3f);
+      labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, 0f, 1f));
+      labelMats[0].SetFloat("_EmissionGain", .0f);
 
-      labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, .7f, .9f));
-      labelMats[1].SetFloat("_EmissionGain", .3f);
+      labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, 0f, 1f));
+      labelMats[1].SetFloat("_EmissionGain", .0f);
     }
 
     setSwitch(true, true);
@@ -54,15 +54,14 @@ public class basicSwitch : manipObject {
     switchVal = on;
     float rot = rotationIncrement * (switchVal ? 1 : -1);
     switchObject.localRotation = Quaternion.Euler(rot, 0, 0);
+    
+    //if (onLabel != null && offLabel != null) {
+    //  labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, on ? .9f : .1f));
+    //  labelMats[0].SetFloat("_EmissionGain", on ? .0f : .0f);
 
-
-    if (onLabel != null && offLabel != null) {
-      labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, on ? .9f : .1f));
-      labelMats[0].SetFloat("_EmissionGain", on ? .3f : .05f);
-
-      labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, .7f, !on ? .9f : .1f));
-      labelMats[1].SetFloat("_EmissionGain", !on ? .3f : .05f);
-    }
+    //  labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, .7f, !on ? .9f : .1f));
+    //  labelMats[1].SetFloat("_EmissionGain", !on ? .0f : .0f);
+    //}
   }
 
   public override void grabUpdate(Transform t) {

@@ -30,28 +30,28 @@ public class slider : manipObject {
 
   Material[] labels;
 
-  public Color labelColor = new Color(0, 0.65f, 0.15f);
+  public Color labelColor = new Color(0f, 0.8f, 1f);
 
   public override void Awake() {
     base.Awake();
     if (rend == null) rend = GetComponent<Renderer>();
     offMat = rend.material;
-    customColor = Color.HSVToRGB(sliderHue, 0.8f, .2f);
+    customColor = labelColor;
 
     glowMat = new Material(onMat);
-    glowMat.SetFloat("_EmissionGain", .7f);
-    glowMat.SetColor("_TintColor", customColor);
+    glowMat.SetFloat("_EmissionGain", .0f);
+    glowMat.SetColor("_TintColor", labelColor);
 
-    if (labelsPresent) {
-      labels = new Material[3];
-      labels[0] = transform.parent.Find("Label1").GetComponent<Renderer>().material;
-      labels[1] = transform.parent.Find("Label2").GetComponent<Renderer>().material;
-      labels[2] = transform.parent.Find("Label3").GetComponent<Renderer>().material;
-
-      for (int i = 0; i < 2; i++) {
-        labels[i].SetColor("_TintColor", labelColor);
-      }
-    }
+    //if (labelsPresent) {
+    //  labels = new Material[3];
+    //  labels[0] = transform.parent.Find("Label1").GetComponent<Renderer>().material;
+    //  labels[1] = transform.parent.Find("Label2").GetComponent<Renderer>().material;
+    //  labels[2] = transform.parent.Find("Label3").GetComponent<Renderer>().material;
+      
+    //  for (int i = 0; i < 3; i++) {
+    //    labels[i].SetColor("_TintColor", labelColor);
+    //  }
+    //}
     setPercent(percent);
   }
 
@@ -78,17 +78,17 @@ public class slider : manipObject {
   void updatePercent() {
     percent = .5f + transform.localPosition.x / (2 * xBound);
 
-    if (labelsPresent) {
-      if (percent <= 0.5f) {
-        labels[0].SetColor("_TintColor", labelColor * (0.15f + 0.5f - percent) * 2);
-        labels[1].SetColor("_TintColor", labelColor * (0.15f + percent) * 2);
-        labels[2].SetColor("_TintColor", labelColor * 0.15f);
-      } else {
-        labels[0].SetColor("_TintColor", labelColor * 0.15f);
-        labels[1].SetColor("_TintColor", labelColor * (1.15f - percent) * 2);
-        labels[2].SetColor("_TintColor", labelColor * (percent - 0.35f) * 2);
-      }
-    }
+    //if (labelsPresent) {
+    //  if (percent <= 0.5f) {
+    //    labels[0].SetColor("_TintColor", labelColor * (0.15f + 0.5f - percent) * 2);
+    //    labels[1].SetColor("_TintColor", labelColor * (0.15f + percent) * 2);
+    //    labels[2].SetColor("_TintColor", labelColor * 0.15f);
+    //  } else {
+    //    labels[0].SetColor("_TintColor", labelColor * 0.15f);
+    //    labels[1].SetColor("_TintColor", labelColor * (1.15f - percent) * 2);
+    //    labels[2].SetColor("_TintColor", labelColor * (percent - 0.35f) * 2);
+    //  }
+    //}
   }
 
   float offset = 0;
