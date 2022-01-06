@@ -32,7 +32,7 @@ public class gainSignalGenerator : signalGenerator {
     for(int n = 0; n < buffer.Length; n++) 
     {
       fader = Mathf.Clamp01(fader + ( (!active || incoming == null) ? -0.005f : 0.005f)); // fade out or in
-      buffer[n] = Mathf.Clamp(buffer[n] * amp, -1f, 1f) * fader;
+      buffer[n] = Mathf.Clamp(buffer[n] * Mathf.Pow(amp, 2), -1f, 1f) * fader;
     }
 
   }
