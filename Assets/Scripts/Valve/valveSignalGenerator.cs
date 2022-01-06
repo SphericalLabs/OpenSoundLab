@@ -37,19 +37,19 @@ public class valveSignalGenerator : signalGenerator {
       {
         for (int i = 0; i < buffer.Length; i++)
         {
-          buffer[i] = buffer[i] * (controlBuffer[i] + 1) * 0.5f * amp; // map control buffer -1,1 -> 0,1
+          buffer[i] = buffer[i] * (controlBuffer[i] + 1) * 0.5f * Mathf.Pow(amp, 2); // map control buffer -1,1 -> 0,1
         }
       } else {
         for (int i = 0; i < buffer.Length; i++)
         {
-          buffer[i] = buffer[i] * amp;
+          buffer[i] = buffer[i] * Mathf.Pow(amp, 2);
         }
       }
     } else {
       if(controlSig != null) {
         for (int i = 0; i < buffer.Length; i++)
         {
-          buffer[i] = (controlBuffer[i] + 1) * 0.5f * amp;
+          buffer[i] = (controlBuffer[i] + 1) * 0.5f * Mathf.Pow(amp, 2);
         }
       } else {
         for (int i = 0; i < buffer.Length; i++)

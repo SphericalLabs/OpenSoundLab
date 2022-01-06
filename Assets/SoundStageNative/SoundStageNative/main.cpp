@@ -109,17 +109,13 @@ extern "C" {
         float p = sliderPercent;
         if (aSig && bSig)
         {
-            //if (bufferB.Length != buffer.Length)
-                //System.Array.Resize(ref bufferB, buffer.Length);
-
-            //SetArrayToSingleValue(bufferB, bufferB.Length, 0.0f);
-
             for (int i = 0; i < length; i += channels)
             {
-                if (!samePercent) p = lerp(lastpercent, sliderPercent, (float)i / length);// Mathf.Lerp(lastpercent, sliderPercent, (float)i / buffer.Length);
+                if (!samePercent) p = lerp(lastpercent, sliderPercent, (float)i / length); // slope limiting
 
-                buffer[i] = lerp(buffer[i], bufferB[i], p);
-                buffer[i + 1] = lerp(buffer[i + 1], bufferB[i + 1], p);
+                buffer[i] = buffer[i] * powf(1 - p, 2) + bufferB[i] * powf(p, 2);
+                buffer[i+1] = buffer[i + 1] * powf(1 - p, 2) + bufferB[i + 1] * powf(p, 2);
+
             }
         }
         else
@@ -133,21 +129,20 @@ extern "C" {
                 p = 1 - p;
                 modA = 1;
                 modB = -1;
-                //incomingA.processBuffer(buffer, dspTime, channels);
+
             }
-            //else
-            //{
-            //	incomingB.processBuffer(buffer, dspTime, channels);
-            //}
+
             for (int i = 0; i < length; i += channels)
             {
-                if (!samePercent) p = lerp(lastpercent, sliderPercent, (float)i / length) * modB + modA;
-                buffer[i] *= p;
-                buffer[i + 1] *= p;
-                // should be converted to equal power-crossfade: https://dsp.stackexchange.com/a/36778
+                if (!samePercent) p = lerp(lastpercent, sliderPercent, (float)i / length) * modB + modA; // slope limiting
+                buffer[i] *= powf(p, 2);
+                buffer[i + 1] *= powf(p, 2);
+                
             }
         }
     }
+
+    
 
     bool GetBinaryState(float buffer[], int length, int channels, float &lastBuf)
     {
@@ -196,7 +191,7 @@ extern "C" {
     {
         for (int i = 0; i < length; i += 2)
         {
-            a[i] = a[i + 1] = b[i] * val;
+            a[i] = a[i + 1] = b[i] * powf(val, 2);
         }
     }
 
@@ -455,8 +450,8 @@ extern "C" {
                 if (ampGen) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2.0f);
 
 
-                buffer[i] = clipdata[bufferCount * clipChannels] * endAmplitude;
-                if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * endAmplitude;
+                buffer[i] = clipdata[bufferCount * clipChannels] * powf(endAmplitude, 2);
+                if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * powf(endAmplitude, 2);
                 else buffer[i + 1] = buffer[i];
             }
         }
@@ -559,7 +554,7 @@ extern "C" {
 
             //amp compute
             float endAmplitude = amplitude;
-            if (prevAmplitude != amplitude) endAmplitude = lerp(prevAmplitude, amplitude, (float)i / length);
+            if (prevAmplitude != amplitude) endAmplitude = lerp(prevAmplitude, amplitude, (float)i / length); // slope limiting
 
             //calc side chain effect
             if (bFreqGen)
@@ -576,7 +571,7 @@ extern "C" {
             if (_phase > 1.0) _phase -= 1.0;
 
             //final buffer
-            buffer[i] = buffer[i + 1] = (float)sample * endAmplitude;
+            buffer[i] = buffer[i + 1] = (float)sample * powf(endAmplitude, 2);
 
             //dsptime update
             dspTime += _sampleDuration;
