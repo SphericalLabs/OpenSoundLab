@@ -573,19 +573,19 @@ extern "C" {
         }
     }
 
-    /*
-    https://dsp.stackexchange.com/a/36778
-    returns a float array with two indexes representing the volumes of the left (index 0) and right (index 1) channels
-    */
+    ///*
+    //https://dsp.stackexchange.com/a/36778
+    //returns a float array with two indexes representing the volumes of the left (index 0) and right (index 1) channels
+    //*/
 
-    float xFade(float t, int index) {
-        
-        if (index == 0) {
-            return sqrt(t);
-        } else if (index == 1) {
-            return sqrt(1.f-t);
-        }
-    }
+    //float xFade(float t, int index) {
+    //    
+    //    if (index == 0) {
+    //        return sqrt(t);
+    //    } else if (index == 1) {
+    //        return sqrt(1.f-t);
+    //    }
+    //}
 
     void addCombFilterSignal(float inputbuffer[], float addbuffer[], int length, float delayBufferL[], float delayBufferR[], int delaylength, float gain, int& inPoint, int& outPoint)
     {
