@@ -172,8 +172,14 @@ public class libraryPanel : UIpanel {
     if (on) {
       string f = _panelRing._deviceInterface.getFilename(IDtext);
       f = sampleManager.instance.parseFilename(_panelRing._deviceInterface.getFilename(IDtext));
-
+      
       if (!File.Exists(f)) return;
+
+      FileInfo fileInfo = new FileInfo(f);
+      if(fileInfo != null) {
+        if (fileInfo.Length > 4000000) return; // memory leak workaround: do not preview files larger than 4000kB in order to avoid memory congestion. 
+      }
+
       if (_StreamRoutine != null) {
         if (loaderObject != null) Destroy(loaderObject);
         StopCoroutine(_StreamRoutine);
