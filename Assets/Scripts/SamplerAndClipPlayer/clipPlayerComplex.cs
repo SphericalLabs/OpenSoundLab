@@ -53,9 +53,12 @@ public class clipPlayerComplex : clipPlayer {
   float[] headBuffer;
   float[] tailBuffer;
 
+  float lastPlaybackSpeed = 0f;
+  float lastAmplitude = 0f;
+
   [DllImport("SoundStageNative")]
   public static extern float ClipSignalGenerator(float[] buffer, float[] speedBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
-, int[] sampleBounds, float playbackSpeed, System.IntPtr clip, int clipChannels, float amplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
+, int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
 
   public override void Awake() {
     base.Awake();
@@ -126,7 +129,16 @@ public class clipPlayerComplex : clipPlayer {
     if (!loaded) return;
     sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (headGen == null) ? trackBounds.x : headOffset ));
     sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (tailGen == null) ? trackBounds.y : tailOffset ));
-    if (sampleBounds[0] >= sampleBounds[1]) sampleBounds[0] = sampleBounds[1] - 10; // minimum 10 samples distance... (careful, could get below 0?)
+    if (sampleBounds[0] >= sampleBounds[1])
+    {
+      if(sampleBounds[0] <= 0){ // left end
+        sampleBounds[0] = 0;
+        sampleBounds[1] = 1;
+      } else { // right end
+        sampleBounds[0] = clipSamples.Length / clipChannels - 2;
+        sampleBounds[1] = clipSamples.Length / clipChannels - 1;
+      }    
+    }      
   }
 
   public override void DrawClipTex() {
@@ -265,7 +277,7 @@ public class clipPlayerComplex : clipPlayer {
     if (!scrubGrabbed && !turntableGrabbed) {
       bool curActive = active;
       floatingBufferCount = ClipSignalGenerator(buffer, speedBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, speedGen != null, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
-          playbackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, playdirection, looping, _sampleDuration, bufferCount, ref active);
+          playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, playdirection, looping, _sampleDuration, bufferCount, ref active);
       if (curActive != active) _sampleInterface.playEvent(active);
 
       lp_filter[0] = buffer[buffer.Length - 2];
@@ -311,6 +323,9 @@ public class clipPlayerComplex : clipPlayer {
 
     _lastBuffer = floatingBufferCount;
     samplePos = (float)floatingBufferCount * clipChannels / clipSamples.Length;
+
+    lastAmplitude = amplitude;
+    lastPlaybackSpeed = playbackSpeed;
   }
 
   float[] lp_filter = new float[] { 0, 0 };

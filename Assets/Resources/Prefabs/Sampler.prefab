@@ -1974,7 +1974,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0.25
+  percent: 0.5
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
@@ -3899,7 +3899,7 @@ MonoBehaviour:
   onlyOn: 0
   labelColor: {r: 0.75, g: 0.75, b: 1, a: 1}
   labelEmission: 0.4
-  glowEmission: 0.5
+  glowEmission: 0.1
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
@@ -6983,7 +6983,7 @@ MonoBehaviour:
   onlyOn: 0
   labelColor: {r: 0.75, g: 0.75, b: 1, a: 1}
   labelEmission: 0.4
-  glowEmission: 0.5
+  glowEmission: 0.1
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0

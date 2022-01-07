@@ -50,8 +50,8 @@ public class samplerDeviceInterface : deviceInterface {
     float mod = dirSwitch.switchVal ? 1 : -1;
     if (dirSwitch.switchVal != player.playdirection) player.playdirection = dirSwitch.switchVal;
 
-    player.playbackSpeed = speedDial.percent * 4 * mod;
-    player.amplitude = volumeDial.percent * 2;
+    player.playbackSpeed = Mathf.Pow(speedDial.percent, 1.5f) * 4 * mod;
+    player.amplitude = Mathf.Pow(volumeDial.percent, 2) * 2;
 
     player.headTrim = headTrimDial.percent;
     player.tailTrim = tailTrimDial.percent;

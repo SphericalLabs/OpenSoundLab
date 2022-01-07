@@ -41,7 +41,7 @@ extern "C" {
     SOUNDSTAGE_API int NoiseProcessBuffer(float buffer[], float& sample, int length, int channels, float frequency, int counter, int speedFrames, bool& updated);
     SOUNDSTAGE_API void GateProcessBuffer(float buffer[], int length, int channels, bool incoming, float controlBuffer[], bool bControlSig, float amp);
     SOUNDSTAGE_API float ClipSignalGenerator(float buffer[], float speedBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
-		, int sampleBounds[2], float playbackSpeed, void* clip, int clipChannels, float amplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active);
+		, int sampleBounds[2], float playbackSpeed, float lastPlaybackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active);
     SOUNDSTAGE_API void ADSRSignalGenerator(float buffer[], int length, int channels, int frames[], int& frameCount, bool active, float &ADSRvolume,
 		float volumes[], float startVal, int& curFrame, bool sustaining);
     SOUNDSTAGE_API void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int semitone, float keyMultConst, float& filteredVal );

@@ -402,7 +402,7 @@ extern "C" {
     }
 
     float ClipSignalGenerator(float buffer[], float speedBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
-        , int sampleBounds[2], float playbackSpeed, void* clip, int clipChannels, float amplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active)
+        , int sampleBounds[2], float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active)
     {
 
         float* clipdata = reinterpret_cast<float*>(clip);
@@ -442,6 +442,11 @@ extern "C" {
             }
 
             float endAmplitude = amplitude;
+            if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i/length); // slope limiting
+
+            float endPlaybackSpeed = playbackSpeed;
+            if (lastPlayBackSpeed != playbackSpeed) endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float)i / length); // slope limiting
+
             if (active)
             {
                 if (speedGen) floatingBufferCount += speedBuffer[i] * (playbackSpeed > 0.0f ? 1.0f : -1.0f) + playbackSpeed;
@@ -449,9 +454,9 @@ extern "C" {
 
                 if (ampGen) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2.0f);
 
-
-                buffer[i] = clipdata[bufferCount * clipChannels] * powf(endAmplitude, 2);
-                if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * powf(endAmplitude, 2);
+                
+                buffer[i] = clipdata[bufferCount * clipChannels] * endAmplitude;
+                if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * endAmplitude;
                 else buffer[i + 1] = buffer[i];
             }
         }
