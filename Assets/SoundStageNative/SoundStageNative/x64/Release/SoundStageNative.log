@@ -1,5 +1,4 @@
-﻿  Filter.cpp
-  main.cpp
+﻿  main.cpp
 main.cpp(89): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 main.cpp(98): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 main.cpp(205): warning C4309: '=': truncation of constant value
@@ -12,11 +11,9 @@ main.cpp(501): warning C4244: '=': conversion from 'double' to 'float', possible
 main.cpp(517): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 main.cpp(523): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 main.cpp(527): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-main.cpp(530): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-main.cpp(533): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
      Creating library C:\Users\Ludwig\Desktop\The New Normal\soundstage\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\x64\Release\SoundStageNative.lib and object C:\Users\Ludwig\Desktop\The New Normal\soundstage\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\x64\Release\SoundStageNative.exp
   Generating code
-  22 of 34 functions (64.7%) were compiled, the rest were copied from previous compilation.
+  21 of 34 functions (61.8%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

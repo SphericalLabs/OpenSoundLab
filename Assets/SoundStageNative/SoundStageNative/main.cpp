@@ -475,7 +475,7 @@ extern "C" {
         }
     }
 
-    void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float amplitude, float prevAmplitude, float prevSyncValue,
+    void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, float prevSyncValue,
         float frequencyBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime)
     {
 
@@ -519,51 +519,46 @@ extern "C" {
 
             // tri needed
             if (analogWave > 0.66f) {
-                if (_phase <= 0.25f) {
-                    tri = _phase * 4;
+                if (_phase <= 0.5f) {
+                    tri = _phase * 2;
                 }
-                else if (_phase > 0.25f && _phase <= 0.5f)
+                else if (_phase > 0.5f)
                 {
-                    tri = 1 - (_phase - 0.25f) * 4;
-                }
-                else if (_phase > 0.5f && _phase <= 0.75f) {
-                    tri = (_phase - 0.5f) * 4;
-                }
-                else if (_phase > 0.75f) {
-                    tri = 1 - (_phase - 0.75f) * 4;
-                }
-                tri = tri * 2 - 1; // -1,1
+                    tri = 1 - (_phase - 0.5f) * 2;
+                }                
+                tri = tri * 2 - 1; // [0,1]->[-1,1]
             }
 
             // do the blending
             if (analogWave <= 0.33f) // sin <-> square
             {
-                sample = (sine * (0.33f - analogWave) + square * analogWave) * 3; // time 3 is for normalizing the blend to -1,1
+                sample = (sine * powf((0.33f - analogWave) * 3, 2) + square * powf(analogWave * 3, 2)); // time 3 is for normalizing the blend to -1,1
             }
             else if (analogWave > 0.33f && analogWave <= 0.66f) // square <-> saw
             {
-                sample = (square * (0.66f - analogWave) + saw * (analogWave - 0.33f)) * 3;
+                sample = (square * powf((0.66f - analogWave) * 3, 2) + saw * powf((analogWave - 0.33f) * 3, 2));
             }
             else { // saw <-> tri
-                sample = ( saw * (1 - analogWave) + tri * (analogWave - 0.66f) ) * 3;
+                sample = ( saw * powf((1 - analogWave) * 3, 2) + tri * powf((analogWave - 0.66f) * 3, 2) );
             }
 
 
             //frequency compute
             float endFrequency = frequency;
+            if (prevFrequency != frequency) endFrequency = lerp(prevFrequency, frequency, (float)i / length); // slope limiting
 
             //amp compute
             float endAmplitude = amplitude;
             if (prevAmplitude != amplitude) endAmplitude = lerp(prevAmplitude, amplitude, (float)i / length); // slope limiting
 
-            //calc side chain effect
+            //calc control inputs
             if (bFreqGen)
             {
                 endFrequency = frequency * (frequencyBuffer[i] + 1);
             }
             if (bAmpGen)
             {
-                endAmplitude = endAmplitude * ((amplitudeBuffer[i] + 1) / 2.f);
+                endAmplitude = endAmplitude * ((amplitudeBuffer[i] + 1) / 2.f); //[-1,1]->[0,1]
             }
 
             //update phase for next frame
@@ -575,6 +570,20 @@ extern "C" {
 
             //dsptime update
             dspTime += _sampleDuration;
+        }
+    }
+
+    /*
+    https://dsp.stackexchange.com/a/36778
+    returns a float array with two indexes representing the volumes of the left (index 0) and right (index 1) channels
+    */
+
+    float xFade(float t, int index) {
+        
+        if (index == 0) {
+            return sqrt(t);
+        } else if (index == 1) {
+            return sqrt(1.f-t);
         }
     }
 

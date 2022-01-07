@@ -36,12 +36,13 @@ public class oscillatorSignalGenerator : signalGenerator
     float[] pwmBuffer = new float[0];
     float lastSyncValue = -1f;
 
-
     int counter = 0;
 
     float prevAmplitude;
+    float prevFrequency;
+
     [DllImport("SoundStageNative")]
-    public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
+    public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
                                 float[] frequencyBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer, bool bFreqGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, ref double dspTime);
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
@@ -62,7 +63,7 @@ public class oscillatorSignalGenerator : signalGenerator
         if (syncGen != null) syncGen.processBuffer(syncBuffer, dspTime, channels);
         if (pwmGen != null) pwmGen.processBuffer(pwmBuffer, dspTime, channels);
 
-        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
+        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
             freqGen != null, ampGen != null, syncGen != null, pwmGen != null,  _sampleDuration, ref dspTime);
 
         
@@ -71,6 +72,7 @@ public class oscillatorSignalGenerator : signalGenerator
 
         // memory for next go around
         prevAmplitude = amplitude;
+        prevFrequency = frequency;
         //counter++;
     }
 
