@@ -125,7 +125,7 @@ public class samplerLoad : MonoBehaviour {
   GameObject loaderObject;
   Coroutine _streamRoutine;
   IEnumerator streamRoutine(string fullpath) {
-    AudioClip c = RuntimeAudioClipLoader.Manager.Load(fullpath, false, true, false);
+    AudioClip c = RuntimeAudioClipLoader.Manager.Load(fullpath, false, true, true);
 
     loaderObject = Instantiate(loadingPrefab, transform, false) as GameObject;
     loaderObject.transform.localPosition = new Vector3(-.05f, .013f, 0.061f);
