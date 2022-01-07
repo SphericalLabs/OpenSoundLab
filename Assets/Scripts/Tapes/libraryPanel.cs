@@ -168,23 +168,24 @@ public class libraryPanel : UIpanel {
   Coroutine _StreamRoutine;
   bool previewing = false;
   void preview(bool on) {
-    //previewing = on;
-    //if (on) {
-    //  string f = _panelRing._deviceInterface.getFilename(IDtext);
-    //  f = sampleManager.instance.parseFilename(_panelRing._deviceInterface.getFilename(IDtext));
+    previewing = on;
+    if (on) {
+      string f = _panelRing._deviceInterface.getFilename(IDtext);
+      f = sampleManager.instance.parseFilename(_panelRing._deviceInterface.getFilename(IDtext));
 
-    //  if (!File.Exists(f)) return;
-    //  if (_StreamRoutine != null) {
-    //    if (loaderObject != null) Destroy(loaderObject);
-    //    StopCoroutine(_StreamRoutine);
-    //  }
-    //  _StreamRoutine = StartCoroutine(streamRoutine(f));
+      if (!File.Exists(f)) return;
+      if (_StreamRoutine != null) {
+        if (loaderObject != null) Destroy(loaderObject);
+        StopCoroutine(_StreamRoutine);
+      }
+      _StreamRoutine = StartCoroutine(streamRoutine(f));
 
-    //} else { // apparently thethis doesn't work. memory is leaking here
-    //  if (loaderObject != null) Destroy(loaderObject);
-    //  if (_StreamRoutine != null) StopCoroutine(_StreamRoutine);
-    //  _panelRing.GetComponent<AudioSource>().Stop();
-    //}
+    } else {
+      if (loaderObject != null) Destroy(loaderObject);
+      if (_StreamRoutine != null) StopCoroutine(_StreamRoutine);
+      _panelRing.GetComponent<AudioSource>().Stop();
+
+    }
   }
 
 
