@@ -143,7 +143,7 @@ public class libraryPanel : UIpanel {
 
 
   IEnumerator streamRoutine(string f) {
-    AudioClip c = RuntimeAudioClipLoader.Manager.Load(f, false, true, false);
+    AudioClip c = RuntimeAudioClipLoader.Manager.Load(f, false, true, true);
 
     loaderObject = Instantiate(loadingPrefab, transform, false) as GameObject;
     loaderObject.transform.localPosition = new Vector3(-.03f, -.037f, .01f);
