@@ -394,7 +394,7 @@ extern "C" {
 
     void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int semitone, float keyMultConst, float& filteredVal)
     {
-        float val = pow(keyMultConst, semitone) - 1; // - 1 here means transpose down one octave?
+        float val = (float)semitone / 12.f;
         for (int i = 0; i < length; i += channels)
         {
             buffer[i] = buffer[i + 1] = filteredVal = lerp(val, filteredVal, .9f); // lerp as eased follower
@@ -559,7 +559,7 @@ extern "C" {
             //calc control inputs
             if (bFreqGen)
             {
-                endFrequency = frequency * (frequencyBuffer[i] + 1);
+                endFrequency = frequency * powf(2, frequencyBuffer[i]); // must be different for lfo mode?
             }
             if (bAmpGen)
             {

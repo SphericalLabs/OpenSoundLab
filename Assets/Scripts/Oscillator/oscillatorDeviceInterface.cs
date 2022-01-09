@@ -83,14 +83,11 @@ public class oscillatorDeviceInterface : deviceInterface
         freqPercent = freqDial.percent;
         if (lfo)
         {
-            signal.frequency = Mathf.Pow(freqPercent, 4) * 100 + 1.0f / 120.0f; // range unclear, needs rewrite
+            signal.frequency = 2f * 4 * Mathf.Pow(freqPercent, 4) * 100; // range unclear, needs rewrite
         }
         else
         {
-            signal.frequency = 3520.00f * Mathf.Pow(freqDial.percent, 2) + 20f; // [0,1]->[20, 3520]?
-            //Mathf.Clamp(3520.00f * Mathf.Pow(freqDial.percent, 2), 0f, Mathf.Infinity);
-            //Mathf.Pow(freqDial.percent, 2); 
-            //signal.frequency = 40 + 10000 * Mathf.Pow(freqDial.percent, 2);
+            signal.frequency = 261.6256f * Mathf.Pow(2, Utils.map(freqPercent, 0f, 1f, -4f, 4f)); // C4 
         }
     }
 

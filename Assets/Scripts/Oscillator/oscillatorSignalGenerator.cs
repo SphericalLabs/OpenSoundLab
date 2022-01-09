@@ -23,7 +23,7 @@ public class oscillatorSignalGenerator : signalGenerator
     public waveViz viz;
 
     public bool lfo = false;
-    public float frequency = 220f;
+    public float frequency = 261.6256f; // C4, MIDI 60, will usually be overwritten for Oscillator because of dial
     public float amplitude = 1;
     public float analogWave = 0;
 
