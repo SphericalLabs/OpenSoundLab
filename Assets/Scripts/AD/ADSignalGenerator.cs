@@ -27,7 +27,7 @@ public class ADSignalGenerator : signalGenerator
     int releaseLengthFinal = 0;
     float linearity = 1f;
 
-    int length = 44100 * 5; // 5 seconds
+    int length = 48000 * 5; // 5 seconds
 
     int stage = 0;
     int counter = 0;
@@ -133,7 +133,7 @@ public class ADSignalGenerator : signalGenerator
                 if (stage == 0)
                 {
                     // need speed up with pre-calculated lookups at some point?
-                    buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / (float)attackLengthFinal, linearity) * 2f - 1f;
+                    buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / (float)attackLengthFinal, linearity);
                     counter++;
                     if (counter > attackLengthFinal)
                     {
@@ -143,7 +143,7 @@ public class ADSignalGenerator : signalGenerator
                 }
                 else if (stage == 1)
                 {
-                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / (float)releaseLengthFinal, linearity) * 2f - 1f;
+                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / (float)releaseLengthFinal, linearity);
                     counter++;
                     if (counter > releaseLengthFinal)
                     {
@@ -156,13 +156,13 @@ public class ADSignalGenerator : signalGenerator
             }
             else
             {
-                SetArrayToSingleValue(buffer, buffer.Length, -1f);
+                SetArrayToSingleValue(buffer, buffer.Length, 0f);
             }
 
             // hotfix for occasional NaNs that crash other devices. occurs when linearity != 1
             if (System.Single.IsNaN(buffer[n]))
             {
-                buffer[n] = buffer[n + 1] = -1f;
+                buffer[n] = buffer[n + 1] = 0f;
                 //Debug.Log("NaN in stage: " + stage);
                 //Debug.Log("counter: " + counter);
                 //Debug.Log("attack: " + attackLengthFinal);

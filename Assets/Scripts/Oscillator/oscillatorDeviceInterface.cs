@@ -94,7 +94,7 @@ public class oscillatorDeviceInterface : deviceInterface
     void UpdateAmp()
     {
         ampPercent = ampDial.percent;
-        signal.amplitude = ampPercent;
+        signal.amplitude = ampPercent * ampPercent;
     }
 
     void UpdateWave()

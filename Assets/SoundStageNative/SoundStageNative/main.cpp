@@ -369,14 +369,14 @@ extern "C" {
         {
             for (int i = 0; i < length; i += channels)
             {
-                buffer[i] = buffer[i + 1] = -1.f;
+                buffer[i] = buffer[i + 1] = 0.f;
             }
             return;
         }
 
         for (int i = 0; i < length; i += channels)
         {
-            buffer[i + 1] = buffer[i] = ADSRvolume = lerp((getADSR(curFrame, startVal, frameCount, frames, volumes) + -.5f) * 2.f, ADSRvolume, .98f);
+            buffer[i + 1] = buffer[i] = ADSRvolume = lerp(getADSR(curFrame, startVal, frameCount, frames, volumes), ADSRvolume, .98f);
 
             if (curFrame != 2) frameCount++;
             else if (curFrame == 2 && !sustaining) frameCount++;
@@ -452,7 +452,7 @@ extern "C" {
                 if (speedGen) floatingBufferCount += speedBuffer[i] * (playbackSpeed > 0.0f ? 1.0f : -1.0f) + playbackSpeed;
                 else floatingBufferCount += playbackSpeed;
 
-                if (ampGen) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2.0f);
+                if (ampGen) endAmplitude = endAmplitude * ampBuffer[i];
 
                 
                 buffer[i] = clipdata[bufferCount * clipChannels] * endAmplitude;
@@ -563,7 +563,7 @@ extern "C" {
             }
             if (bAmpGen)
             {
-                endAmplitude = endAmplitude * ((amplitudeBuffer[i] + 1) / 2.f); //[-1,1]->[0,1]
+                endAmplitude = endAmplitude * amplitudeBuffer[i]; // allows for negative inputs, will invert phase then
             }
 
             //update phase for next frame
@@ -571,7 +571,7 @@ extern "C" {
             if (_phase > 1.0) _phase -= 1.0;
 
             //final buffer
-            buffer[i] = buffer[i + 1] = (float)sample * powf(endAmplitude, 2);
+            buffer[i] = buffer[i + 1] = (float)sample * endAmplitude;
 
             //dsptime update
             dspTime += _sampleDuration;
