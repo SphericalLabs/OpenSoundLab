@@ -394,10 +394,10 @@ extern "C" {
 
     void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int semitone, float keyMultConst, float& filteredVal)
     {
-        float val = (float)semitone / 12.f;
+        float val = (float)semitone / 12.f * 0.1f;
         for (int i = 0; i < length; i += channels)
         {
-            buffer[i] = buffer[i + 1] = filteredVal = lerp(val, filteredVal, .9f); // lerp as eased follower
+            buffer[i] = buffer[i + 1] = filteredVal = lerp(val, filteredVal, .9f); // lerp as eased follower, downscale 1V/Oct to 0.1V/Oct
         }
     }
 
@@ -449,7 +449,7 @@ extern "C" {
 
             if (active)
             {
-                if (speedGen) floatingBufferCount += speedBuffer[i] * (playbackSpeed > 0.0f ? 1.0f : -1.0f) + playbackSpeed;
+                if (speedGen) floatingBufferCount += playbackSpeed * powf(2, speedBuffer[i] * 10.f); // upscale 0.1V/Oct to 1V/Oct
                 else floatingBufferCount += playbackSpeed;
 
                 if (ampGen) endAmplitude = endAmplitude * ampBuffer[i];
@@ -559,7 +559,7 @@ extern "C" {
             //calc control inputs
             if (bFreqGen)
             {
-                endFrequency = frequency * powf(2, frequencyBuffer[i]); // must be different for lfo mode?
+                endFrequency = frequency * powf(2, frequencyBuffer[i] * 10.f); // convert 0.1V/Oct to 1V/Oct 
             }
             if (bAmpGen)
             {
