@@ -24,7 +24,7 @@ public class clipPlayerSimple : clipPlayer
     public int ID = 0;
 
     public float amplitude = 1;
-    public signalGenerator seqGen, speedGen, ampGen;
+    public signalGenerator seqGen, freqExpGen, ampGen;
 
     public bool seqMuted = false; // electribe-ish midi sequence muting
 
@@ -33,14 +33,18 @@ public class clipPlayerSimple : clipPlayer
     float _lastBuffer = 0;
     float[] lastSeqGen;
 
-    [DllImport("SoundStageNative")]
-    public static extern float ClipSignalGenerator(float[] buffer, float[] speedBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
-       , int[] sampleBounds, float playbackSpeed, System.IntPtr clip, int clipChannels, float amplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
+    float lastPlaybackSpeed = 0f;
+    float lastAmplitude = 0f;
+
+  [DllImport("SoundStageNative")]
+    public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
+, int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
+
 
     [DllImport("SoundStageNative")]
     public static extern void SetArrayToFixedValue(float[] buffer, int length, float value);
 
-    float[] speedBuffer = new float[0];
+    float[] freqExpBuffer = new float[0];
     float[] ampBuffer = new float[0];
     float[] seqBuffer = new float[0];
 
@@ -68,8 +72,8 @@ public class clipPlayerSimple : clipPlayer
 
         if (seqBuffer.Length != buffer.Length)
             System.Array.Resize(ref seqBuffer, buffer.Length);
-        if (speedBuffer.Length != buffer.Length)
-            System.Array.Resize(ref speedBuffer, buffer.Length);
+        if (freqExpBuffer.Length != buffer.Length)
+            System.Array.Resize(ref freqExpBuffer, buffer.Length);
         if (ampBuffer.Length != buffer.Length)
             System.Array.Resize(ref ampBuffer, buffer.Length);
 
@@ -79,13 +83,15 @@ public class clipPlayerSimple : clipPlayer
         } else {
             SetArrayToFixedValue(seqBuffer, buffer.Length, -1f);
         }
-        if (speedGen != null) speedGen.processBuffer(speedBuffer, dspTime, channels);
+        if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
 
-
-        floatingBufferCount = ClipSignalGenerator(buffer, speedBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, speedGen != null, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
-       playbackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, true, false, _sampleDuration, bufferCount, ref active);
-
+        floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, null, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, false, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
+          playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, true, false, _sampleDuration, bufferCount, ref active);
+                  
         _lastBuffer = floatingBufferCount;
-    }
+
+        lastAmplitude = amplitude;
+        lastPlaybackSpeed = playbackSpeed;
+  }
 }

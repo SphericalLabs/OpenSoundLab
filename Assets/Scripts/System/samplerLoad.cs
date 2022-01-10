@@ -145,7 +145,7 @@ public class samplerLoad : MonoBehaviour {
     clipSamples = new float[c.samples * c.channels];
     c.GetData(clipSamples, 0);
 
-    //alocate the memory
+    //allocate the memory
     m_ClipHandle = GCHandle.Alloc(clipSamples, GCHandleType.Pinned);
     for (int i = 0; i < players.Length; i++) players[i].LoadSamples(clipSamples, m_ClipHandle, c.channels);
   }

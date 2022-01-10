@@ -29,10 +29,10 @@ public class miniSamplerComponentInterface : componentInterface
 
     void Update()
     {
-        player.playbackSpeed = speedDial.percent * 4;
-        player.amplitude = volumeDial.percent * 2;
+        player.playbackSpeed = 1f * Mathf.Pow(2, Utils.map(speedDial.percent, 0f, 1f, -4f, 4f));
+        player.amplitude = Mathf.Pow(volumeDial.percent, 2);
 
-        if (player.speedGen != speedInput.signal) player.speedGen = speedInput.signal;
+        if (player.freqExpGen != speedInput.signal) player.freqExpGen = speedInput.signal;
         if (player.ampGen != volumeInput.signal) player.ampGen = volumeInput.signal;
 
         player.seqMuted = muteButton.isHit;

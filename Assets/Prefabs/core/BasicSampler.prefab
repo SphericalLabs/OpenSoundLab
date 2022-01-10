@@ -1095,7 +1095,7 @@ MonoBehaviour:
   ID: 0
   amplitude: 1
   seqGen: {fileID: 0}
-  speedGen: {fileID: 0}
+  freqExpGen: {fileID: 0}
   ampGen: {fileID: 0}
   seqMuted: 0
 --- !u!114 &114000013787682994
@@ -1807,7 +1807,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0.25
+  percent: 0.5
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
