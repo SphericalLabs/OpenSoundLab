@@ -22,8 +22,8 @@ public class gainSignalGenerator : signalGenerator {
   public bool active = true;
   public float amp = 0f;
 
-  float fader = 0f;
-  
+  float muteFader = 0f;
+
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
 
@@ -31,8 +31,8 @@ public class gainSignalGenerator : signalGenerator {
 
     for(int n = 0; n < buffer.Length; n++) 
     {
-      fader = Mathf.Clamp01(fader + ( (!active || incoming == null) ? -0.005f : 0.005f)); // fade out or in
-      buffer[n] = Mathf.Clamp(buffer[n] * Mathf.Pow(amp, 2), -1f, 1f) * fader;
+      muteFader = Mathf.Clamp01(muteFader + ( (!active || incoming == null) ? -0.005f : 0.005f)); // fade out or in
+      buffer[n] *= amp * muteFader;
     }
 
   }
