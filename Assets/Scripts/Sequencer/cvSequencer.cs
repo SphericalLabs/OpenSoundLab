@@ -20,10 +20,12 @@ using System;
 
 public class cvSequencer : signalGenerator
 {
+    public static float lowRange = 0.1f; // central place to set these ranges!
+    public static float highRange = 0.3f; // 
 
 
     float outVal = 0f;
-    float rangeMultiplier = 1f;
+    float rangeMultiplier = lowRange;
 
     [DllImport("SoundStageNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);

@@ -58,7 +58,7 @@ public class cvSequencerDeviceInterface : deviceInterface
     dial swingDial;
     signalGenerator externalPulse;
     beatTracker _beatManager;
-    basicSwitch rangeSwitcher;
+    public basicSwitch rangeSwitcher;
     bool lastRangeLow = true;
 
     double _phase = 0;
@@ -106,7 +106,7 @@ public class cvSequencerDeviceInterface : deviceInterface
         // init ranges
         for (int i = 0; i < curDimensions[1]; i++)
         {
-            cvSeqList[i].setRange(lastRangeLow ? 1f : 3f);
+            cvSeqList[i].setRange(lastRangeLow ? cvSequencer.lowRange : cvSequencer.highRange);
         }
     }
 
@@ -237,7 +237,7 @@ public class cvSequencerDeviceInterface : deviceInterface
             lastRangeLow = rangeSwitcher.switchVal;
             for (int i = 0; i < curDimensions[1]; i++)
             {
-                cvSeqList[i].setRange(lastRangeLow ? 1f : 3f);
+                cvSeqList[i].setRange(lastRangeLow ? cvSequencer.lowRange : cvSequencer.highRange); // 0.1/Oct -> select between -1,1 and -4,4 ranges
             }
         }
 
