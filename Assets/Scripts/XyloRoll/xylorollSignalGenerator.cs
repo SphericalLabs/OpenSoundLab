@@ -49,7 +49,7 @@ public class xylorollSignalGenerator : signalGenerator {
     for (int i = 0; i < voices.Count; i++) {
       for (int i2 = 0; i2 < 2; i2++) {
         voices[i].osc[i2].amplitude = amps[i2];
-        voices[i].osc[i2].frequency = Mathf.Lerp(414f, 466f, freqs[i2]); // need to update this?
+        voices[i].osc[i2].frequency = 261.6256f * Mathf.Pow(2, Utils.map(freqs[i2], 0f, 1f, -0.5f, 0.5f)); // 261.6256f; // C4
         voices[i].osc[i2].analogWave = waves[i2];
       }
     }

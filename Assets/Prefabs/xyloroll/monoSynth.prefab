@@ -57,7 +57,7 @@ MonoBehaviour:
   pwmGen: {fileID: 0}
   viz: {fileID: 0}
   lfo: 0
-  frequency: 220
+  frequency: 261.6256
   amplitude: 1
   analogWave: 0
 --- !u!114 &114000013332634474
@@ -82,7 +82,7 @@ MonoBehaviour:
   pwmGen: {fileID: 0}
   viz: {fileID: 0}
   lfo: 0
-  frequency: 220
+  frequency: 261.6256
   amplitude: 1
   analogWave: 0
 --- !u!114 &114000012982958476

@@ -29,17 +29,18 @@ public class keyFrequencySignalGenerator : signalGenerator {
 
   public void UpdateKey(int k) {
     curKey = k;
-    semitone = k - 9 + octave * 12;
+    semitone = k + octave * 12;
   }
 
   public float getMult(int k) { // only used in xyloroll
-    semitone = k - 9 + octave * 12;
-    return Mathf.Pow(keyMultConst, semitone);
+    semitone = k + octave * 12;
+    return semitone;
+    //return Mathf.Pow(keyMultConst, semitone);
   }
 
   public void updateOctave(int n) {
     octave = n;
-    semitone = curKey - 9 + octave * 12;
+    semitone = curKey + octave * 12;
   }
   float filteredVal = 0;
 
