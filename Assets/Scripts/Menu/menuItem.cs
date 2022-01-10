@@ -35,6 +35,7 @@ public class menuItem : manipObject {
     Stereo,
     Glide,
     Gain,
+    Quantizer,
     Valve,
     SampleHold,
     ConferenceCall,
