@@ -401,7 +401,7 @@ extern "C" {
         }
     }
 
-    float ClipSignalGenerator(float buffer[], float speedBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
+    float ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
         , int sampleBounds[2], float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active)
     {
 
@@ -438,7 +438,6 @@ extern "C" {
             if (endOfSample)
             {
                 if (!looping) active = false;
-                //else if (seqGen && lastSeqGen[1] != 1) active = false;
             }
 
             float endAmplitude = amplitude;
@@ -449,12 +448,12 @@ extern "C" {
 
             if (active)
             {
-                if (speedGen) floatingBufferCount += playbackSpeed * powf(2, speedBuffer[i] * 10.f); // upscale 0.1V/Oct to 1V/Oct
-                else floatingBufferCount += playbackSpeed;
-
+                if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, freqExpBuffer[i] * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
+                else floatingBufferCount += endPlaybackSpeed;
+                if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 10.f; // lin fm 
+                
                 if (ampGen) endAmplitude = endAmplitude * ampBuffer[i];
 
-                
                 buffer[i] = clipdata[bufferCount * clipChannels] * endAmplitude;
                 if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * endAmplitude;
                 else buffer[i + 1] = buffer[i];
@@ -481,7 +480,7 @@ extern "C" {
     }
 
     void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, float prevSyncValue,
-        float frequencyBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime)
+        float frequencyExpBuffer[], float frequencyLinBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqExpGen, bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime)
     {
 
         float sine = 0.f;
@@ -557,9 +556,12 @@ extern "C" {
             if (prevAmplitude != amplitude) endAmplitude = lerp(prevAmplitude, amplitude, (float)i / length); // slope limiting
 
             //calc control inputs
-            if (bFreqGen)
+            if (bFreqExpGen)
             {
-                endFrequency = frequency * powf(2, frequencyBuffer[i] * 10.f); // convert 0.1V/Oct to 1V/Oct 
+                endFrequency = endFrequency * powf(2, frequencyExpBuffer[i] * 10.f); // convert 0.1V/Oct to 1V/Oct; 
+            }
+            if (bFreqLinGen) {
+                endFrequency = endFrequency + frequencyLinBuffer[i] * 10.f * 100.f; // add lin fm, thru zero, 1V / 100Hz
             }
             if (bAmpGen)
             {

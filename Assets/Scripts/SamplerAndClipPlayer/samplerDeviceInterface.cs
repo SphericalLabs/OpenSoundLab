@@ -17,7 +17,7 @@ using System.Collections;
 
 public class samplerDeviceInterface : deviceInterface {
   public dial speedDial, volumeDial, headTrimDial, tailTrimDial;
-  public omniJack speedInput, volumeInput, controlInput, output;
+  public omniJack freqExpInput, freqLinInput, volumeInput, controlInput, output;
   public omniJack headInput, tailInput;
   public basicSwitch dirSwitch, loopSwitch;
   public button playButton, turntableButton;
@@ -58,7 +58,9 @@ public class samplerDeviceInterface : deviceInterface {
 
     if (loopSwitch.switchVal != player.looping) player.looping = loopSwitch.switchVal;
 
-    if (player.speedGen != speedInput.signal) player.speedGen = speedInput.signal;
+    if (player.freqExpGen != freqExpInput.signal) player.freqExpGen = freqExpInput.signal;
+    if (player.freqLinGen != freqLinInput.signal) player.freqLinGen = freqLinInput.signal;
+
     if (player.ampGen != volumeInput.signal) player.ampGen = volumeInput.signal;
     if (player.seqGen != controlInput.signal) player.seqGen = controlInput.signal;
     if (seq != controlInput.signal) seq = controlInput.signal;
@@ -105,7 +107,8 @@ public class samplerDeviceInterface : deviceInterface {
     data.label = GetComponent<samplerLoad>().CurTapeLabel;
 
     data.jackInAmpID = volumeInput.transform.GetInstanceID();
-    data.jackInSpeedID = speedInput.transform.GetInstanceID();
+    data.jackInFreqExpID = freqExpInput.transform.GetInstanceID();
+    data.jackInFreqLinID = freqLinInput.transform.GetInstanceID();
     data.jackInSeqID = controlInput.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
     data.dirSwitch = dirSwitch.switchVal;
@@ -130,7 +133,7 @@ public class samplerDeviceInterface : deviceInterface {
     GetComponent<samplerLoad>().SetSample(data.label, data.file);
 
     volumeInput.ID = data.jackInAmpID;
-    speedInput.ID = data.jackInSpeedID;
+    freqExpInput.ID = data.jackInFreqExpID;
     controlInput.ID = data.jackInSeqID;
     output.ID = data.jackOutID;
 
@@ -152,7 +155,8 @@ public class SamplerData : InstrumentData {
   public float ampDial;
   public float speedDial;
   public int jackInAmpID;
-  public int jackInSpeedID;
+  public int jackInFreqExpID;
+  public int jackInFreqLinID;
   public int jackInSeqID;
   public int jackOutID;
   public bool dirSwitch;

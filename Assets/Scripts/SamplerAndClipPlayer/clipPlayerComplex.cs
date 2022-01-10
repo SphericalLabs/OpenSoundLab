@@ -30,7 +30,7 @@ public class clipPlayerComplex : clipPlayer {
   public GameObject[] scrubIndicators;
   Vector2 scrubRange = new Vector2(.2f, -.2f);
 
-  public signalGenerator speedGen, ampGen, seqGen;
+  public signalGenerator freqExpGen, freqLinGen, ampGen, seqGen;
   public signalGenerator headGen, tailGen;
   public float speedRange = 1;
 
@@ -47,7 +47,8 @@ public class clipPlayerComplex : clipPlayer {
   int waveheight = 64;
   Color32[] wavepixels;
 
-  float[] speedBuffer;
+  float[] freqExpBuffer;
+  float[] freqLinBuffer;
   float[] ampBuffer;
   float[] seqBuffer;
   float[] headBuffer;
@@ -57,12 +58,13 @@ public class clipPlayerComplex : clipPlayer {
   float lastAmplitude = 0f;
 
   [DllImport("SoundStageNative")]
-  public static extern float ClipSignalGenerator(float[] buffer, float[] speedBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
+  public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float [] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
 , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
 
   public override void Awake() {
     base.Awake();
-    speedBuffer = new float[MAX_BUFFER_LENGTH];
+    freqExpBuffer = new float[MAX_BUFFER_LENGTH];
+    freqLinBuffer = new float[MAX_BUFFER_LENGTH];
     ampBuffer = new float[MAX_BUFFER_LENGTH];
     seqBuffer = new float[MAX_BUFFER_LENGTH];
     headBuffer = new float[MAX_BUFFER_LENGTH];
@@ -237,8 +239,10 @@ public class clipPlayerComplex : clipPlayer {
     if (!loaded) return;
     floatingBufferCount = _lastBuffer;
 
-    if (speedBuffer.Length != buffer.Length)
-      System.Array.Resize(ref speedBuffer, buffer.Length);
+    if (freqExpBuffer.Length != buffer.Length)
+      System.Array.Resize(ref freqExpBuffer, buffer.Length);
+    if (freqLinBuffer.Length != buffer.Length)
+      System.Array.Resize(ref freqLinBuffer, buffer.Length);
     if (ampBuffer.Length != buffer.Length)
       System.Array.Resize(ref ampBuffer, buffer.Length);
     if (seqBuffer.Length != buffer.Length)
@@ -250,7 +254,8 @@ public class clipPlayerComplex : clipPlayer {
       System.Array.Resize(ref tailBuffer, buffer.Length);
 
 
-    if (speedGen != null) speedGen.processBuffer(speedBuffer, dspTime, channels);
+    if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
+    if (freqLinGen != null) freqLinGen.processBuffer(freqLinBuffer, dspTime, channels);
     if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
     if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
 
@@ -276,7 +281,7 @@ public class clipPlayerComplex : clipPlayer {
 
     if (!scrubGrabbed && !turntableGrabbed) {
       bool curActive = active;
-      floatingBufferCount = ClipSignalGenerator(buffer, speedBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, speedGen != null, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
+      floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, freqLinBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, freqLinGen != null, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
           playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, playdirection, looping, _sampleDuration, bufferCount, ref active);
       if (curActive != active) _sampleInterface.playEvent(active);
 

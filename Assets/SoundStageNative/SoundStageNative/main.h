@@ -40,7 +40,7 @@ extern "C" {
     SOUNDSTAGE_API void ColorTest(char a[]);
     SOUNDSTAGE_API int NoiseProcessBuffer(float buffer[], float& sample, int length, int channels, float frequency, int counter, int speedFrames, bool& updated);
     SOUNDSTAGE_API void GateProcessBuffer(float buffer[], int length, int channels, bool incoming, float controlBuffer[], bool bControlSig, float amp);
-    SOUNDSTAGE_API float ClipSignalGenerator(float buffer[], float speedBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool speedGen, bool ampGen, bool seqGen, float floatingBufferCount
+    SOUNDSTAGE_API float ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
 		, int sampleBounds[2], float playbackSpeed, float lastPlaybackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active);
     SOUNDSTAGE_API void ADSRSignalGenerator(float buffer[], int length, int channels, int frames[], int& frameCount, bool active, float &ADSRvolume,
 		float volumes[], float startVal, int& curFrame, bool sustaining);
@@ -48,7 +48,7 @@ extern "C" {
     SOUNDSTAGE_API void XylorollMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]);
     SOUNDSTAGE_API void XylorollMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]);
     SOUNDSTAGE_API void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, float prevSyncValue,
-        float frequencyBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime);
+        float frequencyExpBuffer[], float frequencyLinBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqExpGen, bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime);
     SOUNDSTAGE_API void addCombFilterSignal(float inputbuffer[], float addbuffer[], int length, float delayBufferL[], float delayBufferR[], int delaylength, float gain, int& inPoint, int& outPoint);
     SOUNDSTAGE_API void processCombFilterSignal(float buffer[], int length, float delayBufferL[], float delayBufferR[], int delaylength, float gain, int& inPoint, int& outPoint);
     SOUNDSTAGE_API void lowpassSignal(float buffer[], int length, float& lowpassL, float& lowpassR);

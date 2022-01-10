@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 
 public class oscillatorSignalGenerator : signalGenerator
 {
-    public signalGenerator freqGen, ampGen, syncGen, pwmGen;
+    public signalGenerator freqExpGen, freqLinGen, ampGen, syncGen, pwmGen;
     public waveViz viz;
 
     public bool lfo = false;
@@ -30,7 +30,8 @@ public class oscillatorSignalGenerator : signalGenerator
     double lastIncomingDspTime = -1;
     float keyMultConst = Mathf.Pow(2, 1f / 12);
 
-    float[] frequencyBuffer = new float[0];
+    float[] frequencyExpBuffer = new float[0];
+    float[] frequencyLinBuffer = new float[0];
     float[] amplitudeBuffer = new float[0];
     float[] syncBuffer = new float[0];
     float[] pwmBuffer = new float[0];
@@ -43,14 +44,16 @@ public class oscillatorSignalGenerator : signalGenerator
 
     [DllImport("SoundStageNative")]
     public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
-                                float[] frequencyBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer, bool bFreqGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, ref double dspTime);
+                                float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer, bool bFreqExpGen, bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, ref double dspTime);
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
         lastIncomingDspTime = dspTime;
 
-        if (frequencyBuffer.Length != buffer.Length)
-            System.Array.Resize(ref frequencyBuffer, buffer.Length);
+        if (frequencyExpBuffer.Length != buffer.Length)
+            System.Array.Resize(ref frequencyExpBuffer, buffer.Length);
+        if (frequencyLinBuffer.Length != buffer.Length)
+            System.Array.Resize(ref frequencyLinBuffer, buffer.Length);
         if (amplitudeBuffer.Length != buffer.Length)
             System.Array.Resize(ref amplitudeBuffer, buffer.Length);
         if (syncBuffer.Length != buffer.Length)
@@ -58,13 +61,14 @@ public class oscillatorSignalGenerator : signalGenerator
         if (pwmBuffer.Length != buffer.Length)
             System.Array.Resize(ref pwmBuffer, buffer.Length);
 
-        if (freqGen != null) freqGen.processBuffer(frequencyBuffer, dspTime, channels);
+        if (freqExpGen != null) freqExpGen.processBuffer(frequencyExpBuffer, dspTime, channels);
+        if (freqLinGen != null) freqLinGen.processBuffer(frequencyLinBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
         if (syncGen != null) syncGen.processBuffer(syncBuffer, dspTime, channels);
         if (pwmGen != null) pwmGen.processBuffer(pwmBuffer, dspTime, channels);
 
-        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
-            freqGen != null, ampGen != null, syncGen != null, pwmGen != null,  _sampleDuration, ref dspTime);
+        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
+            freqExpGen != null, freqLinGen != null, ampGen != null, syncGen != null, pwmGen != null,  _sampleDuration, ref dspTime);
 
         
         // wave viz if there

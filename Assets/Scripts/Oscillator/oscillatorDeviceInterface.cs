@@ -26,7 +26,7 @@ public class oscillatorDeviceInterface : deviceInterface
     public basicSwitch lfoSwitch;
     public dial freqDial, ampDial;
     public waveViz viz;
-    public omniJack signalOutput, freqInput, ampInput, syncInput, pwmInput;
+    public omniJack signalOutput, freqExpInput, freqLinInput, ampInput, syncInput, pwmInput;
     public slider waveSlider;
     public AudioSource speaker;
 
@@ -62,7 +62,8 @@ public class oscillatorDeviceInterface : deviceInterface
         if (wavePercent != waveSlider.percent) UpdateWave();
 
         // update inputs
-        if (signal.freqGen != freqInput.signal) signal.freqGen = freqInput.signal;
+        if (signal.freqExpGen != freqExpInput.signal) signal.freqExpGen = freqExpInput.signal;
+        if (signal.freqLinGen != freqLinInput.signal) signal.freqLinGen = freqLinInput.signal;
         if (signal.ampGen != ampInput.signal) signal.ampGen = ampInput.signal;
         if (signal.syncGen != syncInput.signal) signal.syncGen = syncInput.signal;
         if (signal.pwmGen != pwmInput.signal) signal.pwmGen = pwmInput.signal;
@@ -116,7 +117,8 @@ public class oscillatorDeviceInterface : deviceInterface
 
         data.jackOutID = signalOutput.transform.GetInstanceID();
         data.jackInAmpID = ampInput.transform.GetInstanceID();
-        data.jackInFreqID = freqInput.transform.GetInstanceID();
+        data.jackInFreqExpID = freqExpInput.transform.GetInstanceID();
+        data.jackInFreqLinID = freqLinInput.transform.GetInstanceID();
         data.jackInSyncID = syncInput.transform.GetInstanceID();
         data.jackInPwmID = pwmInput.transform.GetInstanceID();
 
@@ -136,7 +138,8 @@ public class oscillatorDeviceInterface : deviceInterface
         ID = data.ID;
         signalOutput.ID = data.jackOutID;
         ampInput.ID = data.jackInAmpID;
-        freqInput.ID = data.jackInFreqID;
+        freqExpInput.ID = data.jackInFreqExpID;
+        freqLinInput.ID = data.jackInFreqLinID;
         syncInput.ID = data.jackInSyncID;
         pwmInput.ID = data.jackInPwmID;
     }
@@ -150,7 +153,8 @@ public class OscillatorData : InstrumentData
     public float wave;
     public int jackOutID;
     public int jackInAmpID;
-    public int jackInFreqID;
+    public int jackInFreqExpID;
+    public int jackInFreqLinID;
     public int jackInSyncID;
     public int jackInPwmID;
 }
