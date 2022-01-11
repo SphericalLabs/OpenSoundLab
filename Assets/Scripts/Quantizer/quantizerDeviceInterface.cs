@@ -18,7 +18,7 @@ using System.Collections;
 public class quantizerDeviceInterface : deviceInterface {
   public omniJack input, output;
   public dial transposeDial;
-  public basicSwitch octaveSwitch; 
+  public dial scaleDial; 
   quantizerSignalGenerator signal;
   
 
@@ -29,8 +29,7 @@ public class quantizerDeviceInterface : deviceInterface {
 
   void Update() {
 
-    signal.isOctave = octaveSwitch.switchVal;
-    //signal.transpose = octaveSwitch.switchVal ? Utils.map(transposeDial.percent, 0f, 1f, -0.4f, 0.4f) : Utils.map(transposeDial.percent, 0f, 1f, -0.1f, 0.1f);
+    signal.selectedScale = Mathf.RoundToInt(scaleDial.percent * 3);
     signal.transpose = Utils.map(transposeDial.percent, 0f, 1f, -0.3f, 0.3f);
 
     if (signal.incoming != input.signal) signal.incoming = input.signal;
@@ -42,7 +41,7 @@ public class quantizerDeviceInterface : deviceInterface {
     GetTransformData(data);
 
     data.transposeState = transposeDial.percent;
-    data.octaveState = octaveSwitch.switchVal;
+    data.scaleState = scaleDial.percent;
 
     data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
@@ -58,13 +57,13 @@ public class quantizerDeviceInterface : deviceInterface {
     output.ID = data.jackOutID;
 
     transposeDial.setPercent(data.transposeState);
-    octaveSwitch.setSwitch(data.octaveState);
+    scaleDial.setPercent(data.scaleState);
   }
 }
 
 public class QuantizerData : InstrumentData {
   public float transposeState;
-  public bool octaveState;
+  public float scaleState;
   public int jackOutID;
   public int jackInID;
   public int jackControlID;
