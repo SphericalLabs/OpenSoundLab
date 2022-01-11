@@ -30,8 +30,8 @@ public class quantizerDeviceInterface : deviceInterface {
   void Update() {
 
     signal.isOctave = octaveSwitch.switchVal;
-    signal.transpose = octaveSwitch.switchVal ? Utils.map(transposeDial.percent, 0f, 1f, -0.4f, 0.4f) : Utils.map(transposeDial.percent, 0f, 1f, -0.1f, 0.1f);
-
+    //signal.transpose = octaveSwitch.switchVal ? Utils.map(transposeDial.percent, 0f, 1f, -0.4f, 0.4f) : Utils.map(transposeDial.percent, 0f, 1f, -0.1f, 0.1f);
+    signal.transpose = Utils.map(transposeDial.percent, 0f, 1f, -0.3f, 0.3f);
 
     if (signal.incoming != input.signal) signal.incoming = input.signal;
   }
