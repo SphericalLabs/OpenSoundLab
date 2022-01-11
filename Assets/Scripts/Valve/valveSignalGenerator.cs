@@ -21,7 +21,7 @@ public class valveSignalGenerator : signalGenerator {
   public signalGenerator incoming, controlSig;
   public bool active = true;
   public float amp = 1f;
-
+  float sign;
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
 
@@ -31,32 +31,32 @@ public class valveSignalGenerator : signalGenerator {
     if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
 
 
-    if(incoming != null) 
+    if (incoming != null) 
     { 
       if(controlSig != null) 
       {
         for (int i = 0; i < buffer.Length; i++)
         {
-          buffer[i] = buffer[i] * (controlBuffer[i] + 1) * 0.5f * Mathf.Pow(amp, 2); // map control buffer -1,1 -> 0,1
+          buffer[i] = buffer[i] * controlBuffer[i] * Mathf.Pow(amp, 2); // RingMod, 0-1 fades normal, -1 inverts phase
         }
       } else {
         for (int i = 0; i < buffer.Length; i++)
         {
-          buffer[i] = buffer[i] * Mathf.Pow(amp, 2);
+          buffer[i] = buffer[i] * Mathf.Pow(amp, 2); // dial acts as attenuator
         }
       }
-    } else {
-      if(controlSig != null) {
-        for (int i = 0; i < buffer.Length; i++)
-        {
-          buffer[i] = (controlBuffer[i] + 1) * 0.5f * Mathf.Pow(amp, 2);
-        }
-      } else {
+    } else { // nothing plugged, no output
+      //if(controlSig != null) {
+      //  for (int i = 0; i < buffer.Length; i++)
+      //  {
+      //    buffer[i] = controlBuffer[i] * Mathf.Pow(amp, 2);
+      //  }
+      //} else {
         for (int i = 0; i < buffer.Length; i++)
         {
           buffer[i] = 0;
         }
-      }
+      //}
     }
 
   }
