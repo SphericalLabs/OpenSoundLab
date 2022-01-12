@@ -17,11 +17,14 @@ using System.Collections;
 
 public class spectrumDisplay : MonoBehaviour {
   public AudioSource source;
-  int texW = 256;
-  int texH = 32;
+  int texW = 2048;
+  int texH = 64;
   Texture2D tex;
   public Renderer texrend;
   Color32[] texpixels;
+  Color32 onColor = new Color32(255, 255, 255, 255); // add transparency?
+  Color32 offColor = new Color32(0, 0, 0, 255);
+
 
   bool active = false;
 
@@ -44,13 +47,11 @@ public class spectrumDisplay : MonoBehaviour {
   }
 
   const float spectrumMult = 5;
-  void GenerateTex() {
+
+  void GenerateTex() { 
     for (int i = 0; i < texW; i++) {
       for (int i2 = 0; i2 < texH; i2++) {
-        byte s = 0;
-        if (spectrum[i] * spectrumMult * texH >= i2) s = 255;
-        texpixels[i2 * texW + i] = new Color32(s, s, s, 255);
-        //texpixels[i2 * texW + i] = new Color32(255, 0, 0, 255);
+        texpixels[i2 * texW + i] = (spectrum[i] * spectrumMult * texH >= i2) ? onColor : offColor; // how to make this logarithmic?
       }
     }
   }

@@ -37,11 +37,11 @@ public class filterSignalGenerator : signalGenerator {
     public enum filterType
     {
         none,
-        LP,
-        HP,
+        LP, // x
+        HP, // x
         LP_long,
         HP_long,
-        BP,
+        BP, // x
         Notch,
         pass
     };
@@ -57,7 +57,7 @@ public class filterSignalGenerator : signalGenerator {
     [DllImport("SoundStageNative")]
     public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfA, ref mfValues mfB, float[] frequencyBuffer, float resonance);
 
-  public filterType curType = filterType.none;
+    public filterType curType = filterType.LP;
 
     public override void Awake()
     {
