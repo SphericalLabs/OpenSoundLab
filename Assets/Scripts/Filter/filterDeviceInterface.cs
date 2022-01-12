@@ -95,14 +95,21 @@ public class filterDeviceInterface : deviceInterface {
       filter.controlIncoming = controlInput.signal;
     }
 
-    if (filter.controlIncoming != null) {
+    if (filter.controlIncoming != null)
+    {
       float per = (filter.controlFloat + 1) / 2f;
-      if (quads[1].curState != manipObject.manipState.grabbed) {
-        if (quads[0].curState != manipObject.manipState.grabbed && quads[2].curState != manipObject.manipState.grabbed) {
+      if (quads[1].curState != manipObject.manipState.grabbed)
+      {
+        if (quads[0].curState != manipObject.manipState.grabbed && quads[2].curState != manipObject.manipState.grabbed)
+        {
           quads[1].updatePercentage(per);
-        } else if (quads[0].curState == manipObject.manipState.grabbed && quads[2].curState != manipObject.manipState.grabbed) {
+        }
+        else if (quads[0].curState == manipObject.manipState.grabbed && quads[2].curState != manipObject.manipState.grabbed)
+        {
           quads[2].updatePercentage(per);
-        } else if (quads[2].curState == manipObject.manipState.grabbed && quads[0].curState != manipObject.manipState.grabbed) {
+        }
+        else if (quads[2].curState == manipObject.manipState.grabbed && quads[0].curState != manipObject.manipState.grabbed)
+        {
           quads[0].updatePercentage(per);
         }
       }

@@ -52,10 +52,12 @@ public class filterSignalGenerator : signalGenerator {
     public static extern void CopyArray(float[] a, float[] b, int length);
     [DllImport("SoundStageNative")]
     public static extern void AddArrays(float[] a, float[] b, int length);
+    //[DllImport("SoundStageNative")]
+    //public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfA, ref mfValues mfB);
     [DllImport("SoundStageNative")]
-    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfA, ref mfValues mfB);
+    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfA, ref mfValues mfB, float[] frequencyBuffer, float resonance);
 
-    public filterType curType = filterType.none;
+  public filterType curType = filterType.none;
 
     public override void Awake()
     {
@@ -138,7 +140,12 @@ public class filterSignalGenerator : signalGenerator {
             filters[2].SetFrequency(frequency[0]);
             filters[3].SetFrequency(frequency[0]);
         }
-    }
+
+        filters[0].SetResonance(resonance);
+        filters[1].SetResonance(resonance);
+        filters[2].SetResonance(resonance);
+        filters[3].SetResonance(resonance);
+  }
 
     void Update()
     {
@@ -170,7 +177,11 @@ public class filterSignalGenerator : signalGenerator {
             filters[2].SetFrequency(frequency[0]);
             filters[3].SetFrequency(frequency[0]);
         }
-    }
+        filters[0].SetResonance(resonance);
+        filters[1].SetResonance(resonance);
+        filters[2].SetResonance(resonance);
+        filters[3].SetResonance(resonance);
+  }
 
     private void OnAudioFilterRead(float[] buffer, int channels)
     {        
@@ -189,7 +200,7 @@ public class filterSignalGenerator : signalGenerator {
         if (controlIncoming != null)
         {
             controlIncoming.processBuffer(controlBuffer, dspTime, channels);
-            controlFloat = controlBuffer[controlBuffer.Length - 1];
+            controlFloat = controlBuffer[controlBuffer.Length - 1]; // thats for the normal Unity Thread, to visualise
         }
 
         // if silent, 0 out and return
@@ -211,22 +222,22 @@ public class filterSignalGenerator : signalGenerator {
 
         if (curType != filterType.Notch && curType != filterType.BP)
         {
-            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf);
+            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
         }
         else if (curType == filterType.Notch)
         {
             CopyArray(buffer, bufferCopy, buffer.Length);
 
-            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf);
-            processStereoFilter(bufferCopy, bufferCopy.Length, ref filters[2].mf, ref filters[3].mf);
+            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
+            processStereoFilter(bufferCopy, bufferCopy.Length, ref filters[2].mf, ref filters[3].mf, controlBuffer, resonance);
 
             AddArrays(buffer, bufferCopy, buffer.Length);
         }
 
         else if (curType == filterType.BP)
         {
-            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf);
-            processStereoFilter(buffer, buffer.Length, ref filters[2].mf, ref filters[3].mf);
+            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
+            processStereoFilter(buffer, buffer.Length, ref filters[2].mf, ref filters[3].mf, controlBuffer, resonance);
         }
         
         CopyArray(buffer, bufferCopy, buffer.Length);

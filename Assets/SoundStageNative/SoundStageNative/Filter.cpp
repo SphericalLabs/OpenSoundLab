@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "main.h"
+#include <math.h>
 #include "Filter.h"
 
 extern "C" {
@@ -34,12 +35,43 @@ extern "C" {
 		else return input - fd->b4;
 	}
 
-	void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB)
-	{
-		for (int i = 0; i < length; i += 2)
-		{
-			buffer[i] = ProcessSample(mfA, buffer[i]); 
-			buffer[i + 1] = ProcessSample(mfB, buffer[i+1]);
-		}
-	}
+	//void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB)
+	//{
+	//	for (int i = 0; i < length; i += 2)
+	//	{
+	//		buffer[i] = ProcessSample(mfA, buffer[i]); 
+	//		buffer[i + 1] = ProcessSample(mfB, buffer[i+1]);
+	//	}
+	//}
+
+    void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB, float frequencyBuffer[], float resonance)
+    {
+
+        resonance = clamp(resonance, 0.f, 1.f);
+
+        for (int i = 0; i < length; i += 2)
+        {
+            // should behave exponentially, maybe with an added linear fm input
+            frequencyBuffer[i] = clamp((frequencyBuffer[i] + 1.f) / 2.f, 0.f, 1.f); // [-1,1] -> [0,1] with safety clamp
+            frequencyBuffer[i+1] = clamp((frequencyBuffer[i+1] + 1.f) / 2.f, 0.f, 1.f);
+
+            mfA->q = 1.0f - frequencyBuffer[i];
+            mfA->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfA->q;
+            mfA->f = mfA->p + mfA->p - 1.0f;
+            mfA->q = resonance * (1.0f + 0.5f * mfA->q * (1.0f - mfA->q + 5.6f * mfA->q * mfA->q));
+
+            mfB->q = 1.0f - frequencyBuffer[i+1];
+            mfB->p = frequencyBuffer[i+1] + 0.8f * frequencyBuffer[i+1] * mfB->q;
+            mfB->f = mfA->p + mfB->p - 1.0f;
+            mfB->q = resonance * (1.0f + 0.5f * mfB->q * (1.0f - mfB->q + 5.6f * mfB->q * mfB->q));
+
+            buffer[i] = ProcessSample(mfA, buffer[i]);
+            buffer[i + 1] = ProcessSample(mfB, buffer[i + 1]);
+        }
+    }
+
+    float clamp(float d, float min, float max) {
+        const float t = d < min ? min : d;
+        return t > max ? max : t;
+    }
 }
