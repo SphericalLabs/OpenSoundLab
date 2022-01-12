@@ -1,0 +1,232 @@
+//  Created by Hannes Barfuss on 15.12.2021.
+//
+//  This is a feed-forward compressor based on this paper:
+//  https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysisx
+//
+//  The gain is computed by first applying threshold, ratio and knee to the input signal, then smoothing the resulting control signal by a 0-pole IIR filter (envelope follower). The computed gain is then applied ("fed forward") to the input signal.
+//  Note that if the compressor's ratio is set to its maxValue, it is internally interpreted as INFINITY and the compressor acts as a brickwall limiter.
+//  The compressor has an optional Lookahead feature, which is mainly useful in conjunction with brickwall limiting, to avoid rectangular artifacts. A limiter without lookahead only guarantees to not overshoot if it has an attack time of 0, which means no attack gain smoothing is applied at all. With a lookahead, the limiter can have an attack time > 0, which results in smoother gain reduction. The downside is that a lookahead of n samples adds n samples of latency to the output signal (because it is impossible to see into the future, so the "lookahead" is actually implemented as a delay on the input signal...)
+
+#include "Compressor.h"
+#include "util.h"
+#include <string.h>
+#include <math.h>
+#include <assert.h>
+
+#define MAX_LOOKAHEAD 100
+#define MAX_RATIO 12
+#define DELAY_ATTACK 10
+
+enum CompressorParams
+{
+    P_ATTACK,
+    P_RELEASE,
+    P_THRESHOLD,
+    P_RATIO,
+    P_KNEE,
+    P_MAKEUP,
+    P_LOOKAHEAD,
+    P_N
+};
+
+float _coeff(float t, float samplerate) {
+    float smpls = (t / 1000) * samplerate;
+    return powf((1-one_minus_oneOverE), (1.0/smpls));
+}
+
+inline float _interpolate(float *buf, float index)
+{
+    int floored = (int)index;
+    float f2 = index - floored;
+    float f1 = 1 - f2;
+    return f1 * buf[floored] + f2 * buf[floored + 1];
+}
+
+SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, int channels, CompressorData* x)
+{
+    /* Attention: inbuffer & outbuffer are interleaved! */
+    
+    if (channels != 2)
+    {
+        return;
+    }
+    
+    //TODO: This causes the compressor to not kick in immediately after periods of silence!
+    float sumIn = _fSumOfMags(buffer, length);
+    if(sumIn < 0.0000000001)
+    {
+        return;
+    }
+    
+    x->clipping = false;
+    
+    float threshold = x->params[P_THRESHOLD];
+    float ratio = x->params[P_RATIO];
+    float knee = x->params[P_KNEE];
+    float makeup = x->params[P_MAKEUP];
+    
+    float attenuation = 0;
+    float tmp;
+    float xG;
+    float yG;
+    float xL;
+    float y1;
+    float yL;
+    float cdb;
+    float c;
+    int lookaheadSmpls = _mstosmpls(x->params[P_LOOKAHEAD], x->sampleRate);
+    int delay;
+    float *inBuf = buffer;
+    float *sidechain = sc;
+    float *outBuf = buffer;
+    int readPtr;
+    int n = length / channels;
+    while(n--)
+    {
+        //"Lookahead" is implemented by delaying the input signal.
+        //Envelope smoothing is applied to delay time to reduce artifacts at sudden changes
+        delay = (lookaheadSmpls == x->d_prev) ? lookaheadSmpls : (int)roundf( x->aD * x->d_prev + (1.0f - x->aD) * lookaheadSmpls );
+        
+        readPtr = x->bufPtr - channels * delay;
+        while(readPtr < 0)
+            readPtr += x->bufLength;
+        
+        for(int k = 0; k < channels; k++)
+        {
+            //write sample to lookahead buffer
+            x->buf[x->bufPtr+k] = inBuf[k];
+            
+            //convert to decibel so we can operate in log domain
+            if(x->params[P_RATIO] <= MAX_RATIO)
+                xG = _atodb(fabsf(sidechain[k]));
+            //If we are in limiter mode, we look at current sidechain value as well as current output signal value, and use whichever is bigger to calculate the gain reduction. If we would only use the sidechain, then transients that are shorter than the lookahead time will not get attenuated.
+            else
+             xG = _atodb(_max(fabs(sidechain[k]), fabs(x->buf[readPtr+k])));
+            
+            //apply threshold, ratio, knee: eq.4
+            tmp = 2*(xG - threshold);
+            //signal is below treshold and not within knee, no attenuation at all:
+            if(tmp < -(knee)) yG = xG;
+            //signal is above threshold and not within knee, full attenuation:
+            else if ((tmp > knee)) yG = threshold + (xG - threshold) / ratio;
+            //signal is within knee, attenuate smoothly:
+            else yG = xG + (1/ratio-1) * powf(xG - threshold + knee/2, 2) / (2*knee);
+            
+            //smooth level detection: eq.17
+            //The calculated attenuation is smoothed by an envelope follower.
+            xL = xG - yG;
+            y1 = _max(xL, x->aR * x->y1_prev[k] + (1 - x->aR) * xL);
+            yL = x->aA * x->yL_prev[k] + (1 - x->aA) * y1;
+            cdb = -yL + makeup;
+            attenuation += -yL;
+            c = _dbtoa(cdb);
+            
+            //store current samples for later
+            x->y1_prev[k] = y1;
+            x->yL_prev[k] = yL;
+            
+            //write final output sample
+            outBuf[k] = c * x->buf[readPtr+k];
+            
+            //Check if clipping
+            if(fabs(outBuf[k]) > 1)
+                x->clipping = true;
+        }
+        
+        //Increment pointers
+        outBuf += channels;
+        sidechain += channels;
+        inBuf += channels;
+        x->bufPtr = (x->bufPtr + channels) % x->bufLength;
+        x->d_prev = delay;
+    }
+
+    x->attenuation = attenuation / length;
+    return;
+}
+
+
+SOUNDSTAGE_API struct CompressorData *Compressor_New(float sampleRate)
+{
+    struct CompressorData *x = (struct CompressorData *)_malloc(sizeof(struct CompressorData));
+    
+    //public
+    float *params = (float*)_malloc(P_N * sizeof(float));
+    params[P_LOOKAHEAD] = 0;
+    params[P_KNEE] = 0;
+    params[P_RATIO] = 1;
+    params[P_ATTACK] = 0;
+    params[P_RELEASE] = 0;
+    params[P_THRESHOLD] = 0;
+    params[P_MAKEUP] = 0;
+    x->params = params;
+    
+    //internal
+    x->aA = 0;
+    x->aR = 0;
+    x->aD = _coeff(DELAY_ATTACK, sampleRate);
+    x->y1_prev[0] = 0;
+    x->yL_prev[0] = 0;
+    x->y1_prev[1] = 0;
+    x->yL_prev[1] = 0;
+    x->d_prev = 0;
+    x->sampleRate = sampleRate;
+    x->bufLength = _nextPowOf2 ( 2 * _mstosmpls(MAX_LOOKAHEAD, sampleRate) );
+    x->buf = (float*)_malloc(x->bufLength * sizeof(float));
+    _fZero(x->buf, x->bufLength);
+    x->bufPtr = 0;
+    x->attenuation = 0;
+    
+    printv("Created new Compressor instance with sampleRate %f\n", sampleRate);
+    
+    return x;
+}
+
+SOUNDSTAGE_API void Compressor_Free(struct CompressorData *x)
+{
+    free(x->buf);
+    free(x->params);
+    free(x);
+}
+
+SOUNDSTAGE_API void Compressor_SetParam(float value, int param, struct CompressorData *x)
+{
+    assert(param < P_N);
+        
+    switch (param) {
+        case P_ATTACK:
+            if(value != x->params[param])
+                x->aA = _coeff(value, x->sampleRate);
+            break;
+        case P_RELEASE:
+            if(value != x->params[param])
+                x->aR = _coeff(value, x->sampleRate);
+            break;
+        case P_LOOKAHEAD:
+            assert(value <= MAX_LOOKAHEAD);
+            break;
+        case P_RATIO:
+            if(value >= MAX_RATIO)
+                value = INFINITY;
+            break;
+        default:
+            break;
+    }
+    
+    x->params[param] = value;
+}
+
+SOUNDSTAGE_API float Compressor_GetAttenuation(struct CompressorData *x)
+{
+    return x->attenuation;
+}
+
+SOUNDSTAGE_API bool Compressor_IsRamping(struct CompressorData *x)
+{
+    return (_mstosmpls(x->params[P_LOOKAHEAD], x->sampleRate) == x->d_prev);
+}
+
+SOUNDSTAGE_API bool Compressor_IsClipping(struct CompressorData *x)
+{
+    return x->clipping;
+}

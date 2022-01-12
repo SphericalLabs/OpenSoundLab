@@ -45,6 +45,7 @@ public class menuItem : manipObject {
     Funktion,
     Sampler,
     Recorder,
+    Compressor,
     Mixer,
     Drum,
     Keyboard,
@@ -56,7 +57,9 @@ public class menuItem : manipObject {
     Splitter,
     TouchPad,
     XyloRoll,
+    Delay,
     Reverb,
+    StereoVerb,
     Microphone,
     Camera,
     Filter,
@@ -118,6 +121,7 @@ public class menuItem : manipObject {
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.ConferenceCall) label.text = "WebCam";
     if (item == deviceType.SampleHold) label.text = "S&H";
+    if (item == deviceType.Compressor) label.text = "Comp/Limiter";
 
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(true);
