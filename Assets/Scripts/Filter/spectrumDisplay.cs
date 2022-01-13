@@ -15,23 +15,26 @@
 using UnityEngine;
 using System.Collections;
 using System.Diagnostics;
+using System;
 
 public class spectrumDisplay : MonoBehaviour {
   public AudioSource source;
   public FFTWindow fftWin = FFTWindow.BlackmanHarris;
 
-  int texW = 512;
-  int texH = 512;
+  int texW = 256*4;
+  int texH = 256;
   Texture2D tex;
   public Renderer texrend;
   Color32[] texpixels;
+  Color32[] blackpixels;
   public Color32 onColor = new Color32(255, 255, 255, 255); 
   public Color32 offColor = new Color32(0, 0, 0, 255);
 
   bool active = false;
 
   public bool doSpectrum = true;
-  public bool doClear = true;
+  public bool doClear1 = true;
+  public bool doClear2 = false;
   public bool doDraw = true;
 
   float[] spectrum;
@@ -41,9 +44,10 @@ public class spectrumDisplay : MonoBehaviour {
 
     tex = new Texture2D(texW, texH, TextureFormat.RGBA32, false);
     texpixels = new Color32[texW * texH];
+    blackpixels = new Color32[texW * texH];
 
-    for (int i = 0; i < texpixels.Length; i++) texpixels[i] = offColor;
-    tex.SetPixels32(texpixels);
+    for (int i = 0; i < blackpixels.Length; i++) blackpixels[i] = offColor;
+    tex.SetPixels32(blackpixels);
     tex.Apply(true);
 
     texrend.material.mainTexture = tex;
@@ -52,22 +56,27 @@ public class spectrumDisplay : MonoBehaviour {
   }
 
   const float spectrumMult = 5;
+  public int skip = 15;
 
   void GenerateTex() {
 
     // Please note: Ideally this would be ported to native code and OpenGL?
     // Fallback, decrease fps: 72, 36, 18
 
-    if (doClear)
+    if (doClear1)
     {
-      // fill background
+      Array.Copy(blackpixels, texpixels, blackpixels.Length);
+    }
+
+    if(doClear2){
+      //fill background
       for (int i = 0; i < texpixels.Length; i++)
       {
         texpixels[i] = offColor; // takes a lot of time, speed up with optimised copy from backbuffer?
       }
-      tex.SetPixels32(texpixels); // avoid this here, move it down
     }
 
+    // run multi-threaded? https://www.raywenderlich.com/7880445-unity-job-system-and-burst-compiler-getting-started
     if (doDraw)
     {
       // draw spectrum
@@ -75,21 +84,25 @@ public class spectrumDisplay : MonoBehaviour {
       int bandX = 0;
       Vector2 p1 = new Vector2(0f, 0f);
       Vector2 p2 = new Vector2(0f, 0f);
+      int lastBandX = 0;
       for (int freqBand = 0; freqBand < spectrum.Length; freqBand++)
       {
         bandX = Mathf.RoundToInt(Mathf.Pow((float)freqBand / spectrum.Length, 0.5f) * spectrum.Length); // skip bands if to close together?, do uv trick to avoid non-linearity?
+        if (bandX - lastBandX <= skip) continue;
         bandHeight = Mathf.RoundToInt(Mathf.Pow(spectrum[freqBand], 0.3f) * texH);
 
         p2.x = bandX;
         p2.y = bandHeight;
-        drawLine(tex, p1, p2, onColor); // rewrite to directly write into texpixels array?
+        drawLine(texpixels, p1, p2, onColor); 
         p1 = p2;
+        lastBandX = bandX;
       }
+      tex.SetPixels32(texpixels);
       tex.Apply(); // apply takes time, from RAM to vRAM.
     }
   }
 
-  public void drawLine(Texture2D tex, Vector2 p1, Vector2 p2, Color col)
+  public void drawLine(Color32[] pixels, Vector2 p1, Vector2 p2, Color col)
   {
     Vector2 t = p1;
     float frac = 1 / Mathf.Sqrt(Mathf.Pow(p2.x - p1.x, 2) + Mathf.Pow(p2.y - p1.y, 2));
@@ -99,7 +112,8 @@ public class spectrumDisplay : MonoBehaviour {
     {
       t = Vector2.Lerp(p1, p2, ctr);
       ctr += frac;
-      tex.SetPixel((int)t.x, (int)t.y, col);
+      //tex.SetPixel((int)t.x, (int)t.y, col);
+      pixels[(int)t.y * tex.width + (int)t.x] = col;
     }
   }
 

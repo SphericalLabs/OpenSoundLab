@@ -1068,6 +1068,10 @@ MonoBehaviour:
   offColor:
     serializedVersion: 2
     rgba: 4278190080
+  doSpectrum: 1
+  doClear: 1
+  doDraw: 1
+  skip: 1
 --- !u!1 &1000013377660662
 GameObject:
   m_ObjectHideFlags: 0
