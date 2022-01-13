@@ -20,24 +20,29 @@ using System;
 public class spectrumDisplay : MonoBehaviour {
   public AudioSource source;
   public FFTWindow fftWin = FFTWindow.BlackmanHarris;
+  float[] spectrum;
 
   int texW = 256*4;
-  int texH = 256;
+  int texH = 256*1;
   Texture2D tex;
   public Renderer texrend;
   Color32[] texpixels;
   Color32[] blackpixels;
   public Color32 onColor = new Color32(255, 255, 255, 255); 
   public Color32 offColor = new Color32(0, 0, 0, 255);
-
-  bool active = false;
-
+    
   public bool doSpectrum = true;
   public bool doClear1 = true;
-  public bool doClear2 = false;
   public bool doDraw = true;
+  bool active = false;
 
-  float[] spectrum;
+  int drawY = 0;
+  int drawX = 0;  
+  int lastDrawX = 0;
+  int lastDrawY = 0;
+  public int skip = 1;
+  float bandWidth;
+  float maxLog;
 
   void Start() {
     spectrum = new float[texW];
@@ -53,67 +58,67 @@ public class spectrumDisplay : MonoBehaviour {
     texrend.material.mainTexture = tex;
     texrend.material.SetTexture(Shader.PropertyToID("_MainTex"), tex);
 
+    bandWidth = 24000f / texW;
+    maxLog = Mathf.Log10(24000);
+
   }
 
-  const float spectrumMult = 5;
-  public int skip = 15;
+  
 
   void GenerateTex() {
 
     // Please note: Ideally this would be ported to native code and OpenGL?
     // Fallback, decrease fps: 72, 36, 18
+    // run multi-threaded? https://www.raywenderlich.com/7880445-unity-job-system-and-burst-compiler-getting-started
 
     if (doClear1)
     {
       Array.Copy(blackpixels, texpixels, blackpixels.Length);
     }
-
-    if(doClear2){
-      //fill background
-      for (int i = 0; i < texpixels.Length; i++)
-      {
-        texpixels[i] = offColor; // takes a lot of time, speed up with optimised copy from backbuffer?
-      }
-    }
-
-    // run multi-threaded? https://www.raywenderlich.com/7880445-unity-job-system-and-burst-compiler-getting-started
+        
     if (doDraw)
     {
-      // draw spectrum
-      int bandHeight = 0;
-      int bandX = 0;
-      Vector2 p1 = new Vector2(0f, 0f);
-      Vector2 p2 = new Vector2(0f, 0f);
-      int lastBandX = 0;
-      for (int freqBand = 0; freqBand < spectrum.Length; freqBand++)
-      {
-        bandX = Mathf.RoundToInt(Mathf.Pow((float)freqBand / spectrum.Length, 0.5f) * spectrum.Length); // skip bands if to close together?, do uv trick to avoid non-linearity?
-        if (bandX - lastBandX <= skip) continue;
-        bandHeight = Mathf.RoundToInt(Mathf.Pow(spectrum[freqBand], 0.3f) * texH);
+      // reset for this frame
+      drawY = 0;
+      drawX = 0;
+      lastDrawX = 0;
+      lastDrawY = 0;
 
-        p2.x = bandX;
-        p2.y = bandHeight;
-        drawLine(texpixels, p1, p2, onColor); 
-        p1 = p2;
-        lastBandX = bandX;
+      for (int freqBand = 1; freqBand < spectrum.Length; freqBand++) // skip 0, because of log negative?
+      {
+        drawX = Mathf.RoundToInt(Utils.map(Mathf.Log10(freqBand * bandWidth), 1f, maxLog, 0f, texW));
+        if (drawX - lastDrawX <= skip) continue; // skip bands if too close together
+
+        drawY = Mathf.RoundToInt(Mathf.Pow(spectrum[freqBand], 0.3f) * (texH-1));
+
+        drawLine(texpixels, lastDrawX, lastDrawY, drawX, drawY, onColor);
+
+        //p1 = p2;
+        lastDrawX = drawX;
+        lastDrawY = drawY;
       }
+
       tex.SetPixels32(texpixels);
       tex.Apply(); // apply takes time, from RAM to vRAM.
     }
   }
 
-  public void drawLine(Color32[] pixels, Vector2 p1, Vector2 p2, Color col)
+  // Bresenham's line algorithm, ported from http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.23
+  void drawLine(Color32[] pixels, int x0, int y0, int x1, int y1, Color color)
   {
-    Vector2 t = p1;
-    float frac = 1 / Mathf.Sqrt(Mathf.Pow(p2.x - p1.x, 2) + Mathf.Pow(p2.y - p1.y, 2));
-    float ctr = 0;
-
-    while ((int)t.x != (int)p2.x || (int)t.y != (int)p2.y)
+    int dx = Math.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;  // move variables globally for speed
+    int dy = Math.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = (dx > dy ? dx : -dy) / 2, e2;
+    for (; ; )
     {
-      t = Vector2.Lerp(p1, p2, ctr);
-      ctr += frac;
-      //tex.SetPixel((int)t.x, (int)t.y, col);
-      pixels[(int)t.y * tex.width + (int)t.x] = col;
+      pixels[y0 * texW + x0] = color;
+      if (x0 == x1 && y0 == y1)
+      {
+        break;
+      }
+      e2 = err;
+      if (e2 > -dx) { err -= dy; x0 += sx; }
+      if (e2 < dy) { err += dx; y0 += sy; }
     }
   }
 
@@ -127,16 +132,14 @@ public class spectrumDisplay : MonoBehaviour {
   }
 
   void Update() {
-    Stopwatch timer = new Stopwatch();
-    timer.Start();
+    //Stopwatch timer = new Stopwatch();
+    //timer.Start();
     if (!active) return;
 
     if(doSpectrum) source.GetSpectrumData(spectrum, 0, fftWin);
 
     GenerateTex();
-    timer.Stop();
-    UnityEngine.Debug.Log(timer.ElapsedTicks);
-
-    
+    //timer.Stop();
+    //UnityEngine.Debug.Log(timer.ElapsedTicks);
   }
 }
