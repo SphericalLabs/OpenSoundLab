@@ -18,20 +18,19 @@ using System.Runtime.InteropServices;
 
 public class filterSignalGenerator : signalGenerator {
 
-    public signalGenerator incoming,controlIncoming;
+    public signalGenerator incoming, controlIncoming;
 
-    public float controlFloat = 0;
+    //MonoFilter[] filters;
 
-    MonoFilter[] filters;
-
-    public float resonance = .5f;//0 to 1 - tie to a dial?
-    public float[] frequency = new float[] { .3f,.6f};// cutoff frequency for LP and BP
-
+    public float cutoffFrequency = 0f;
+    public float resonance = .5f;
+    //public float[] frequency = new float[] { .3f,.6f};// cutoff frequency for LP and BP
+    
     float[] bufferCopy;
-    float[] controlBuffer;
+    float[] frequencyBuffer;
 
     // Changing this number requires changing native code.
-    const int NUM_FILTERS = 4;
+    //const int NUM_FILTERS = 4;
 
     // Changing this enum requires changing the mirrored native enum.
     public enum filterType
@@ -42,7 +41,7 @@ public class filterSignalGenerator : signalGenerator {
         LP_long,
         HP_long,
         BP, // x
-        Notch,
+        Notch, // x
         pass
     };
 
@@ -52,136 +51,140 @@ public class filterSignalGenerator : signalGenerator {
     public static extern void CopyArray(float[] a, float[] b, int length);
     [DllImport("SoundStageNative")]
     public static extern void AddArrays(float[] a, float[] b, int length);
-    //[DllImport("SoundStageNative")]
-    //public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfA, ref mfValues mfB);
+
     [DllImport("SoundStageNative")]
-    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfA, ref mfValues mfB, float[] frequencyBuffer, float resonance);
+    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfA, ref mfValues mfB, float cutoffFrequencym, float[] frequencyBuffer, float resonance);
+    // do these structs have to be created in native code?
 
     public filterType curType = filterType.LP;
 
-    public override void Awake()
+    // create empty structs for passing to native code
+    mfValues mfV1 = new mfValues();
+    mfValues mfV2 = new mfValues();
+
+  public override void Awake()
     {
         base.Awake();
-        filters = new MonoFilter[NUM_FILTERS];
+        //filters = new MonoFilter[NUM_FILTERS];
         bufferCopy = new float[MAX_BUFFER_LENGTH];
-        controlBuffer = new float[MAX_BUFFER_LENGTH];
+        frequencyBuffer = new float[MAX_BUFFER_LENGTH];
 
-        //primary stereo filter
-        filters[0] = new MonoFilter(frequency[0], resonance);
-        filters[1] = new MonoFilter(frequency[0], resonance);
+        ////primary stereo filter
+        //filters[0] = new MonoFilter(frequency[0], resonance);
+        //filters[1] = new MonoFilter(frequency[0], resonance);
 
-        //secondary stereo filter (for BP/notch)
-        filters[2] = new MonoFilter(frequency[1], resonance);
-        filters[3] = new MonoFilter(frequency[1], resonance);
+        ////secondary stereo filter (for BP/notch)
+        //filters[2] = new MonoFilter(frequency[1], resonance);
+        //filters[3] = new MonoFilter(frequency[1], resonance);
     }
 
 
-    public void updateFilterType(filterType f)
-    {
-        curType = f;
+  //  public void updateFilterType(filterType f)
+  //  {
+  //      curType = f;
 
-        if(f == filterType.LP)
-        {
-            filters[0].mf.LP = true;
-            filters[1].mf.LP = true;
+  //      if(f == filterType.LP)
+  //      {
+  //          filters[0].mf.LP = true;
+  //          filters[1].mf.LP = true;
 
-            filters[0].SetFrequency(frequency[0]);
-            filters[1].SetFrequency(frequency[0]);
-        }
-        else if(f == filterType.LP_long)
-        {
-            filters[0].mf.LP = true;
-            filters[1].mf.LP = true;
+  //          filters[0].SetFrequency(frequency[0]);
+  //          filters[1].SetFrequency(frequency[0]);
+  //      }
+  //      else if(f == filterType.LP_long)
+  //      {
+  //          filters[0].mf.LP = true;
+  //          filters[1].mf.LP = true;
 
-            filters[0].SetFrequency(frequency[1]);
-            filters[1].SetFrequency(frequency[1]);
-        }
-        else if (f == filterType.HP)
-        {
-            filters[0].mf.LP = false;
-            filters[1].mf.LP = false;
+  //          filters[0].SetFrequency(frequency[1]);
+  //          filters[1].SetFrequency(frequency[1]);
+  //      }
+  //      else if (f == filterType.HP)
+  //      {
+  //          filters[0].mf.LP = false;
+  //          filters[1].mf.LP = false;
 
-            filters[0].SetFrequency(frequency[1]);
-            filters[1].SetFrequency(frequency[1]);
-        }
-        else if (f == filterType.HP_long)
-        {
-            filters[0].mf.LP = false;
-            filters[1].mf.LP = false;
+  //          filters[0].SetFrequency(frequency[1]);
+  //          filters[1].SetFrequency(frequency[1]);
+  //      }
+  //      else if (f == filterType.HP_long)
+  //      {
+  //          filters[0].mf.LP = false;
+  //          filters[1].mf.LP = false;
 
-            filters[0].SetFrequency(frequency[0]);
-            filters[1].SetFrequency(frequency[0]);
-        }
-        else if (f == filterType.Notch)
-        {
-            filters[0].mf.LP = true;
-            filters[1].mf.LP = true;
+  //          filters[0].SetFrequency(frequency[0]);
+  //          filters[1].SetFrequency(frequency[0]);
+  //      }
+  //      else if (f == filterType.Notch)
+  //      {
+  //          filters[0].mf.LP = true;
+  //          filters[1].mf.LP = true;
 
-            filters[2].mf.LP = false;
-            filters[3].mf.LP = false;
+  //          filters[2].mf.LP = false;
+  //          filters[3].mf.LP = false;
 
-            filters[0].SetFrequency(frequency[0]);
-            filters[1].SetFrequency(frequency[0]);
+  //          filters[0].SetFrequency(frequency[0]);
+  //          filters[1].SetFrequency(frequency[0]);
 
-            filters[2].SetFrequency(frequency[1]);
-            filters[3].SetFrequency(frequency[1]);
-        }
-        else if (f == filterType.BP)
-        {
-            filters[0].mf.LP = true;
-            filters[1].mf.LP = true;
+  //          filters[2].SetFrequency(frequency[1]);
+  //          filters[3].SetFrequency(frequency[1]);
+  //      }
+  //      else if (f == filterType.BP)
+  //      {
+  //          filters[0].mf.LP = true;
+  //          filters[1].mf.LP = true;
 
-            filters[2].mf.LP = false;
-            filters[3].mf.LP = false;
+  //          filters[2].mf.LP = false;
+  //          filters[3].mf.LP = false;
 
-            filters[0].SetFrequency(frequency[1]);
-            filters[1].SetFrequency(frequency[1]);
+  //          filters[0].SetFrequency(frequency[1]);
+  //          filters[1].SetFrequency(frequency[1]);
 
-            filters[2].SetFrequency(frequency[0]);
-            filters[3].SetFrequency(frequency[0]);
-        }
+  //          filters[2].SetFrequency(frequency[0]);
+  //          filters[3].SetFrequency(frequency[0]);
+  //      }
 
-        filters[0].SetResonance(resonance);
-        filters[1].SetResonance(resonance);
-        filters[2].SetResonance(resonance);
-        filters[3].SetResonance(resonance);
-  }
+  //      filters[0].SetResonance(resonance);
+  //      filters[1].SetResonance(resonance);
+  //      filters[2].SetResonance(resonance);
+  //      filters[3].SetResonance(resonance);
+  //}
 
-    void Update()
-    {
-        if (curType == filterType.LP || curType == filterType.HP_long)
-        {
-            filters[0].SetFrequency(frequency[0]);
-            filters[1].SetFrequency(frequency[0]);
-        }
-        else if (curType == filterType.LP_long || curType == filterType.HP)
-        {
-            filters[0].SetFrequency(frequency[1]);
-            filters[1].SetFrequency(frequency[1]);
-        }
-        else if (curType == filterType.Notch)
-        {
+  //  void Update()
+  //  {
+  //      if (curType == filterType.LP || curType == filterType.HP_long)
+  //      {
+  //          filters[0].SetFrequency(frequency[0]);
+  //          filters[1].SetFrequency(frequency[0]);
+  //      }
+  //      else if (curType == filterType.LP_long || curType == filterType.HP)
+  //      {
+  //          filters[0].SetFrequency(frequency[1]);
+  //          filters[1].SetFrequency(frequency[1]);
+  //      }
+  //      else if (curType == filterType.Notch)
+  //      {
 
-            filters[0].SetFrequency(frequency[0]);
-            filters[1].SetFrequency(frequency[0]);
+  //          filters[0].SetFrequency(frequency[0]);
+  //          filters[1].SetFrequency(frequency[0]);
 
-            filters[2].SetFrequency(frequency[1]);
-            filters[3].SetFrequency(frequency[1]);
-        }
-        else if (curType == filterType.BP)
-        {
+  //          filters[2].SetFrequency(frequency[1]);
+  //          filters[3].SetFrequency(frequency[1]);
+  //      }
+  //      else if (curType == filterType.BP)
+  //      {
 
-            filters[0].SetFrequency(frequency[1]);
-            filters[1].SetFrequency(frequency[1]);
+  //          filters[0].SetFrequency(frequency[1]);
+  //          filters[1].SetFrequency(frequency[1]);
 
-            filters[2].SetFrequency(frequency[0]);
-            filters[3].SetFrequency(frequency[0]);
-        }
-        filters[0].SetResonance(resonance);
-        filters[1].SetResonance(resonance);
-        filters[2].SetResonance(resonance);
-        filters[3].SetResonance(resonance);
-  }
+  //          filters[2].SetFrequency(frequency[0]);
+  //          filters[3].SetFrequency(frequency[0]);
+  //      }
+  //      filters[0].SetResonance(resonance);
+  //      filters[1].SetResonance(resonance);
+  //      filters[2].SetResonance(resonance);
+  //      filters[3].SetResonance(resonance);
+  //}
 
     private void OnAudioFilterRead(float[] buffer, int channels)
     {        
@@ -194,13 +197,12 @@ public class filterSignalGenerator : signalGenerator {
         if (bufferCopy.Length != buffer.Length)
             System.Array.Resize(ref bufferCopy, buffer.Length);
 
-        if (controlBuffer.Length != buffer.Length)
-            System.Array.Resize(ref controlBuffer, buffer.Length);
+        if (frequencyBuffer.Length != buffer.Length)
+            System.Array.Resize(ref frequencyBuffer, buffer.Length);
 
         if (controlIncoming != null)
         {
-            controlIncoming.processBuffer(controlBuffer, dspTime, channels);
-            controlFloat = controlBuffer[controlBuffer.Length - 1]; // thats for the normal Unity Thread, to visualise
+            controlIncoming.processBuffer(frequencyBuffer, dspTime, channels);
         }
 
         // if silent, 0 out and return
@@ -210,37 +212,56 @@ public class filterSignalGenerator : signalGenerator {
             SetArrayToSingleValue(bufferCopy, bufferCopy.Length, 0.0f);
             return;            
         }
-
         incoming.processBuffer(buffer, dspTime, channels);
 
-        // if pass through, just end
-        if (curType == filterType.pass)
-        {
-            CopyArray(buffer, bufferCopy,buffer.Length);
-            return;
-        }
+    //// if pass through, just end
+    //if (curType == filterType.pass)
+    //{
+    //    CopyArray(buffer, bufferCopy,buffer.Length);
+    //    return;
+    //}
 
-        if (curType != filterType.Notch && curType != filterType.BP)
-        {
-            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
-        }
-        else if (curType == filterType.Notch)
-        {
-            CopyArray(buffer, bufferCopy, buffer.Length);
+    //if (curType != filterType.Notch && curType != filterType.BP)
+    //{
+    //    processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
+    //}
+    //else if (curType == filterType.Notch)
+    //{
+    //    CopyArray(buffer, bufferCopy, buffer.Length);
 
-            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
-            processStereoFilter(bufferCopy, bufferCopy.Length, ref filters[2].mf, ref filters[3].mf, controlBuffer, resonance);
+    //    processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
+    //    processStereoFilter(bufferCopy, bufferCopy.Length, ref filters[2].mf, ref filters[3].mf, controlBuffer, resonance);
 
-            AddArrays(buffer, bufferCopy, buffer.Length);
-        }
+    //    AddArrays(buffer, bufferCopy, buffer.Length);
+    //}
 
-        else if (curType == filterType.BP)
-        {
-            processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
-            processStereoFilter(buffer, buffer.Length, ref filters[2].mf, ref filters[3].mf, controlBuffer, resonance);
-        }
-        
-        CopyArray(buffer, bufferCopy, buffer.Length);
+    //else if (curType == filterType.BP)
+    //{
+    //    processStereoFilter(buffer, buffer.Length, ref filters[0].mf, ref filters[1].mf, controlBuffer, resonance);
+    //    processStereoFilter(buffer, buffer.Length, ref filters[2].mf, ref filters[3].mf, controlBuffer, resonance);
+    //}
+
+    if (curType != filterType.Notch && curType != filterType.BP) // not a double filter setup, works for LP, but not for HP yet!
+    {
+      processStereoFilter(buffer, buffer.Length, ref mfV1, ref mfV2, cutoffFrequency, frequencyBuffer, resonance);
+    }
+    else if (curType == filterType.Notch) // duplicate buffer in order to process two filters in parallel
+    {
+      CopyArray(buffer, bufferCopy, buffer.Length); 
+
+      processStereoFilter(buffer, buffer.Length, ref mfV1, ref mfV2, cutoffFrequency, frequencyBuffer, resonance); 
+      processStereoFilter(bufferCopy, bufferCopy.Length, ref mfV1, ref mfV2, cutoffFrequency, frequencyBuffer, resonance);
+
+      AddArrays(buffer, bufferCopy, buffer.Length);
+    }
+
+    else if (curType == filterType.BP) // process two filter in series
+    {
+      processStereoFilter(buffer, buffer.Length, ref mfV1, ref mfV2, cutoffFrequency, frequencyBuffer, resonance); 
+      processStereoFilter(buffer, buffer.Length, ref mfV1, ref mfV2, cutoffFrequency, frequencyBuffer, resonance); 
+    }
+
+      CopyArray(buffer, bufferCopy, buffer.Length);
     }
 }
 
@@ -248,42 +269,42 @@ public struct mfValues
 {
     public float f, p, q; //filter coefficients
     public float b0, b1, b2, b3, b4; //filter buffers (beware denormals!)
-    public bool LP;
+    public bool LP; // needed?
 };
 
-class MonoFilter
-{
-    public float frequency = .5f;
-    public float resonance = .5f;
+//class MonoFilter
+//{
+//    public float frequency = .5f;
+//    public float resonance = .5f;
     
-    public mfValues mf = new mfValues();
-    float t1, t2; 
-    public MonoFilter(float fre, float r)
-    {
-        mf.LP = true;
-        frequency = fre;
-        resonance = r;        
-        Update();
-    }
+//    public mfValues mf = new mfValues();
+//    float t1, t2; 
+//    public MonoFilter(float fre, float r)
+//    {
+//        mf.LP = true;
+//        frequency = fre;
+//        resonance = r;        
+//        Update();
+//    }
 
-    public void SetFrequency(float fre)
-    {
-        frequency = fre;
-        Update();
-    }
+//    public void SetFrequency(float fre)
+//    {
+//        frequency = fre;
+//        Update();
+//    }
 
-    public void SetResonance(float r)
-    {
-        resonance = r;
-        Update();
-    }
+//    public void SetResonance(float r)
+//    {
+//        resonance = r;
+//        Update();
+//    }
 
-    public void Update()
-    {
-        mf.q = 1.0f - frequency;
-        mf.p = frequency + 0.8f * frequency * mf.q;
-        mf.f = mf.p + mf.p - 1.0f;
-        mf.q = resonance * (1.0f + 0.5f * mf.q * (1.0f - mf.q + 5.6f * mf.q * mf.q));
-    }
-}
+//    public void Update()
+//    {
+//        mf.q = 1.0f - frequency;
+//        mf.p = frequency + 0.8f * frequency * mf.q;
+//        mf.f = mf.p + mf.p - 1.0f;
+//        mf.q = resonance * (1.0f + 0.5f * mf.q * (1.0f - mf.q + 5.6f * mf.q * mf.q));
+//    }
+//}
 

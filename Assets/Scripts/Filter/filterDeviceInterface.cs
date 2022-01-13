@@ -19,9 +19,12 @@ public class filterDeviceInterface : deviceInterface {
 
   int ID = 0;
   public omniJack input, controlInput, output;
+  public dial frequencyDial, resonanceDial, modeDial;
 
   spectrumDisplay spectrum;
   filterSignalGenerator filter;
+
+  float freqPercent, resPercent, modePercent = 0f; 
 
 
   public override void Awake() {
@@ -30,7 +33,52 @@ public class filterDeviceInterface : deviceInterface {
     spectrum = GetComponentInChildren<spectrumDisplay>();
   }
 
-  void Start() {
+  void Update()
+  {
+
+    if (filter.incoming != input.signal)
+    {
+      filter.incoming = input.signal;
+      spectrum.toggleActive(filter.incoming != null);
+    }
+
+    if (filter.controlIncoming != controlInput.signal)
+    {
+      filter.controlIncoming = controlInput.signal;
+    }
+
+    if (freqPercent != frequencyDial.percent) updateFrequency();
+    if (resPercent != resonanceDial.percent) updateResonance();
+    if (modePercent != modeDial.percent) updateMode();
+  }
+
+  void updateFrequency(){
+    freqPercent = frequencyDial.percent;
+    filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -1f, 1f);
+  }
+
+  void updateResonance(){
+    resPercent = resonanceDial.percent;
+    filter.resonance = resonanceDial.percent;
+  }
+  void updateMode(){
+    modePercent = modeDial.percent;
+    
+    switch(Mathf.RoundToInt(modePercent * 3)){
+      case 0:
+        filter.curType = filterSignalGenerator.filterType.LP;
+        break;
+      case 1:
+        filter.curType = filterSignalGenerator.filterType.HP;
+        break;
+      case 2:
+        filter.curType = filterSignalGenerator.filterType.BP;
+        break;
+      case 3:
+        filter.curType = filterSignalGenerator.filterType.Notch;
+        break;
+    }
+    
   }
 
   public override InstrumentData GetData() {
@@ -55,19 +103,6 @@ public class filterDeviceInterface : deviceInterface {
     controlInput.ID = data.jackControlInID;
   }
 
-
-
-  void Update() {
-   
-    if (filter.incoming != input.signal) {
-      filter.incoming = input.signal;
-      spectrum.toggleActive(filter.incoming != null);
-    }
-
-    if (filter.controlIncoming != controlInput.signal) {
-      filter.controlIncoming = controlInput.signal;
-    }
-  }
 
 }
 

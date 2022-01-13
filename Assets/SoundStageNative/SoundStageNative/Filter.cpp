@@ -35,25 +35,16 @@ extern "C" {
 		else return input - fd->b4;
 	}
 
-	//void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB)
-	//{
-	//	for (int i = 0; i < length; i += 2)
-	//	{
-	//		buffer[i] = ProcessSample(mfA, buffer[i]); 
-	//		buffer[i + 1] = ProcessSample(mfB, buffer[i+1]);
-	//	}
-	//}
-
-    void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB, float frequencyBuffer[], float resonance)
+    void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB, float cutoffFrequency, float frequencyBuffer[], float resonance)
     {
 
         resonance = clamp(resonance, 0.f, 1.f);
 
         for (int i = 0; i < length; i += 2)
         {
-            // should behave exponentially, maybe with an added linear fm input
-            frequencyBuffer[i] = clamp((frequencyBuffer[i] + 1.f) / 2.f, 0.f, 1.f); // [-1,1] -> [0,1] with safety clamp
-            frequencyBuffer[i+1] = clamp((frequencyBuffer[i+1] + 1.f) / 2.f, 0.f, 1.f);
+            // exponantial 1/Oct, tracks 20 octaves
+            frequencyBuffer[i] = clamp( (261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f); // 24kHz, Nyquist 48kHz
+            frequencyBuffer[i+1] = clamp((261.6256f * powf(2, (frequencyBuffer[i+1] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f);
 
             mfA->q = 1.0f - frequencyBuffer[i];
             mfA->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfA->q;
