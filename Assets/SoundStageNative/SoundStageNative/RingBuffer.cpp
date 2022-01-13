@@ -74,5 +74,6 @@ SOUNDSTAGE_API struct RingBuffer *RingBuffer_New(int n)
 
 SOUNDSTAGE_API void RingBuffer_Free(struct RingBuffer *x)
 {
+    _free(x->buf);
     _free(x);
 }

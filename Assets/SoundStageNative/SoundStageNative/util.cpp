@@ -1,10 +1,17 @@
 #include "util.h"
+#include <vector>
 #include <math.h>
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
 #include <sys/time.h>
+#endif
+#ifdef _WIN32
+#include <stddef.h>
+#include <stdint.h>
+#endif
 
 #ifdef __APPLE__
 #define __APPLE_VDSP 1
@@ -49,9 +56,6 @@
     #include "NE10.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
     
 #if __NE10
     int Ne10_init = 0;
@@ -328,7 +332,7 @@ extern "C" {
         return (n != 0) && ((n & (n - 1)) == 0);
     }
     
-    void _fInterleave(const float* src, float *dest, int n, int channels)
+    void _fInterleave(const float* src, float *dest, const int n, int channels)
     {
 #if __APPLE_VDSP_DONTUSE
         /* vDSP is a little faster here, but vDSP_ztoc does not work if src == dest, so it is disabled for now. */
@@ -373,11 +377,11 @@ extern "C" {
         /* out of place: */
         if(src == dest)
         {
-            float t[n];
+            std::vector<float> t(n);
             for(int i = 0; i < m; i++)
                 for(int j = 0; j < channels; j++)
                     t[channels * i + j] = src[j * m + i];
-            memcpy(dest, t,  n*sizeof(float));
+            memcpy(dest, &t[0],  n*sizeof(float));
         }
         /* in-place: */
         else
@@ -389,7 +393,7 @@ extern "C" {
 #endif
     }
     
-    void _fDeinterleave(const float* src, float *dest, int n, int channels)
+    void _fDeinterleave(const float* src, float *dest, const int n, int channels)
     {
 #if __APPLE_VDSP_DONTUSE
         /* vDSP is a little faster here, but vDSP_ctoz does not work if src == dest, so it is disabled for now. */
@@ -433,11 +437,11 @@ extern "C" {
         /* out of place: */
         if(src == dest)
         {
-            float t[n];
+            std::vector<float> t(n);
             for(int i = 0; i < m; i++)
                 for(int j = 0; j < channels; j++)
                     t[j * m + i] = src[channels * i + j];
-            memcpy(dest, t,  n*sizeof(float));
+            memcpy(dest, &t[0],  n*sizeof(float));
         }
         /* in-place: */
         else
@@ -449,6 +453,7 @@ extern "C" {
 #endif
     }
 
+#if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void){
         struct timeval time;
         if (gettimeofday(&time,NULL)){
@@ -489,7 +494,4 @@ extern "C" {
         printv("ARM Neon is not supported.\n");
 #endif
     }
-    
-#ifdef __cplusplus
-}
 #endif

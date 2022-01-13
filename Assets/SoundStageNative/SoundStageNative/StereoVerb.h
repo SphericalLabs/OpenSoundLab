@@ -7,7 +7,11 @@
 
 #include "main.h"
 #include "util.h"
+#ifdef _WIN32
+#include "Freeverb/freeverb/components/revmodel.hpp"
+#else
 #include "revmodel.hpp"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

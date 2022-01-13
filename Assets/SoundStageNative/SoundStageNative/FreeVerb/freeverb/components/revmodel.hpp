@@ -9,10 +9,13 @@
 
 
 #include <vector>
-
 #include "allpass.hpp"
 #include "comb.hpp"
+#ifdef _WIN32
+#include "../../dfx-library/dfxsmoothedvalue.h"
+#else
 #include "dfxsmoothedvalue.h"
+#endif
 #include "tuning.h"
 
 

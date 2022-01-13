@@ -1,0 +1,17 @@
+﻿  revmodel.cpp
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\FreeVerb\freeverb\components\revmodel.hpp(15,10): fatal error C1083: Cannot open include file: 'dfxsmoothedvalue.h': No such file or directory
+  main.cpp
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(89,85): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(98,26): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(205,16): warning C4309: '=': truncation of constant value
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(416,79): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(417,60): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(430,51): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(435,51): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(505,27): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(521,34): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(527,34): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\main.cpp(531,29): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  StereoVerb.cpp
+\\Mac\Home\Documents\dev\soundstage\git-fresh\soundstagevr-quest\Assets\SoundStageNative\SoundStageNative\StereoVerb.h(10,10): fatal error C1083: Cannot open include file: 'revmodel.hpp': No such file or directory
+  Generating Code...

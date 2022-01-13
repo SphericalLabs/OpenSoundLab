@@ -94,7 +94,7 @@ SOUNDSTAGE_API struct DelayData *Delay_New(int n)
 
 SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
 {
-    _free(x->tap);
+    RingBuffer_Free(x->tap);
     _free(x->temp);
     _free(x);
 }
