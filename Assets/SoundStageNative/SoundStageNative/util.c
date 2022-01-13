@@ -1,5 +1,4 @@
 #include "util.h"
-#include <vector>
 #include <math.h>
 #include <assert.h>
 #include <string.h>
@@ -56,6 +55,9 @@
     #include "NE10.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
     
 #if __NE10
     int Ne10_init = 0;
@@ -332,6 +334,8 @@
         return (n != 0) && ((n & (n - 1)) == 0);
     }
     
+    /* Visual Studio does not allow variable length arrays, therefore (de-)interleaving functions are deactivated until further notice. */
+#ifndef _WIN32
     void _fInterleave(const float* src, float *dest, const int n, int channels)
     {
 #if __APPLE_VDSP_DONTUSE
@@ -377,11 +381,11 @@
         /* out of place: */
         if(src == dest)
         {
-            std::vector<float> t(n);
+            float t[n];
             for(int i = 0; i < m; i++)
                 for(int j = 0; j < channels; j++)
                     t[channels * i + j] = src[j * m + i];
-            memcpy(dest, &t[0],  n*sizeof(float));
+            memcpy(dest, t,  n*sizeof(float));
         }
         /* in-place: */
         else
@@ -437,11 +441,11 @@
         /* out of place: */
         if(src == dest)
         {
-            std::vector<float> t(n);
+            float t[n];
             for(int i = 0; i < m; i++)
                 for(int j = 0; j < channels; j++)
                     t[j * m + i] = src[channels * i + j];
-            memcpy(dest, &t[0],  n*sizeof(float));
+            memcpy(dest, t,  n*sizeof(float));
         }
         /* in-place: */
         else
@@ -452,6 +456,7 @@
         }
 #endif
     }
+#endif /* _WIN32 */
 
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void){
@@ -494,4 +499,8 @@
         printv("ARM Neon is not supported.\n");
 #endif
     }
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -3,7 +3,7 @@
 if [[ $USER == "hannes.barfuss@fhnw.ch" ]]
 then
 	NDK_PATH="/Users/hannes.barfuss@fhnw.ch/Library/Android/sdk/ndk/23.1.7779620/ndk-build"
-	PLUGIN_PATH="/Users/hannes.barfuss@fhnw.ch/Documents/dev/soundstage/soundstagevr-quest/Assets/SoundStageNative/SoundStageNative"
+	PLUGIN_PATH="/Users/hannes.barfuss@fhnw.ch/Documents/dev/soundstage/git-fresh/soundstagevr-quest/Assets/SoundStageNative/SoundStageNative"
 	cd $PLUGIN_PATH
 	echo ""
 	echo "Compiling native code..."

@@ -71,12 +71,14 @@ extern "C" {
     /* Returns 1 if n is a power of 2, and 0 otherwise. */
     int _isPowOf2(int n);
 
+    /* Visual Studio does not allow variable length arrays, therefore (de-)interleaving functions are deactivated until further notice. */
+#ifndef _WIN32
     /* Interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory addresses, a slightly faster in-place operation is performed. */
     void _fInterleave(const float* src, float *dest, int n, int channels);
 
     /* De-interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory addresses, a slightly faster in-place operation is performed. */
     void _fDeinterleave(const float* src, float *dest, int n, int channels);
-
+#endif /* _WIN32 */
     double _wallTime(void);
 
     double _cpuTime(void);

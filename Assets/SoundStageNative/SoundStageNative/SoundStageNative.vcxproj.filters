@@ -33,7 +33,7 @@
     <ClCompile Include="StereoVerb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util.cpp">
+    <ClCompile Include="util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FreeVerb\freeverb\components\allpass.cpp">

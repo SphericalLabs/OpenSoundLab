@@ -237,7 +237,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RingBuffer.cpp" />
     <ClCompile Include="StereoVerb.cpp" />
-    <ClCompile Include="util.cpp" />
+    <ClCompile Include="util.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Compressor.h" />
