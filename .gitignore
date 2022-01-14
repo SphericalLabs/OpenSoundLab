@@ -30,6 +30,7 @@ sysinfo.txt
 *.unitypackage
 
 .vs/
+.vsconfig
 Assets/third_party/RuntimeAudioClipLoader/Plugins/NVorbis.pdb
 Assets/third_party/RuntimeAudioClipLoader/Plugins/NVorbis.dll.meta
 Assets/third_party/RuntimeAudioClipLoader/Plugins/NVorbis.dll.mdb.meta
@@ -426,10 +427,24 @@ user.keystore
 /Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/SoundStageNative.write.1u.tlog
 /Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/link.read.1.tlog
 /Assets/SoundStageNative/SoundStageNative/x64/Release/main.obj
+
+/Assets/SoundStageNative/SoundStageNative/x64/Release/Compressor.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/Delay.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/Filter.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/RingBuffer.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/StereoVerb.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/allpass.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/comb.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/revmodel.obj
+/Assets/SoundStageNative/SoundStageNative/x64/Release/util.obj
+
+/Assets/SoundStageNative/SoundStageNative/x64/Debug/*
+/Assets/SoundStageNative/SoundStageNative/Debug/*
+
 /Assets/SoundStageNative/SoundStageNative/x64/Release/vc140.pdb
 /Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/CL.command.1.tlog
 /Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/CL.read.1.tlog
 /Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/CL.write.1.tlog
-
+/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.Build.CppClean.log
  
  
