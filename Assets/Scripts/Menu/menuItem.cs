@@ -255,13 +255,13 @@ public class menuItem : manipObject {
       g.transform.localRotation = Quaternion.Euler(0, 0, 0);
     }
     if (item == deviceType.Filter) {
-      g.transform.localPosition = new Vector3(.015f, 0, .02f);
-      g.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      //g.transform.localPosition = new Vector3(.015f, 0, .02f);
+      //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
     if (item == deviceType.Scope)
     {
-      g.transform.localPosition = new Vector3(.015f, 0, .02f);
-      g.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      //g.transform.localPosition = new Vector3(.015f, 0, .02f);
+      //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
     if (item == deviceType.Splitter) {
       g.transform.localPosition = new Vector3(.0185f, 0, .02f);

@@ -21,7 +21,6 @@ public class filterDeviceInterface : deviceInterface {
   public omniJack input, controlInput, output;
   public dial frequencyDial, resonanceDial, modeDial;
 
-  spectrumDisplay spectrum;
   filterSignalGenerator filter;
 
   float freqPercent, resPercent, modePercent = 0f; 
@@ -30,7 +29,6 @@ public class filterDeviceInterface : deviceInterface {
   public override void Awake() {
     base.Awake();
     filter = GetComponent<filterSignalGenerator>();
-    spectrum = GetComponentInChildren<spectrumDisplay>();
   }
 
   void Update()
@@ -39,7 +37,6 @@ public class filterDeviceInterface : deviceInterface {
     if (filter.incoming != input.signal)
     {
       filter.incoming = input.signal;
-      spectrum.toggleActive(filter.incoming != null);
     }
 
     if (filter.controlIncoming != controlInput.signal)
@@ -54,7 +51,8 @@ public class filterDeviceInterface : deviceInterface {
 
   void updateFrequency(){
     freqPercent = frequencyDial.percent;
-    filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -1f, 1f);
+    //filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -1f, 1f);
+    filter.cutoffFrequency = freqPercent;
   }
 
   void updateResonance(){

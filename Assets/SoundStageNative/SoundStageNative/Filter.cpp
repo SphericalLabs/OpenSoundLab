@@ -35,29 +35,32 @@ extern "C" {
 		else return input - fd->b4;
 	}
 
-    void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB, float cutoffFrequency, float frequencyBuffer[], float resonance)
+    void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float frequencyBuffer[], float resonance)
     {
 
         resonance = clamp(resonance, 0.f, 1.f);
 
         for (int i = 0; i < length; i += 2)
         {
-            // exponantial 1/Oct, tracks 20 octaves
-            frequencyBuffer[i] = clamp( (261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f); // 24kHz, Nyquist 48kHz
-            frequencyBuffer[i+1] = clamp((261.6256f * powf(2, (frequencyBuffer[i+1] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f);
+            // exponential 1/Oct
+            //frequencyBuffer[i] = clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f); // 24kHz, Nyquist 48kHz
+            //frequencyBuffer[i+1] = clamp((261.6256f * powf(2, (frequencyBuffer[i+1] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f);
 
-            mfA->q = 1.0f - frequencyBuffer[i];
-            mfA->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfA->q;
-            mfA->f = mfA->p + mfA->p - 1.0f;
-            mfA->q = resonance * (1.0f + 0.5f * mfA->q * (1.0f - mfA->q + 5.6f * mfA->q * mfA->q));
+            frequencyBuffer[i] = clamp(cutoffFrequency + frequencyBuffer[i], 0.f, 1.f); 
+            frequencyBuffer[i + 1] = clamp(cutoffFrequency + frequencyBuffer[i + 1], 0.f, 1.f);
 
-            mfB->q = 1.0f - frequencyBuffer[i+1];
-            mfB->p = frequencyBuffer[i+1] + 0.8f * frequencyBuffer[i+1] * mfB->q;
-            mfB->f = mfA->p + mfB->p - 1.0f;
-            mfB->q = resonance * (1.0f + 0.5f * mfB->q * (1.0f - mfB->q + 5.6f * mfB->q * mfB->q));
+            mfL->q = 1.0f - frequencyBuffer[i];
+            mfL->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfL->q;
+            mfL->f = mfL->p + mfL->p - 1.0f;
+            mfL->q = resonance * (1.0f + 0.5f * mfL->q * (1.0f - mfL->q + 5.6f * mfL->q * mfL->q));
 
-            buffer[i] = ProcessSample(mfA, buffer[i]);
-            buffer[i + 1] = ProcessSample(mfB, buffer[i + 1]);
+            mfR->q = 1.0f - frequencyBuffer[i+1];
+            mfR->p = frequencyBuffer[i+1] + 0.8f * frequencyBuffer[i+1] * mfR->q;
+            mfR->f = mfR->p + mfR->p - 1.0f;
+            mfR->q = resonance * (1.0f + 0.5f * mfR->q * (1.0f - mfR->q + 5.6f * mfR->q * mfR->q));
+
+            buffer[i] = ProcessSample(mfL, buffer[i]);
+            buffer[i + 1] = ProcessSample(mfR, buffer[i + 1]);
         }
     }
 
