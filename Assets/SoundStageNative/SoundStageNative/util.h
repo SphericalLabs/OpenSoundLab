@@ -77,11 +77,19 @@ extern "C" {
     /* De-interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory addresses, a slightly faster in-place operation is performed. */
     void _fDeinterleave(const float* src, float *dest, int n, int channels);
 
+/* Evaluates y = ab^x with slope ym. x will be clamped to [0..1]. ym < 0.5 yields an exponential curve, ym > 0.5 yields a logarithmic curve. Return val will be in range [0..1]. */
+float _expCurve(float x, float ym);
+
+/* Maps a value from one range to another, applying a slope between 0 and 1 (0.5 is linear or "no slope"). */
+float _map(float x, float start1, float stop1, float start2, float stop2, float slope);
+
+#if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void);
 
     double _cpuTime(void);
 
     void _neonFeatures(void);
+#endif
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,8 @@ using System;
 public class compressorDeviceInterface : deviceInterface
 {
     public omniJack input, sidechain, output;
-    public dial attackDial, releaseDial, thresholdDial, ratioDial, kneeDial, lookaheadDial, makeupDial;
+    public dial attackDial, releaseDial, thresholdDial, ratioDial, makeupDial;
+    public basicSwitch bypassSwitch;
     public glowDisk attenuationDisplay;
     public GameObject clippingDisplay;
     compressorSignalGenerator signal;
@@ -29,7 +30,7 @@ public class compressorDeviceInterface : deviceInterface
     {
         base.Awake();
         signal = GetComponent<compressorSignalGenerator>();
-        dials = new dial[7] { attackDial, releaseDial, thresholdDial, ratioDial, kneeDial, makeupDial, lookaheadDial };
+        dials = new dial[5] { attackDial, releaseDial, thresholdDial, ratioDial, makeupDial };
         clippingDisplay.SetActive(false);
         attenuationDisplay.percent = 0;
     }
@@ -39,22 +40,14 @@ public class compressorDeviceInterface : deviceInterface
         if (signal.input != input.signal) signal.input = input.signal;
         if (signal.sidechain != sidechain.signal) signal.sidechain = sidechain.signal;
 
-        for(int i = 0; i < dials.Length; i++)
-        {
-            signal.SetParam(dials[i].percent, i);
-        }
-
-        /* TODO: The calculated values are absolutely correct, but the attenuationDisplay 
-         * can not be seen on the Quest 2...
-         */
+        signal.SetParam(attackDial.percent, (int)compressorSignalGenerator.Param.P_ATTACK);
+        signal.SetParam(releaseDial.percent, (int)compressorSignalGenerator.Param.P_RELEASE);
+        signal.SetParam(thresholdDial.percent, (int)compressorSignalGenerator.Param.P_THRESHOLD);
+        signal.SetParam(ratioDial.percent, (int)compressorSignalGenerator.Param.P_RATIO);
+        signal.SetParam(makeupDial.percent, (int)compressorSignalGenerator.Param.P_MAKEUP);
+        signal.SetParam(bypassSwitch.switchVal ? 1 : 0, (int)compressorSignalGenerator.Param.P_BYPASS);
 
         float attenuation = signal.attenuation;
-        //float attenuationScaled = ( attenuation / -40 ) * 0.05f;
-        /*float attenuationScaled = 0.01f + (attenuation / -40) * 0.05f;
-        Vector3 scale = attenuationDisplay.transform.localScale;
-        Vector3 position = attenuationDisplay.transform.position;
-        attenuationDisplay.transform.localScale = new Vector3(attenuation, scale.y, scale.z);
-        attenuationDisplay.transform.position = new Vector3(-0.07f + attenuationScaled / 2, position.y, position.z);*/
 
         float attenuationPercent = Mathf.Min( (attenuation / -40.0f), 1);
         attenuationDisplay.percent = attenuationPercent * 0.85f;
@@ -74,9 +67,7 @@ public class compressorDeviceInterface : deviceInterface
         data.releaseState = releaseDial.percent;
         data.thresholdState = thresholdDial.percent;
         data.ratioState = ratioDial.percent;
-        data.kneeState = kneeDial.percent;
         data.makeupState = makeupDial.percent;
-        data.lookaheadState = lookaheadDial.percent;
 
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
@@ -98,9 +89,7 @@ public class compressorDeviceInterface : deviceInterface
         releaseDial.setPercent(data.releaseState);
         thresholdDial.setPercent(data.thresholdState);
         ratioDial.setPercent(data.ratioState);
-        kneeDial.setPercent(data.kneeState);
         makeupDial.setPercent(data.makeupState);
-        lookaheadDial.setPercent(data.lookaheadState);
     }
 }
 
@@ -110,9 +99,7 @@ public class compressorData : InstrumentData
     public float releaseState;
     public float thresholdState;
     public float ratioState;
-    public float kneeState;
     public float makeupState;
-    public float lookaheadState;
 
     public int jackOutID;
     public int jackInID;

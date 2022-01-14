@@ -122,7 +122,7 @@ public class menuItem : manipObject {
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.ConferenceCall) label.text = "WebCam";
     if (item == deviceType.SampleHold) label.text = "S&H";
-    if (item == deviceType.Compressor) label.text = "Comp/Limiter";
+    if (item == deviceType.StereoVerb) label.text = "Freeverb";
 
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(true);

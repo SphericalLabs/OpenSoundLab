@@ -21,10 +21,10 @@ public class delaySignalGenerator : signalGenerator
     public const float MAX_TIME = 3.0f; //3 seconds
     public const float MIN_FEEDBACK = 0;
     public const float MAX_FEEDBACK = 0.95f;
-    public const float MIN_WET = 0;
-    public const float MAX_WET = 1;
-    public const float MIN_DRY = 0;
-    public const float MAX_DRY = 1;
+    public const float MIN_WET = -96; //dB
+    public const float MAX_WET = 0; //dB
+    public const float MIN_DRY = -96; //dB
+    public const float MAX_DRY = 0; //dB
 
     public signalGenerator input;
 
@@ -37,11 +37,6 @@ public class delaySignalGenerator : signalGenerator
         int maxDelaySamples = (int)(MAX_TIME * AudioSettings.outputSampleRate);
         x = Delay_New(maxDelaySamples);
         Debug.Log("Maximum delay time in samples is " + maxDelaySamples);
-
-        Delay_SetParam(0.5f, (int)Param.P_TIME, x);
-        Delay_SetParam(0.0f, (int)Param.P_FEEDBACK, x);
-        Delay_SetParam(1.0f, (int)Param.P_WET, x);
-        Delay_SetParam(0.0f, (int)Param.P_DRY, x);
     }
 
     private void OnDestroy()
@@ -60,10 +55,10 @@ public class delaySignalGenerator : signalGenerator
                 p[param] = Utils.map(value, 0, 1, MIN_FEEDBACK, MAX_FEEDBACK);
                 break;
             case (int)Param.P_WET:
-                p[param] = Utils.map(value, 0, 1, MIN_WET, MAX_WET);
+                p[param] = Utils.dbToLin( Utils.map(value, 0, 1, MIN_WET, MAX_WET, 0.8f) );
                 break;
             case (int)Param.P_DRY:
-                p[param] = Utils.map(value, 0, 1, MIN_DRY, MAX_DRY);
+                p[param] = Utils.dbToLin( Utils.map(value, 0, 1, MIN_DRY, MAX_DRY, 0.8f) );
                 break;
         }
         Debug.Log("Delay: Set param " + ((Param)param).ToString() + " to value " + p[param]);
