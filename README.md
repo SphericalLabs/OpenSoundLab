@@ -1,6 +1,6 @@
 # SoundStage Pro
 
-SoundStage Pro is a fork of Logan Olson's magnificent [SoundStage VR](https://github.com/googlearchive/soundstagevr). The intention of SoundStage Pro is to enhance the original version so that it is better suited for teaching and performing in the context of experimental electronic music, to make it feel less like a game and more like an actual sound laboratory. To recreate the physicality of working in spaces, but without being bound to mimicking in physical past. Feel free to get in touch if that sounds interesting to you. 
+SoundStage Pro is a fork of Logan Olson's magnificent [SoundStage VR](https://github.com/googlearchive/soundstagevr). The intention of SoundStage Pro is to enhance the original version so that it is better suited for teaching and performing in the context of experimental electronic music, to make it feel less like a game and more like an actual sound laboratory. To recreate the physicality of working in spaces, but without being bound to mimicking the physical past. Feel free to get in touch if that sounds interesting to you. 
 
 Binaries will soon be made available on SideQuest, Oculus App Lab and maybe the Oculus Quest Store as well. The project is currently funded by an educational grant of the University of Applied Sciences Northwestern Switzerland (FHNW).
 
