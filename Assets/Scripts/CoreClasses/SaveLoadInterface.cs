@@ -170,7 +170,6 @@ public class SaveLoadInterface : MonoBehaviour {
 
   [XmlInclude(typeof(GlideData))]
   [XmlInclude(typeof(GainData))]
-  [XmlInclude(typeof(ConferenceCallData))] 
   [XmlInclude(typeof(SARSCov2Data))]
   [XmlInclude(typeof(FunktionData))]
 

@@ -63,6 +63,7 @@ public class menuItem : manipObject {
     Microphone,
     Camera,
     Filter,
+    Scope,
     Noise,
     Looper,
     Airhorn,
@@ -257,6 +258,11 @@ public class menuItem : manipObject {
       g.transform.localPosition = new Vector3(.015f, 0, .02f);
       g.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
+    if (item == deviceType.Scope)
+    {
+      g.transform.localPosition = new Vector3(.015f, 0, .02f);
+      g.transform.localRotation = Quaternion.Euler(0, 180, 0);
+    }
     if (item == deviceType.Splitter) {
       g.transform.localPosition = new Vector3(.0185f, 0, .02f);
     }
@@ -317,7 +323,7 @@ public class menuItem : manipObject {
 
     if (item == deviceType.Tapes) {
       g.transform.Translate(.1f, .02f, -.185f, Space.Self);
-    } else if (item != deviceType.Filter && item != deviceType.Airhorn && item != deviceType.ADSR) g.transform.Rotate(0, 180, 0, Space.Self);
+    } else if (item != deviceType.Filter && item != deviceType.Scope && item != deviceType.Airhorn && item != deviceType.ADSR) g.transform.Rotate(0, 180, 0, Space.Self);
 
     manipulatorObj.GetComponent<manipulator>().ForceGrab(g.GetComponentInChildren<handle>());
   }
