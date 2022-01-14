@@ -14,7 +14,6 @@
 #include <assert.h>
 
 #define MAX_LOOKAHEAD 100
-#define MAX_RATIO 12
 #define DELAY_ATTACK 10
 
 enum CompressorParams
@@ -26,6 +25,8 @@ enum CompressorParams
     P_KNEE,
     P_MAKEUP,
     P_LOOKAHEAD,
+    P_LIMIT,
+    P_BYPASS,
     P_N
 };
 
@@ -97,7 +98,7 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
             x->buf[x->bufPtr+k] = inBuf[k];
             
             //convert to decibel so we can operate in log domain
-            if(x->params[P_RATIO] <= MAX_RATIO)
+            if(!x->params[P_LIMIT])
                 xG = _atodb(fabsf(sidechain[k]));
             //If we are in limiter mode, we look at current sidechain value as well as current output signal value, and use whichever is bigger to calculate the gain reduction. If we would only use the sidechain, then transients that are shorter than the lookahead time will not get attenuated.
             else
@@ -117,7 +118,10 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
             xL = xG - yG;
             y1 = _max(xL, x->aR * x->y1_prev[k] + (1 - x->aR) * xL);
             yL = x->aA * x->yL_prev[k] + (1 - x->aA) * y1;
-            cdb = -yL + makeup;
+            //If compressor is in bypass state, we still apply the makeup gain.
+            //People should not get the impression that a compressor "makes things louder"
+            //bc it is just wrong...
+            cdb = x->params[P_BYPASS] ? makeup : -yL + makeup;
             attenuation += -yL;
             c = _dbtoa(cdb);
             
@@ -141,7 +145,7 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
         x->d_prev = delay;
     }
 
-    x->attenuation = attenuation / length;
+    x->attenuation = x->params[P_BYPASS] ? 0 : attenuation / length;
     return;
 }
 
@@ -159,6 +163,8 @@ SOUNDSTAGE_API struct CompressorData *Compressor_New(float sampleRate)
     params[P_RELEASE] = 0;
     params[P_THRESHOLD] = 0;
     params[P_MAKEUP] = 0;
+    params[P_LIMIT] = 0;
+    params[P_BYPASS] = 0;
     x->params = params;
     
     //internal
@@ -204,10 +210,6 @@ SOUNDSTAGE_API void Compressor_SetParam(float value, int param, struct Compresso
             break;
         case P_LOOKAHEAD:
             assert(value <= MAX_LOOKAHEAD);
-            break;
-        case P_RATIO:
-            if(value >= MAX_RATIO)
-                value = INFINITY;
             break;
         default:
             break;

@@ -17,6 +17,8 @@ public class compressorSignalGenerator : signalGenerator
         P_KNEE,
         P_MAKEUP,
         P_LOOKAHEAD,
+        P_LIMIT,
+        P_BYPASS,
         P_N
     };
 
@@ -31,6 +33,9 @@ public class compressorSignalGenerator : signalGenerator
     public override void Awake()
     {
         x = Compressor_New(AudioSettings.outputSampleRate);
+        SetParam(6.0f, (int)Param.P_KNEE);
+        SetParam(0, (int)Param.P_LIMIT);
+        SetParam(0, (int)Param.P_LOOKAHEAD);
         Debug.Log("Sample rate is " + AudioSettings.outputSampleRate);
     }
 
@@ -44,25 +49,38 @@ public class compressorSignalGenerator : signalGenerator
         switch(param)
         {
             case (int)Param.P_ATTACK:
-                p[param] = 0.1f + value * 99.9f;
+                p[param] = Utils.map(value, 0, 1, 0.1f, 100.0f, 0.2f);
+                //p[param] = 0.1f + value * 99.9f;
                 break;
             case (int)Param.P_RELEASE:
-                p[param] = 10 + value * 1990;
+                p[param] = Utils.map(value, 0, 1, 10.0f, 2000.0f, 0.2f);
+                //p[param] = 10 + value * 1990;
                 break;
             case (int)Param.P_THRESHOLD:
-                p[param] = value * -40;
+                p[param] = Utils.map(value, 0, 1, 0, -40, 0.2f);
+                //p[param] = value * -40;
                 break;
             case (int)Param.P_RATIO:
-                p[param] = 1 + value * 11;
+                p[param] = Utils.map(value, 0, 1, 1, 24, 0.2f);
+                //p[param] = 1 + value * 11;
                 break;
             case (int)Param.P_KNEE:
-                p[param] = value * 18;
+                p[param] = Utils.map(value, 0, 1, 0, 18, 0.2f);
+                //p[param] = value * 18;
                 break;
             case (int)Param.P_MAKEUP:
-                p[param] = value * 40;
+                p[param] = Utils.map(value, 0, 1, 0, 40, 0.2f);
+                //p[param] = value * 40;
                 break;
             case (int)Param.P_LOOKAHEAD:
-                p[param] = value * 100;
+                p[param] = Utils.map(value, 0, 1, 0, 100, 0.2f);
+                //p[param] = value * 100;
+                break;
+            case (int)Param.P_LIMIT:
+                p[param] = value == 0 ? 0 : 1;
+                break;
+            case (int)Param.P_BYPASS:
+                p[param] = value == 0 ? 0 : 1;
                 break;
         }
         Debug.Log("Set param " + param + " to value " + p[param]);
@@ -94,13 +112,12 @@ public class compressorSignalGenerator : signalGenerator
         if (sidechainBuffer.Length != buffer.Length)
             System.Array.Resize(ref sidechainBuffer, buffer.Length);
 
+        Compressor_SetParam(p[(int)Param.P_BYPASS], (int)Param.P_BYPASS, x);
         Compressor_SetParam(p[(int)Param.P_ATTACK], (int)Param.P_ATTACK, x);
         Compressor_SetParam(p[(int)Param.P_RELEASE], (int)Param.P_RELEASE, x);
         Compressor_SetParam(p[(int)Param.P_THRESHOLD], (int)Param.P_THRESHOLD, x);
         Compressor_SetParam(p[(int)Param.P_RATIO], (int)Param.P_RATIO, x);
-        Compressor_SetParam(p[(int)Param.P_KNEE], (int)Param.P_KNEE, x);
         Compressor_SetParam(p[(int)Param.P_MAKEUP], (int)Param.P_MAKEUP, x);
-        Compressor_SetParam(p[(int)Param.P_LOOKAHEAD], (int)Param.P_LOOKAHEAD, x);
 
         if (input != null)
         {

@@ -472,6 +472,26 @@ extern "C" {
         }
 #endif
     }
+    
+    float _expCurve(float x, float ym)
+    {
+        if (x <= 0) {return 0;}
+        if (x >= 1) {return 1;}
+        if(ym == 0.5f) {return x;}
+        //y = ab^x - a
+        //y = (1/b-1) * ((1/ym) - 1)^2 - (1/b-1)
+        float b = powf((1 / ym) - 1, 2);
+        float a = (1 / (b - 1));
+        float y = a * powf(b, x) - a;
+        return y;
+    }
+    
+    float _map(float x, float start1, float stop1, float start2, float stop2, float slope)
+        {
+            float a = (x - start1) / (stop1 - start1); //percentage of x in old range, linear
+            a = _expCurve(a, slope); //percentage of x in old range with slope applied
+            return start2 + a * (stop2 - start2); //value mapped to new range
+        }
 
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void){
