@@ -46,9 +46,6 @@ public class xmlUpdate {
             case "Gain":
               serializer = new XmlSerializer(typeof(GainData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "ConferenceCall":
-              serializer = new XmlSerializer(typeof(ConferenceCallData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
             case "SARSCov2":
               serializer = new XmlSerializer(typeof(SARSCov2Data), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
