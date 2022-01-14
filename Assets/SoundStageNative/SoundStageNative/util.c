@@ -8,6 +8,9 @@
 #include <sys/time.h>
 #endif
 #ifdef _WIN32
+#pragma message "Target platform is Windows."
+/* Windows does not support C99 standard, so variable length arrays are not supported and are emulated using _malloca and _freea. */
+#include <malloc.h>
 #include <stddef.h>
 #include <stdint.h>
 #endif
@@ -334,8 +337,7 @@ extern "C" {
         return (n != 0) && ((n & (n - 1)) == 0);
     }
     
-    /* Visual Studio does not allow variable length arrays, therefore (de-)interleaving functions are deactivated until further notice. */
-#ifndef _WIN32
+
     void _fInterleave(const float* src, float *dest, const int n, int channels)
     {
 #if __APPLE_VDSP_DONTUSE
@@ -381,11 +383,18 @@ extern "C" {
         /* out of place: */
         if(src == dest)
         {
+#ifdef _WIN32
+            float* t = _malloca(n * sizeof(float));
+#else
             float t[n];
+#endif
             for(int i = 0; i < m; i++)
                 for(int j = 0; j < channels; j++)
                     t[channels * i + j] = src[j * m + i];
             memcpy(dest, t,  n*sizeof(float));
+#ifdef _WIN32
+            _freea(t);
+#endif
         }
         /* in-place: */
         else
@@ -441,11 +450,18 @@ extern "C" {
         /* out of place: */
         if(src == dest)
         {
+#ifdef _WIN32
+            float* t = _malloca(n * sizeof(float));
+#else
             float t[n];
+#endif
             for(int i = 0; i < m; i++)
                 for(int j = 0; j < channels; j++)
                     t[j * m + i] = src[channels * i + j];
             memcpy(dest, t,  n*sizeof(float));
+#ifdef _WIN32
+            _freea(t);
+#endif
         }
         /* in-place: */
         else
@@ -456,7 +472,6 @@ extern "C" {
         }
 #endif
     }
-#endif /* _WIN32 */
 
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void){
