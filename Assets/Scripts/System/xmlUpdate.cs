@@ -140,9 +140,6 @@ public class xmlUpdate {
             case "Gain":
               data[data.Count - 1].deviceType = menuItem.deviceType.Gain;
               break;
-            case "ConferenceCall":
-              data[data.Count - 1].deviceType = menuItem.deviceType.ConferenceCall;
-              break;
             case "SARSCov2":
               data[data.Count - 1].deviceType = menuItem.deviceType.SARSCov2;
               break;

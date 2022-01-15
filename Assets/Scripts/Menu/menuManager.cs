@@ -75,32 +75,33 @@ public class menuManager : MonoBehaviour {
     active = on;
   }
 
-  int rowLength = 9;
+  int rowLength = 8;
 
-  void loadMenu() {
+  // this populates the menu on program start
+  void loadMenu() { 
     menuItems = new List<GameObject>();
     menuItemScripts = new List<menuItem>();
-    for (int i = 0; i < (int)menuItem.deviceType.Max; i++) {
+    for (int i = (int)menuItem.deviceType.Max - 1; i >= 0; i--) {
       // skip incompatible devices
       if (Application.platform == RuntimePlatform.Android)
       {
-        if ((menuItem.deviceType)i == menuItem.deviceType.ConferenceCall) continue;
         if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
-        if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
-        if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
+        //if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
+        //if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
       }
       // skip unneeded devices
       if ((menuItem.deviceType)i == menuItem.deviceType.Airhorn) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Stereo) continue; // remove completely?
-      if ((menuItem.deviceType)i == menuItem.deviceType.ADSR) continue;
+      //if ((menuItem.deviceType)i == menuItem.deviceType.ADSR) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Maracas) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Drum) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Timeline) continue;
+      //if ((menuItem.deviceType)i == menuItem.deviceType.Scope) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Funktion) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.SARSCov2) continue;
 
 
-      // might want to reactivate these for Windows builds at a later point
-      if ((menuItem.deviceType)i == menuItem.deviceType.ConferenceCall) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue; // skip for windows, too, throws error otherwise
 
       GameObject tmpObj = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
       tmpObj.transform.parent = rootNode.transform;
@@ -112,7 +113,7 @@ public class menuManager : MonoBehaviour {
 
     int tempCount = 0;
     float h = 0;
-    float arc = 37.5f * rowLength / 5; // depending on rowLength?
+    float arc = -37.5f * rowLength / 5; // depending on rowLength?
 
     //Debug.Log(menuItems.Length);
     while (tempCount < menuItems.Count) {
@@ -151,58 +152,33 @@ public class menuManager : MonoBehaviour {
 
   Coroutine activationCoroutine;
   IEnumerator activationRoutine(bool on, Transform pad) {
-    float timer = 0;
-    if (on) {
-      //_audioSource.PlayOneShot(openClip);
-
+    
+    if(on){
       rootNode.SetActive(true);
-      trashNode.SetActive(false);
-      settingsNode.SetActive(false);
-      metronomeNode.SetActive(false);
-
-      List<int> remaining = new List<int>();
-      for (int i = 0; i < menuItemScripts.Count; i++) {
-        remaining.Add(i);
-        menuItemScripts[i].transform.localScale = Vector3.zero;
-      }
-      Vector3 startPos = transform.position = pad.position;
-      
-      while (timer < 1) {
-        timer = Mathf.Clamp01(timer + Time.deltaTime * 1.5f);
-        for (int i = 0; i < menuItemScripts.Count; i++) {
-          if (remaining.Contains(i)) {
-            if (timer / openSpeed > Vector3.Distance(startPos, menuItemScripts[i].transform.position)) {
-              menuItemScripts[i].Appear(on);
-              remaining.Remove(i);
-            }
-          }
-        }
-        transform.position = startPos + Vector3.Lerp(Vector3.zero, Vector3.up * .025f, timer);
-        Vector3 camPos = Camera.main.transform.position;
-        camPos.y -= .2f;
-        transform.LookAt(camPos, Vector3.up);
-        yield return null;
-      }
       trashNode.SetActive(true);
       settingsNode.SetActive(true);
       metronomeNode.SetActive(true);
-    } else {
-      //_audioSource.PlayOneShot(closeClip);
-      Vector3 startPos = transform.position;
+      for (int i = 0; i < menuItems.Count; i++)
+      {
+        menuItemScripts[i].Appear(on);
+        //menuItemScripts[i].transform.localScale = Vector3.one;
+      }
+      transform.position = pad.position;
+      Vector3 camPos = Camera.main.transform.position;
+      camPos.y -= .2f;
+      transform.LookAt(camPos, Vector3.up);
+    }
+    else {
       trashNode.SetActive(false);
       settingsNode.SetActive(false);
       metronomeNode.SetActive(false);
-      for (int i = 0; i < menuItems.Count; i++) {
+      for (int i = 0; i < menuItems.Count; i++)
+      {
         menuItemScripts[i].Appear(on);
-      }
-
-      while (timer < 1) {
-        timer = Mathf.Clamp01(timer + Time.deltaTime * 4);
-        transform.position = Vector3.Lerp(startPos, pad.position, timer);
-        yield return null;
       }
       rootNode.SetActive(false);
     }
+    yield return null;
   }
 
   void Activate(bool on, Transform pad) {

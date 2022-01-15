@@ -135,9 +135,9 @@ public class filterSignalGenerator : signalGenerator
 
 public struct mfValues
 {
-  public float f, p, q; //filter coefficients
-  public float b0, b1, b2, b3, b4; //filter buffers (beware denormals!)
-  public bool LP; // needed?
+  public float f, p, q; // filter coefficients
+  public float b0, b1, b2, b3, b4; // filter buffers (beware denormals!)
+  public bool LP; 
 };
 
 

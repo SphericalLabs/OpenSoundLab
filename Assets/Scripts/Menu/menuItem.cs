@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 public class menuItem : manipObject {
   public deviceType item = deviceType.Oscillator;
@@ -32,47 +32,48 @@ public class menuItem : manipObject {
   bool disabled = false;
 
   public enum deviceType {
-    Stereo,
-    Glide,
-    Gain,
-    Quantizer,
-    Valve,
-    SampleHold,
-    ConferenceCall,
-    SARSCov2, 
-    Oscillator,
-    Speaker,
-    Funktion,
-    Sampler,
-    Recorder,
-    Compressor,
-    Mixer,
-    Drum,
-    Keyboard,
-    Sequencer,
-    CVSequencer,
-    Maracas,
-    ControlCube,
-    Tapes,
-    Splitter,
-    TouchPad,
-    XyloRoll,
-    Delay,
-    Reverb,
-    StereoVerb,
-    Microphone,
-    Camera,
-    Filter,
-    Scope,
-    Noise,
-    Looper,
-    Airhorn,
-    Timeline,
+    // Please obey ascending alphabetical order, will define the order to the menuItems
     AD,
     ADSR,
+    Airhorn,
+    Camera,
+    Compressor,
+    ControlCube,
+    CVSequencer,
+    Delay,
+    Drum,
+    Filter,
+    Funktion,
+    Gain,
+    Glide,
+    Keyboard,
+    Looper,
+    Maracas,
+    Microphone,
     MIDIIN,
     MIDIOUT,
-    Max,
+    Mixer,
+    Noise,
+    Oscillator,
+    Quantizer,
+    Recorder,
+    Reverb,
+    SampleHold,
+    Sampler,
+    SARSCov2,
+    Scope,
+    Sequencer,
+    Speaker,
+    Splitter,
+    Stereo,
+    StereoVerb,
+    Tapes,
+    Timeline,
+    TouchPad,
+    Valve,
+    XyloRoll,
+    // this is a stopper, items below won't appear in menu; alternatively you can skip items in menuManager.loadMenu()
+    Max,        
     TapeGroup,
     Pano
   };
@@ -110,19 +111,19 @@ public class menuItem : manipObject {
     symbol.material.SetTexture("_MainTex", tex);
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
-    if (item == deviceType.Valve) label.text = "VCA/Atten";
-    if (item == deviceType.Glide) label.text = "Glide/DC";
-    if (item == deviceType.Gain) label.text = "Gain/Mute";
+    // Please use the first letter of the original enum name for proper sorting in the menu!
+    if (item == deviceType.Valve) label.text = "VCA / Atten";
+    if (item == deviceType.Glide) label.text = "Glide / DC";
+    if (item == deviceType.Gain) label.text = "Gain / Mute";
     if (item == deviceType.MIDIIN) label.text = "MIDI In";
     if (item == deviceType.MIDIOUT) label.text = "MIDI Out";
     if (item == deviceType.Sequencer) label.text = "DrumSeq";
     if (item == deviceType.Timeline) label.text = "NoteSeq";
-    if (item == deviceType.CVSequencer) label.text = "DualSeq";
+    if (item == deviceType.CVSequencer) label.text = "CVDrumSeq";
     if (item == deviceType.ControlCube) label.text = "CubeXYZ";
     if (item == deviceType.Microphone) label.text = "Mic";
-    if (item == deviceType.ConferenceCall) label.text = "WebCam";
-    if (item == deviceType.SampleHold) label.text = "S&H";
-    if (item == deviceType.StereoVerb) label.text = "Freeverb";
+    if (item == deviceType.SampleHold) label.text = "Sample & Hold";
+    if (item == deviceType.StereoVerb) label.text = "FreeVerb";
 
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(true);
@@ -220,7 +221,7 @@ public class menuItem : manipObject {
       Destroy(g.transform.Find("screenFrame").gameObject);
     }
 
-        if (item == deviceType.Keyboard) {
+    if (item == deviceType.Keyboard) {
       g.transform.localPosition = new Vector3(0.013f, 0, .026f);
       g.transform.localScale = Vector3.one * .08f;
       Destroy(g.transform.Find("KeyboardTimeline").gameObject);
