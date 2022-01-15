@@ -55,5 +55,5 @@ extern "C" {
     SOUNDSTAGE_API void combineArrays(float buffer[], float bufferB[], int length, float levelA, float levelB);
     SOUNDSTAGE_API void ProcessWaveTexture(float buffer[], int length, void* pixels, unsigned char Ra, unsigned char Ga, unsigned char Ba, unsigned char Rb, unsigned char Gb, unsigned char Bb,
 		int period, int waveheight, int wavewidth, int& lastWaveH, int& curWaveW);
-                   //float xFade(float t, int index)
+    float lerp(float a, float b, float f);
 }

@@ -35,19 +35,22 @@ extern "C" {
 		else return input - fd->b4;
 	}
 
-    void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float frequencyBuffer[], float resonance)
+    void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, float frequencyBuffer[], float resonance)
     {
 
-        resonance = clamp(resonance, 0.f, 1.f);
+        //resonance = clamp(resonance, 0.f, 1.f);
+
+        float freqDiv = 1 / 24000.f; // 24kHz, Nyquist 48kHz
+        bool sameCutoff = cutoffFrequency == lastCutoffFrequency;
+        float cut = cutoffFrequency;
 
         for (int i = 0; i < length; i += 2)
         {
-            // exponential 1/Oct
-            //frequencyBuffer[i] = clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f); // 24kHz, Nyquist 48kHz
-            //frequencyBuffer[i+1] = clamp((261.6256f * powf(2, (frequencyBuffer[i+1] + cutoffFrequency) * 10.f)) / 24000.f, 0.f, 1.f);
 
-            frequencyBuffer[i] = clamp(cutoffFrequency + frequencyBuffer[i], 0.f, 1.f); 
-            frequencyBuffer[i + 1] = clamp(cutoffFrequency + frequencyBuffer[i + 1], 0.f, 1.f);
+            if (!sameCutoff) cut = lerp(lastCutoffFrequency, cutoffFrequency, (float)i / length); // slope limiting for dial
+
+            // exponential 1/Oct, freqMod taken from left channel only
+            frequencyBuffer[i] = frequencyBuffer[i+1] = clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) * freqDiv, 0.f, 1.f); 
 
             mfL->q = 1.0f - frequencyBuffer[i];
             mfL->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfL->q;

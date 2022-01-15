@@ -19,11 +19,12 @@ public class filterDeviceInterface : deviceInterface {
 
   int ID = 0;
   public omniJack input, controlInput, output;
-  public dial frequencyDial, resonanceDial, modeDial;
+  public dial frequencyDial, resonanceDial, modeDial, bandwidthDial;
 
   filterSignalGenerator filter;
 
-  float freqPercent, resPercent, modePercent = 0f; 
+  float freqPercent, resPercent, modePercent = 0f;
+  //public float bandwidthPercent = 0f;
 
 
   public override void Awake() {
@@ -33,6 +34,7 @@ public class filterDeviceInterface : deviceInterface {
 
   void Update()
   {
+    
 
     if (filter.incoming != input.signal)
     {
@@ -47,17 +49,20 @@ public class filterDeviceInterface : deviceInterface {
     if (freqPercent != frequencyDial.percent) updateFrequency();
     if (resPercent != resonanceDial.percent) updateResonance();
     if (modePercent != modeDial.percent) updateMode();
+
+
+    //filter.bandWidthHalfed = bandwidthPercent = Utils.map(bandwidthDial.percent, 0f, 1f, 0f, 0.4f) / 2f; // up to 4 octaves
+    //filter.bandWidthHalfed = Mathf.Pow(bandwidthPercent, 3f) / 2f;
   }
 
   void updateFrequency(){
     freqPercent = frequencyDial.percent;
-    //filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -1f, 1f);
-    filter.cutoffFrequency = freqPercent;
+    filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -0.6f, 0.7f); // 13 octaves around C4
   }
 
   void updateResonance(){
     resPercent = resonanceDial.percent;
-    filter.resonance = resonanceDial.percent;
+    filter.resonance = resonanceDial.percent; // will crash often if higher
   }
   void updateMode(){
     modePercent = modeDial.percent;
