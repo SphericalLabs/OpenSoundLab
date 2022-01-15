@@ -39,7 +39,6 @@ public class menuItem : manipObject {
     Camera,
     Compressor,
     ControlCube,
-    CVSequencer,
     Delay,
     Drum,
     Filter,
@@ -63,14 +62,15 @@ public class menuItem : manipObject {
     SARSCov2,
     Scope,
     Sequencer,
+    SequencerCV,
     Speaker,
     Splitter,
     Stereo,
-    StereoVerb,
+    stereoVerb,
     Tapes,
     Timeline,
     TouchPad,
-    Valve,
+    VCA,
     XyloRoll,
     // this is a stopper, items below won't appear in menu; alternatively you can skip items in menuManager.loadMenu()
     Max,        
@@ -112,18 +112,19 @@ public class menuItem : manipObject {
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
     // Please use the first letter of the original enum name for proper sorting in the menu!
-    if (item == deviceType.Valve) label.text = "VCA / Atten";
+    if (item == deviceType.VCA) label.text = "VCA / Atten";
     if (item == deviceType.Glide) label.text = "Glide / DC";
     if (item == deviceType.Gain) label.text = "Gain / Mute";
     if (item == deviceType.MIDIIN) label.text = "MIDI In";
     if (item == deviceType.MIDIOUT) label.text = "MIDI Out";
-    if (item == deviceType.Sequencer) label.text = "DrumSeq";
-    if (item == deviceType.Timeline) label.text = "NoteSeq";
-    if (item == deviceType.CVSequencer) label.text = "CVDrumSeq";
-    if (item == deviceType.ControlCube) label.text = "CubeXYZ";
+    if (item == deviceType.Sequencer) label.text = "Sequencer I";    
+    if (item == deviceType.SequencerCV) label.text = "Sequencer II";
+    if (item == deviceType.Timeline) label.text = "Sequencer III";
+    if (item == deviceType.ControlCube) label.text = "ControlCube";
     if (item == deviceType.Microphone) label.text = "Mic";
-    if (item == deviceType.SampleHold) label.text = "Sample & Hold";
-    if (item == deviceType.StereoVerb) label.text = "FreeVerb";
+    if (item == deviceType.SampleHold) label.text = "Sample / Hold";
+    if (item == deviceType.Reverb) label.text = "Reverb";
+    if (item == deviceType.stereoVerb) label.text = "StereoVerb";
 
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(true);
@@ -153,19 +154,19 @@ public class menuItem : manipObject {
       Destroy(g.transform.Find("stretchNode").gameObject);
     }
 
-    if (item == deviceType.CVSequencer)
+    if (item == deviceType.SequencerCV)
     {
       for (int i = 0; i < 2; i++)
       {
         for (int i2 = 0; i2 < 4; i2++)
         {
-          GameObject cube = Instantiate(g.GetComponent<cvSequencerDeviceInterface>().touchDialPrefab, transform.position, transform.rotation) as GameObject;
+          GameObject cube = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().touchDialPrefab, transform.position, transform.rotation) as GameObject;
           cube.transform.parent = g.transform;
           cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
           cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
         }
 
-        GameObject seq = Instantiate(g.GetComponent<cvSequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
+        GameObject seq = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
         seq.transform.parent = g.transform;
         seq.transform.Translate(Vector3.right * .081f, Space.Self);
         seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);

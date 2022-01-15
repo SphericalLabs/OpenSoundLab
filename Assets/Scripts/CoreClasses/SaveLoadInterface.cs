@@ -183,7 +183,7 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(MaracaData))]
 [XmlInclude(typeof(MicrophoneData))]
 [XmlInclude(typeof(TouchPadData))]
-[XmlInclude(typeof(ValveData))]
+[XmlInclude(typeof(vcaData))]
 [XmlInclude(typeof(ReverbData))]
 [XmlInclude(typeof(TapeGroupData))]
 [XmlInclude(typeof(MixerData))]

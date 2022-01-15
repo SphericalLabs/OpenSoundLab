@@ -15,16 +15,16 @@
 using UnityEngine;
 using System.Collections;
 
-public class ValveDeviceInterface : deviceInterface {
+public class vcaDeviceInterface : deviceInterface {
   public omniJack input, output, controlInput;
   dial ampDial;
 
-  valveSignalGenerator signal;
+  vcaSignalGenerator signal;
 
   public override void Awake() {
     base.Awake();
     ampDial = GetComponentInChildren<dial>();
-    signal = GetComponent<valveSignalGenerator>();
+    signal = GetComponent<vcaSignalGenerator>();
   }
 
   void Update() {
@@ -35,8 +35,8 @@ public class ValveDeviceInterface : deviceInterface {
   }
 
   public override InstrumentData GetData() {
-    ValveData data = new ValveData();
-    data.deviceType = menuItem.deviceType.Valve;
+    vcaData data = new vcaData();
+    data.deviceType = menuItem.deviceType.VCA;
     GetTransformData(data);
 
     data.dialState = ampDial.percent;
@@ -49,7 +49,7 @@ public class ValveDeviceInterface : deviceInterface {
   }
 
   public override void Load(InstrumentData d) {
-    ValveData data = d as ValveData;
+    vcaData data = d as vcaData;
     base.Load(data);
 
     input.ID = data.jackInID;
@@ -61,7 +61,7 @@ public class ValveDeviceInterface : deviceInterface {
   }
 }
 
-public class ValveData : InstrumentData {
+public class vcaData : InstrumentData {
   public float dialState;
 
   public int jackOutID;

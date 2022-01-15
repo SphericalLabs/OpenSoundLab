@@ -16,7 +16,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class valveSignalGenerator : signalGenerator {
+public class vcaSignalGenerator : signalGenerator {
 
   public signalGenerator incoming, controlSig;
   public bool active = true;

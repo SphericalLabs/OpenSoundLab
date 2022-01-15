@@ -286,9 +286,9 @@ GameObject:
   m_Component:
   - component: {fileID: 421762}
   - component: {fileID: 11403690}
-  - component: {fileID: 114000012825010844}
+  - component: {fileID: 6976060637216830611}
   m_Layer: 0
-  m_Name: Valve
+  m_Name: VCA
   m_TagString: instrument
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -337,7 +337,7 @@ MonoBehaviour:
   controlSig: {fileID: 0}
   active: 1
   amp: 1
---- !u!114 &114000012825010844
+--- !u!114 &6976060637216830611
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -346,7 +346,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 161644}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c212e30a5c1268f4087610641bbc24de, type: 3}
+  m_Script: {fileID: 11500000, guid: 887e9ec4f8c42cd498400dc1641bc690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   useNativeIfAvailable: 1

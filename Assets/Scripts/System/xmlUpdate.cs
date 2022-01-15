@@ -95,7 +95,7 @@ public class xmlUpdate {
               serializer = new XmlSerializer(typeof(ControlCubeData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "Valves":
-              serializer = new XmlSerializer(typeof(ValveData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              serializer = new XmlSerializer(typeof(vcaData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "Reverbs":
               serializer = new XmlSerializer(typeof(ReverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -129,7 +129,7 @@ public class xmlUpdate {
               data[data.Count - 1].deviceType = menuItem.deviceType.AD;
               break;
             case "CVSequencer":
-              data[data.Count - 1].deviceType = menuItem.deviceType.CVSequencer;
+              data[data.Count - 1].deviceType = menuItem.deviceType.SequencerCV;
               break;
             case "SampleHold":
               data[data.Count - 1].deviceType = menuItem.deviceType.SampleHold;
@@ -190,7 +190,7 @@ public class xmlUpdate {
               data[data.Count - 1].deviceType = menuItem.deviceType.ControlCube;
               break;
             case "Valves":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Valve;
+              data[data.Count - 1].deviceType = menuItem.deviceType.VCA;
               break;
             case "Reverbs":
               data[data.Count - 1].deviceType = menuItem.deviceType.Reverb;

@@ -127,10 +127,17 @@ public class menuManager : MonoBehaviour {
       h += 0.07f;
     }
 
-    metronomeNode.transform.localPosition = Quaternion.Euler(0, -arc / 2 - 10, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f) + Vector3.up * .014f;
-    metronomeNode.transform.rotation = Quaternion.Euler(0, -arc / 2 - 10, 0);
-    settingsNode.transform.localPosition = Quaternion.Euler(0, arc / 2 + 10, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f);
-    settingsNode.transform.rotation = Quaternion.Euler(0, arc / 2 + 10, 0);
+    //metronomeNode.transform.localPosition = Quaternion.Euler(0, -arc / 2 - 10, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f) + Vector3.up * .014f;
+    //metronomeNode.transform.rotation = Quaternion.Euler(0, -arc / 2 - 10, 0);
+    //settingsNode.transform.localPosition = Quaternion.Euler(0, arc / 2 + 10, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f);
+    //settingsNode.transform.rotation = Quaternion.Euler(0, arc / 2 + 10, 0);
+
+    metronomeNode.transform.localPosition = new Vector3(0.329f, 0.012f, 0.107f);
+    metronomeNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);
+
+    settingsNode.transform.localPosition = new Vector3(-0.341f, 0.023f, 0.125f);
+    settingsNode.transform.rotation = Quaternion.Euler(-0.422f, 40.013f, 0.576f);
+
   }
 
   public void SelectAudio() {
