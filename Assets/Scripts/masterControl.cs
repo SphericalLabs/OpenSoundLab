@@ -93,8 +93,13 @@ public class masterControl : MonoBehaviour {
 
     GetComponent<sampleManager>().Init();
 
-    OVRManager.fixedFoveatedRenderingLevel = OVRManager.FixedFoveatedRenderingLevel.High; // it's the maximum foveation level
-    OVRManager.useDynamicFixedFoveatedRendering = true;
+    //OVRPlugin.systemDisplayFrequency = 72;
+    Debug.Log("Current cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+    Debug.Log("Trying to set levels to 4");
+    OVRManager.gpuLevel = 2;
+    OVRManager.cpuLevel = 2;
+    Debug.Log("New cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+
   }
 
   public void toggleInstrumentVolume(bool on) {
