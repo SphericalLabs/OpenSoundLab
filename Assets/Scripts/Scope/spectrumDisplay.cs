@@ -24,7 +24,8 @@ public class spectrumDisplay : MonoBehaviour
   float[] spectrum;
 
   int width = 256 * 4;
-  int height = 256 * 1;
+  int height = 256 * 2;
+  int fftBins = 1024 * 2;
 
   RenderTexture offlineTexture;
   Material offlineMaterial;
@@ -42,9 +43,15 @@ public class spectrumDisplay : MonoBehaviour
   float bandWidth;
   float maxLog;
 
+  // needed this to avoid the graph having a gap on the left
+  float leftOffset = 1.665f;
+
+  public FilterMode fm = FilterMode.Bilinear;
+  public int ani = 4;
+
   void Start()
   {
-    spectrum = new float[width];
+    spectrum = new float[fftBins];
 
     bandWidth = 24000f / width;
     maxLog = Mathf.Log10(24000);
@@ -56,11 +63,12 @@ public class spectrumDisplay : MonoBehaviour
     offlineMaterial.hideFlags = HideFlags.HideAndDontSave;
     offlineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
     // get a RenderTexture and set it as target for offline rendering
-    offlineTexture = RenderTexture.GetTemporary(width, height);
-    RenderTexture.active = offlineTexture;
+    offlineTexture = new RenderTexture(width, height, 24);
+    offlineTexture.useMipMap = true;
+
 
     // these are the ones that you will actually see
-    onlineTexture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+    onlineTexture = new Texture2D(width, height, TextureFormat.ARGB32, true);
     onlineMaterial = Instantiate(onlineMaterial);
     GetComponent<Renderer>().material = onlineMaterial;
 
@@ -70,9 +78,11 @@ public class spectrumDisplay : MonoBehaviour
   {
 
     if (!active) return;
-
+    //if (Time.frameCount % 3 != 0) return; // if lower fps desired, then run async in worker thread to smooth out cpu peak
     source.GetSpectrumData(spectrum, 0, fftWin);
     RenderGLToTexture(width, height, offlineMaterial);
+    onlineTexture.filterMode = fm;
+    onlineTexture.anisoLevel = ani;
 
   }
 
@@ -80,12 +90,7 @@ public class spectrumDisplay : MonoBehaviour
   void RenderGLToTexture(int width, int height, Material material)
   {
 
-    //Destroy(offlineTexture);
-
-    // get a temporary RenderTexture //
-    //offlineTexture = RenderTexture.GetTemporary(width, height);
-
-    // always reset offline render here, in case another script had its finger on it in the meantime
+    // always re-set offline render here, in case another script had its finger on it in the meantime
     RenderTexture.active = offlineTexture;
 
     GL.Clear(false, true, Color.black);
@@ -93,8 +98,9 @@ public class spectrumDisplay : MonoBehaviour
     material.SetPass(0);
     GL.PushMatrix();
     GL.LoadPixelMatrix(0, width, height, 0);
-    GL.Begin(GL.LINE_STRIP);
     GL.Color(new Color(1, 1, 1, 1f));
+    GL.Begin(GL.LINE_STRIP);
+
 
     drawY = 0;
     drawX = 0;
@@ -103,8 +109,11 @@ public class spectrumDisplay : MonoBehaviour
 
     for (int freqBand = 0; freqBand < spectrum.Length; freqBand++) // skip 0, because of log negative?
     {
-      drawX = Mathf.RoundToInt(Utils.map(Mathf.Log10(freqBand * bandWidth), 1f, maxLog, 0f, width));
-      if (drawX - lastDrawX <= skip) continue; // skip bands if too close together
+      drawX = Mathf.RoundToInt(Utils.map(Mathf.Log10(freqBand * bandWidth), leftOffset, maxLog, 0f, width));
+      if (drawX - lastDrawX < skip)
+      {
+        continue; // skip bands if too close together
+      }
 
       drawY = height - Mathf.RoundToInt(Mathf.Pow(spectrum[freqBand], 0.3f) * height);
 
@@ -121,11 +130,17 @@ public class spectrumDisplay : MonoBehaviour
     // blit/copy the offlineTexture into the onlineTexture (on GPU)
     Graphics.CopyTexture(offlineTexture, onlineTexture);
 
-    // See https://docs.unity3d.com/ScriptReference/RenderTexture.GetTemporary.html
-    //RenderTexture.active = null;
-    //RenderTexture.ReleaseTemporary(offlineTexture); 
   }
 
+  public void OnDestroy()
+  {
+    // cleanup manually, since the GC isn't managing the GPU
+    if (offlineTexture != null)
+    {
+      offlineTexture.Release();
+      Destroy(offlineTexture);
+    }
+  }
 
   public void toggleActive(bool on)
   {
