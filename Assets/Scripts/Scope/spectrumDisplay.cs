@@ -71,6 +71,7 @@ public class spectrumDisplay : MonoBehaviour
     onlineTexture = new Texture2D(width, height, TextureFormat.ARGB32, true);
     onlineMaterial = Instantiate(onlineMaterial);
     GetComponent<Renderer>().material = onlineMaterial;
+    onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), Texture2D.blackTexture);
 
   }
 
