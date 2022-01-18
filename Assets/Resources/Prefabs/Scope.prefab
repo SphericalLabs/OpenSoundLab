@@ -875,16 +875,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   source: {fileID: 82000012982030508}
   fftWin: 5
-  texrend: {fileID: 23000014021579546}
-  onColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  offColor:
-    serializedVersion: 2
-    rgba: 4278190080
-  doSpectrum: 1
-  doClear1: 1
-  doDraw: 1
+  onlineMaterial: {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
   skip: 1
 --- !u!1 &1000013377660662
 GameObject:
