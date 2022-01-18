@@ -19,6 +19,7 @@ enum DelayParams
     P_N
 };
 
+/* TODO: Right now, if x->time < n, the delay will produce strange glitches. */
 void Delay_ProcessPitchShift(float buffer[], int n, int channels, DelayData* x)
 {
     assert(x->time > 0);
@@ -30,9 +31,7 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, DelayData* x)
          This is especially important since short delay times resut in more oversampling and thus more CPU load...
          */
     }
-    
-    //float offset = -(x->time * stride); //this is unnecessary, as with fixed buffer length, offset is always == -(x->maxTime);
-    
+        
     int nPerChannel = n/channels;
     if(channels > 1)
         _fDeinterleave(buffer, buffer, n, channels);
@@ -46,15 +45,7 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, DelayData* x)
 
     _fScale(buffer, buffer, x->dry, nPerChannel);
     _fScale(x->temp2, x->temp2, x->wet, nPerChannel);
-    //RingBuffer_ReadPadded(x->temp, nPerChannel, -(x->maxTime + nPerChannel * stride), stride, x->tap);
-    
-    printv("stride: %f\n", stride);
-    for(int i = 0; i < nPerChannel; i++)
-        printv("temp[%d] == %f\n", i, x->temp[i]);
-    printv("====\n");
-    
-    //_fScale(x->temp, x->temp, x->wet, nPerChannel);
-    
+        
     _fAdd(buffer, x->temp2, buffer, nPerChannel);
     
     if(channels > 1)

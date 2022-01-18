@@ -46,8 +46,10 @@ SOUNDSTAGE_API int RingBuffer_WritePadded(float *src, int n, float stride, struc
         //calcualte m (number of times to write current sample) BEFORE wrapping fPtr
         m = (int)(fPtr + 0.5f) - x->ptr;
         //Wrap fPtr
-        while(fPtr >= x->n)
+        while(fPtr >= x->n) // >= bc max valid index is n-1
             fPtr -= x->n;
+        while(m >= x->n) // > bc can write n samples max
+            m -= x->n;
         
         //printv("fPtr == %f, m == %d, x->ptr == %d\n", fPtr, m, x->ptr);
         
@@ -66,7 +68,7 @@ SOUNDSTAGE_API int RingBuffer_WritePadded(float *src, int n, float stride, struc
     }
     
     //assert(tn == total); //later remove
-    return tn;
+    return total;
 }
 
 SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingBuffer *x)
@@ -99,7 +101,7 @@ SOUNDSTAGE_API void RingBuffer_ReadPadded(float *dest, int n, int offset, float 
     
     for(int i = 0; i < n; i++)
     {
-        dest[i] = x->buf[(int)(fPtr + 0.5f)];
+        dest[i] = x->buf[((int)(fPtr + 0.5f)) % x->n];
         fPtr += stride;
         if(fPtr >= x->n)
             fPtr -= x->n;
