@@ -1,5 +1,5 @@
 APP_OPTIM        := release
-APP_ABI          := armeabi-v7a
+APP_ABI          := arm64-v8a
 APP_PLATFORM     := android-23
 APP_BUILD_SCRIPT := Android.mk
 # IMPORTANT: c++_static will only work if we have one and only one .so in the whole application.

@@ -86,7 +86,7 @@ extern "C" {
     {
         for (int i = 0; i < length; i += channels)
         {
-            buffer[i] = buffer[i + 1] = ((amp * sin((float)_phase * 2 * PI)) - .5f) * 2; ;
+            buffer[i] = buffer[i + 1] = ((amp * sin(_phase * 2 * PI)) - .5f) * 2; ;
             _phase += amp * 16 * _sampleDuration;
         }
     }
@@ -95,7 +95,7 @@ extern "C" {
     {
         for (int i = 0; i < length; i += channels)
         {
-            float sample = sin((float)_phase * 2 * PI);
+            float sample = sin(_phase * 2 * PI);
             buffer[i] = buffer[i + 1] = ((controlBuffer[i] + 1) / 2.0f) * sample;
 
             float endFrequency = 200.0f + ((controlBuffer[i] + 1) / 2.0f) * 300.0f;
@@ -502,7 +502,7 @@ extern "C" {
 
             // sine needed
             if (analogWave <= 0.33f) {
-                sine = sin((float)_phase * 2 * PI);
+                sine = sin(_phase * 2 * PI);
             }
 
             // square needed

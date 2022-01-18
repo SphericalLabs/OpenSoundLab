@@ -15,8 +15,8 @@ else
 	echo ""
 	echo "Compiling native code..."
 
-	$NDK_PATH NDK_DEBUG=1 NDK_PROJECT_PATH=. NDK_APPLICATION_MK=./Application.mk $*
-	mv libs/armeabi-v7a/libSoundStageNative.so ./armv7/Release/libSoundStageNative.so
+	$NDK_PATH NDK_PROJECT_PATH=. NDK_APPLICATION_MK=./Application.mk $*
+	mv libs/arm64-v8a/libSoundStageNative.so ./arm64/Release/libSoundStageNative.so
 fi
 
 echo ""

@@ -17,10 +17,10 @@ public class delaySignalGenerator : signalGenerator
         P_N
     };
 
-    public const float MIN_TIME = 0.015f; //0.015 seconds = 15ms
-    public const float MAX_TIME = 3.0f; //3 seconds
+    public const float MIN_TIME = 0.050f; // * 1000ms
+    public const float MAX_TIME = 5.0f; // * 1000 ms
     public const float MIN_FEEDBACK = 0;
-    public const float MAX_FEEDBACK = 0.95f;
+    public const float MAX_FEEDBACK = 1f;
     public const float MIN_WET = -96; //dB
     public const float MAX_WET = 0; //dB
     public const float MIN_DRY = -96; //dB
@@ -49,7 +49,7 @@ public class delaySignalGenerator : signalGenerator
         switch(param)
         {
             case (int)Param.P_TIME:
-                p[param] = Utils.map(value, 0, 1, MIN_TIME * AudioSettings.outputSampleRate, MAX_TIME * AudioSettings.outputSampleRate);
+                p[param] = Utils.map(Mathf.Pow(value, 3), 0, 1, MIN_TIME * AudioSettings.outputSampleRate, MAX_TIME * AudioSettings.outputSampleRate);
                 break;
             case (int)Param.P_FEEDBACK:
                 p[param] = Utils.map(value, 0, 1, MIN_FEEDBACK, MAX_FEEDBACK);
