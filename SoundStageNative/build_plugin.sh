@@ -11,7 +11,7 @@ then
 
 	arch -x86_64 $NDK_PATH NDK_DEBUG=1 NDK_PROJECT_PATH=. NDK_APPLICATION_MK=./Application.mk $*
 
-	mv libs/arm64-v8a/libSoundStageNative.so ../Assets/SoundStageNative/x64/Release/libSoundStageNative.so
+	mv libs/arm64-v8a/libSoundStageNative.so ../Assets/SoundStageNative/arm64/Release/libSoundStageNative.so
 else
 
 	NDK_PATH="/c/Users/Ludwig/android-ndk-r21e-windows-x86_64/android-ndk-r21e/build/ndk-build.cmd"
@@ -19,7 +19,7 @@ else
 	echo "Compiling native code..."
 
 	$NDK_PATH NDK_PROJECT_PATH=. NDK_APPLICATION_MK=./Application.mk $*
-	mv libs/arm64-v8a/libSoundStageNative.so ../Assets/SoundStageNative/x64/Release/libSoundStageNative.so
+	mv libs/arm64-v8a/libSoundStageNative.so ../Assets/SoundStageNative/arm64/Release/libSoundStageNative.so
 fi
 
 echo ""
