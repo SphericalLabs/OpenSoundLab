@@ -13,8 +13,10 @@ struct DelayData
     float dry;
     
     //internal
+    int maxTime;
     struct RingBuffer *tap;
     float *temp;
+    float *temp2;
 };
 
 #ifdef __cplusplus

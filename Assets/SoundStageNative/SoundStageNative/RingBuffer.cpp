@@ -4,6 +4,11 @@
 #include "util.h"
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
+
+#if __ARM_NEON
+    #include <arm_neon.h>
+#endif
 
 SOUNDSTAGE_API void RingBuffer_Write(float *src, int n, struct RingBuffer *x)
 {
@@ -23,6 +28,47 @@ SOUNDSTAGE_API void RingBuffer_Write(float *src, int n, struct RingBuffer *x)
     }
 }
 
+SOUNDSTAGE_API int RingBuffer_WritePadded(float *src, int n, float stride, struct RingBuffer *x)
+{
+    int total = 0; //later remove
+    int tn = (int)(n * stride);
+    if(tn > x->n)
+    {
+        //TODO: no need to write all samples, as the first ones will be overwritten anyway.
+    }
+    
+    float fPtr = x->ptr;
+    int m; //number of times to write 1 sample
+    for(int i = 0; i < n; i++)
+    {
+        //Advance floating pointer
+        fPtr += stride;
+        //calcualte m (number of times to write current sample) BEFORE wrapping fPtr
+        m = (int)(fPtr + 0.5f) - x->ptr;
+        //Wrap fPtr
+        while(fPtr >= x->n)
+            fPtr -= x->n;
+        
+        //printv("fPtr == %f, m == %d, x->ptr == %d\n", fPtr, m, x->ptr);
+        
+        //Write sample 0, 1 or multiple times. After this loop, x->ptr corresponds to (int)(fPtr + 0.5f).
+        for(int j = 0; j < m; j++)
+        {
+            //printv("x->ptr == %d\n", x->ptr);
+            x->buf[x->ptr] = *src;
+            x->ptr = (x->ptr + 1) % x->n;
+            total++;
+        }
+        //assert(x->ptr == (int)(fPtr = 0.5f) );
+        
+        //Increment source pointer
+        src++;
+    }
+    
+    //assert(tn == total); //later remove
+    return tn;
+}
+
 SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingBuffer *x)
 {
     int m = 0; //number of elements to read in current step
@@ -38,6 +84,25 @@ SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingB
         n -= m;
         dest += m;
         rPtr = (rPtr + m) % x->n;
+    }
+}
+
+SOUNDSTAGE_API void RingBuffer_ReadPadded(float *dest, int n, int offset, float stride, struct RingBuffer *x)
+{
+    int rPtr = x->ptr + offset;
+    while(rPtr >= x->n)
+        rPtr -= x->n;
+    while(rPtr < 0)
+        rPtr += x->n;
+    
+    float fPtr = (float)rPtr;
+    
+    for(int i = 0; i < n; i++)
+    {
+        dest[i] = x->buf[(int)(fPtr + 0.5f)];
+        fPtr += stride;
+        if(fPtr >= x->n)
+            fPtr -= x->n;
     }
 }
 
