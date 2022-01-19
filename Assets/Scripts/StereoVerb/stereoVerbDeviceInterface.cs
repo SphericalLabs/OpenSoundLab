@@ -37,7 +37,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
         signal.SetParam(size.percent, (int)stereoVerbSignalGenerator.Param.P_ROOMSIZE);
         signal.SetParam(damping.percent, (int)stereoVerbSignalGenerator.Param.P_DAMPING);
         signal.SetParam(width.percent, (int)stereoVerbSignalGenerator.Param.P_WIDTH);
-        signal.SetParam(freeze.switchVal ? 0 : 1, (int)stereoVerbSignalGenerator.Param.P_WIDTH);
+        signal.SetParam(freeze.switchVal ? 1 : 0, (int)stereoVerbSignalGenerator.Param.P_FREEZE);
         signal.SetParam(dryWet.percent, (int)stereoVerbSignalGenerator.Param.P_WET);
         signal.SetParam(1 - dryWet.percent, (int)stereoVerbSignalGenerator.Param.P_DRY);
     }
