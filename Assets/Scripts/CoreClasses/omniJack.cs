@@ -44,7 +44,7 @@ public class omniJack : manipObject {
     jackTargetHue = findHue();
     jackColor = Color.HSVToRGB(jackTargetHue, 0.8f, 0.5f);
     if (homesignal == null) homesignal = transform.parent.GetComponent<signalGenerator>();
-    mat.SetColor("_EmissionColor", jackColor);
+    //mat.SetColor("_EmissionColor", jackColor);
 
     if (masterControl.instance != null) {
       if (!masterControl.instance.jacksEnabled) GetComponent<Collider>().enabled = false;
@@ -52,7 +52,7 @@ public class omniJack : manipObject {
   }
 
   public void setColor(Color c) {
-    mat.SetColor("_EmissionColor", c);
+    //mat.SetColor("_EmissionColor", c);
   }
 
   public override void setState(manipState state) {
@@ -90,9 +90,9 @@ public class omniJack : manipObject {
       else near.mouseoverEvent(false);
     } else if (curState == manipState.selected) {
       if (dimCoroutine != null) StopCoroutine(dimCoroutine);
-      jackColor = Color.HSVToRGB(findHue(), 0.8f, 0.2f);
-      jackRepRend.material.SetFloat("_EmissionGain", .1f);
-      jackRepRend.material.SetColor("_TintColor", jackColor);
+      //jackColor = Color.HSVToRGB(findHue(), 0.8f, 0.2f);
+      //jackRepRend.material.SetFloat("_EmissionGain", .1f);
+      //jackRepRend.material.SetColor("_TintColor", jackColor);
 
       if (near == null) plugRep.SetActive(true);
       else near.mouseoverEvent(true);
@@ -136,8 +136,8 @@ public class omniJack : manipObject {
     float t = 0;
     while (t < 1) {
       t = Mathf.Clamp01(t + Time.deltaTime * 2);
-      jackRepRend.material.SetFloat("_EmissionGain", Mathf.Lerp(.1f, 0, t));
-      jackRepRend.material.SetColor("_TintColor", Color.Lerp(jackColor, Color.black, t));
+      //jackRepRend.material.SetFloat("_EmissionGain", Mathf.Lerp(.1f, 0, t));
+      //jackRepRend.material.SetColor("_TintColor", Color.Lerp(jackColor, Color.black, t));
       yield return null;
     }
     plugRep.SetActive(false);
@@ -148,7 +148,7 @@ public class omniJack : manipObject {
   public void flash(Color c) {
     if (flashCoroutine != null)
       StopCoroutine(flashCoroutine);
-    mat.SetColor("_EmissionColor", jackColor);
+    //mat.SetColor("_EmissionColor", jackColor);
     if (c != Color.black) {
       targColor = c;
       flashCoroutine = StartCoroutine(flashRoutine());
@@ -160,7 +160,7 @@ public class omniJack : manipObject {
     float t = 0;
     while (true) {
       t += Time.deltaTime * 6;
-      mat.SetColor("_EmissionColor", Color.Lerp(Color.black, targColor, Mathf.Abs(Mathf.Sin(t))));
+      //mat.SetColor("_EmissionColor", Color.Lerp(Color.black, targColor, Mathf.Abs(Mathf.Sin(t))));
       yield return null;
     }
   }
