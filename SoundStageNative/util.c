@@ -143,15 +143,20 @@ extern "C" {
         /* Surprisingly, this version is a little faster than using vmulq_n_f32.
          But it uses one register more (float32x4_t scale).
          */
-        assert(n % 4 == 0);
-        float32x4_t scale = vdupq_n_f32(factor);
-        float32x4_t temp;
-        for(int i = 0; i < n; i+= 4)
+        if(n % 4 == 0)
         {
-            temp = vld1q_f32(src + i);
-            temp = vmulq_f32(temp, scale);
-            vst1q_f32(src + i, temp);
+            float32x4_t scale = vdupq_n_f32(factor);
+            float32x4_t temp;
+            for(int i = 0; i < n; i+= 4)
+            {
+                temp = vld1q_f32(src + i);
+                temp = vmulq_f32(temp, scale);
+                vst1q_f32(src + i, temp);
+            }
         }
+        else
+            for(int i = 0; i < n; i++)
+                dest[i] = factor * src[i];
 #else
         for(int i = 0; i < n; i++)
         {
@@ -196,16 +201,21 @@ extern "C" {
         /* 1.5x as fast as naive implementation (Onone) */
         /* TODO: naive implementation is twice as fast (O3) */
         /* A bit slower than naive implementation (Ofast). Interestingly, the Neon version gets a speedup from O3 to Ofast, while the naive implementation does not change. */
-        assert(n % 4 == 0);
-        float32x4_t temp1;
-        float32x4_t temp2;
-        for(int i = 0; i < n; i+=4)
+        if(n % 4 == 0)
         {
-            temp1 = vld1q_f32(src1 + i);
-            temp2 = vld1q_f32(src2 + i);
-            temp2 = vaddq_f32(temp1, temp2);
-            vst1q_f32(dest + i, temp2);
+            float32x4_t temp1;
+            float32x4_t temp2;
+            for(int i = 0; i < n; i+=4)
+            {
+                temp1 = vld1q_f32(src1 + i);
+                temp2 = vld1q_f32(src2 + i);
+                temp2 = vaddq_f32(temp1, temp2);
+                vst1q_f32(dest + i, temp2);
+            }
         }
+        else
+            for(int i = 0; i < n; i++)
+                dest[i] = src1[i] + src2[i];
 #else
         for(int i = 0; i < n; i++)
         {

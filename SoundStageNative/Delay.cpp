@@ -19,35 +19,45 @@ enum DelayParams
     P_N
 };
 
-/* TODO: Right now, if x->time < n, the delay will produce strange glitches. */
-void Delay_ProcessPitchShift(float buffer[], int n, int channels, DelayData* x)
+void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
-    assert(x->time > 0);
-    float stride = (float)x->maxTime / (float)x->time;
+    /* Prepare */
+    int time = cTime != 0 ? (x->maxTime - x->time) * cTime : x->time;
+    float feedback = cFeedback != 0 ? (1.0f - x->feedback) * cFeedback : x->feedback;
     
-    if(x->time < n)
-    {
-        /* if the delay time is shorter than the buffer, then we should avoid writing samples we will not use anyway.
-         This is especially important since short delay times resut in more oversampling and thus more CPU load...
-         */
-    }
+    assert(time > 0);
+    
+    float stride = (float)x->maxTime / (float)time;
         
     int nPerChannel = n/channels;
     if(channels > 1)
         _fDeinterleave(buffer, buffer, n, channels);
     
-    RingBuffer_ReadPadded(x->temp, nPerChannel, -(x->maxTime), stride, x->tap);
-    _fCopy(x->temp, x->temp2, nPerChannel);
-    
-    _fScale(x->temp, x->temp, x->feedback, nPerChannel);
-    _fAdd(buffer, x->temp, x->temp, nPerChannel);
-    RingBuffer_WritePadded(x->temp, nPerChannel, stride, x->tap);
-
-    _fScale(buffer, buffer, x->dry, nPerChannel);
-    _fScale(x->temp2, x->temp2, x->wet, nPerChannel);
+    /* Process delay */
+    int m;
+    int r = nPerChannel;
+    float* bufOffset = buffer;
+    while(r)
+    {
+        m = time < r ? time : r;
         
-    _fAdd(buffer, x->temp2, buffer, nPerChannel);
+        RingBuffer_ReadPadded(x->temp, m, -(x->maxTime), stride, x->tap);
+        _fCopy(x->temp, x->temp2, m);
+        
+        _fScale(x->temp, x->temp, feedback, m);
+        _fAdd(bufOffset, x->temp, x->temp, m);
+        RingBuffer_WritePadded(x->temp, m, stride, x->tap);
+
+        _fScale(bufOffset, bufOffset, x->dry, m);
+        _fScale(x->temp2, x->temp2, x->wet, m);
+            
+        _fAdd(bufOffset, x->temp2, bufOffset, m);
+        
+        bufOffset += m;
+        r -= m;
+    }
     
+    /* Finalize */
     if(channels > 1)
     {
         for(int i = 1; i < channels; i++)
@@ -84,10 +94,15 @@ void Delay_ProcessSimple(float buffer[], int n, int channels, DelayData* x) {
 }
 
 
-SOUNDSTAGE_API void Delay_Process(float buffer[], int n, int channels, DelayData* x)
+SOUNDSTAGE_API void Delay_Process(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
-    Delay_ProcessPitchShift(buffer, n, channels, x);
+    Delay_ProcessPitchShift(buffer, n, channels, cTime, cFeedback, x);
     //Delay_ProcessSimple(buffer, n, channels, x);
+}
+
+SOUNDSTAGE_API void Delay_Clear(DelayData* x)
+{
+    _fZero(x->tap->buf, x->tap->n);
 }
 
 SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x)
@@ -99,11 +114,6 @@ SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x)
     switch (param) {
         case P_TIME:
             assert(value <= x->tap->n);
-            if(intval % 2 != 0)
-            {
-                //This is a quick hack to ensure the ringbuffer will not randomly switch left and right channels when used with interleaved audio data.
-                value--;
-            }
             x->time = intval;
             //printv("Set delay time to %d\n", intval);
             break;

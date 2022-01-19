@@ -48,7 +48,7 @@ SOUNDSTAGE_API int RingBuffer_WritePadded(float *src, int n, float stride, struc
         //Wrap fPtr
         while(fPtr >= x->n) // >= bc max valid index is n-1
             fPtr -= x->n;
-        while(m >= x->n) // > bc can write n samples max
+        while(m > x->n) // > bc can write n samples max
             m -= x->n;
         
         //printv("fPtr == %f, m == %d, x->ptr == %d\n", fPtr, m, x->ptr);

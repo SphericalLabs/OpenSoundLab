@@ -18,8 +18,9 @@ using System;
 
 public class delayDeviceInterface : deviceInterface
 {
-    public omniJack input, output;
+    public omniJack input, cTimeInput, cFeedbackInput, output;
     public dial timeDial, feedbackDial, wetDial, dryDial;
+    public button panicButton;
     delaySignalGenerator signal;
     private dial[] dials;
 
@@ -33,11 +34,15 @@ public class delayDeviceInterface : deviceInterface
     void Update()
     {
         if (signal.input != input.signal) signal.input = input.signal;
+        if (signal.cFeedbackInput != cFeedbackInput.signal) signal.cFeedbackInput = cFeedbackInput.signal;
+        if (signal.cTimeInput != cTimeInput.signal) signal.cTimeInput = cTimeInput.signal;
 
-        for(int i = 0; i < dials.Length; i++)
+        for (int i = 0; i < dials.Length; i++)
         {
             signal.SetParam(dials[i].percent, i);
         }
+        if (panicButton.isHit)
+            signal.SetParam(1, (int)delaySignalGenerator.Param.P_CLEAR);
     }
 
     public override InstrumentData GetData()
