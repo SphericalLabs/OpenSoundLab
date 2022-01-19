@@ -36,7 +36,6 @@ public class compressorSignalGenerator : signalGenerator
         SetParam(6.0f, (int)Param.P_KNEE);
         SetParam(0, (int)Param.P_LIMIT);
         SetParam(0, (int)Param.P_LOOKAHEAD);
-        Debug.Log("Sample rate is " + AudioSettings.outputSampleRate);
     }
 
     private void OnDestroy()
@@ -83,7 +82,6 @@ public class compressorSignalGenerator : signalGenerator
                 p[param] = value == 0 ? 0 : 1;
                 break;
         }
-        Debug.Log("Set param " + param + " to value " + p[param]);
     }
 
     [DllImport("SoundStageNative")]

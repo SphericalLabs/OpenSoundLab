@@ -124,7 +124,7 @@ public class menuItem : manipObject {
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.SampleHold) label.text = "Sample / Hold";
     if (item == deviceType.Reverb) label.text = "Reverb";
-    if (item == deviceType.stereoVerb) label.text = "StereoVerb";
+    if (item == deviceType.stereoVerb) label.text = "Freeverb";
 
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(true);
