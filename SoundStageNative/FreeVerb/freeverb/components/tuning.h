@@ -24,7 +24,8 @@ static constexpr float  kAllPassFeedback    = 0.5f;
 static constexpr float  kInputGainScale     = 0.015f;
 static constexpr float  kDampingScale       = 0.4f;
 static constexpr float  kRoomSizeMin        = 0.7f;
-static constexpr float  kRoomSizeMax        = kRoomSizeMin + 0.28f;
+//static constexpr float  kRoomSizeMax        = kRoomSizeMin + 0.28f;
+static constexpr float  kRoomSizeMax        = kRoomSizeMin + 0.299f; //HB edit
 static constexpr float  kWetLevelMax        = 3.0f;
 static constexpr float  kDryLevelMax        = 2.0f;
 
