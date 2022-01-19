@@ -33,8 +33,8 @@ public class delaySignalGenerator : signalGenerator
     private float[] p = new float[(int)Param.P_N];
     private bool shouldClear = false;
 
-    private float[] cTimeBuffer = new float[2] { 0, 0 };
-    private float[] cFeedbackBuffer = new float[2] { 0, 0 };
+    private float[] cTimeBuffer = new float[0];
+    private float[] cFeedbackBuffer = new float[0];
     private float cTime;
     private float cFeedback;
 
@@ -54,10 +54,10 @@ public class delaySignalGenerator : signalGenerator
         switch(param)
         {
             case (int)Param.P_TIME:
-                p[param] = Utils.map(Mathf.Pow(value, 3), 0, 1, MIN_TIME * AudioSettings.outputSampleRate, MAX_TIME * AudioSettings.outputSampleRate);
+                p[param] = value; //this is finally set in process method
                 break;
             case (int)Param.P_FEEDBACK:
-                p[param] = Utils.map(value, 0, 1, MIN_FEEDBACK, MAX_FEEDBACK);
+                p[param] = value; //this is finally set in process method
                 break;
             case (int)Param.P_WET:
                 p[param] = Utils.dbToLin( Utils.map(value, 0, 1, MIN_WET, MAX_WET, 0.8f) );
@@ -101,11 +101,6 @@ public class delaySignalGenerator : signalGenerator
             shouldClear = false;
         }
 
-        Delay_SetParam(p[(int)Param.P_TIME], (int)Param.P_TIME, x);
-        Delay_SetParam(p[(int)Param.P_FEEDBACK], (int)Param.P_FEEDBACK, x);
-        Delay_SetParam(p[(int)Param.P_WET], (int)Param.P_WET, x);
-        Delay_SetParam(p[(int)Param.P_DRY], (int)Param.P_DRY, x);
-
         if (input != null)
         {
             input.processBuffer(buffer, dspTime, channels);
@@ -124,6 +119,11 @@ public class delaySignalGenerator : signalGenerator
             cFeedbackInput.processBuffer(cFeedbackBuffer, dspTime, channels);
             cFeedback = cFeedbackBuffer[0];
         }
+
+        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME] + cTime), 3), 0, 1, MIN_TIME * AudioSettings.outputSampleRate, MAX_TIME * AudioSettings.outputSampleRate), (int)Param.P_TIME, x);
+        Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + cFeedback), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
+        Delay_SetParam(p[(int)Param.P_WET], (int)Param.P_WET, x);
+        Delay_SetParam(p[(int)Param.P_DRY], (int)Param.P_DRY, x);
 
         //We need to process the delay even if there is currently no input,
         //bc there could be unconsumed samples from a previous input left in the delay line.

@@ -7,9 +7,6 @@
 
 #define DELAY_MAXVECTORSIZE 4096
 
-#define DELAY_MAXTIME 96000 //in samples
-#define DELAY_MINTIME 512 //in bucket brigade mode, shorter delay means more oversampling, so we have to set a reasonable limit.
-
 enum DelayParams
 {
     P_TIME,
@@ -21,9 +18,9 @@ enum DelayParams
 
 void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
-    /* Prepare */
-    int time = cTime != 0 ? (x->maxTime - x->time) * cTime : x->time;
-    float feedback = cFeedback != 0 ? (1.0f - x->feedback) * cFeedback : x->feedback;
+    // Prepare
+    int time = x->time;
+    float feedback = x->feedback;
     
     assert(time > 0);
     
@@ -33,7 +30,7 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
     if(channels > 1)
         _fDeinterleave(buffer, buffer, n, channels);
     
-    /* Process delay */
+    // Process delay
     int m;
     int r = nPerChannel;
     float* bufOffset = buffer;
@@ -57,7 +54,7 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
         r -= m;
     }
     
-    /* Finalize */
+    // Finalize
     if(channels > 1)
     {
         for(int i = 1; i < channels; i++)

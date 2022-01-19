@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "RingBuffer.h"
+#include "CompressedRingBuffer.h"
 
 struct DelayData
 {
