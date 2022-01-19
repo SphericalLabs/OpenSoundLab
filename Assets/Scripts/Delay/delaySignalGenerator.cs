@@ -17,8 +17,8 @@ public class delaySignalGenerator : signalGenerator
         P_N
     };
 
-    public const float MIN_TIME = 0.050f; // * 1000ms
-    public const float MAX_TIME = 5.0f; // * 1000 ms
+    public const float MIN_TIME = 0.200f; // * 1000ms
+    public const float MAX_TIME = MIN_TIME * 50; // * 1000ms
     public const float MIN_FEEDBACK = 0;
     public const float MAX_FEEDBACK = 1f;
     public const float MIN_WET = -96; //dB
