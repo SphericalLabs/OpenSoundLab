@@ -47,7 +47,7 @@ extern "C" {
     SOUNDSTAGE_API void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int semitone, float keyMultConst, float& filteredVal );
     SOUNDSTAGE_API void XylorollMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]);
     SOUNDSTAGE_API void XylorollMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]);
-    SOUNDSTAGE_API void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, float prevSyncValue,
+    SOUNDSTAGE_API void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, float& prevSyncValue,
         float frequencyExpBuffer[], float frequencyLinBuffer[], float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqExpGen, bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, double &dspTime);
     SOUNDSTAGE_API void addCombFilterSignal(float inputbuffer[], float addbuffer[], int length, float delayBufferL[], float delayBufferR[], int delaylength, float gain, int& inPoint, int& outPoint);
     SOUNDSTAGE_API void processCombFilterSignal(float buffer[], int length, float delayBufferL[], float delayBufferR[], int delaylength, float gain, int& inPoint, int& outPoint);
