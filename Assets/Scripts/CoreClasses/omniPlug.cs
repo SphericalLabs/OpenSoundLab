@@ -47,9 +47,9 @@ public class omniPlug : manipObject {
     mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
     lr = GetComponent<LineRenderer>();
     cordColor = new Color(Random.value, Random.value, Random.value);
-    lr.material.SetColor("_TintColor", cordColor);
-    mat.SetColor("_TintColor", cordColor);
-    mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
+    //lr.material.SetColor("_TintColor", cordColor);
+    //mat.SetColor("_TintColor", cordColor);
+    //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
     mouseoverFeedback.SetActive(false);
     plugTrans = transform.GetChild(0);
 
@@ -62,14 +62,14 @@ public class omniPlug : manipObject {
     Color jackColor = Color.HSVToRGB(c, .8f, .5f);
     cordColor = Color.HSVToRGB(c, .8f, .2f);
 
-    mat.SetColor("_TintColor", jackColor);
-    mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", jackColor);
+    //mat.SetColor("_TintColor", jackColor);
+    //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", jackColor);
     wireType = masterControl.instance.WireSetting;
     outputPlug = outputting;
     otherPlug = other;
 
     if (outputPlug) {
-      lr.material.SetColor("_TintColor", cordColor);
+      //lr.material.SetColor("_TintColor", cordColor);
       plugPath.Add(otherPlug.transform.position);
 
       updateLineVerts();
@@ -79,7 +79,7 @@ public class omniPlug : manipObject {
 
   public void setLineColor(Color c) {
     cordColor = c;
-    lr.material.SetColor("_TintColor", c);
+    //lr.material.SetColor("_TintColor", c);
   }
 
   public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor) {
@@ -90,9 +90,9 @@ public class omniPlug : manipObject {
     Color c2 = Color.HSVToRGB(h, .8f, .2f);
 
     cordColor = tempColor;
-    lr.material.SetColor("_TintColor", c2);
-    mat.SetColor("_TintColor", c1);
-    mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", c1);
+    //lr.material.SetColor("_TintColor", c2);
+    //mat.SetColor("_TintColor", c1);
+    //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", c1);
 
     if (outputPlug) {
 
@@ -209,8 +209,8 @@ public class omniPlug : manipObject {
   float flowVal = 0;
   void lrFlowEffect() {
     flowVal = Mathf.Repeat(flowVal - Time.deltaTime, 1);
-    lr.material.mainTextureOffset = new Vector2(flowVal, 0);
-    lr.material.SetFloat("_EmissionGain", .1f);
+    //lr.material.mainTextureOffset = new Vector2(flowVal, 0);
+    //lr.material.SetFloat("_EmissionGain", .1f);
   }
 
   Transform closestJack;
