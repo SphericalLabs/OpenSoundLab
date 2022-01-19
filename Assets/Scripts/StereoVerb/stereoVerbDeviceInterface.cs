@@ -17,9 +17,8 @@ using System.Collections;
 
 public class stereoVerbDeviceInterface : deviceInterface {
     stereoVerbSignalGenerator signal;
-    public dial size, damping, width;
+    public dial size, damping, width, dry, wet;
     public basicSwitch freeze;
-    public slider dryWet;
     public omniJack input, output;
     public AudioSource speaker;
 
@@ -37,9 +36,9 @@ public class stereoVerbDeviceInterface : deviceInterface {
         signal.SetParam(size.percent, (int)stereoVerbSignalGenerator.Param.P_ROOMSIZE);
         signal.SetParam(damping.percent, (int)stereoVerbSignalGenerator.Param.P_DAMPING);
         signal.SetParam(width.percent, (int)stereoVerbSignalGenerator.Param.P_WIDTH);
-        signal.SetParam(freeze.switchVal ? 0 : 1, (int)stereoVerbSignalGenerator.Param.P_WIDTH);
-        signal.SetParam(dryWet.percent, (int)stereoVerbSignalGenerator.Param.P_WET);
-        signal.SetParam(1 - dryWet.percent, (int)stereoVerbSignalGenerator.Param.P_DRY);
+        signal.SetParam(freeze.switchVal ? 1 : 0, (int)stereoVerbSignalGenerator.Param.P_FREEZE);
+        signal.SetParam(wet.percent, (int)stereoVerbSignalGenerator.Param.P_WET);
+        signal.SetParam(dry.percent, (int)stereoVerbSignalGenerator.Param.P_DRY);
     }
 
     public override InstrumentData GetData() {
@@ -52,7 +51,8 @@ public class stereoVerbDeviceInterface : deviceInterface {
 
         data.size = size.percent;
         data.damping = damping.percent;
-        data.dryWet = dryWet.percent;
+        data.wet = wet.percent;
+        data.dry = dry.percent;
         data.width = width.percent;
         data.freeze = freeze.switchVal;
 
@@ -67,14 +67,15 @@ public class stereoVerbDeviceInterface : deviceInterface {
 
         size.setPercent(data.size);
         damping.setPercent(data.size);
-        dryWet.setPercent(data.dryWet);
+        dry.setPercent(data.dry);
+        wet.setPercent(data.wet);
         width.setPercent(data.width);
         freeze.switchVal = data.freeze;
     }
 }
 
 public class StereoVerbData : InstrumentData {
-    public float size, damping, dryWet, width;
+    public float size, damping, dry, wet, width;
     public bool freeze;
     public int jackOutID, jackInID;
 }
