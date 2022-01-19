@@ -36,7 +36,6 @@ public class delaySignalGenerator : signalGenerator
     {
         int maxDelaySamples = (int)(MAX_TIME * AudioSettings.outputSampleRate);
         x = Delay_New(maxDelaySamples);
-        Debug.Log("Maximum delay time in samples is " + maxDelaySamples);
     }
 
     private void OnDestroy()
@@ -61,7 +60,6 @@ public class delaySignalGenerator : signalGenerator
                 p[param] = Utils.dbToLin( Utils.map(value, 0, 1, MIN_DRY, MAX_DRY, 0.8f) );
                 break;
         }
-        Debug.Log("Delay: Set param " + ((Param)param).ToString() + " to value " + p[param]);
     }
 
     [DllImport("SoundStageNative")]
@@ -93,12 +91,6 @@ public class delaySignalGenerator : signalGenerator
         //To optimize, we could store the timestamp when the last input connection was removed.
         //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed.
         Delay_Process(buffer, buffer.Length, channels, x);
-
-        if (!processing)
-        {
-            processing = true;
-            Debug.Log("Delay is processing");
-        }
     }
 }
 
