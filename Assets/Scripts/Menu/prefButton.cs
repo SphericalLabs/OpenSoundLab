@@ -22,22 +22,20 @@ public class prefButton : manipObject {
     menuManager manager;
 
     Material mat;
-    Color normalColor = new Color(.5f, .5f, 1);
-    Color normalOnColor = new Color(.5f, .5f, 1);
-    Color selectColor = new Color(.85f, .85f, 1);
-    Color grabColor = new Color(.85f, .85f, 1);
+  Color normalColor;
+  Color selectColor;
+  Color grabColor;
 
     bool tipsOn = false;
 
     public override void Awake()
     {
         base.Awake();
-        normalColor = Color.HSVToRGB(.6f, 1f, .06f);
-        normalOnColor = Color.HSVToRGB(.6f, .95f, .2f);
-        selectColor = Color.HSVToRGB(.6f, .95f, .5f);
-        grabColor = Color.HSVToRGB(.6f, .9f, 1f);
+        normalColor = Color.HSVToRGB(0.6f, 1f, 0.5f);
+        selectColor = Color.HSVToRGB(0.6f, 1f, 0.7f);
+        grabColor = Color.HSVToRGB(0.6f, 1f, 1f);
 
-        mat = gearRenderer.material;
+        mat = gearRenderer.sharedMaterial;
         mat.SetColor("_TintColor", normalColor);
         manager = transform.parent.parent.GetComponent<menuManager>();
     }

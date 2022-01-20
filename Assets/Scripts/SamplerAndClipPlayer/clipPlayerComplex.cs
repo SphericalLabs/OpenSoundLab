@@ -105,14 +105,14 @@ public class clipPlayerComplex : clipPlayer {
       timer = 0;
       while (timer < 1) {
         timer = Mathf.Clamp01(timer + Time.deltaTime * 3);
-        waverend.material.SetFloat("_EmissionGain", Mathf.Lerp(1, .25f, timer));
+        waverend.material.SetFloat("_EmissionGain", Mathf.Lerp(1, .55f, timer));
         yield return null;
       }
     } else {
       float timer = 0;
       while (timer < 1) {
         timer = Mathf.Clamp01(timer + Time.deltaTime * 5);
-        waverend.material.SetFloat("_EmissionGain", Mathf.Lerp(.25f, 0, timer));
+        waverend.material.SetFloat("_EmissionGain", Mathf.Lerp(.55f, 0, timer));
         yield return null;
       }
     }
