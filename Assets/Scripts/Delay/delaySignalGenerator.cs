@@ -42,7 +42,7 @@ public class delaySignalGenerator : signalGenerator
 
     public override void Awake()
     {
-    sampleRate = AudioSettings.outputSampleRate;
+        sampleRate = AudioSettings.outputSampleRate;
         int maxDelaySamples = (int)(MAX_TIME * sampleRate);
         x = Delay_New(maxDelaySamples);
     }
