@@ -1037,7 +1037,7 @@ MonoBehaviour:
   onlyOn: 0
   labelColor: {r: 0.75, g: 0.75, b: 1, a: 1}
   labelEmission: 0.4
-  glowEmission: 0.15
+  glowEmission: 0.5
   startToggled: 1
   disregardStartToggled: 0
   changeOverlayGlow: 0
@@ -1251,7 +1251,7 @@ GameObject:
   - component: {fileID: 82000011234211416}
   - component: {fileID: 114790924756963406}
   m_Layer: 9
-  m_Name: CVSequencer
+  m_Name: SequencerCV
   m_TagString: instrument
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1411,6 +1411,7 @@ MonoBehaviour:
   beatSlider: {fileID: 114000012190995366}
   controlInput: {fileID: 114000010336139522}
   playButton: {fileID: 114000010763487664}
+  rangeSwitcher: {fileID: 0}
   dimensionDisplays:
   - {fileID: 102000013518395380}
   - {fileID: 102000013255618616}

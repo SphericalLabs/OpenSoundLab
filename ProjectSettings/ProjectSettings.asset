@@ -46,8 +46,8 @@ PlayerSettings:
   defaultScreenHeight: 768
   defaultScreenWidthWeb: 960
   defaultScreenHeightWeb: 600
-  m_StereoRenderingPath: 0
-  m_ActiveColorSpace: 0
+  m_StereoRenderingPath: 1
+  m_ActiveColorSpace: 1
   m_MTRendering: 1
   m_StackTraceTypes: 010000000100000001000000010000000100000001000000
   iosShowActivityIndicatorOnLoading: -1
@@ -118,9 +118,8 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 0.1.9
-  preloadedAssets:
-  - {fileID: 8207365043489784020, guid: 93c4f4428c8e3814dbf9d469c39e85d4, type: 2}
+  bundleVersion: 0.20
+  preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -169,7 +168,7 @@ PlayerSettings:
     tvOS: com.oculus.UnitySample
   buildNumber:
     iPhone: 0
-  AndroidBundleVersionCode: 19
+  AndroidBundleVersionCode: 20
   AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 0
@@ -414,7 +413,7 @@ PlayerSettings:
     m_GraphicsJobMode: 0
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: AndroidPlayer
-    m_APIs: 0b00000008000000
+    m_APIs: 0b000000
     m_Automatic: 0
   m_BuildTargetVRSettings:
   - m_BuildTarget: Android
@@ -474,7 +473,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Enabled: 1
     m_Devices: []
-  openGLRequireES31: 0
+  openGLRequireES31: 1
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
   m_TemplateCustomTags: {}
@@ -740,7 +739,7 @@ PlayerSettings:
   allowUnsafeCode: 0
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
-  gcIncremental: 0
+  gcIncremental: 1
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1

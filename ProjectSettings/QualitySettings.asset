@@ -41,7 +41,9 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - iPhone
   - serializedVersion: 2
     name: Fast
     pixelLightCount: 0
@@ -77,11 +79,13 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - iPhone
   - serializedVersion: 2
     name: Simple
     pixelLightCount: 1
-    shadows: 1
+    shadows: 0
     shadowResolution: 0
     shadowProjection: 1
     shadowCascades: 1
@@ -92,8 +96,8 @@ QualitySettings:
     shadowmaskMode: 0
     skinWeights: 2
     textureQuality: 0
-    anisotropicTextures: 1
-    antiAliasing: 0
+    anisotropicTextures: 2
+    antiAliasing: 2
     softParticles: 0
     softVegetation: 0
     realtimeReflectionProbes: 0
@@ -149,7 +153,9 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - iPhone
+    - Android
   - serializedVersion: 2
     name: Beautiful
     pixelLightCount: 3
@@ -185,7 +191,9 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - iPhone
+    - Android
   - serializedVersion: 2
     name: Fantastic
     pixelLightCount: 4
@@ -221,7 +229,9 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - iPhone
+    - Android
   m_PerPlatformDefaultQuality:
     Android: 2
     BlackBerry: 2

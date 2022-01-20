@@ -94,7 +94,7 @@ public class menuItem : manipObject {
 
   public override void Awake() {
     base.Awake();
-    disabledColor = normalColor = selectColor = new Color(0.3f, 0.3f, 0.3f);
+    disabledColor = normalColor = selectColor = new Color(0.5f, 0.5f, 0.5f);
     
     label = GetComponentInChildren<TextMesh>();
     labelMat = label.GetComponent<Renderer>().material;
@@ -347,11 +347,11 @@ public class menuItem : manipObject {
       g.SetActive(true);
       manager.SelectAudio();
     } else if (curState == manipState.grabbed) {
-      symbol.material.SetColor("_TintColor", Color.white);
+      symbol.material.SetColor("_TintColor", selectColor);
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(true);
       g.SetActive(true);
-      labelMat.SetColor("_TintColor", Color.white);
+      labelMat.SetColor("_TintColor", selectColor);
       manager.GrabAudio();
       StartCoroutine(flash());
       createItem();
