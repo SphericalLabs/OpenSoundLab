@@ -52,7 +52,6 @@ public class compressorDeviceInterface : deviceInterface
         float attenuationPercent = Mathf.Min( (attenuation / -40.0f), 1);
         attenuationDisplay.percent = attenuationPercent * 0.85f;
         attenuationDisplay.PercentUpdate();
-        Debug.Log("attenuation: " + attenuation + " / " + attenuationPercent);
 
         clippingDisplay.SetActive(signal.isClipping);
     }
