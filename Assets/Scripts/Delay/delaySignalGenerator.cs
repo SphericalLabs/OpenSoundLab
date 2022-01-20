@@ -27,6 +27,8 @@ public class delaySignalGenerator : signalGenerator
     public const float MIN_DRY = -96; //dB
     public const float MAX_DRY = 0; //dB
 
+    int sampleRate;
+
     public signalGenerator input, cTimeInput, cFeedbackInput;
 
     private IntPtr x;
@@ -40,7 +42,8 @@ public class delaySignalGenerator : signalGenerator
 
     public override void Awake()
     {
-        int maxDelaySamples = (int)(MAX_TIME * AudioSettings.outputSampleRate);
+    sampleRate = AudioSettings.outputSampleRate;
+        int maxDelaySamples = (int)(MAX_TIME * sampleRate);
         x = Delay_New(maxDelaySamples);
     }
 
@@ -120,7 +123,7 @@ public class delaySignalGenerator : signalGenerator
             cFeedback = cFeedbackBuffer[0];
         }
 
-        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME] + cTime), 3), 0, 1, MIN_TIME * AudioSettings.outputSampleRate, MAX_TIME * AudioSettings.outputSampleRate), (int)Param.P_TIME, x);
+        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME] + cTime), 3), 0, 1, MIN_TIME * sampleRate, MAX_TIME * sampleRate), (int)Param.P_TIME, x);
         Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + cFeedback), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
         Delay_SetParam(p[(int)Param.P_WET], (int)Param.P_WET, x);
         Delay_SetParam(p[(int)Param.P_DRY], (int)Param.P_DRY, x);
