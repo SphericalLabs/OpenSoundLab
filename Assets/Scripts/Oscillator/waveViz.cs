@@ -13,61 +13,131 @@
 // limitations under the License.
 
 using UnityEngine;
-using System.Collections;
+//using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+//using System.Runtime.InteropServices;
 
 public class waveViz : MonoBehaviour {
-  Texture2D tex;
-  public Renderer waverend;
-  int wavewidth = 512;
-  int waveheight = 64;
+
+  public Renderer displayRenderer;
+
+  RenderTexture offlineTexture;
+  Material offlineMaterial;
+
+  Texture2D onlineTexture;
+  public Material onlineMaterial;
+
+  int waveWidth = 512;
+  int waveHeight = 64;
   public int period = 512;
-  Color32[] wavepixels;
-  int curWaveW = 0;
-  int lastWaveH = 0;
-  public Color32 waveBG = Color.black;
-  public Color32 waveLine = Color.white;
 
-  [DllImport("SoundStageNative")]
-  public static extern void ProcessWaveTexture(float[] buffer, int length, System.IntPtr pixels, byte Ra, byte Ga, byte Ba, byte Rb, byte Gb, byte Bb,
-    int period, int waveheight, int wavewidth, ref int lastWaveH, ref int curWaveW);
+  //int curWaveW = 0;
+  //int lastWaveH = 0;
+  
+  public FilterMode fm = FilterMode.Bilinear;
+  public int ani = 4;
 
-  List<float> bufferDrawList;
+  public float[] lastBuffer; // will be written from audio thread
 
-  GCHandle m_WavePixelsHandle;
-
+  //List<float> bufferDrawList;
+  
   void Awake() {
-    bufferDrawList = new List<float>();
-    tex = new Texture2D(wavewidth, waveheight, TextureFormat.RGBA32, false);
-    wavepixels = new Color32[wavewidth * waveheight];
+    
+  offlineMaterial = new Material(Shader.Find("GUI/Text Shader"));
+    offlineMaterial.hideFlags = HideFlags.HideAndDontSave;
+    offlineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
+    // get a RenderTexture and set it as target for offline rendering
+    offlineTexture = new RenderTexture(waveWidth, waveHeight, 24);
+    offlineTexture.useMipMap = true;
+    
+    // these are the ones that you will actually see
+    onlineTexture = new Texture2D(waveWidth, waveHeight, TextureFormat.RGBA32, true);
+    onlineMaterial = Instantiate(onlineMaterial);
+    displayRenderer.material = onlineMaterial;
+    onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), onlineTexture);
 
-    for (int i = 0; i < wavewidth; i++) {
-      for (int i2 = 0; i2 < waveheight; i2++) {
-        wavepixels[i2 * wavewidth + i] = waveBG;
-      }
-    }
-
-    m_WavePixelsHandle = GCHandle.Alloc(wavepixels, GCHandleType.Pinned);
   }
-
-  void OnDestroy() {
-    m_WavePixelsHandle.Free();
-  }
+  
 
   void Start() {
-    tex.SetPixels32(wavepixels);
-    tex.Apply(false);
-    waverend.material.mainTexture = tex;
+    onlineMaterial.mainTexture = onlineTexture;
   }
-
-  public void UpdateViz(float[] buffer) {
-    ProcessWaveTexture(buffer, buffer.Length, m_WavePixelsHandle.AddrOfPinnedObject(), waveLine.r, waveLine.g, waveLine.b, waveBG.r, waveBG.g, waveBG.b, period, waveheight, wavewidth, ref lastWaveH, ref curWaveW);
+  
+  public void storeBuffer(float[] buffer){
+    
+    if(lastBuffer == null) lastBuffer = new float[0]; 
+    if (lastBuffer.Length != buffer.Length) System.Array.Resize(ref lastBuffer, buffer.Length);
+    System.Array.Copy(buffer, lastBuffer, buffer.Length);
+    
   }
 
   void Update() {
-    tex.SetPixels32(wavepixels);
-    tex.Apply(false);
-    waverend.material.mainTextureOffset = new Vector2((float)curWaveW / wavewidth, 0);
+
+    RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
+
+    onlineTexture.filterMode = fm;
+    onlineTexture.anisoLevel = ani;
+
+    //waverend.material.mainTextureOffset = new Vector2((float)curWaveW / waveWidth, 0);
   }
+
+  void RenderGLToTexture(int width, int height, Material material)
+  {
+
+    // always re-set offline render here, in case another script had its finger on it in the meantime
+    RenderTexture.active = offlineTexture;
+
+    GL.Clear(false, true, Color.black);
+
+    material.SetPass(0);
+    GL.PushMatrix();
+    GL.LoadPixelMatrix(0, width, height, 0);
+    GL.Color(new Color(1, 1, 1, 1f));
+    GL.Begin(GL.LINE_STRIP);
+
+    for(int i = 0; i < lastBuffer.Length; i++){
+      GL.Vertex3(i, (1f - (lastBuffer[i] + 1f) * 0.5f) * waveHeight, 0);
+    }
+    
+
+    //drawY = 0;
+    //drawX = 0;
+    //lastDrawX = 0;
+    //lastDrawY = 0;
+
+    //for (int freqBand = 0; freqBand < spectrum.Length; freqBand++) // skip 0, because of log negative?
+    //{
+    //  drawX = Mathf.RoundToInt(Utils.map(Mathf.Log10(freqBand * bandWidth), leftOffset, maxLog, 0f, width));
+    //  if (drawX - lastDrawX < skip)
+    //  {
+    //    continue; // skip bands if too close together
+    //  }
+
+    //  drawY = height - Mathf.RoundToInt(Mathf.Pow(spectrum[freqBand], 0.3f) * height);
+
+    //  GL.Vertex3(drawX, drawY, 0);
+
+    //  //p1 = p2;
+    //  lastDrawX = drawX;
+    //  lastDrawY = drawY;
+    //}
+
+    GL.End();
+    GL.PopMatrix();
+
+    // blit/copy the offlineTexture into the onlineTexture (on GPU)
+    Graphics.CopyTexture(offlineTexture, onlineTexture);
+
+  }
+
+  public void OnDestroy()
+  {
+    // cleanup manually, since the GC isn't managing the GPU
+    if (offlineTexture != null)
+    {
+      offlineTexture.Release();
+      Destroy(offlineTexture);
+    }
+  }
+
 }

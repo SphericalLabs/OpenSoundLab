@@ -44,7 +44,7 @@ public class oscillatorDeviceInterface : deviceInterface
         signal = GetComponent<oscillatorSignalGenerator>();
         active = true;
         viz.period = lfo ? 512 : 1;
-        viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
+        //viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
 
         UpdateLFO();
         UpdateAmp();
@@ -73,7 +73,7 @@ public class oscillatorDeviceInterface : deviceInterface
     {
         lfo = !lfoSwitch.switchVal;
         viz.period = lfo ? 512 : 1;
-        viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
+        //viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
         signal.lfo = lfo;
         UpdateFreq();
         speaker.volume = lfo ? 0f : 1f;

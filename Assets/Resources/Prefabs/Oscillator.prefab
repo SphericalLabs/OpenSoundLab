@@ -1652,7 +1652,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6e81ed43153861a478ea77402191efb2, type: 2}
+  - {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3382,14 +3382,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16d3205c66faf5844bd906d35d51e554, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waverend: {fileID: 23000010152746958}
+  displayRenderer: {fileID: 23000010152746958}
+  onlineMaterial: {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
   period: 512
-  waveBG:
-    serializedVersion: 2
-    rgba: 4278190080
-  waveLine:
-    serializedVersion: 2
-    rgba: 4286443653
+  fm: 1
+  ani: 4
+  lastBuffer: []
 --- !u!1 &1000014130592554
 GameObject:
   m_ObjectHideFlags: 0
