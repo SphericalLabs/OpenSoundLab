@@ -27,7 +27,7 @@ public class oscillatorDeviceInterface : deviceInterface
     public dial freqDial, ampDial;
     public waveViz viz;
     public omniJack signalOutput, freqExpInput, freqLinInput, ampInput, syncInput, pwmInput;
-    public slider waveSlider;
+    public sliderNotched waveSlider;
     public AudioSource speaker;
 
     // current values
@@ -132,7 +132,7 @@ public class oscillatorDeviceInterface : deviceInterface
 
         freqDial.setPercent(data.freq);
         ampDial.setPercent(data.amp);
-        waveSlider.setPercent(data.wave);
+        waveSlider.setVal(Mathf.RoundToInt(data.wave*3));
         lfoSwitch.setSwitch(!data.lfo);
 
         ID = data.ID;
