@@ -20,6 +20,7 @@ public class delayDeviceInterface : deviceInterface
 {
     public omniJack input, cTimeInput, cFeedbackInput, output;
     public dial timeDial, feedbackDial, wetDial, dryDial;
+    public dial modeDial; //this one is special and does not go into the array
     public button panicButton;
     delaySignalGenerator signal;
     private dial[] dials;
@@ -43,6 +44,8 @@ public class delayDeviceInterface : deviceInterface
         }
         if (panicButton.isHit)
             signal.SetParam(1, (int)delaySignalGenerator.Param.P_CLEAR);
+
+        signal.SetMode(Mathf.RoundToInt(modeDial.percent * 3));
     }
 
     public override InstrumentData GetData()

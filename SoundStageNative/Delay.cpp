@@ -102,6 +102,16 @@ SOUNDSTAGE_API void Delay_Clear(DelayData* x)
     _fZero(x->tap->buf, x->tap->n);
 }
 
+SOUNDSTAGE_API void Delay_SetRange(int min, int max, DelayData* x)
+{
+    if(x->maxTime != max)
+    {
+        RingBuffer_Resize(max, x->tap);
+        Delay_Clear(x);
+        x->maxTime = max;
+    }
+}
+
 SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x)
 {
     assert(param < P_N);

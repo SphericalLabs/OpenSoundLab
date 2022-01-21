@@ -27,7 +27,8 @@ SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingB
 SOUNDSTAGE_API void RingBuffer_ReadPadded(float *dest, int n, int offset, float stride, struct RingBuffer *x);
 ///Reads n samples from the ring buffer and adds the values to the dest array.
 SOUNDSTAGE_API void RingBuffer_ReadAndAdd(float *dest, int n, int offset, struct RingBuffer *x);
-///Reads n samples from the ring buffer and copies the values to the dest array.
+///Resizes the buffer. This includes a memory re-allocation, so use with caution!
+SOUNDSTAGE_API void RingBuffer_Resize(int n, struct RingBuffer *x);
 SOUNDSTAGE_API struct RingBuffer *RingBuffer_New(int n);
 ///Frees all resources.
 SOUNDSTAGE_API void RingBuffer_Free(struct RingBuffer *x);

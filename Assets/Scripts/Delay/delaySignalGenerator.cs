@@ -18,14 +18,17 @@ public class delaySignalGenerator : signalGenerator
         P_N
     };
 
-    public const float MIN_TIME = 0.001f; // * 1000ms
-    public const float MAX_TIME = 0.05f; // * 1000 ms
+    public const float MAX_TIME = 12.5f; // * 1000 ms.
     public const float MIN_FEEDBACK = 0;
     public const float MAX_FEEDBACK = 1f;
     public const float MIN_WET = -96; //dB
     public const float MAX_WET = 0; //dB
     public const float MIN_DRY = -96; //dB
     public const float MAX_DRY = 0; //dB
+
+    //currently selected min/max range in samples.
+    public int minTime = 1;
+    public int maxTime = 1; //cannot be larger than const MAX_TIME.
 
     int sampleRate;
 
@@ -75,6 +78,30 @@ public class delaySignalGenerator : signalGenerator
         }
     }
 
+
+    public void SetMode(int mode)
+    {
+        switch (mode)
+        {
+            case 0:
+                minTime = 1;
+                maxTime = 50;
+                break;
+            case 1:
+                minTime = (int)(0.001f * sampleRate);
+                maxTime = (int)(0.05f * sampleRate);
+                break;
+            case 2:
+                minTime = (int)(0.025f * sampleRate);
+                maxTime = (int)(1.25f * sampleRate);
+                break;
+            case 3:
+                minTime = (int)(0.25f * sampleRate);
+                maxTime = (int)(12.5f * sampleRate);
+                break;
+        }
+    }
+
     [DllImport("SoundStageNative")]
     private static extern void Delay_Process(float[] buffer, int length, int channels, float cTime, float cFeedback, IntPtr x);
 
@@ -89,6 +116,9 @@ public class delaySignalGenerator : signalGenerator
 
     [DllImport("SoundStageNative")]
     private static extern void Delay_Clear(IntPtr x);
+
+    [DllImport("SoundStageNative")]
+    private static extern bool Delay_SetRange(int min, int max, IntPtr x);
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
@@ -123,7 +153,8 @@ public class delaySignalGenerator : signalGenerator
             cFeedback = cFeedbackBuffer[0];
         }
 
-        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME] + cTime), 3), 0, 1, MIN_TIME * sampleRate, MAX_TIME * sampleRate), (int)Param.P_TIME, x);
+        Delay_SetRange(minTime, maxTime, x);
+        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME] + cTime), 3), 0, 1, minTime, maxTime), (int)Param.P_TIME, x);
         Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + cFeedback), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
         Delay_SetParam(p[(int)Param.P_WET], (int)Param.P_WET, x);
         Delay_SetParam(p[(int)Param.P_DRY], (int)Param.P_DRY, x);

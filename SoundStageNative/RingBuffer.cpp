@@ -129,6 +129,14 @@ SOUNDSTAGE_API void RingBuffer_ReadAndAdd(float *dest, int n, int offset, struct
     }
 }
 
+SOUNDSTAGE_API void RingBuffer_Resize(int n, struct RingBuffer *x)
+{
+    x->buf = (float*)realloc(x->buf, n * sizeof(float));
+    assert(x->buf != NULL);
+    x->n = n;
+    x->ptr = 0;
+}
+
 SOUNDSTAGE_API struct RingBuffer *RingBuffer_New(int n)
 {
     struct RingBuffer *x = (struct RingBuffer*)_malloc(sizeof(struct RingBuffer));
