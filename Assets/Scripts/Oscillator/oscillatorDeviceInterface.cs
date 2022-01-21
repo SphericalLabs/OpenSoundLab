@@ -27,7 +27,7 @@ public class oscillatorDeviceInterface : deviceInterface
     public dial freqDial, ampDial;
     public waveViz viz;
     public omniJack signalOutput, freqExpInput, freqLinInput, ampInput, syncInput, pwmInput;
-    public slider waveSlider;
+    public sliderNotched waveSlider;
     public AudioSource speaker;
 
     // current values
@@ -44,7 +44,7 @@ public class oscillatorDeviceInterface : deviceInterface
         signal = GetComponent<oscillatorSignalGenerator>();
         active = true;
         viz.period = lfo ? 512 : 1;
-        viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
+        //viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
 
         UpdateLFO();
         UpdateAmp();
@@ -73,7 +73,7 @@ public class oscillatorDeviceInterface : deviceInterface
     {
         lfo = !lfoSwitch.switchVal;
         viz.period = lfo ? 512 : 1;
-        viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
+        //viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
         signal.lfo = lfo;
         UpdateFreq();
         speaker.volume = lfo ? 0f : 1f;
@@ -132,7 +132,7 @@ public class oscillatorDeviceInterface : deviceInterface
 
         freqDial.setPercent(data.freq);
         ampDial.setPercent(data.amp);
-        waveSlider.setPercent(data.wave);
+        waveSlider.setVal(Mathf.RoundToInt(data.wave*3));
         lfoSwitch.setSwitch(!data.lfo);
 
         ID = data.ID;
