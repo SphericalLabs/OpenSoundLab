@@ -20,10 +20,7 @@ public class ControlCubeDeviceInterface : deviceInterface {
   public Vector3 percent;
   public ControlCubeSingleSignalGenerator[] signals;
   public omniJack[] outputs;
-  public oscillatorSignalGenerator Osc1, Osc2;
   public cubeZone cubeManip;
-  public dial volumeDial;
-  public button muteButton;
 
   public override void Awake() {
     base.Awake();
@@ -38,17 +35,10 @@ public class ControlCubeDeviceInterface : deviceInterface {
   }
 
   public override void hit(bool on, int ID = -1) {
-    toggleMute(on);
+
   }
 
   void Update() {
-    if (!muted) Osc1.amplitude = volumeDial.percent;
-  }
-
-  bool muted = false;
-  public void toggleMute(bool on) {
-    muted = on;
-    Osc1.amplitude = muted ? 0 : volumeDial.percent;
   }
 
   public void updatePercent(Vector3 p) {
@@ -58,10 +48,6 @@ public class ControlCubeDeviceInterface : deviceInterface {
     signals[1].value = (percent.y - .5f) * 2;
     signals[2].value = (percent.z - .5f) * 2;
 
-    Osc1.analogWave = percent.x;
-    Osc1.frequency = 40 + 5000 * Mathf.Pow(percent.y, 2);
-    Osc2.frequency = percent.z * 8;
-    Osc2.amplitude = percent.z;
   }
 
   public override InstrumentData GetData() {
@@ -71,14 +57,10 @@ public class ControlCubeDeviceInterface : deviceInterface {
     GetTransformData(data);
 
     data.jackOutID = new int[4];
-    for (int i = 0; i < 4; i++) data.jackOutID[i] = outputs[i].transform.GetInstanceID();
+    for (int i = 0; i < 3; i++) data.jackOutID[i] = outputs[i].transform.GetInstanceID();
 
     data.dimensionValues = new float[3];
     for (int i = 0; i < 3; i++) data.dimensionValues[i] = percent[i];
-
-    data.muted = muted;
-
-    data.volume = volumeDial.percent;
 
     return data;
   }
@@ -88,13 +70,9 @@ public class ControlCubeDeviceInterface : deviceInterface {
 
     base.Load(data);
 
-    for (int i = 0; i < 4; i++) outputs[i].ID = data.jackOutID[i];
+    for (int i = 0; i < 3; i++) outputs[i].ID = data.jackOutID[i];
     for (int i = 0; i < 3; i++) percent[i] = data.dimensionValues[i];
-
-    volumeDial.setPercent(data.volume);
-
-    muteButton.startToggled = data.muted;
-
+        
     Setup(percent);
   }
 }
@@ -102,6 +80,4 @@ public class ControlCubeDeviceInterface : deviceInterface {
 public class ControlCubeData : InstrumentData {
   public int[] jackOutID;
   public float[] dimensionValues;
-  public bool muted;
-  public float volume;
 }
