@@ -42,7 +42,6 @@ public class adsrSignalGenerator : signalGenerator {
   float[] lastVol = new float[] { 0, 0 };
   float ADSRvolume = -1;
 
-  double lastIncomingDspTime;
   public bool sustaining = false;
   float sustainTime = 0;
   double _lastPhase = 0;
@@ -80,11 +79,11 @@ public class adsrSignalGenerator : signalGenerator {
       frameCount = 0;
     } else if (curFrame == 0 && frameCount == 0) active = false;
 
-
     sustaining = on;
   }
 
   float startVal = 0;
+  float lastPulseFloat = 0;
 
   void adsrValUpdate() {
     bool unchanged = true;
@@ -137,17 +136,33 @@ public class adsrSignalGenerator : signalGenerator {
   float lastBuffer = -1;
   int curFrame = 0;
   int frameCount = 0;
+  bool markForReleaseInNextFrame = false; // workaround, ADSRSignalGenerator expects to be released not 1 sample, but one buffer later...
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    ADSRSignalGenerator(buffer, buffer.Length, channels, frames, ref frameCount, active, ref ADSRvolume, volumes, startVal, ref curFrame, sustaining);
+  
+    if(markForReleaseInNextFrame){
+      markForReleaseInNextFrame = false;
+      hit(false);
+    }
 
-    if (incoming != null && _devinterface != null) {
+    if (incoming != null) {
       if (pulseBuffer.Length != buffer.Length)
         System.Array.Resize(ref pulseBuffer, buffer.Length);
 
       incoming.processBuffer(pulseBuffer, dspTime, channels);
-      bool on = GetBinaryState(pulseBuffer, pulseBuffer.Length, channels, ref lastBuffer);
-      _devinterface.pulseUpdate(on);
+
+      for (int n = 0; n < buffer.Length; n += 2){
+          if (pulseBuffer[n] > 0f && lastPulseFloat <= 0f) // high
+          { 
+            hit(true);
+          } else if (pulseBuffer[n] <= 0f && lastPulseFloat >= 0f) { // low
+            markForReleaseInNextFrame = true;
+          }
+          lastPulseFloat = pulseBuffer[n];
+        }
+      
     }
+
+    ADSRSignalGenerator(buffer, buffer.Length, channels, frames, ref frameCount, active, ref ADSRvolume, volumes, startVal, ref curFrame, sustaining);
   }
 
 

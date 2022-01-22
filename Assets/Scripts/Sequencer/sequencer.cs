@@ -38,7 +38,6 @@ public class sequencer : signalGenerator
 
         SetArrayToSingleValue(buffer, buffer.Length, -1);
 
-        // how does this work exactly? sigTime comes from signalGenerator?
         if (newSignal)
         {
             if ((sigTime == -1 || sigTime == dspTime) && signalOn)
