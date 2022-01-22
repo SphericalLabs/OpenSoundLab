@@ -36,6 +36,8 @@ public class quantizerSignalGenerator : signalGenerator {
 
   public float output = 0f;
 
+  int counter = 0;
+
   [DllImport("SoundStageNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
@@ -52,12 +54,12 @@ public class quantizerSignalGenerator : signalGenerator {
     //Major  1    2    3 4    5    6    7
     //Minor  1    2 b3   4    5    6    7;
 
-    // pre-multiply semitone factor in order to comply 1/Oct
-    for(int j = 0; j < scales.Count; j++){
-      for(int k = 0; k < scales[j].Length; k++){
-        scales[j][k] *= semiMult;
-      }
-    }
+     //pre-multiply semitone factor in order to comply 1/Oct
+    //for(int j = 0; j < scales.Count; j++){
+    //  for(int k = 0; k < scales[j].Length; k++){
+    //    scales[j][k] *= semiMult;
+    //  }
+    //}
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
@@ -75,9 +77,14 @@ public class quantizerSignalGenerator : signalGenerator {
       SetArrayToSingleValue(buffer, buffer.Length, Mathf.Round((buffer[0] + transpose) * 10f) * 0.1f);
       return;
     }
-
+    
     integerPart = Mathf.Floor((buffer[0] + transpose) * 10); // only first sample, 48000 / 512 => 93.75Hz 
+    //decimalPart = (float) System.Math.Round((buffer[0] + transpose) * 10 - integerPart, 2); // upscale 
     decimalPart = (buffer[0] + transpose) * 10 - integerPart; // upscale 
+    //if (counter % 72 == 0) Debug.Log("buffer: " + buffer[0]);
+    //if (counter % 72 == 0) Debug.Log("integerPart: " + integerPart);
+    //if (counter % 72 == 0) Debug.Log("decimalPart: " + decimalPart);
+    
 
     // incoming signals and transpose dial need to be upscaled 0.1/Oct to 1/Oct
     // scales need to be adjusted for semi steps in 1/Oct by multiplying semiMult
@@ -86,7 +93,7 @@ public class quantizerSignalGenerator : signalGenerator {
     i = 0;
     while (i < scales[selectedScale].Length)
     {
-      if (decimalPart < scales[selectedScale][i])
+      if (decimalPart < scales[selectedScale][i] * semiMult)
       {        
         break;
       }
@@ -97,29 +104,32 @@ public class quantizerSignalGenerator : signalGenerator {
 
         
     if (i == scales[selectedScale].Length - 1) // edge case: last value, need wrap around
-    { 
-      if(Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(decimalPart - scales[selectedScale][0])) // higher than last value
-      { 
-        output = integerPart + scales[selectedScale][i];
+    {
+      
+      if (Mathf.Abs(decimalPart - scales[selectedScale][i] * semiMult) <= Mathf.Abs(1 - decimalPart) ) // higher than last value
+      {
+        //if (counter % 72 == 0) Debug.Log("last note in previous");
+        output = integerPart + scales[selectedScale][i] * semiMult;
       } 
       else 
       {
-        output = integerPart + scales[selectedScale][0];
+        //if (counter % 72 == 0) Debug.Log("next octave");
+        output = integerPart + 1 + scales[selectedScale][0] * semiMult; // last part is actually zero, no need to compute
       }
     } 
     else // normal case
     {
-      if (Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(decimalPart - scales[selectedScale][i+1]))
+      if (Mathf.Abs(decimalPart - scales[selectedScale][i] * semiMult) <= Mathf.Abs(decimalPart - scales[selectedScale][i+1] * semiMult))
       {
-        output = integerPart + scales[selectedScale][i];
+        output = integerPart + scales[selectedScale][i] * semiMult;
       }
       else
       {
-        output = integerPart + scales[selectedScale][i+1];
+        output = integerPart + scales[selectedScale][i+1] * semiMult;
       }
     }
 
     SetArrayToSingleValue(buffer, buffer.Length, output * 0.1f); // downscale to 0.1/Oct
-
+    //counter++;
   }
 }
