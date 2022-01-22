@@ -27,7 +27,7 @@ public class waveViz : MonoBehaviour {
   Texture2D onlineTexture;
   public Material onlineMaterial;
 
-  int waveWidth = 512;
+  int waveWidth = 256;
   int waveHeight = 64;
   public int period = 512;
 
@@ -73,10 +73,11 @@ public class waveViz : MonoBehaviour {
 
   void Update() {
 
-    RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
-
-    onlineTexture.filterMode = fm;
-    onlineTexture.anisoLevel = ani;
+    if(displayRenderer.isVisible){ 
+      RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
+      if(onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
+      if(onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
+    }
 
     //waverend.material.mainTextureOffset = new Vector2((float)curWaveW / waveWidth, 0);
   }

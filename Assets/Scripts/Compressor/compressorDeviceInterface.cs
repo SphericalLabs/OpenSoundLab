@@ -22,7 +22,7 @@ public class compressorDeviceInterface : deviceInterface
     public dial attackDial, releaseDial, thresholdDial, ratioDial, makeupDial;
     public basicSwitch bypassSwitch;
     public glowDisk attenuationDisplay;
-    public GameObject clippingDisplay;
+    //public GameObject clippingDisplay;
     compressorSignalGenerator signal;
     private dial[] dials;
 
@@ -31,7 +31,7 @@ public class compressorDeviceInterface : deviceInterface
         base.Awake();
         signal = GetComponent<compressorSignalGenerator>();
         dials = new dial[5] { attackDial, releaseDial, thresholdDial, ratioDial, makeupDial };
-        clippingDisplay.SetActive(false);
+        //clippingDisplay.SetActive(false);
         attenuationDisplay.percent = 0;
     }
 
@@ -45,7 +45,7 @@ public class compressorDeviceInterface : deviceInterface
         signal.SetParam(thresholdDial.percent, (int)compressorSignalGenerator.Param.P_THRESHOLD);
         signal.SetParam(ratioDial.percent, (int)compressorSignalGenerator.Param.P_RATIO);
         signal.SetParam(makeupDial.percent, (int)compressorSignalGenerator.Param.P_MAKEUP);
-        signal.SetParam(bypassSwitch.switchVal ? 1 : 0, (int)compressorSignalGenerator.Param.P_BYPASS);
+        signal.SetParam(bypassSwitch.switchVal ? 0 : 1, (int)compressorSignalGenerator.Param.P_BYPASS);
 
         float attenuation = signal.attenuation;
 
@@ -53,7 +53,7 @@ public class compressorDeviceInterface : deviceInterface
         attenuationDisplay.percent = attenuationPercent * 0.85f;
         attenuationDisplay.PercentUpdate();
 
-        clippingDisplay.SetActive(signal.isClipping);
+        //clippingDisplay.SetActive(signal.isClipping);
     }
 
     public override InstrumentData GetData()

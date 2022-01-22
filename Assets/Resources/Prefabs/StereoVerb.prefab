@@ -160,7 +160,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0
+  percent: 0.25
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
@@ -188,7 +188,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 159476}
   m_LocalRotation: {x: 0.000000115202326, y: 0.7071067, z: 0.7071068, w: -0.00000011520231}
-  m_LocalPosition: {x: 0.0547, y: 0.01, z: 0.0352}
+  m_LocalPosition: {x: 0.0439, y: 0.01, z: 0.0352}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4540573392749946}
@@ -196,7 +196,7 @@ Transform:
   - {fileID: 456538}
   - {fileID: 412116}
   m_Father: {fileID: 421762}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &160262
 GameObject:
@@ -306,6 +306,8 @@ Transform:
   m_LocalPosition: {x: 0.11, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1.0000004}
   m_Children:
+  - {fileID: 4000013139796536}
+  - {fileID: 4000013049326252}
   - {fileID: 585364020180731769}
   - {fileID: 5434945076978160505}
   - {fileID: 4000013251892330}
@@ -313,8 +315,6 @@ Transform:
   - {fileID: 416902}
   - {fileID: 1631801086205345164}
   - {fileID: 1802577971254783765}
-  - {fileID: 4000013049326252}
-  - {fileID: 4000013139796536}
   - {fileID: 2465226309309164450}
   - {fileID: 2750373780205009574}
   - {fileID: 2800734803100735246}
@@ -745,11 +745,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000011940393488}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0038, y: -0.0076932, z: 0}
-  m_LocalScale: {x: 4.168178, y: 1.7803663, z: 1.1944777}
+  m_LocalPosition: {x: 0.0012000026, y: -0.0076932, z: 0}
+  m_LocalScale: {x: 3.699258, y: 1.7803663, z: 1.1944777}
   m_Children: []
   m_Father: {fileID: 421762}
-  m_RootOrder: 7
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33000013262328834
 MeshFilter:
@@ -942,13 +942,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012278325560}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071067}
-  m_LocalPosition: {x: 0.0804, y: 0, z: 0}
+  m_LocalPosition: {x: 0.0749, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4000013912241344}
   - {fileID: 4000011357450366}
   m_Father: {fileID: 421762}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33000010458287870
 MeshFilter:
@@ -1066,13 +1066,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012869793228}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071067}
-  m_LocalPosition: {x: -0.088, y: 0, z: 0}
+  m_LocalPosition: {x: -0.0734, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4000012494202226}
   - {fileID: 4000010972701524}
   m_Father: {fileID: 421762}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33000013793342076
 MeshFilter:
@@ -1267,11 +1267,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000013491107532}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0037999973, y: -0.00783631, z: 0}
-  m_LocalScale: {x: 4.217155, y: 1.8439554, z: 1.1944777}
+  m_LocalPosition: {x: 0.0012000054, y: -0.00783631, z: 0}
+  m_LocalScale: {x: 3.742725, y: 1.8439554, z: 1.1944777}
   m_Children: []
   m_Father: {fileID: 421762}
-  m_RootOrder: 8
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &65000011257044982
 BoxCollider:
@@ -1469,7 +1469,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0
+  percent: 0.25
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
@@ -1507,7 +1507,7 @@ Transform:
   - {fileID: 5160460419346135546}
   - {fileID: 4926480359844816539}
   m_Father: {fileID: 421762}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &666144795071344370
 GameObject:
@@ -1535,7 +1535,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 666144795071344370}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 0.0528, y: -0.0192, z: 0.028}
+  m_LocalPosition: {x: 0.0438, y: -0.0192, z: 0.028}
   m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_Children:
   - {fileID: 5709964314151031842}
@@ -2033,7 +2033,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0
+  percent: 0.8
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
@@ -2593,7 +2593,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3002451959978904248}
   m_LocalRotation: {x: 0.000000115202326, y: 0.7071067, z: 0.7071068, w: -0.00000011520231}
-  m_LocalPosition: {x: 0.0003, y: -0.0199, z: 0.0352}
+  m_LocalPosition: {x: -0.04, y: -0.019, z: 0.0352}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6095537474240974071}
@@ -2669,7 +2669,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0
+  percent: 1
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
@@ -2784,7 +2784,7 @@ Transform:
   - {fileID: 1392933807578289525}
   - {fileID: 6920711317338206211}
   m_Father: {fileID: 421762}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4097859109088705541
 GameObject:
@@ -3077,7 +3077,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4421172811764932903}
   m_LocalRotation: {x: 0.000000115202326, y: 0.7071067, z: 0.7071068, w: -0.00000011520231}
-  m_LocalPosition: {x: -0.0581, y: -0.0199, z: 0.0352}
+  m_LocalPosition: {x: -0.0402, y: 0.0101000015, z: 0.0352}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5006428250791658686}
@@ -3464,7 +3464,7 @@ Transform:
   - {fileID: 2394410670468380956}
   - {fileID: 549921415641557164}
   m_Father: {fileID: 421762}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &5219654632071106244
 MonoBehaviour:
@@ -3549,7 +3549,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0
+  percent: 0.8
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
@@ -4443,7 +4443,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7940016406281755845}
   m_LocalRotation: {x: 0.000000115202326, y: 0.7071067, z: 0.7071068, w: -0.00000011520231}
-  m_LocalPosition: {x: -0.0581, y: 0.01, z: 0.0352}
+  m_LocalPosition: {x: 0.0005, y: -0.0192, z: 0.0352}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8089459435120442405}
@@ -4451,7 +4451,7 @@ Transform:
   - {fileID: 412926233801330735}
   - {fileID: 702480927149549216}
   m_Father: {fileID: 421762}
-  m_RootOrder: 6
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8259830676228630423
 GameObject:
