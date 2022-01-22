@@ -70,6 +70,15 @@ public class masterControl : MonoBehaviour {
     _measurePhase = 0;
     _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
 
+    if (Application.platform == RuntimePlatform.Android)
+    {
+      Debug.Log("Buffer size was: " + AudioSettings.GetConfiguration().dspBufferSize);
+      var configuration = AudioSettings.GetConfiguration();
+      configuration.dspBufferSize = 128;
+      AudioSettings.Reset(configuration);
+      Debug.Log("Buffer size is now set to: " + AudioSettings.GetConfiguration().dspBufferSize);
+    }
+
     if (!PlayerPrefs.HasKey("glowVal")) PlayerPrefs.SetFloat("glowVal", 1);
     if (!PlayerPrefs.HasKey("envSound")) PlayerPrefs.SetInt("envSound", 1);
 
