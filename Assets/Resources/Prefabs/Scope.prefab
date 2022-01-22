@@ -876,7 +876,10 @@ MonoBehaviour:
   source: {fileID: 82000012982030508}
   fftWin: 5
   onlineMaterial: {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
+  displayRenderer: {fileID: 23000014021579546}
   skip: 1
+  fm: 1
+  ani: 4
 --- !u!1 &1000013377660662
 GameObject:
   m_ObjectHideFlags: 0

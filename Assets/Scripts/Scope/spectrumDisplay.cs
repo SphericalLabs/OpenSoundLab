@@ -32,6 +32,7 @@ public class spectrumDisplay : MonoBehaviour
 
   Texture2D onlineTexture;
   public Material onlineMaterial;
+  public Renderer displayRenderer;
 
   bool active = false;
 
@@ -79,11 +80,12 @@ public class spectrumDisplay : MonoBehaviour
   {
 
     if (!active) return;
-    //if (Time.frameCount % 3 != 0) return; // if lower fps desired, then run async in worker thread to smooth out cpu peak
+    if (!displayRenderer.isVisible) return;
+    
     source.GetSpectrumData(spectrum, 0, fftWin);
     RenderGLToTexture(width, height, offlineMaterial);
-    onlineTexture.filterMode = fm;
-    onlineTexture.anisoLevel = ani;
+    if(onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
+    if(onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
 
   }
 
