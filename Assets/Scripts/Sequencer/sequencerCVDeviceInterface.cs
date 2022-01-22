@@ -410,7 +410,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             jack.parent = transform;
             jack.localRotation = Quaternion.Euler(0, 0, -90);
             jack.localScale = Vector3.one;
-            jack.localPosition = new Vector3(-cubeConst / 2f - .001f - cubeConst * (curDimensions[0] - 1), -cubeConst * curDimensions[1], 0);
+            jack.localPosition = new Vector3(-cubeConst / 2f - .001f - cubeConst * (curDimensions[0] - 1), -cubeConst * curDimensions[1], -cubeConst);
 
             jackList.Add(jack);
             seqList.Add(jack.GetComponent<sequencer>());
@@ -420,7 +420,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             cvJack.parent = transform;
             cvJack.localRotation = Quaternion.Euler(0, 0, -90);
             cvJack.localScale = Vector3.one;
-            cvJack.localPosition = new Vector3(-cubeConst / 2f - .001f - cubeConst * (curDimensions[0] - 1), -cubeConst * curDimensions[1], cubeConst);
+            cvJack.localPosition = new Vector3(-cubeConst / 2f - .001f - cubeConst * (curDimensions[0] - 1), -cubeConst * curDimensions[1], 0);
 
             cvJackList.Add(cvJack);
             cvSeqList.Add(cvJack.GetComponent<sequencerCV>());
