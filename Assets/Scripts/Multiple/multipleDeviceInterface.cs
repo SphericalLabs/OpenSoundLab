@@ -25,22 +25,23 @@ public class multipleDeviceInterface : deviceInterface {
   multipleSignalGenerator signal;
   basicSwitch flowSwitch;
 
-  public Texture flowTex;
-  public Renderer symbolquad;
+  public Renderer symbolA;
+  public Renderer symbolB;
 
   int count = 0;
 
   bool flow = true;
-  Color flowMixerColor = new Color(1f, 0f, 0f);
-  Color flowSplitterColor = new Color(0f, 1f, 0f);
+
+  public Material mixerMaterial;
+  public Material splitterMaterial;
 
   public override void Awake() {
     signal = GetComponent<multipleSignalGenerator>();
     flowSwitch = GetComponentInChildren<basicSwitch>();
     signal.nodes = new List<multipleNodeSignalGenerator>();
 
-    symbolquad.material.SetTexture("_MainTex", flowTex);
-    symbolquad.material.SetColor("_TintColor", flowMixerColor);
+    symbolA.sharedMaterial = mixerMaterial;
+    symbolB.sharedMaterial = mixerMaterial;
 
     float xVal = stretchSlider.localPosition.x;
 
@@ -77,13 +78,21 @@ public class multipleDeviceInterface : deviceInterface {
     flow = on;
 
     if (flow) {
-      symbolquad.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
-      symbolquad.transform.localRotation = Quaternion.Euler(0, 180, 0);
-      symbolquad.material.SetColor("_TintColor", flowMixerColor);
+      symbolA.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
+      symbolA.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      symbolA.sharedMaterial = mixerMaterial;
+
+      symbolB.transform.localPosition = new Vector3(.0025f, .0012f, -.0217f);
+      symbolB.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      symbolB.sharedMaterial = mixerMaterial;
     } else {
-      symbolquad.transform.localPosition = new Vector3(.00075f, -.0016f, .0217f);
-      symbolquad.transform.localRotation = Quaternion.Euler(0, 0, 90);
-      symbolquad.material.SetColor("_TintColor", flowSplitterColor);
+      symbolA.transform.localPosition = new Vector3(.00075f, -.0016f, .0217f);
+      symbolA.transform.localRotation = Quaternion.Euler(0, 0, 90);
+      symbolA.sharedMaterial = splitterMaterial;
+
+      symbolB.transform.localPosition = new Vector3(.00075f, -.0016f, -.0217f);
+      symbolB.transform.localRotation = Quaternion.Euler(0, 0, 90);
+      symbolB.sharedMaterial = splitterMaterial;
     }
 
     if (input.near != null) {

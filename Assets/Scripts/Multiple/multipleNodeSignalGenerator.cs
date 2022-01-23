@@ -18,16 +18,15 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 
 public class multipleNodeSignalGenerator : signalGenerator {
-  public Texture flowTex;
-  public Renderer symbolquad, symbolquadB;
+  public Renderer symbolA, symbolB;
 
   bool flow = true;
   public signalGenerator mainSig;
   public omniJack jack;
   signalGenerator sig;
 
-  Color flowMixerColor = new Color(1f, 0f, 0f);
-  Color flowSplitterColor = new Color(0f, 1f, 0f);
+  public Material mixerMaterial;
+  public Material splitterMaterial;
 
   [DllImport("SoundStageNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
@@ -36,11 +35,8 @@ public class multipleNodeSignalGenerator : signalGenerator {
     sig = mainSig;
     jack = GetComponentInChildren<omniJack>();
 
-    symbolquad.material.SetTexture("_MainTex", flowTex);
-    symbolquad.material.SetColor("_TintColor", flowMixerColor);
-    symbolquadB.material.SetTexture("_MainTex", flowTex);
-    symbolquadB.material.SetColor("_TintColor", flowMixerColor);
-    symbolquad.material.SetColor("_TintColor", flowMixerColor);
+    symbolA.sharedMaterial = mixerMaterial;
+    symbolB.sharedMaterial = mixerMaterial;
   }
 
   public void setup(signalGenerator s, bool f) {
@@ -51,19 +47,21 @@ public class multipleNodeSignalGenerator : signalGenerator {
   public void setFlow(bool on) {
     flow = on;
     if (flow) {
-      symbolquad.transform.localPosition = new Vector3(.00075f, -.0016f, .0217f);
-      symbolquad.transform.localRotation = Quaternion.Euler(0, 180, 0);
-      symbolquadB.transform.localPosition = new Vector3(.00075f, -.0016f, -.0217f);
-      symbolquadB.transform.localRotation = Quaternion.Euler(0, 180, 0);
-      symbolquad.material.SetColor("_TintColor", flowMixerColor);
-      symbolquadB.material.SetColor("_TintColor", flowMixerColor);
+      symbolA.transform.localPosition = new Vector3(.00075f, -.0016f, .0217f);
+      symbolA.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      symbolA.sharedMaterial = mixerMaterial;
+
+      symbolB.transform.localPosition = new Vector3(.00075f, -.0016f, -.0217f);
+      symbolB.transform.localRotation = Quaternion.Euler(0, 180, 0);      
+      symbolB.sharedMaterial = mixerMaterial;
     } else {
-      symbolquad.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
-      symbolquadB.transform.localPosition = new Vector3(.0025f, .0012f, -.0217f);
-      symbolquad.transform.localRotation = Quaternion.Euler(0, 0, 90);
-      symbolquadB.transform.localRotation = Quaternion.Euler(0, 0, 90);
-      symbolquad.material.SetColor("_TintColor", flowSplitterColor);
-      symbolquadB.material.SetColor("_TintColor", flowSplitterColor);
+      symbolA.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
+      symbolA.transform.localRotation = Quaternion.Euler(0, 0, 90);
+      symbolA.sharedMaterial = splitterMaterial;
+      
+      symbolB.transform.localPosition = new Vector3(.0025f, .0012f, -.0217f);
+      symbolB.transform.localRotation = Quaternion.Euler(0, 0, 90);
+      symbolB.sharedMaterial = splitterMaterial;
     }
 
     if (jack.near != null) {
