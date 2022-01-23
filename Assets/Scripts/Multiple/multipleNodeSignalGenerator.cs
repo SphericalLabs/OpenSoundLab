@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 
-public class splitterNodeSignalGenerator : signalGenerator {
+public class multipleNodeSignalGenerator : signalGenerator {
   public Texture flowTex;
   public Renderer symbolquad, symbolquadB;
 

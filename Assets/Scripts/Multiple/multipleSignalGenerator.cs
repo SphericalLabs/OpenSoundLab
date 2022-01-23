@@ -17,9 +17,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 
-public class splitterSignalGenerator : signalGenerator {
+public class multipleSignalGenerator : signalGenerator {
   public signalGenerator incoming;
-  public List<splitterNodeSignalGenerator> nodes;
+  public List<multipleNodeSignalGenerator> nodes;
 
   bool flow = true;
 

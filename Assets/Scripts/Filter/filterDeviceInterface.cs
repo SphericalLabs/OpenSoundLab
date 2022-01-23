@@ -62,7 +62,7 @@ public class filterDeviceInterface : deviceInterface {
 
   void updateResonance(){
     resPercent = resonanceDial.percent;
-    filter.resonance = resonanceDial.percent; // will crash often if higher
+    filter.resonance = resonanceDial.percent * 0.9f; // will crash often if higher than 1f
   }
   void updateMode(){
     modePercent = modeDial.percent;

@@ -52,6 +52,7 @@ public class menuItem : manipObject {
     MIDIIN,
     MIDIOUT,
     Mixer,
+    Multiple,
     Noise,
     Oscillator,
     Quantizer,
@@ -63,8 +64,7 @@ public class menuItem : manipObject {
     Scope,
     Sequencer,
     SequencerCV,
-    Speaker,
-    Splitter,
+    Speaker,    
     Stereo,
     stereoVerb,
     Tapes,
@@ -267,7 +267,7 @@ public class menuItem : manipObject {
       //g.transform.localPosition = new Vector3(.015f, 0, .02f);
       //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
-    if (item == deviceType.Splitter) {
+    if (item == deviceType.Multiple) {
       g.transform.localPosition = new Vector3(.0185f, 0, .02f);
     }
     if (item == deviceType.Sequencer) {

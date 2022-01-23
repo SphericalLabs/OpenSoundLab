@@ -64,8 +64,8 @@ public class xmlUpdate {
             case "Drums":
               serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "Splitters":
-              serializer = new XmlSerializer(typeof(SplitterData), new XmlRootAttribute { ElementName = xmlNode.Name });
+            case "Multiples":
+              serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "Recorders":
               serializer = new XmlSerializer(typeof(RecorderData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -159,8 +159,8 @@ public class xmlUpdate {
             case "Drums":
               data[data.Count - 1].deviceType = menuItem.deviceType.Drum;
               break;
-            case "Splitters":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Splitter;
+            case "Multiples":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Multiple;
               break;
             case "Recorders":
               data[data.Count - 1].deviceType = menuItem.deviceType.Recorder;

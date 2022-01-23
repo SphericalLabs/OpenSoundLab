@@ -17,12 +17,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class splitterDeviceInterface : deviceInterface {
+public class multipleDeviceInterface : deviceInterface {
 
   public GameObject splitterNodePrefab;
   public omniJack input, output;
   public Transform stretchSlider, handleA, handleB;
-  splitterSignalGenerator signal;
+  multipleSignalGenerator signal;
   basicSwitch flowSwitch;
 
   public Texture flowTex;
@@ -33,9 +33,9 @@ public class splitterDeviceInterface : deviceInterface {
   bool flow = true;
 
   public override void Awake() {
-    signal = GetComponent<splitterSignalGenerator>();
+    signal = GetComponent<multipleSignalGenerator>();
     flowSwitch = GetComponentInChildren<basicSwitch>();
-    signal.nodes = new List<splitterNodeSignalGenerator>();
+    signal.nodes = new List<multipleNodeSignalGenerator>();
 
     symbolquad.material.SetTexture("_MainTex", flowTex);
     symbolquad.material.SetColor("_TintColor", Color.HSVToRGB(0.1f, .62f, .7f));
@@ -50,7 +50,7 @@ public class splitterDeviceInterface : deviceInterface {
     int cur = signal.nodes.Count;
     if (count > cur) {
       for (int i = 0; i < count - cur; i++) {
-        splitterNodeSignalGenerator s = (Instantiate(splitterNodePrefab, transform, false) as GameObject).GetComponent<splitterNodeSignalGenerator>();
+        multipleNodeSignalGenerator s = (Instantiate(splitterNodePrefab, transform, false) as GameObject).GetComponent<multipleNodeSignalGenerator>();
         s.setup(signal, flow);
         signal.nodes.Add(s);
         s.transform.localPosition = new Vector3(-.04f * signal.nodes.Count, 0, 0);
@@ -116,8 +116,8 @@ public class splitterDeviceInterface : deviceInterface {
   }
 
   public override InstrumentData GetData() {
-    SplitterData data = new SplitterData();
-    data.deviceType = menuItem.deviceType.Splitter;
+    MultipleData data = new MultipleData();
+    data.deviceType = menuItem.deviceType.Multiple;
     GetTransformData(data);
 
     data.flowDir = flow;
@@ -136,7 +136,7 @@ public class splitterDeviceInterface : deviceInterface {
   }
 
   public override void Load(InstrumentData d) {
-    SplitterData data = d as SplitterData;
+    MultipleData data = d as MultipleData;
     base.Load(data);
 
     input.ID = data.jackInID;
@@ -170,7 +170,7 @@ public class splitterDeviceInterface : deviceInterface {
   }
 }
 
-public class SplitterData : InstrumentData {
+public class MultipleData : InstrumentData {
   public bool flowDir;
   public int jackOutAID;
   public int jackOutBID;

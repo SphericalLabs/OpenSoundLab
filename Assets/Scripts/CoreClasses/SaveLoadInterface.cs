@@ -187,7 +187,7 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(ReverbData))]
 [XmlInclude(typeof(TapeGroupData))]
 [XmlInclude(typeof(MixerData))]
-[XmlInclude(typeof(SplitterData))]
+[XmlInclude(typeof(MultipleData))]
 [XmlInclude(typeof(LooperData))]
 [XmlInclude(typeof(RecorderData))]
 [XmlInclude(typeof(SamplerData))]
