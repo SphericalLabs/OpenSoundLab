@@ -31,6 +31,8 @@ public class multipleDeviceInterface : deviceInterface {
   int count = 0;
 
   bool flow = true;
+  Color flowMixerColor = new Color(1f, 0f, 0f);
+  Color flowSplitterColor = new Color(0f, 1f, 0f);
 
   public override void Awake() {
     signal = GetComponent<multipleSignalGenerator>();
@@ -38,7 +40,7 @@ public class multipleDeviceInterface : deviceInterface {
     signal.nodes = new List<multipleNodeSignalGenerator>();
 
     symbolquad.material.SetTexture("_MainTex", flowTex);
-    symbolquad.material.SetColor("_TintColor", Color.HSVToRGB(0.1f, .62f, .7f));
+    symbolquad.material.SetColor("_TintColor", flowMixerColor);
 
     float xVal = stretchSlider.localPosition.x;
 
@@ -77,9 +79,11 @@ public class multipleDeviceInterface : deviceInterface {
     if (flow) {
       symbolquad.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
       symbolquad.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      symbolquad.material.SetColor("_TintColor", flowMixerColor);
     } else {
       symbolquad.transform.localPosition = new Vector3(.00075f, -.0016f, .0217f);
       symbolquad.transform.localRotation = Quaternion.Euler(0, 0, 90);
+      symbolquad.material.SetColor("_TintColor", flowSplitterColor);
     }
 
     if (input.near != null) {

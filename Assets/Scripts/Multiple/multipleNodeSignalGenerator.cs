@@ -26,6 +26,9 @@ public class multipleNodeSignalGenerator : signalGenerator {
   public omniJack jack;
   signalGenerator sig;
 
+  Color flowMixerColor = new Color(1f, 0f, 0f);
+  Color flowSplitterColor = new Color(0f, 1f, 0f);
+
   [DllImport("SoundStageNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
@@ -34,9 +37,10 @@ public class multipleNodeSignalGenerator : signalGenerator {
     jack = GetComponentInChildren<omniJack>();
 
     symbolquad.material.SetTexture("_MainTex", flowTex);
-    symbolquad.material.SetColor("_TintColor", Color.HSVToRGB(0.1f, .62f, .7f));
+    symbolquad.material.SetColor("_TintColor", flowMixerColor);
     symbolquadB.material.SetTexture("_MainTex", flowTex);
-    symbolquadB.material.SetColor("_TintColor", Color.HSVToRGB(0.1f, .62f, .7f));
+    symbolquadB.material.SetColor("_TintColor", flowMixerColor);
+    symbolquad.material.SetColor("_TintColor", flowMixerColor);
   }
 
   public void setup(signalGenerator s, bool f) {
@@ -51,11 +55,15 @@ public class multipleNodeSignalGenerator : signalGenerator {
       symbolquad.transform.localRotation = Quaternion.Euler(0, 180, 0);
       symbolquadB.transform.localPosition = new Vector3(.00075f, -.0016f, -.0217f);
       symbolquadB.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      symbolquad.material.SetColor("_TintColor", flowMixerColor);
+      symbolquadB.material.SetColor("_TintColor", flowMixerColor);
     } else {
       symbolquad.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
       symbolquadB.transform.localPosition = new Vector3(.0025f, .0012f, -.0217f);
       symbolquad.transform.localRotation = Quaternion.Euler(0, 0, 90);
       symbolquadB.transform.localRotation = Quaternion.Euler(0, 0, 90);
+      symbolquad.material.SetColor("_TintColor", flowSplitterColor);
+      symbolquadB.material.SetColor("_TintColor", flowSplitterColor);
     }
 
     if (jack.near != null) {

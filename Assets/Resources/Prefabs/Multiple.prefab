@@ -1552,7 +1552,7 @@ GameObject:
   - component: {fileID: 114179934575807804}
   - component: {fileID: 114187759859482556}
   m_Layer: 9
-  m_Name: Splitter
+  m_Name: Multiple
   m_TagString: instrument
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1620,4 +1620,5 @@ MonoBehaviour:
   _phase: 0
   useNativeIfAvailable: 1
   incoming: {fileID: 0}
+  multipleDevice: {fileID: 114179934575807804}
   nodes: []
