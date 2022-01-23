@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 
 public class keyFrequencySignalGenerator : signalGenerator {
   
-  float keyMultConst = Mathf.Pow(2, 1f / 12); // relative difference between two keys as multiplier
+  float keyMultConst = Mathf.Pow(2, 1f / 12); // not used anymore, update native api?
 
   public int octave = 0;
   int curKey = -1;
