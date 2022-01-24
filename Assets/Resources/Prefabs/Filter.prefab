@@ -1785,8 +1785,8 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   controllerRot: 0
-  notched: 0
-  steps: 4
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &646129951174984302
 GameObject:
   m_ObjectHideFlags: 0
@@ -1942,8 +1942,8 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   controllerRot: 0
-  notched: 0
-  steps: 4
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &2251638775376113915
 GameObject:
   m_ObjectHideFlags: 0
@@ -2379,8 +2379,8 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   controllerRot: 0
-  notched: 1
-  steps: 4
+  isNotched: 1
+  notchSteps: 4
 --- !u!1 &3254699730181108768
 GameObject:
   m_ObjectHideFlags: 0
@@ -2457,8 +2457,8 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   controllerRot: 0
-  notched: 0
-  steps: 4
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &3601203309325798146
 GameObject:
   m_ObjectHideFlags: 0
