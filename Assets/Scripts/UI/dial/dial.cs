@@ -29,6 +29,12 @@ public class dial : manipObject {
 
   GameObject littleDisk;
 
+  public float deltaRot = 0;
+  public float curRot = 0;
+  public float realRot = 0f;
+  public float prevShakeRot = 0f;
+  public float fineMult = 5f;
+
   public override void Awake() {
     base.Awake();
     littleDisk = transform.Find("littleDisk").gameObject;
@@ -82,6 +88,8 @@ public class dial : manipObject {
     foreach (Material m in mats) m.SetColor("_TintColor", c);
   }
 
+
+
   void Start() {
     setPercent(percent);
   }
@@ -92,76 +100,111 @@ public class dial : manipObject {
 
   public void setPercent(float p) {
     percent = Mathf.Clamp01(p);
-    if (p >= 0.5f) realRot = (percent - .5f) * 300;
-    else realRot = percent * 300 + 210;
-
-    curRot = realRot / 2f;
+    realRot = Utils.map(percent, 0f, 1f, -150f, 150f);
+    
+    curRot = realRot; // can be removed?
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
   }
 
   void updatePercent() {
-    if (realRot < 180) percent = .5f + realRot / 300;
-    else percent = (realRot - 210) / 300;
 
-    dialFeedback.percent = percent * 0.85f;
+    percent = Utils.map(realRot, -150f, 150f, 0f, 1f);
+
+    // viz
+    dialFeedback.percent = percent * 0.85f; // why that multiplier?
     dialFeedback.PercentUpdate();
   }
 
-  Vector2 dialCoordinates(Vector3 vec) {
-    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
-    return new Vector2(flat.x, flat.z);
+  public float controllerRot = 0f;
+
+  // begin grab, this sets the entry rotation via deltaRot
+  public override void setState(manipState state) {
+    curState = state;
+    setGlowState(state);
+
+    if (curState == manipState.grabbed) {
+      turnCount = 0;
+      if (!masterControl.instance.dialUsed) { // trigger beginners guidance
+        if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
+        _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
+      }
+
+      // this still flips in some extreme ranges, but fine for now
+      Vector2 temp = dialCoordinates(manipulatorObj.up);
+
+      controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
+
+      if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
+      {
+        deltaRot = controllerRot - curRot * fineMult;        
+      } else {
+        deltaRot = controllerRot - curRot;
+      }
+      
+    }
   }
 
-  float deltaRot = 0;
-  float curRot = 0;
-  float realRot = 0f;
-  float prevShakeRot = 0f;
-  float fineMult = 5f;
+  // deltaRot = x - curRot
 
-  public override void grabUpdate(Transform t) {
-    Vector2 temp = dialCoordinates(t.right);
 
-    // naughty hack, since grip button has to be pressed BEFORE starting gabbing... otherwise jumps
-    // also loops around too early
+  public override void grabUpdate(Transform t)
+  {
+    Vector2 temp = dialCoordinates(t.up);
+
     curRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - deltaRot;
 
-
+    // fine tune modifier, should know about hand
     if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
-      curRot /= fineMult; 
+      curRot /= fineMult;
 
-    curRot = Mathf.Repeat(curRot, 360f);
-    realRot = Mathf.Repeat(curRot * 2, 360f);
+    realRot = curRot = Mathf.Clamp(curRot, -150f, 150f); 
 
-    if (realRot > 150 && realRot < 210) {
-      if (realRot < 180) realRot = 150;
-      else realRot = 210;
-    }
+    // apply
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
-    
 
-    if (Mathf.Abs(realRot - prevShakeRot) > 10f) {
+    //transform.localRotation = Quaternion.Euler(0,
+    //  Mathf.Clamp(transform.localRotation.eulerAngles.y + realRot, 0f, 180f),
+    //0);
+
+    // haptics
+    if (Mathf.Abs(realRot - prevShakeRot) > 10f)
+    {
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(500);
       prevShakeRot = realRot;
       turnCount++;
     }
   }
 
+
+  Vector2 dialCoordinates(Vector3 vec)
+  {
+    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
+    return new Vector2(flat.x, flat.z);
+  }
+
+
+  // code for first steps guidance below, currently not enabled
+
   int turnCount = 0;
 
   Coroutine _dialCheckRoutine;
-  IEnumerator dialCheckRoutine() {
+  IEnumerator dialCheckRoutine()
+  {
     Vector3 lastPos = Vector3.zero;
     float cumulative = 0;
-    if (manipulatorObj != null) {
+    if (manipulatorObj != null)
+    {
       lastPos = manipulatorObj.position;
     }
 
-    while (curState == manipState.grabbed && manipulatorObj != null && !masterControl.instance.dialUsed) {
+    while (curState == manipState.grabbed && manipulatorObj != null && !masterControl.instance.dialUsed)
+    {
       cumulative += Vector3.Magnitude(manipulatorObj.position - lastPos);
       lastPos = manipulatorObj.position;
 
       if (turnCount > 3) masterControl.instance.dialUsed = true;
-      else if (cumulative > .2f) {
+      else if (cumulative > .2f)
+      {
         masterControl.instance.dialUsed = true;
         Instantiate(Resources.Load("Hints/TurnVignette", typeof(GameObject)), transform.parent, false);
       }
@@ -169,27 +212,5 @@ public class dial : manipObject {
       yield return null;
     }
     yield return null;
-  }
-
-  public override void setState(manipState state) {
-    curState = state;
-    setGlowState(state);
-
-    if (curState == manipState.grabbed) {
-      turnCount = 0;
-      if (!masterControl.instance.dialUsed) {
-        if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
-        _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
-      }
-      Vector2 temp = dialCoordinates(manipulatorObj.right);
-
-      if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
-      {
-        deltaRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - curRot * fineMult;
-      } else {
-        deltaRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - curRot;
-      }
-      
-    }
   }
 }

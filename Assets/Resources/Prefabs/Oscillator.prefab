@@ -1110,7 +1110,7 @@ Transform:
   - {fileID: 4000010782578356}
   - {fileID: 4000011216003244}
   m_Father: {fileID: 4000013982566318}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33000010197090748
 MeshFilter:
@@ -1329,7 +1329,7 @@ Transform:
   - {fileID: 4000010505581726}
   - {fileID: 4000011479247218}
   m_Father: {fileID: 4000013982566318}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33000010569493106
 MeshFilter:
@@ -1785,7 +1785,7 @@ Transform:
   m_Children:
   - {fileID: 4000010753576658}
   m_Father: {fileID: 4000013982566318}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33000013565845692
 MeshFilter:
@@ -2270,7 +2270,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012805973394}
-  m_LocalRotation: {x: 0.000000115202326, y: -0.7071067, z: -0.7071068, w: -0.00000011520231}
+  m_LocalRotation: {x: -0.00000019861236, y: -0.7071068, z: -0.7071068, w: 0.00000019861236}
   m_LocalPosition: {x: 0.0215, y: 0.0089, z: 0.0646}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2279,7 +2279,7 @@ Transform:
   - {fileID: 4000011133932686}
   m_Father: {fileID: 4000013982566318}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -179.99998}
 --- !u!1 &1000012834074104
 GameObject:
   m_ObjectHideFlags: 0
@@ -2404,7 +2404,7 @@ Transform:
   - {fileID: 4000013116916432}
   - {fileID: 4000012852959826}
   m_Father: {fileID: 4000013982566318}
-  m_RootOrder: 5
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1000012907768896
 GameObject:
@@ -2856,6 +2856,12 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 1
   hue: 0.65
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
 --- !u!1 &1000013495723170
 GameObject:
   m_ObjectHideFlags: 0
@@ -3299,11 +3305,11 @@ Transform:
   m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_Children:
   - {fileID: 4000013011003768}
+  - {fileID: 4000014033023202}
   - {fileID: 4000012748458022}
   - {fileID: 4000012170902088}
   - {fileID: 1609977543367695296}
   - {fileID: 4000012865158292}
-  - {fileID: 4000014033023202}
   - {fileID: 4000012758257624}
   - {fileID: 4000010977965876}
   - {fileID: 4000013960174006}
@@ -3535,6 +3541,12 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
 --- !u!1 &1436940005579262
 GameObject:
   m_ObjectHideFlags: 0
@@ -4459,7 +4471,7 @@ Transform:
   - {fileID: 682452023870263849}
   - {fileID: 7277884580424669484}
   m_Father: {fileID: 4000013982566318}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7991494371834060765
 MeshFilter:
