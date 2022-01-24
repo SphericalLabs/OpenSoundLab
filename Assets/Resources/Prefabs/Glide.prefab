@@ -70,6 +70,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  notched: 0
+  steps: 4
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0

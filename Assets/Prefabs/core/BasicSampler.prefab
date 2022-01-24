@@ -664,7 +664,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: deb65283edf18824e96029ebd9515b2c, type: 2}
+  - {fileID: 2100000, guid: 6720adb4bf350c3489679896bd5fa9b4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1812,6 +1812,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  notched: 0
+  steps: 4
 --- !u!1 &5524744127145006012
 GameObject:
   m_ObjectHideFlags: 0
@@ -2088,6 +2096,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 1
   hue: 0.65
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  notched: 0
+  steps: 4
 --- !u!1 &8065478067471053381
 GameObject:
   m_ObjectHideFlags: 0

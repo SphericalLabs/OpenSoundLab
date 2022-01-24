@@ -26,10 +26,9 @@ public class sliderNotched : manipObject {
   public Transform labelHolder;
 
   Color customColor;
-  public Material onMat;
+  public Material glowMat;
   Renderer rend;
   Material offMat;
-  Material glowMat;
   public bool labelsPresent = true;
 
   public GameObject[] labelObjects;
@@ -42,12 +41,12 @@ public class sliderNotched : manipObject {
   public override void Awake() {
     base.Awake();
     rend = GetComponent<Renderer>();
-    offMat = rend.material;
+    offMat = rend.sharedMaterial;
     customColor = Color.HSVToRGB(Random.value, 0.8f, .2f);
 
-    glowMat = new Material(onMat);
-    glowMat.SetFloat("_EmissionGain", .7f);
-    glowMat.SetColor("_TintColor", customColor);
+    //glowMat = new Material(onMat);
+    //glowMat.SetFloat("_EmissionGain", .7f);
+    //glowMat.SetColor("_TintColor", customColor);
 
     if (labelsPresent) {
       labels = new Material[labelObjects.Length];
@@ -108,13 +107,13 @@ public class sliderNotched : manipObject {
   public override void setState(manipState state) {
     curState = state;
     if (curState == manipState.none) {
-      rend.material = offMat;
+      rend.sharedMaterial = offMat;
     } else if (curState == manipState.selected) {
-      rend.material = glowMat;
-      glowMat.SetFloat("_EmissionGain", .5f);
+      rend.sharedMaterial = glowMat;
+      //glowMat.SetFloat("_EmissionGain", .5f);
     } else if (curState == manipState.grabbed) {
-      rend.material = glowMat;
-      glowMat.SetFloat("_EmissionGain", .7f);
+      rend.sharedMaterial = glowMat;
+      //glowMat.SetFloat("_EmissionGain", .7f);
       offset = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
     }
   }
