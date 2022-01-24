@@ -19,6 +19,8 @@ public class dial : manipObject {
 
   public float percent = 0f;
 
+  float defaultPercent; 
+
   glowDisk dialFeedback;
   Material[] mats;
 
@@ -37,6 +39,10 @@ public class dial : manipObject {
 
   public override void Awake() {
     base.Awake();
+
+    // store the first value on Awake and keep it as default
+    defaultPercent = percent;
+
     littleDisk = transform.Find("littleDisk").gameObject;
 
     mats = new Material[3];
@@ -95,6 +101,18 @@ public class dial : manipObject {
   }
 
   void Update() {
+
+    if (curState == manipState.selected || curState == manipState.grabbed)
+    {
+      // reset dial to default
+      if ((selectObj.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawButton.Y)
+      || (selectObj.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawButton.B))))
+      {
+        setPercent(defaultPercent);
+        deltaRot = controllerRot - curRot;
+      }
+    }
+
     updatePercent();
   }
 
@@ -124,16 +142,17 @@ public class dial : manipObject {
 
     if (curState == manipState.grabbed) {
       turnCount = 0;
-      if (!masterControl.instance.dialUsed) { // trigger beginners guidance
+
+      // trigger beginners guidance
+      if (!masterControl.instance.dialUsed) { 
         if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
         _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
       }
 
-      // this still flips in some extreme ranges, but fine for now
       Vector2 temp = dialCoordinates(manipulatorObj.up);
-
       controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
 
+      // UPDATE THIS
       if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
       {
         deltaRot = controllerRot - curRot * fineMult;        
@@ -144,23 +163,29 @@ public class dial : manipObject {
     }
   }
 
-  // deltaRot = x - curRot
-
 
   public override void grabUpdate(Transform t)
   {
-    Vector2 temp = dialCoordinates(t.up);
 
+    Vector2 temp = dialCoordinates(manipulatorObj.up);
+    controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
+    
     curRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - deltaRot;
 
-    // fine tune modifier, should know about hand
-    if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
+    // fine tune modifier
+    // https://developer.oculus.com/documentation/unity/unity-ovrinput
+    // only raw input worked properly
+    if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
+    || (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f))
       curRot /= fineMult;
+
 
     curRot = Mathf.Clamp(curRot, -150f, 150f);
 
+
+    // catch naughty fliparounds, use realRot as lastRot
     if (realRot == -150f && curRot > 0f) return;
-    if (realRot == 150f && curRot < 0f) return;
+    if (realRot ==  150f && curRot < 0f) return;
     realRot = curRot;
 
     // apply

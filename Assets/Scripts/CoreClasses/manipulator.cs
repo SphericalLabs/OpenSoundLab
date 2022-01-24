@@ -47,20 +47,20 @@ public class manipulator : MonoBehaviour {
     _touchpad.manip = this;
     activeTip.SetActive(false);
 
-    glowMenuTransform.position = viveMenuButtonTransform.position;
-    glowMenuTransform.rotation = viveMenuButtonTransform.rotation;
+    //glowMenuTransform.position = viveMenuButtonTransform.position;
+    //glowMenuTransform.rotation = viveMenuButtonTransform.rotation;
 
-    oculusSprites[0].material.SetColor("_TintColor", onColor);
-    oculusSprites[0].material.SetFloat("_EmissionGain", .5f);
-    oculusSprites[0].gameObject.SetActive(true);
-    for (int i = 1; i < oculusSprites.Length; i++) {
-      oculusSprites[i].material.SetColor("_TintColor", onColor);
-      oculusSprites[i].material.SetFloat("_EmissionGain", .5f);
-      oculusSprites[i].gameObject.SetActive(false);
-    }
+    //oculusSprites[0].material.SetColor("_TintColor", onColor);
+    //oculusSprites[0].material.SetFloat("_EmissionGain", .5f);
+    //oculusSprites[0].gameObject.SetActive(true);
+    //for (int i = 1; i < oculusSprites.Length; i++) {
+    //  oculusSprites[i].material.SetColor("_TintColor", onColor);
+    //  oculusSprites[i].material.SetFloat("_EmissionGain", .5f);
+    //  oculusSprites[i].gameObject.SetActive(false);
+    //}
 
-    oculusContextButtonGlow.GetComponent<Renderer>().material.SetColor("_TintColor", onColor);
-    oculusContextButtonGlow.SetActive(false);
+    //oculusContextButtonGlow.GetComponent<Renderer>().material.SetColor("_TintColor", onColor);
+    //oculusContextButtonGlow.SetActive(false);
   }
 
   bool controllerVisible = true;
@@ -277,10 +277,10 @@ public class manipulator : MonoBehaviour {
     copyEnabled = on;
     if (!usingOculus) _touchpad.toggleCopy(on);
     else if (!copying) {
-      oculusSprites[0].gameObject.SetActive(!on);
-      oculusSprites[1].gameObject.SetActive(on);
-      oculusSprites[2].gameObject.SetActive(false);
-      oculusSprites[3].gameObject.SetActive(false);
+      //oculusSprites[0].gameObject.SetActive(!on);
+      //oculusSprites[1].gameObject.SetActive(on);
+      //oculusSprites[2].gameObject.SetActive(false);
+      //oculusSprites[3].gameObject.SetActive(false);
 
     }
 
@@ -293,10 +293,10 @@ public class manipulator : MonoBehaviour {
     deleteEnabled = on;
     if (!usingOculus) _touchpad.toggleDelete(on);
     else {
-      oculusSprites[0].gameObject.SetActive(!on);
-      oculusSprites[1].gameObject.SetActive(false);
-      oculusSprites[2].gameObject.SetActive(on);
-      oculusSprites[3].gameObject.SetActive(false);
+      //oculusSprites[0].gameObject.SetActive(!on);
+      //oculusSprites[1].gameObject.SetActive(false);
+      //oculusSprites[2].gameObject.SetActive(on);
+      //oculusSprites[3].gameObject.SetActive(false);
     }
 
   }
@@ -396,11 +396,11 @@ public class manipulator : MonoBehaviour {
   bool showingTips = false;
   public void toggleTips(bool on) {
      
-    showingTips = on;
-    for (int i = 0; i < tipTexts.Length; i++) {
-      tipTexts[i].SetActive(showingTips);
-    }
-    if (!usingOculus) _touchpad.setQuestionMark(showingTips);
+    //showingTips = on;
+    //for (int i = 0; i < tipTexts.Length; i++) {
+    //  tipTexts[i].SetActive(showingTips);
+    //}
+    //if (!usingOculus) _touchpad.setQuestionMark(showingTips);
   }
 
 
@@ -409,10 +409,10 @@ public class manipulator : MonoBehaviour {
       usingOculus = true;
       oculusObjects.SetActive(true);
       viveObjects.SetActive(false);
-      glowMenuTransform.position = oculusMenuButton.transform.position;
+      //glowMenuTransform.position = oculusMenuButton.transform.position;
 
-      glowMenuTransform.rotation = oculusMenuButton.transform.rotation;
-      glowMenuTransform.Translate(Vector3.up * .01f, Space.Self);
+      //glowMenuTransform.rotation = oculusMenuButton.transform.rotation;
+      //glowMenuTransform.Translate(Vector3.up * .01f, Space.Self);
       tipPackage.localPosition = oculusManipTarget.localPosition;
       tipPackage.localRotation = oculusManipTarget.localRotation;
       triggerTrans = oculusTrigger.transform;
@@ -538,13 +538,13 @@ public class manipulator : MonoBehaviour {
         else if (deleteEnabled) DeleteSelection(true);
         else if (multiselectEnabled) MultiselectSelection(true);
         else toggleTips(true);
-        oculusContextButtonGlow.SetActive(true);
+        //oculusContextButtonGlow.SetActive(true);
       } else if (secondaryUp) {
         toggleTips(false);
         if (copying) SetCopy(false);
         else if (deleting) DeleteSelection(false);
         else if (multiselectEnabled) MultiselectSelection(false);
-        oculusContextButtonGlow.SetActive(false);
+        //oculusContextButtonGlow.SetActive(false);
       }
     } else if (grabbing && selectedObject != null) {
       if (secondaryDown) selectedObject.setPress(true);
