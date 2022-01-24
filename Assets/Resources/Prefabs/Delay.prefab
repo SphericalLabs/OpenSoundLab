@@ -164,6 +164,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0
@@ -1478,6 +1486,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &541675933790746528
 GameObject:
   m_ObjectHideFlags: 0
@@ -1926,6 +1942,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &2603726188220982559
 GameObject:
   m_ObjectHideFlags: 0
@@ -2090,6 +2114,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 1
+  notchSteps: 4
 --- !u!1 &2777184327606219814
 GameObject:
   m_ObjectHideFlags: 0
@@ -3030,6 +3062,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &4910307545461964701
 GameObject:
   m_ObjectHideFlags: 0

@@ -152,21 +152,21 @@ public class dial : manipObject {
       Vector2 temp = dialCoordinates(manipulatorObj.up);
       controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
 
-      // UPDATE THIS
-      if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
-      {
-        deltaRot = controllerRot - curRot * fineMult;        
-      } else {
+      //if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
+      //{
+      //  deltaRot = controllerRot - curRot * fineMult;        
+      //} else {
         deltaRot = controllerRot - curRot;
-      }
+      //}
       
     }
   }
 
+  public bool isNotched = false;
+  public int notchSteps = 4;
 
   public override void grabUpdate(Transform t)
   {
-
     Vector2 temp = dialCoordinates(manipulatorObj.up);
     controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
     
@@ -175,10 +175,9 @@ public class dial : manipObject {
     // fine tune modifier
     // https://developer.oculus.com/documentation/unity/unity-ovrinput
     // only raw input worked properly
-    if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
-    || (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f))
-      curRot /= fineMult;
-
+    //if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
+    //|| (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f))
+    //  curRot /= fineMult;
 
     curRot = Mathf.Clamp(curRot, -150f, 150f);
 
@@ -186,7 +185,13 @@ public class dial : manipObject {
     // catch naughty fliparounds, use realRot as lastRot
     if (realRot == -150f && curRot > 0f) return;
     if (realRot ==  150f && curRot < 0f) return;
-    realRot = curRot;
+
+    if (isNotched)
+    {
+      curRot = Utils.map(Mathf.Round(Utils.map(curRot, -150f, 150f, 0f, 1f) * (notchSteps - 1)), 0, notchSteps - 1, -150f, 150f);
+    }
+
+    realRot = curRot; // for percent storing and viz
 
     // apply
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
