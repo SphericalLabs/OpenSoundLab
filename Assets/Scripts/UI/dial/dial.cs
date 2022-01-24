@@ -157,14 +157,14 @@ public class dial : manipObject {
     if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
       curRot /= fineMult;
 
-    realRot = curRot = Mathf.Clamp(curRot, -150f, 150f); 
+    curRot = Mathf.Clamp(curRot, -150f, 150f);
+
+    if (realRot == -150f && curRot > 0f) return;
+    if (realRot == 150f && curRot < 0f) return;
+    realRot = curRot;
 
     // apply
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
-
-    //transform.localRotation = Quaternion.Euler(0,
-    //  Mathf.Clamp(transform.localRotation.eulerAngles.y + realRot, 0f, 180f),
-    //0);
 
     // haptics
     if (Mathf.Abs(realRot - prevShakeRot) > 10f)
