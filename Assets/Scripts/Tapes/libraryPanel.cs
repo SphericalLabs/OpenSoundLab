@@ -154,7 +154,10 @@ public class libraryPanel : UIpanel {
       yield return null;
     }
     if (loaderObject != null) Destroy(loaderObject);
-    _panelRing.GetComponent<AudioSource>().PlayOneShot(c, .25f);
+    AudioSource src = _panelRing.GetComponent<AudioSource>();
+    src.pitch = (float) AudioSettings.outputSampleRate / (float) c.frequency; // adjust playback speed
+    src.PlayOneShot(c, .5f);
+    
   }
 
   public override void selectEvent(bool on) {

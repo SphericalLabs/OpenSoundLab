@@ -19,6 +19,7 @@ public class recorderDeviceInterface : deviceInterface {
   public omniJack input, output, recordTrigger, playTrigger, backTrigger;
   public sliderNotched durSlider;
   waveTranscribeRecorder transcriber;
+  public basicSwitch normalizeSwitch;
   public button[] buttons;
 
   int[] durations = new int[] { 300, 150, 60, 30, 10 };//{ 10,30,60,150,300 };
@@ -26,7 +27,7 @@ public class recorderDeviceInterface : deviceInterface {
   public override void Awake() {
     base.Awake();
     transcriber = GetComponent<waveTranscribeRecorder>();
-    durSlider = GetComponentInChildren<sliderNotched>();
+    //durSlider = GetComponentInChildren<sliderNotched>();
   }
 
   void Update() {

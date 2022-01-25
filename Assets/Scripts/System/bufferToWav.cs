@@ -22,9 +22,10 @@ using System.Runtime.InteropServices;
 
 public class bufferToWav : MonoBehaviour {
     public static bufferToWav instance;
+    public bool applyNormalization = false;
 
     [DllImport("SoundStageNative")]
-    public static extern void CompressClip(float[] clip, int length);
+    public static extern void NormalizeClip(float[] clip, int length);
 
     void Awake()
     {
@@ -32,9 +33,10 @@ public class bufferToWav : MonoBehaviour {
     }
 
     public bool savingInProgress = false;
-    public Coroutine Save(string filename, float[] clip, int channels, int length, TextMesh txt, signalGenerator sig)
+    public Coroutine Save(string filename, float[] clip, int channels, int length, TextMesh txt, signalGenerator sig, bool normalize)
     {
         savingInProgress = true;
+        applyNormalization = normalize;
 
         if (!filename.ToLower().EndsWith(".wav")) filename += ".wav";
         return StartCoroutine(SaveRoutine(filename, clip, length, txt, sig));
@@ -42,7 +44,7 @@ public class bufferToWav : MonoBehaviour {
 
     void WavHeader(BinaryWriter b, int length)
     {
-        int _samplerate = 44100;
+        int _samplerate = AudioSettings.outputSampleRate;
         int _channels = 2;
         int _samplelength = 2; //2 bytes
        
@@ -70,7 +72,8 @@ public class bufferToWav : MonoBehaviour {
         BinaryWriter _binarystream = new BinaryWriter(_filestream);
         WavHeader(_binarystream, length);
 
-        CompressClip(clip, clip.Length);
+        if(applyNormalization) 
+          NormalizeClip(clip, clip.Length);
 
         int counter = 0;
         for (int i = 0; i < length; i++)
@@ -96,6 +99,13 @@ public class bufferToWav : MonoBehaviour {
         savingInProgress = false;
         txt.gameObject.SetActive(false);
         sig.updateTape(filename);
+
+        // flush after saving, good for quick flow and otherwise we would have to update display. buffer was altered if normalization was on. more clean to simply flush away the old data.
+        if(sig is waveTranscribeRecorder){
+          waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
+          rec.Flush();
+        }
+
         yield return new WaitForSeconds(1.5f);
     }    
 }

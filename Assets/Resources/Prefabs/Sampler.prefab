@@ -2293,10 +2293,10 @@ MonoBehaviour:
   waverend: {fileID: 23000013535739332}
   waveBG:
     serializedVersion: 2
-    rgba: 16777215
+    rgba: 0
   waveLine:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 4294967295
   headOffset: 0
   tailOffset: 0
   looping: 1

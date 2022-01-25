@@ -70,14 +70,30 @@ public class masterControl : MonoBehaviour {
     _measurePhase = 0;
     _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
 
+    var configuration = AudioSettings.GetConfiguration();
+    if(configuration.sampleRate == 48000){
+      Debug.Log("Unity sample rate is " + configuration.sampleRate);
+    } else {
+      Debug.LogWarning("Unity sample rate is " + configuration.sampleRate);
+    }
+
     if (Application.platform == RuntimePlatform.Android)
     {
       Debug.Log("Buffer size was: " + AudioSettings.GetConfiguration().dspBufferSize);
-      var configuration = AudioSettings.GetConfiguration();
+      configuration = AudioSettings.GetConfiguration();
       configuration.dspBufferSize = 128;
-      AudioSettings.Reset(configuration);
+      
       Debug.Log("Buffer size is now set to: " + AudioSettings.GetConfiguration().dspBufferSize);
+
+      //OVRPlugin.systemDisplayFrequency = 72;
+      Debug.Log("Current cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+      Debug.Log("Trying to set levels to 4");
+      OVRManager.gpuLevel = 2;
+      OVRManager.cpuLevel = 2;
+      Debug.Log("New cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
     }
+
+    AudioSettings.Reset(configuration);
 
     if (!PlayerPrefs.HasKey("glowVal")) PlayerPrefs.SetFloat("glowVal", 1);
     if (!PlayerPrefs.HasKey("envSound")) PlayerPrefs.SetInt("envSound", 1);
@@ -102,12 +118,7 @@ public class masterControl : MonoBehaviour {
 
     GetComponent<sampleManager>().Init();
 
-    //OVRPlugin.systemDisplayFrequency = 72;
-    Debug.Log("Current cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
-    Debug.Log("Trying to set levels to 4");
-    OVRManager.gpuLevel = 2;
-    OVRManager.cpuLevel = 2;
-    Debug.Log("New cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+
 
   }
 

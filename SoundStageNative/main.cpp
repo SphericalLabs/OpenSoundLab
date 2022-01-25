@@ -170,7 +170,7 @@ extern "C" {
         else return false;
     }
 
-    void CompressClip(float buffer[], int length)
+    void NormalizeClip(float buffer[], int length)
     {
         float maxVal = 0;
         for (int i = 0; i < length; i += 2)
@@ -178,7 +178,7 @@ extern "C" {
             if (buffer[i] > maxVal) maxVal = buffer[i];
         }
 
-        if (maxVal <= 1) return;
+        if (maxVal == 1) return;
 
         float mod = 1.0f / maxVal;
         for (int i = 0; i < length; ++i)
