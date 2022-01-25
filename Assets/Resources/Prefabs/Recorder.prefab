@@ -1354,10 +1354,10 @@ MonoBehaviour:
   period: 512
   waveBG:
     serializedVersion: 2
-    rgba: 4278321152
+    rgba: 0
   waveLine:
     serializedVersion: 2
-    rgba: 4291846458
+    rgba: 4294967295
 --- !u!114 &114000010837035514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2387,7 +2387,7 @@ MonoBehaviour:
   switchVal: 2
   notchCount: 5
   labelHolder: {fileID: 4000012067684476}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects: []
   titleLabel: {fileID: 0}
@@ -2801,7 +2801,7 @@ GameObject:
   - component: {fileID: 64000013737397024}
   - component: {fileID: 23000013960569974}
   m_Layer: 9
-  m_Name: Quad
+  m_Name: WaveformDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

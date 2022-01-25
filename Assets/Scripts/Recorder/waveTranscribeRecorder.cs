@@ -45,7 +45,7 @@ public class waveTranscribeRecorder : signalGenerator {
   Color32[] wavepixels;
   int curWaveW = 0;
   int lastWaveH = 0;
-  public Color32 waveBG = Color.black;
+  public Color32 waveBG = Color.black; // overridden in prefab
   public Color32 waveLine = Color.white;
   int columnMult = 1;
   double _sampleRateOverride;
@@ -59,6 +59,7 @@ public class waveTranscribeRecorder : signalGenerator {
     virtualBufferLength = sampleBuffer.Length;
     _sampleRateOverride = AudioSettings.outputSampleRate;
 
+    // don't do mipmapping here to keep computation low
     tex = new Texture2D(wavewidth, waveheight, TextureFormat.RGBA32, false);
     wavepixels = new Color32[wavewidth * waveheight];
     waverend.material.mainTexture = tex;
@@ -84,7 +85,7 @@ public class waveTranscribeRecorder : signalGenerator {
 
     for (int i = 0; i < wavewidth; i++) {
       if (columnMult * i < virtualBufferLength) {
-        int curH = Mathf.FloorToInt((waveheight - 1) * .5f * Mathf.Clamp01(Mathf.Abs(sampleBuffer[columnMult * i])));
+        int curH = Mathf.FloorToInt((waveheight - 1) * .5f * Mathf.Pow(Mathf.Clamp01(Mathf.Abs(sampleBuffer[columnMult * i])), 0.5f));
 
         for (int i2 = 0; i2 < centerH; i2++) {
           if (i2 < curH) wavepixels[(centerH - i2) * wavewidth + i] = wavepixels[(centerH + i2) * wavewidth + i] = waveLine;
