@@ -7,22 +7,22 @@ Binaries will soon be made available on SideQuest, Oculus App Lab and maybe the 
 Project team:
 Hannes Barfuss, Ludwig Zeller
 
-Initial Oculus Quest port by [James Surine](https://github.com/plaidpants/soundstagevr). 
-
-Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles' by bariacg.
-
 [Quick Start Manual](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)
 
-Original Credits
-
-CREATED BY
+### Original Credits
+###### CREATED BY
 Logan Olson
 
-SOUND DESIGNER (SAMPLES)
+###### SOUND DESIGNER (SAMPLES)
 Reek Havok
 
-PROGRAMMING CONSULTANT
+###### PROGRAMMING CONSULTANT
 Giray Ozil <-iumlat
 
-MUSIC CONSULTANT
+###### MUSIC CONSULTANT
 Ron Fish
+
+###### INITIAL QUEST PORT 
+James Surine
+
+Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles' by bariacg.
