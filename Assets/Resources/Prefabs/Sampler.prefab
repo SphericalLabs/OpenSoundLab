@@ -340,6 +340,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0.65
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &110094
 GameObject:
   m_ObjectHideFlags: 0
@@ -1978,6 +1986,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &178182
 GameObject:
   m_ObjectHideFlags: 0
@@ -2277,7 +2293,7 @@ MonoBehaviour:
   waverend: {fileID: 23000013535739332}
   waveBG:
     serializedVersion: 2
-    rgba: 4278519045
+    rgba: 4281019179
   waveLine:
     serializedVersion: 2
     rgba: 4294638330
@@ -4001,7 +4017,7 @@ GameObject:
   - component: {fileID: 65000013496060404}
   - component: {fileID: 114000011525495266}
   m_Layer: 9
-  m_Name: Quad
+  m_Name: WaveformDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5421,6 +5437,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0.65
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &1154846448440730
 GameObject:
   m_ObjectHideFlags: 0
@@ -5665,6 +5689,14 @@ MonoBehaviour:
   customColor: {r: 0, g: 0, b: 0, a: 0}
   externalHue: 0
   hue: 0.65
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  controllerRot: 0
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &1228129869104064
 GameObject:
   m_ObjectHideFlags: 0
