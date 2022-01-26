@@ -101,10 +101,10 @@ public class bufferToWav : MonoBehaviour {
         sig.updateTape(filename);
 
         // flush after saving, good for quick flow and otherwise we would have to update display. buffer was altered if normalization was on. more clean to simply flush away the old data.
-        if(sig is waveTranscribeRecorder){
-          waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
-          rec.Flush();
-        }
+        //if(sig is waveTranscribeRecorder){
+        //  waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
+        //  rec.Flush();
+        //}
 
         yield return new WaitForSeconds(1.5f);
     }    

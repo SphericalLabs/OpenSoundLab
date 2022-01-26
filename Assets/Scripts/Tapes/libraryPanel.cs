@@ -156,7 +156,7 @@ public class libraryPanel : UIpanel {
     if (loaderObject != null) Destroy(loaderObject);
     AudioSource src = _panelRing.GetComponent<AudioSource>();
     src.pitch = (float) AudioSettings.outputSampleRate / (float) c.frequency; // adjust playback speed
-    src.PlayOneShot(c, .5f);
+    src.PlayOneShot(c, .25f);
     
   }
 

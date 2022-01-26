@@ -15,20 +15,24 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Runtime.InteropServices;
 
 public class waveTranscribeRecorder : signalGenerator {
   public int duration = 300;
   public bool recording = false;
   public bool playing = false;
 
+  public GameObject tapePrefab;
+  public Transform tapeHolder;
+  public tape curTape;
+
   public TextMesh saveText;
 
-  int maxDuration = 300;
-
   float[] sampleBuffer;
+  // Int16[] cheaperBuffer; // -> todo?
+  int maxDuration = 300; // in seconds
+  public int truncatedBufferLength = 0;
   int curBufferIndex = 0;
-
-  int virtualBufferLength = 0;
 
   public Transform scrubTransform;
   Vector2 scrubRange = new Vector2(.4f, -.4f);
@@ -52,11 +56,16 @@ public class waveTranscribeRecorder : signalGenerator {
 
   float[] lastRecSig, lastPlaySig, lastBackSig;
 
+  [DllImport("SoundStageNative")]
+  public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+
   public override void Awake() {
     base.Awake();
     _deviceInterface = GetComponent<recorderDeviceInterface>();
     sampleBuffer = new float[(int)(maxDuration * AudioSettings.outputSampleRate) * 2];
-    virtualBufferLength = sampleBuffer.Length;
+    truncatedBufferLength = sampleBuffer.Length;
+
     _sampleRateOverride = AudioSettings.outputSampleRate;
 
     // don't do mipmapping here to keep computation low
@@ -71,8 +80,8 @@ public class waveTranscribeRecorder : signalGenerator {
 
   public void updateDuration(int newduration) {
     duration = newduration;
-    virtualBufferLength = duration * AudioSettings.outputSampleRate * 2;
-    columnMult = Mathf.CeilToInt((float)virtualBufferLength / (wavewidth - 1));
+    truncatedBufferLength = duration * AudioSettings.outputSampleRate * 2;
+    columnMult = Mathf.CeilToInt((float)truncatedBufferLength / (wavewidth - 1));
     recalcTex();
     if (!playing) {
       tex.SetPixels32(wavepixels);
@@ -84,7 +93,7 @@ public class waveTranscribeRecorder : signalGenerator {
     int centerH = waveheight / 2;
 
     for (int i = 0; i < wavewidth; i++) {
-      if (columnMult * i < virtualBufferLength) {
+      if (columnMult * i < truncatedBufferLength) {
         int curH = Mathf.FloorToInt((waveheight - 1) * .5f * Mathf.Pow(Mathf.Clamp01(Mathf.Abs(sampleBuffer[columnMult * i])), 0.5f));
 
         for (int i2 = 0; i2 < centerH; i2++) {
@@ -113,7 +122,8 @@ public class waveTranscribeRecorder : signalGenerator {
   }
 
   bool resetScrub = false;
-  float samplePos = 0;
+  float samplePos = 0; // for viz
+
   void Update() {
     if (resetScrub) scrubReset();
     if (!playing) return;
@@ -133,7 +143,13 @@ public class waveTranscribeRecorder : signalGenerator {
       }
     }
 
-    sampleBuffer = new float[(int)(maxDuration * _sampleRateOverride) * 2];
+    //sampleBuffer = new float[(int)(maxDuration * AudioSettings.outputSampleRate) * 2];
+
+    //SetArrayToSingleValue(sampleBuffer, sampleBuffer.Length, 0f);
+    for(int i = 0; i < sampleBuffer.Length; i++){
+      sampleBuffer[i] = 0f;
+    }
+
     tex.SetPixels32(wavepixels);
     tex.Apply(false);
   }
@@ -145,9 +161,18 @@ public class waveTranscribeRecorder : signalGenerator {
       string.Format("{0:yyyy-MM-dd_HH-mm-ss}.wav",
        DateTime.Now);
 
-    bufferToWav.instance.Save(audioFilename, sampleBuffer, 2, virtualBufferLength, saveText, this, _deviceInterface.normalizeSwitch.switchVal);
+    bufferToWav.instance.Save(audioFilename, sampleBuffer, 2, truncatedBufferLength, saveText, this, _deviceInterface.normalizeSwitch.switchVal);
   }
 
+  string curfilename = "";
+  public override void updateTape(string s)
+  {
+    s = System.IO.Path.GetFileNameWithoutExtension(s);
+    curfilename = s;
+    if (curTape != null) Destroy(curTape.gameObject);
+    curTape = (Instantiate(tapePrefab, tapeHolder, false) as GameObject).GetComponent<tape>();
+    curTape.Setup(s, sampleManager.instance.sampleDictionary["Recordings"][s]);
+  }
 
   public void Back() {
     curBufferIndex = 0;
@@ -254,13 +279,13 @@ public class waveTranscribeRecorder : signalGenerator {
         }
 
         curBufferIndex = (curBufferIndex + 2);
-        if (curBufferIndex >= virtualBufferLength) {
+        if (curBufferIndex >= truncatedBufferLength) {
           curBufferIndex = 0; //NOT RIGHT
           Stop();
         }
 
       }
     }
-    samplePos = (float)curBufferIndex / virtualBufferLength;
+    samplePos = (float)curBufferIndex / truncatedBufferLength;
   }
 }
