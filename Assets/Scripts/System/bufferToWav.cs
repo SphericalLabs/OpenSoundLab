@@ -21,7 +21,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 public class bufferToWav : MonoBehaviour {
-    public static bufferToWav instance;
+    public static bufferToWav instance; // singleton
     public bool applyNormalization = false;
 
     [DllImport("SoundStageNative")]
@@ -63,6 +63,8 @@ public class bufferToWav : MonoBehaviour {
         b.Write(length * _samplelength); // subchunk 2 size
     }
 
+    int sample;
+
     IEnumerator SaveRoutine(string filename, float[] clip, int length, TextMesh txt, signalGenerator sig)
     {
         txt.gameObject.SetActive(true);
@@ -78,7 +80,9 @@ public class bufferToWav : MonoBehaviour {
         int counter = 0;
         for (int i = 0; i < length; i++)
         {
-            Int16 sample = Convert.ToInt16( Mathf.Clamp(clip[i],-1f,1f) * 32760 );
+            // mind non-linearity around 0: https://www.cs.cmu.edu/~rbd/papers/cmj-float-to-int.html
+            // this also fixed a weird bug in the previous int16 conversion, where converting 0f would always crash
+            sample = (((int)(Mathf.Clamp(clip[i], -1f, 1f) * 32760f + 32768.5)) - 32768); // TODO: move clipping to native preprocessing function
             _binarystream.Write((short)sample);
             counter++;
 
@@ -98,14 +102,16 @@ public class bufferToWav : MonoBehaviour {
         txt.text = "Saved";
         savingInProgress = false;
         txt.gameObject.SetActive(false);
+        
+        // flush after saving, good for quick flow and otherwise we would have to update display. buffer was altered if normalization was on. more clean to simply flush away the old data.
+        if (sig is waveTranscribeRecorder)
+        {
+          waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
+          rec.Flush();
+        }
+
         sig.updateTape(filename);
 
-        // flush after saving, good for quick flow and otherwise we would have to update display. buffer was altered if normalization was on. more clean to simply flush away the old data.
-        //if(sig is waveTranscribeRecorder){
-        //  waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
-        //  rec.Flush();
-        //}
-
-        yield return new WaitForSeconds(1.5f);
+    yield return new WaitForSeconds(1.5f);
     }    
 }

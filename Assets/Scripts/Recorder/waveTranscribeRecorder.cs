@@ -123,7 +123,6 @@ public class waveTranscribeRecorder : signalGenerator {
 
   bool resetScrub = false;
   float samplePos = 0; // for viz
-
   void Update() {
     if (resetScrub) scrubReset();
     if (!playing) return;
@@ -143,15 +142,12 @@ public class waveTranscribeRecorder : signalGenerator {
       }
     }
 
-    //sampleBuffer = new float[(int)(maxDuration * AudioSettings.outputSampleRate) * 2];
-
-    //SetArrayToSingleValue(sampleBuffer, sampleBuffer.Length, 0f);
-    for(int i = 0; i < sampleBuffer.Length; i++){
-      sampleBuffer[i] = 0f;
-    }
+    SetArrayToSingleValue(sampleBuffer, sampleBuffer.Length, 0f); 
 
     tex.SetPixels32(wavepixels);
     tex.Apply(false);
+
+    if (curTape != null) Destroy(curTape.gameObject);
   }
 
   public void Save() {

@@ -2487,9 +2487,9 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0.5
+  percent: 0
   xBound: 0.05
-  switchVal: 2
+  switchVal: 4
   notchCount: 5
   labelHolder: {fileID: 4000012067684476}
   glowMat: {fileID: 2100000, guid: 45fde5fa853ca544ea832ac3c37357bc, type: 2}
@@ -5002,7 +5002,7 @@ MonoBehaviour:
   canBeDeleted: 0
   onLabel: {fileID: 3343593483683319918}
   offLabel: {fileID: 2719829424431712282}
-  switchVal: 1
+  switchVal: 0
   switchObject: {fileID: 5495462073357820828}
   glowTrans: {fileID: 8582426942314504621}
   redOption: 1
