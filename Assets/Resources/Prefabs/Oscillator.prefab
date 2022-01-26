@@ -526,7 +526,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010450949100}
   m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: 0.0555, y: 0.0327, z: 0.0275}
+  m_LocalPosition: {x: 0.053, y: -0.0003, z: 0.0275}
   m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_Children:
   - {fileID: 4000013961779218}
@@ -2862,8 +2862,8 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   controllerRot: 0
-  notched: 0
-  steps: 4
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &1000013495723170
 GameObject:
   m_ObjectHideFlags: 0
@@ -3549,8 +3549,8 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   controllerRot: 0
-  notched: 0
-  steps: 4
+  isNotched: 0
+  notchSteps: 4
 --- !u!1 &1436940005579262
 GameObject:
   m_ObjectHideFlags: 0

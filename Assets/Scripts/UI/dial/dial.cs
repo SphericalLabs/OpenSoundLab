@@ -37,6 +37,9 @@ public class dial : manipObject {
   public float prevShakeRot = 0f;
   public float fineMult = 5f;
 
+  public bool isNotched = false;
+  public int notchSteps = 4;
+
   public override void Awake() {
     base.Awake();
 
@@ -162,9 +165,8 @@ public class dial : manipObject {
     }
   }
 
-  public bool isNotched = false;
-  public int notchSteps = 4;
-
+  
+  
   public override void grabUpdate(Transform t)
   {
     Vector2 temp = dialCoordinates(manipulatorObj.up);
@@ -199,7 +201,7 @@ public class dial : manipObject {
     // haptics
     if (Mathf.Abs(realRot - prevShakeRot) > 10f)
     {
-      if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(500);
+      if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse( isNotched ? (ushort) 3999 : (ushort) 700); // 3999 is max power
       prevShakeRot = realRot;
       turnCount++;
     }
