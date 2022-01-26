@@ -22,7 +22,7 @@ Giray Ozil <-iumlat
 ###### MUSIC CONSULTANT
 Ron Fish
 
+### Non-Original Credits
+
 ###### INITIAL QUEST PORT 
 James Surine
-
-Models: 'Rubber Med Gloves' by Komodoz, 'surgical mask' by F2A, 'Safety Goggles' by bariacg.
