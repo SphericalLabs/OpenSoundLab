@@ -136,6 +136,8 @@ public class waveTranscribeRecorder : signalGenerator {
   }
 
   public void Flush() {
+    if (bufferToWav.instance.savingInProgress) return;
+
     for (int i = 0; i < wavewidth; i++) {
       for (int i2 = 0; i2 < waveheight; i2++) {
         wavepixels[i2 * wavewidth + i] = waveBG;

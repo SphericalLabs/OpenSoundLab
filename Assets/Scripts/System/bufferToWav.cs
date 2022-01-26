@@ -83,10 +83,11 @@ public class bufferToWav : MonoBehaviour {
             // mind non-linearity around 0: https://www.cs.cmu.edu/~rbd/papers/cmj-float-to-int.html
             // this also fixed a weird bug in the previous int16 conversion, where converting 0f would always crash
             sample = (((int)(Mathf.Clamp(clip[i], -1f, 1f) * 32760f + 32768.5)) - 32768); // TODO: move clipping to native preprocessing function
-            _binarystream.Write((short)sample);
+
+            _binarystream.Write((short)sample); // would it be faster if full more data is written at once? but mind frame budget!
             counter++;
 
-            if (counter > 10000)
+            if (counter > 10000) // needs approx 1.6ms per frame
             {
                 counter = 0;
                 txt.text = "Saving... " + (int)(100 * (float)i / length) + "% Complete";
@@ -112,6 +113,6 @@ public class bufferToWav : MonoBehaviour {
 
         sig.updateTape(filename);
 
-    yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.5f);
     }    
 }
