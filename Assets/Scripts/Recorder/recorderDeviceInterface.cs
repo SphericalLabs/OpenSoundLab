@@ -21,6 +21,7 @@ public class recorderDeviceInterface : deviceInterface {
   waveTranscribeRecorder transcriber;
   public basicSwitch normalizeSwitch;
   public button[] buttons;
+  public AudioSource babySpeakerRim;
 
   int[] durations = new int[] { 300, 150, 60, 30, 10 };//{ 10,30,60,150,300 };
 
@@ -49,6 +50,9 @@ public class recorderDeviceInterface : deviceInterface {
     if (ID == 1) {
       if (!on) buttons[0].keyHit(false);
       transcriber.playing = on;
+    }
+    if(ID == 5){
+      babySpeakerRim.mute = on;
     }
   }
 

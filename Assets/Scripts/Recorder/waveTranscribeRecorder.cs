@@ -189,19 +189,20 @@ public class waveTranscribeRecorder : signalGenerator {
   }
 
   double lastIncomingDspTime = -1;
-  float[] oldBuffer;
+  //float[] oldBuffer;
   bool playingLastFrame = false;
+
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    if (lastIncomingDspTime == dspTime) {
+    //if (lastIncomingDspTime == dspTime) {
 
-      for (int i = 0; i < buffer.Length; i++) {
-        buffer[i] = oldBuffer[i];
-      }
-      return;
-    }
-    lastIncomingDspTime = dspTime;
+    //  for (int i = 0; i < buffer.Length; i++) {
+    //    buffer[i] = oldBuffer[i];
+    //  }
+    //  return;
+    //}
+    //lastIncomingDspTime = dspTime;
 
-    oldBuffer = new float[buffer.Length];
+    //oldBuffer = new float[buffer.Length];
     float[] recBuffer = new float[buffer.Length];
     float[] playBuffer = new float[buffer.Length];
     float[] backBuffer = new float[buffer.Length];
@@ -244,21 +245,27 @@ public class waveTranscribeRecorder : signalGenerator {
       if (_deviceInterface.backTrigger.signal != null) {
         if (backBuffer[i] > lastBackSig[1] && lastBackSig[1] <= lastBackSig[0]) {
           curBufferIndex = 0;
-
         }
 
         lastBackSig[0] = lastBackSig[1];
         lastBackSig[1] = backBuffer[i];
       }
 
-      if (playing) {
-        oldBuffer[i] = buffer[i] += sampleBuffer[curBufferIndex];
-        oldBuffer[i + 1] = buffer[i + 1] += sampleBuffer[curBufferIndex + 1];
-      }
-      if (recording) {
+      if (recording && playing) {
         sampleBuffer[curBufferIndex] = buffer[i];
         sampleBuffer[curBufferIndex + 1] = buffer[i + 1];
+      } 
+
+      if (playing && !recording)
+      {
+        buffer[i] = sampleBuffer[curBufferIndex];
+        buffer[i + 1] = sampleBuffer[curBufferIndex + 1];
       }
+
+      //if(!playing && !recording){
+        // do nothing, just pass through buffers that have already been populated from incoming
+      //}
+
       if (playing) {
         int centerH = waveheight / 2;
         if (curBufferIndex % columnMult == 0) {
