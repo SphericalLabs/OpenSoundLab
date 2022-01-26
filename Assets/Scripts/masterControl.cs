@@ -82,14 +82,16 @@ public class masterControl : MonoBehaviour {
       Debug.Log("Buffer size was: " + AudioSettings.GetConfiguration().dspBufferSize);
       configuration = AudioSettings.GetConfiguration();
       configuration.dspBufferSize = 128;
-      
+      AudioSettings.Reset(configuration);
+
+      configuration = AudioSettings.GetConfiguration();
       Debug.Log("Buffer size is now set to: " + AudioSettings.GetConfiguration().dspBufferSize);
 
       //OVRPlugin.systemDisplayFrequency = 72;
       Debug.Log("Current cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
       Debug.Log("Trying to set levels to 4");
-      OVRManager.gpuLevel = 2;
-      OVRManager.cpuLevel = 2;
+      OVRManager.gpuLevel = 4;
+      OVRManager.cpuLevel = 4;
       Debug.Log("New cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
     }
 
