@@ -345,9 +345,9 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
-  controllerRot: 0
   isNotched: 0
   notchSteps: 4
+  controllerRot: 0
 --- !u!1 &110094
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,15 +849,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 131494}
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: -0.1915, y: 0, z: 0.0014}
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: -0.000000104308114}
+  m_LocalPosition: {x: -0.1504, y: -0.0006, z: -0.0375}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_Children:
   - {fileID: 466404}
   - {fileID: 459150}
   m_Father: {fileID: 410468}
   m_RootOrder: 17
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -179.99998, z: 0}
 --- !u!114 &11497432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1991,9 +1991,9 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
-  controllerRot: 0
   isNotched: 0
   notchSteps: 4
+  controllerRot: 0
 --- !u!1 &178182
 GameObject:
   m_ObjectHideFlags: 0
@@ -2630,8 +2630,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010555237248}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071067}
-  m_LocalPosition: {x: -0.1915, y: -0.0038, z: 0.0376}
-  m_LocalScale: {x: 1.4999995, y: 1.4999995, z: 1.5}
+  m_LocalPosition: {x: -0.1915, y: -0.0006, z: 0.0382}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4000014094186146}
   m_Father: {fileID: 410468}
@@ -5442,9 +5442,9 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
-  controllerRot: 0
   isNotched: 0
   notchSteps: 4
+  controllerRot: 0
 --- !u!1 &1154846448440730
 GameObject:
   m_ObjectHideFlags: 0
@@ -5694,9 +5694,9 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
-  controllerRot: 0
   isNotched: 0
   notchSteps: 4
+  controllerRot: 0
 --- !u!1 &1228129869104064
 GameObject:
   m_ObjectHideFlags: 0

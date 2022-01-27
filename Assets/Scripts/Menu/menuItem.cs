@@ -66,10 +66,11 @@ public class menuItem : manipObject {
     SequencerCV,
     Speaker,    
     Stereo,
-    stereoVerb,
+    stereoVerb,    
     Tapes,
     Timeline,
     TouchPad,
+    Tutorials,
     VCA,
     XyloRoll,
     // this is a stopper, items below won't appear in menu; alternatively you can skip items in menuManager.loadMenu()
