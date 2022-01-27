@@ -30,7 +30,7 @@ public class tutorialPanel : manipObject {
   
   public override void Awake() {
     base.Awake();    
-    if (transform.parent) tutorialsManager = transform.parent.GetComponent<tutorialsDeviceInterface>();
+    if (transform.parent.parent) tutorialsManager = transform.parent.parent.GetComponent<tutorialsDeviceInterface>();
   }
 
   public void setLabel(string labelString){
@@ -42,9 +42,9 @@ public class tutorialPanel : manipObject {
     videoString = str;
   }
 
-  public void setActive(bool active){
-    if (active && !isActive){ // freshly activated, tell the manager once
-      tutorialsManager.triggerTutorial(this);
+  public void setActivated(bool active, bool notifyManager = true){
+    if (active && !isActive && notifyManager){ // freshly activated, tell the manager once
+      tutorialsManager.triggerOpenTutorial(this);
     }
     isActive = active;
     panelRenderer.sharedMaterial = isActive ? activeMat : normalMat;
@@ -57,7 +57,8 @@ public class tutorialPanel : manipObject {
     } else if(state == manipState.selected){
       panelRenderer.sharedMaterial = selectedMat;
     } else if(state == manipState.grabbed){
-      setActive(true);
+      setActivated(true);
+      manipulatorObjScript.hapticPulse(700);
     }
     //if (curState == manipState.selected && curState != state) selectEvent(false);
     //else if (curState == manipState.grabbed && curState != state) grabEvent(false);

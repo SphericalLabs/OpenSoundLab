@@ -18,7 +18,8 @@ using UnityEngine.Video;
 
 
 
-public class tutorialsDeviceInterface : deviceInterface {
+public class tutorialsDeviceInterface : deviceInterface
+{
 
   public button playButton, resetButton, jumpBackButton, jumpForthButton, scrollUpButton, scrollDownButton;
   public GameObject videoContainer;
@@ -28,56 +29,151 @@ public class tutorialsDeviceInterface : deviceInterface {
   public tutorialPanel selectedTutorial;
   public tutorialPanel[] tutorials;
   public TutorialRecord[] tutorialRecords;
-  
+
   public VideoPlayer videoPlayer;
 
-  [System.Serializable] 
+  public Transform progressTransform;
+  private Vector3 maxProgressScale;
+  //private float minProgressScale;
+
+  [System.Serializable]
   public class TutorialRecord
   {
     public string labelString;
     public string videoString;
   }
 
-  public override void Awake() {
+  public override void Awake()
+  {
     base.Awake();
+
+  }
+
+  void Start()
+  {
+    maxProgressScale = progressTransform.localScale;
+
     tutorials = new tutorialPanel[tutorialRecords.Length];
-    for(int i = 0; i < tutorialRecords.Length; i ++){
+    for (int i = 0; i < tutorialRecords.Length; i++)
+    {
       tutorials[i] = Instantiate<tutorialPanel>(panelPrefab, tutorialHolder);
       tutorials[i].transform.localPosition = new Vector3(0, -0.0321f * i, 0);
       tutorials[i].transform.localRotation = Quaternion.Euler(0, 90, 90);
       tutorials[i].setLabel(tutorialRecords[i].labelString);
       tutorials[i].setVideo(tutorialRecords[i].videoString);
     }
+
+    triggerOpenTutorial(tutorials[0]);
+
   }
+  Vector3 scaleVector = new Vector3(0f, 1f, 1f);
+  float minScale = 0f;
+  void Update()
+  {
+    if (videoPlayer.isPrepared) {
+      scaleVector.x = Utils.map((float)videoPlayer.frame, 0f, (float)videoPlayer.frameCount, minScale, 1f);
 
-
-  void Update() {
-
+    } else {
+      scaleVector.x = minScale;
+    }
+    progressTransform.localScale = Vector3.Scale(maxProgressScale, scaleVector);
   }
 
 
   public override void hit(bool on, int ID = -1)
   {
-    if (ID == 0) /*player.togglePause(on)*/;
-    if (ID == 1 && on) /*player.Back()*/;
-    if (ID == 2)
+    switch (ID)
     {
-
+      case 1:
+        // rewind
+        if (!on) return; // only on enter events
+        videoPlayer.frame = 0; 
+        break;
+      case 2:
+        // -10s
+        if (!on) return; // only on enter events
+        if (videoPlayer.frame - 10 * videoPlayer.frameRate >= 0)
+        {
+          videoPlayer.frame = Mathf.RoundToInt(videoPlayer.frame - 10 * videoPlayer.frameRate);
+        }
+        else
+        {
+          videoPlayer.frame = 0;
+        }
+        break;
+      case 3:
+        // play
+        playPauseVideo(); // enter and release events
+        break;
+      case 4:
+        // +10s
+        if (!on) return; // only on enter events
+        if (videoPlayer.frame + 10 * videoPlayer.frameRate >= videoPlayer.frameCount)
+        {
+          videoPlayer.frame = 0;
+          videoPlayer.Pause();
+          playButton.isHit = false; 
+        }
+        else
+        {
+          videoPlayer.frame = (int)(videoPlayer.frame + 10 * videoPlayer.frameRate);
+        }
+        break;
+      default:
+        break;
     }
+
   }
 
-  public void triggerTutorial(tutorialPanel tut){
-    // disable all tutorials
-    for(int i = 0; i < tutorials.Length; i++){
-      tutorials[i].setActive(false);
-    }
+  public void triggerOpenTutorial(tutorialPanel tut)
+  {
+    playButton.keyHit(false);
+    StartCoroutine(openTutorial(tut));
+  }
+
+  IEnumerator openTutorial(tutorialPanel tut)
+  {
+
     selectedTutorial = tut;
-    selectedTutorial.setActive(true);
-    playVideo(selectedTutorial.videoString);
+
+    // disable all other tutorials
+    for (int i = 0; i < tutorials.Length; i++)
+    {
+      if (tutorials[i] != selectedTutorial)
+        tutorials[i].setActivated(false);
+    }
+
+    selectedTutorial.setActivated(true, false); // do not notify manager, otherwise stackoverflow
+
+    videoPlayer.url = Application.streamingAssetsPath + "/" + selectedTutorial.videoString;
+    videoPlayer.Prepare();
+
+    while (!videoPlayer.isPrepared)
+    {
+      yield return new WaitForSeconds(.1f);
+    }
+
+    videoPlayer.renderMode = VideoRenderMode.MaterialOverride;
+    videoPlayer.targetMaterialRenderer = videoPlayer.GetComponentInChildren<Renderer>();
+    videoPlayer.targetMaterialProperty = "_MainTex";
   }
 
-  public void playVideo(string videoString){
+  public void playPauseVideo()
+  {
+    if (playButton.isHit)
+    {
+      videoPlayer.Play();
+    }
+    else
+    {
+      videoPlayer.Pause();
+    }
 
+    //if(videoPlayer.isPlaying){
+    //  videoPlayer.Pause();
+    //} else if (videoPlayer.isPaused) {
+    //  videoPlayer.Play();
+    //}
   }
 
 }
