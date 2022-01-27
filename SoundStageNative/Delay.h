@@ -4,6 +4,7 @@
 #include "main.h"
 #include "RingBuffer.h"
 #include "CompressedRingBuffer.h"
+#include "CRingBuffer.hpp"
 
 struct DelayData
 {
@@ -15,7 +16,8 @@ struct DelayData
     
     //internal
     int maxTime;
-    struct RingBuffer *tap;
+    //struct RingBuffer *tap;
+    FrameRingBuffer *tap;
     float *temp;
     float *temp2;
 };

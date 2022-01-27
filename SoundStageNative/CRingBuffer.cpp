@@ -11,358 +11,113 @@
 
 #define FB_UNINITIALIZED -1
 #define _MAX(a, b) a > b ? a : b
+#define _MIN(a, b) a < b ? a : b
 
 void insertFrame(int length, float stride, FrameRingBuffer *x)
 {
     assert(length > 0);
     
+//#if DEBUG
+//    //printv("Adding %d samples from ptr %d..\n", length, x->ptr);
+//    if(FrameRingBuffer_Warn(stride, x) > 1)
+//    {
+//        printv("warning: there is already a frame with stride %f\n", stride);
+//    }
+//#endif
+    
     if(length > x->n)
         length = x->n;
     //vector<FrameHeader> frames = x->headers;
     int ptr = x->ptr;
-    int N = x->n;
-    FrameHeader *nextFrame;
-    FrameHeader frame;
-    frame.length = 0;
-    frame.head = ptr;
-    frame.stride = stride;
-    int head, tail;
+    const int N = x->n;
+    FrameHeader *existingFrame;
+    FrameHeader newFrame;
+    newFrame.length = 0;
+    newFrame.head = ptr;
+    newFrame.stride = stride;
     
-    //Check if we can attach to oldest frame
-    /*nextFrame = &x->headers[0];
-    if(nextFrame->stride == frame.stride)
+    bool push = true;
+    
+    //Check if the array contains only 1 frame which already has the correct stride. if so, there is nothing to do.
+    existingFrame = &x->headers[0];
+    if(x->headers.size() == 1)
     {
-        //concatenate
-    }
-    //Check if we can attach to most recent frame
-    else if(x->headers.size() > 1)
-    {
-        nextFrame = &x->headers.back();
-        if(nextFrame->stride == frame.stride)
+        if(existingFrame->stride == newFrame.stride)
         {
-            //concatenate
+            return; //Nothing to change
         }
-    }*/
-    
-    //Delete headers until we have enough samples
-    while(frame.length < length)
+    }
+    //If the oldest frame has the same stride as the new samples, we concatenate them.
+    //TODO: doesn't this cause a problem bc now ptr will not be contained in x->headers[0]?
+    else if(existingFrame->stride == newFrame.stride)
     {
-        assert(x->headers.size() > 0);
-        nextFrame = &x->headers[0];
-        //need to concatenate frames, so delete existing one and resize new one
-        if(nextFrame->stride == stride)
+        newFrame.length = existingFrame->length;
+        x->headers.erase(x->headers.begin());
+    }
+    //If the most recent frame has the same stride as the new samples, we concatenate them.
+    else
+    {
+        existingFrame = &x->headers.back();
+        if(existingFrame->stride == newFrame.stride)
         {
-            /*
-             need to check if
-             (1)
-             |----|     (nextFrame)
-                |----|  (frame)
-             or (2)
-                |----|
-             |-----|
-             or (3)
-             |--------|
-               |---|
-             or (4)
-               |---|
-             |--------|
-             */
-            head = frame.head; //only valid in case 2!
-            //case 1: head = nextFrame.head; frame.length = ???)
-            //case 3: frame.head = nextFrame.head; frame.frameLength = nextframe.LframeLength; delete nextFrame;
-            //case 4: frame.head = head; frame.
-            tail = (nextFrame->head + nextFrame->length) % N;
-            frame.length = tail - head;
-            if( frame.length <= 0)
-                frame.length += N;
-            //Note: at this point, frame.frameLength can be > length, which is alright.
-            
-            //TODO: what if frame.frameLength > N?
-            assert(frame.length <= N);
-            
+            //Calculate how many new samples we can store in the existing frame:
+            int samplesAvailable = (existingFrame->head + existingFrame->length) - newFrame.head;
+            if(newFrame.head < existingFrame->head)
+                samplesAvailable -= N;
+            newFrame.length = existingFrame->length;
+            newFrame.head = existingFrame->head;
+            //we have to add the samples that we inherit from the existing frame to our total:
+            length += (newFrame.length - samplesAvailable);
+            x->headers.pop_back();
+        }
+    }
+
+    //Now we delete headers, consuming their length, until the length of the new frame is identical to the number of samples we want to store.
+    while(newFrame.length < length)
+    {
+        existingFrame = &x->headers[0];
+        
+        int remaining = length - newFrame.length;
+        //need to consume whole frame, so delete it
+        if(existingFrame->length <= remaining)
+        {
+            newFrame.length += existingFrame->length;
             x->headers.erase(x->headers.begin());
         }
+        //no need to consume whole frame, so resize it
         else
         {
-            int remaining = length - frame.length;
-            //need to consume whole frame, so delete it
-            if(nextFrame->length <= remaining)
-            {
-                frame.length += nextFrame->length;
-                x->headers.erase(x->headers.begin());
-            }
-            //no need to consume whole frame, so resize it
-            else
-            {
-                nextFrame->length -= remaining;
-                nextFrame->head = (nextFrame->head + remaining) % N;
-                frame.length = length;
-            }
+            existingFrame->length -= remaining;
+            existingFrame->head = (existingFrame->head + remaining) % N;
+            newFrame.length = length;
         }
     }
     
-    //check if previous frame has same stride, if so concatenate
+    //We check once again if the adjacent frame has the same stride, which could be possible if we deleted some frames and thus "closed a gap" between frames of the same stride. If so, concatenate. We have to leave the frame in its place at the beginning of the vector bc it contains the ptr.
     if(x->headers.size() > 0)
     {
-        FrameHeader *previousFrame = &x->headers.back();
-        if(previousFrame->stride == frame.stride)
+        existingFrame = &x->headers[0];
+        if(existingFrame->stride == newFrame.stride)
         {
-            frame.length += previousFrame->length;
-            frame.head = previousFrame->head;
-            x->headers.pop_back();
-            assert(frame.length <= N);
+            existingFrame->length += newFrame.length;
+            existingFrame->head = newFrame.head;
+            push = false;
         }
     }
     
-    x->headers.push_back(frame);
-}
-
-inline bool _overlap(int head1, int tail1, int head2, int tail2)
-{
-    if(tail1 == head1 || tail2 == head2)
-    {
-        /*
-         |--------------------|-------------------|
-         0                head1/tail1             n-1
-         */
-        return true;
-    }
-    else if(tail1 > head1)
-    {
-        /*
-         |        |-----------------|         |
-         0      head1              tail1        n-1
-         */
-        if(tail2 > head2)
-        {
-            /*
-             |        |-----------------|         |
-             |    |-----------------|             |
-             */
-            
-            //char *x = a, *y =  b;
-            //return (x<=y && x+n>y) || (y<=x && y+n>x);
-            
-            return head1 <= head2 && head1 + (tail1 - head1) > head2 || head2 >= head1 && head2 + (tail2 - head2) > head1;
-        }
-        else
-        {
-            /*
-             |        |-----------------|         |
-             |----------|              |----------|
-             */
-            return head2 < tail1 || tail2 >= head1;
-        }
-    }
-    else
-    {
-        /*
-         |-----|         |-------------|
-         0    tail1      head1          n-1
-         */
-        
-        if(tail2 > head2)
-        {
-            /*
-             |----------|              |----------|
-             |              |-----------------|   |
-             */
-            return head1 < tail2 || tail1 >= head2;
-        }
-        else
-        {
-            /*
-             |-------------|              |-------|
-             |----------|              |----------|
-             */
-            return tail2 > 0 || head2 < tail1; //TODO: second part is bullshit
-        }
-    }
-}
-
-/* Returns the number of samples that overlap in the two arrays defined by [head1, tail1] and [head2, tail2]. */
-inline int _delta(int head1, int tail1, int head2, int tail2, int n)
-{
-    int delta = 0;
-    int length1 = head1 < tail1 ? tail1 - head1 : n - head1 + tail1;
-    int length2 = head2 < tail2 ? tail2 - head2 : n - head2 + tail2;
+    if(push)
+        x->headers.push_back(newFrame);
     
-    if(tail1 == head1)
-    {
-        /*
-         |--------------------|-------------------|
-         0                head1/tail1             n-1
-         */
-        delta = length2;
-    }
-    else if(tail2 == head2)
-    {
-        delta = length1;
-    }
-    else if(tail1 > head1)
-    {
-        if(tail2 > head2)
-        {
-            /*
-             0      head1             tail1     n-1
-             |        |-----------------|         |
-             |    |-----------------|             |
-             0   head2             tail2        n-1
-             */
-            
-            //char *x = a, *y =  b;
-            //return (x<=y && x+n>y) || (y<=x && y+n>x);
-            
-            //return head1 <= head2 && head1 + (tail1 - head1) > head2 || head2 >= head1 && head2 + (tail2 - head2) > head1;
-            delta = length2 - (abs(head2 - head1) + abs(tail2 - tail2));
-        }
-        else
-        {
-            /*
-             0       head1             tail1     n-1
-             |        |-----------------|         |
-             |----------|              |----------|
-             0        tail1           head1      n-1
-             */
-            if(tail1 > head2) delta += tail1 - head2;
-            if(tail2 > head1) delta += tail2 - head1;
-        }
-    }
-    else
-    {
-        if(tail2 > head2)
-        {
-            /*
-             0        tail1          head1       n-1
-             |----------|              |----------|
-             |              |-----------------|   |
-             0             head2            tail2
-             */
-            if(tail1 > head2) delta += tail1 - head2;
-            if(tail2 > head1) delta += tail2 - head1;
-            //return head1 < tail2 || tail1 >= head2;
-        }
-        else
-        {
-            /*
-             |-------------|              |-------|
-             |----------|              |----------|
-             */
-            delta += tail1 > tail2 ? tail2 : tail1;
-            delta += head1 > head2 ? n - head1 : n - head2;
-        }
-    }
-    
-    return delta;
-}
-
-inline void _strip(FrameHeader* frame, int head1, int tail1, int head2, int tail2, int n)
-{
-    int length1 = head1 < tail1 ? tail1 - head1 : n - head1 + tail1;
-    int length2 = head2 < tail2 ? tail2 - head2 : n - head2 + tail2;
-    
-    if(tail1 == head1)
-    {
-        /*
-         |--------------------|-------------------|
-         0                head1/tail1             n-1
-         */
-        frame->length = 0;
-        //no need to do anything else, frame will be deleted anyway
-    }
-    else if(tail2 == head2)
-    {
-        frame->length -= length1;
-        frame->head = tail1;
-        /*
-                --------
-         -----------------|--------
-         */
-    }
-    else if(tail1 > head1)
-    {
-        if(tail2 > head2)
-        {
-            /*
-             0      head1             tail1     n-1
-             |        |-----------------|         |
-             |    |-----------------|             |
-             0   head2             tail2        n-1
-             */
-            
-            //char *x = a, *y =  b;
-            //return (x<=y && x+n>y) || (y<=x && y+n>x);
-            
-            //return head1 <= head2 && head1 + (tail1 - head1) > head2 || head2 >= head1 && head2 + (tail2 - head2) > head1;
-            int delta = length2 - (abs(head2 - head1) + abs(tail2 - tail2));
-            frame->length -= delta;
-            frame->head += delta;
-        }
-        else
-        {
-            /*
-             0       head1             tail1     n-1
-             |        |-----------------|         |
-             |----------|              |----------|
-             0        tail1           head1      n-1
-             */
-            if(tail1 > head2)
-            {
-                frame->length -= tail1 - head2;
-            }
-            if(tail2 > head1)
-            {
-                frame->length -= tail2 - head1;
-            }
-        }
-    }
-    else
-    {
-        if(tail2 > head2)
-        {
-            /*
-             0        tail1          head1       n-1
-             |----------|              |----------|
-             |              |-----------------|   |
-             0             head2            tail2
-             */
-            if(tail1 > head2)
-            {
-                frame->length -= tail1 - head2;
-                frame->head = tail1;
-            }
-            if(tail2 > head1)
-            {
-                frame->length -= tail2 - head1;
-            }
-            //return head1 < tail2 || tail1 >= head2;
-        }
-        else
-        {
-            /*
-             |-------------|              |-------|
-             |             --|          |-        | THIS CANNOT BE ALLOWED TO HAPPEN!!!!!!
-             */
-            if(tail1 > tail2)
-            {
-                frame->length -= tail2;
-            }
-            else
-            {
-                frame->length -= tail1;
-            }
-            if(head1 > head2)
-            {
-                frame->length -= head2;
-            }
-            else
-            {
-                frame->length -= head1;
-            }
-            frame->length -= tail1 > tail2 ? tail2 : tail1;
-            frame->length -= head1 > head2 ? n - head1 : n - head2;
-        }
-    }
+//#if DEBUG
+//    if(FrameRingBuffer_Warn(stride, x) > 1)
+//    {
+//        bool legit = FrameRingBuffer_Validate(x);
+//        if(!legit)
+//        {
+//            printv("hold on..\n");
+//        }
+//    }
+//#endif
 }
 
 FrameRingBuffer* FrameRingBuffer_New(int n)
@@ -386,6 +141,7 @@ void FrameRingBuffer_Free(FrameRingBuffer *x)
     _free(x);
 }
 
+/* This is efficient as long as n is reasonably large, e.g. writing buffers of 256 samples. */
 void FrameRingBuffer_Write(float* src, int n, float stride, FrameRingBuffer *x)
 {
     ///Clamp n
@@ -409,118 +165,6 @@ void FrameRingBuffer_Write(float* src, int n, float stride, FrameRingBuffer *x)
         x->ptr = (x->ptr + n2) % x->n;
     }
 }
-
-/* This is efficient as long as n is reasonably large, e.g. writing buffers of 512 samples. */
-/*void FrameRingBuffer_Write(float* src, int n, float stride, FrameRingBuffer *x)
-{
-    ///Clamp n
-    if(n > x->n)
-    {
-        src = src + (n - x->n);
-        n = x->n;
-    }
-    
-    int head, tail;
-    
-    /// Write new header or modify previous header
-    FrameHeader *header = &(x->headers.back());
-    if(header->stride == stride)
-    {
-        ///Previous frame has same stride, can modify
-        header->length += n;
-        if(header->length > x->n)
-            header->length = x->n;
-        head = header->head;
-        tail = (head + header->length) % x->n;
-    }
-    else
-    {
-        header = &(x->headers[0]);
-        if(header->stride == stride)
-        {
-            ///Next frame has same stride, can modify
-            header-> length += n;
-            if(header->length > x->n)
-                header->length = x->n;
-            header->head = x->ptr;
-            
-            head = header->head;
-            tail = (head + header->length) % x->n;
-            
-            //quick hack to ensure the frame that is written to is at the end of the vector
-            std::rotate(x->headers.begin(), x->headers.begin()+1, x->headers.end());
-        }
-        else
-        {
-            ///Have to insert new frame with new stride
-            FrameHeader newHeader;
-            newHeader.length = n;
-            newHeader.stride = stride;
-            newHeader.head = x->ptr;
-            x->headers.push_back(newHeader);
-            header = &x->headers.back();
-            
-            head = newHeader.head;
-            tail = (head + newHeader.length) % x->n;
-        }
-    }
-    
-    ///Delete/modify existing headers
-    int delta, frameStart, frameLength;
-    while(x->headers.size() > 1) // > 1 bc at this point at least the header we modified / added must stay in the vector.
-    {
-        header = &x->headers[0];
-        frameStart = header->head;
-        frameLength = header->length;
-        
-        ///
-        ///    |----------|                  |--------------------------------|
-        ///    0        tail2              x->ptr                           tail1
-        ///
-        /// ----: samples that will be overwritten
-        delta = _delta(head, tail, frameStart, (frameStart + frameLength) % x->n, x->n);
-        if(delta >= header->length)
-        {
-            x->headers.erase(x->headers.begin());
-        }
-        else if(delta > 0)
-        {
-            
- /// It seems there are cases that are not considered:
- ///            1. both tail and head of an existing frame have to be shifted
- ///               2. the new frame is completely contained within an existing frame, so the existing frame becomes now 2 frames (one before and one after the new frame)
-             
- ///           This breaks in the following condition:
- ///           -------------------|-------------
- ///                            -----
- ///           (head2 is between head1 and tail1)
- ///           delta is correct but just shifting the framestart is not correct, have to -= tail as well as += head...
-             
- ///            case: n is 5, ptr is 18, frameStart 20, frameLength 32.
- ///            delta is correctly calculated as 5.
- ///            but
-            header->head += delta;
-            header->head %= x->n;
-            header->length -= delta;
-            break;
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    /// Copy data to buffer
-    int n1 = _min( x->n - x->ptr, n);
-    memcpy(x->data + x->ptr, src, n1*sizeof(float));
-    x->ptr = (x->ptr + n1) % x->n;
-    if(n1 < n)
-    {
-        int n2 = n - n1;
-        memcpy(x->data, src + n1, n2*sizeof(float));
-        x->ptr = (x->ptr + n2) % x->n;
-    }
-}*/
 
 void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRingBuffer *x)
 {
@@ -594,41 +238,35 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
         if(fPtr >= x->n)
             fPtr -= x->n;
         ptr = (int)(fPtr + 0.5f) % x->n;
-        printv("copying: %f\n", x->data[ptr]);
+        //printv("copying: %f\n", x->data[ptr]);
         dest[i] = x->data[ptr];
         
         //we need to advance vStride samples to be able to copy the next sample.
         samplesNeeded = vStride;
-        
-        /*ptr = (int)(fPtr + 0.5f) % x->n;
-        
-        //TODO: This is not correct. if we stride into a new frame, then the part of the stride that leaps into the new frame is not correct in case header->frameStride != previous header->frameStride...
-        while(ptr >= header->frameStart + header->frameLength)
-        {
-            headerIndex++;
-            header = &(x->headers[headerIndex]);
-            vStride = stride / header->frameStride;
-        }
-        dest[i] = x->data[ptr];
-        fPtr += vStride;*/
-        
-        
-        
-        /*leaking = fPtr - (header->frameStart + header->frameLength);
-        while(leaking > 0)
-        {
-            headerIndex++;
-            header = &(x->headers[headerIndex]);
-            fPtr -= leaking;
-            fPtr += leaking * (vStride / header->frameStride);
-            vStride = stride / header->frameStride;
-            leaking = fPtr - (header->frameStart + header->frameLength);
-        }
-
-        ptr = (int)(fPtr + 0.5f) % x->n;
-        dest[i] = x->data[ptr];
-        fPtr += vStride;*/
     }
+}
+
+void FrameRingBuffer_Clear(FrameRingBuffer *x)
+{
+    _fZero(x->data, x->n);
+    x->headers.clear();
+    FrameHeader h;
+    h.length = x->n;
+    h.head = 0;
+    h.stride = 1;
+    x->headers.emplace_back(h);
+    x->ptr = 0;
+}
+
+int FrameRingBuffer_Warn(float stride, FrameRingBuffer *x)
+{
+    int count = 0;
+    for(int i = 0; i < x->headers.size(); i++)
+    {
+        if(x->headers[i].stride == stride)
+            count++;
+    }
+    return count;
 }
 
 bool FrameRingBuffer_Validate(FrameRingBuffer *x)
@@ -638,7 +276,11 @@ bool FrameRingBuffer_Validate(FrameRingBuffer *x)
     int numSmpls = 0;
     for(int i = 0; i < x->headers.size(); i++)
         numSmpls += x->headers[i].length;
-    assert(numSmpls == x->n);
+    if(numSmpls != x->n)
+    {
+        printv("VALIDATION FAILED: the buffer contains %d samples, but the headers sum up to %d samples: \n", x->n, numSmpls);
+        legit = false;
+    }
     
     int adjacentFramesWithSameStride = 0;
     if(x->headers.size() > 1)
@@ -652,7 +294,12 @@ bool FrameRingBuffer_Validate(FrameRingBuffer *x)
         }
     }
 
-    assert(adjacentFramesWithSameStride == 0);
+    //assert(adjacentFramesWithSameStride == 0);
+    if(adjacentFramesWithSameStride != 0)
+    {
+        printv("VALIDATION FAILED: the buffer contains %d adjacent frames with same stride: \n", adjacentFramesWithSameStride);
+        legit = false;
+    }
     
     int corruptCounds = 0;
     for(int i = 0; i < x->headers.size() - 1; i++)
@@ -662,7 +309,15 @@ bool FrameRingBuffer_Validate(FrameRingBuffer *x)
         if(tail > nextHead)
             corruptCounds++;
     }
-    assert(corruptCounds == 0);
+    if(corruptCounds != 0)
+    {
+        printv("VALIDATION FAILED: the buffer contains %d corrupt bounds: \n", corruptCounds);
+        legit = false;
+    }
+        
+    
+    //if(!legit)
+        FrameRingBuffer_Print(x);
         
     return legit;
 }
