@@ -75,9 +75,9 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
+  isNotched: 0
+  notchSteps: 4
   controllerRot: 0
-  notched: 0
-  steps: 4
 --- !u!1 &1000010222783446
 GameObject:
   m_ObjectHideFlags: 0
@@ -1419,7 +1419,7 @@ MonoBehaviour:
   beatSlider: {fileID: 114000012190995366}
   controlInput: {fileID: 114000010336139522}
   playButton: {fileID: 114000010763487664}
-  rangeSwitcher: {fileID: 0}
+  rangeSwitcher: {fileID: 5121695292029034116}
   dimensionDisplays:
   - {fileID: 102000013518395380}
   - {fileID: 102000013255618616}
@@ -3257,7 +3257,7 @@ MonoBehaviour:
   canBeDeleted: 0
   onLabel: {fileID: 8953582735279091453}
   offLabel: {fileID: 1152803307485891241}
-  switchVal: 0
+  switchVal: 1
   switchObject: {fileID: 1683251403833520661}
   glowTrans: {fileID: 6987434748709864327}
   redOption: 1
