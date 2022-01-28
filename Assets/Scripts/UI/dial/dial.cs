@@ -14,22 +14,18 @@
 
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class dial : manipObject {
 
   public float percent = 0f;
-
   float defaultPercent; 
 
-  glowDisk dialFeedback;
-  Material[] mats;
-
-  public Color customColor;
-
-  public bool externalHue = false;
-  public float hue = .5f;
+  public enum dialColors {yellow, red, blue};
+  public dialColors dialColor = dialColors.yellow; // dropdown, defaulting to white
 
   GameObject littleDisk;
+  glowDisk dialFeedback;
 
   public float deltaRot = 0;
   public float curRot = 0;
@@ -41,62 +37,29 @@ public class dial : manipObject {
   public int notchSteps = 4;
 
   public override void Awake() {
-    base.Awake();
-
+    base.Awake();    
+    
     // store the first value on Awake and keep it as default
     defaultPercent = percent;
 
     littleDisk = transform.Find("littleDisk").gameObject;
-
-    mats = new Material[3];
-    mats[0] = littleDisk.GetComponent<Renderer>().material;
-    mats[1] = transform.parent.Find("glowDisk").GetComponent<Renderer>().material;
-    mats[2] = transform.parent.Find("Label").GetComponent<Renderer>().material;
-
-    customColor = Color.HSVToRGB(hue, 1f, 0.4f);
-
-    setGlowState(manipState.none);
-
     dialFeedback = transform.parent.Find("glowDisk").GetComponent<glowDisk>();
+
+    setMaterials(dialColor);
+    //setGlowState(manipState.none); // no glow variant to save draw calls
+
   }
 
-  void setGlowState(manipState s) {
-    Color c = customColor;
+  void setMaterials(dialColors colorVariant){
+    
+    string str = Enum.GetName(typeof(dialColors), colorVariant); // gets the string name of the enum
 
-    switch (s) {
-      case manipState.none:
-        littleDisk.SetActive(false);
-
-        for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", .5f);
-          mats[i].SetColor("_TintColor", c);
-        }
-        break;
-      case manipState.selected:
-        littleDisk.SetActive(true);
-        for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", 0.5f);
-          mats[i].SetColor("_TintColor", c);
-        }
-        break;
-      case manipState.grabbed:
-        littleDisk.SetActive(true);
-
-        for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", 0.5f);
-          mats[i].SetColor("_TintColor", c);
-        }
-        break;
-      default:
-        break;
-    }
+    // Please note: setting a material using .material does not immediately instantiate a copy of that material - only if its properties are accessed!
+    // Using sharedMaterial here, but the shader has alpha and therefore cannot be fully batched.
+    littleDisk.GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "LittleDisk");
+    transform.parent.Find("glowDisk").GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "GlowDisk");
+    //transform.parent.Find("Label").GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "Label");
   }
-
-
-  void updateMatsColor(Color c) {
-    foreach (Material m in mats) m.SetColor("_TintColor", c);
-  }
-
 
 
   void Start() {
@@ -141,7 +104,7 @@ public class dial : manipObject {
   // begin grab, this sets the entry rotation via deltaRot
   public override void setState(manipState state) {
     curState = state;
-    setGlowState(state);
+    //setGlowState(state);
 
     if (curState == manipState.grabbed) {
       turnCount = 0;
@@ -246,3 +209,5 @@ public class dial : manipObject {
     yield return null;
   }
 }
+
+

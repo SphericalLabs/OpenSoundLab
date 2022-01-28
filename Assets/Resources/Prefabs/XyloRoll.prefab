@@ -1189,7 +1189,7 @@ MonoBehaviour:
   switchVal: 3
   notchCount: 7
   labelHolder: {fileID: 4876749961810154}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1610294463474676}
@@ -2695,7 +2695,7 @@ MonoBehaviour:
   switchVal: 0
   notchCount: 17
   labelHolder: {fileID: 4595958427884446}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1772154838658544}
@@ -7516,7 +7516,7 @@ MonoBehaviour:
   switchVal: 3
   notchCount: 7
   labelHolder: {fileID: 4082404674105882}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1101944793732344}
@@ -8332,9 +8332,15 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0.5
+  dialColor: 2
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  isNotched: 0
+  notchSteps: 4
+  controllerRot: 0
 --- !u!1 &1418883701491334
 GameObject:
   m_ObjectHideFlags: 0
@@ -11021,7 +11027,7 @@ MonoBehaviour:
   switchVal: 2
   notchCount: 5
   labelHolder: {fileID: 4778491685139160}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1002484162341994}
@@ -11949,9 +11955,15 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.495
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0.5
+  dialColor: 1
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  isNotched: 0
+  notchSteps: 4
+  controllerRot: 0
 --- !u!1 &1562188261907970
 GameObject:
   m_ObjectHideFlags: 0
@@ -17397,7 +17409,7 @@ MonoBehaviour:
   switchVal: 0
   notchCount: 5
   labelHolder: {fileID: 4421707739096700}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1485182228625182}
@@ -18392,9 +18404,15 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.505
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0.5
+  dialColor: 1
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  isNotched: 0
+  notchSteps: 4
+  controllerRot: 0
 --- !u!1 &1874690567598494
 GameObject:
   m_ObjectHideFlags: 0
@@ -18576,9 +18594,15 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0.5
+  dialColor: 2
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  isNotched: 0
+  notchSteps: 4
+  controllerRot: 0
 --- !u!1 &1887341488726168
 GameObject:
   m_ObjectHideFlags: 0
