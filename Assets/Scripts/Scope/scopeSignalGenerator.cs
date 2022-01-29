@@ -20,7 +20,10 @@ public class scopeSignalGenerator : signalGenerator
 {
 
   public signalGenerator incoming;
-  float[] bufferCopy;
+  float[] bufferCopy; // for FFT
+  waveViz displayOsc; // for OSC
+  spectrumDisplay displayFft;
+  
 
   [DllImport("SoundStageNative")]
   public static extern void CopyArray(float[] a, float[] b, int length);
@@ -31,6 +34,9 @@ public class scopeSignalGenerator : signalGenerator
   public override void Awake()
   {
     base.Awake();
+    displayOsc = GetComponentInChildren<waveViz>();
+    displayFft = GetComponentInChildren<spectrumDisplay>();
+
     bufferCopy = new float[MAX_BUFFER_LENGTH];
   }
 
@@ -58,6 +64,7 @@ public class scopeSignalGenerator : signalGenerator
       incoming.processBuffer(buffer, dspTime, channels);
     }
 
-    CopyArray(buffer, bufferCopy, buffer.Length); // copy over for FFT
+    /*if(displayFft.gameObject.activeSelf) */CopyArray(buffer, bufferCopy, buffer.Length); // copy over for FFT
+    /*if(displayOsc.gameObject.activeSelf) */displayOsc.storeBuffer(buffer); // copy over for OSC
   }
 }

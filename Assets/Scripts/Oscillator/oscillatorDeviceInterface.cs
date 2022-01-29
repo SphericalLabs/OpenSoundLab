@@ -18,144 +18,146 @@ using System.Collections;
 public class oscillatorDeviceInterface : deviceInterface
 {
 
-    public int ID = -1;
-    bool active = false;
-    bool lfo = false;
+  public int ID = -1;
+  bool active = false;
+  bool lfo = false;
 
-    // interfaces
-    public basicSwitch lfoSwitch;
-    public dial freqDial, ampDial;
-    public waveViz viz;
-    public omniJack signalOutput, freqExpInput, freqLinInput, ampInput, syncInput, pwmInput;
-    public sliderNotched waveSlider;
-    public AudioSource speaker;
+  // interfaces
+  public basicSwitch lfoSwitch;
+  public dial freqDial, ampDial;
+  public waveViz viz;
+  public omniJack signalOutput, freqExpInput, freqLinInput, ampInput, syncInput, pwmInput;
+  public sliderNotched waveSlider;
+  public AudioSource speaker;
 
-    // current values
-    float freqPercent, ampPercent, wavePercent;
+  // current values
+  float freqPercent, ampPercent, wavePercent;
 
-    oscillatorSignalGenerator signal;
+  oscillatorSignalGenerator signal;
+  int bufferSize;
 
-    Color lfoWaveColor = new Color(133 / 255f, 240 / 255f, 125 / 255f);
-    Color oscWaveColor = new Color(125 / 255f, 154 / 255f, 240 / 255f);
+  public override void Awake()
+  {
+    base.Awake();
+    AudioConfiguration configuration = AudioSettings.GetConfiguration();
+    bufferSize = configuration.dspBufferSize;
 
-    public override void Awake()
+    signal = GetComponent<oscillatorSignalGenerator>();
+    active = true;
+    viz.period = lfo ? 1 : bufferSize;
+
+    UpdateLFO();
+    UpdateAmp();
+    UpdateWave();
+  }
+
+  void Update()
+  {
+    if (!active) return;
+
+    // update changed inputs
+    if (lfo != !lfoSwitch.switchVal) UpdateLFO();
+    if (freqPercent != freqDial.percent) UpdateFreq();
+    if (ampPercent != ampDial.percent) UpdateAmp();
+    if (wavePercent != waveSlider.percent) UpdateWave();
+
+    // update inputs
+    if (signal.freqExpGen != freqExpInput.signal) signal.freqExpGen = freqExpInput.signal;
+    if (signal.freqLinGen != freqLinInput.signal) signal.freqLinGen = freqLinInput.signal;
+    if (signal.ampGen != ampInput.signal) signal.ampGen = ampInput.signal;
+    if (signal.syncGen != syncInput.signal) signal.syncGen = syncInput.signal;
+    if (signal.pwmGen != pwmInput.signal) signal.pwmGen = pwmInput.signal;
+  }
+
+  void UpdateLFO()
+  {
+    lfo = !lfoSwitch.switchVal;
+    viz.period = lfo ? 1 : bufferSize;
+
+    signal.lfo = lfo;
+    UpdateFreq();
+    speaker.volume = lfo ? 0f : 1f;
+  }
+
+  void UpdateFreq()
+  {
+    freqPercent = freqDial.percent;
+    if (lfo)
     {
-        base.Awake();
-        signal = GetComponent<oscillatorSignalGenerator>();
-        active = true;
-        viz.period = lfo ? 512 : 1;
-        //viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
-
-        UpdateLFO();
-        UpdateAmp();
-        UpdateWave();
+      signal.frequency = 2f * Mathf.Pow(2, Utils.map(freqPercent, 0f, 1f, -8f, 8f)); // 2Hz base, 16 octaves range
     }
-
-    void Update()
+    else
     {
-        if (!active) return;
-
-        // update changed inputs
-        if (lfo != !lfoSwitch.switchVal) UpdateLFO();
-        if (freqPercent != freqDial.percent) UpdateFreq();
-        if (ampPercent != ampDial.percent) UpdateAmp();
-        if (wavePercent != waveSlider.percent) UpdateWave();
-
-        // update inputs
-        if (signal.freqExpGen != freqExpInput.signal) signal.freqExpGen = freqExpInput.signal;
-        if (signal.freqLinGen != freqLinInput.signal) signal.freqLinGen = freqLinInput.signal;
-        if (signal.ampGen != ampInput.signal) signal.ampGen = ampInput.signal;
-        if (signal.syncGen != syncInput.signal) signal.syncGen = syncInput.signal;
-        if (signal.pwmGen != pwmInput.signal) signal.pwmGen = pwmInput.signal;
+      signal.frequency = 261.6256f * Mathf.Pow(2, Utils.map(freqPercent, 0f, 1f, -4f, 4f)); // C4, 8 octaves range
     }
+    // though this would make viz more adaptive, but it shows garbage.
+    //viz.period = Mathf.RoundToInt(Utils.map(signal.frequency, 0f, 10000f, 1f, bufferSize));
+  }
 
-    void UpdateLFO()
-    {
-        lfo = !lfoSwitch.switchVal;
-        viz.period = lfo ? 512 : 1;
-        //viz.waveLine = lfo ? lfoWaveColor : oscWaveColor;
-        signal.lfo = lfo;
-        UpdateFreq();
-        speaker.volume = lfo ? 0f : 1f;
-    }
+  void UpdateAmp()
+  {
+    ampPercent = ampDial.percent;
+    signal.amplitude = ampPercent * ampPercent;
+  }
 
-    void UpdateFreq()
-    {
-        freqPercent = freqDial.percent;
-        if (lfo)
-        {
-            signal.frequency = 2f * Mathf.Pow(2, Utils.map(freqPercent, 0f, 1f, -8f, 8f)); // 2Hz base, 16 octaves range
-        }
-        else
-        {
-            signal.frequency = 261.6256f * Mathf.Pow(2, Utils.map(freqPercent, 0f, 1f, -4f, 4f)); // C4, 8 octaves range
-        }
-    }
+  void UpdateWave()
+  {
+    wavePercent = waveSlider.percent;
+    signal.analogWave = waveSlider.percent;
+  }
 
-    void UpdateAmp()
-    {
-        ampPercent = ampDial.percent;
-        signal.amplitude = ampPercent * ampPercent;
-    }
+  public override InstrumentData GetData()
+  {
+    OscillatorData data = new OscillatorData();
+    data.deviceType = menuItem.deviceType.Oscillator;
+    GetTransformData(data);
 
-    void UpdateWave()
-    {
-        wavePercent = waveSlider.percent;
-        signal.analogWave = waveSlider.percent;
-    }
+    data.lfo = lfo;
+    data.amp = ampPercent;
+    data.freq = freqPercent;
+    data.wave = wavePercent;
 
-    public override InstrumentData GetData()
-    {
-        OscillatorData data = new OscillatorData();
-        data.deviceType = menuItem.deviceType.Oscillator;
-        GetTransformData(data);
+    data.jackOutID = signalOutput.transform.GetInstanceID();
+    data.jackInAmpID = ampInput.transform.GetInstanceID();
+    data.jackInFreqExpID = freqExpInput.transform.GetInstanceID();
+    data.jackInFreqLinID = freqLinInput.transform.GetInstanceID();
+    data.jackInSyncID = syncInput.transform.GetInstanceID();
+    data.jackInPwmID = pwmInput.transform.GetInstanceID();
 
-        data.lfo = lfo;
-        data.amp = ampPercent;
-        data.freq = freqPercent;
-        data.wave = wavePercent;
+    return data;
+  }
 
-        data.jackOutID = signalOutput.transform.GetInstanceID();
-        data.jackInAmpID = ampInput.transform.GetInstanceID();
-        data.jackInFreqExpID = freqExpInput.transform.GetInstanceID();
-        data.jackInFreqLinID = freqLinInput.transform.GetInstanceID();
-        data.jackInSyncID = syncInput.transform.GetInstanceID();
-        data.jackInPwmID = pwmInput.transform.GetInstanceID();
+  public override void Load(InstrumentData d)
+  {
+    OscillatorData data = d as OscillatorData;
+    base.Load(data);
 
-        return data;
-    }
+    freqDial.setPercent(data.freq);
+    ampDial.setPercent(data.amp);
+    waveSlider.setVal(Mathf.RoundToInt(data.wave * 3));
+    lfoSwitch.setSwitch(!data.lfo);
 
-    public override void Load(InstrumentData d)
-    {
-        OscillatorData data = d as OscillatorData;
-        base.Load(data);
-
-        freqDial.setPercent(data.freq);
-        ampDial.setPercent(data.amp);
-        waveSlider.setVal(Mathf.RoundToInt(data.wave*3));
-        lfoSwitch.setSwitch(!data.lfo);
-
-        ID = data.ID;
-        signalOutput.ID = data.jackOutID;
-        ampInput.ID = data.jackInAmpID;
-        freqExpInput.ID = data.jackInFreqExpID;
-        freqLinInput.ID = data.jackInFreqLinID;
-        syncInput.ID = data.jackInSyncID;
-        pwmInput.ID = data.jackInPwmID;
-    }
+    ID = data.ID;
+    signalOutput.ID = data.jackOutID;
+    ampInput.ID = data.jackInAmpID;
+    freqExpInput.ID = data.jackInFreqExpID;
+    freqLinInput.ID = data.jackInFreqLinID;
+    syncInput.ID = data.jackInSyncID;
+    pwmInput.ID = data.jackInPwmID;
+  }
 }
 
 public class OscillatorData : InstrumentData
 {
-    public float amp;
-    public float freq;
-    public bool lfo;
-    public float wave;
-    public int jackOutID;
-    public int jackInAmpID;
-    public int jackInFreqExpID;
-    public int jackInFreqLinID;
-    public int jackInSyncID;
-    public int jackInPwmID;
+  public float amp;
+  public float freq;
+  public bool lfo;
+  public float wave;
+  public int jackOutID;
+  public int jackInAmpID;
+  public int jackInFreqExpID;
+  public int jackInFreqLinID;
+  public int jackInSyncID;
+  public int jackInPwmID;
 }
 

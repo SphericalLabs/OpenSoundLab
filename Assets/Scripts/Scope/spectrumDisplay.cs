@@ -23,8 +23,8 @@ public class spectrumDisplay : MonoBehaviour
   public FFTWindow fftWin = FFTWindow.BlackmanHarris;
   float[] spectrum;
 
-  int width = 256 * 4;
-  int height = 256 * 2;
+  public int width = 256 * 4;
+  public int height = 256 * 2;
   int fftBins = 1024 * 2;
 
   RenderTexture offlineTexture;

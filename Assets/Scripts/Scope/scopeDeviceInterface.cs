@@ -20,22 +20,47 @@ public class scopeDeviceInterface : deviceInterface {
   int ID = 0;
   public omniJack input, output;
 
-  spectrumDisplay spectrum;
-  scopeSignalGenerator scope;
+  spectrumDisplay displayFft;
+  waveViz displayOsc;
 
+  scopeSignalGenerator scopeSignal;
+
+  public dial periodDial;
+  public basicSwitch modeSelector;
+
+  public int bufferSize;
 
   public override void Awake() {
     base.Awake();
-    spectrum = GetComponentInChildren<spectrumDisplay>();
-    scope = GetComponentInChildren<scopeSignalGenerator>();
+    displayFft = GetComponentInChildren<spectrumDisplay>();
+    displayOsc = GetComponentInChildren<waveViz>();
+    scopeSignal = GetComponentInChildren<scopeSignalGenerator>();
+
+    AudioConfiguration configuration = AudioSettings.GetConfiguration();
+    bufferSize = configuration.dspBufferSize;
+
+    //displayOsc.period = bufferSize;
+
   }
 
   void Update()
   {
-    if (scope.incoming != input.signal)
+    if(displayFft.gameObject.activeSelf != modeSelector.switchVal)
     {
-      scope.incoming = input.signal;
-      spectrum.toggleActive(scope.incoming != null);
+      displayFft.gameObject.SetActive(modeSelector.switchVal);
+    }
+    if (displayOsc.gameObject.activeSelf == modeSelector.switchVal)
+    {
+      displayOsc.gameObject.SetActive(!modeSelector.switchVal);
+    }
+
+    //displayOsc.period = Mathf.RoundToInt(Utils.map(periodDial.percent, 0f, 1f, 1, bufferSize));
+    displayOsc.period = Mathf.RoundToInt(Utils.map(Mathf.Pow(periodDial.percent, 5f), 0f, 1f, 1, displayOsc.waveWidth)); // todo: discuss with Hannes
+
+    if (scopeSignal.incoming != input.signal)
+    {
+      scopeSignal.incoming = input.signal;
+      displayFft.toggleActive(scopeSignal.incoming != null);
     }
   }
 

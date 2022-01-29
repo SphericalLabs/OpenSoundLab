@@ -72,7 +72,6 @@ public class oscillatorSignalGenerator : signalGenerator
 
 
     // wave viz if there
-    //if (viz != null) viz.UpdateViz(buffer);
     if (viz != null) viz.storeBuffer(buffer);
 
     // memory for next go around
