@@ -21,8 +21,8 @@ public class dial : manipObject {
   public float percent = 0f;
   float defaultPercent; 
 
-  public enum dialColors {yellow, red, blue};
-  public dialColors dialColor = dialColors.yellow; // dropdown, defaulting to white
+  public enum dialColors {generic, frequency, amplitude};
+  public dialColors dialColor = dialColors.generic; // dropdown, defaulting to white
 
   GameObject littleDisk;
   glowDisk dialFeedback;
@@ -58,7 +58,7 @@ public class dial : manipObject {
     // Using sharedMaterial here, but the shader has alpha and therefore cannot be fully batched.
     littleDisk.GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "LittleDisk");
     transform.parent.Find("glowDisk").GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "GlowDisk");
-    //transform.parent.Find("Label").GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "Label");
+
   }
 
 
