@@ -143,31 +143,31 @@ public class waveViz : MonoBehaviour
   void RenderGLToTexture(int width, int height, Material material)
   {
 
-    int n = renderBuffer.Length - 1;
+    int n = 0;
 
     if (doTriggering)
     {
 
-      RingBuffer_Read(fullBuffer, fullBuffer.Length, 0, ringBufferPtr); // first scan on data, TODO: avoid this, move trigger code to RingBuffer
-      lastWasPositive = fullBuffer[n] >= 0f; // take first sample
+      RingBuffer_Read(fullBuffer, fullBuffer.Length, 0, ringBufferPtr); // first scan on data, TODO: move trigger code to RingBuffer
+      lastWasPositive = fullBuffer[fullBuffer.Length - 1 - n] >= 0f; // take first sample
       foundZeroCrossing = false;
-      n--;
+      n++;
 
-      while (n >= 0)
+      while (n < fullBuffer.Length - renderBuffer.Length)
       { // search for first 0-pass from right and then take as offset
-        if ((fullBuffer[n] > 0f && !lastWasPositive) /*|| (renderBuffer[n] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
+        if ((fullBuffer[fullBuffer.Length - 1 - n] > 0f && !lastWasPositive) /*|| (renderBuffer[n] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
         {
           foundZeroCrossing = true;
           break;
         }
-        lastWasPositive = fullBuffer[n] >= 0f;
-        n--;
+        lastWasPositive = fullBuffer[fullBuffer.Length - 1 - n] >= 0f;
+        n++;
       }
+      
       if (!foundZeroCrossing) return; // no new draw if nothing found
 
-      // works, but doesnt make sense. triggers on falling slope. in which direction is offset offsetting? is the buffer read from left or right?
-      RingBuffer_Read(renderBuffer, renderBuffer.Length, n - fullBuffer.Length - 1, ringBufferPtr);
-      //Array.Copy(fullBuffer, fullBuffer.Length - 1 - renderBuffer.Length - n - renderBuffer.Length, renderBuffer, 0, renderBuffer.Length - 1);
+      Array.Copy(fullBuffer, fullBuffer.Length - 1 - renderBuffer.Length - n, renderBuffer, 0, renderBuffer.Length);
+
     } else {
       RingBuffer_Read(renderBuffer, renderBuffer.Length, 0, ringBufferPtr);
     }
