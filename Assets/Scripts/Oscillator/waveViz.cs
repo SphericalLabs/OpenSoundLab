@@ -19,7 +19,8 @@ using System.Runtime.InteropServices;
 
 
 
-public class waveViz : MonoBehaviour {
+public class waveViz : MonoBehaviour
+{
 
   public Renderer displayRenderer;
 
@@ -32,9 +33,11 @@ public class waveViz : MonoBehaviour {
   public int waveWidth = 256;
   public int waveHeight = 64;
   public int sampleStep = 512; // should not be higher than buffer size, otherwise looped data?
-  
+  public bool doTriggering = false;
+
   FilterMode fm = FilterMode.Bilinear;
   int ani = 4;
+  public int offset = 0;
 
   IntPtr ringBufferPtr;
 
@@ -43,11 +46,11 @@ public class waveViz : MonoBehaviour {
   static extern void RingBuffer_Write(float[] src, int n, IntPtr x);
 
   ///Writes samples to the ringbuffer with a specified stride. If the stride is 1, all samples are written to the ringbuffer. If stride < 1, some samples are skipped. If stride > 1, some samples are written more than once (=padded)f. No interpolation is performed. Returns the difference between old and new writeptr.
-  [DllImport("SoundStageNative")] 
+  [DllImport("SoundStageNative")]
   static extern int RingBuffer_WritePadded(float[] src, int n, float stride, IntPtr x);
-  
+
   ///Reads n samples from the ring buffer
-  [DllImport("SoundStageNative")] 
+  [DllImport("SoundStageNative")]
   static extern void RingBuffer_Read(float[] dest, int n, int offset, IntPtr x);
 
   //Reads n samples with a specific stride
@@ -59,11 +62,11 @@ public class waveViz : MonoBehaviour {
 
   ///Resizes the buffer. This includes a memory re-allocation, so use with caution!
   //static extern void RingBuffer_Resize(int n, struct RingBuffer *x);
-  [DllImport("SoundStageNative")] 
+  [DllImport("SoundStageNative")]
   static extern IntPtr RingBuffer_New(int n);
 
   ///Frees all resources.
-  [DllImport("SoundStageNative")] 
+  [DllImport("SoundStageNative")]
   static extern void RingBuffer_Free(IntPtr x);
 
   [DllImport("SoundStageNative")]
@@ -74,11 +77,15 @@ public class waveViz : MonoBehaviour {
 
   float[] renderBuffer;
   float[] storageBuffer;
-  
-  void Awake() {
+  float[] fullBuffer;
 
-    ringBufferPtr = RingBuffer_New(waveWidth);
+  void Awake()
+  {
+
+    ringBufferPtr = RingBuffer_New(waveWidth * 4);
+    fullBuffer = new float[waveWidth*4];
     renderBuffer = new float[waveWidth];
+
     storageBuffer = new float[1];
 
     offlineMaterial = new Material(Shader.Find("GUI/Text Shader"));
@@ -87,7 +94,7 @@ public class waveViz : MonoBehaviour {
     // get a RenderTexture and set it as target for offline rendering
     offlineTexture = new RenderTexture(waveWidth, waveHeight, 24);
     offlineTexture.useMipMap = true;
-    
+
     // these are the ones that you will actually see
     onlineTexture = new Texture2D(waveWidth, waveHeight, TextureFormat.RGBA32, true);
     onlineMaterial = Instantiate(onlineMaterial);
@@ -99,15 +106,18 @@ public class waveViz : MonoBehaviour {
     if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
 
   }
-  
-  void Start() {
+
+  void Start()
+  {
     onlineMaterial.mainTexture = onlineTexture;
   }
-  
-  public void storeBuffer(float[] buffer, int channels){
+
+  public void storeBuffer(float[] buffer, int channels)
+  {
     if (storageBuffer.Length != buffer.Length / channels / sampleStep) System.Array.Resize(ref storageBuffer, buffer.Length / channels / sampleStep);
     int tempIndex;
-    for(int i = 0; i < storageBuffer.Length; i++){
+    for (int i = 0; i < storageBuffer.Length; i++)
+    {
       tempIndex = i * channels * sampleStep;
       if (tempIndex >= buffer.Length) break; // overshooting the buffer, finish
       storageBuffer[i] = buffer[tempIndex];
@@ -116,18 +126,53 @@ public class waveViz : MonoBehaviour {
     RingBuffer_Write(storageBuffer, storageBuffer.Length, ringBufferPtr);
   }
 
-  void Update() {
+  void Update()
+  {
 
-    if(displayRenderer.isVisible){ 
-      RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);      
+    if (displayRenderer.isVisible)
+    {
+      RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
     }
 
   }
 
+  bool lastWasPositive = false;
+  bool foundZeroCrossing = false;
+  
+
   void RenderGLToTexture(int width, int height, Material material)
   {
 
-    RingBuffer_Read(renderBuffer, renderBuffer.Length, 0, ringBufferPtr);
+    int n = renderBuffer.Length - 1;
+
+    if (doTriggering)
+    {
+
+      RingBuffer_Read(fullBuffer, fullBuffer.Length, 0, ringBufferPtr); // first scan on data, TODO: avoid this, move trigger code to RingBuffer
+      lastWasPositive = fullBuffer[n] >= 0f; // take first sample
+      foundZeroCrossing = false;
+      n--;
+
+      while (n >= 0)
+      { // search for first 0-pass from right and then take as offset
+        if ((fullBuffer[n] > 0f && !lastWasPositive) /*|| (renderBuffer[n] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
+        {
+          foundZeroCrossing = true;
+          break;
+        }
+        lastWasPositive = fullBuffer[n] >= 0f;
+        n--;
+      }
+      if (!foundZeroCrossing) return; // no new draw if nothing found
+
+      // works, but doesnt make sense. triggers on falling slope. in which direction is offset offsetting? is the buffer read from left or right?
+      RingBuffer_Read(renderBuffer, renderBuffer.Length, n - fullBuffer.Length - 1, ringBufferPtr);
+      //Array.Copy(fullBuffer, fullBuffer.Length - 1 - renderBuffer.Length - n - renderBuffer.Length, renderBuffer, 0, renderBuffer.Length - 1);
+    } else {
+      RingBuffer_Read(renderBuffer, renderBuffer.Length, 0, ringBufferPtr);
+    }
+
+    
 
     // always re-set offline render here, in case another script had its finger on it in the meantime
     RenderTexture.active = offlineTexture;
@@ -140,7 +185,8 @@ public class waveViz : MonoBehaviour {
     GL.Color(new Color(1, 1, 1, 1f));
     GL.Begin(GL.LINE_STRIP);
 
-    for(int i = 0; i < renderBuffer.Length; i++){
+    for (int i = 0; i < renderBuffer.Length; i++)
+    {
       GL.Vertex3(i, (1f - (renderBuffer[i] + 1f) * 0.5f) * height, 0); // 3px padding
     }
 
@@ -160,7 +206,7 @@ public class waveViz : MonoBehaviour {
       offlineTexture.Release();
       Destroy(offlineTexture);
     }
-    
+
     RingBuffer_Free(ringBufferPtr);
   }
 

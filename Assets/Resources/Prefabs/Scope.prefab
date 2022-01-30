@@ -2418,6 +2418,7 @@ MonoBehaviour:
   waveWidth: 1024
   waveHeight: 512
   sampleStep: 512
+  doTriggering: 1
 --- !u!1 &8135534423989162767
 GameObject:
   m_ObjectHideFlags: 0
