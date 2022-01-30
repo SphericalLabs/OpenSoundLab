@@ -29,6 +29,7 @@ public class scopeDeviceInterface : deviceInterface {
   public basicSwitch modeSelector;
 
   public int bufferSize;
+  float lastPeriodDialPercent = 0f;
 
   public override void Awake() {
     base.Awake();
@@ -38,8 +39,10 @@ public class scopeDeviceInterface : deviceInterface {
 
     AudioConfiguration configuration = AudioSettings.GetConfiguration();
     bufferSize = configuration.dspBufferSize;
+    periodDial.notchSteps = Mathf.RoundToInt(Mathf.Log(bufferSize, 2) + 1);
 
-    //displayOsc.period = bufferSize;
+    displayOsc.sampleStep = calcSampleStep(periodDial.percent); // first init
+
 
   }
 
@@ -54,8 +57,10 @@ public class scopeDeviceInterface : deviceInterface {
       displayOsc.gameObject.SetActive(!modeSelector.switchVal);
     }
 
-    //displayOsc.period = Mathf.RoundToInt(Utils.map(periodDial.percent, 0f, 1f, 1, bufferSize));
-    displayOsc.period = Mathf.RoundToInt(Utils.map(Mathf.Pow(periodDial.percent, 5f), 0f, 1f, 1, displayOsc.waveWidth)); // todo: discuss with Hannes
+    if (periodDial.percent != lastPeriodDialPercent) {
+      displayOsc.sampleStep = calcSampleStep(periodDial.percent);
+      lastPeriodDialPercent = periodDial.percent;
+    }
 
     if (scopeSignal.incoming != input.signal)
     {
@@ -64,6 +69,9 @@ public class scopeDeviceInterface : deviceInterface {
     }
   }
 
+  int calcSampleStep(float val){
+    return Mathf.RoundToInt(Mathf.Pow(2, Mathf.Round(Utils.map(1-val, 0f, 1f, 0, Mathf.Log(bufferSize, 2))))); // 1 - 1024 in 2^ steps
+  }
     
   public override InstrumentData GetData() {
     ScopeData data = new ScopeData();

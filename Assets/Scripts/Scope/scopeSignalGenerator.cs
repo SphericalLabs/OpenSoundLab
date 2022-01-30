@@ -65,6 +65,6 @@ public class scopeSignalGenerator : signalGenerator
     }
 
     /*if(displayFft.gameObject.activeSelf) */CopyArray(buffer, bufferCopy, buffer.Length); // copy over for FFT
-    /*if(displayOsc.gameObject.activeSelf) */displayOsc.storeBuffer(buffer); // copy over for OSC
+    /*if(displayOsc.gameObject.activeSelf) */displayOsc.storeBuffer(buffer, channels); // copy over for OSC
   }
 }

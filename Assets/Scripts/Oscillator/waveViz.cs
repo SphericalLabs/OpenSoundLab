@@ -31,7 +31,7 @@ public class waveViz : MonoBehaviour {
 
   public int waveWidth = 256;
   public int waveHeight = 64;
-  public int period = 512; // should not be higher than buffer size, otherwise looped data?
+  public int sampleStep = 512; // should not be higher than buffer size, otherwise looped data?
   
   FilterMode fm = FilterMode.Bilinear;
   int ani = 4;
@@ -66,13 +66,21 @@ public class waveViz : MonoBehaviour {
   [DllImport("SoundStageNative")] 
   static extern void RingBuffer_Free(IntPtr x);
 
+  [DllImport("SoundStageNative")]
+  static extern void _fDeinterleave(float[] src, float[] dest, int n, int channels);
+
+  [DllImport("SoundStageNative")]
+  static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
   float[] renderBuffer;
+  float[] storageBuffer;
   
   void Awake() {
 
     ringBufferPtr = RingBuffer_New(waveWidth);
     renderBuffer = new float[waveWidth];
-    
+    storageBuffer = new float[1];
+
     offlineMaterial = new Material(Shader.Find("GUI/Text Shader"));
     offlineMaterial.hideFlags = HideFlags.HideAndDontSave;
     offlineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
@@ -86,23 +94,32 @@ public class waveViz : MonoBehaviour {
     displayRenderer.material = onlineMaterial;
     onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), onlineTexture);
 
+    if (onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
+    if (onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
+    if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
+
   }
   
   void Start() {
     onlineMaterial.mainTexture = onlineTexture;
   }
   
-  public void storeBuffer(float[] buffer){
-    // this should be oversampled!
-    RingBuffer_Write(buffer, period, ringBufferPtr);
+  public void storeBuffer(float[] buffer, int channels){
+    if (storageBuffer.Length != buffer.Length / channels / sampleStep) System.Array.Resize(ref storageBuffer, buffer.Length / channels / sampleStep);
+    int tempIndex;
+    for(int i = 0; i < storageBuffer.Length; i++){
+      tempIndex = i * channels * sampleStep;
+      if (tempIndex >= buffer.Length) break; // overshooting the buffer, finish
+      storageBuffer[i] = buffer[tempIndex];
+    }
+
+    RingBuffer_Write(storageBuffer, storageBuffer.Length, ringBufferPtr);
   }
 
   void Update() {
 
     if(displayRenderer.isVisible){ 
-      RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
-      if(onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
-      if(onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
+      RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);      
     }
 
   }

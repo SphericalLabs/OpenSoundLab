@@ -1734,7 +1734,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1207776486901562351}
   m_LocalRotation: {x: 0.70710725, y: -0.00000017136337, z: -0.00000004715441, w: -0.70710635}
-  m_LocalPosition: {x: 0.54893494, y: 0.20000112, z: -0.13799998}
+  m_LocalPosition: {x: 0.54893494, y: 0.2, z: -0.119}
   m_LocalScale: {x: 3.115859, y: 10.092265, z: 5.0461626}
   m_Children:
   - {fileID: 8825698462377052431}
@@ -2172,7 +2172,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6226832455343379695}
   m_LocalRotation: {x: -0.7071069, y: -0.0000011663946, z: 0.0000007113711, w: -0.7071067}
-  m_LocalPosition: {x: 0.0005, y: -0.0124, z: -0.018}
+  m_LocalPosition: {x: 0.0005, y: -0.0124, z: -0.0216}
   m_LocalScale: {x: 0.059999995, y: 0.06, z: 0.060000014}
   m_Children: []
   m_Father: {fileID: 1233923445180825749}
@@ -2225,7 +2225,9 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6226832455343379695}
-  m_Text: PERIOD
+  m_Text: 'SAMPLE
+
+    RATE'
   m_OffsetZ: 0
   m_CharacterSize: 0.03
   m_LineSpacing: 1
@@ -2415,7 +2417,7 @@ MonoBehaviour:
   onlineMaterial: {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
   waveWidth: 1024
   waveHeight: 512
-  period: 1024
+  sampleStep: 512
 --- !u!1 &8135534423989162767
 GameObject:
   m_ObjectHideFlags: 0
@@ -2568,8 +2570,8 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
-  isNotched: 0
-  notchSteps: 6
+  isNotched: 1
+  notchSteps: 11
   controllerRot: 0
 --- !u!1 &8446214836861030364
 GameObject:

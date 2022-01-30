@@ -44,7 +44,7 @@ public class oscillatorDeviceInterface : deviceInterface
 
     signal = GetComponent<oscillatorSignalGenerator>();
     active = true;
-    viz.period = lfo ? 1 : bufferSize;
+    viz.sampleStep = lfo ? bufferSize : 1;
 
     UpdateLFO();
     UpdateAmp();
@@ -72,11 +72,11 @@ public class oscillatorDeviceInterface : deviceInterface
   void UpdateLFO()
   {
     lfo = !lfoSwitch.switchVal;
-    viz.period = lfo ? 1 : bufferSize;
+    viz.sampleStep = lfo ? bufferSize : 1;
 
     signal.lfo = lfo;
     UpdateFreq();
-    speaker.volume = lfo ? 0f : 1f;
+    //speaker.volume = lfo ? 0f : 1f;
   }
 
   void UpdateFreq()
@@ -88,7 +88,7 @@ public class oscillatorDeviceInterface : deviceInterface
     }
     else
     {
-      signal.frequency = 261.6256f * Mathf.Pow(2, Utils.map(freqPercent, 0f, 1f, -4f, 4f)); // C4, 8 octaves range
+      signal.frequency = 261.6256f * Mathf.Pow(2, Utils.map(freqPercent, 0f, 1f, -5f, 5f)); // C4, 10 octaves range
     }
     // though this would make viz more adaptive, but it shows garbage.
     //viz.period = Mathf.RoundToInt(Utils.map(signal.frequency, 0f, 10000f, 1f, bufferSize));
