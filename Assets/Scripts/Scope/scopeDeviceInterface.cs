@@ -27,6 +27,7 @@ public class scopeDeviceInterface : deviceInterface {
 
   public dial periodDial;
   public basicSwitch modeSelector;
+  public button triggerButton;
 
   public int bufferSize;
   float lastPeriodDialPercent = 0f;
@@ -42,7 +43,6 @@ public class scopeDeviceInterface : deviceInterface {
     periodDial.notchSteps = Mathf.RoundToInt(Mathf.Log(bufferSize, 2) + 1);
 
     displayOsc.sampleStep = calcSampleStep(periodDial.percent); // first init
-
 
   }
 
@@ -67,6 +67,8 @@ public class scopeDeviceInterface : deviceInterface {
       scopeSignal.incoming = input.signal;
       displayFft.toggleActive(scopeSignal.incoming != null);
     }
+
+    displayOsc.doTriggering = triggerButton.isHit;
   }
 
   int calcSampleStep(float val){
