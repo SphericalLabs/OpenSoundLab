@@ -81,9 +81,9 @@ public class waveViz : MonoBehaviour
 
   void Awake()
   {
-
-    ringBufferPtr = RingBuffer_New(waveWidth * 4);
-    fullBuffer = new float[waveWidth*4];
+    //int longBufferLength = Mathf.RoundToInt(waveWidth * 4f);
+    ringBufferPtr = RingBuffer_New(waveWidth*2);
+    fullBuffer = new float[waveWidth*2];
     renderBuffer = new float[waveWidth];
 
     storageBuffer = new float[1];
@@ -112,13 +112,14 @@ public class waveViz : MonoBehaviour
     onlineMaterial.mainTexture = onlineTexture;
   }
 
+  int tempIndex;
   public void storeBuffer(float[] buffer, int channels)
   {
     if (storageBuffer.Length != buffer.Length / channels / sampleStep) System.Array.Resize(ref storageBuffer, buffer.Length / channels / sampleStep);
-    int tempIndex;
+    
     for (int i = 0; i < storageBuffer.Length; i++)
     {
-      tempIndex = i * channels * sampleStep;
+      tempIndex = i * channels * sampleStep; // skip through the interleaved audio buffer
       if (tempIndex >= buffer.Length) break; // overshooting the buffer, finish
       storageBuffer[i] = buffer[tempIndex];
     }
@@ -138,42 +139,42 @@ public class waveViz : MonoBehaviour
 
   bool lastWasPositive = false;
   bool foundZeroCrossing = false;
-  
+
+  int kk;
 
   void RenderGLToTexture(int width, int height, Material material)
   {
 
-    int n = 0;
-
     if (doTriggering)
     {
 
-      RingBuffer_Read(fullBuffer, fullBuffer.Length, 0, ringBufferPtr); // first scan on data, TODO: move trigger code to RingBuffer
-      lastWasPositive = fullBuffer[fullBuffer.Length - 1 - n] >= 0f; // take first sample
-      foundZeroCrossing = false;
-      n++;
+      kk = 0;
 
-      while (n < fullBuffer.Length - renderBuffer.Length)
+      RingBuffer_Read(fullBuffer, fullBuffer.Length, 0, ringBufferPtr); // first scan on data, TODO: move trigger code to RingBuffer
+      lastWasPositive = fullBuffer[fullBuffer.Length - 1 - kk] >= 0f; // take first sample
+      foundZeroCrossing = false;
+      kk++;
+
+      while (kk < fullBuffer.Length - renderBuffer.Length)
       { // search for first 0-pass from right and then take as offset
-        if ((fullBuffer[fullBuffer.Length - 1 - n] > 0f && !lastWasPositive) /*|| (renderBuffer[n] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
+        if (/*(fullBuffer[fullBuffer.Length - 1 - kk] > 0f && !lastWasPositive)*/ (fullBuffer[fullBuffer.Length - 1 - kk] < 0f && lastWasPositive)) // triggers on rising zero crossing only
         {
           foundZeroCrossing = true;
           break;
         }
-        lastWasPositive = fullBuffer[fullBuffer.Length - 1 - n] >= 0f;
-        n++;
+        lastWasPositive = fullBuffer[fullBuffer.Length - 1 - kk] >= 0f;
+        kk++;
       }
       
       if (!foundZeroCrossing) return; // no new draw if nothing found
 
-      Array.Copy(fullBuffer, fullBuffer.Length - 1 - renderBuffer.Length - n, renderBuffer, 0, renderBuffer.Length);
+      Array.Copy(fullBuffer, fullBuffer.Length - 1 - renderBuffer.Length - kk, renderBuffer, 0, renderBuffer.Length);
 
     } else {
-      RingBuffer_Read(renderBuffer, renderBuffer.Length, 0, ringBufferPtr);
+      RingBuffer_Read(renderBuffer, renderBuffer.Length, -renderBuffer.Length, ringBufferPtr);
     }
 
     
-
     // always re-set offline render here, in case another script had its finger on it in the meantime
     RenderTexture.active = offlineTexture;
 

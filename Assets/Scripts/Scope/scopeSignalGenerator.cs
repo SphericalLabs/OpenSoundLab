@@ -23,7 +23,7 @@ public class scopeSignalGenerator : signalGenerator
   float[] bufferCopy; // for FFT
   waveViz displayOsc; // for OSC
   spectrumDisplay displayFft;
-  
+  public bool isMuted = false;
 
   [DllImport("SoundStageNative")]
   public static extern void CopyArray(float[] a, float[] b, int length);
@@ -66,5 +66,9 @@ public class scopeSignalGenerator : signalGenerator
 
     /*if(displayFft.gameObject.activeSelf) */CopyArray(buffer, bufferCopy, buffer.Length); // copy over for FFT
     /*if(displayOsc.gameObject.activeSelf) */displayOsc.storeBuffer(buffer, channels); // copy over for OSC
+    
+    if(isMuted){
+      SetArrayToSingleValue(buffer, buffer.Length, 0.0f); // clear after usage before passing on. todo: this could be made more efficient and click-free
+    }
   }
 }

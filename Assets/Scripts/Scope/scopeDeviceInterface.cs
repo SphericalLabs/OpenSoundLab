@@ -28,6 +28,7 @@ public class scopeDeviceInterface : deviceInterface {
   public dial periodDial;
   public basicSwitch modeSelector;
   public button triggerButton;
+  public button muteButton;
 
   public int bufferSize;
   float lastPeriodDialPercent = 0f;
@@ -68,7 +69,16 @@ public class scopeDeviceInterface : deviceInterface {
       displayFft.toggleActive(scopeSignal.incoming != null);
     }
 
-    displayOsc.doTriggering = triggerButton.isHit;
+    
+  }
+
+  public override void hit(bool on, int ID = -1)
+  {
+    if(ID == 1){
+      displayOsc.doTriggering = on;
+    } else if(ID == 2){
+      scopeSignal.isMuted = on;
+    }
   }
 
   int calcSampleStep(float val){

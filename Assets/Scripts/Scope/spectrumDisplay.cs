@@ -74,6 +74,10 @@ public class spectrumDisplay : MonoBehaviour
     GetComponent<Renderer>().material = onlineMaterial;
     onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), Texture2D.blackTexture);
 
+    if (onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
+    if (onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
+    if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
+
   }
 
   void Update()
@@ -84,9 +88,7 @@ public class spectrumDisplay : MonoBehaviour
     
     source.GetSpectrumData(spectrum, 0, fftWin);
     RenderGLToTexture(width, height, offlineMaterial);
-    if(onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
-    if(onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
-
+    
   }
 
   // Via https://forum.unity.com/threads/rendering-gl-to-a-texture2d-immediately-in-unity4.158918/
