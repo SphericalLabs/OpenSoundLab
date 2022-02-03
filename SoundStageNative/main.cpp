@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "main.h"
+#include "util.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -532,7 +533,7 @@ extern "C" {
             //calc control inputs
             if (bFreqExpGen)
             {
-                endFrequency = endFrequency * powf(2, frequencyExpBuffer[i] * 10.f); // convert 0.1V/Oct to 1V/Oct; 
+                endFrequency = endFrequency * powf(2, clamp(frequencyExpBuffer[i] * 10.f, -20.f, 20.f)); // convert 0.1V/Oct to 1V/Oct; this has to be clamped, could crash the system otherwise, think 2^320
             }
             if (bFreqLinGen) {
                 endFrequency = endFrequency + frequencyLinBuffer[i] * 10.f * 100.f; // add lin fm, thru zero, 1V / 100Hz
@@ -542,9 +543,16 @@ extern "C" {
                 endAmplitude = endAmplitude * amplitudeBuffer[i]; // allows for negative inputs, will invert phase then
             }
 
-            //update phase for next frame
-            _phase += endFrequency * _sampleDuration;
-            if (_phase > 1.0) _phase -= 1.0;
+            //update phase for next sample
+            _phase += clamp(endFrequency, -192000.f, 192000.f) * _sampleDuration; // clamp to +/- 192kHz, way to high for 48kHz anyways
+
+            // wrap around, also for negative thru-zero phases and frequencies higher than nyquist
+            if (_phase >= 0.0) { 
+              _phase = fmod(_phase, 1);
+            }
+            else {
+              _phase = 1.0 - fmod(_phase, 1);
+            }
 
             //final buffer
             buffer[i] = buffer[i + 1] = buffer[i] * endAmplitude;

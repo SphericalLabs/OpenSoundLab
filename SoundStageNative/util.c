@@ -503,6 +503,12 @@ extern "C" {
             return start2 + a * (stop2 - start2); //value mapped to new range
         }
 
+
+    float clamp(float d, float min, float max) {
+      const float t = d < min ? min : d;
+      return t > max ? max : t;
+    }
+
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void){
         struct timeval time;
