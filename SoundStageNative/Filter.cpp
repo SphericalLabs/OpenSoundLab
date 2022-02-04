@@ -51,7 +51,9 @@ extern "C" {
             if (!sameCutoff) cut = lerp(lastCutoffFrequency, cutoffFrequency, (float)i / length); // slope limiting for dial
 
             // exponential 1/Oct, freqMod taken from left channel only
-            frequencyBuffer[i] = frequencyBuffer[i+1] = clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) * freqDiv, 0.f, 1.f); 
+            // clamp fm mod -1,1 and effective frequencies 1,260000
+            //frequencyBuffer[i] = frequencyBuffer[i + 1] = clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) * freqDiv, 0.f, 1.f);
+            frequencyBuffer[i] = frequencyBuffer[i + 1] = clamp(261.6256f * powf(2, (clamp(frequencyBuffer[i], -1.f, 1.f) + cutoffFrequency) * 10.f) * freqDiv, 0.f, 1.f); 
 
             mfL->q = 1.0f - frequencyBuffer[i];
             mfL->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfL->q;
