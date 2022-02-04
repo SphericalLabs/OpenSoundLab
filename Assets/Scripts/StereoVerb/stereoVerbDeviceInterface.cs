@@ -43,7 +43,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
 
     public override InstrumentData GetData() {
         StereoVerbData data = new StereoVerbData();
-        data.deviceType = menuItem.deviceType.Reverb;
+        data.deviceType = menuItem.deviceType.stereoVerb;
         GetTransformData(data);
 
         data.jackInID = input.transform.GetInstanceID();
@@ -70,7 +70,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
         dry.setPercent(data.dry);
         wet.setPercent(data.wet);
         width.setPercent(data.width);
-        freeze.switchVal = data.freeze;
+        freeze.setSwitch(data.freeze, true);
     }
 }
 

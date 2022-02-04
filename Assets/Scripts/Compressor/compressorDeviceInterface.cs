@@ -67,6 +67,7 @@ public class compressorDeviceInterface : deviceInterface
         data.thresholdState = thresholdDial.percent;
         data.ratioState = ratioDial.percent;
         data.makeupState = makeupDial.percent;
+        data.bypassState = bypassSwitch.switchVal;
 
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
@@ -89,16 +90,19 @@ public class compressorDeviceInterface : deviceInterface
         thresholdDial.setPercent(data.thresholdState);
         ratioDial.setPercent(data.ratioState);
         makeupDial.setPercent(data.makeupState);
+        bypassSwitch.setSwitch(data.bypassState, true);
     }
 }
 
 public class compressorData : InstrumentData
 {
+
     public float attackState;
     public float releaseState;
     public float thresholdState;
     public float ratioState;
     public float makeupState;
+    public bool bypassState;
 
     public int jackOutID;
     public int jackInID;

@@ -85,10 +85,15 @@ public class sliderNotched : manipObject {
     updateLabels();
   }
 
+  public void setValByPercent(float p){
+    setVal(Mathf.RoundToInt(p * (notchCount - 1)));
+  }
+
   public void setVal(int v) {
     switchVal = v;
+    percent = (float)v / (notchCount - 1);
     Vector3 pos = transform.localPosition;
-    pos.x = Mathf.Lerp(-xBound, xBound, (float)v / (notchCount - 1));
+    pos.x = Mathf.Lerp(-xBound, xBound, percent);
     transform.localPosition = pos;
     updateLabels();
   }

@@ -46,6 +46,7 @@ public class ADDeviceInterface : deviceInterface
 
         data.attackState = attackDial.percent;
         data.releaseState = releaseDial.percent;
+        data.linearityState = linearityDial.percent;
 
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
@@ -68,6 +69,7 @@ public class ADDeviceInterface : deviceInterface
 
         attackDial.setPercent(data.attackState);
         releaseDial.setPercent(data.releaseState);
+        linearityDial.setPercent(data.linearityState);
     }
 }
 
@@ -75,6 +77,7 @@ public class ADData : InstrumentData
 {
     public float attackState;
     public float releaseState;
+    public float linearityState;
 
     public int jackOutID;
     public int jackInID;

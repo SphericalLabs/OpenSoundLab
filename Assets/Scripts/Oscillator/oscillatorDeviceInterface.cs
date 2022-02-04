@@ -134,7 +134,9 @@ public class oscillatorDeviceInterface : deviceInterface
 
     freqDial.setPercent(data.freq);
     ampDial.setPercent(data.amp);
-    waveSlider.setVal(Mathf.RoundToInt(data.wave * 3));
+
+    waveSlider.setValByPercent(data.wave);
+
     lfoSwitch.setSwitch(!data.lfo);
 
     ID = data.ID;

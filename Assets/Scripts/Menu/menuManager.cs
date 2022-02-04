@@ -86,8 +86,8 @@ public class menuManager : MonoBehaviour {
       if (Application.platform == RuntimePlatform.Android)
       {
         if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
-        //if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
-        //if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
+        if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
+        if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
       }
       // skip unneeded devices
       if ((menuItem.deviceType)i == menuItem.deviceType.Airhorn) continue;

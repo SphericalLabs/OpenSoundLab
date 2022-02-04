@@ -93,6 +93,10 @@ public class filterDeviceInterface : deviceInterface {
     data.jackOutID = output.transform.GetInstanceID();
     data.jackControlInID = controlInput.transform.GetInstanceID();
 
+    data.resonance = resonanceDial.percent;
+    data.frequency = frequencyDial.percent;
+    data.filterMode = modeDial.percent;
+
     return data;
   }
 
@@ -104,6 +108,10 @@ public class filterDeviceInterface : deviceInterface {
     input.ID = data.jackInID;
     output.ID = data.jackOutID;
     controlInput.ID = data.jackControlInID;
+
+    resonanceDial.setPercent(data.resonance);
+    frequencyDial.setPercent(data.frequency);
+    modeDial.setPercent(data.filterMode);
   }
 
 
@@ -111,9 +119,10 @@ public class filterDeviceInterface : deviceInterface {
 
 
 public class FilterData : InstrumentData {
-  public float resonance, frequency, width; // width is for BP
+  public float resonance, frequency; // width is for BP
   //public int filterMode; // 0 = LP, 1 == BP, 2 = HP, 4 = NO(TCH)
-  public filterSignalGenerator.filterType filterMode; // possible?
+  //public filterSignalGenerator.filterType filterMode; // possible?
+  public float filterMode;
   public int jackOutID;
   public int jackInID;
   public int jackControlInID;

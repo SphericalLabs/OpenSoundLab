@@ -81,7 +81,7 @@ public class masterControl : MonoBehaviour {
     {
       Debug.Log("Buffer size was: " + AudioSettings.GetConfiguration().dspBufferSize);
       configuration = AudioSettings.GetConfiguration();
-      configuration.dspBufferSize = 128;
+      configuration.dspBufferSize = 256;
       AudioSettings.Reset(configuration);
 
       configuration = AudioSettings.GetConfiguration();

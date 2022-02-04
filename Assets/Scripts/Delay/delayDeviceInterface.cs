@@ -58,6 +58,7 @@ public class delayDeviceInterface : deviceInterface
         data.feedbackState = feedbackDial.percent;
         data.wetState = wetDial.percent;
         data.dryState = dryDial.percent;
+        data.modeState = modeDial.percent;
 
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
@@ -77,6 +78,7 @@ public class delayDeviceInterface : deviceInterface
         feedbackDial.setPercent(data.feedbackState);
         wetDial.setPercent(data.wetState);
         dryDial.setPercent(data.dryState);
+        modeDial.setPercent(data.modeState);
     }
 }
 
@@ -86,6 +88,7 @@ public class delayData : InstrumentData
     public float feedbackState;
     public float wetState;
     public float dryState;
+    public float modeState;
 
     public int jackOutID;
     public int jackInID;

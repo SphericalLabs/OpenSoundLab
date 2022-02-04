@@ -67,6 +67,7 @@ public class recorderDeviceInterface : deviceInterface {
     data.playTriggerID = playTrigger.transform.GetInstanceID();
     data.backTriggerID = backTrigger.transform.GetInstanceID();
     data.dur = durSlider.switchVal;
+    data.normalize = normalizeSwitch.switchVal;
     return data;
   }
 
@@ -79,6 +80,7 @@ public class recorderDeviceInterface : deviceInterface {
     playTrigger.ID = data.playTriggerID;
     backTrigger.ID = data.backTriggerID;
     durSlider.setVal(data.dur);
+    normalizeSwitch.setSwitch(data.normalize, true);
   }
 }
 
@@ -89,5 +91,6 @@ public class RecorderData : InstrumentData {
   public int playTriggerID;
   public int backTriggerID;
   public int dur;
+  public bool normalize;
   public string audioFilename;
 }

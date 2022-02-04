@@ -69,7 +69,6 @@ public class scopeDeviceInterface : deviceInterface {
       displayFft.toggleActive(scopeSignal.incoming != null);
     }
 
-    
   }
 
   public override void hit(bool on, int ID = -1)
@@ -92,6 +91,10 @@ public class scopeDeviceInterface : deviceInterface {
 
     data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
+    data.periodState = periodDial.percent;
+    data.modeState = modeSelector.switchVal;
+    data.triggerState = triggerButton.isHit;
+    data.muteState = muteButton.isHit;
 
     return data;
   }
@@ -103,8 +106,13 @@ public class scopeDeviceInterface : deviceInterface {
     ID = data.ID;
     input.ID = data.jackInID;
     output.ID = data.jackOutID;
-  }
 
+    muteButton.setOnAtStart(data.muteState);
+    triggerButton.setOnAtStart(data.triggerState);
+
+    periodDial.setPercent(data.periodState);
+    modeSelector.setSwitch(data.modeState, true);
+  }
 
 }
 
@@ -112,4 +120,9 @@ public class scopeDeviceInterface : deviceInterface {
 public class ScopeData : InstrumentData {
   public int jackOutID;
   public int jackInID;
+
+  public float periodState;
+  public bool modeState;
+  public bool triggerState;
+  public bool muteState;
 }

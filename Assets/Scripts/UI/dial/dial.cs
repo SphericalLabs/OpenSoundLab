@@ -84,7 +84,12 @@ public class dial : manipObject {
 
   public void setPercent(float p) {
     percent = Mathf.Clamp01(p);
-    realRot = Utils.map(percent, 0f, 1f, -150f, 150f);
+    if (isNotched)
+    {
+      realRot = Utils.map(Mathf.Round(percent * (notchSteps - 1)), 0, notchSteps - 1, -150f, 150f);
+    } else {
+      realRot = Utils.map(percent, 0f, 1f, -150f, 150f);
+    }
     
     curRot = realRot; // can be removed?
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
