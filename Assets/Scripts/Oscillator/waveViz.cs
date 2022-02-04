@@ -32,6 +32,7 @@ public class waveViz : MonoBehaviour
 
   public int waveWidth = 256;
   public int waveHeight = 64;
+  public int heightPadding = 2;
   public int sampleStep = 512; // should not be higher than buffer size, otherwise looped data?
   public bool doTriggering = false;
 
@@ -110,6 +111,12 @@ public class waveViz : MonoBehaviour
   void Start()
   {
     onlineMaterial.mainTexture = onlineTexture;
+
+
+    // init black screen
+    RenderTexture.active = offlineTexture;
+    GL.Clear(false, true, Color.black);
+    Graphics.CopyTexture(offlineTexture, onlineTexture);
   }
 
   int tempIndex;
@@ -157,7 +164,7 @@ public class waveViz : MonoBehaviour
 
       while (kk < fullBuffer.Length - renderBuffer.Length)
       { // search for first 0-pass from right and then take as offset
-        if (/*(fullBuffer[fullBuffer.Length - 1 - kk] > 0f && !lastWasPositive)*/ (fullBuffer[fullBuffer.Length - 1 - kk] < 0f && lastWasPositive)) // triggers on rising zero crossing only
+        if ((fullBuffer[fullBuffer.Length - 1 - kk] > 0f && !lastWasPositive) /*(fullBuffer[fullBuffer.Length - 1 - kk] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
         {
           foundZeroCrossing = true;
           break;
@@ -188,7 +195,8 @@ public class waveViz : MonoBehaviour
 
     for (int i = 0; i < renderBuffer.Length; i++)
     {
-      GL.Vertex3(i, (1f - (renderBuffer[i] + 1f) * 0.5f) * height, 0); // 3px padding
+      //GL.Vertex3(i, height - (renderBuffer[i] + 1f) * 0.5f * height, 0); // 2px padding
+      GL.Vertex3(i, Utils.map(renderBuffer[i], -1f, 1f, height - heightPadding, heightPadding), 0); // 2px padding
     }
 
     GL.End();

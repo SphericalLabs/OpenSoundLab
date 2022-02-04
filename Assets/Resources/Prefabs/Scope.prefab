@@ -2953,6 +2953,7 @@ MonoBehaviour:
   onlineMaterial: {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
   waveWidth: 1024
   waveHeight: 512
+  heightPadding: 10
   sampleStep: 512
   doTriggering: 1
   offset: 0
