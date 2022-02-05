@@ -50,7 +50,7 @@ public class delayDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        delayData data = new delayData();
+        DelayData data = new DelayData();
         data.deviceType = menuItem.deviceType.Delay;
         GetTransformData(data);
 
@@ -68,7 +68,7 @@ public class delayDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d)
     {
-        delayData data = d as delayData;
+        DelayData data = d as DelayData;
         base.Load(data);
 
         input.ID = data.jackInID;
@@ -82,7 +82,7 @@ public class delayDeviceInterface : deviceInterface
     }
 }
 
-public class delayData : InstrumentData
+public class DelayData : InstrumentData
 {
     public float timeState;
     public float feedbackState;

@@ -164,10 +164,18 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
-  [XmlInclude(typeof(ADData))]
-  [XmlInclude(typeof(cvSequencerData))] // update?
+
+[XmlInclude(typeof(CompressorData))]
+[XmlInclude(typeof(StereoVerbData))]
+[XmlInclude(typeof(DelayData))]
+[XmlInclude(typeof(ScopeData))]
+[XmlInclude(typeof(QuantizerData))] 
+
+[XmlInclude(typeof(ADData))]
+  [XmlInclude(typeof(SequencerCVData))] // update?
   [XmlInclude(typeof(SampleHoldData))]
 
+  
   [XmlInclude(typeof(GlideData))]
   [XmlInclude(typeof(GainData))]
   [XmlInclude(typeof(SARSCov2Data))]

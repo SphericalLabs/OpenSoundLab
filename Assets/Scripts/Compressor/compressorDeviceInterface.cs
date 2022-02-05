@@ -58,7 +58,7 @@ public class compressorDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        compressorData data = new compressorData();
+        CompressorData data = new CompressorData();
         data.deviceType = menuItem.deviceType.Compressor;
         GetTransformData(data);
 
@@ -78,7 +78,7 @@ public class compressorDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d)
     {
-        compressorData data = d as compressorData;
+        CompressorData data = d as CompressorData;
         base.Load(data);
 
         input.ID = data.jackInID;
@@ -94,7 +94,7 @@ public class compressorDeviceInterface : deviceInterface
     }
 }
 
-public class compressorData : InstrumentData
+public class CompressorData : InstrumentData
 {
 
     public float attackState;

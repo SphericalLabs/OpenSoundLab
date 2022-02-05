@@ -31,19 +31,36 @@ public class xmlUpdate {
         foreach (XmlNode xmlNode in xmlNodeParent) {
           XmlSerializer serializer;
           switch (xmlNode.Name) {
-            case "AD":
+
+            case "Compressors":
+              serializer = new XmlSerializer(typeof(CompressorData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "StereoVerbs":
+              serializer = new XmlSerializer(typeof(StereoVerbData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "Delays":
+              serializer = new XmlSerializer(typeof(DelayData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "Scopes":
+              serializer = new XmlSerializer(typeof(ScopeData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "Quantizers":
+              serializer = new XmlSerializer(typeof(QuantizerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+
+            case "ADs":
               serializer = new XmlSerializer(typeof(ADData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "CVSequencer":
-              serializer = new XmlSerializer(typeof(cvSequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+            case "SequencerCVs":
+              serializer = new XmlSerializer(typeof(SequencerCVData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "SampleHold":
+            case "SampleHolds":
               serializer = new XmlSerializer(typeof(SampleHoldData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "Glide":
+            case "Glides":
               serializer = new XmlSerializer(typeof(GlideData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "Gain":
+            case "Gains":
               serializer = new XmlSerializer(typeof(GainData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "SARSCov2":
@@ -94,7 +111,7 @@ public class xmlUpdate {
             case "ControlCubes":
               serializer = new XmlSerializer(typeof(ControlCubeData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "Valves":
+            case "VCAs":
               serializer = new XmlSerializer(typeof(vcaData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "Reverbs":
@@ -112,7 +129,7 @@ public class xmlUpdate {
             case "Tapes":
               serializer = new XmlSerializer(typeof(InstrumentData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "Noise":
+            case "Noises":
               serializer = new XmlSerializer(typeof(NoiseData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "Filters":
@@ -125,19 +142,36 @@ public class xmlUpdate {
           data.Add((InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode)));
 
           switch (xmlNode.Name) {
-            case "AD":
+
+            case "Compressors":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Compressor;
+              break;
+            case "StereoVerbs":
+              data[data.Count - 1].deviceType = menuItem.deviceType.StereoVerb;
+              break;
+            case "Delays":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Delay;
+              break;
+            case "Scopes":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Scope;
+              break;
+            case "Quantizers":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Quantizer;
+              break;
+
+            case "ADs":
               data[data.Count - 1].deviceType = menuItem.deviceType.AD;
               break;
-            case "CVSequencer":
+            case "SequencerCVs":
               data[data.Count - 1].deviceType = menuItem.deviceType.SequencerCV;
               break;
-            case "SampleHold":
+            case "SampleHolds":
               data[data.Count - 1].deviceType = menuItem.deviceType.SampleHold;
               break;
-            case "Glide":
+            case "Glides":
               data[data.Count - 1].deviceType = menuItem.deviceType.Glide;
               break;
-            case "Gain":
+            case "Gains":
               data[data.Count - 1].deviceType = menuItem.deviceType.Gain;
               break;
             case "SARSCov2":
@@ -189,7 +223,7 @@ public class xmlUpdate {
             case "ControlCubes":
               data[data.Count - 1].deviceType = menuItem.deviceType.ControlCube;
               break;
-            case "Valves":
+            case "VCAs":
               data[data.Count - 1].deviceType = menuItem.deviceType.VCA;
               break;
             case "Reverbs":

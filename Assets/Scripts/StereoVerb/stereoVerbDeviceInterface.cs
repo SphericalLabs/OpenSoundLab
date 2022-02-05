@@ -43,7 +43,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
 
     public override InstrumentData GetData() {
         StereoVerbData data = new StereoVerbData();
-        data.deviceType = menuItem.deviceType.stereoVerb;
+        data.deviceType = menuItem.deviceType.StereoVerb;
         GetTransformData(data);
 
         data.jackInID = input.transform.GetInstanceID();

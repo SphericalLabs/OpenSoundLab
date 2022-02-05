@@ -651,7 +651,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     }
 }
 
-public class cvSequencerData : InstrumentData
+public class SequencerCVData : InstrumentData
 {
     public bool onSwitch;
     public int jackInID;
