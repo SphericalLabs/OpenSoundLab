@@ -118,8 +118,8 @@ public class menuItem : manipObject {
     if (item == deviceType.Gain) label.text = "Gain / Mute";
     if (item == deviceType.MIDIIN) label.text = "MIDI In";
     if (item == deviceType.MIDIOUT) label.text = "MIDI Out";
-    if (item == deviceType.Sequencer) label.text = "Sequencer I";    
-    if (item == deviceType.SequencerCV) label.text = "Sequencer II";
+    if (item == deviceType.Sequencer) label.text = "Sequencer (Old)";    
+    if (item == deviceType.SequencerCV) label.text = "Sequencer";
     if (item == deviceType.Timeline) label.text = "Sequencer III";
     if (item == deviceType.ControlCube) label.text = "ControlCube";
     if (item == deviceType.Microphone) label.text = "Mic";

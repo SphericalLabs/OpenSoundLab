@@ -45,7 +45,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     public bool[][] cubeBools;  // the step sequencer button values
     public float[][] cubeFloats; // the step sequencer dial values
 
-    //public List<List<dial>> cubeDials;  // the step sequencer dials
+    public List<List<dial>> cubeDials;  // the step sequencer dials, keep them so that you don't have to search them in the scene graph on Update()
 
     public bool[] rowMute; 
     public string[][] tapeList; // why 2-dimensional?
@@ -83,9 +83,9 @@ public class sequencerCVDeviceInterface : deviceInterface
         samplerList = new List<clipPlayerSimple>();
 
         cubeBools = new bool[max][]; // init cubes horizontally
-        cubeFloats = new float[max][]; 
+        cubeFloats = new float[max][];
 
-        //cubeDials = new List<List<dial>>();
+        cubeDials = new List<List<dial>>();
         tapeList = new string[max][];
         rowMute = new bool[max];
         for (int i = 0; i < max; i++)
@@ -103,7 +103,7 @@ public class sequencerCVDeviceInterface : deviceInterface
           }
         }
 
-    beatSlider = GetComponentInChildren<sliderNotched>();
+        beatSlider = GetComponentInChildren<sliderNotched>();
         swingDial = GetComponentInChildren<dial>();
         switchRange = GetComponentInChildren<basicSwitch>();
 
@@ -155,12 +155,8 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         for (int i = 0; i < curDimensions[1]; i++)
         {
-
             seqList[i].setSignal(cubeBools[targetStep][i]);
-            cvSeqList[i].setSignal(cubeFloats[targetStep][i] * 2f - 1f);
-            //cvSeqList[i].setSignal((cubeDials[i][targetStep].percent * 2f - 1f));
-            // TODO: why did I have to switch targetStep and i?
-
+            cvSeqList[i].setSignal(cubeFloats[targetStep][i] * 2f - 1f);   
         }
     }
 
@@ -267,7 +263,8 @@ public class sequencerCVDeviceInterface : deviceInterface
         {
           for (int i2 = 0; i2 < dimensions[1]; i2++)
           {
-            cubeFloats[i][i2] = cubeList[i2][i].GetComponentInChildren<dial>().percent;
+            //cubeFloats[i][i2] = cubeList[i2][i].GetComponentInChildren<dial>().percent;
+            cubeFloats[i][i2] = cubeDials[i2][i].percent; // read from local registry of dials, avoid searching
           }
         }
     }
@@ -364,7 +361,7 @@ public class sequencerCVDeviceInterface : deviceInterface
 
                 t.localScale = Vector3.one;
                 cubeList[i2].Add(t);
-                //cubeDials[i2].Add(t.GetComponentInChildren<dial>());
+                cubeDials[i2].Add(t.GetComponentInChildren<dial>());
 
                 float Hval = (float)i2 / max;
                 t.GetComponent<button>().Setup(curDimensions[0], i2, cubeBools[curDimensions[0]][i2], Color.HSVToRGB(Hval, .9f, .05f));
@@ -393,7 +390,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             for (int i2 = 0; i2 < curDimensions[1]; i2++)
             {
                 Transform t = cubeList[i2].Last();
-                //cubeDials[i2].RemoveAt(cubeDials[i2].Count - 1);
+                cubeDials[i2].RemoveAt(cubeDials[i2].Count - 1);
                 Destroy(t.gameObject);
                 cubeList[i2].RemoveAt(cubeList[i2].Count - 1);
 
@@ -417,7 +414,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         for (int i = 0; i < c; i++)
         {
             cubeList.Add(new List<Transform>());
-            //cubeDials.Add(new List<dial>());
+            cubeDials.Add(new List<dial>());
 
             for (int i2 = 0; i2 < curDimensions[0]; i2++)
             {
@@ -429,7 +426,7 @@ public class sequencerCVDeviceInterface : deviceInterface
                 t.localPosition = new Vector3(-cubeConst * xMult, -cubeConst * yMult, 0);
                 t.localScale = Vector3.one;
                 cubeList.Last().Add(t);
-                //cubeDials.Last().Add(t.GetComponentInChildren<dial>());
+                cubeDials.Last().Add(t.GetComponentInChildren<dial>());
 
                 float Hval = (float)curDimensions[1] / max;
                 t.GetComponent<button>().Setup(i2, curDimensions[1], cubeBools[i2][curDimensions[1]], Color.HSVToRGB(Hval, .9f, .05f));
@@ -495,7 +492,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         {
 
             int z = cubeList.Count - 1;
-            //cubeDials.RemoveAt(z);
+            cubeDials.RemoveAt(z);
             for (int i2 = 0; i2 < cubeList[z].Count; i2++)
             {
                 Transform t = cubeList[z][i2];
