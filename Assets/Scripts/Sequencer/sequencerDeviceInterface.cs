@@ -182,6 +182,8 @@ public class sequencerDeviceInterface : deviceInterface {
       _beatManager.toggleMC(externalPulse == null);
       if (externalPulse != null) forcePlay(false);
     }
+
+
   }
 
   public void forcePlay(bool on) {
