@@ -70,6 +70,8 @@ public class sequencerCVDeviceInterface : deviceInterface
 
     public TextMesh[] dimensionDisplays;
 
+    public bool initialised = false;
+
     public override void Awake()
     {
         base.Awake();
@@ -93,7 +95,15 @@ public class sequencerCVDeviceInterface : deviceInterface
             tapeList[i] = new string[] { "", "" };
         }
 
-        beatSlider = GetComponentInChildren<sliderNotched>();
+        for (int i = 0; i < max; i++)
+        {
+          for (int i2 = 0; i2 < max; i2++)
+          {
+            cubeFloats[i][i2] = 0.5f; // this overwrites the init value of the touchDial prefab!
+          }
+        }
+
+    beatSlider = GetComponentInChildren<sliderNotched>();
         swingDial = GetComponentInChildren<dial>();
         switchRange = GetComponentInChildren<basicSwitch>();
 
@@ -206,7 +216,6 @@ public class sequencerCVDeviceInterface : deviceInterface
     void Update()
     {
 
-
         SelectStepUpdate();
 
         dimensions[0] = Mathf.CeilToInt((stretchNode.localPosition.x + cubeConst * .75f) / -cubeConst);
@@ -249,6 +258,11 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         // read in all dials, because there is no hit-style update system for dials yet
         // the search in the scene graph might take too long!
+        readAllDials();
+
+    }
+
+    public void readAllDials(){
         for (int i = 0; i < dimensions[0]; i++)
         {
           for (int i2 = 0; i2 < dimensions[1]; i2++)
@@ -256,8 +270,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             cubeFloats[i][i2] = cubeList[i2][i].GetComponentInChildren<dial>().percent;
           }
         }
-
-  }
+    }
 
     public void forcePlay(bool on)
     {
