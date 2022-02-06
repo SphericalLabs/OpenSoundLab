@@ -67,9 +67,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0
+  dialColor: 0
   deltaRot: 0
   curRot: 0
   realRot: 0
@@ -1410,8 +1408,8 @@ MonoBehaviour:
   stepSelect: {fileID: 114000012285081508}
   running: 1
   dimensions: 0100000001000000
-  jackList: []
-  cvJackList: []
+  jackTriggerList: []
+  jackCvList: []
   seqList: []
   cvSeqList: []
   samplerList: []
@@ -1419,10 +1417,11 @@ MonoBehaviour:
   beatSlider: {fileID: 114000012190995366}
   controlInput: {fileID: 114000010336139522}
   playButton: {fileID: 114000010763487664}
-  rangeSwitcher: {fileID: 5121695292029034116}
+  switchRange: {fileID: 0}
   dimensionDisplays:
   - {fileID: 102000013518395380}
   - {fileID: 102000013255618616}
+  initialised: 0
   silent: 0
 --- !u!1 &1000012189469876
 GameObject:
@@ -2948,6 +2947,7 @@ Transform:
   m_Children:
   - {fileID: 1152803307485891241}
   - {fileID: 8953582735279091453}
+  - {fileID: 1178873273455687382}
   m_Father: {fileID: 6857106195101108095}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3030,7 +3030,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2281621269044222530}
-  m_Text: HIGH
+  m_Text: +/- 1
   m_OffsetZ: 0
   m_CharacterSize: 0.03
   m_LineSpacing: 1
@@ -3123,6 +3123,101 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &3972130263693250046
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1178873273455687382}
+  - component: {fileID: 4821715228408505834}
+  - component: {fileID: 6114586967848574392}
+  m_Layer: 9
+  m_Name: offLabel (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1178873273455687382
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3972130263693250046}
+  m_LocalRotation: {x: 0.7069846, y: 0, z: 0, w: 0.70722896}
+  m_LocalPosition: {x: 0.0398, y: -0.0031, z: 0.0003}
+  m_LocalScale: {x: 0.11869212, y: 0.11869212, z: 0.11869212}
+  m_Children: []
+  m_Father: {fileID: 6300461376510934568}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &4821715228408505834
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3972130263693250046}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a83b5e1055cd76f4bb1706e3e6f7c073, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!102 &6114586967848574392
+TextMesh:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3972130263693250046}
+  m_Text: 'OUTPUT
+
+    RANGE'
+  m_OffsetZ: 0
+  m_CharacterSize: 0.03
+  m_LineSpacing: 1
+  m_Anchor: 4
+  m_Alignment: 0
+  m_TabSize: 4
+  m_FontSize: 30
+  m_FontStyle: 0
+  m_RichText: 1
+  m_Font: {fileID: 12800000, guid: 31a7f34e01049fa479a7f2d4c8942f55, type: 3}
+  m_Color:
+    serializedVersion: 2
+    rgba: 4294967295
 --- !u!1 &4905459887957780399
 GameObject:
   m_ObjectHideFlags: 0
@@ -3228,7 +3323,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5269645710880466794}
   m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: -0.5}
-  m_LocalPosition: {x: -0.103, y: 0.053, z: 0.0002}
+  m_LocalPosition: {x: -0.103, y: 0.0529, z: 0.004}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_Children:
   - {fileID: 3711231797045539265}
@@ -3353,7 +3448,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5304538652123739278}
-  m_Text: LOW
+  m_Text: +/- 0.1
   m_OffsetZ: 0
   m_CharacterSize: 0.03
   m_LineSpacing: 1

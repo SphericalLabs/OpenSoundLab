@@ -174,7 +174,7 @@ public class manipulator : MonoBehaviour {
     }
   }
 
-  public void hapticPulse(ushort hapticPower = 750) {
+  public void hapticPulse(ushort hapticPower = 900) {
         // if (masterControl.instance.currentPlatform == masterControl.platform.Vive) SteamVR_Controller.Input(controllerIndex).TriggerHapticPulse(hapticPower);
         //  else if (masterControl.instance.currentPlatform == masterControl.platform.Oculus) bigHaptic(hapticPower, .05f);
         List<UnityEngine.XR.InputDevice> devices = new List<UnityEngine.XR.InputDevice>();

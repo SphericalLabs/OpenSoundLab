@@ -76,7 +76,7 @@ public class oscillatorDeviceInterface : deviceInterface
 
     signal.lfo = lfo;
     UpdateFreq();
-    //speaker.volume = lfo ? 0f : 1f;
+    speaker.volume = lfo ? 0f : 1f;
   }
 
   void UpdateFreq()
