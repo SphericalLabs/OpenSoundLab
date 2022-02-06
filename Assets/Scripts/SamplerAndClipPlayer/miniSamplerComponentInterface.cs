@@ -19,8 +19,8 @@ public class miniSamplerComponentInterface : componentInterface
 {
     clipPlayerSimple player;
     public button muteButton;
-    public omniJack jackout, speedInput, volumeInput;
-    public dial speedDial, volumeDial;
+    public omniJack jackSampleOut, jackPitch, jackAmp;
+    public dial dialPitch, dialAmp;
 
     void Awake()
     {
@@ -29,11 +29,11 @@ public class miniSamplerComponentInterface : componentInterface
 
     void Update()
     {
-        player.playbackSpeed = 1f * Mathf.Pow(2, Utils.map(speedDial.percent, 0f, 1f, -4f, 4f));
-        player.amplitude = Mathf.Pow(volumeDial.percent, 2);
+        player.playbackSpeed = 1f * Mathf.Pow(2, Utils.map(dialPitch.percent, 0f, 1f, -4f, 4f));
+        player.amplitude = Mathf.Pow(dialAmp.percent, 2);
 
-        if (player.freqExpGen != speedInput.signal) player.freqExpGen = speedInput.signal;
-        if (player.ampGen != volumeInput.signal) player.ampGen = volumeInput.signal;
+        if (player.freqExpGen != jackPitch.signal) player.freqExpGen = jackPitch.signal;
+        if (player.ampGen != jackAmp.signal) player.ampGen = jackAmp.signal;
 
         player.seqMuted = muteButton.isHit;
     }

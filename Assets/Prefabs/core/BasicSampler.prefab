@@ -1114,11 +1114,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useNativeIfAvailable: 1
   muteButton: {fileID: 114000010075456048}
-  jackout: {fileID: 114000014109223676}
-  speedInput: {fileID: 8257217584120589837}
-  volumeInput: {fileID: 1155618421894485141}
-  speedDial: {fileID: 2694766225831041881}
-  volumeDial: {fileID: 2728118564238663338}
+  jackSampleOut: {fileID: 114000014109223676}
+  jackPitch: {fileID: 8257217584120589837}
+  jackAmp: {fileID: 1155618421894485141}
+  dialPitch: {fileID: 2694766225831041881}
+  dialAmp: {fileID: 2728118564238663338}
 --- !u!1 &183296187179527755
 GameObject:
   m_ObjectHideFlags: 0
