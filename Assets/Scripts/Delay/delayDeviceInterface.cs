@@ -62,6 +62,8 @@ public class delayDeviceInterface : deviceInterface
 
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
+        data.jackTimeID = cTimeInput.transform.GetInstanceID();
+        data.jackFeedbackID = cFeedbackInput.transform.GetInstanceID();
 
         return data;
     }
@@ -73,6 +75,8 @@ public class delayDeviceInterface : deviceInterface
 
         input.ID = data.jackInID;
         output.ID = data.jackOutID;
+        cTimeInput.ID = data.jackTimeID;
+        cFeedbackInput.ID = data.jackFeedbackID;
 
         timeDial.setPercent(data.timeState);
         feedbackDial.setPercent(data.feedbackState);
@@ -92,5 +96,8 @@ public class DelayData : InstrumentData
 
     public int jackOutID;
     public int jackInID;
-    public int jackSidechainID;
+
+    public int jackTimeID;
+    public int jackFeedbackID;
+
 }
