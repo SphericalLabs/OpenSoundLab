@@ -2269,7 +2269,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000013326465882}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.02756, y: -0.0006, z: -0.00404}
+  m_LocalPosition: {x: -0.0288, y: -0.0006, z: 0.001}
   m_LocalScale: {x: 0.08520513, y: 0.08520479, z: 0.08520474}
   m_Children: []
   m_Father: {fileID: 4000014003536200}
@@ -2329,7 +2329,7 @@ TextMesh:
   m_CharacterSize: 0.03
   m_LineSpacing: 1
   m_Anchor: 4
-  m_Alignment: 1
+  m_Alignment: 2
   m_TabSize: 4
   m_FontSize: 30
   m_FontStyle: 0
@@ -2768,7 +2768,6 @@ MonoBehaviour:
   yBounds: {x: -Infinity, y: 0}
   percent: {x: 0, y: 0}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
-  usingGlowMat: 1
   usePercent: 0
   _interface: {fileID: 0}
 --- !u!1 &1294162313138962

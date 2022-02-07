@@ -265,6 +265,7 @@ public class sequencerCVDeviceInterface : deviceInterface
           {
             //cubeFloats[i][i2] = cubeList[i2][i].GetComponentInChildren<dial>().percent;
             cubeFloats[i][i2] = cubeDials[i2][i].percent; // read from local registry of dials, avoid searching
+            // please note: i2 and i are swapped for these cube lists, but works fine
           }
         }
     }
@@ -365,7 +366,7 @@ public class sequencerCVDeviceInterface : deviceInterface
 
                 float Hval = (float)i2 / max;
                 t.GetComponent<button>().Setup(curDimensions[0], i2, cubeBools[curDimensions[0]][i2], Color.HSVToRGB(Hval, .9f, .05f));
-                t.GetComponent<dial>().setPercent(cubeFloats[0][i2]);
+                t.GetComponentInChildren<dial>().setPercent(cubeFloats[0][i2]);
 
                 Vector3 pJ = jackTriggerList[i2].localPosition;
                 pJ.x -= cubeConst;
