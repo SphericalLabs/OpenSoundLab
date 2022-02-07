@@ -86,10 +86,11 @@ public class menuManager : MonoBehaviour {
       if (Application.platform == RuntimePlatform.Android)
       {
         if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
-        //if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
-        //if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
       }
-      // skip unneeded devices
+      
+      if ((menuItem.deviceType)i == menuItem.deviceType.Sequencer) continue; 
+      if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Airhorn) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Stereo) continue; // remove completely?
       //if ((menuItem.deviceType)i == menuItem.deviceType.ADSR) continue;
@@ -99,6 +100,7 @@ public class menuManager : MonoBehaviour {
       if ((menuItem.deviceType)i == menuItem.deviceType.Funktion) continue;
       //if ((menuItem.deviceType)i == menuItem.deviceType.SARSCov2) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Looper) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.Reverb) continue;
 
 
       if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue; // skip for windows, too, throws error otherwise

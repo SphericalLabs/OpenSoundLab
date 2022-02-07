@@ -182,6 +182,8 @@ public class sequencerDeviceInterface : deviceInterface {
       _beatManager.toggleMC(externalPulse == null);
       if (externalPulse != null) forcePlay(false);
     }
+
+
   }
 
   public void forcePlay(bool on) {
@@ -456,7 +458,7 @@ public class sequencerDeviceInterface : deviceInterface {
 
     data.sampleJackOutIDs = new int[samplerList.Count];
     for (int i = 0; i < samplerList.Count; i++) {
-      data.sampleJackOutIDs[i] = samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackout.transform.GetInstanceID();
+      data.sampleJackOutIDs[i] = samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackSampleOut.transform.GetInstanceID();
     }
 
     return data;
@@ -495,22 +497,25 @@ public class sequencerDeviceInterface : deviceInterface {
     swingDial.setPercent(data.swing);
 
     for (int i = 0; i < samplerList.Count; i++) {
-      samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackout.ID = data.sampleJackOutIDs[i];
+      samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackSampleOut.ID = data.sampleJackOutIDs[i];
     }
   }
 }
 
 public class SequencerData : InstrumentData {
+  
   public bool onSwitch;
   public int jackInID;
-  public int[] dimensions;
-  public bool[][] cubeStates;
+  
+  public int speedMult;
+  public float swing;
 
   public int[] jackOutIDs;
 
-  public int speedMult;
   public string[][] rowSamples;
   public int[] sampleJackOutIDs;
   public bool[] rowMute;
-  public float swing;
+  public int[] dimensions;
+  public bool[][] cubeStates;
+
 }

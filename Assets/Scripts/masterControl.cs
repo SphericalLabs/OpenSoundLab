@@ -70,6 +70,44 @@ public class masterControl : MonoBehaviour {
     _measurePhase = 0;
     _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
 
+    var configuration = AudioSettings.GetConfiguration();
+
+    if (configuration.sampleRate == 48000)
+    {
+      Debug.Log("Unity sample rate is " + configuration.sampleRate);
+    }
+    else
+    {
+      Debug.LogWarning("Unity sample rate is " + configuration.sampleRate);
+    }
+
+    int bufferSize = 512;
+
+    if(Application.platform == RuntimePlatform.WindowsEditor)
+    {
+      bufferSize = 512;
+    } 
+    else if (Application.platform == RuntimePlatform.Android)
+    {
+      bufferSize = 256;
+
+      //OVRPlugin.systemDisplayFrequency = 72;
+
+      Debug.Log("Current cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+      Debug.Log("Trying to set levels to 4");
+      OVRManager.gpuLevel = 4;
+      OVRManager.cpuLevel = 4;
+      Debug.Log("New cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+    }
+
+    Debug.Log("Buffer size is: " + configuration.dspBufferSize);
+    //configuration.dspBufferSize = bufferSize;
+    //AudioSettings.OnAudioConfigurationChanged += resetMasterClockDSPTime;
+    //AudioSettings.Reset(configuration); // this fried the OnAudioFilterRead hook on the mastercontrol clock
+    //AudioSettings.SetDSPBufferSize(bufferSize, 2);
+
+    //Debug.Log("Buffer size is now set to: " + AudioSettings.GetConfiguration().dspBufferSize);
+
     if (!PlayerPrefs.HasKey("glowVal")) PlayerPrefs.SetFloat("glowVal", 1);
     if (!PlayerPrefs.HasKey("envSound")) PlayerPrefs.SetInt("envSound", 1);
 
@@ -93,14 +131,11 @@ public class masterControl : MonoBehaviour {
 
     GetComponent<sampleManager>().Init();
 
-    //OVRPlugin.systemDisplayFrequency = 72;
-    Debug.Log("Current cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
-    Debug.Log("Trying to set levels to 4");
-    OVRManager.gpuLevel = 2;
-    OVRManager.cpuLevel = 2;
-    Debug.Log("New cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
-
   }
+
+  //public void resetMasterClockDSPTime(bool wasChanged){
+  //  if (wasChanged) resetClock();
+  //}
 
   public void toggleInstrumentVolume(bool on) {
     masterMixer.SetFloat("instrumentVolume", on ? 0 : -18);

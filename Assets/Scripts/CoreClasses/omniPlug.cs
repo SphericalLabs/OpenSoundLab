@@ -25,7 +25,7 @@ public class omniPlug : manipObject {
 
   Color cordColor;
   LineRenderer lr;
-  Material mat;
+  //Material mat;
 
   Transform plugTrans;
   List<Vector3> plugPath = new List<Vector3>();
@@ -44,7 +44,7 @@ public class omniPlug : manipObject {
   public override void Awake() {
     base.Awake();
     gameObject.layer = 12; //jacks
-    mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
+    //mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
     lr = GetComponent<LineRenderer>();
     cordColor = new Color(Random.value, Random.value, Random.value);
     //lr.material.SetColor("_TintColor", cordColor);
@@ -59,8 +59,8 @@ public class omniPlug : manipObject {
   }
 
   public void Setup(float c, bool outputting, omniPlug other) {
-    Color jackColor = Color.HSVToRGB(c, .8f, .5f);
-    cordColor = Color.HSVToRGB(c, .8f, .2f);
+    //Color jackColor = Color.HSVToRGB(c, .8f, .5f);
+    //cordColor = Color.HSVToRGB(c, .8f, .2f);
 
     //mat.SetColor("_TintColor", jackColor);
     //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", jackColor);
@@ -84,12 +84,12 @@ public class omniPlug : manipObject {
 
   public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor) {
     float h, s, v;
-    Color.RGBToHSV(tempColor, out h, out s, out v);
+    //Color.RGBToHSV(tempColor, out h, out s, out v);
 
-    Color c1 = Color.HSVToRGB(h, .8f, .5f);
-    Color c2 = Color.HSVToRGB(h, .8f, .2f);
+    //Color c1 = Color.HSVToRGB(h, .8f, .5f);
+    //Color c2 = Color.HSVToRGB(h, .8f, .2f);
 
-    cordColor = tempColor;
+    //cordColor = tempColor;
     //lr.material.SetColor("_TintColor", c2);
     //mat.SetColor("_TintColor", c1);
     //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", c1);
@@ -202,7 +202,7 @@ public class omniPlug : manipObject {
       }
 
       updateLineVerts();
-      if (noChange) calmLine();
+      //if (noChange) calmLine();
     }
   }
 

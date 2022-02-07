@@ -21,27 +21,28 @@ public class xyHandle : manipObject {
   public Vector2 xBounds = new Vector2(-Mathf.Infinity, -.05f);
   public Vector2 yBounds = new Vector2(-Mathf.Infinity, 0);
   public Vector2 percent = Vector2.zero;
-  public Material onMat;
+  
   Renderer rend;
+  public Material onMat;
   Material offMat;
-  Material glowMat;
+  //Material glowMat;
 
-  public bool usingGlowMat = true;
+  //public bool usingGlowMat = true;
   public bool usePercent = true;
 
   public componentInterface _interface;
 
-  Color glowColor = Color.HSVToRGB(0, .5f, .1f);
+  //Color glowColor = Color.HSVToRGB(0, .5f, .1f);
 
   public override void Awake() {
     base.Awake();
     rend = GetComponent<Renderer>();
-
-    if (usingGlowMat) {
-      offMat = rend.material;
-      glowMat = new Material(onMat);
-      glowMat.SetColor("_TintColor", glowColor);
-    } else rend.material.SetColor("_TintColor", glowColor * .25f);
+    offMat = rend.sharedMaterial;
+    //if (usingGlowMat) {
+    //  offMat = rend.sharedMaterial;
+    //  //glowMat = new Material(onMat);
+    //  //glowMat.SetColor("_TintColor", glowColor);
+    //} else rend.material.SetColor("_TintColor", glowColor * .25f);
   }
 
   void Start() {
@@ -107,18 +108,13 @@ public class xyHandle : manipObject {
     curState = state;
     if (curState == manipState.none) {
       if (_interface != null) _interface.onSelect(false, ID);
-      if (usingGlowMat) rend.material = offMat;
-      else rend.material.SetColor("_TintColor", glowColor * 0.25f);
+      rend.sharedMaterial = offMat;      
     } else if (curState == manipState.selected) {
       if (_interface != null) _interface.onSelect(true, ID);
-      if (usingGlowMat) {
-        rend.material = glowMat;
-        glowMat.SetColor("_TintColor", glowColor * .25f);
-      } else rend.material.SetColor("_TintColor", glowColor * 0.5f);
+      rend.sharedMaterial = onMat;      
     } else if (curState == manipState.grabbed) {
       if (_interface != null) _interface.onSelect(true, ID);
-      if (usingGlowMat) rend.material = glowMat;
-      else rend.material.SetColor("_TintColor", glowColor * 0.5f);
+      rend.sharedMaterial = onMat;
 
       posstart = (Vector2)transform.localPosition;
       offset.x = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;

@@ -26,14 +26,11 @@ struct FilterData
 };
 
 
-
-
 extern "C"
 {
 	//filter
 //    SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB);
     SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, float filterBuffer[], float resonance);
-    float clamp(float d, float min, float max);
 }
 
 

@@ -44,7 +44,8 @@ public class tape : manipObject {
     mat = tapeTrans.GetComponent<Renderer>().material;
     labelMesh = GetComponentInChildren<TextMesh>();
     labelMesh.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
-    tapeHue = Random.value;
+    //tapeHue = Random.value;
+    tapeHue = 0.5f;
     tapeColor = Color.HSVToRGB(tapeHue, .5f, 1);
     SetColor(tapeColor);
     createHandleFeedback();

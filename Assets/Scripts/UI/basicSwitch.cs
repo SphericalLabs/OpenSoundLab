@@ -45,7 +45,7 @@ public class basicSwitch : manipObject {
       labelMats[1].SetFloat("_EmissionGain", .0f);
     }
 
-    setSwitch(true, true);
+    setSwitch(switchVal, true);
   }
 
   public void setSwitch(bool on, bool forced = false) {

@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using UnityEngine;
-//using System.Collections;
+using System;
 using System.Collections.Generic;
-//using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
-public class waveViz : MonoBehaviour {
+
+
+public class waveViz : MonoBehaviour
+{
 
   public Renderer displayRenderer;
 
@@ -27,63 +30,158 @@ public class waveViz : MonoBehaviour {
   Texture2D onlineTexture;
   public Material onlineMaterial;
 
-  int waveWidth = 512;
-  int waveHeight = 64;
-  public int period = 512;
+  public int waveWidth = 256;
+  public int waveHeight = 64;
+  public int heightPadding = 2;
+  public int sampleStep = 512; // should not be higher than buffer size, otherwise looped data?
+  public bool doTriggering = false;
 
-  //int curWaveW = 0;
-  //int lastWaveH = 0;
-  
-  public FilterMode fm = FilterMode.Bilinear;
-  public int ani = 4;
+  FilterMode fm = FilterMode.Bilinear;
+  int ani = 4;
+  public int offset = 0;
 
-  public float[] lastBuffer; // will be written from audio thread
+  IntPtr ringBufferPtr;
 
-  //List<float> bufferDrawList;
-  
-  void Awake() {
-    
-  offlineMaterial = new Material(Shader.Find("GUI/Text Shader"));
+  ///Writes n samples to the ring buffer.
+  [DllImport("SoundStageNative")]
+  static extern void RingBuffer_Write(float[] src, int n, IntPtr x);
+
+  ///Writes samples to the ringbuffer with a specified stride. If the stride is 1, all samples are written to the ringbuffer. If stride < 1, some samples are skipped. If stride > 1, some samples are written more than once (=padded)f. No interpolation is performed. Returns the difference between old and new writeptr.
+  [DllImport("SoundStageNative")]
+  static extern int RingBuffer_WritePadded(float[] src, int n, float stride, IntPtr x);
+
+  ///Reads n samples from the ring buffer
+  [DllImport("SoundStageNative")]
+  static extern void RingBuffer_Read(float[] dest, int n, int offset, IntPtr x);
+
+  //Reads n samples with a specific stride
+  [DllImport("SoundStageNative")]
+  static extern void RingBuffer_ReadPadded(float[] dest, int n, int offset, float stride, IntPtr x);
+
+  ///Reads n samples from the ring buffer and adds the values to the dest array.
+  //static extern void RingBuffer_ReadAndAdd(float* dest, int n, int offset, struct RingBuffer *x);
+
+  ///Resizes the buffer. This includes a memory re-allocation, so use with caution!
+  //static extern void RingBuffer_Resize(int n, struct RingBuffer *x);
+  [DllImport("SoundStageNative")]
+  static extern IntPtr RingBuffer_New(int n);
+
+  ///Frees all resources.
+  [DllImport("SoundStageNative")]
+  static extern void RingBuffer_Free(IntPtr x);
+
+  [DllImport("SoundStageNative")]
+  static extern void _fDeinterleave(float[] src, float[] dest, int n, int channels);
+
+  [DllImport("SoundStageNative")]
+  static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+  float[] renderBuffer;
+  float[] storageBuffer;
+  float[] fullBuffer;
+
+  void Awake()
+  {
+    //int longBufferLength = Mathf.RoundToInt(waveWidth * 4f);
+    ringBufferPtr = RingBuffer_New(waveWidth*2);
+    fullBuffer = new float[waveWidth*2];
+    renderBuffer = new float[waveWidth];
+
+    storageBuffer = new float[1];
+
+    offlineMaterial = new Material(Shader.Find("GUI/Text Shader"));
     offlineMaterial.hideFlags = HideFlags.HideAndDontSave;
     offlineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
     // get a RenderTexture and set it as target for offline rendering
     offlineTexture = new RenderTexture(waveWidth, waveHeight, 24);
     offlineTexture.useMipMap = true;
-    
+
     // these are the ones that you will actually see
     onlineTexture = new Texture2D(waveWidth, waveHeight, TextureFormat.RGBA32, true);
     onlineMaterial = Instantiate(onlineMaterial);
     displayRenderer.material = onlineMaterial;
     onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), onlineTexture);
 
-  }
-  
+    if (onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
+    if (onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
+    if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
 
-  void Start() {
+  }
+
+  void Start()
+  {
     onlineMaterial.mainTexture = onlineTexture;
+
+
+    // init black screen
+    RenderTexture.active = offlineTexture;
+    GL.Clear(false, true, Color.black);
+    Graphics.CopyTexture(offlineTexture, onlineTexture);
   }
-  
-  public void storeBuffer(float[] buffer){
+
+  int tempIndex;
+  public void storeBuffer(float[] buffer, int channels)
+  {
+    if (storageBuffer.Length != buffer.Length / channels / sampleStep) System.Array.Resize(ref storageBuffer, buffer.Length / channels / sampleStep);
     
-    if(lastBuffer == null) lastBuffer = new float[0]; 
-    if (lastBuffer.Length != buffer.Length) System.Array.Resize(ref lastBuffer, buffer.Length);
-    System.Array.Copy(buffer, lastBuffer, buffer.Length);
-    
+    for (int i = 0; i < storageBuffer.Length; i++)
+    {
+      tempIndex = i * channels * sampleStep; // skip through the interleaved audio buffer
+      if (tempIndex >= buffer.Length) break; // overshooting the buffer, finish
+      storageBuffer[i] = buffer[tempIndex];
+    }
+
+    RingBuffer_Write(storageBuffer, storageBuffer.Length, ringBufferPtr);
   }
 
-  void Update() {
+  void Update()
+  {
 
-    RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
+    if (displayRenderer.isVisible)
+    {
+      RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
+    }
 
-    onlineTexture.filterMode = fm;
-    onlineTexture.anisoLevel = ani;
-
-    //waverend.material.mainTextureOffset = new Vector2((float)curWaveW / waveWidth, 0);
   }
+
+  bool lastWasPositive = false;
+  bool foundZeroCrossing = false;
+
+  int kk;
 
   void RenderGLToTexture(int width, int height, Material material)
   {
 
+    if (doTriggering)
+    {
+
+      kk = 0;
+
+      RingBuffer_Read(fullBuffer, fullBuffer.Length, 0, ringBufferPtr); // first scan on data, TODO: move trigger code to RingBuffer
+      lastWasPositive = fullBuffer[fullBuffer.Length - 1 - kk] >= 0f; // take first sample
+      foundZeroCrossing = false;
+      kk++;
+
+      while (kk < fullBuffer.Length - renderBuffer.Length)
+      { // search for first 0-pass from right and then take as offset
+        if ((fullBuffer[fullBuffer.Length - 1 - kk] > 0f && !lastWasPositive) /*(fullBuffer[fullBuffer.Length - 1 - kk] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
+        {
+          foundZeroCrossing = true;
+          break;
+        }
+        lastWasPositive = fullBuffer[fullBuffer.Length - 1 - kk] >= 0f;
+        kk++;
+      }
+      
+      if (!foundZeroCrossing) return; // no new draw if nothing found
+
+      Array.Copy(fullBuffer, fullBuffer.Length - 1 - renderBuffer.Length - kk, renderBuffer, 0, renderBuffer.Length);
+
+    } else {
+      RingBuffer_Read(renderBuffer, renderBuffer.Length, -renderBuffer.Length, ringBufferPtr);
+    }
+
+    
     // always re-set offline render here, in case another script had its finger on it in the meantime
     RenderTexture.active = offlineTexture;
 
@@ -95,32 +193,11 @@ public class waveViz : MonoBehaviour {
     GL.Color(new Color(1, 1, 1, 1f));
     GL.Begin(GL.LINE_STRIP);
 
-    for(int i = 0; i < lastBuffer.Length; i++){
-      GL.Vertex3(i, (1f - (lastBuffer[i] + 1f) * 0.5f) * waveHeight, 0);
+    for (int i = 0; i < renderBuffer.Length; i++)
+    {
+      //GL.Vertex3(i, height - (renderBuffer[i] + 1f) * 0.5f * height, 0); // 2px padding
+      GL.Vertex3(i, Utils.map(renderBuffer[i], -1f, 1f, height - heightPadding, heightPadding), 0); // 2px padding
     }
-    
-
-    //drawY = 0;
-    //drawX = 0;
-    //lastDrawX = 0;
-    //lastDrawY = 0;
-
-    //for (int freqBand = 0; freqBand < spectrum.Length; freqBand++) // skip 0, because of log negative?
-    //{
-    //  drawX = Mathf.RoundToInt(Utils.map(Mathf.Log10(freqBand * bandWidth), leftOffset, maxLog, 0f, width));
-    //  if (drawX - lastDrawX < skip)
-    //  {
-    //    continue; // skip bands if too close together
-    //  }
-
-    //  drawY = height - Mathf.RoundToInt(Mathf.Pow(spectrum[freqBand], 0.3f) * height);
-
-    //  GL.Vertex3(drawX, drawY, 0);
-
-    //  //p1 = p2;
-    //  lastDrawX = drawX;
-    //  lastDrawY = drawY;
-    //}
 
     GL.End();
     GL.PopMatrix();
@@ -138,6 +215,8 @@ public class waveViz : MonoBehaviour {
       offlineTexture.Release();
       Destroy(offlineTexture);
     }
+
+    RingBuffer_Free(ringBufferPtr);
   }
 
 }

@@ -19,14 +19,16 @@ public class recorderDeviceInterface : deviceInterface {
   public omniJack input, output, recordTrigger, playTrigger, backTrigger;
   public sliderNotched durSlider;
   waveTranscribeRecorder transcriber;
+  public basicSwitch normalizeSwitch;
   public button[] buttons;
+  public AudioSource babySpeakerRim;
 
   int[] durations = new int[] { 300, 150, 60, 30, 10 };//{ 10,30,60,150,300 };
 
   public override void Awake() {
     base.Awake();
     transcriber = GetComponent<waveTranscribeRecorder>();
-    durSlider = GetComponentInChildren<sliderNotched>();
+    //durSlider = GetComponentInChildren<sliderNotched>();
   }
 
   void Update() {
@@ -49,6 +51,9 @@ public class recorderDeviceInterface : deviceInterface {
       if (!on) buttons[0].keyHit(false);
       transcriber.playing = on;
     }
+    if(ID == 5){
+      babySpeakerRim.mute = on;
+    }
   }
 
   public override InstrumentData GetData() {
@@ -62,6 +67,7 @@ public class recorderDeviceInterface : deviceInterface {
     data.playTriggerID = playTrigger.transform.GetInstanceID();
     data.backTriggerID = backTrigger.transform.GetInstanceID();
     data.dur = durSlider.switchVal;
+    data.normalize = normalizeSwitch.switchVal;
     return data;
   }
 
@@ -74,6 +80,7 @@ public class recorderDeviceInterface : deviceInterface {
     playTrigger.ID = data.playTriggerID;
     backTrigger.ID = data.backTriggerID;
     durSlider.setVal(data.dur);
+    normalizeSwitch.setSwitch(data.normalize, true);
   }
 }
 
@@ -84,5 +91,6 @@ public class RecorderData : InstrumentData {
   public int playTriggerID;
   public int backTriggerID;
   public int dur;
+  public bool normalize;
   public string audioFilename;
 }

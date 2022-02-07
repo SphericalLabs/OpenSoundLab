@@ -67,9 +67,15 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0
+  dialColor: 1
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  isNotched: 0
+  notchSteps: 4
+  controllerRot: 0
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0
@@ -1639,9 +1645,15 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0
+  dialColor: 1
+  deltaRot: 0
+  curRot: 0
+  realRot: 0
+  prevShakeRot: 0
+  fineMult: 5
+  isNotched: 1
+  notchSteps: 4
+  controllerRot: 0
 --- !u!1 &1889782904049535752
 GameObject:
   m_ObjectHideFlags: 0

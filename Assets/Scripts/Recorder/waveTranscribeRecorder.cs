@@ -15,20 +15,24 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Runtime.InteropServices;
 
 public class waveTranscribeRecorder : signalGenerator {
   public int duration = 300;
   public bool recording = false;
   public bool playing = false;
 
+  public GameObject tapePrefab;
+  public Transform tapeHolder;
+  public tape curTape;
+
   public TextMesh saveText;
 
-  int maxDuration = 300;
-
   float[] sampleBuffer;
+  // Int16[] cheaperBuffer; // -> todo?
+  int maxDuration = 300; // in seconds
+  public int truncatedBufferLength = 0;
   int curBufferIndex = 0;
-
-  int virtualBufferLength = 0;
 
   public Transform scrubTransform;
   Vector2 scrubRange = new Vector2(.4f, -.4f);
@@ -45,20 +49,26 @@ public class waveTranscribeRecorder : signalGenerator {
   Color32[] wavepixels;
   int curWaveW = 0;
   int lastWaveH = 0;
-  public Color32 waveBG = Color.black;
+  public Color32 waveBG = Color.black; // overridden in prefab
   public Color32 waveLine = Color.white;
   int columnMult = 1;
   double _sampleRateOverride;
 
   float[] lastRecSig, lastPlaySig, lastBackSig;
 
+  [DllImport("SoundStageNative")]
+  public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+
   public override void Awake() {
     base.Awake();
     _deviceInterface = GetComponent<recorderDeviceInterface>();
     sampleBuffer = new float[(int)(maxDuration * AudioSettings.outputSampleRate) * 2];
-    virtualBufferLength = sampleBuffer.Length;
+    truncatedBufferLength = sampleBuffer.Length;
+
     _sampleRateOverride = AudioSettings.outputSampleRate;
 
+    // don't do mipmapping here to keep computation low
     tex = new Texture2D(wavewidth, waveheight, TextureFormat.RGBA32, false);
     wavepixels = new Color32[wavewidth * waveheight];
     waverend.material.mainTexture = tex;
@@ -70,8 +80,8 @@ public class waveTranscribeRecorder : signalGenerator {
 
   public void updateDuration(int newduration) {
     duration = newduration;
-    virtualBufferLength = duration * AudioSettings.outputSampleRate * 2;
-    columnMult = Mathf.CeilToInt((float)virtualBufferLength / (wavewidth - 1));
+    truncatedBufferLength = duration * AudioSettings.outputSampleRate * 2;
+    columnMult = Mathf.CeilToInt((float)truncatedBufferLength / (wavewidth - 1));
     recalcTex();
     if (!playing) {
       tex.SetPixels32(wavepixels);
@@ -83,8 +93,8 @@ public class waveTranscribeRecorder : signalGenerator {
     int centerH = waveheight / 2;
 
     for (int i = 0; i < wavewidth; i++) {
-      if (columnMult * i < virtualBufferLength) {
-        int curH = Mathf.FloorToInt((waveheight - 1) * .5f * Mathf.Clamp01(Mathf.Abs(sampleBuffer[columnMult * i])));
+      if (columnMult * i < truncatedBufferLength) {
+        int curH = Mathf.FloorToInt((waveheight - 1) * .5f * Mathf.Pow(Mathf.Clamp01(Mathf.Abs(sampleBuffer[columnMult * i])), 0.5f));
 
         for (int i2 = 0; i2 < centerH; i2++) {
           if (i2 < curH) wavepixels[(centerH - i2) * wavewidth + i] = wavepixels[(centerH + i2) * wavewidth + i] = waveLine;
@@ -112,7 +122,7 @@ public class waveTranscribeRecorder : signalGenerator {
   }
 
   bool resetScrub = false;
-  float samplePos = 0;
+  float samplePos = 0; // for viz
   void Update() {
     if (resetScrub) scrubReset();
     if (!playing) return;
@@ -126,15 +136,20 @@ public class waveTranscribeRecorder : signalGenerator {
   }
 
   public void Flush() {
+    if (bufferToWav.instance.savingInProgress) return;
+
     for (int i = 0; i < wavewidth; i++) {
       for (int i2 = 0; i2 < waveheight; i2++) {
         wavepixels[i2 * wavewidth + i] = waveBG;
       }
     }
 
-    sampleBuffer = new float[(int)(maxDuration * _sampleRateOverride) * 2];
+    SetArrayToSingleValue(sampleBuffer, sampleBuffer.Length, 0f); 
+
     tex.SetPixels32(wavepixels);
     tex.Apply(false);
+
+    if (curTape != null) Destroy(curTape.gameObject);
   }
 
   public void Save() {
@@ -144,9 +159,18 @@ public class waveTranscribeRecorder : signalGenerator {
       string.Format("{0:yyyy-MM-dd_HH-mm-ss}.wav",
        DateTime.Now);
 
-    bufferToWav.instance.Save(audioFilename, sampleBuffer, 2, virtualBufferLength, saveText, this);
+    bufferToWav.instance.Save(audioFilename, sampleBuffer, 2, truncatedBufferLength, saveText, this, _deviceInterface.normalizeSwitch.switchVal);
   }
 
+  string curfilename = "";
+  public override void updateTape(string s)
+  {
+    s = System.IO.Path.GetFileNameWithoutExtension(s);
+    curfilename = s;
+    if (curTape != null) Destroy(curTape.gameObject);
+    curTape = (Instantiate(tapePrefab, tapeHolder, false) as GameObject).GetComponent<tape>();
+    curTape.Setup(s, sampleManager.instance.sampleDictionary["Recordings"][s]);
+  }
 
   public void Back() {
     curBufferIndex = 0;
@@ -165,19 +189,20 @@ public class waveTranscribeRecorder : signalGenerator {
   }
 
   double lastIncomingDspTime = -1;
-  float[] oldBuffer;
+  //float[] oldBuffer;
   bool playingLastFrame = false;
+
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    if (lastIncomingDspTime == dspTime) {
+    //if (lastIncomingDspTime == dspTime) {
 
-      for (int i = 0; i < buffer.Length; i++) {
-        buffer[i] = oldBuffer[i];
-      }
-      return;
-    }
-    lastIncomingDspTime = dspTime;
+    //  for (int i = 0; i < buffer.Length; i++) {
+    //    buffer[i] = oldBuffer[i];
+    //  }
+    //  return;
+    //}
+    //lastIncomingDspTime = dspTime;
 
-    oldBuffer = new float[buffer.Length];
+    //oldBuffer = new float[buffer.Length];
     float[] recBuffer = new float[buffer.Length];
     float[] playBuffer = new float[buffer.Length];
     float[] backBuffer = new float[buffer.Length];
@@ -220,21 +245,27 @@ public class waveTranscribeRecorder : signalGenerator {
       if (_deviceInterface.backTrigger.signal != null) {
         if (backBuffer[i] > lastBackSig[1] && lastBackSig[1] <= lastBackSig[0]) {
           curBufferIndex = 0;
-
         }
 
         lastBackSig[0] = lastBackSig[1];
         lastBackSig[1] = backBuffer[i];
       }
 
-      if (playing) {
-        oldBuffer[i] = buffer[i] += sampleBuffer[curBufferIndex];
-        oldBuffer[i + 1] = buffer[i + 1] += sampleBuffer[curBufferIndex + 1];
-      }
-      if (recording) {
+      if (recording && playing) {
         sampleBuffer[curBufferIndex] = buffer[i];
         sampleBuffer[curBufferIndex + 1] = buffer[i + 1];
+      } 
+
+      if (playing && !recording)
+      {
+        buffer[i] = sampleBuffer[curBufferIndex];
+        buffer[i + 1] = sampleBuffer[curBufferIndex + 1];
       }
+
+      //if(!playing && !recording){
+        // do nothing, just pass through buffers that have already been populated from incoming
+      //}
+
       if (playing) {
         int centerH = waveheight / 2;
         if (curBufferIndex % columnMult == 0) {
@@ -253,13 +284,13 @@ public class waveTranscribeRecorder : signalGenerator {
         }
 
         curBufferIndex = (curBufferIndex + 2);
-        if (curBufferIndex >= virtualBufferLength) {
+        if (curBufferIndex >= truncatedBufferLength) {
           curBufferIndex = 0; //NOT RIGHT
           Stop();
         }
 
       }
     }
-    samplePos = (float)curBufferIndex / virtualBufferLength;
+    samplePos = (float)curBufferIndex / truncatedBufferLength;
   }
 }

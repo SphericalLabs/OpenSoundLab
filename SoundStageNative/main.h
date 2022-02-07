@@ -35,7 +35,7 @@ extern "C" {
     SOUNDSTAGE_API float LoganTest();
     SOUNDSTAGE_API bool GetBinaryState(float buffer[], int length, int channels, float &lastBuf);
     SOUNDSTAGE_API bool IsPulse(float buffer[], int length);
-    SOUNDSTAGE_API void CompressClip(float buffer[], int length);
+    SOUNDSTAGE_API void NormalizeClip(float buffer[], int length);
     SOUNDSTAGE_API void MicFunction(float a[], float b[], int length, float val);
     SOUNDSTAGE_API void ColorTest(char a[]);
     SOUNDSTAGE_API int NoiseProcessBuffer(float buffer[], float& sample, int length, int channels, float frequency, int counter, int speedFrames, bool& updated);

@@ -118,7 +118,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 0.21
+  bundleVersion: 0.27
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -163,12 +163,12 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: unity.HardLightLabsLLC.SoundStage
-    Standalone: unity.Hard Light Labs LLC.SoundStage
+    Standalone: unity.HardLightLabsLLC.SoundStage
     iPhone: com.oculus.UnitySample
     tvOS: com.oculus.UnitySample
   buildNumber:
     iPhone: 0
-  AndroidBundleVersionCode: 21
+  AndroidBundleVersionCode: 27
   AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 0
@@ -489,7 +489,7 @@ PlayerSettings:
   - m_BuildTarget: PS4
     m_EncodingQuality: 1
   - m_BuildTarget: Android
-    m_EncodingQuality: 1
+    m_EncodingQuality: 2
   m_BuildTargetGroupLightmapSettings: []
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0

@@ -166,7 +166,7 @@ public class waveTranscribeLooper : signalGenerator {
          "Recordings" + System.IO.Path.DirectorySeparatorChar +
         string.Format("{0:yyyy-MM-dd_HH-mm-ss}.wav",
         DateTime.Now);
-    bufferToWav.instance.Save(audioFilename, sampleBuffer, 2, virtualBufferLength, saveText, this);
+    bufferToWav.instance.Save(audioFilename, sampleBuffer, 2, virtualBufferLength, saveText, this, false);
   }
 
   string curfilename = "";

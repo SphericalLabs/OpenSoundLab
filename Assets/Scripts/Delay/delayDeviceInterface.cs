@@ -50,7 +50,7 @@ public class delayDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        delayData data = new delayData();
+        DelayData data = new DelayData();
         data.deviceType = menuItem.deviceType.Delay;
         GetTransformData(data);
 
@@ -58,6 +58,7 @@ public class delayDeviceInterface : deviceInterface
         data.feedbackState = feedbackDial.percent;
         data.wetState = wetDial.percent;
         data.dryState = dryDial.percent;
+        data.modeState = modeDial.percent;
 
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
@@ -67,7 +68,7 @@ public class delayDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d)
     {
-        delayData data = d as delayData;
+        DelayData data = d as DelayData;
         base.Load(data);
 
         input.ID = data.jackInID;
@@ -77,15 +78,17 @@ public class delayDeviceInterface : deviceInterface
         feedbackDial.setPercent(data.feedbackState);
         wetDial.setPercent(data.wetState);
         dryDial.setPercent(data.dryState);
+        modeDial.setPercent(data.modeState);
     }
 }
 
-public class delayData : InstrumentData
+public class DelayData : InstrumentData
 {
     public float timeState;
     public float feedbackState;
     public float wetState;
     public float dryState;
+    public float modeState;
 
     public int jackOutID;
     public int jackInID;

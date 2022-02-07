@@ -14,154 +14,197 @@
 
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class dial : manipObject {
 
   public float percent = 0f;
+  float defaultPercent; 
 
-  glowDisk dialFeedback;
-  Material[] mats;
-
-  public Color customColor;
-
-  public bool externalHue = false;
-  public float hue = .5f;
+  public enum dialColors {generic, frequency, amplitude};
+  public dialColors dialColor = dialColors.generic; // dropdown, defaulting to white
 
   GameObject littleDisk;
+  glowDisk dialFeedback;
+
+  public float deltaRot = 0;
+  public float curRot = 0;
+  public float realRot = 0f;
+  public float prevShakeRot = 0f;
+  public float fineMult = 5f;
+
+  public bool isNotched = false;
+  public int notchSteps = 4;
 
   public override void Awake() {
-    base.Awake();
+    base.Awake();    
+    
+    // store the first value on Awake and keep it as default
+    defaultPercent = percent;
+
     littleDisk = transform.Find("littleDisk").gameObject;
-
-    mats = new Material[3];
-    mats[0] = littleDisk.GetComponent<Renderer>().material;
-    mats[1] = transform.parent.Find("glowDisk").GetComponent<Renderer>().material;
-    mats[2] = transform.parent.Find("Label").GetComponent<Renderer>().material;
-
-    customColor = Color.HSVToRGB(hue, 1f, 0.4f);
-
-    setGlowState(manipState.none);
-
     dialFeedback = transform.parent.Find("glowDisk").GetComponent<glowDisk>();
+
+    setMaterials(dialColor);
+    //setGlowState(manipState.none); // no glow variant to save draw calls
+
   }
 
-  void setGlowState(manipState s) {
-    Color c = customColor;
+  void setMaterials(dialColors colorVariant){
+    
+    string str = Enum.GetName(typeof(dialColors), colorVariant); // gets the string name of the enum
 
-    switch (s) {
-      case manipState.none:
-        littleDisk.SetActive(false);
+    // Please note: setting a material using .material does not immediately instantiate a copy of that material - only if its properties are accessed!
+    // Using sharedMaterial here, but the shader has alpha and therefore cannot be fully batched.
+    littleDisk.GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "LittleDisk");
+    transform.parent.Find("glowDisk").GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "GlowDisk");
 
-        for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", .5f);
-          mats[i].SetColor("_TintColor", c);
-        }
-        break;
-      case manipState.selected:
-        littleDisk.SetActive(true);
-        for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", 0.5f);
-          mats[i].SetColor("_TintColor", c);
-        }
-        break;
-      case manipState.grabbed:
-        littleDisk.SetActive(true);
-
-        for (int i = 0; i < mats.Length; i++) {
-          mats[i].SetFloat("_EmissionGain", 0.5f);
-          mats[i].SetColor("_TintColor", c);
-        }
-        break;
-      default:
-        break;
-    }
   }
 
-
-  void updateMatsColor(Color c) {
-    foreach (Material m in mats) m.SetColor("_TintColor", c);
-  }
 
   void Start() {
     setPercent(percent);
   }
 
   void Update() {
+
+    if (curState == manipState.selected || curState == manipState.grabbed)
+    {
+      // reset dial to default
+      if ((selectObj.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawButton.Y)
+      || (selectObj.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawButton.B))))
+      {
+        setPercent(defaultPercent);
+        deltaRot = controllerRot - curRot;
+      }
+    }
+
     updatePercent();
   }
 
   public void setPercent(float p) {
     percent = Mathf.Clamp01(p);
-    if (p >= 0.5f) realRot = (percent - .5f) * 300;
-    else realRot = percent * 300 + 210;
-
-    curRot = realRot / 2f;
+    if (isNotched)
+    {
+      realRot = Utils.map(Mathf.Round(percent * (notchSteps - 1)), 0, notchSteps - 1, -150f, 150f);
+    } else {
+      realRot = Utils.map(percent, 0f, 1f, -150f, 150f);
+    }
+    
+    curRot = realRot; // can be removed?
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
   }
 
   void updatePercent() {
-    if (realRot < 180) percent = .5f + realRot / 300;
-    else percent = (realRot - 210) / 300;
 
-    dialFeedback.percent = percent * 0.85f;
+    percent = Utils.map(realRot, -150f, 150f, 0f, 1f);
+
+    // viz
+    dialFeedback.percent = percent * 0.85f; // why that multiplier?
     dialFeedback.PercentUpdate();
   }
 
-  Vector2 dialCoordinates(Vector3 vec) {
-    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
-    return new Vector2(flat.x, flat.z);
+  public float controllerRot = 0f;
+
+  // begin grab, this sets the entry rotation via deltaRot
+  public override void setState(manipState state) {
+    curState = state;
+    //setGlowState(state);
+
+    if (curState == manipState.grabbed) {
+      turnCount = 0;
+
+      // trigger beginners guidance
+      if (!masterControl.instance.dialUsed) { 
+        if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
+        _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
+      }
+
+      Vector2 temp = dialCoordinates(manipulatorObj.up);
+      controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
+
+      //if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
+      //{
+      //  deltaRot = controllerRot - curRot * fineMult;        
+      //} else {
+        deltaRot = controllerRot - curRot;
+      //}
+      
+    }
   }
 
-  float deltaRot = 0;
-  float curRot = 0;
-  float realRot = 0f;
-  float prevShakeRot = 0f;
-  float fineMult = 5f;
-
-  public override void grabUpdate(Transform t) {
-    Vector2 temp = dialCoordinates(t.right);
-
-    // naughty hack, since grip button has to be pressed BEFORE starting gabbing... otherwise jumps
-    // also loops around too early
+  
+  
+  public override void grabUpdate(Transform t)
+  {
+    Vector2 temp = dialCoordinates(manipulatorObj.up);
+    controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
+    
     curRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - deltaRot;
 
+    // fine tune modifier
+    // https://developer.oculus.com/documentation/unity/unity-ovrinput
+    // only raw input worked properly
+    //if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
+    //|| (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f))
+    //  curRot /= fineMult;
 
-    if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
-      curRot /= fineMult; 
+    curRot = Mathf.Clamp(curRot, -150f, 150f);
 
-    curRot = Mathf.Repeat(curRot, 360f);
-    realRot = Mathf.Repeat(curRot * 2, 360f);
 
-    if (realRot > 150 && realRot < 210) {
-      if (realRot < 180) realRot = 150;
-      else realRot = 210;
+    // catch naughty fliparounds, use realRot as lastRot
+    if (realRot == -150f && curRot > 0f) return;
+    if (realRot ==  150f && curRot < 0f) return;
+
+    if (isNotched)
+    {
+      curRot = Utils.map(Mathf.Round(Utils.map(curRot, -150f, 150f, 0f, 1f) * (notchSteps - 1)), 0, notchSteps - 1, -150f, 150f);
     }
-    transform.localRotation = Quaternion.Euler(0, realRot, 0);
-    
 
-    if (Mathf.Abs(realRot - prevShakeRot) > 10f) {
-      if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(500);
+    realRot = curRot; // for percent storing and viz
+
+    // apply
+    transform.localRotation = Quaternion.Euler(0, realRot, 0);
+
+    // haptics
+    if (Mathf.Abs(realRot - prevShakeRot) > 10f)
+    {
+      if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse( isNotched ? (ushort) 3999 : (ushort) 700); // 3999 is max power
       prevShakeRot = realRot;
       turnCount++;
     }
   }
 
+
+  Vector2 dialCoordinates(Vector3 vec)
+  {
+    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
+    return new Vector2(flat.x, flat.z);
+  }
+
+
+  // code for first steps guidance below, currently not enabled
+
   int turnCount = 0;
 
   Coroutine _dialCheckRoutine;
-  IEnumerator dialCheckRoutine() {
+  IEnumerator dialCheckRoutine()
+  {
     Vector3 lastPos = Vector3.zero;
     float cumulative = 0;
-    if (manipulatorObj != null) {
+    if (manipulatorObj != null)
+    {
       lastPos = manipulatorObj.position;
     }
 
-    while (curState == manipState.grabbed && manipulatorObj != null && !masterControl.instance.dialUsed) {
+    while (curState == manipState.grabbed && manipulatorObj != null && !masterControl.instance.dialUsed)
+    {
       cumulative += Vector3.Magnitude(manipulatorObj.position - lastPos);
       lastPos = manipulatorObj.position;
 
       if (turnCount > 3) masterControl.instance.dialUsed = true;
-      else if (cumulative > .2f) {
+      else if (cumulative > .2f)
+      {
         masterControl.instance.dialUsed = true;
         Instantiate(Resources.Load("Hints/TurnVignette", typeof(GameObject)), transform.parent, false);
       }
@@ -170,26 +213,6 @@ public class dial : manipObject {
     }
     yield return null;
   }
-
-  public override void setState(manipState state) {
-    curState = state;
-    setGlowState(state);
-
-    if (curState == manipState.grabbed) {
-      turnCount = 0;
-      if (!masterControl.instance.dialUsed) {
-        if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
-        _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
-      }
-      Vector2 temp = dialCoordinates(manipulatorObj.right);
-
-      if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
-      {
-        deltaRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - curRot * fineMult;
-      } else {
-        deltaRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - curRot;
-      }
-      
-    }
-  }
 }
+
+

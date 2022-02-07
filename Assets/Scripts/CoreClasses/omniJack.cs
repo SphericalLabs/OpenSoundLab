@@ -26,23 +26,23 @@ public class omniJack : manipObject {
   public int ID = -1;
 
   public signalGenerator signal, homesignal;
-  Material mat;
-  Renderer jackRepRend;
+  //Material mat;
+  //Renderer jackRepRend;
 
   public omniPlug far, near;
 
   public soundUtils.Hue jackHue = soundUtils.Hue.Red;
 
-  Color jackColor = Color.white;
+  //Color jackColor = Color.white;
   float jackTargetHue = 0.5f;
 
   public override void Awake() {
     base.Awake();
     gameObject.layer = 12; //jacks
-    mat = GetComponent<Renderer>().material;
-    jackRepRend = plugRep.GetComponent<Renderer>();
-    jackTargetHue = findHue();
-    jackColor = Color.HSVToRGB(jackTargetHue, 0.8f, 0.5f);
+    //mat = GetComponent<Renderer>().material;
+    //jackRepRend = plugRep.GetComponent<Renderer>();
+    //jackTargetHue = findHue();
+    //jackColor = Color.HSVToRGB(jackTargetHue, 0.8f, 0.5f);
     if (homesignal == null) homesignal = transform.parent.GetComponent<signalGenerator>();
     //mat.SetColor("_EmissionColor", jackColor);
 

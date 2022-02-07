@@ -52,6 +52,7 @@ public class menuItem : manipObject {
     MIDIIN,
     MIDIOUT,
     Mixer,
+    Multiple,
     Noise,
     Oscillator,
     Quantizer,
@@ -63,13 +64,13 @@ public class menuItem : manipObject {
     Scope,
     Sequencer,
     SequencerCV,
-    Speaker,
-    Splitter,
+    Speaker,    
     Stereo,
-    stereoVerb,
+    StereoVerb,    
     Tapes,
     Timeline,
     TouchPad,
+    Tutorials,
     VCA,
     XyloRoll,
     // this is a stopper, items below won't appear in menu; alternatively you can skip items in menuManager.loadMenu()
@@ -117,14 +118,16 @@ public class menuItem : manipObject {
     if (item == deviceType.Gain) label.text = "Gain / Mute";
     if (item == deviceType.MIDIIN) label.text = "MIDI In";
     if (item == deviceType.MIDIOUT) label.text = "MIDI Out";
-    if (item == deviceType.Sequencer) label.text = "Sequencer I";    
-    if (item == deviceType.SequencerCV) label.text = "Sequencer II";
+    if (item == deviceType.Sequencer) label.text = "Sequencer (Old)";    
+    if (item == deviceType.SequencerCV) label.text = "Sequencer";
     if (item == deviceType.Timeline) label.text = "Sequencer III";
     if (item == deviceType.ControlCube) label.text = "ControlCube";
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.SampleHold) label.text = "Sample / Hold";
     if (item == deviceType.Reverb) label.text = "Reverb";
-    if (item == deviceType.stereoVerb) label.text = "Freeverb";
+    if (item == deviceType.StereoVerb) label.text = "Freeverb";
+    if (item == deviceType.Quantizer) label.text = "Quant. / Trans.";
+
 
     label.gameObject.SetActive(true);
     symbol.gameObject.SetActive(true);
@@ -265,7 +268,7 @@ public class menuItem : manipObject {
       //g.transform.localPosition = new Vector3(.015f, 0, .02f);
       //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
-    if (item == deviceType.Splitter) {
+    if (item == deviceType.Multiple) {
       g.transform.localPosition = new Vector3(.0185f, 0, .02f);
     }
     if (item == deviceType.Sequencer) {

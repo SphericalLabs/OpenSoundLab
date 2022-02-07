@@ -102,6 +102,8 @@ public class samplerDeviceInterface : deviceInterface {
     GetTransformData(data);
     data.speedDial = speedDial.percent;
     data.ampDial = volumeDial.percent;
+    data.headTrimDial = headTrimDial.percent;
+    data.tailTrimDial = tailTrimDial.percent;
 
     data.file = GetComponent<samplerLoad>().CurFile;
     data.label = GetComponent<samplerLoad>().CurTapeLabel;
@@ -130,6 +132,8 @@ public class samplerDeviceInterface : deviceInterface {
     base.Load(data);
     speedDial.setPercent(data.speedDial);
     volumeDial.setPercent(data.ampDial);
+    headTrimDial.setPercent(data.headTrimDial);
+    tailTrimDial.setPercent(data.tailTrimDial);
     GetComponent<samplerLoad>().SetSample(data.label, data.file);
 
     volumeInput.ID = data.jackInAmpID;
@@ -154,6 +158,8 @@ public class SamplerData : InstrumentData {
   public string file;
   public float ampDial;
   public float speedDial;
+  public float headTrimDial;
+  public float tailTrimDial;
   public int jackInAmpID;
   public int jackInFreqExpID;
   public int jackInFreqLinID;

@@ -92,8 +92,8 @@ public class delaySignalGenerator : signalGenerator
                 maxTime = (int)(0.05f * sampleRate);
                 break;
             case 2:
-                minTime = (int)(0.025f * sampleRate);
-                maxTime = (int)(1.25f * sampleRate);
+                minTime = (int)(0.05f * sampleRate);
+                maxTime = (int)(2.5f * sampleRate);
                 break;
             case 3:
                 minTime = (int)(0.25f * sampleRate);

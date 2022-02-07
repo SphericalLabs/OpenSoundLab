@@ -132,7 +132,7 @@ public class compressorSignalGenerator : signalGenerator
         }
 
         attenuation = Compressor_GetAttenuation(x);
-        isClipping = Compressor_IsClipping(x);
+        //isClipping = Compressor_IsClipping(x);
     }
 }
 

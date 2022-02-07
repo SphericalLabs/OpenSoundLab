@@ -19,6 +19,10 @@ public class metronome : componentInterface {
   public dial bpmDial, volumeDial;
 
   float bpm = 120f;
+  float minBpm = 60f;
+  float maxBpm = 180f;
+  float pitchBendMult = 1f;
+
   float bpmpercent = .1f;
 
   float volumepercent = 0;
@@ -31,29 +35,33 @@ public class metronome : componentInterface {
   }
 
   public void Reset() {
-    float targ = 120;
-    bpmpercent = (targ - 40) / 160;
-    bpmDial.setPercent(bpmpercent);
-    UpdateBPM();
+    SetBPM(bpm);
   }
 
   public void SetBPM(float targ) {
-    bpmpercent = (targ - 40) / 160;
+    bpmpercent = Utils.map(targ, minBpm, maxBpm, 0f, 1f);
     bpmDial.setPercent(bpmpercent);
-    UpdateBPM();
+    readBpmDialAndBroadcast();
   }
 
   public override void hit(bool on, int ID = -1) {
     if (ID == 0) masterControl.instance.toggleBeatUpdate(on);
     if (ID == 1 && on) masterControl.instance.resetClock();
+
+    if (ID == 3 && on) pitchBendMult = 1 / 1.03f;
+    if (ID == 3 && !on) pitchBendMult = 1;
+    if (ID == 4 && on) pitchBendMult = 1 * 1.03f;
+    if (ID == 4 && !on) pitchBendMult = 1;
+
+    broadcastBpm(); // temporary pitchbend
   }
 
   void OnEnable() {
     bpm = masterControl.instance.bpm;
-    bpmpercent = (bpm - 40) / 160;
+    bpmpercent = Utils.map(bpm, minBpm, maxBpm, 0f, 1f);
 
     bpmDial.setPercent(bpmpercent);
-    txt.text = bpm.ToString();
+    txt.text = bpm.ToString("N1");
   }
 
   bool rodDir = false;
@@ -77,12 +85,16 @@ public class metronome : componentInterface {
       masterControl.instance.metronomeClick.volume = Mathf.Clamp01(volumepercent - .1f);
     }
 
-    if (bpmpercent != bpmDial.percent) UpdateBPM();
+    if (bpmpercent != bpmDial.percent) readBpmDialAndBroadcast();
   }
 
-  void UpdateBPM() {
+  void readBpmDialAndBroadcast() {
     bpmpercent = bpmDial.percent;
-    bpm = bpmpercent * 160 + 40;
+    broadcastBpm();
+  }
+
+  void broadcastBpm(){
+    bpm = Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm) * pitchBendMult;
     masterControl.instance.setBPM(bpm);
     txt.text = bpm.ToString("N1");
   }

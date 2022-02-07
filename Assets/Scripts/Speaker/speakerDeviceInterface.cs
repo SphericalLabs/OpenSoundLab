@@ -67,6 +67,7 @@ public class speakerDeviceInterface : deviceInterface {
     data.deviceType = menuItem.deviceType.Speaker;
     GetTransformData(data);
     data.jackInID = input.transform.GetInstanceID();
+    data.channelState = channelSwitcher.switchVal;
     return data;
   }
 
@@ -79,9 +80,12 @@ public class speakerDeviceInterface : deviceInterface {
 
     ID = data.ID;
     input.ID = data.jackInID;
+    channelSwitcher.setSwitch(data.channelState, true);
+
   }
 }
 
 public class SpeakerData : InstrumentData {
   public int jackInID;
+  public bool channelState;
 }

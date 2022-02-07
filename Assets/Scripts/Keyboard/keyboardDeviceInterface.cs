@@ -20,44 +20,42 @@ public class keyboardDeviceInterface : deviceInterface {
   public timelineComponentInterface _timeline;
   public midiComponentInterface _midiIn, _midiOut;
   public GameObject whiteKeyPrefab, blackKeyPrefab;
-  public omniJack output, freqoutput, ampoutput;
-  public button muteButton, midiInButton, midiOutButton, sequenceButton;
+  public omniJack freqOutput, gateOutput;
+  public button midiInButton, midiOutButton, sequenceButton;
 
   public midiOutOfRange midiLow, midiHigh;
 
-  public speaker _speaker;
-  int keyCount = 25;
+  int keyCount = 12 * 2 + 1; 
   key[] keys;
 
   adsrInterface _adsrInterface;
-  basicSwitch octaveToggle;
-
+  
   keyFrequencySignalGenerator freqSignal;
-  adsrSignalGenerator adsrSignal;
+  keyGateSignalGenerator gateSignal;
+
   int curKey;
 
-  keyState[] keyStates = new keyState[25];
+  keyState[] keyStates;
 
   public override void Awake() {
     base.Awake();
 
+    keyStates = new keyState[keyCount];
+
     curKey = -1;
 
     _adsrInterface = GetComponentInChildren<adsrInterface>();
-    octaveToggle = GetComponentInChildren<basicSwitch>();
-
+    
     freqSignal = GetComponent<keyFrequencySignalGenerator>();
-    adsrSignal = GetComponent<adsrSignalGenerator>();
+    gateSignal = GetComponent<keyGateSignalGenerator>();
 
-    freqoutput.homesignal = freqSignal;
-    ampoutput.homesignal = adsrSignal;
+    freqOutput.homesignal = freqSignal;
+    gateOutput.homesignal = gateSignal;
 
     keys = new key[keyCount];
-    adsrSignal.durations = _adsrInterface.durations;
-    adsrSignal.volumes = _adsrInterface.volumes;
     SpawnKeys();
 
-    for (int i = 0; i < 25; i++) keyStates[i] = new keyState(false);
+    for (int i = 0; i < keyCount; i++) keyStates[i] = new keyState(false);
   }
 
   void SpawnKeys() {
@@ -80,11 +78,6 @@ public class keyboardDeviceInterface : deviceInterface {
     }
   }
 
-  bool muted = false;
-  public void toggleMute(bool on) {
-    muted = on;
-    _speaker.volume = muted ? 0 : 1;
-  }
 
   public override void onTimelineEvent(int track, bool on) {
     asynchKeyHit(on, track, keyInput.seq);
@@ -128,18 +121,18 @@ public class keyboardDeviceInterface : deviceInterface {
         curKey = ID;
 
         if (prev != -1) {
-          adsrSignal.hit(false);
+          gateSignal.isHigh = false;
           if (_midiOut != null) _midiOut.OutputNote(false, prev);
         }
 
         if (_midiOut != null) _midiOut.OutputNote(on, ID);
         freqSignal.UpdateKey(curKey);
-        adsrSignal.hit(true);
+        gateSignal.isHigh = true;
       }
     } else {
       if (curKey == ID) {
         _midiOut.OutputNote(false, ID);
-        adsrSignal.hit(false);
+        gateSignal.isHigh = false;
         curKey = -1;
       }
     }
@@ -159,7 +152,6 @@ public class keyboardDeviceInterface : deviceInterface {
 
   public override void hit(bool on, int ID = -1) {
     if (ID == -1) {
-      toggleMute(on);
     } else if (ID == -2) {
       toggleMIDIin(on);
     } else if (ID == -3) {
@@ -172,9 +164,7 @@ public class keyboardDeviceInterface : deviceInterface {
   }
 
   void Update() {
-    if (octaveToggle.switchVal) freqSignal.octave = 1;
-    else freqSignal.octave = 0;
-
+    
     if (midiLowDesired) {
       midiLowDesired = false;
       midiLow.gameObject.SetActive(true);
@@ -192,16 +182,10 @@ public class keyboardDeviceInterface : deviceInterface {
     KeyboardData data = new KeyboardData();
     data.deviceType = menuItem.deviceType.Keyboard;
     GetTransformData(data);
-    data.muted = muted;
-    data.octaveSwitch = octaveToggle.switchVal;
-    data.ADSRdata = new Vector2[3];
-    for (int i = 0; i < 3; i++) {
-      data.ADSRdata[i] = _adsrInterface.xyHandles[i].percent;
-    }
 
-    data.jackOutID = output.transform.GetInstanceID();
-    data.freqOutID = freqoutput.transform.GetInstanceID();
-    data.ampOutID = ampoutput.transform.GetInstanceID();
+    
+    data.freqOutID = freqOutput.transform.GetInstanceID();
+    data.gateOutID = gateOutput.transform.GetInstanceID();
 
     data.midiInConnection = _midiIn.connectedDevice;
     data.midiOutConnection = _midiOut.connectedDevice;
@@ -223,16 +207,10 @@ public class keyboardDeviceInterface : deviceInterface {
     KeyboardData data = d as KeyboardData;
     base.Load(data);
 
-    output.ID = data.jackOutID;
-    freqoutput.ID = data.freqOutID;
-    ampoutput.ID = data.ampOutID;
+    freqOutput.ID = data.freqOutID;
+    gateOutput.ID = data.gateOutID;
 
-    for (int i = 0; i < 3; i++) _adsrInterface.xyHandles[i].setPercent(data.ADSRdata[i]);
-    _adsrInterface.setDefaults = false;
-
-    muteButton.startToggled = data.muted;
-    octaveToggle.setSwitch(data.octaveSwitch);
-
+    
     if (data.midiInConnection != null & data.midiInConnection != "") {
       midiInButton.startToggled = true;
       _midiIn.ConnectByName(data.midiInConnection);
@@ -296,13 +274,10 @@ public class keyboardDeviceInterface : deviceInterface {
 
 
 public class KeyboardData : InstrumentData {
-  public Vector2[] ADSRdata;
-  public bool muted;
-  public bool octaveSwitch;
   public bool sequencerEnabled;
-  public int jackOutID;
+
   public int freqOutID;
-  public int ampOutID;
+  public int gateOutID;
   public string midiInConnection;
   public string midiOutConnection;
 

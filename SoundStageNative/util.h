@@ -83,6 +83,8 @@ float _expCurve(float x, float ym);
 /* Maps a value from one range to another, applying a slope between 0 and 1 (0.5 is linear or "no slope"). */
 float _map(float x, float start1, float stop1, float start2, float stop2, float slope);
 
+float clamp(float d, float min, float max);
+
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void);
 

@@ -41,10 +41,10 @@ public class clipPlayerComplex : clipPlayer {
 
   Texture2D tex;
   public Renderer waverend;
-  public Color32 waveBG = Color.black;
+  public Color32 waveBG = Color.black; // currently overridden in prefab
   public Color32 waveLine = Color.white;
-  int wavewidth = 512;
-  int waveheight = 64;
+  int wavewidth = 512*2;
+  int waveheight = 64*4;
   Color32[] wavepixels;
 
   float[] freqExpBuffer;
@@ -144,7 +144,9 @@ public class clipPlayerComplex : clipPlayer {
   }
 
   public override void DrawClipTex() {
-    tex = new Texture2D(wavewidth, waveheight, TextureFormat.RGBA32, false);
+    tex = new Texture2D(wavewidth, waveheight, TextureFormat.RGBA32, true);
+    tex.anisoLevel = 4;
+    tex.filterMode = FilterMode.Bilinear;
     wavepixels = new Color32[wavewidth * waveheight];
 
     for (int i = 0; i < wavewidth; i++) {
@@ -160,7 +162,9 @@ public class clipPlayerComplex : clipPlayer {
     for (int i = 0; i < wavewidth; i++) {
 
       if (columnMult * i < clipSamples.Length) {
-        int curH = Mathf.FloorToInt((waveheight - 1) * .5f * Mathf.Clamp01(Mathf.Abs(clipSamples[columnMult * i])));
+        // pow(0.5f) to make quite sounds appear louder, easier to use than log?
+        // cf. https://stackoverflow.com/questions/26452026/how-to-make-waveform-rendering-more-interesting
+        int curH = Mathf.FloorToInt((waveheight - 1) * .5f * Mathf.Pow(Mathf.Clamp01(Mathf.Abs(clipSamples[columnMult * i])), 0.5f)); 
 
         for (int i2 = 0; i2 < centerH; i2++) {
           if (i2 < curH) wavepixels[(centerH - i2) * wavewidth + i] = wavepixels[(centerH + i2) * wavewidth + i] = waveLine;
@@ -170,7 +174,7 @@ public class clipPlayerComplex : clipPlayer {
     }
 
     tex.SetPixels32(wavepixels);
-    tex.Apply(false);
+    tex.Apply(true);
     waverend.material.mainTexture = tex;
   }
 

@@ -23,8 +23,8 @@ public class spectrumDisplay : MonoBehaviour
   public FFTWindow fftWin = FFTWindow.BlackmanHarris;
   float[] spectrum;
 
-  int width = 256 * 4;
-  int height = 256 * 2;
+  public int width = 256 * 4;
+  public int height = 256 * 2;
   int fftBins = 1024 * 2;
 
   RenderTexture offlineTexture;
@@ -32,6 +32,7 @@ public class spectrumDisplay : MonoBehaviour
 
   Texture2D onlineTexture;
   public Material onlineMaterial;
+  public Renderer displayRenderer;
 
   bool active = false;
 
@@ -73,18 +74,21 @@ public class spectrumDisplay : MonoBehaviour
     GetComponent<Renderer>().material = onlineMaterial;
     onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), Texture2D.blackTexture);
 
+    if (onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
+    if (onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
+    if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
+
   }
 
   void Update()
   {
 
     if (!active) return;
-    //if (Time.frameCount % 3 != 0) return; // if lower fps desired, then run async in worker thread to smooth out cpu peak
+    if (!displayRenderer.isVisible) return;
+    
     source.GetSpectrumData(spectrum, 0, fftWin);
     RenderGLToTexture(width, height, offlineMaterial);
-    onlineTexture.filterMode = fm;
-    onlineTexture.anisoLevel = ani;
-
+    
   }
 
   // Via https://forum.unity.com/threads/rendering-gl-to-a-texture2d-immediately-in-unity4.158918/

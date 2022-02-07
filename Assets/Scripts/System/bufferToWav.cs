@@ -21,10 +21,11 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 public class bufferToWav : MonoBehaviour {
-    public static bufferToWav instance;
+    public static bufferToWav instance; // singleton
+    public bool applyNormalization = false;
 
     [DllImport("SoundStageNative")]
-    public static extern void CompressClip(float[] clip, int length);
+    public static extern void NormalizeClip(float[] clip, int length);
 
     void Awake()
     {
@@ -32,9 +33,10 @@ public class bufferToWav : MonoBehaviour {
     }
 
     public bool savingInProgress = false;
-    public Coroutine Save(string filename, float[] clip, int channels, int length, TextMesh txt, signalGenerator sig)
+    public Coroutine Save(string filename, float[] clip, int channels, int length, TextMesh txt, signalGenerator sig, bool normalize)
     {
         savingInProgress = true;
+        applyNormalization = normalize;
 
         if (!filename.ToLower().EndsWith(".wav")) filename += ".wav";
         return StartCoroutine(SaveRoutine(filename, clip, length, txt, sig));
@@ -42,7 +44,7 @@ public class bufferToWav : MonoBehaviour {
 
     void WavHeader(BinaryWriter b, int length)
     {
-        int _samplerate = 44100;
+        int _samplerate = AudioSettings.outputSampleRate;
         int _channels = 2;
         int _samplelength = 2; //2 bytes
        
@@ -61,6 +63,8 @@ public class bufferToWav : MonoBehaviour {
         b.Write(length * _samplelength); // subchunk 2 size
     }
 
+    int sample;
+
     IEnumerator SaveRoutine(string filename, float[] clip, int length, TextMesh txt, signalGenerator sig)
     {
         txt.gameObject.SetActive(true);
@@ -70,16 +74,23 @@ public class bufferToWav : MonoBehaviour {
         BinaryWriter _binarystream = new BinaryWriter(_filestream);
         WavHeader(_binarystream, length);
 
-        CompressClip(clip, clip.Length);
+        if(applyNormalization) 
+          NormalizeClip(clip, clip.Length);
 
         int counter = 0;
         for (int i = 0; i < length; i++)
         {
-            Int16 sample = Convert.ToInt16( Mathf.Clamp(clip[i],-1f,1f) * 32760 );
-            _binarystream.Write((short)sample);
+            // mind non-linearity around 0: https://www.cs.cmu.edu/~rbd/papers/cmj-float-to-int.html
+            // this also fixed a weird bug in the previous int16 conversion, where converting 0f would always crash
+            sample = (((int)(Mathf.Clamp(clip[i], -1f, 1f) * 32760f + 32768.5)) - 32768); // TODO: move clipping to native preprocessing function
+
+            // sample = (((int)(Mathf.Clamp(clip[i], -1f, 1f) * 8388600 + 8388608.5)) - 8388608);
+            // bc 2^23 == 8388608
+            _binarystream.Write((short)sample); // would it be faster if full more data is written at once? but mind frame budget!
+
             counter++;
 
-            if (counter > 10000)
+            if (counter > 10000) 
             {
                 counter = 0;
                 txt.text = "Saving... " + (int)(100 * (float)i / length) + "% Complete";
@@ -95,7 +106,16 @@ public class bufferToWav : MonoBehaviour {
         txt.text = "Saved";
         savingInProgress = false;
         txt.gameObject.SetActive(false);
+        
+        // flush after saving, good for quick flow and otherwise we would have to update display. buffer was altered if normalization was on. more clean to simply flush away the old data.
+        if (sig is waveTranscribeRecorder)
+        {
+          waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
+          rec.Flush();
+        }
+
         sig.updateTape(filename);
+
         yield return new WaitForSeconds(1.5f);
     }    
 }

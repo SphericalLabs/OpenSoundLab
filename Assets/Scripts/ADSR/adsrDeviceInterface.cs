@@ -34,7 +34,6 @@ public class adsrDeviceInterface : deviceInterface {
   adsrInterface _adsrInterface;
   adsrSignalGenerator adsrSignal;
   public omniJack input, output;
-  public GameObject embeddedAudio;
 
   public override void Awake() {
     base.Awake();
@@ -50,22 +49,8 @@ public class adsrDeviceInterface : deviceInterface {
       adsrSignal.incoming = input.signal;
     }
 
-    if (embeddedAudio.activeSelf != (output.near == null)) {
-      embeddedAudio.SetActive(output.near == null);
-    }
   }
 
-  bool buttonState = false;
-  bool signalState = false;
-  public void pulseUpdate(bool on) {
-    signalState = on;
-    adsrSignal.hit(buttonState || signalState);
-  }
-
-  public override void hit(bool on, int ID = -1) {
-    buttonState = on;
-    adsrSignal.hit(buttonState || signalState);
-  }
 
   public override InstrumentData GetData() {
     ADSRData data = new ADSRData();

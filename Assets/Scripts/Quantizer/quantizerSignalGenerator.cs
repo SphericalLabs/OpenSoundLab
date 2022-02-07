@@ -36,6 +36,8 @@ public class quantizerSignalGenerator : signalGenerator {
 
   public float output = 0f;
 
+  int counter = 0;
+
   [DllImport("SoundStageNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
@@ -52,7 +54,7 @@ public class quantizerSignalGenerator : signalGenerator {
     //Major  1    2    3 4    5    6    7
     //Minor  1    2 b3   4    5    6    7;
 
-    // pre-multiply semitone factor in order to comply 1/Oct
+    //pre-multiply semitone factor in order to comply 1/Oct
     for(int j = 0; j < scales.Count; j++){
       for(int k = 0; k < scales[j].Length; k++){
         scales[j][k] *= semiMult;
@@ -72,12 +74,13 @@ public class quantizerSignalGenerator : signalGenerator {
     // hard coded OCTAVE!
     if (selectedScale == 3)
     {
-      SetArrayToSingleValue(buffer, buffer.Length, Mathf.Round((buffer[0] + transpose) * 10f) * 0.1f);
+      SetArrayToSingleValue(buffer, buffer.Length, Mathf.Round((buffer[0] + transpose) * 10f) * 0.1f); // transpose -5,5 octaves
       return;
     }
-
-    integerPart = Mathf.Floor((buffer[0] + transpose) * 10); // only first sample, 48000 / 512 => 93.75Hz 
-    decimalPart = (buffer[0] + transpose) * 10 - integerPart; // upscale 
+    
+    integerPart = Mathf.Floor(buffer[0] * 10 + transpose * 2); // transpose -1,1 octaves
+    decimalPart = buffer[0] * 10 + transpose * 2 - integerPart; 
+    
 
     // incoming signals and transpose dial need to be upscaled 0.1/Oct to 1/Oct
     // scales need to be adjusted for semi steps in 1/Oct by multiplying semiMult
@@ -97,14 +100,15 @@ public class quantizerSignalGenerator : signalGenerator {
 
         
     if (i == scales[selectedScale].Length - 1) // edge case: last value, need wrap around
-    { 
-      if(Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(decimalPart - scales[selectedScale][0])) // higher than last value
-      { 
+    {
+      
+      if (Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(1 - decimalPart) ) // higher than last value
+      {
         output = integerPart + scales[selectedScale][i];
       } 
       else 
       {
-        output = integerPart + scales[selectedScale][0];
+        output = integerPart + 1 + scales[selectedScale][0]; // last part is actually zero, no need to compute
       }
     } 
     else // normal case
@@ -120,6 +124,5 @@ public class quantizerSignalGenerator : signalGenerator {
     }
 
     SetArrayToSingleValue(buffer, buffer.Length, output * 0.1f); // downscale to 0.1/Oct
-
   }
 }
