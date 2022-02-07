@@ -17,17 +17,17 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
 {
     assert(length > 0);
     
-//#if DEBUG
-//    //printv("Adding %d samples from ptr %d..\n", length, x->ptr);
-//    if(FrameRingBuffer_Warn(stride, x) > 1)
-//    {
-//        printv("warning: there is already a frame with stride %f\n", stride);
-//    }
-//#endif
+#if DEBUG
+    //printv("Adding %d samples from ptr %d..\n", length, x->ptr);
+    vector<FrameHeader> oldFrames(x->headers);
+    /*if(FrameRingBuffer_Warn(stride, x) > 1)
+    {
+        printv("warning: there is already a frame with stride %f\n", stride);
+    }*/
+#endif
     
     if(length > x->n)
         length = x->n;
-    //vector<FrameHeader> frames = x->headers;
     int ptr = x->ptr;
     const int N = x->n;
     FrameHeader *existingFrame;
@@ -48,7 +48,6 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
         }
     }
     //If the oldest frame has the same stride as the new samples, we concatenate them.
-    //TODO: doesn't this cause a problem bc now ptr will not be contained in x->headers[0]?
     else if(existingFrame->stride == newFrame.stride)
     {
         newFrame.length = existingFrame->length;
@@ -68,16 +67,26 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
             newFrame.head = existingFrame->head;
             //we have to add the samples that we inherit from the existing frame to our total:
             length += (newFrame.length - samplesAvailable);
+            if(length > N)
+                length = N;
             x->headers.pop_back();
         }
     }
+    
+    //At this point we know we will have to modify or delete 1+ existing headers. TODO: But if ptr != header of oldest frame (which can happen through concatenation of 2 frames), then inserting the new frame will modify the head of the oldest frame, and in some cases even split it into 2 frames!
+    // before:
+    // |--------------------|
+    //         ptr
+    // after:
+    // |-------|-------|----|
+    //                  ptr
 
     //Now we delete headers, consuming their length, until the length of the new frame is identical to the number of samples we want to store.
     while(newFrame.length < length)
     {
         existingFrame = &x->headers[0];
         
-        int remaining = length - newFrame.length;
+        int remaining = length - newFrame.length; //this is only correct if existingFrame->head == ptr, which is not necessarily the case
         //need to consume whole frame, so delete it
         if(existingFrame->length <= remaining)
         {
@@ -88,6 +97,7 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
         else
         {
             existingFrame->length -= remaining;
+            //TODO: if the ptr is between the frame boundaries, the next line is wrong!
             existingFrame->head = (existingFrame->head + remaining) % N;
             newFrame.length = length;
         }
@@ -108,16 +118,24 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
     if(push)
         x->headers.push_back(newFrame);
     
-//#if DEBUG
-//    if(FrameRingBuffer_Warn(stride, x) > 1)
-//    {
-//        bool legit = FrameRingBuffer_Validate(x);
-//        if(!legit)
-//        {
-//            printv("hold on..\n");
-//        }
-//    }
-//#endif
+#if DEBUG
+    bool legit = FrameRingBuffer_Validate(x);
+    if(!legit)
+    {
+        printv("Validation failed in InsertFrame with input: \n");
+        FrameHeader h;
+        for(int i = 0; i < oldFrames.size(); i++)
+        {
+            h = oldFrames[i];
+            printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.stride);
+        }
+        printv("======\n");
+    }
+    /*if(FrameRingBuffer_Warn(stride, x) > 1)
+    {
+
+    }*/
+#endif
 }
 
 FrameRingBuffer* FrameRingBuffer_New(int n)
@@ -139,6 +157,40 @@ void FrameRingBuffer_Free(FrameRingBuffer *x)
 {
     _free(x->data);
     _free(x);
+}
+
+void FrameRingBuffer_GetPtrFrame(int *frame, int *offset, FrameRingBuffer *x)
+{
+    FrameHeader *f;
+    int h, t;
+    int N = x->n;
+    int ptr = x->ptr;
+    for(int i = 0; i < x->headers.size(); i++)
+    {
+        f = &x->headers[i];
+        h = f->head;
+        t = (h + f->length) % N;
+
+        if(
+        (t == h)
+        ||
+        (h <= ptr && t >= ptr)
+        ||
+        (t < h && (ptr >= h || ptr < t))
+           )
+        {
+            *frame = i;
+            if(ptr >= h) //TODO: or should it be ptr > h?
+                *offset = ptr - h;
+            else
+                *offset = (ptr + N) - h;
+            if(*offset > N)
+                printv("%d - %d = %d\n", ptr, h, *offset);
+            return;
+        }
+    }
+    printv("ERROR: GetPtrFrame: uncaught case!!!\n");
+    FrameRingBuffer_Print(x);
 }
 
 /* This is efficient as long as n is reasonably large, e.g. writing buffers of 256 samples. */
@@ -174,67 +226,60 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
     assert(abs(offset) <= x->n);
     assert(n <= x->n);
     
-    float smplsInFrame;
-    float samplesNeeded = -offset;
-    float vStride = FB_UNINITIALIZED;
-    FrameHeader *header = NULL;
-    int headerIndex = x->headers.size() - 1;
+    int f;
+    int o;
+    FrameRingBuffer_GetPtrFrame(&f, &o, x);
+    //printv("ptr (%d) is in frame %d with offset %d\n", x->ptr, f, o);
+    int headerIndex = f;
+    FrameHeader *header = &(x->headers[f]);
+    
+    float samplesInFrame = o * header->stride / stride;
+    float samplesNeeded = -offset - samplesInFrame;
     
     /* Find the position to start reading from */
-    assert(x->headers.size() > 0);
-    while(samplesNeeded > 0 && headerIndex >= 0)
+    while(samplesNeeded > 0)
     {
+        headerIndex--;
+        if(headerIndex < 0)
+            headerIndex = x->headers.size() - 1;
+        
         header = &(x->headers[headerIndex]);
-        vStride = header->stride / stride; //example: a sample that has been written with a stride of 4 but is now read with a stride of 1, needs to be copied 4 times, therefore it advances the offset by 4 samples. In a delay, this results in audio stretching / lower pitch.
         
-        smplsInFrame = vStride * header->length; //number of samples as viewed from the reader's perspective.
+        samplesInFrame = header->length * header->stride / stride; //number of samples as viewed from the reader's perspective.
         
-        samplesNeeded -= smplsInFrame;
-        if(samplesNeeded > 0)
-        {
-            headerIndex--;
-            if(headerIndex < 0)
-                headerIndex = x->headers.size() - 1;
-        }
+        samplesNeeded -= samplesInFrame;
     }
     
-    assert(headerIndex < x->headers.size());
-    assert(headerIndex >= 0);
     /* The position to start reading from is in the current frame with an offset of (-samplesNeeded). */
-    
-    //assert(fPtr != FB_UNINITIALIZED);
-    assert(vStride != FB_UNINITIALIZED);
-    assert(header != NULL);
+
     int ptr;
-    vStride = stride / header->stride;
     float fPtr = header->head; //the start index of the frame in which the first sample to read is located
-    float samplesAvailable = header->length;
     
+    //vStride = stride / header->stride;
+    samplesInFrame = header->length * header->stride / stride;
     // Calculate the offset from the start of the frame to the first sample to read
     // At this point, samplesNeeded is either 0 or negative; negative meaning we backtracked "too far", so we have to start reading so much into the frame
-    samplesNeeded = (-samplesNeeded) * vStride;
+    samplesNeeded = -samplesNeeded;
     
     for(int i = 0; i < n; i++)
     {
         //Skip some frames if necessary
-        while(samplesAvailable < samplesNeeded)
+        while(samplesInFrame < samplesNeeded)
         {
-            assert(i != 0); //in first iteration we should always be in the correct frame
-            samplesNeeded -= samplesAvailable;
+            //assert(i != 0); //in first iteration we should always be in the correct frame
+            samplesNeeded -= samplesInFrame;
             headerIndex = (headerIndex + 1) % x->headers.size();
             header = &x->headers[headerIndex];
-            samplesAvailable = header->length;
-            samplesNeeded = (samplesNeeded / vStride) * (header->stride / stride);
-            //samplesNeeded = samplesNeeded * (vStride / header->stride); //Scale samples with new stride
-            vStride = stride / header->stride;
+            //vStride = stride / header->stride;
+            samplesInFrame = header->length * header->stride / stride;
             fPtr = header->head;
         }
         
         //we will advance samplesNeeded samples into the frame in order to copy the next sample, so they are not available anymore.
-        samplesAvailable -= samplesNeeded;
+        samplesInFrame -= samplesNeeded;
         
         //We have found the frame in which the next sample to copy is located, so we update our pointers and copy 1 sample to dest.
-        fPtr += samplesNeeded;
+        fPtr += samplesNeeded * stride / header->stride;
         if(fPtr >= x->n)
             fPtr -= x->n;
         ptr = (int)(fPtr + 0.5f) % x->n;
@@ -242,7 +287,7 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
         dest[i] = x->data[ptr];
         
         //we need to advance vStride samples to be able to copy the next sample.
-        samplesNeeded = vStride;
+        samplesNeeded = 1;
     }
 }
 
@@ -302,21 +347,23 @@ bool FrameRingBuffer_Validate(FrameRingBuffer *x)
     }
     
     int corruptCounds = 0;
-    for(int i = 0; i < x->headers.size() - 1; i++)
+    for(int i = 0; i < x->headers.size(); i++)
     {
         int tail = (x->headers[i].head + x->headers[i].length) % x->n;
-        int nextHead = x->headers[i+1].head;
-        if(tail > nextHead)
+        int nextHead = x->headers[(i+1) % x->headers.size()].head;
+        if(tail != nextHead)
+        {
             corruptCounds++;
+        }
     }
     if(corruptCounds != 0)
     {
-        printv("VALIDATION FAILED: the buffer contains %d corrupt bounds: \n", corruptCounds);
+        printv("VALIDATION FAILED: the buffer contains %d corrupt bounds. \n", corruptCounds);
         legit = false;
     }
         
     
-    //if(!legit)
+    if(!legit)
         FrameRingBuffer_Print(x);
         
     return legit;
@@ -334,9 +381,9 @@ void FrameRingBuffer_Print(FrameRingBuffer *x)
         printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.stride);
     }
     printv("======\n");
-    printv("BUFFER:\n");
+    /*printv("BUFFER:\n");
     for(int i = 0; i < x->n; i++)
     {
         printv("%d: %f\n", i, x->data[i]);
-    }
+    }*/
 }
