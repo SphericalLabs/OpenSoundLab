@@ -21,6 +21,7 @@ extern "C" {
 SOUNDSTAGE_API void RingBuffer_Write(float *src, int n, struct RingBuffer *x);
 ///Writes samples to the ringbuffer with a specified stride. If the stride is 1, all samples are written to the ringbuffer. If stride < 1, some samples are skipped. If stride > 1, some samples are written more than once (=padded)f. No interpolation is performed. Returns the difference between old and new writeptr.
 SOUNDSTAGE_API int RingBuffer_WritePadded(float *src, int n, float stride, struct RingBuffer *x);
+SOUNDSTAGE_API void RingBuffer_Read_Absolute(float *dest, int n, int startIndex, struct RingBuffer *x);
 ///Reads n samples from the ring buffer
 SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingBuffer *x);
 //Reads n samples with a specific stride

@@ -15,7 +15,7 @@ enum DelayParams
     P_DRY,
     P_N
 };
-/*
+
 void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
     // Prepare
@@ -166,9 +166,9 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     _free(x->temp);
     _free(x);
 }
-*/
 
-void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
+
+/*void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
     // Prepare
     int time = x->time;
@@ -176,7 +176,8 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
     
     assert(time > 0);
     
-    float stride = (float)x->maxTime / (float)time;
+    ///"Stride" is actually the oversampling factor, which is determined by the length of the delay buffer and the actual delay time.
+    float oversampling = (float)x->maxTime / (float)time;
         
     int nPerChannel = n/channels;
     if(channels > 1)
@@ -186,17 +187,22 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
     int m;
     int r = nPerChannel;
     float* bufOffset = buffer;
+    
+    ///We first read from the delay buffer and then write the new samples to it. If the delay buffer is smaller than n (the DSP vector size), we have to repeat this procedure until we consumed all n samples.
     while(r)
     {
         m = time < r ? time : r;
         
-        FrameRingBuffer_Read(x->temp, m, -(x->maxTime), stride, x->tap);
+        ///Read some samples from the delay buffer
+        FrameRingBuffer_Read(x->temp, m, -(x->maxTime), oversampling, x->tap);
         _fCopy(x->temp, x->temp2, m);
         
+        ///Multiply those samples with the feedback gain, add the new input samples and write everything into the delay buffer
         _fScale(x->temp, x->temp, feedback, m);
         _fAdd(bufOffset, x->temp, x->temp, m);
-        FrameRingBuffer_Write(x->temp, m, stride, x->tap);
+        FrameRingBuffer_Write(x->temp, m, oversampling, x->tap);
 
+        ///Scale the input samples and the previously read delay samples for output
         _fScale(bufOffset, bufOffset, x->dry, m);
         _fScale(x->temp2, x->temp2, x->wet, m);
             
@@ -206,13 +212,14 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
         r -= m;
     }
     
-    // Finalize
+    ///Finally, if there are > 1 output channels, we copy channel 1 to all other channels
     if(channels > 1)
     {
         for(int i = 1; i < channels; i++)
         {
             _fCopy(buffer, buffer+i*nPerChannel, nPerChannel);
         }
+        /// We deinterleaved the data to process it, so we have to interleave it again
         _fInterleave(buffer, buffer, n, channels);
     }
 }
@@ -282,3 +289,4 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     _free(x->temp);
     _free(x);
 }
+*/

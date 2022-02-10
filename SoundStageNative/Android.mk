@@ -11,7 +11,8 @@ LOCAL_C_INCLUDES  := $(LOCAL_PATH)/FreeVerb/dfx-library
 LOCAL_C_INCLUDES  += $(LOCAL_PATH)/FreeVerb/freeverb/components
 FREEVERB_SOURCES := $(wildcard $(LOCAL_PATH)/FreeVerb/freeverb/components/*.cpp)
 FREEVERB_SOURCES += $(wildcard $(LOCAL_PATH)/FreeVerb/dfx-library/*.cpp)
-LOCAL_SRC_FILES := main.cpp util.c Filter.cpp Compressor.cpp RingBuffer.cpp CRingBuffer.cpp Delay.cpp StereoVerb.cpp $(FREEVERB_SOURCES:$(LOCAL_PATH)/%=%)
+MASTERBUSRECORDER_SOURCES := $(wildcard $(LOCAL_PATH)/MasterBusRecorder/*.cpp)
+LOCAL_SRC_FILES := main.cpp util.c Filter.cpp Compressor.cpp RingBuffer.cpp CRingBuffer.cpp Delay.cpp StereoVerb.cpp $(MASTERBUSRECORDER_SOURCES) $(FREEVERB_SOURCES:$(LOCAL_PATH)/%=%)
 LOCAL_LDLIBS    := -llog
 
 # optional: print source files

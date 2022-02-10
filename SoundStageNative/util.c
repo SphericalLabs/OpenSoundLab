@@ -99,11 +99,57 @@ extern "C" {
     }
 
     float _atodb(float a) {
-        return a == 0 ? -96 : 20 * log10f(a);
+        return a == 0 ? -INFINITY : 20 * log10f(a);
     }
 
     float _dbtoa(float a) {
         return powf(10, a/20);
+    }
+    
+    float _fclamp(float f, float min, float max) {
+      const double t = f < min ? min : f;
+      return t > max ? max : t;
+    }
+    
+    inline int16_t _float32toint16(float f)
+    {
+        return ((int32_t)(f * 32760.0f + 32768.5f)) - 32768;
+    }
+    
+    void _float32toint16buffer(float* src, int16_t* dest, int n)
+    {
+        for(int i = 0; i < n; i++)
+        {
+            dest[i] = _float32toint16(src[i]);
+        }
+    }
+    
+    void _float32toint24buffer(float* src, int8_t* dest, int endianness, int n)
+    {
+#if __APPLE_VDSP_DONTUSE
+        ///This does not work the way intended, probably bc of the stride, bc it worked when used on each sample individually...
+        float scaling = 8388600.0f;
+        vDSP_vsmfix24(src, 1, &scaling, (vDSP_int24*)dest, 3, n);
+#else
+        int32_t integer;
+        for(int i = 0; i < n; i++)
+        {
+            integer = ((int32_t)(src[i] * 8388600.0f + 8388608.5f)) - 8388608;
+            
+            if(endianness == WAV_LITTLE_ENDIAN)
+            {
+                dest[3 * i] = (int8_t)(integer >> 16);
+                dest[3 * i + 1] = (int8_t)(integer >> 8);
+                dest[3 * i + 2] = (int8_t)integer;
+            }
+            else
+            {
+                dest[3 * i + 2] = (int8_t)(integer >> 16);
+                dest[3 * i + 1] = (int8_t)(integer >> 8);
+                dest[3 * i] = (int8_t)integer;
+            }
+        }
+#endif
     }
 
     float _max(float a, float b) {

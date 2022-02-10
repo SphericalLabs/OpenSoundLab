@@ -13,7 +13,7 @@
 #define _MAX(a, b) a > b ? a : b
 #define _MIN(a, b) a < b ? a : b
 
-void insertFrame(int length, float stride, FrameRingBuffer *x)
+void insertFrame(int length, float oversampling, FrameRingBuffer *x)
 {
     assert(length > 0);
     
@@ -34,7 +34,7 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
     FrameHeader newFrame;
     newFrame.length = 0;
     newFrame.head = ptr;
-    newFrame.stride = stride;
+    newFrame.oversampling = oversampling;
     
     bool push = true;
     
@@ -42,13 +42,13 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
     existingFrame = &x->headers[0];
     if(x->headers.size() == 1)
     {
-        if(existingFrame->stride == newFrame.stride)
+        if(existingFrame->oversampling == newFrame.oversampling)
         {
             return; //Nothing to change
         }
     }
     //If the oldest frame has the same stride as the new samples, we concatenate them.
-    else if(existingFrame->stride == newFrame.stride)
+    else if(existingFrame->oversampling == newFrame.oversampling)
     {
         newFrame.length = existingFrame->length;
         x->headers.erase(x->headers.begin());
@@ -57,7 +57,7 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
     else
     {
         existingFrame = &x->headers.back();
-        if(existingFrame->stride == newFrame.stride)
+        if(existingFrame->oversampling == newFrame.oversampling)
         {
             //Calculate how many new samples we can store in the existing frame:
             int samplesAvailable = (existingFrame->head + existingFrame->length) - newFrame.head;
@@ -107,7 +107,7 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
     if(x->headers.size() > 0)
     {
         existingFrame = &x->headers[0];
-        if(existingFrame->stride == newFrame.stride)
+        if(existingFrame->oversampling == newFrame.oversampling)
         {
             existingFrame->length += newFrame.length;
             existingFrame->head = newFrame.head;
@@ -127,7 +127,7 @@ void insertFrame(int length, float stride, FrameRingBuffer *x)
         for(int i = 0; i < oldFrames.size(); i++)
         {
             h = oldFrames[i];
-            printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.stride);
+            printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.oversampling);
         }
         printv("======\n");
     }
@@ -147,7 +147,7 @@ FrameRingBuffer* FrameRingBuffer_New(int n)
     x->n = n;
     x->headers.push_back(FrameHeader());
     x->headers[0].length = n;
-    x->headers[0].stride = 1;
+    x->headers[0].oversampling = 1;
     x->headers[0].head = 0;
     
     return x;
@@ -194,7 +194,7 @@ void FrameRingBuffer_GetPtrFrame(int *frame, int *offset, FrameRingBuffer *x)
 }
 
 /* This is efficient as long as n is reasonably large, e.g. writing buffers of 256 samples. */
-void FrameRingBuffer_Write(float* src, int n, float stride, FrameRingBuffer *x)
+void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffer *x)
 {
     ///Clamp n
     if(n > x->n)
@@ -204,7 +204,7 @@ void FrameRingBuffer_Write(float* src, int n, float stride, FrameRingBuffer *x)
     }
     
     ///Insert new frame header
-    insertFrame(n, stride, x);
+    insertFrame(n, oversampling, x);
 
     /// Copy data to buffer
     int n1 = _min( x->n - x->ptr, n);
@@ -218,11 +218,11 @@ void FrameRingBuffer_Write(float* src, int n, float stride, FrameRingBuffer *x)
     }
 }
 
-void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRingBuffer *x)
+void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, FrameRingBuffer *x)
 {
     /* Find starting point */
     assert(offset < 0);
-    assert(stride > 0);
+    assert(oversampling > 0);
     assert(abs(offset) <= x->n);
     assert(n <= x->n);
     
@@ -233,7 +233,7 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
     int headerIndex = f;
     FrameHeader *header = &(x->headers[f]);
     
-    float samplesInFrame = o * header->stride / stride;
+    float samplesInFrame = o * header->oversampling / oversampling;
     float samplesNeeded = -offset - samplesInFrame;
     
     /* Find the position to start reading from */
@@ -245,7 +245,7 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
         
         header = &(x->headers[headerIndex]);
         
-        samplesInFrame = header->length * header->stride / stride; //number of samples as viewed from the reader's perspective.
+        samplesInFrame = header->length * header->oversampling / oversampling; //number of samples as viewed from the reader's perspective.
         
         samplesNeeded -= samplesInFrame;
     }
@@ -256,7 +256,7 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
     float fPtr = header->head; //the start index of the frame in which the first sample to read is located
     
     //vStride = stride / header->stride;
-    samplesInFrame = header->length * header->stride / stride;
+    samplesInFrame = header->length * header->oversampling / oversampling;
     // Calculate the offset from the start of the frame to the first sample to read
     // At this point, samplesNeeded is either 0 or negative; negative meaning we backtracked "too far", so we have to start reading so much into the frame
     samplesNeeded = -samplesNeeded;
@@ -271,7 +271,7 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
             headerIndex = (headerIndex + 1) % x->headers.size();
             header = &x->headers[headerIndex];
             //vStride = stride / header->stride;
-            samplesInFrame = header->length * header->stride / stride;
+            samplesInFrame = header->length * header->oversampling / oversampling;
             fPtr = header->head;
         }
         
@@ -279,7 +279,7 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRin
         samplesInFrame -= samplesNeeded;
         
         //We have found the frame in which the next sample to copy is located, so we update our pointers and copy 1 sample to dest.
-        fPtr += samplesNeeded * stride / header->stride;
+        fPtr += samplesNeeded * oversampling / header->oversampling;
         if(fPtr >= x->n)
             fPtr -= x->n;
         ptr = (int)(fPtr + 0.5f) % x->n;
@@ -298,7 +298,7 @@ void FrameRingBuffer_Clear(FrameRingBuffer *x)
     FrameHeader h;
     h.length = x->n;
     h.head = 0;
-    h.stride = 1;
+    h.oversampling = 1;
     x->headers.emplace_back(h);
     x->ptr = 0;
 }
@@ -308,7 +308,7 @@ int FrameRingBuffer_Warn(float stride, FrameRingBuffer *x)
     int count = 0;
     for(int i = 0; i < x->headers.size(); i++)
     {
-        if(x->headers[i].stride == stride)
+        if(x->headers[i].oversampling == stride)
             count++;
     }
     return count;
@@ -332,8 +332,8 @@ bool FrameRingBuffer_Validate(FrameRingBuffer *x)
     {
         for(int i = 0; i < x->headers.size(); i++)
         {
-            float stride1 = x->headers[i].stride;
-            float stride2 = x->headers[(i + 1) % x->headers.size()].stride;
+            float stride1 = x->headers[i].oversampling;
+            float stride2 = x->headers[(i + 1) % x->headers.size()].oversampling;
             if (stride1 == stride2)
                 adjacentFramesWithSameStride++;
         }
@@ -378,7 +378,7 @@ void FrameRingBuffer_Print(FrameRingBuffer *x)
     for(int i = 0; i < x->headers.size(); i++)
     {
         h = x->headers[i];
-        printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.stride);
+        printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.oversampling);
     }
     printv("======\n");
     /*printv("BUFFER:\n");

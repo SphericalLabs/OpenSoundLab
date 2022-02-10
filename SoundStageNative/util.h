@@ -17,6 +17,9 @@
 
 #define one_minus_oneOverE 0.6321205588285576784044762298 //1-(1/e)
 
+#define WAV_BIG_ENDIAN 0
+#define WAV_LITTLE_ENDIAN 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,6 +38,16 @@ extern "C" {
 
     /* Converts one logarithmic domain sample to linear domain sample */
     float _dbtoa(float a);
+
+    /* Clamps f between min and max */
+    float _fclamp(float f, float min, float max);
+
+    /* Converts a 32bit float to a 16bit signed int */
+    int16_t _float32toint16(float f);
+
+    void _float32toint16buffer(float* src, int16_t* dest, int n);
+
+    void _float32toint24buffer(float* src, int8_t* dest, int endianness, int n);
 
     /* Returns the bigger of two floats */
     float _max(float a, float b);
@@ -61,6 +74,8 @@ extern "C" {
     void _fMultiplyAdd(float *src1, float *src2, float *dest, int n);
 
     float _fSumOfMags(float *src, int n);
+
+    float _fAverageSumOfMags(float *src, int n);
 
     /* Clears the negative sign from all elements in src */
     void _fAbs(float *src, float* dest, int n);

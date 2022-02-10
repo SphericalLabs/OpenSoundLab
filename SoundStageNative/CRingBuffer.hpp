@@ -18,7 +18,7 @@ typedef struct _FrameHeader
 {
     int head;
     int length;
-    float stride;
+    float oversampling;
 } FrameHeader;
 
 typedef struct _FrameRingBuffer
@@ -31,8 +31,8 @@ typedef struct _FrameRingBuffer
 
 FrameRingBuffer* FrameRingBuffer_New(int n);
 void FrameRingBuffer_Free(FrameRingBuffer *x);
-void FrameRingBuffer_Write(float* src, int n, float stride, FrameRingBuffer *x);
-void FrameRingBuffer_Read(float* dest, int n, int offset, float stride, FrameRingBuffer *x);
+void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffer *x);
+void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, FrameRingBuffer *x);
 void FrameRingBuffer_Clear(FrameRingBuffer *x);
 int FrameRingBuffer_Warn(float stride, FrameRingBuffer *x);
 bool FrameRingBuffer_Validate(FrameRingBuffer *x);

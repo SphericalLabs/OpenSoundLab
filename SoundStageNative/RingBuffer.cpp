@@ -71,6 +71,24 @@ SOUNDSTAGE_API int RingBuffer_WritePadded(float *src, int n, float stride, struc
     return total;
 }
 
+SOUNDSTAGE_API void RingBuffer_Read_Absolute(float *dest, int n, int startIndex, struct RingBuffer *x)
+{
+    int m = 0; //number of elements to read in current step
+    int rPtr = startIndex; //read pointer
+     while(rPtr >= x->n)
+         rPtr -= x->n;
+     while(rPtr < 0)
+         rPtr += x->n;
+    while(n)
+    {
+        m = _min(x->n - rPtr, n);
+        memcpy(dest, x->buf + rPtr, m*sizeof(float));
+        n -= m;
+        dest += m;
+        rPtr = (rPtr + m) % x->n;
+    }
+}
+
 SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingBuffer *x)
 {
     int m = 0; //number of elements to read in current step
@@ -128,6 +146,8 @@ SOUNDSTAGE_API void RingBuffer_ReadAndAdd(float *dest, int n, int offset, struct
         rPtr = (rPtr + m) % x->n;
     }
 }
+
+/* The following functions are NOT thread-safe! Snychronize accordingly if using them in a multi-threaded setting. */
 
 SOUNDSTAGE_API void RingBuffer_Resize(int n, struct RingBuffer *x)
 {

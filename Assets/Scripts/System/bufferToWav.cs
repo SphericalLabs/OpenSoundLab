@@ -42,11 +42,10 @@ public class bufferToWav : MonoBehaviour {
         return StartCoroutine(SaveRoutine(filename, clip, length, txt, sig));
     }
 
-    void WavHeader(BinaryWriter b, int length)
+    public void WavHeader(BinaryWriter b, int length, int _samplelength = 2)
     {
         int _samplerate = AudioSettings.outputSampleRate;
         int _channels = 2;
-        int _samplelength = 2; //2 bytes
        
         b.Write(Encoding.ASCII.GetBytes("RIFF")); // chunkid
         b.Write(36 + length * _samplelength); // chunksize = (length * _samplelength) + 36???
@@ -117,5 +116,22 @@ public class bufferToWav : MonoBehaviour {
         sig.updateTape(filename);
 
         yield return new WaitForSeconds(1.5f);
-    }    
+    }
+
+    public void UpdateWavHeader(string fileName, int length, int _samplelength = 2)
+    {
+        using (var stream = File.Open(fileName, FileMode.Open))
+        {
+            byte[] bytes = BitConverter.GetBytes(36 + length * _samplelength);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            stream.Position = 4;
+            stream.Write(bytes, 0, bytes.Length);
+            bytes = BitConverter.GetBytes(length * _samplelength);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            stream.Position = 40;
+            stream.Write(bytes, 0, bytes.Length);
+        }
+    }
 }

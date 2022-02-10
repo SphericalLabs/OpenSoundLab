@@ -1,11 +1,9 @@
-//  Created by Hannes Barfuss on 15.12.2021.
-//
-//  This is a feed-forward compressor based on this paper:
-//  https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysisx
-//
-//  The gain is computed by first applying threshold, ratio and knee to the input signal, then smoothing the resulting control signal by a 0-pole IIR filter (envelope follower). The computed gain is then applied ("fed forward") to the input signal.
-//  Note that if the compressor's ratio is set to its maxValue, it is internally interpreted as INFINITY and the compressor acts as a brickwall limiter.
-//  The compressor has an optional Lookahead feature, which is mainly useful in conjunction with brickwall limiting, to avoid rectangular artifacts. A limiter without lookahead only guarantees to not overshoot if it has an attack time of 0, which means no attack gain smoothing is applied at all. With a lookahead, the limiter can have an attack time > 0, which results in smoother gain reduction. The downside is that a lookahead of n samples adds n samples of latency to the output signal (because it is impossible to see into the future, so the "lookahead" is actually implemented as a delay on the input signal...)
+///  Created by Hannes Barfuss on 15.12.2021.
+///
+///  This is a feed-forward compressor based on this paper:
+///  https://www.researchgate.net/publication/277772168_Digital_Dynamic_Range_Compressor_Design-A_Tutorial_and_Analysisx
+///  The gain is computed by first applying threshold, ratio and knee to the input signal, then smoothing the resulting control signal by a 0-pole IIR filter (envelope follower). The computed gain is then applied ("fed forward") to the input signal.
+///  The compressor has an optional Lookahead feature, which is mainly useful in conjunction with brickwall limiting. A limiter without lookahead only guarantees to not overshoot if it has an attack time of 0, which means no attack gain smoothing is applied at all. This will lead to rectangular wave shapes and thus unpleasant audible distortion. With a lookahead, the limiter can have an attack time > 0, which results in smoother gain reduction, and at the same time guarantee to not overshoot. The downside is that a lookahead of n samples adds n samples of latency to the output signal (because it is impossible to see into the future, so the "lookahead" is actually implemented as a delay on the input signal...)
 
 #include "Compressor.h"
 #include "util.h"
@@ -45,22 +43,23 @@ inline float _interpolate(float *buf, float index)
 
 SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, int channels, CompressorData* x)
 {
-    /* Attention: inbuffer & outbuffer are interleaved! */
+    ///Attention: inbuffer & outbuffer are interleaved!
+    
+    x->clipping = false;
+    x->attenuation = 0.0f;
     
     if (channels != 2)
     {
         return;
     }
     
-    //TODO: This causes the compressor to not kick in immediately after periods of silence!
+    ///TODO: This causes the compressor to not kick in immediately after periods of silence!
     float sumIn = _fSumOfMags(buffer, length);
     if(sumIn < 0.0000000001)
     {
         return;
     }
-    
-    x->clipping = false;
-    
+        
     float threshold = x->params[P_THRESHOLD];
     float ratio = x->params[P_RATIO];
     float knee = x->params[P_KNEE];
@@ -84,8 +83,8 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
     int n = length / channels;
     while(n--)
     {
-        //"Lookahead" is implemented by delaying the input signal.
-        //Envelope smoothing is applied to delay time to reduce artifacts at sudden changes
+        ///"Lookahead" is implemented by delaying the input signal.
+        ///Envelope smoothing is applied to delay time to reduce artifacts at sudden changes
         delay = (lookaheadSmpls == x->d_prev) ? lookaheadSmpls : (int)roundf( x->aD * x->d_prev + (1.0f - x->aD) * lookaheadSmpls );
         
         readPtr = x->bufPtr - channels * delay;
@@ -94,50 +93,51 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
         
         for(int k = 0; k < channels; k++)
         {
-            //write sample to lookahead buffer
+            ///Write sample to lookahead buffer
             x->buf[x->bufPtr+k] = inBuf[k];
             
-            //convert to decibel so we can operate in log domain
+            ///Convert to decibel so we can operate in log domain
             if(!x->params[P_LIMIT])
                 xG = _atodb(fabsf(sidechain[k]));
-            //If we are in limiter mode, we look at current sidechain value as well as current output signal value, and use whichever is bigger to calculate the gain reduction. If we would only use the sidechain, then transients that are shorter than the lookahead time will not get attenuated.
+            ///If we are in normal compressor mode, we want to look only at the sidechain signal. In the most common usecase of a compressor, the sidechain signal is the same signal as the audio signal to process. Using a distinct signal as a sidechain (for example a kick drum) to compress another signal allows for the typical "ducking" effect used in modern electronic music.
             else
              xG = _atodb(_max(fabs(sidechain[k]), fabs(x->buf[readPtr+k])));
+            ///On the other hand, if we are in limiter mode, we look at current sidechain value as well as current output signal value, and use whichever is bigger to calculate the gain reduction. If we would only use the sidechain, then transients that are shorter than the lookahead time will not get attenuated.
             
-            //apply threshold, ratio, knee: eq.4
+            ///apply threshold, ratio, knee: eq.4
             tmp = 2*(xG - threshold);
-            //signal is below treshold and not within knee, no attenuation at all:
+            ///signal is below treshold and not within knee, no attenuation at all:
             if(tmp < -(knee)) yG = xG;
-            //signal is above threshold and not within knee, full attenuation:
+            ///signal is above threshold and not within knee, full attenuation:
             else if ((tmp > knee)) yG = threshold + (xG - threshold) / ratio;
-            //signal is within knee, attenuate smoothly:
+            ///signal is within knee, attenuate smoothly:
             else yG = xG + (1/ratio-1) * powf(xG - threshold + knee/2, 2) / (2*knee);
             
-            //smooth level detection: eq.17
-            //The calculated attenuation is smoothed by an envelope follower.
+            ///smooth level detection: eq.17
+            ///The calculated attenuation is smoothed by an envelope follower.
             xL = xG - yG;
             y1 = _max(xL, x->aR * x->y1_prev[k] + (1 - x->aR) * xL);
             yL = x->aA * x->yL_prev[k] + (1 - x->aA) * y1;
-            //If compressor is in bypass state, we still apply the makeup gain.
-            //People should not get the impression that a compressor "makes things louder"
-            //bc it is just wrong...
+            ///If compressor is in bypass state, we still apply the makeup gain.
+            ///People should not get the impression that a compressor "makes things louder"
+            ///bc it is just wrong...
             cdb = x->params[P_BYPASS] ? makeup : -yL + makeup;
             attenuation += -yL;
             c = _dbtoa(cdb);
             
-            //store current samples for later
+            ///store current samples for later
             x->y1_prev[k] = y1;
             x->yL_prev[k] = yL;
             
-            //write final output sample
+            ///write final output sample
             outBuf[k] = c * x->buf[readPtr+k];
             
-            //Check if clipping
+            ///Check if clipping
             if(fabs(outBuf[k]) > 1)
                 x->clipping = true;
         }
         
-        //Increment pointers
+        ///Increment pointers
         outBuf += channels;
         sidechain += channels;
         inBuf += channels;

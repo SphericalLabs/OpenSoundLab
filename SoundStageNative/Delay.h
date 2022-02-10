@@ -16,8 +16,8 @@ struct DelayData
     
     //internal
     int maxTime;
-    //struct RingBuffer *tap;
-    FrameRingBuffer *tap;
+    struct RingBuffer *tap;
+    //FrameRingBuffer *tap;
     float *temp;
     float *temp2;
 };
