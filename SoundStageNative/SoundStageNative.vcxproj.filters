@@ -45,6 +45,12 @@
     <ClCompile Include="FreeVerb\freeverb\components\revmodel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MasterBusRecorder\AudioPluginUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MasterBusRecorder\MasterBusRecorder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -87,6 +93,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FreeVerb\dfx-library\idfxsmoothedvalue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterBusRecorder\PluginList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterBusRecorder\AudioPluginUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterBusRecorder\AudioPluginInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
