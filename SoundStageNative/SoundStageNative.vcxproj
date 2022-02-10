@@ -30,7 +30,7 @@
     <ProjectGuid>{0C2474D3-4453-45B3-B87D-54844668DC70}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SoundStageNative</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -128,6 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,6 +146,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,6 +164,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -180,6 +183,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -200,6 +204,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -220,6 +225,7 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -236,7 +242,16 @@
     <ClCompile Include="FreeVerb\freeverb\components\comb.cpp" />
     <ClCompile Include="FreeVerb\freeverb\components\revmodel.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RingBuffer.cpp" />
+    <ClCompile Include="MasterBusRecorder\AudioPluginUtil.cpp" />
+    <ClCompile Include="MasterBusRecorder\MasterBusRecorder.cpp" />
+    <ClCompile Include="RingBuffer.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="StereoVerb.cpp" />
     <ClCompile Include="util.c" />
   </ItemGroup>
@@ -252,6 +267,9 @@
     <ClInclude Include="FreeVerb\freeverb\components\revmodel.hpp" />
     <ClInclude Include="FreeVerb\freeverb\components\tuning.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MasterBusRecorder\AudioPluginInterface.h" />
+    <ClInclude Include="MasterBusRecorder\AudioPluginUtil.h" />
+    <ClInclude Include="MasterBusRecorder\PluginList.h" />
     <ClInclude Include="RingBuffer.h" />
     <ClInclude Include="StereoVerb.h" />
     <ClInclude Include="util.h" />

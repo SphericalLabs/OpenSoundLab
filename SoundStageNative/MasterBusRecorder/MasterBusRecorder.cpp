@@ -1,7 +1,13 @@
 #include "AudioPluginUtil.h"
-#include "util.h"
 #include <atomic>
+///TODO: Windows include paths are horribly broken. It works for now, but should eventually clean this up.
+#ifdef _WIN32
+#include "../util.h"
+#include "../RingBuffer.h"
+#else
+#include "util.h"
 #include "RingBuffer.h"
+#endif
 
 ///Note: The plugin only works if "Load at startup" is checked in the Import settings in Unity for the SoundStageNative library.template
 
@@ -12,6 +18,7 @@ namespace MasterBusRecorder
 {
     enum Param
     {
+        P_LIMIT,
         P_NUM
     };
 
@@ -20,8 +27,8 @@ namespace MasterBusRecorder
         struct Data
         {
             float p[P_NUM];
-            std::atomic_bool recording;
-            std::atomic_int newSamples;
+            std::atomic<bool> recording;
+            std::atomic<int> newSamples;
             std::atomic<float> level_dB;
             std::atomic<float> level_lin;
             struct RingBuffer *buffer;
@@ -32,6 +39,9 @@ namespace MasterBusRecorder
             Data data;
             unsigned char pad[(sizeof(Data) + 15) & ~15]; // This entire structure must be a multiple of 16 bytes (and and instance 16 byte aligned) for PS3 SPU DMA requirements
         };
+        //Defining constructors explicitly seems to be necessary when using std::atomic types bc the default constuctor will then be deleted. Was never a problem with Xcode or Android NDK, but would not compile without explicit constructors in Visual Studio.
+        EffectData() {}
+        ~EffectData() {}
     };
 
     struct EffectData::Data *instance = NULL;
@@ -40,6 +50,7 @@ namespace MasterBusRecorder
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
+        AudioPluginUtil::RegisterParameter(definition, "Limiter", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_LIMIT, "Limiter on/off.");
         return numparams;
     }
 

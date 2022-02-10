@@ -37,13 +37,20 @@ public class masterBusRecorderDeviceInterface : deviceInterface
     int length;
     int bitDepth = 24;
 
+    private void Awake()
+    {
+        //You can set the bitDepth here if you want:
+        //bitDepth = 16;
+        //bitDepth = 24;
+    }
+
     private void Update()
     {
         if(_state == State.Recording)
         {
+            //You can use these for level visualization:
             float lin = GetLevel_Lin();
             float db = GetLevel_dB();
-            Debug.Log("MasterBus level: " + lin + " = " + db + "dB");
         }
     }
 
@@ -170,7 +177,9 @@ DateTime.Now);
                 }
                 else if (recInterface.bitDepth == 24)
                 {
+                    //Adapted for 24bit: boundaries are [-2^23...2^23-1]
                     convertedSample = (((int)(Mathf.Clamp(sample, -1f, 1f) * 8388600 + 8388608.5)) - 8388608);
+                    //Have to spread across 3 bytes bc there is no 24bit data type
                     bytes[0] = (byte)(convertedSample);
                     bytes[1] = (byte)(convertedSample >> 8);
                     bytes[2] = (byte)(convertedSample >> 16);

@@ -1,6 +1,7 @@
 /* A basic ring buffer that can be used for delay lanes etc. */
 
-#pragma once
+#ifndef RingBuffer_h
+#define RingBuffer_h
 
 #include "main.h"
 
@@ -36,3 +37,5 @@ SOUNDSTAGE_API void RingBuffer_Free(struct RingBuffer *x);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RingBuffer_h */

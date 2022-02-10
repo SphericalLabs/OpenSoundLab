@@ -11,6 +11,7 @@
 #include <vector>
 #include "allpass.hpp"
 #include "comb.hpp"
+///TODO: Windows include paths are horribly broken. It works for now, but should eventually clean this up.
 #ifdef _WIN32
 #include "../../dfx-library/dfxsmoothedvalue.h"
 #else

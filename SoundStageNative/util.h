@@ -2,7 +2,8 @@
 //
 //  This is a collection of utility functions that are often used in audio processing. Some of them are optimized with Neon Instrinsics for arm64 CPUs. Make sure you compile with Neon support if available on the target hardware, as performance gains are substantial (up to 4x faster).
 
-#pragma once
+#ifndef util_h
+#define util_h
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,6 +14,11 @@
     #define  printv(...) __android_log_print(ANDROID_LOG_INFO,ANDDOIR_LOG_TAG,__VA_ARGS__)
 #else
     #define printv(...) printf(__VA_ARGS__)
+#endif
+
+//Windows needs explicit import of the intxx_t types
+#ifdef _WIN32
+#include <stdint.h>
 #endif
 
 #define one_minus_oneOverE 0.6321205588285576784044762298 //1-(1/e)
@@ -111,3 +117,5 @@ float clamp(float d, float min, float max);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* util_h */
