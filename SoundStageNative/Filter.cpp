@@ -21,7 +21,7 @@ extern "C" {
 
 	float ProcessSample(FilterData* fd, float sample)
 	{
-		float input = sample - fd->q * fd->b4;//feedback
+		float input = _clamp(sample, -1.f, 1.f) - fd->q * fd->b4; //feedback
 
 		float t1 = fd->b1;
 		fd->b1 = (input + fd->b0) * fd->p - fd->b1 * fd->f;

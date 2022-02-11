@@ -202,7 +202,7 @@ public class omniPlug : manipObject {
       }
 
       updateLineVerts();
-      //if (noChange) calmLine();
+      if (noChange) calmLine();
     }
   }
 
