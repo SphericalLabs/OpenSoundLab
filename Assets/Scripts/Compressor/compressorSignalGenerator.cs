@@ -56,11 +56,11 @@ public class compressorSignalGenerator : signalGenerator
                 //p[param] = 10 + value * 1990;
                 break;
             case (int)Param.P_THRESHOLD:
-                p[param] = Utils.map(value, 0, 1, 0, -40, 0.2f);
+                p[param] = Utils.map(value, 0, 1, -40, 0, 0.2f);
                 //p[param] = value * -40;
                 break;
             case (int)Param.P_RATIO:
-                p[param] = Utils.map(value, 0, 1, 1, 24, 0.2f);
+                p[param] = value == 1 ? float.MaxValue : Utils.map(value, 0, 1, 1, 24, 0.2f);
                 //p[param] = 1 + value * 11;
                 break;
             case (int)Param.P_KNEE:
