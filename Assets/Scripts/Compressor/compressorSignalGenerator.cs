@@ -48,7 +48,7 @@ public class compressorSignalGenerator : signalGenerator
         switch(param)
         {
             case (int)Param.P_ATTACK:
-                p[param] = Utils.map(value, 0, 1, 0.01f, 100.0f, 0.2f);
+                p[param] = Utils.map(value, 0, 1, 0.01f, 1000.0f, 0.2f);
                 //p[param] = 0.1f + value * 99.9f;
                 break;
             case (int)Param.P_RELEASE:
