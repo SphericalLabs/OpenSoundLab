@@ -27,14 +27,14 @@ public class metronome : componentInterface {
 
   float volumepercent = 0;
 
-  masterBusRecorderDeviceInterface recorder;
+  masterBusRecorder recorder;
 
   public Transform rod;
   public TextMesh txt;
 
   void Awake() {
     bpmDial = GetComponentInChildren<dial>();
-    recorder = gameObject.AddComponent<masterBusRecorderDeviceInterface>();
+    recorder = gameObject.AddComponent<masterBusRecorder>();
   }
 
   public void Reset() {

@@ -1,3 +1,10 @@
+///Created on 07.02. by Hannes
+///MasterBusRecorder is a Unity Native Audio Effect that buffers its input and makes it available for any other modules/threads (for example for writing WAV files to disk).
+/// It has an optional limiter feature, which can be completely bypassed.
+/// Please note that the plugin only works if "Load at startup" is checked in the Import settings in Unity for the SoundStageNative library (.so, .dll, .dylib, .a or .bundle) and that you have to set this for each platform individually.
+/// For best efficiency, you should check that the target system provides lock-free implementations of std::atomic<bool>, std::atomic<int> and std::atomic<float>. This plugin's main target is the Oculus Quest 2, which provides these lock-free atomics.
+/// If your target system does not provide lock-free atomics, it should in most cases still be safe to use this plugin. Performance may suffer a bit. HOWEVER, if your target system does not provide lock-free atomic types AND your audio processing engine operates interrupt-driven, you are strongly advised NOT to use this plugin.
+
 #include "AudioPluginUtil.h"
 #include <atomic>
 ///TODO: Windows include paths are horribly broken. It works for now, but should eventually clean this up.
@@ -10,8 +17,6 @@
 #include "RingBuffer.h"
 #include "Compressor.h"
 #endif
-
-///Note: The plugin only works if "Load at startup" is checked in the Import settings in Unity for the SoundStageNative library.template
 
 ///If Unity runs with 60fps and an audio buffer size of 256 with 48kHz sample rate, then the DSP process chain is called roughly 190 times per second, which means between 3 and 4 times per frame.
 #define MBR_BUFFERLENGTH 16384 ///2^14, this should be enough to handle any common dsp vector size and frame rate as well as some frames without Unity consuming the buffer, which may occasionally happen.
@@ -59,33 +64,42 @@ namespace MasterBusRecorder
 
 extern "C"
 {
-    SOUNDSTAGE_API void StartRecording()
+    ///Sets the recording flag. After calling this, the AudioMixerThread will start recording the incoming audio to the record buffer. The expected usage in a multi-threaded environment is:
+    ///1) Call StartRecording()
+    ///2) Call ReadRecordedSample(s) repeatedly to consume the available samples. It is very important that this step is well synchronized with the processing rate of the AudioMxerThread to avoid buffer overflow or underflow. Buffer overflow means that no more samples can be recorded because the buffer is completely filled with unconsumed samples. This happens if your querying rate is too low, and it will cause audible gaps in the recorded audio file. Buffer underflow means that you repeatedly query for new samples when there are none. This happens if your querying rate is too high and is a waste of CPU. As a rule of thumb, you should try to consume the samples at approximately the same rate and in the same block size as the AudioMxerThread uses.
+    SOUNDSTAGE_API void MasterBusRecorder_StartRecording()
     {
         instance->recording.store(true);
     }
 
-    SOUNDSTAGE_API void StopRecording()
+    ///Unsets the recording flag. Note that if you call StopRecording() while the AudioMixerThread is processing an audio buffer, this audio buffer will be completely processed before the AudioMixerThread stops recording. The expected usage in a multi-threaded environment is:
+    ///1) Call StopRecording()
+    ///2) Call ReadRecordedSample(s) until there are no more samples available. This is important, because if you skip this step, some samples may remain in the buffer and will be read when you start the next recording.
+    ///3) Do any finalizing steps (writing file headers, writing file to disk or whatever)
+    SOUNDSTAGE_API void MasterBusRecorder_StopRecording()
     {
         instance->recording.store(false);
     }
 
-    SOUNDSTAGE_API float GetLevel_Lin()
+    ///Returns the average signal energy of the most recent buffer as a linear value in range [0...1].
+    SOUNDSTAGE_API float MasterBusRecorder_GetLevel_Lin()
     {
         return instance->level_lin.load();
     }
 
-    SOUNDSTAGE_API float GetLevel_dB()
+    ///Returns the average signal energy of the most recent buffer in dB in range [-inf...0].
+    SOUNDSTAGE_API float MasterBusRecorder_GetLevel_dB()
     {
         return instance->level_dB.load();
     }
 
-    ///Reads 1 sample from the record buffer. Note that this needs an atomic_load operation, which is not guaranteed to be lock-free on all systems. It is more efficient to use ReadRecordedSamples() to read ALL new samples in one go, as this also only needs 1 atomic_load operation - needs more memory, though. On systems with lock-free implementations of atomic_load, it should be fine to use this function.
-    SOUNDSTAGE_API bool ReadRecordedSample(float* sample)
+    ///Reads 1 sample from the record buffer. Note that this needs an atomic_load operation, which is not guaranteed to be lock-free on all systems. On systems with lock-free implementations of atomic_load, it should be fine to use this function. Otherwise, it is more efficient to use ReadRecordedSamples() to read ALL new samples in one go, as this also only needs 1 atomic_load operation - needs more memory, though.
+    SOUNDSTAGE_API bool MasterBusRecorder_ReadRecordedSample(float* sample)
     {
         int n = instance->newSamples.load();
         if(n > 0)
         {
-            *sample = instance->buffer->buf[instance->readPtr]; //We are bypassing the RingBuffer's API here and reading directly from its underlying buffer. This is not recommended...
+            *sample = instance->buffer->buf[instance->readPtr]; //We are bypassing the RingBuffer's API here and reading directly from its underlying buffer. This is not recommended... otherwise, calling RingBuffer_Read for one single sample seems overkill.
             instance->newSamples.fetch_sub(1);
             instance->readPtr++;
             if (instance->readPtr >= MBR_BUFFERLENGTH)
@@ -96,8 +110,8 @@ extern "C"
             return false;
     }
 
-    ///Reads all new samples into outBuffer and returns the number of copied samples. Needs 1 atomic_load no matter of the number of samples to read.
-    SOUNDSTAGE_API int ReadRecordedSamples(float* outBuffer)
+    ///Reads all new samples into outBuffer and returns the number of copied samples. Needs 1 atomic_load operation which is not guaranteed to be lock-free on all systems.
+    SOUNDSTAGE_API int MasterBusRecorder_ReadRecordedSamples(float* outBuffer)
     {
         int n = 0;
         int N = 0;
@@ -114,7 +128,13 @@ extern "C"
         return N;
     }
 
-    SOUNDSTAGE_API int GetBufferPointer(void *ringbuffer, int* readOffset)
+    ///Writes a reference to the ring buffer and the current readOffset to the given memory addresses. The return value is the maximum number of samples the caller is allowed to access, starting from readOffset. Violating this rule results in undefined behavior, as the other part of the RingBuffer is reserved for the AudioMixerThread for write access.
+    ///The expected usage in a multi-threaded environment is as follows:
+    ///1) Call GetBufferPointer
+    ///2) Do something with some or all of the available samples in the ringbuffer
+    ///3) Call AdvanceBufferPointer and pass as argument the number of samples you consumed in 2)
+    ///Note that if you do very expensive processing on the samples, it may be better to copy the samples to an intermediate buffer, then call AdvanceBufferPointer, and then to the expensive processing on the intermediate buffer.
+    SOUNDSTAGE_API int MasterBusRecorder_GetBufferPointer(void *ringbuffer, int* readOffset)
     {
         int n = instance->newSamples.load();
         
@@ -125,7 +145,8 @@ extern "C"
         return n;
     }
 
-    SOUNDSTAGE_API void AdvanceBufferPointer(int n)
+    ///Advances the readOffset by n samples. Think of this as marking n samples as "consumed", so they can be overwritten.
+    SOUNDSTAGE_API void MasterBusRecorder_AdvanceBufferPointer(int n)
     {
         instance->readPtr += n;
         if (instance->readPtr >= MBR_BUFFERLENGTH)
@@ -133,7 +154,8 @@ extern "C"
         instance->newSamples.fetch_sub(n);
     }
 
-    SOUNDSTAGE_API void* GetRecorderInstance()
+    ///Returns a pointer to the current recorder instance.
+    SOUNDSTAGE_API void* MasterBusRecorder_GetRecorderInstance()
     {
         return (void*)instance;
     }
@@ -168,13 +190,17 @@ extern "C"
         instance = &effectdata->data;
         
         if(!atomic_is_lock_free(&effectdata->data.recording))
-            printv(("Warning: MasterBusRecorder: The atomic recording flag is not lock-free on this system. Therefore, you are advised to carefully examine the effects of locks in the audio thread on this system before using the MasterBusRecorder.\n"));
+            printv(("Warning: MasterBusRecorder: std::atomic<bool> is not lock-free on this system. Therefore, you are advised to carefully examine the effects of locks in the audio thread on this system before using the MasterBusRecorder.\n"));
         else
-            printv(("MasterBusRecorder: The atomic recording flag is lock-free.\n"));
+            printv(("MasterBusRecorder: std::atomic<bool> is lock-free.\n"));
         if(!atomic_is_lock_free(&effectdata->data.newSamples))
-            printv(("Warning: MasterBusRecorder: The atomic newSamples counter is not lock-free on this system. Therefore, it is highly discouraged to use ReadRecordedSample() on this system. Use ReadRecordedSamples() instead.\n"));
+            printv(("Warning: MasterBusRecorder: std::atomic<int> is not lock-free on this system. Therefore, it is highly discouraged to use ReadRecordedSample() on this system. Use ReadRecordedSamples() instead.\n"));
         else
-            printv(("MasterBusRecorder: The atomic newSamples counter is lock-free.\n"));
+            printv(("MasterBusRecorder: std::atomic<int> is lock-free.\n"));
+        if(!atomic_is_lock_free(&effectdata->data.level_dB))
+            printv(("Warning: MasterBusRecorder: std::atomic<float> is not lock-free on this system. Therefore, you are advised to carefully examine the effects of locks in the audio thread on this system before using the MasterBusRecorder.\n"));
+        else
+            printv(("MasterBusRecorder: std::atomic<float> is lock-free.\n"));
         
         return UNITY_AUDIODSP_OK;
     }
@@ -186,7 +212,7 @@ extern "C"
         
         while(data->recording.load() == true)
         {
-            //Have to use a spinlock here to wait until mainthead finishes recording. Ideally, StopRecording() is always called before Unity calls ReleaseCallback(). For example, you could call StopRecording in OnDestroy() routine of a MonoBehaviour.
+            //Have to use a spinlock here to wait until mainthread finishes recording. Ideally, StopRecording() is always called before Unity calls ReleaseCallback(). For example, you could call StopRecording in OnDestroy() routine of a MonoBehaviour.
         }
         
         if (instance == &effectdata->data)

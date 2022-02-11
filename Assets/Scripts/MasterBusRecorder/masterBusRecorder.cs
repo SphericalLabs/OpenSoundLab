@@ -5,20 +5,20 @@ using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-public class masterBusRecorderDeviceInterface : deviceInterface
+public class masterBusRecorder : MonoBehaviour
 {
     [DllImport("SoundStageNative")]
-    static extern IntPtr GetRecorderInstance();
+    static extern IntPtr MasterBusRecorder_GetRecorderInstance();
     [DllImport("SoundStageNative")]
-    static extern void StartRecording();
+    static extern void MasterBusRecorder_StartRecording();
     [DllImport("SoundStageNative")]
-    static extern void StopRecording();
+    static extern void MasterBusRecorder_StopRecording();
     [DllImport("SoundStageNative")]
-    static extern bool ReadRecordedSample(ref float sample);
+    static extern bool MasterBusRecorder_ReadRecordedSample(ref float sample);
     [DllImport("SoundStageNative")]
-    static extern float GetLevel_Lin();
+    static extern float MasterBusRecorder_GetLevel_Lin();
     [DllImport("SoundStageNative")]
-    static extern float GetLevel_dB();
+    static extern float MasterBusRecorder_GetLevel_dB();
 
     public enum State
     {
@@ -42,6 +42,8 @@ public class masterBusRecorderDeviceInterface : deviceInterface
         //You can set the bitDepth here if you want:
         //bitDepth = 16;
         //bitDepth = 24;
+
+        WritePseudoFile();
     }
 
     private void Update()
@@ -49,8 +51,8 @@ public class masterBusRecorderDeviceInterface : deviceInterface
         if(_state == State.Recording)
         {
             //You can use these for level visualization:
-            float lin = GetLevel_Lin();
-            float db = GetLevel_dB();
+            float lin = MasterBusRecorder_GetLevel_Lin();
+            float db = MasterBusRecorder_GetLevel_dB();
         }
     }
 
@@ -122,7 +124,7 @@ DateTime.Now);
         _state = State.Recording;
 
         //Tell native code to start recording:
-        StartRecording();
+        MasterBusRecorder_StartRecording();
 
         //Start coroutine with custom onEnded action:
         Action onEnded = delegate () { OnRecordingFinished(); };
@@ -134,7 +136,7 @@ DateTime.Now);
         Debug.Log("MasterBusRecorder: Recording stopped, waiting for Coroutine to finish...");
 
         //Tell native code to stop recording:
-        StopRecording();
+        MasterBusRecorder_StopRecording();
 
         //Tell coroutine to terminate as soon as all queued samples have been read:
         _state = State.Finishing;
@@ -156,7 +158,7 @@ DateTime.Now);
         _state = State.Idle;
     }
 
-    public IEnumerator QuerySamples(masterBusRecorderDeviceInterface recInterface, Action onEnded)
+    public IEnumerator QuerySamples(masterBusRecorder recInterface, Action onEnded)
     {
         ///Prepare data structures
         float sample = 0;
@@ -164,10 +166,10 @@ DateTime.Now);
         byte[] bytes = new byte[3];
 
         ///Repeatingly query native code for new samples
-        while (recInterface.state != masterBusRecorderDeviceInterface.State.Idle)
+        while (recInterface.state != masterBusRecorder.State.Idle)
         {
             ///If we can get a new sample, we convert it to the desired number format and write it to the file
-            if (ReadRecordedSample(ref sample) == true)
+            if (MasterBusRecorder_ReadRecordedSample(ref sample) == true)
             {
                 recInterface.length++;
                 if(recInterface.bitDepth == 16)
@@ -190,7 +192,7 @@ DateTime.Now);
             else
             {
                 ///1) We consumed all samples because the recording has been stopped:
-                if (recInterface.state == masterBusRecorderDeviceInterface.State.Finishing)
+                if (recInterface.state == masterBusRecorder.State.Finishing)
                 {
                     onEnded(); // we can call this here already bc we will no longer access the native code
                 }
@@ -200,5 +202,19 @@ DateTime.Now);
             }
         }
         yield return null;
+    }
+
+    public void WritePseudoFile()
+    {
+        filename = masterControl.instance.SaveDir + System.IO.Path.DirectorySeparatorChar + "Samples" + System.IO.Path.DirectorySeparatorChar +
+"Recordings" + System.IO.Path.DirectorySeparatorChar +
+"DUMMY.txt";
+        fs = new FileStream(filename, FileMode.Create);
+        bw = new BinaryWriter(fs);
+        bufferToWav.instance.WavHeader(bw, 0, 2);
+        bw.Close();
+        fs.Close();
+        File.Delete(filename);
+        Debug.Log(filename);
     }
 }
