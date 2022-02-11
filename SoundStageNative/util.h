@@ -1,6 +1,12 @@
 //  Created by Hannes Barfuss on 28.12.2021.
 //
 //  This is a collection of utility functions that are often used in audio processing. Some of them are optimized with Neon Instrinsics for arm64 CPUs. Make sure you compile with Neon support if available on the target hardware, as performance gains are substantial (up to 4x faster).
+//
+//  Please follow these style conventions:
+//  * all functions start with an underscore: _func(...)
+//  * functions on float buffers start with _f: _fCopy(...)
+//  * Document "what it does & how to use it" only in util.h
+//  * Document "how it works" only in util.c
 
 #ifndef util_h
 #define util_h
@@ -10,8 +16,8 @@
 
 #if defined(ANDROID) || defined(__ANDROID__)
     #include <android/log.h>
-    #define ANDDOIR_LOG_TAG "SoundStageNative"
-    #define  printv(...) __android_log_print(ANDROID_LOG_INFO,ANDDOIR_LOG_TAG,__VA_ARGS__)
+    #define ANDROID_LOG_TAG "SoundStageNative"
+    #define  printv(...) __android_log_print(ANDROID_LOG_INFO,ANDROID_LOG_TAG,__VA_ARGS__)
 #else
     #define printv(...) printf(__VA_ARGS__)
 #endif
@@ -46,7 +52,7 @@ extern "C" {
     float _dbtoa(float a);
 
     /* Clamps f between min and max */
-    float _fclamp(float f, float min, float max);
+    float _clamp(float f, float min, float max);
 
     /* Converts a 32bit float to a 16bit signed int */
     int16_t _float32toint16(float f);
@@ -79,8 +85,10 @@ extern "C" {
     /* Multiplies elements of src1 and src2 and adds the results to dest */
     void _fMultiplyAdd(float *src1, float *src2, float *dest, int n);
 
+    /* Calculates the sum of magnitudes of src. */
     float _fSumOfMags(float *src, int n);
 
+    /* Calculates the average signal energy of src. */
     float _fAverageSumOfMags(float *src, int n);
 
     /* Clears the negative sign from all elements in src */
@@ -98,13 +106,11 @@ extern "C" {
     /* De-interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory addresses, a slightly faster in-place operation is performed. */
     void _fDeinterleave(const float* src, float *dest, int n, int channels);
 
-/* Evaluates y = ab^x with slope ym. x will be clamped to [0..1]. ym < 0.5 yields an exponential curve, ym > 0.5 yields a logarithmic curve. Return val will be in range [0..1]. */
-float _expCurve(float x, float ym);
+    /* Evaluates y = ab^x with slope ym. x will be clamped to [0..1]. ym < 0.5 yields an exponential curve, ym > 0.5 yields a logarithmic curve. Return val will be in range [0..1]. */
+    float _expCurve(float x, float ym);
 
-/* Maps a value from one range to another, applying a slope between 0 and 1 (0.5 is linear or "no slope"). */
-float _map(float x, float start1, float stop1, float start2, float stop2, float slope);
-
-float clamp(float d, float min, float max);
+    /* Maps a value from one range to another, applying a slope between 0 and 1 (0.5 is linear or "no slope"). */
+    float _map(float x, float start1, float stop1, float start2, float stop2, float slope);
 
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void);

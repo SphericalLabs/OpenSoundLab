@@ -10,7 +10,9 @@ AudioMixerEffectController:
   m_EffectID: b29b1f88342754aeab016ea8a2690316
   m_EffectName: Master Bus Recorder
   m_MixLevel: 34795d314a43142b5981839a7b216fd8
-  m_Parameters: []
+  m_Parameters:
+  - m_ParameterName: Limiter
+    m_GUID: 9999571f4af974e349b53371062e79d9
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
@@ -89,8 +91,9 @@ AudioMixerSnapshotController:
   m_SnapshotID: 5e8bd7df6f6c3c64ba0c885ccbcff25e
   m_FloatValues:
     6dda0c328c58e0444bc81661fdafa36b: -0.16685224
-    25068b73c14e6bf43b3c185271990c9a: -0.08374829
+    25068b73c14e6bf43b3c185271990c9a: 0
     4f4744ec3e0a278418e21b16fbe52245: -80
+    9999571f4af974e349b53371062e79d9: 1
     7bd869afe3ab9794590ed134500693d6: 0
   m_TransitionOverrides: {}
 --- !u!243 &243000014088388890

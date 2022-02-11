@@ -16,15 +16,15 @@
 
 enum CompressorParams
 {
-    P_ATTACK,
-    P_RELEASE,
-    P_THRESHOLD,
-    P_RATIO,
-    P_KNEE,
-    P_MAKEUP,
-    P_LOOKAHEAD,
-    P_LIMIT,
-    P_BYPASS,
+    P_ATTACK, //0
+    P_RELEASE, //1
+    P_THRESHOLD, //2
+    P_RATIO, //3
+    P_KNEE, //4
+    P_MAKEUP, //5
+    P_LOOKAHEAD, //6
+    P_LIMIT, //7
+    P_BYPASS, //8
     P_N
 };
 
@@ -54,11 +54,11 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
     }
     
     ///TODO: This causes the compressor to not kick in immediately after periods of silence!
-    float sumIn = _fSumOfMags(buffer, length);
+    /*float sumIn = _fSumOfMags(buffer, length);
     if(sumIn < 0.0000000001)
     {
         return;
-    }
+    }*/
         
     float threshold = x->params[P_THRESHOLD];
     float ratio = x->params[P_RATIO];
@@ -102,7 +102,7 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
             ///If we are in normal compressor mode, we want to look only at the sidechain signal. In the most common usecase of a compressor, the sidechain signal is the same signal as the audio signal to process. Using a distinct signal as a sidechain (for example a kick drum) to compress another signal allows for the typical "ducking" effect used in modern electronic music.
             else
              xG = _atodb(_max(fabs(sidechain[k]), fabs(x->buf[readPtr+k])));
-            ///On the other hand, if we are in limiter mode, we look at current sidechain value as well as current output signal value, and use whichever is bigger to calculate the gain reduction. If we would only use the sidechain, then transients that are shorter than the lookahead time will not get attenuated.
+            ///On the other hand, if we are in limiter mode, we look at current sidechain value as well as current input signal value, and use whichever is bigger to calculate the gain reduction. If we would only use the sidechain, then transients that are shorter than the lookahead time will not get attenuated.
             
             ///apply threshold, ratio, knee: eq.4
             tmp = 2*(xG - threshold);

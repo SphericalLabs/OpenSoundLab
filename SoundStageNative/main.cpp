@@ -449,7 +449,7 @@ extern "C" {
 
             if (active)
             {
-                if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
+                if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, _clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
                 else floatingBufferCount += endPlaybackSpeed;
                 if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 10.f; // lin fm 
                 
@@ -533,7 +533,7 @@ extern "C" {
             //calc control inputs
             if (bFreqExpGen)
             {
-                endFrequency = endFrequency * powf(2, clamp(frequencyExpBuffer[i], -1.f, 1.f) * 10.f); // convert 0.1V/Oct to 1V/Oct; this has to be clamped, could crash the system otherwise, think 2^320
+                endFrequency = endFrequency * powf(2, _clamp(frequencyExpBuffer[i], -1.f, 1.f) * 10.f); // convert 0.1V/Oct to 1V/Oct; this has to be clamped, could crash the system otherwise, think 2^320
             }
             if (bFreqLinGen) {
                 endFrequency = endFrequency + frequencyLinBuffer[i] * 10.f * 100.f; // add lin fm, thru zero, 1V / 100Hz
@@ -544,7 +544,7 @@ extern "C" {
             }
 
             //update phase for next sample
-            _phase += clamp(endFrequency, -24000.f, 24000.f) * _sampleDuration; // clamp to +/- 24kHz
+            _phase += _clamp(endFrequency, -24000.f, 24000.f) * _sampleDuration; // clamp to +/- 24kHz
 
             // wrap around, also for negative thru-zero phases and frequencies higher than nyquist
             if (_phase >= 0.0) { 

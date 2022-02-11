@@ -39,7 +39,7 @@ extern "C" {
     void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, float frequencyBuffer[], float resonance)
     {
 
-        //resonance = clamp(resonance, 0.f, 1.f);
+        //resonance = _clamp(resonance, 0.f, 1.f);
 
         float freqDiv = 1 / 24000.f; // 24kHz, Nyquist 48kHz
         bool sameCutoff = cutoffFrequency == lastCutoffFrequency;
@@ -52,8 +52,8 @@ extern "C" {
 
             // exponential 1/Oct, freqMod taken from left channel only
             // clamp fm mod -1,1 and effective frequencies 1,260000
-            //frequencyBuffer[i] = frequencyBuffer[i + 1] = clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) * freqDiv, 0.f, 1.f);
-            frequencyBuffer[i] = frequencyBuffer[i + 1] = clamp(261.6256f * powf(2, (clamp(frequencyBuffer[i], -1.f, 1.f) + cutoffFrequency) * 10.f) * freqDiv, 0.f, 1.f); 
+            //frequencyBuffer[i] = frequencyBuffer[i + 1] = _clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) * freqDiv, 0.f, 1.f);
+            frequencyBuffer[i] = frequencyBuffer[i + 1] = _clamp(261.6256f * powf(2, (_clamp(frequencyBuffer[i], -1.f, 1.f) + cutoffFrequency) * 10.f) * freqDiv, 0.f, 1.f);
 
             mfL->q = 1.0f - frequencyBuffer[i];
             mfL->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfL->q;

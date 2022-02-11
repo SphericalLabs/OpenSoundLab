@@ -1,5 +1,6 @@
 
-#pragma once
+#ifndef Compressor_h
+#define Compressor_h
 
 #include "main.h"
 
@@ -43,3 +44,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* Compressor_h */

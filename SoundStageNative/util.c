@@ -12,7 +12,6 @@
 /* Windows does not support C99 standard, so variable length arrays are not supported and are emulated using _malloca and _freea. */
 #include <malloc.h>
 #include <stddef.h>
-#include <stdint.h>
 #endif
 
 #ifdef __APPLE__
@@ -99,14 +98,14 @@ extern "C" {
     }
 
     float _atodb(float a) {
-        return a == 0 ? -INFINITY : 20 * log10f(a);
+        return a == 0 ? -192 : 20 * log10f(a);
     }
 
     float _dbtoa(float a) {
         return powf(10, a/20);
     }
     
-    float _fclamp(float f, float min, float max) {
+    float _clamp(float f, float min, float max) {
       const double t = f < min ? min : f;
       return t > max ? max : t;
     }
@@ -548,12 +547,6 @@ extern "C" {
             a = _expCurve(a, slope); //percentage of x in old range with slope applied
             return start2 + a * (stop2 - start2); //value mapped to new range
         }
-
-
-    float clamp(float d, float min, float max) {
-      const float t = d < min ? min : d;
-      return t > max ? max : t;
-    }
 
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void){

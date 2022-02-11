@@ -4,9 +4,11 @@
 #ifdef _WIN32
 #include "../util.h"
 #include "../RingBuffer.h"
+#include "../Compressor.h"
 #else
 #include "util.h"
 #include "RingBuffer.h"
+#include "Compressor.h"
 #endif
 
 ///Note: The plugin only works if "Load at startup" is checked in the Import settings in Unity for the SoundStageNative library.template
@@ -32,6 +34,7 @@ namespace MasterBusRecorder
             std::atomic<float> level_dB;
             std::atomic<float> level_lin;
             struct RingBuffer *buffer;
+            struct CompressorData *limiter;
             int readPtr;
         };
         union
@@ -148,6 +151,19 @@ extern "C"
         effectdata->data.buffer = RingBuffer_New(MBR_BUFFERLENGTH);
         effectdata->data.readPtr = 0;
         effectdata->data.recording = false;
+        
+        CompressorData *limiter = Compressor_New(state->samplerate);
+        Compressor_SetParam(0.5f, 0, limiter); //attack
+        Compressor_SetParam(2, 1, limiter); //release
+        Compressor_SetParam(0, 2, limiter); //thresh
+        Compressor_SetParam(INFINITY, 3, limiter); //ratio
+        Compressor_SetParam(18, 4, limiter); //knee
+        Compressor_SetParam(0, 5, limiter); //makeup
+        Compressor_SetParam(3, 6, limiter); //lookahead
+        Compressor_SetParam(1, 7, limiter); //limit
+        Compressor_SetParam(0, 8, limiter); //bypass
+        effectdata->data.limiter = limiter;
+        
         state->effectdata = effectdata;
         instance = &effectdata->data;
         
@@ -176,6 +192,7 @@ extern "C"
         if (instance == &effectdata->data)
             instance = NULL;
         RingBuffer_Free(data->buffer);
+        Compressor_Free(data->limiter);
         delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
@@ -209,9 +226,16 @@ extern "C"
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
         
-        ///Pass the audio to the next device in chain without modifying it
-        _fCopy(inbuffer, outbuffer, length * outchannels);
-        float average = _fAverageSumOfMags(inbuffer, length * inchannels);
+        ///Limit output if limiter is enabled
+        if(data->p[P_LIMIT])
+            Compressor_Process(inbuffer, inbuffer, (int)(length*inchannels), inchannels, data->limiter);
+        
+        ///Pass the audio to the next device in chain
+        if(inbuffer != outbuffer)
+            _fCopy(inbuffer, outbuffer, (int)(length * outchannels));
+        
+        ///Calculate average signal energy
+        float average = _fAverageSumOfMags(inbuffer, (int)(length * inchannels));
         instance->level_lin.store(average);
         instance->level_dB.store(_atodb(average));
         
