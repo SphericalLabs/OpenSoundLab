@@ -51,8 +51,8 @@ public class masterBusRecorder : MonoBehaviour
         if(_state == State.Recording)
         {
             //You can use these for level visualization:
-            float lin = MasterBusRecorder_GetLevel_Lin();
-            float db = MasterBusRecorder_GetLevel_dB();
+            float lin = MasterBusRecorder_GetLevel_Lin(); // [0...1]
+            float db = MasterBusRecorder_GetLevel_dB(); //[-192...0]
         }
     }
 
@@ -109,9 +109,14 @@ public class masterBusRecorder : MonoBehaviour
     {
         Debug.Log("MasterBusRecorder: Recording started...");
 
-        //Create filename and filestream:
-        filename = masterControl.instance.SaveDir + System.IO.Path.DirectorySeparatorChar + "Samples" + System.IO.Path.DirectorySeparatorChar +
-"Recordings" + System.IO.Path.DirectorySeparatorChar +
+        //Create filename and filestream, create directory if does not exist:
+        string dir = masterControl.instance.SaveDir + System.IO.Path.DirectorySeparatorChar + "Samples" + System.IO.Path.DirectorySeparatorChar +
+"Sessions";
+        if (!Directory.Exists(dir))
+        {
+            Directory.CreateDirectory(dir);
+        }        
+        filename = dir + System.IO.Path.DirectorySeparatorChar +
 string.Format("{0:yyyy-MM-dd_HH-mm-ss}.wav",
 DateTime.Now);
         Debug.Log(filename);
