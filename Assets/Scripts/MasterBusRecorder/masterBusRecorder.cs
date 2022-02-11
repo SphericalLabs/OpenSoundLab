@@ -35,25 +35,17 @@ public class masterBusRecorder : MonoBehaviour
     FileStream fs;
     string filename;
     int length;
-    int bitDepth = 24;
+    public int bitDepth = 24;
+    public GameObject overloadIndicator;
 
     private void Awake()
     {
-        //You can set the bitDepth here if you want:
-        //bitDepth = 16;
-        //bitDepth = 24;
-
-        //WritePseudoFile();
+        overloadIndicator.SetActive(false);
     }
 
     private void Update()
     {
-        if(_state == State.Recording)
-        {
-            //You can use these for level visualization:
-            float lin = MasterBusRecorder_GetLevel_Lin(); // [0...1]
-            float db = MasterBusRecorder_GetLevel_dB(); //[-192...0]
-        }
+
     }
 
     private void OnDestroy()

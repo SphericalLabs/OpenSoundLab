@@ -27,14 +27,14 @@ public class metronome : componentInterface {
 
   float volumepercent = 0;
 
-  masterBusRecorder recorder;
+  public masterBusRecorder recorder;
 
   public Transform rod;
   public TextMesh txt;
 
   void Awake() {
     bpmDial = GetComponentInChildren<dial>();
-    recorder = gameObject.AddComponent<masterBusRecorder>();
+    recorder = GetComponentInChildren<masterBusRecorder>();
   }
 
   public void Reset() {
@@ -58,7 +58,7 @@ public class metronome : componentInterface {
 
     if (ID == 5) recorder.ToggleRec(on);
 
-    broadcastBpm(); // temporary pitchbend
+    broadcastBpm(); // temporary bpm nudging
   }
 
   void OnEnable() {
