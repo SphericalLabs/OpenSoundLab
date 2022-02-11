@@ -100,6 +100,22 @@ public class sampleManager : MonoBehaviour {
     }
   }
 
+  public void AddSession(string newsample)
+  {
+    if (sampleDictionary["Sessions"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
+    {
+      return;
+    }
+
+    sampleDictionary["Sessions"][Path.GetFileNameWithoutExtension(newsample)] = newsample;
+
+    libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
+    for (int i2 = 0; i2 < libs.Length; i2++)
+    {
+      if (libs[i2].curPrimary == "Sessions") libs[i2].updateSecondaryPanels("Sessions");
+    }
+  }
+
   int customSampleCount = 0;
   bool inStartup = false;
   void AddCustomSamples() {

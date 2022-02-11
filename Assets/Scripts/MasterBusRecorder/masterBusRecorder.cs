@@ -43,7 +43,7 @@ public class masterBusRecorder : MonoBehaviour
         //bitDepth = 16;
         //bitDepth = 24;
 
-        WritePseudoFile();
+        //WritePseudoFile();
     }
 
     private void Update()
@@ -159,6 +159,9 @@ DateTime.Now);
         ///Finally, update the WAV header so it has the correct size
         bufferToWav.instance.UpdateWavHeader(filename, length, bitDepth / 8);
 
+        // show it in Tapes->Sessions
+        sampleManager.instance.AddSession(filename);
+        
         //Reset state so a new recording session can be started:
         _state = State.Idle;
     }
