@@ -29,7 +29,7 @@ AudioMixerController:
   - {fileID: 24500003}
   m_StartSnapshot: {fileID: 24500003}
   m_SuspendThreshold: -80
-  m_EnableSuspend: 1
+  m_EnableSuspend: 0
   m_UpdateMode: 0
   m_ExposedParameters:
   - guid: 7bd869afe3ab9794590ed134500693d6
