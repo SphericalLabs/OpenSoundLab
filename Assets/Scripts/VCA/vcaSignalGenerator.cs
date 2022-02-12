@@ -21,6 +21,7 @@ public class vcaSignalGenerator : signalGenerator {
   public signalGenerator incoming, controlSig;
   public bool active = true;
   public float amp = 1f;
+  float lastAmp = 0f;
   float sign;
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
@@ -37,12 +38,12 @@ public class vcaSignalGenerator : signalGenerator {
       {
         for (int i = 0; i < buffer.Length; i++)
         {
-          buffer[i] = buffer[i] * controlBuffer[i] * Mathf.Pow(amp, 2); // RingMod, 0-1 fades normal, -1 inverts phase
+          buffer[i] = buffer[i] * controlBuffer[i] * Mathf.Pow(Utils.lerp(lastAmp, amp, (float) i / (buffer.Length - 1)), 2); // RingMod, 0-1 fades normal, -1 inverts phase
         }
       } else {
         for (int i = 0; i < buffer.Length; i++)
         {
-          buffer[i] = buffer[i] * Mathf.Pow(amp, 2); // dial acts as attenuator
+          buffer[i] = buffer[i] * Mathf.Pow(Utils.lerp(lastAmp, amp, (float) i / (buffer.Length - 1)), 2); // dial acts as attenuator
         }
       }
     } else { // nothing plugged, no output
@@ -58,6 +59,8 @@ public class vcaSignalGenerator : signalGenerator {
         }
       //}
     }
+
+    lastAmp = amp;
 
   }
 }

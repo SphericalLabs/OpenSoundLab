@@ -21,6 +21,7 @@ public class gainSignalGenerator : signalGenerator {
   public signalGenerator incoming;
   public bool active = true;
   public float amp = 0f;
+  float lastAmp = 0f;
 
   float muteFader = 0f;
 
@@ -32,8 +33,8 @@ public class gainSignalGenerator : signalGenerator {
     for(int n = 0; n < buffer.Length; n++) 
     {
       muteFader = Mathf.Clamp01(muteFader + ( (!active || incoming == null) ? -0.005f : 0.005f)); // fade out or in
-      buffer[n] *= amp * muteFader;
+      buffer[n] *= Utils.lerp(lastAmp, amp, (float) n / buffer.Length) * muteFader;
     }
-
+    lastAmp = amp;
   }
 }

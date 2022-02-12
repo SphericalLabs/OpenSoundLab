@@ -29,9 +29,9 @@ public class gainDeviceInterface : deviceInterface {
   }
 
   void Update() {
-    
-    signal.amp = 1f + Mathf.Pow(ampDial.percent, 2) * 32; // 30db! 6 db per duplication, sqrt(32) * 6 = 5 * 6 = 30
-    
+
+    signal.amp = Mathf.Pow(2, ampDial.percent * 6); // 36db gain, 6 db per duplication, log(36) * 6 = 6 * 6 = 36
+
     signal.active = activeSwitch.switchVal;
     if (signal.incoming != input.signal) signal.incoming = input.signal;
   }
