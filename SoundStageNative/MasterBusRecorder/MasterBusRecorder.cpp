@@ -24,7 +24,7 @@
 #endif
 
 ///If Unity runs with 60fps and an audio buffer size of 256 with 48kHz sample rate, then the DSP process chain is called roughly 190 times per second, which means between 3 and 4 times per frame.
-#define MBR_BUFFERLENGTH 16384 ///2^14, this should be enough to handle any common dsp vector size and frame rate as well as some frames without Unity consuming the buffer, which may occasionally happen.
+#define MBR_BUFFERLENGTH 480000 ///10 seconds @ 48kHz this should be enough to handle any common dsp vector size and frame rate as well as some frames without Unity consuming the buffer, which may occasionally happen.
 
 namespace MasterBusRecorder
 {
@@ -287,7 +287,7 @@ extern "C"
         
         else
         {
-            return UNITY_AUDIODSP_ERR_UNSUPPORTED;
+            return UNITY_AUDIODSP_OK;
         }
     }
 }
