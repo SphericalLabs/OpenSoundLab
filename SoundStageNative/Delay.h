@@ -1,3 +1,10 @@
+///Created by Hannes January 2022
+///
+///This is a simple delay audio effect that emulates a bucket-brigade delay. It operates on a fixed-size buffer.
+///The delay time is determined by the oversampling factor used to write/read to the buffer.
+///This results in the characteristic "pitch-shift" effect when changing the delay time while there is still signal in the delay buffer.
+///
+///All functions are not thread-safe, hence the caller must avoid simultaneous access from multiple threads.
 
 #pragma once
 

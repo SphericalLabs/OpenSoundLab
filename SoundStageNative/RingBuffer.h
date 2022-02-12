@@ -1,4 +1,9 @@
-/* A basic ring buffer that can be used for delay lanes etc. */
+/// A basic ring buffer that can be used for delay lanes etc.
+///
+/// All functions are not thread-safe, hence the caller must avoid simultaneous access from multiple threads.
+///
+/// However, it is easy to use the RingBuffer in a multi-threaded environment with one reader and one writer thread:
+/// You just have to ensure that the reader thread and the writer thread operate on non-overlapping parts of the RingBuffer.
 
 #ifndef RingBuffer_h
 #define RingBuffer_h
