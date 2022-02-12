@@ -185,6 +185,7 @@ public class sampleManager : MonoBehaviour {
     dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
     Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Custom");
     Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Recordings");
+    Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Sessions");
     loadSampleDictionary(dir, "DOC");
     AddCustomSamples();
 

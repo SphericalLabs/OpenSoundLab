@@ -35,12 +35,11 @@ public class masterBusRecorder : MonoBehaviour
     FileStream fs;
     string filename;
     int length;
-    public int bitDepth = 24;
-    public GameObject overloadIndicator;
+    public int bitDepth = 24;    
 
     private void Awake()
     {
-        overloadIndicator.SetActive(false);
+        
     }
 
     private void Update()
