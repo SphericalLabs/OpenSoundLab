@@ -3,6 +3,8 @@
  
  These are just some wrapper functions for FreeVerb.
  
+ All functions are not thread-safe, hence the caller must avoid simultaneous access from multiple threads.
+ 
  */
 
 #include "main.h"

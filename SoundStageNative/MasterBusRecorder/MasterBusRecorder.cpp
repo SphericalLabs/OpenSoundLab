@@ -1,9 +1,14 @@
-///Created on 07.02. by Hannes
-///MasterBusRecorder is a Unity Native Audio Effect that buffers its input and makes it available for any other modules/threads (for example for writing WAV files to disk).
+/// Created on 07.02. by Hannes
+/// MasterBusRecorder is a Unity Native Audio Effect that buffers its input and makes it available for any other modules/threads (for example for writing WAV files to disk).
 /// It has an optional limiter feature, which can be completely bypassed.
+/// It is intended to use as a singleton, e.g. only one instance should be used. In fact, if you create multiple plugin instances, only the most recent one will be active.
+///
+/// All functions tagged SOUNDSTAGE_API are thread-safe and can be called from any thread.
+/// All functions tagged UNITY_AUDIODSP_CALLBACK are called by Unity's audio Engine and should NEVER be called by the user.
+///
 /// Please note that the plugin only works if "Load at startup" is checked in the Import settings in Unity for the SoundStageNative library (.so, .dll, .dylib, .a or .bundle) and that you have to set this for each platform individually.
 /// For best efficiency, you should check that the target system provides lock-free implementations of std::atomic<bool>, std::atomic<int> and std::atomic<float>. This plugin's main target is the Oculus Quest 2, which provides these lock-free atomics.
-/// If your target system does not provide lock-free atomics, it should in most cases still be safe to use this plugin. Performance may suffer a bit. HOWEVER, if your target system does not provide lock-free atomic types AND your audio processing engine operates interrupt-driven, you are strongly advised NOT to use this plugin.
+/// If your target system does not provide lock-free atomics, it should in most cases still be safe to use this plugin. Performance may suffer a bit. HOWEVER, if your target system does not provide lock-free atomic types AND your audio processing engine operates interrupt-driven, you are strongly advised NOT to use this plugin, as thread-safety can not be guaranteed.
 
 #include "AudioPluginUtil.h"
 #include <atomic>
@@ -19,7 +24,7 @@
 #endif
 
 ///If Unity runs with 60fps and an audio buffer size of 256 with 48kHz sample rate, then the DSP process chain is called roughly 190 times per second, which means between 3 and 4 times per frame.
-#define MBR_BUFFERLENGTH 16384 ///2^14, this should be enough to handle any common dsp vector size and frame rate as well as some frames without Unity consuming the buffer, which may occasionally happen.
+#define MBR_BUFFERLENGTH 480000 ///10 seconds @ 48kHz this should be enough to handle any common dsp vector size and frame rate as well as some frames without Unity consuming the buffer, which may occasionally happen.
 
 namespace MasterBusRecorder
 {
@@ -282,7 +287,7 @@ extern "C"
         
         else
         {
-            return UNITY_AUDIODSP_ERR_UNSUPPORTED;
+            return UNITY_AUDIODSP_OK;
         }
     }
 }

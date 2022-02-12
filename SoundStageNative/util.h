@@ -1,12 +1,12 @@
-//  Created by Hannes Barfuss on 28.12.2021.
-//
-//  This is a collection of utility functions that are often used in audio processing. Some of them are optimized with Neon Instrinsics for arm64 CPUs. Make sure you compile with Neon support if available on the target hardware, as performance gains are substantial (up to 4x faster).
-//
-//  Please follow these style conventions:
-//  * all functions start with an underscore: _func(...)
-//  * functions on float buffers start with _f: _fCopy(...)
-//  * Document "what it does & how to use it" only in util.h
-//  * Document "how it works" only in util.c
+///  Created by Hannes Barfuss on 28.12.2021.
+///
+///  This is a collection of utility functions that are often used in audio processing. Some of them are optimized with Neon Instrinsics for arm64 CPUs. Make sure you compile with Neon support if available on the target hardware, as performance gains are substantial (up to 4x faster).
+///
+///  Please follow these style conventions:
+///  * all functions start with an underscore: _func(...)
+///  * functions on float buffers start with _f: _fCopy(...)
+///  * Document "what it does & how to use it" only in util.h
+///  * Document "how it works" only in util.c
 
 #ifndef util_h
 #define util_h
