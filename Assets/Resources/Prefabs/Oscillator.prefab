@@ -73,7 +73,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 260ca3ce3d6857248b684a90a594af8d, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3390,9 +3390,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayRenderer: {fileID: 23000010152746958}
   onlineMaterial: {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
-  period: 512
-  fm: 2
-  ani: -690
+  waveWidth: 256
+  waveHeight: 64
+  heightPadding: 2
+  sampleStep: 512
+  doTriggering: 0
+  offset: 0
 --- !u!1 &1000014130592554
 GameObject:
   m_ObjectHideFlags: 0
@@ -3563,7 +3566,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4498947789152258
 Transform:
   m_ObjectHideFlags: 0
@@ -3597,7 +3600,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4896338312776070
 Transform:
   m_ObjectHideFlags: 0

@@ -147,7 +147,6 @@ MonoBehaviour:
   yBounds: {x: -0.075, y: 0.075}
   percent: {x: 0, y: 0}
   onMat: {fileID: 0}
-  usingGlowMat: 0
   usePercent: 1
   _interface: {fileID: 0}
 --- !u!1 &1066598448987964
@@ -563,7 +562,6 @@ MonoBehaviour:
   yBounds: {x: -0.075, y: 0.075}
   percent: {x: 0, y: 0}
   onMat: {fileID: 0}
-  usingGlowMat: 0
   usePercent: 1
   _interface: {fileID: 0}
 --- !u!1 &1259489118296080
@@ -1668,7 +1666,6 @@ MonoBehaviour:
   yBounds: {x: -0.075, y: 0.075}
   percent: {x: 0, y: 0}
   onMat: {fileID: 0}
-  usingGlowMat: 0
   usePercent: 1
   _interface: {fileID: 0}
 --- !u!1 &1779401905998466
@@ -1690,7 +1687,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4892366322464914
 Transform:
   m_ObjectHideFlags: 0
@@ -1912,7 +1909,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4313116615489886
 Transform:
   m_ObjectHideFlags: 0

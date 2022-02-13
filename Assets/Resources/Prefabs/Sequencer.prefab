@@ -67,17 +67,15 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
-  customColor: {r: 0, g: 0, b: 0, a: 0}
-  externalHue: 0
-  hue: 0
+  dialColor: 0
   deltaRot: 0
   curRot: 0
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
+  isNotched: 0
+  notchSteps: 4
   controllerRot: 0
-  notched: 0
-  steps: 4
 --- !u!1 &1000010222783446
 GameObject:
   m_ObjectHideFlags: 0
@@ -2764,7 +2762,6 @@ MonoBehaviour:
   yBounds: {x: -Infinity, y: 0}
   percent: {x: 0, y: 0}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
-  usingGlowMat: 1
   usePercent: 0
   _interface: {fileID: 114000012260190240}
 --- !u!1 &1294162313138962
@@ -2786,7 +2783,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4608553845018832
 Transform:
   m_ObjectHideFlags: 0
@@ -2899,7 +2896,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4381011856789694
 Transform:
   m_ObjectHideFlags: 0

@@ -6808,7 +6808,7 @@ MonoBehaviour:
   switchVal: 0
   notchCount: 17
   labelHolder: {fileID: 4655820350268308}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1947755401277734}
@@ -8428,7 +8428,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4639926434396164
 Transform:
   m_ObjectHideFlags: 0
@@ -8901,7 +8901,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4624835824306798
 Transform:
   m_ObjectHideFlags: 0
@@ -12440,7 +12440,7 @@ MonoBehaviour:
   switchVal: 3
   notchCount: 7
   labelHolder: {fileID: 4308529981824200}
-  onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  glowMat: {fileID: 0}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1868536768755774}
