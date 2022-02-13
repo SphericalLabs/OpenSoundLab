@@ -287,6 +287,7 @@ extern "C"
         
         else
         {
+            printv("MasterBusRecorder: buffer overflow!");
             return UNITY_AUDIODSP_OK;
         }
     }
