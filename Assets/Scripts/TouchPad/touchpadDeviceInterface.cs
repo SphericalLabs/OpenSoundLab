@@ -19,15 +19,28 @@ public class touchpadDeviceInterface : deviceInterface {
 
   touchpadSignalGenerator pad;
   omniJack output;
+  basicSwitch modeSelector;
+  button touchPad;
+  public bool switchedOn = false;
 
   public override void Awake() {
     base.Awake();
     pad = GetComponent<touchpadSignalGenerator>();
     output = GetComponentInChildren<omniJack>();
+    modeSelector = GetComponentInChildren<basicSwitch>();
+    touchPad = GetComponentInChildren<button>();
   }
 
   public override void hit(bool on, int ID = -1) {
-    pad.signalOn = on;
+    if(modeSelector.switchVal){ // momentarily trigger
+      touchPad.isToggle = false;
+      pad.signalOn = on;
+    } else { // permanent switch
+      touchPad.isToggle = true;
+      //if (on) switchedOn = !switchedOn;
+      pad.signalOn = touchPad.isHit;
+    }
+     
   }
 
   public override InstrumentData GetData() {
