@@ -19,6 +19,8 @@ public class masterBusRecorder : MonoBehaviour
     static extern float MasterBusRecorder_GetLevel_Lin();
     [DllImport("SoundStageNative")]
     static extern float MasterBusRecorder_GetLevel_dB();
+    [DllImport("SoundStageNative")]
+    static extern int MasterBusRecorder_GetBufferPointer(IntPtr buffer, ref int offset);
 
     public enum State
     {
@@ -35,11 +37,16 @@ public class masterBusRecorder : MonoBehaviour
     FileStream fs;
     string filename;
     int length;
-    public int bitDepth = 24;    
+    public int bitDepth = 24;
+    int instanceId;
+
+    static int instances = 0;
 
     private void Awake()
     {
-        
+        this.instanceId = instances;
+        instances++;
+        Debug.Log("Created new MasterBusRecorder with instanceId " + instanceId);
     }
 
     private void Update()
@@ -171,6 +178,13 @@ DateTime.Now);
             if (MasterBusRecorder_ReadRecordedSample(ref sample) == true)
             {
                 recInterface.length++;
+                if(recInterface.length % 48000 == 0)
+                {
+                    IntPtr buf = IntPtr.Zero;
+                    int offset = 0;
+                    int n = MasterBusRecorder_GetBufferPointer(buf, ref offset);
+                    Debug.Log("instance " + instanceId + ": " + n + " samples in queue.");
+                }
                 if(recInterface.bitDepth == 16)
                 {
                     convertedSample = (((int)(Mathf.Clamp(sample, -1f, 1f) * 32760f + 32768.5)) - 32768);
