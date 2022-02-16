@@ -30,8 +30,17 @@ public class metronome : componentInterface {
   public Transform rod;
   public TextMesh txt;
 
+  public button recButton;
+
   void Awake() {
     bpmDial = GetComponentInChildren<dial>();
+    //TODO: This is not very pretty, but the masterBusRecorder needs a reference to the rec button in case a recording is stopped by the system (for example if the filesize limit is reached)!
+    var buttons = GetComponentsInChildren<button>();
+    foreach(button b in buttons)
+    {
+        if (b.buttonID == 5)
+            recButton = b;
+    }
   }
 
   public void Reset() {
@@ -64,9 +73,16 @@ public class metronome : componentInterface {
 
     bpmDial.setPercent(bpmpercent);
     txt.text = bpm.ToString("N1");
-  }
 
-  bool rodDir = false;
+    //In case the recording has been stopped while the menu was disabled, we have to set the recButton toggle state to false:
+    var recorderState = masterControl.instance.recorder.state;
+    if(recorderState == masterBusRecorder.State.Idle)
+    {
+        recButton.phantomHit(false);
+    }
+    }
+
+    bool rodDir = false;
   void Update() {
     float cyc = Mathf.Repeat(masterControl.instance.curCycle * 4, 1);
 

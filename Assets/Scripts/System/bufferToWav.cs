@@ -118,16 +118,18 @@ public class bufferToWav : MonoBehaviour {
         yield return new WaitForSeconds(1.5f);
     }
 
-    public void UpdateWavHeader(string fileName, int length, int _samplelength = 2)
+    public void UpdateWavHeader(string fileName, uint length, int _samplelength = 2)
     {
         using (var stream = File.Open(fileName, FileMode.Open))
         {
-            byte[] bytes = BitConverter.GetBytes(36 + length * _samplelength);
+            // Note: The explicit (uint) cast is necessary here, otherwise
+            // an automatic cast to long (=signed 64 bit integer) will be executed!
+            byte[] bytes = BitConverter.GetBytes((uint)(36 + length * _samplelength));
             if (!BitConverter.IsLittleEndian)
                 Array.Reverse(bytes);
             stream.Position = 4;
             stream.Write(bytes, 0, bytes.Length);
-            bytes = BitConverter.GetBytes(length * _samplelength);
+            bytes = BitConverter.GetBytes((uint)(length * _samplelength));
             if (!BitConverter.IsLittleEndian)
                 Array.Reverse(bytes);
             stream.Position = 40;

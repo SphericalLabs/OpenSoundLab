@@ -21,7 +21,10 @@ public class masterBusRecorder : MonoBehaviour
     static extern float MasterBusRecorder_GetLevel_dB();
     [DllImport("SoundStageNative")]
     static extern int MasterBusRecorder_GetBufferPointer(IntPtr buffer, ref int offset);
+    [DllImport("SoundStageNative")]
+    static extern void MasterBusRecorder_Clear();
 
+    //types
     public enum State
     {
         Idle,
@@ -29,24 +32,55 @@ public class masterBusRecorder : MonoBehaviour
         Finishing
     }
 
-    State _state;
-
+    //public
     public State state => _state;
 
+    //properties with private backing fields
+    public int bitDepth
+    {
+        get => _bitDepth;
+        set
+        {
+            _bitDepth = value;
+            // The number format for the size fields (chunksize and subchunk2size) in the WAV header are 32bit unsigned integer.
+            // The overhead for the header is 36 bytes, so the actual maximum number of audio samples we can write into a WAV file is:
+            maxFileSize = (uint.MaxValue - 36) / (uint)(_bitDepth / 8);
+        }
+    }
+    int _bitDepth = 24;
+
+    //private
+    State _state;
     BinaryWriter bw;
     FileStream fs;
     string filename;
-    int length;
-    public int bitDepth = 24;
+    uint length;
     int instanceId;
+    uint maxFileSize;
 
+    //static
     static int instances = 0;
 
     private void Awake()
     {
+        bitDepth = _bitDepth; //Set property so maxFileSize is updated
         this.instanceId = instances;
         instances++;
         Debug.Log("Created new MasterBusRecorder with instanceId " + instanceId);
+    }
+
+    private void Start()
+    {
+        // We check if a metronome with a recButton exists (should have been assigned in metronome's Awake() method).
+        // We need this only in case a recording reaches the file size limit,
+        // but we check it here bc if we don't and future code changes break this,
+        // it will go unnoticed until someone actually reaches the file size limit.
+        var metronome = FindObjectOfType<metronome>();
+        if (metronome == null)
+            Debug.LogError("masterBusRecorder: No reference to metronome is set. Cannot update rec button toggle state.");
+        var recButton = metronome.recButton;
+        if (recButton == null)
+            Debug.LogError("masterBusRecorder: No reference to recButton is set. Cannot update rec button toggle state.");
     }
 
     private void Update()
@@ -171,20 +205,40 @@ DateTime.Now);
         int convertedSample;
         byte[] bytes = new byte[3];
 
-        ///Repeatingly query native code for new samples
+        ///Repeatedly query native code for new samples
         while (recInterface.state != masterBusRecorder.State.Idle)
         {
+            ///If we reached the file size limit, stop the recording:
+            if (recInterface.length == maxFileSize)
+            {
+                //Since we reached the file size limit, we do not read the rest of the samples in the rec buffer.
+                //Instead, we immediately clear the rec buffer, finalize the WAV file and set the IDLE state:
+                MasterBusRecorder_StopRecording();
+                MasterBusRecorder_Clear();
+                onEnded();
+                //After finishing the recording, if the menu is enabled, we send a phantom hit to the recButton so it changes its toggle state.
+                //Note that the recButton will in turn trigger a ToggleRec(false) in the recorder instance,
+                //which will be ignored bc the recorder is already in the "Idle" state after onEnded().
+                //* Why don't we just call phantomHit, which will in turn trigger the call to onEnded()?
+                //=> Because we need to guarantee here that the coroutine stops IMMEDIATELY.
+                var metronome = FindObjectOfType<metronome>();
+                if(metronome != null)
+                {
+                    metronome.recButton.phantomHit(false);
+                }    
+            }
             ///If we can get a new sample, we convert it to the desired number format and write it to the file
-            if (MasterBusRecorder_ReadRecordedSample(ref sample) == true)
+            else if (MasterBusRecorder_ReadRecordedSample(ref sample) == true)
             {
                 recInterface.length++;
-                if(recInterface.length % 48000 == 0)
+                //Some debugging, this block can be removed anytime:
+                /*if(recInterface.length % AudioSettings.outputSampleRate == 0)
                 {
                     IntPtr buf = IntPtr.Zero;
                     int offset = 0;
                     int n = MasterBusRecorder_GetBufferPointer(buf, ref offset);
                     Debug.Log("instance " + instanceId + ": " + n + " samples in queue.");
-                }
+                }*/
                 if(recInterface.bitDepth == 16)
                 {
                     convertedSample = (((int)(Mathf.Clamp(sample, -1f, 1f) * 32760f + 32768.5)) - 32768);
@@ -207,9 +261,9 @@ DateTime.Now);
                 ///1) We consumed all samples because the recording has been stopped:
                 if (recInterface.state == masterBusRecorder.State.Finishing)
                 {
-                    onEnded(); // we can call this here already bc we will no longer access the native code
+                    onEnded();
                 }
-                /// 2) We consumed all samples that are currently available, but  new samples may be available in the future bc we are still recording:
+                /// 2) We consumed all samples that are currently available, but new samples may be available in the future bc we are still recording:
                 else
                     yield return null;
             }

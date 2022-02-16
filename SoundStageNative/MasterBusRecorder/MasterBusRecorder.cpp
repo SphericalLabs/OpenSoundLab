@@ -80,12 +80,19 @@ extern "C"
 
     ///Unsets the recording flag. Note that if you call StopRecording() while the AudioMixerThread is processing an audio buffer, this audio buffer will be completely processed before the AudioMixerThread stops recording. The expected usage in a multi-threaded environment is:
     ///1) Call StopRecording()
-    ///2) Call ReadRecordedSample(s) until there are no more samples available. This is important, because if you skip this step, some samples may remain in the buffer and will be read when you start the next recording.
+    ///2) Either call ReadRecordedSample(s) until there are no more samples available, or call MasterBusRecorder_Clear() to clear the buffer. This is important, because if you skip this step, some samples may remain in the buffer and will be read when you start the next recording.
     ///3) Do any finalizing steps (writing file headers, writing file to disk or whatever)
     SOUNDSTAGE_API void MasterBusRecorder_StopRecording()
     {
         if(instance != NULL)
             instance->recording.store(false);
+    }
+
+    /// Clears the recording buffer. Use this if you call MasterBusRecorder_StopRecording() and do NOT want to read query the rest of the available samples.
+    SOUNDSTAGE_API void MasterBusRecorder_Clear()
+    {
+        if(instance != NULL)
+            instance->newSamples.store(0);
     }
 
     ///Returns the average signal energy of the most recent buffer as a linear value in range [0...1].
