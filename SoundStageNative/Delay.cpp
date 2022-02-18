@@ -174,9 +174,9 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
     int time = x->time;
     float feedback = x->feedback;
     
-    assert(time > 0);
+    if(time <= 0)
+        time = 1;
     
-    ///"Stride" is actually the oversampling factor, which is determined by the length of the delay buffer and the actual delay time.
     float oversampling = (float)x->maxTime / (float)time;
         
     int nPerChannel = n/channels;
@@ -187,6 +187,8 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
     int m;
     int r = nPerChannel;
     float* bufOffset = buffer;
+    
+    int rp, wp;
     
     ///We first read from the delay buffer and then write the new samples to it. If the delay buffer is smaller than n (the DSP vector size), we have to repeat this procedure until we consumed all n samples.
     while(r)

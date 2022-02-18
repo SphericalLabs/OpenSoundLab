@@ -34,7 +34,7 @@ void FrameRingBuffer_Free(FrameRingBuffer *x)
     _free(x);
 }
 
-void InsertAndRestore(int n, float oversampling, FrameRingBuffer *x)
+void InsertFrame(int n, float oversampling, FrameRingBuffer *x)
 {
     int p = -1, length = 0, head = x->ptr, tail = -1, delta1, delta2;
     
@@ -72,7 +72,6 @@ void InsertAndRestore(int n, float oversampling, FrameRingBuffer *x)
             delta2 = existingFrame->length - delta1;
             existingFrame->head = (existingFrame->head + delta1) % x->n;
             existingFrame->length = delta2;
-            assert(existingFrame->length >= 0);
             length = n;
         }
     }
@@ -81,7 +80,7 @@ void InsertAndRestore(int n, float oversampling, FrameRingBuffer *x)
     ///This way, we guarantee that adjacent frames always have different oversampling, except at array boundaries
     if(x->headers.size() > 1)
     {
-        existingFrame = &x->headers[x->headers.size() - 1]; //previous frame
+        existingFrame = &x->headers[x->headers.size() - 1]; //most recent frame
         if(existingFrame->oversampling == oversampling)
         {
             length += existingFrame->length;
@@ -133,7 +132,7 @@ void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffe
     }
     
     ///Insert new frame header
-    InsertAndRestore(n, oversampling, x);
+    InsertFrame(n, oversampling, x);
 
     /// Copy data to buffer
     int n1 = _min( x->n - x->ptr, n);
@@ -165,27 +164,24 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, Fr
         headerIndex--;
         if(headerIndex < 0)
             headerIndex = x->headers.size() - 1;
-        
         header = &(x->headers[headerIndex]);
         
-        samplesInFrame = header->length * header->oversampling / oversampling; //number of samples as viewed from the reader's perspective.
+        /// From the reader's perspective, the number of samples available in a frame is:
+        samplesInFrame = header->length * header->oversampling / oversampling;
         
         samplesNeeded -= samplesInFrame;
     }
     
-    /* The position to start reading from is in the current frame with an offset of (-samplesNeeded). */
-
     int ptr;
     float fPtr = header->head; //the start index of the frame in which the first sample to read is located
     
-    samplesInFrame = header->length * header->oversampling / oversampling;
-    // Calculate the offset from the start of the frame to the first sample to read
-    // At this point, samplesNeeded is either 0 or negative; negative meaning we backtracked "too far", so we have to start reading so much into the frame
+    /// At this point, samplesNeeded is either 0 or negative; negative meaning we backtracked "too far", so we have to start reading somewhere in the middle of the frame.
+    /// In other words: The position to start reading from is in the current frame with an offset of (-samplesNeeded).
     samplesNeeded = -samplesNeeded;
     
     for(int i = 0; i < n; i++)
     {
-        //Skip frame(s) if the don't contain the next sample to read
+        //Skip frame(s) if they don't contain the next sample to read:
         while(samplesInFrame < samplesNeeded)
         {
             //assert(i != 0); //in first iteration we should always be in the correct frame
@@ -196,19 +192,42 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, Fr
             fPtr = header->head;
         }
                 
-        //We have found the frame in which the next sample to copy is located, so we update our pointers and copy 1 sample to dest.
+        //We have found the frame in which the next sample to copy is located, so we update the floating and the int pointer.
         fPtr += samplesNeeded * oversampling / header->oversampling;
         if(fPtr >= x->n)
             fPtr -= x->n;
         ptr = (int)(fPtr + 0.5f) % x->n;
-        //printv("copying: %f\n", x->data[ptr]);
+        
+        //Copy 1 sample:
         dest[i] = x->data[ptr];
         
-        //We copied a sample, so we need 1 whole new sample now.
-        samplesNeeded = 1;
+        //TODO: DEBUG
+        /*int head = header->head;
+        int tail = header->tail;
+        if(head < tail)
+        {
+            if(!(ptr >= head && ptr < tail))
+            {
+                //This happens a lot if the sampling rate (read and write) changes often.
+                //It means that the sample we read is not actually in the frame we think it is; thus, the stride we apply is wrong!
+                printv("c1: h=%d, t=%d, ptr=%d, fPtr=%f, sr1/sr2=%f\n", head, tail, ptr, fPtr, header->oversampling/oversampling);
+                printv("\t%f\n", samplesNeeded * oversampling / header->oversampling);
+            }
+        }
+        else
+        {
+            if(!(ptr >= head || ptr < tail))
+            {
+                //This seems to never happen though...
+                printv("c2: h=%d, t=%d, ptr=%d, fPtr=%f\n", head, tail, ptr, fPtr);
+            }
+        }*/
         
         //we advanced samplesNeeded samples into the frame, so they are not available anymore.
         samplesInFrame -= samplesNeeded;
+        
+        //We copied a sample, so we need 1 whole new sample now.
+        samplesNeeded = 1;
     }
 }
 
