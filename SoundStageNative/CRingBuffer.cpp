@@ -127,7 +127,7 @@ void insertFrame(int length, float oversampling, FrameRingBuffer *x)
         for(int i = 0; i < oldFrames.size(); i++)
         {
             h = oldFrames[i];
-            printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.oversampling);
+            printv("%d: start=%d, length=%d, tail=%d, stride=%f\n", i, h.head, h.length, h.tail, h.oversampling);
         }
         printv("======\n");
     }
@@ -149,6 +149,7 @@ FrameRingBuffer* FrameRingBuffer_New(int n)
     x->headers[0].length = n;
     x->headers[0].oversampling = 1;
     x->headers[0].head = 0;
+    x->headers[0].tail = 0;
     
     return x;
 }
@@ -162,21 +163,22 @@ void FrameRingBuffer_Free(FrameRingBuffer *x)
 void FrameRingBuffer_GetPtrFrame(int *frame, int *offset, FrameRingBuffer *x)
 {
     FrameHeader *f;
-    int h, t;
+    int h, t, l;
     int N = x->n;
     int ptr = x->ptr;
     for(int i = 0; i < x->headers.size(); i++)
     {
         f = &x->headers[i];
         h = f->head;
-        t = (h + f->length) % N;
+        l = f->length;
+        t = f->tail;
 
         if(
-        (t == h)
-        ||
-        (h <= ptr && t >= ptr)
-        ||
-        (t < h && (ptr >= h || ptr < t))
+           (t == h)
+           ||
+           (h < t && ptr >= h)
+           ||
+           (h > t && (ptr < t || ptr >= h))
            )
         {
             *frame = i;
@@ -193,6 +195,152 @@ void FrameRingBuffer_GetPtrFrame(int *frame, int *offset, FrameRingBuffer *x)
     FrameRingBuffer_Print(x);
 }
 
+
+void InsertAndRestore(int n, float oversampling, FrameRingBuffer *x)
+{
+    //TODO: There is 1 uncaught case: if the previous frame has same oversampling and it exactly adjacent to ptr => should concatenate
+    
+    int p, o, length = 0, behind, ahead, head = x->ptr, tail = (head + n) % x->n, delta1, delta2;
+    
+    ///1. Get the frame where head is located
+    FrameRingBuffer_GetPtrFrame(&p, &o, x);
+    FrameHeader *existingFrame = &x->headers[p];
+    
+    printv("\n\n=======Start:InsertAndRestore========\n");
+    printv("ptr: %d\n", x->ptr);
+    printv("n: %d\n", n);
+    printv("ptrFrame: %d\n", p);
+    printv("======\n");
+    printv("before insert:\n");
+    for(int i = 0; i < x->headers.size(); i++)
+    {
+        FrameHeader h = x->headers[i];
+        printv("%d: start=%d, length=%d, tail=%d, stride=%f\n", i, h.head, h.length, h.tail, h.oversampling);
+    }
+    
+    ///2. Modify or delete frame where head is located
+    behind = o;
+    ahead = existingFrame->length - o;
+    if(existingFrame->oversampling == oversampling)
+    {
+        if(behind > 0)
+            head = existingFrame->head;
+        if(ahead > 0)
+            tail = existingFrame->tail;
+        length = n + ahead + behind;
+        x->headers.erase(x->headers.begin() + p);
+    }
+    else if(behind > 0 && ahead > 0)
+    {
+        //       head          tail                               head          tail
+        //|ooooooooooooooooooooooooooooo|        =>        |ooooooo|nnnnnnnnnnnnn|ooooooo|
+        //        |nnnnnnnnnnnnn|
+        
+        //head does not change
+        tail = (head + n) % x->n;
+        length = n;
+        
+        // existingFrame->head is correct
+        existingFrame->tail = head;
+        existingFrame->length = behind;
+        
+        FrameHeader h;
+        h.head = tail;
+        h.length = ahead;
+        h.tail = (h.head + h.length) % x->n;
+        
+        x->headers.insert(x->headers.begin(), h); //TODO: is it correct to insert this to the beginning?
+    }
+    else if(behind > 0)
+    {
+        //       head                tail                        head                tail
+        //        |nnnnnnnnnnnnnnnnnnnn|        =>        |ooooooo|nnnnnnnnnnnnnnnnnnnn|
+        //|oooooooooooooooooo|
+        
+        //head does not change
+        length += existingFrame->length - behind;
+        tail = existingFrame->tail;
+        
+        // existingFrame->head is correct
+        existingFrame->tail = head;
+        existingFrame->length = behind;
+        assert(existingFrame->length >= 0);
+    }
+    else if(ahead > n)
+    {
+        //       head                   tail                   head                   tail
+        //        |nnnnnnnnnnnnnnnnnnnnnn|            =>        |nnnnnnnnnnnnnnnnnnnnnn|oooooooo|
+        //        |ooooooooooooooooooooooooooooooo|
+        
+        //head does not change
+        length += n;
+        //tail does not change
+        
+        existingFrame->length -= n;
+        assert(existingFrame->length >= 0);
+        existingFrame->head = tail;
+        //existingFrame->tail is OK
+    }
+    else if (ahead > 0)
+    {
+        length += ahead;
+        x->headers.erase(x->headers.begin() + p);
+        p--;
+    }
+    else
+    {
+        printv("This is impossible...\n");
+    }
+    
+    ///3. Consume frames until length is reached
+    while(length < n)
+    {
+        p = (p + 1) % x->headers.size();
+        existingFrame = &x->headers[p];
+        delta1 = n - length;
+        if(existingFrame->oversampling == oversampling || existingFrame->length <= delta1)
+        {
+            length += existingFrame->length;
+            x->headers.erase(x->headers.begin() + p);
+            p--;
+        }
+        else
+        {
+            delta2 = existingFrame->length - delta1;
+            existingFrame->head = (existingFrame->head + delta1) % x->n;
+            existingFrame->length = delta2;
+            assert(existingFrame->length >= 0);
+            length = n;
+        }
+    }
+        
+    existingFrame = &x->headers[x->headers.size()-1];
+    if(existingFrame->oversampling == oversampling)
+    {
+        head = existingFrame->head;
+        length += existingFrame->length;
+        x->headers.pop_back();
+    }
+    
+    FrameHeader h;
+    h.oversampling = oversampling;
+    h.length = length;
+    h.head = head;
+    h.tail = tail;
+    x->headers.push_back(h);
+
+    
+    //TODO: debug only
+    printv("after insert:\n");
+    for(int i = 0; i < x->headers.size(); i++)
+    {
+        FrameHeader h = x->headers[i];
+        printv("%d: start=%d, length=%d, tail=%d, stride=%f\n", i, h.head, h.length, h.tail, h.oversampling);
+    }
+    bool legit = FrameRingBuffer_Validate(x);
+    printv("=======End:InsertAndRestore========\n\n\n");
+}
+
 /* This is efficient as long as n is reasonably large, e.g. writing buffers of 256 samples. */
 void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffer *x)
 {
@@ -204,7 +352,8 @@ void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffe
     }
     
     ///Insert new frame header
-    insertFrame(n, oversampling, x);
+    //insertFrame(n, oversampling, x);
+    InsertAndRestore(n, oversampling, x);
 
     /// Copy data to buffer
     int n1 = _min( x->n - x->ptr, n);
@@ -351,7 +500,7 @@ bool FrameRingBuffer_Validate(FrameRingBuffer *x)
     {
         int tail = (x->headers[i].head + x->headers[i].length) % x->n;
         int nextHead = x->headers[(i+1) % x->headers.size()].head;
-        if(tail != nextHead)
+        if(tail != nextHead || tail != x->headers[i].tail)
         {
             corruptCounds++;
         }
@@ -378,7 +527,7 @@ void FrameRingBuffer_Print(FrameRingBuffer *x)
     for(int i = 0; i < x->headers.size(); i++)
     {
         h = x->headers[i];
-        printv("%d: start=%d, length=%d, stride=%f\n", i, h.head, h.length, h.oversampling);
+        printv("%d: start=%d, length=%d, tail=%d, stride=%f\n", i, h.head, h.length, h.tail, h.oversampling);
     }
     printv("======\n");
     /*printv("BUFFER:\n");

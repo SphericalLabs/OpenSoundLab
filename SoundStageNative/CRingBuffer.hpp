@@ -16,7 +16,8 @@ using std::vector;
 
 typedef struct _FrameHeader
 {
-    int head;
+    int head; //inclusive
+    int tail; //exclusive
     int length;
     float oversampling;
 } FrameHeader;
