@@ -16,7 +16,7 @@ enum DelayParams
     P_N
 };
 
-void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
+/*void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
     // Prepare
     int time = x->time;
@@ -165,10 +165,10 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     RingBuffer_Free(x->tap);
     _free(x->temp);
     _free(x);
-}
+}*/
 
 
-/*void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
+void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
     // Prepare
     int time = x->time;
@@ -194,7 +194,7 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
         m = time < r ? time : r;
         
         ///Read some samples from the delay buffer
-        FrameRingBuffer_Read(x->temp, m, -(x->maxTime), oversampling, x->tap);
+        FrameRingBuffer_Read(x->temp, m, -time, oversampling, x->tap);
         _fCopy(x->temp, x->temp2, m);
         
         ///Multiply those samples with the feedback gain, add the new input samples and write everything into the delay buffer
@@ -289,4 +289,4 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     _free(x->temp);
     _free(x);
 }
-*/
+
