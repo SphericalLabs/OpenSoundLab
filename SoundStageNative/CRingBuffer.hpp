@@ -1,9 +1,25 @@
-//
-//  CRingBuffer.hpp
-//  SoundStageNative
-//
-//  Created by hb on 19.01.22.
-//
+///FrameRingBuffer is a float RingBuffer that is organized in so-called "frames". Each frame can have a distinct oversampling factor.
+///
+//                    0                                                                                             n-1
+//buffer with samples |----------------------------------------------------------------------------------------------|
+//frame metadata      |--------------------|--------------------------|----------------------------------------------|
+//                     head: 0               head: 13                  head: 39
+//                     length: 13            length: 26                length: 46
+//                     tail: 13              tail: 39                  tail: 0 (wrap-around)
+//                     overs.: 1.46          oversampling: 0.34        oversampling: 1.46
+///
+///FrameRingBuffer guarantees the following at any time:
+///
+///1. Write and Read operation complexity is independent from oversampling factor.
+///2. The ptr of the ringBuffer is always in frame 0 with offset 0.
+///3. The ringbuffer boundary is always a frame boundary; in other words: There is always a frame starting at ringbuffer index 0, and there is always a frame ending at ringuffer index (n-1).
+///4. Adjacent frames never have the same oversampling factor. Exception: The last and the first frame in the ringbuffer can have the same oversampling factor (also see see 3).
+///5. Frames are non-overlapping
+///6. Frames cover the whole ringbuffer
+///
+///The RingBuffer itself is identical to RingBuffer.cpp. The frames are stored in an additional vector of FrameHeader metastructs.
+///
+///FrameRingBuffer is not thread-safe.
 
 #ifndef CRingBuffer_hpp
 #define CRingBuffer_hpp
