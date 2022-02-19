@@ -15,7 +15,7 @@
 FrameRingBuffer* FrameRingBuffer_New(int n)
 {
     FrameRingBuffer *x = new FrameRingBuffer();
-    x->data = (float*)malloc(n * sizeof(float));
+    x->data = (float*)_malloc(n * sizeof(float));
     _fZero(x->data, n);
     x->ptr = 0;
     x->n = n;
@@ -36,11 +36,9 @@ void FrameRingBuffer_Free(FrameRingBuffer *x)
 
 void InsertFrame(int n, float oversampling, FrameRingBuffer *x)
 {
-    int p = -1, length = 0, head = x->ptr, tail = -1, delta1, delta2;
-    
-    ///1. Get the frame where ringbuffer ptr is located => this is where the new frame will start
-    FrameHeader *existingFrame = &x->headers[p];
-    
+    int p = -1, length = 0, head = x->ptr, tail = head, delta1, delta2;
+    FrameHeader *existingFrame;
+        
     /*printv("\n\n=======Start:InsertAndRestore========\n");
     printv("ptr: %d\n", x->ptr);
     printv("n: %d\n", n);
@@ -53,20 +51,20 @@ void InsertFrame(int n, float oversampling, FrameRingBuffer *x)
         printv("%d: start=%d, length=%d, tail=%d, stride=%f\n", i, h.head, h.length, h.tail, h.oversampling);
     }*/
     
-    ///2. Consume existing frames until length is reached.
+    ///1. Consume existing frames until length is reached.
     while(length < n)
     {
         p = (p + 1) % x->headers.size();
         existingFrame = &x->headers[p];
         delta1 = n - length;
-        ///2a. The existing frame mus be completely consumed, so delete it.
+        ///1a. The existing frame must be completely consumed, so we delete it.
         if(existingFrame->length <= delta1)
         {
             length += existingFrame->length;
             x->headers.erase(x->headers.begin() + p);
             p--;
         }
-        ///2b. The existing frame does not need to be consumed completely, so just decrease its size.
+        ///1b. The existing frame does not need to be consumed completely, so we just decrease its size.
         else
         {
             delta2 = existingFrame->length - delta1;
@@ -76,7 +74,7 @@ void InsertFrame(int n, float oversampling, FrameRingBuffer *x)
         }
     }
     
-    ///3. If a previous frame exists and it has the same oversampling, we consume its samples and delete it.
+    ///2. If a previous frame exists and it has the same oversampling, we consume its samples and delete it.
     ///This way, we guarantee that adjacent frames always have different oversampling, except at array boundaries
     if(x->headers.size() > 1)
     {
@@ -89,7 +87,7 @@ void InsertFrame(int n, float oversampling, FrameRingBuffer *x)
         }
     }
     
-    ///4. To guarantee no adjacent frames with same oversampling also at array boundaries, we could do the same check as in 5. also for the NEXT frame.
+    ///3. To guarantee no adjacent frames with same oversampling also at array boundaries, we could do the same check as in 5. also for the NEXT frame.
     ///The code below is an incomplete stub; it does not work correctly. Use as an inspiration if you want to extend.
     /*if(x->headers.size() > 1)
     {
@@ -101,7 +99,7 @@ void InsertFrame(int n, float oversampling, FrameRingBuffer *x)
         }
     }*/
     
-    ///5. Finally, we calculate the new tail and insert the new frame header.
+    ///4. Finally, we calculate the new tail and insert the new frame header.
     tail = (head + length) % x->n;
     FrameHeader h;
     h.oversampling = oversampling;
@@ -124,29 +122,30 @@ void InsertFrame(int n, float oversampling, FrameRingBuffer *x)
 /* This is efficient as long as n is reasonably large, e.g. writing buffers of 256 samples. */
 void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffer *x)
 {
-    ///Clamp n
+    ///1. Clamp n
     if(n > x->n)
     {
         src = src + (n - x->n);
         n = x->n;
     }
     
-    ///Insert new frame header
+    ///2. Insert new frame header
     InsertFrame(n, oversampling, x);
 
-    /// Copy data to buffer
-    int n1 = _min( x->n - x->ptr, n);
-    memcpy(x->data + x->ptr, src, n1*sizeof(float));
-    x->ptr = (x->ptr + n1) % x->n;
-    if(n1 < n)
+    ///3. Copy data to buffer
+    int m = _min( x->n - x->ptr, n);
+    memcpy(x->data + x->ptr, src, m*sizeof(float));
+    x->ptr = x->ptr + m; //no modulus, as we ruled out wrap-around
+    if(m < n)
     {
-        int n2 = n - n1;
-        memcpy(x->data, src + n1, n2*sizeof(float));
-        x->ptr = (x->ptr + n2) % x->n;
+        src += m;
+        m = n - m;
+        memcpy(x->data, src, m*sizeof(float));
+        x->ptr = m; //bc x->ptr is 0 if we reach this block
     }
 }
 
-void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, FrameRingBuffer *x)
+float FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, int interpolation, FrameRingBuffer *x)
 {
     assert(offset < 0);
     assert(oversampling > 0);
@@ -178,10 +177,11 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, Fr
     /// At this point, samplesNeeded is either 0 or negative; negative meaning we backtracked "too far", so we have to start reading somewhere in the middle of the frame.
     /// In other words: The position to start reading from is in the current frame with an offset of (-samplesNeeded).
     samplesNeeded = -samplesNeeded;
-    
+    float frac;
+    /// 2. Copy n samples into the destination buffer
     for(int i = 0; i < n; i++)
     {
-        //Skip frame(s) if they don't contain the next sample to read:
+        ///Skip frame(s) if they don't contain the next sample to read:
         while(samplesInFrame < samplesNeeded)
         {
             //assert(i != 0); //in first iteration we should always be in the correct frame
@@ -192,14 +192,25 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, Fr
             fPtr = header->head;
         }
                 
-        //We have found the frame in which the next sample to copy is located, so we update the floating and the int pointer.
+        /// To advance 1 sample from the reader's perspective, we have to take into account oversampling rates as follows:
         fPtr += samplesNeeded * oversampling / header->oversampling;
         if(fPtr >= x->n)
             fPtr -= x->n;
-        ptr = (int)(fPtr + 0.5f) % x->n;
         
-        //Copy 1 sample:
-        dest[i] = x->data[ptr];
+        if(interpolation == INTERPOLATION_LINEAR)
+        {
+            ptr = (int)fPtr;
+            frac = fPtr - ptr;
+            dest[i] = (1-frac) * x->data[ptr] + frac * x->data[ptr + 1 % x->n];
+        }
+        else if(interpolation == INTERPOLATION_NONE)
+        {
+            ptr = (int)(fPtr + 0.5f) % x->n;
+            /// Sometimes it still happens that ptr == tail, which is not correct, ptr should always be < tail... reason is probably floating point imprecision / rounding errors. Quickfix for now:
+            if(ptr == header->tail)
+                ptr = _MAX(0, ptr - 1);
+            dest[i] = x->data[ptr];
+        }
         
         //TODO: DEBUG
         /*int head = header->head;
@@ -208,8 +219,7 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, Fr
         {
             if(!(ptr >= head && ptr < tail))
             {
-                //This happens a lot if the sampling rate (read and write) changes often.
-                //It means that the sample we read is not actually in the frame we think it is; thus, the stride we apply is wrong!
+                
                 printv("c1: h=%d, t=%d, ptr=%d, fPtr=%f, sr1/sr2=%f\n", head, tail, ptr, fPtr, header->oversampling/oversampling);
                 printv("\t%f\n", samplesNeeded * oversampling / header->oversampling);
             }
@@ -223,12 +233,14 @@ void FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, Fr
             }
         }*/
         
-        //we advanced samplesNeeded samples into the frame, so they are not available anymore.
+        ///we advanced samplesNeeded samples into the frame, so they are not available anymore.
         samplesInFrame -= samplesNeeded;
         
-        //We copied a sample, so we need 1 whole new sample now.
+        ///We copied a sample, so we need 1 whole new sample now.
         samplesNeeded = 1;
     }
+    
+    return fPtr;
 }
 
 void FrameRingBuffer_Clear(FrameRingBuffer *x)
@@ -238,6 +250,7 @@ void FrameRingBuffer_Clear(FrameRingBuffer *x)
     FrameHeader h;
     h.length = x->n;
     h.head = 0;
+    h.tail = 0;
     h.oversampling = 1;
     x->headers.emplace_back(h);
     x->ptr = 0;

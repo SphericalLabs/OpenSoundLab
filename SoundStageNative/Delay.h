@@ -21,6 +21,7 @@ struct DelayData
     float feedback;
     float wet;
     float dry;
+    int interpolation;
     
     //internal
     int maxTime;

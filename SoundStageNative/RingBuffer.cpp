@@ -30,6 +30,12 @@ SOUNDSTAGE_API void RingBuffer_Write(float *src, int n, struct RingBuffer *x)
 
 SOUNDSTAGE_API int RingBuffer_WritePadded(float *src, int n, float stride, struct RingBuffer *x)
 {
+    if(stride == 1)
+    {
+        RingBuffer_Write(src, n, x);
+        return n;
+    }
+    
     int total = 0; //later remove
     int tn = (int)(n * stride);
     if(tn > x->n)
@@ -109,6 +115,12 @@ SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingB
 
 SOUNDSTAGE_API void RingBuffer_ReadPadded(float *dest, int n, int offset, float stride, struct RingBuffer *x)
 {
+    if(stride == 1)
+    {
+        RingBuffer_Read(dest, n, offset, x);
+        return;
+    }
+    
     int rPtr = x->ptr + offset;
     while(rPtr >= x->n)
         rPtr -= x->n;
@@ -123,27 +135,6 @@ SOUNDSTAGE_API void RingBuffer_ReadPadded(float *dest, int n, int offset, float 
         fPtr += stride;
         if(fPtr >= x->n)
             fPtr -= x->n;
-    }
-}
-
-SOUNDSTAGE_API void RingBuffer_ReadAndAdd(float *dest, int n, int offset, struct RingBuffer *x)
-{
-    int m = 0; //number of elements to read in current step
-    int rPtr = x->ptr + offset; //read pointer
-    while(rPtr >= x->n)
-        rPtr -= x->n;
-    while(rPtr < 0)
-        rPtr += x->n;
-    while(n)
-    {
-        m = _min(x->n - rPtr, n);
-        for(int i = 0; i < m; i++)
-        {
-            *(dest + i) += x->buf[x->ptr + i];
-        }
-        n -= m;
-        dest += m;
-        rPtr = (rPtr + m) % x->n;
     }
 }
 

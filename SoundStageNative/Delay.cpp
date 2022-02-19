@@ -13,6 +13,8 @@ enum DelayParams
     P_FEEDBACK,
     P_WET,
     P_DRY,
+    P_CLEAR,
+    P_INTERPOLATION,
     P_N
 };
 
@@ -196,7 +198,7 @@ void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, f
         m = time < r ? time : r;
         
         ///Read some samples from the delay buffer
-        FrameRingBuffer_Read(x->temp, m, -time, oversampling, x->tap);
+        FrameRingBuffer_Read(x->temp, m, -time, oversampling, x->interpolation, x->tap);
         _fCopy(x->temp, x->temp2, m);
         
         ///Multiply those samples with the feedback gain, add the new input samples and write everything into the delay buffer
@@ -264,6 +266,8 @@ SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x)
             x->dry = value;
             //printv("Set delay dry mix to %f\n", value);
             break;
+        case P_INTERPOLATION:
+            x->interpolation = intval;
         default:
             break;
     }
@@ -282,6 +286,7 @@ SOUNDSTAGE_API struct DelayData *Delay_New(int n)
     x->time = n;
     x->maxTime = n;
     x->feedback = 0.3f;
+    x->interpolation = INTERPOLATION_NONE;
     return x;
 }
 
@@ -291,4 +296,3 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     _free(x->temp);
     _free(x);
 }
-

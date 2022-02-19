@@ -15,8 +15,12 @@ public class delaySignalGenerator : signalGenerator
         P_WET,
         P_DRY,
         P_CLEAR,
+        P_INTERPOLATION,
         P_N
     };
+
+    const int INTERPOLATION_NONE = 1;
+    const int INTERPOLATION_LINEAR = 2;
 
     public const float MAX_TIME = 12.5f; // * 1000 ms.
     public const float MIN_FEEDBACK = 0;
@@ -48,6 +52,7 @@ public class delaySignalGenerator : signalGenerator
         sampleRate = AudioSettings.outputSampleRate;
         int maxDelaySamples = (int)(MAX_TIME * sampleRate);
         x = Delay_New(maxDelaySamples);
+        Delay_SetParam(INTERPOLATION_LINEAR, (int)Param.P_INTERPOLATION, x);
     }
 
     private void OnDestroy()
@@ -117,9 +122,6 @@ public class delaySignalGenerator : signalGenerator
     [DllImport("SoundStageNative")]
     private static extern void Delay_Clear(IntPtr x);
 
-    [DllImport("SoundStageNative")]
-    private static extern bool Delay_SetRange(int min, int max, IntPtr x);
-
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
         if (cTimeBuffer.Length != buffer.Length)
@@ -153,7 +155,6 @@ public class delaySignalGenerator : signalGenerator
             cFeedback = cFeedbackBuffer[0];
         }
 
-        Delay_SetRange(minTime, maxTime, x);
         Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME] + cTime), 3), 0, 1, minTime, maxTime), (int)Param.P_TIME, x);
         Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + cFeedback), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
         Delay_SetParam(p[(int)Param.P_WET], (int)Param.P_WET, x);
@@ -162,7 +163,7 @@ public class delaySignalGenerator : signalGenerator
         //We need to process the delay even if there is currently no input,
         //bc there could be unconsumed samples from a previous input left in the delay line.
         //To optimize, we could store the timestamp when the last input connection was removed.
-        //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed.
+        //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed. 
         Delay_Process(buffer, buffer.Length, channels, cTime, cFeedback, x);
     }
 }

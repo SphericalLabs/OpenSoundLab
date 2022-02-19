@@ -39,8 +39,6 @@ SOUNDSTAGE_API void RingBuffer_Read_Absolute(float *dest, int n, int startIndex,
 SOUNDSTAGE_API void RingBuffer_Read(float *dest, int n, int offset, struct RingBuffer *x);
 ///Reads n samples with a specific stride
 SOUNDSTAGE_API void RingBuffer_ReadPadded(float *dest, int n, int offset, float stride, struct RingBuffer *x);
-///Reads n samples from the ring buffer and adds the values to the dest array.
-SOUNDSTAGE_API void RingBuffer_ReadAndAdd(float *dest, int n, int offset, struct RingBuffer *x);
 ///Resizes the buffer. This includes a memory re-allocation, so use with caution!
 SOUNDSTAGE_API void RingBuffer_Resize(int n, struct RingBuffer *x);
 ///Allocates a new RIngBuffer with maximum capacity n and returns a reference to it.
