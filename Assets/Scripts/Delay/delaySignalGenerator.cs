@@ -89,8 +89,8 @@ public class delaySignalGenerator : signalGenerator
         switch (mode)
         {
             case 0:
-                minTime = 1;
-                maxTime = 50;
+                minTime = (int)(0.001f * sampleRate);
+                maxTime = (int)(12.5f * sampleRate);
                 break;
             case 1:
                 minTime = (int)(0.001f * sampleRate);
