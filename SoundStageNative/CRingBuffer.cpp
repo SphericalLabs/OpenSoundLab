@@ -178,20 +178,10 @@ float FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, i
     /// In other words: The position to start reading from is in the current frame with an offset of (-samplesNeeded).
     samplesNeeded = -samplesNeeded;
     float frac;
+    
     /// 2. Copy n samples into the destination buffer
     for(int i = 0; i < n; i++)
     {
-        ///Skip frame(s) if they don't contain the next sample to read:
-        while(samplesInFrame < samplesNeeded)
-        {
-            //assert(i != 0); //in first iteration we should always be in the correct frame
-            samplesNeeded -= samplesInFrame;
-            headerIndex = (headerIndex + 1) % x->headers.size();
-            header = &x->headers[headerIndex];
-            samplesInFrame = header->length * header->oversampling / oversampling;
-            fPtr = header->head;
-        }
-                
         /// To advance 1 sample from the reader's perspective, we have to take into account oversampling rates as follows:
         fPtr += samplesNeeded * oversampling / header->oversampling;
         if(fPtr >= x->n)
@@ -212,32 +202,22 @@ float FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, i
             dest[i] = x->data[ptr];
         }
         
-        //TODO: DEBUG
-        /*int head = header->head;
-        int tail = header->tail;
-        if(head < tail)
-        {
-            if(!(ptr >= head && ptr < tail))
-            {
-                
-                printv("c1: h=%d, t=%d, ptr=%d, fPtr=%f, sr1/sr2=%f\n", head, tail, ptr, fPtr, header->oversampling/oversampling);
-                printv("\t%f\n", samplesNeeded * oversampling / header->oversampling);
-            }
-        }
-        else
-        {
-            if(!(ptr >= head || ptr < tail))
-            {
-                //This seems to never happen though...
-                printv("c2: h=%d, t=%d, ptr=%d, fPtr=%f\n", head, tail, ptr, fPtr);
-            }
-        }*/
-        
         ///we advanced samplesNeeded samples into the frame, so they are not available anymore.
         samplesInFrame -= samplesNeeded;
         
         ///We copied a sample, so we need 1 whole new sample now.
         samplesNeeded = 1;
+        
+        ///Skip frame(s) if they don't contain the next sample to read:
+        while(samplesInFrame < samplesNeeded)
+        {
+            //assert(i != 0); //in first iteration we should always be in the correct frame
+            samplesNeeded -= samplesInFrame;
+            headerIndex = (headerIndex + 1) % x->headers.size();
+            header = &x->headers[headerIndex];
+            samplesInFrame = header->length * header->oversampling / oversampling;
+            fPtr = header->head;
+        }
     }
     
     return fPtr;
