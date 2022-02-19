@@ -65,8 +65,6 @@ public class masterControl : MonoBehaviour {
   public bool handlesEnabled = true;
   public bool jacksEnabled = true;
 
-  public masterBusRecorder recorder;
-
   void Awake() {
     instance = this;
     _measurePhase = 0;
@@ -132,9 +130,6 @@ public class masterControl : MonoBehaviour {
     setBPM(120);
 
     GetComponent<sampleManager>().Init();
-
-   recorder = GetComponentInChildren<masterBusRecorder>();
-
   }
 
   //public void resetMasterClockDSPTime(bool wasChanged){
