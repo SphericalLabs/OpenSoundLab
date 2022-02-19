@@ -74,35 +74,49 @@ extern "C"
     ///2) Call ReadRecordedSample(s) repeatedly to consume the available samples. It is very important that this step is well synchronized with the processing rate of the AudioMxerThread to avoid buffer overflow or underflow. Buffer overflow means that no more samples can be recorded because the buffer is completely filled with unconsumed samples. This happens if your querying rate is too low, and it will cause audible gaps in the recorded audio file. Buffer underflow means that you repeatedly query for new samples when there are none. This happens if your querying rate is too high and is a waste of CPU. As a rule of thumb, you should try to consume the samples at approximately the same rate and in the same block size as the AudioMxerThread uses.
     SOUNDSTAGE_API void MasterBusRecorder_StartRecording()
     {
-        instance->recording.store(true);
+        if(instance != NULL)
+            instance->recording.store(true);
     }
 
     ///Unsets the recording flag. Note that if you call StopRecording() while the AudioMixerThread is processing an audio buffer, this audio buffer will be completely processed before the AudioMixerThread stops recording. The expected usage in a multi-threaded environment is:
     ///1) Call StopRecording()
-    ///2) Call ReadRecordedSample(s) until there are no more samples available. This is important, because if you skip this step, some samples may remain in the buffer and will be read when you start the next recording.
+    ///2) Either call ReadRecordedSample(s) until there are no more samples available, or call MasterBusRecorder_Clear() to clear the buffer. This is important, because if you skip this step, some samples may remain in the buffer and will be read when you start the next recording.
     ///3) Do any finalizing steps (writing file headers, writing file to disk or whatever)
     SOUNDSTAGE_API void MasterBusRecorder_StopRecording()
     {
-        instance->recording.store(false);
+        if(instance != NULL)
+            instance->recording.store(false);
+    }
+
+    /// Clears the recording buffer. Use this if you call MasterBusRecorder_StopRecording() and do NOT want to read query the rest of the available samples.
+    SOUNDSTAGE_API void MasterBusRecorder_Clear()
+    {
+        if(instance != NULL)
+            instance->newSamples.store(0);
     }
 
     ///Returns the average signal energy of the most recent buffer as a linear value in range [0...1].
     SOUNDSTAGE_API float MasterBusRecorder_GetLevel_Lin()
     {
-        return instance->level_lin.load();
+        if(instance != NULL)
+            return instance->level_lin.load();
+        else
+            return 0;
     }
 
     ///Returns the average signal energy of the most recent buffer in dB in range [-inf...0].
     SOUNDSTAGE_API float MasterBusRecorder_GetLevel_dB()
     {
-        return instance->level_dB.load();
+        if(instance != NULL)
+            return instance->level_dB.load();
+        else
+            return -INFINITY;
     }
 
     ///Reads 1 sample from the record buffer. Note that this needs an atomic_load operation, which is not guaranteed to be lock-free on all systems. On systems with lock-free implementations of atomic_load, it should be fine to use this function. Otherwise, it is more efficient to use ReadRecordedSamples() to read ALL new samples in one go, as this also only needs 1 atomic_load operation - needs more memory, though.
     SOUNDSTAGE_API bool MasterBusRecorder_ReadRecordedSample(float* sample)
     {
-        int n = instance->newSamples.load();
-        if(n > 0)
+        if(instance != NULL && instance->newSamples.load() > 0)
         {
             *sample = instance->buffer->buf[instance->readPtr]; //We are bypassing the RingBuffer's API here and reading directly from its underlying buffer. This is not recommended... otherwise, calling RingBuffer_Read for one single sample seems overkill.
             instance->newSamples.fetch_sub(1);
@@ -118,6 +132,9 @@ extern "C"
     ///Reads all new samples into outBuffer and returns the number of copied samples. Needs 1 atomic_load operation which is not guaranteed to be lock-free on all systems.
     SOUNDSTAGE_API int MasterBusRecorder_ReadRecordedSamples(float* outBuffer)
     {
+        if(instance == NULL)
+            return 0;
+        
         int n = 0;
         int N = 0;
         while((n = instance->newSamples.load() > 0))
@@ -141,6 +158,9 @@ extern "C"
     ///Note that if you do very expensive processing on the samples, it may be better to copy the samples to an intermediate buffer, then call AdvanceBufferPointer, and then to the expensive processing on the intermediate buffer.
     SOUNDSTAGE_API int MasterBusRecorder_GetBufferPointer(void *ringbuffer, int* readOffset)
     {
+        if(instance == NULL)
+            return 0;
+        
         int n = instance->newSamples.load();
         
         ringbuffer = (void*)(instance->buffer);
@@ -153,6 +173,9 @@ extern "C"
     ///Advances the readOffset by n samples. Think of this as marking n samples as "consumed", so they can be overwritten.
     SOUNDSTAGE_API void MasterBusRecorder_AdvanceBufferPointer(int n)
     {
+        if(instance == NULL)
+            return;
+        
         instance->readPtr += n;
         if (instance->readPtr >= MBR_BUFFERLENGTH)
             instance->readPtr -= MBR_BUFFERLENGTH;
@@ -287,6 +310,7 @@ extern "C"
         
         else
         {
+            printv("MasterBusRecorder: buffer overflow!");
             return UNITY_AUDIODSP_OK;
         }
     }

@@ -7,6 +7,9 @@
  
  */
 
+#ifndef StereoVerb_h
+#define StereoVerb_h
+
 #include "main.h"
 #include "util.h"
 #ifdef _WIN32
@@ -33,3 +36,5 @@ SOUNDSTAGE_API void StereoVerb_Process(float buffer[], int length, int channels,
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* StereoVerb_h */

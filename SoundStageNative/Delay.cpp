@@ -13,10 +13,12 @@ enum DelayParams
     P_FEEDBACK,
     P_WET,
     P_DRY,
+    P_CLEAR,
+    P_INTERPOLATION,
     P_N
 };
 
-void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
+/*void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
     // Prepare
     int time = x->time;
@@ -165,18 +167,18 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     RingBuffer_Free(x->tap);
     _free(x->temp);
     _free(x);
-}
+}*/
 
 
-/*void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
+void Delay_ProcessPitchShift(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x)
 {
     // Prepare
     int time = x->time;
     float feedback = x->feedback;
     
-    assert(time > 0);
+    if(time <= 0)
+        time = 1;
     
-    ///"Stride" is actually the oversampling factor, which is determined by the length of the delay buffer and the actual delay time.
     float oversampling = (float)x->maxTime / (float)time;
         
     int nPerChannel = n/channels;
@@ -188,13 +190,15 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     int r = nPerChannel;
     float* bufOffset = buffer;
     
+    int rp, wp;
+    
     ///We first read from the delay buffer and then write the new samples to it. If the delay buffer is smaller than n (the DSP vector size), we have to repeat this procedure until we consumed all n samples.
     while(r)
     {
         m = time < r ? time : r;
         
         ///Read some samples from the delay buffer
-        FrameRingBuffer_Read(x->temp, m, -(x->maxTime), oversampling, x->tap);
+        FrameRingBuffer_Read(x->temp, m, -time, oversampling, x->interpolation, x->tap);
         _fCopy(x->temp, x->temp2, m);
         
         ///Multiply those samples with the feedback gain, add the new input samples and write everything into the delay buffer
@@ -262,6 +266,8 @@ SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x)
             x->dry = value;
             //printv("Set delay dry mix to %f\n", value);
             break;
+        case P_INTERPOLATION:
+            x->interpolation = intval;
         default:
             break;
     }
@@ -280,6 +286,7 @@ SOUNDSTAGE_API struct DelayData *Delay_New(int n)
     x->time = n;
     x->maxTime = n;
     x->feedback = 0.3f;
+    x->interpolation = INTERPOLATION_NONE;
     return x;
 }
 
@@ -289,4 +296,3 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     _free(x->temp);
     _free(x);
 }
-*/

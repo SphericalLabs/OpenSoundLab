@@ -6,7 +6,8 @@
 ///
 ///All functions are not thread-safe, hence the caller must avoid simultaneous access from multiple threads.
 
-#pragma once
+#ifndef Delay_h
+#define Delay_h
 
 #include "main.h"
 #include "RingBuffer.h"
@@ -20,11 +21,12 @@ struct DelayData
     float feedback;
     float wet;
     float dry;
+    int interpolation;
     
     //internal
     int maxTime;
-    struct RingBuffer *tap;
-    //FrameRingBuffer *tap;
+    //struct RingBuffer *tap;
+    FrameRingBuffer *tap;
     float *temp;
     float *temp2;
 };
@@ -47,3 +49,5 @@ SOUNDSTAGE_API void Delay_Clear(DelayData* x);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* Delay_h */
