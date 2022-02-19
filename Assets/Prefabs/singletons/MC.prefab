@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 114465591553212382}
   - component: {fileID: 114625744848687504}
   - component: {fileID: 114568204637131020}
+  - component: {fileID: 835394206}
   m_Layer: 0
   m_Name: MC
   m_TagString: Untagged
@@ -94,6 +95,7 @@ MonoBehaviour:
   SaveDir: 
   handlesEnabled: 1
   jacksEnabled: 1
+  recorder: {fileID: 0}
   tooltipsOn: 1
   examplesOn: 1
   dialUsed: 0
@@ -257,6 +259,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyNormalization: 0
   savingInProgress: 0
+--- !u!114 &835394206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012983180942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb56fda7f7b14ccb8953a7ff29903f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1581954127674324
 GameObject:
   m_ObjectHideFlags: 0

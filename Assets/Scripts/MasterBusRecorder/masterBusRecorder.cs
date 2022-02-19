@@ -71,16 +71,16 @@ public class masterBusRecorder : MonoBehaviour
 
     private void Start()
     {
-        // We check if a metronome with a recButton exists (should have been assigned in metronome's Awake() method).
-        // We need this only in case a recording reaches the file size limit,
-        // but we check it here bc if we don't and future code changes break this,
-        // it will go unnoticed until someone actually reaches the file size limit.
-        var metronome = FindObjectOfType<metronome>();
-        if (metronome == null)
-            Debug.LogError("masterBusRecorder: No reference to metronome is set. Cannot update rec button toggle state.");
-        var recButton = metronome.recButton;
-        if (recButton == null)
-            Debug.LogError("masterBusRecorder: No reference to recButton is set. Cannot update rec button toggle state.");
+        //// We check if a metronome with a recButton exists (should have been assigned in metronome's Awake() method).
+        //// We need this only in case a recording reaches the file size limit,
+        //// but we check it here bc if we don't and future code changes break this,
+        //// it will go unnoticed until someone actually reaches the file size limit.
+        //var metronome = FindObjectOfType<metronome>();
+        //if (metronome == null)
+        //    Debug.LogError("masterBusRecorder: No reference to metronome is set. Cannot update rec button toggle state.");
+        //var recButton = metronome.recButton;
+        //if (recButton == null)
+        //    Debug.LogError("masterBusRecorder: No reference to recButton is set. Cannot update rec button toggle state.");
     }
 
     private void Update()
