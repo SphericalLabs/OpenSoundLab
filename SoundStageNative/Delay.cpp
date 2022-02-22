@@ -54,7 +54,7 @@ void Delay_ProcessPadded(float buffer[], int n, int channels, DelayData* x)
         {
             float prevOversampling = (float)x->maxTime / (float)prevTime;
             RingBuffer_ReadPadded(x->temp2, m, -(x->maxTime), prevOversampling, tap);
-            _fCrossfadeLogarithmic(x->temp2, x->temp, x->temp, true, m);
+            _fCrossfadeLinear(x->temp2, x->temp, x->temp, m);
             prevTime = time;
         }
         
@@ -238,7 +238,7 @@ void Delay_ProcessInterpolated(float buffer[], int n, int channels, DelayData* x
         {
             float prevOversampling = (float)x->maxTime / (float)prevTime;
             FrameRingBuffer_Read(x->temp2, m, -prevTime, prevOversampling, x->interpolation, tap);
-            _fCrossfadeLogarithmic(x->temp2, x->temp, x->temp, true, m);
+            _fCrossfadeLinear(x->temp2, x->temp, x->temp, m);
             prevTime = time;
         }
         

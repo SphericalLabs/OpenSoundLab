@@ -533,13 +533,12 @@ extern "C" {
     
     void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n)
     {
-        float frac;
-        int max = n-1;
+        float frac = 0, step = 1.0f/(n-1);
         dest[0] = src1[0];
         dest[n-1] = src2[n-1];
         for(int i = 1; i < n-1; i++)
         {
-            frac = (float)i / max;
+            frac += step;
             dest[i] = src1[i] + frac * (src2[i] - src1[i]); //bc (1-c)a + cb = a + c(b-a)
         }
     }
