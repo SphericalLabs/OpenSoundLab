@@ -26,9 +26,6 @@
 
 #include <vector>
 
-#define INTERPOLATION_NONE 1
-#define INTERPOLATION_LINEAR 2
-
 using std::vector;
 
 typedef struct _FrameHeader

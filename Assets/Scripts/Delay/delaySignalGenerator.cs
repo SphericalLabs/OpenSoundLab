@@ -22,6 +22,10 @@ public class delaySignalGenerator : signalGenerator
     const int INTERPOLATION_NONE = 1;
     const int INTERPOLATION_LINEAR = 2;
 
+    const int DELAYMODE_SIMPLE = 0;
+    const int DELAYMODE_OVERAMPLED = 1;
+    const int DELAYMODE_EFFICIENT = 2;
+
     public const float MAX_TIME = 12.5f; // * 1000 ms.
     public const float MIN_FEEDBACK = 0;
     public const float MAX_FEEDBACK = 1f;
@@ -53,6 +57,7 @@ public class delaySignalGenerator : signalGenerator
         int maxDelaySamples = (int)(MAX_TIME * sampleRate);
         x = Delay_New(maxDelaySamples);
         Delay_SetParam(INTERPOLATION_LINEAR, (int)Param.P_INTERPOLATION, x);
+        Delay_SetMode(DELAYMODE_EFFICIENT, x);
     }
 
     private void OnDestroy()
@@ -121,6 +126,9 @@ public class delaySignalGenerator : signalGenerator
 
     [DllImport("SoundStageNative")]
     private static extern void Delay_Clear(IntPtr x);
+
+    [DllImport("SoundStageNative")]
+    private static extern void Delay_SetMode(int mode, IntPtr x);
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {

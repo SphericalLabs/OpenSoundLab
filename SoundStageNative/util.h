@@ -32,6 +32,10 @@
 #define WAV_BIG_ENDIAN 0
 #define WAV_LITTLE_ENDIAN 1
 
+#define INTERPOLATION_NONE 1
+#define INTERPOLATION_LINEAR 2
+#define INTERPOLATION_WSINC 3
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -105,6 +109,15 @@ extern "C" {
 
     /* De-interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory addresses, a slightly faster in-place operation is performed. */
     void _fDeinterleave(const float* src, float *dest, int n, int channels);
+
+    /* Executes a linear crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves power with totally correlated signals. */
+    void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n);
+
+    /* Executes a logarithmic crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves power with totally uncorrelated signals. */
+    /* If destructive is set true (or >= 1), the source arrays are used to store immediate results. You are advised to use the destructive version whenever possible, as the computation is MUCH faster. */
+    void _fCrossfadeLogarithmic(float* src1, float* src2, float* dest, int destructive, int n);
+
+    void _fLerp(float* src, float* dest, float gain1, float gain2, int n);
 
     /* Evaluates y = ab^x with slope ym. x will be clamped to [0..1]. ym < 0.5 yields an exponential curve, ym > 0.5 yields a logarithmic curve. Return val will be in range [0..1]. */
     float _expCurve(float x, float ym);

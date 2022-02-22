@@ -1,6 +1,6 @@
 ///Created by Hannes January 2022
 ///
-///This is a simple delay audio effect that emulates a bucket-brigade delay. It operates on a fixed-size buffer.
+///This is a delay audio effect that emulates a bucket-brigade delay. It operates on a fixed-size buffer.
 ///The delay time is determined by the oversampling factor used to write/read to the buffer.
 ///This results in the characteristic "pitch-shift" effect when changing the delay time while there is still signal in the delay buffer.
 ///
@@ -14,6 +14,10 @@
 #include "CompressedRingBuffer.h"
 #include "CRingBuffer.hpp"
 
+#define DELAYMODE_SIMPLE 0
+#define DELAYMODE_PADDED 1
+#define DELAYMODE_INTERPOLATED 2
+
 struct DelayData
 {
     //public
@@ -22,11 +26,15 @@ struct DelayData
     float wet;
     float dry;
     int interpolation;
+    int delayMode;
     
     //internal
     int maxTime;
-    //struct RingBuffer *tap;
-    FrameRingBuffer *tap;
+    int prevTime; //for time interpolation
+    float prevFeedback;
+    float prevDry;
+    float prevWet;
+    void *tap; //either RingBuffer or FrameRingBuffer, depending on the delay's current mode
     float *temp;
     float *temp2;
 };
@@ -42,6 +50,7 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x);
 SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x);
 //Sets the possible range of the delay. This is necessary for now bc excessive oversampling causes high CPU loads otherwise.
 SOUNDSTAGE_API void Delay_SetRange(int min, int max, DelayData* x);
+SOUNDSTAGE_API void Delay_SetMode(int mode, DelayData* x);
 ///Processes 1 block of interleaved audio data.
 SOUNDSTAGE_API void Delay_Process(float buffer[], int n, int channels, float cTime, float cFeedback, DelayData* x);
 //Clears the delay buffer.
