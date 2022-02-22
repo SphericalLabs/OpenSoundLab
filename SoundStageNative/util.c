@@ -111,7 +111,7 @@ extern "C" {
       return t > max ? max : t;
     }
     
-    inline float _interpolate_linear(float a, float b, float frac)
+    float _interpolate_linear(float a, float b, float frac)
     {
         return a + frac * (b - a); //bc (1-c)a + cb = a + c(b-a)
     }
@@ -172,12 +172,7 @@ extern "C" {
     
     void _fCopy(float *src, float *dest, int n)
     {
-#if __APPLE_VDSP__DONTUSE
-        /* This does not make a difference and probably just calls memcpy internally. */
-        cblas_scopy(n, src, 1, dest, 1);
-#else
         memcpy(dest, src,  n*sizeof(float));
-#endif
     }
 
     void _fScale(float *src, float *dest, float factor, int n)
@@ -617,14 +612,14 @@ extern "C" {
         }
     }
     
-    void _fNoiseDestructive(float *buf, float amount, int n)
+    void _fNoise(float *buf, float amplitude, int n)
     {
-        if(amount == 0)
+        if(amplitude == 0)
             return;
         
         for(int i = 0; i < n; i++)
         {
-            buf[i] = ((float)rand() / RAND_MAX * 2 - 1) * amount;
+            buf[i] = ((float)rand() / RAND_MAX * 2 - 1) * amplitude;
         }
     }
     

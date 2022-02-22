@@ -44,20 +44,29 @@ typedef struct _FrameRingBuffer
     vector<FrameHeader> headers;
 } FrameRingBuffer;
 
+/* Writing into the buffer */
+
+///Writes n samples from src to the FrameRingBuffer. Writes a new frame header with specified oversampling. Concatenating of frame headers with same oversampling is also taken care of.
+void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffer *x);
+///Fills the FrameRingBuffer with 0's.
+void FrameRingBuffer_Clear(FrameRingBuffer *x);
+
+/* Reading from the buffer */
+
+///Reads n samples from the FrameRingBuffer. Stride between samples is calculated based on the specified oversampling as well as the oversampling in the frame headers.
+///Returns the index of the last sample that was read. Note that this index is fracitonal, in other words, it can be located between two samples.
+float FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, int interpolation, FrameRingBuffer *x);
+float FrameRingBuffer_Read2(float* dest, int n, int offset, float* oversampling, int singleValueOversampling, int interpolation, FrameRingBuffer *x);
+
+/* Allocating, Freeing */
+
 ///Allocates a new FrameRingBuffer with capacity n and returns a pointer to it.
 FrameRingBuffer* FrameRingBuffer_New(int n);
 ///Frees all resources of a FrameRingBuffer.
 void FrameRingBuffer_Free(FrameRingBuffer *x);
-///Writes n samples from src to the FrameRingBuffer. Writes a new frame header with specified oversampling. Concatenating of frame headers with same oversampling is also taken care of.
-void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffer *x);
-///Reads n samples from the FrameRingBuffer. Stride between samples is calculated based on the specified oversampling as well as the oversampling in the frame headers.
-///Returns the index of the last sample that was read. Note that this index is fracitonal, in other words, it can be located between two samples.
-float FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, int interpolation, FrameRingBuffer *x);
 
-float FrameRingBuffer_Read2(float* dest, int n, int offset, float* oversampling, int singleValueOversampling, int interpolation, FrameRingBuffer *x);
-///Fills the FrameRingBuffer with 0's.
-void FrameRingBuffer_Clear(FrameRingBuffer *x);
-int FrameRingBuffer_Warn(float stride, FrameRingBuffer *x);
+/* Validating, Printing */
+
 ///Checks if the FrameRingBuffer's frames do not violate any restrictions (see comments above).
 bool FrameRingBuffer_Validate(FrameRingBuffer *x);
 ///Prints the frame headers of the FrameRingBuffer.

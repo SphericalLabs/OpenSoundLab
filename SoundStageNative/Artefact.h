@@ -4,6 +4,7 @@
 //
 //  Created by hb on 22.02.22.
 //
+// Artefact creates all kinds of digital havoc: white noise, jitter, bit crushing, downsampling.
 
 #ifndef Artefact_h
 #define Artefact_h

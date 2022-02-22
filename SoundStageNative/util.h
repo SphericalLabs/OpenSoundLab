@@ -39,8 +39,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    /* Allocate n bytes of memory. */
     void *_malloc(size_t n);
 
+    /* Frees a previously allocated pointer. */
     void _free(void *x);
 
     /* Converts millisceonds to samples */
@@ -57,6 +59,9 @@ extern "C" {
 
     /* Clamps f between min and max */
     float _clamp(float f, float min, float max);
+
+    /* Performs linear interpolation between two samples. The output is the hypothetical sample at position [a + frac]. */
+    float _interpolate_linear(float a, float b, float frac);
 
     /* Converts a 32bit float to a 16bit signed int */
     int16_t _float32toint16(float f);
@@ -114,14 +119,19 @@ extern "C" {
     void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n);
 
     /* Executes a logarithmic crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves power with totally uncorrelated signals. */
-    /* If destructive is set true (or >= 1), the source arrays are used to store immediate results. You are advised to use the destructive version whenever possible, as the computation is MUCH faster. */
+    /* If destructive is set true (or >= 1), lookup tables ares used for calculation and the source arrays are used to store immediate results. You are advised to use the destructive version whenever possible, as the computation is MUCH faster. */
     void _fCrossfadeLogarithmic(float* src1, float* src2, float* dest, int destructive, int n);
 
+    /* Multiplies the src array with a linear ramp that starts at gain1 and ends at gain2.
+     * If gain1 == gain2, the more efficient _fScale operation is called.
+     */
     void _fLerp(float* src, float* dest, float gain1, float gain2, int n);
 
+    /* Clamps all values in src array. */
     void _fClamp(float *src, float min, float max, int n);
 
-    void _fNoiseDestructive(float *buf, float amount, int n);
+    /* Fills the input buffer with white noise of the specified amplitude. */
+    void _fNoise(float *buf, float amplitude, int n);
 
     /* Adds noise to the input signal. Overall amplitudes are preserved. 0 corresponds to no noise, 1 corresponds to "only noise". */
     void _fNoiseAdditive(float *buf, float amount, int n);
