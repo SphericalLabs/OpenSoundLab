@@ -285,24 +285,19 @@ void Delay_ProcessInterpolated(float buffer[], int n, int channels, DelayData* x
     x->prevDry = x->dry;
 }
 
-/*void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeBuffer[], float feedbackBuffer[], DelayData* x)
+void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeBuffer[], float feedbackBuffer[], DelayData* x)
 {
     FrameRingBuffer *tap = (FrameRingBuffer*)x->tap;
     
     // Prepare
-    int time = x->time, prevTime = x->prevTime;
-    float feedback = x->feedback;
-    float prevFeedback = x->prevFeedback;
-    float prevDry = x->prevDry;
-    float prevWet = x->prevWet;
-    float temp;
+    int m, time = x->time, prevTime = x->prevTime, nPerChannel = n/channels, r = nPerChannel;
+    float temp, feedback = x->feedback, prevFeedback = x->prevFeedback, prevDry = x->prevDry, prevWet = x->prevWet;
+    float *bufOffset = buffer, *tb = x->cTime;
     
     if(time <= 0)
         time = 1;
-    
-    float oversampling = (float)x->maxTime / (float)time;
         
-    int nPerChannel = n/channels;
+    ///Deinterleave if necessary
     if(channels > 1)
     {
         _fDeinterleave(buffer, buffer, n, channels);
@@ -310,26 +305,26 @@ void Delay_ProcessInterpolated(float buffer[], int n, int channels, DelayData* x
         if(feedbackBuffer) _fDeinterleave(feedbackBuffer, feedbackBuffer, n, channels);
     }
     
-    // Process delay
-    int m;
-    int r = nPerChannel;
-    float* bufOffset = buffer;
+    ///Generate control signal(s) and calculate average oversampling
+    std::fill(x->cTime, x->cTime+nPerChannel, 1.0f);
+    _fLerp(x->cTime, x->cTime, prevTime, time, nPerChannel);
+    if(timeBuffer != NULL)
+    {
+        _fScale(timeBuffer, timeBuffer, (float)x->maxTime, nPerChannel); //convert PCM float range [-1...1] to [-maxtime...maxtime]
+        //alternatively we could scale to [0...maxtime:]
+        //_fAdd(x->cTime, timeBuffer, timeBuffer, nPerChannel); //assuming x->cTime is padded with 1's at this moment
+        //_fScale(timeBuffer, timeBuffer, (float)x->maxTime/2, nPerChannel);
+        _fAdd(timeBuffer, x->cTime, x->cTime, nPerChannel);
+        _fClamp(x->cTime, 1, x->maxTime, nPerChannel);
+    }
+    float oversampling = x->maxTime / _fAverageSumOfMags(x->cTime, nPerChannel); //this is the "average" oversampling over the whole buffer. We use this to avoid many small frames in the ringbuffer, as this affects read performance negatively.
         
     ///We first read from the delay buffer and then write the new samples to it. If the delay buffer is smaller than n (the DSP vector size), we have to repeat this procedure until we consumed all n samples.
     while(r)
     {
         m = time < r ? time : r;
         
-        temp = prevTime + ((float)m/nPerChannel) * (time - prevTime);
-        std::fill(x->temp2, x->temp2+m, 1.0f);
-        _fLerp(x->temp2, x->temp2, prevTime, temp, m);
-        prevTime = temp;
-        if(timeBuffer != NULL)
-        {
-            _fAdd(timeBuffer, x->temp2, x->temp2, m);
-            _fClamp(x->temp2, 1, tap->n, m);
-        }
-        FrameRingBuffer_Read2(x->temp, m, -x->maxTime, x->temp2, false, x->interpolation, tap);
+        FrameRingBuffer_Read2(x->temp, m, -x->maxTime, tb, false, x->interpolation, tap);
         
         _fCopy(x->temp, x->temp2, m);
         
@@ -354,6 +349,7 @@ void Delay_ProcessInterpolated(float buffer[], int n, int channels, DelayData* x
         _fAdd(bufOffset, x->temp2, bufOffset, m);
         
         bufOffset += m;
+        tb += m;
         if(timeBuffer) timeBuffer += m;
         if(feedbackBuffer) feedbackBuffer += m;
         r -= m;
@@ -376,7 +372,17 @@ void Delay_ProcessInterpolated(float buffer[], int n, int channels, DelayData* x
     x->prevFeedback = x->feedback;
     x->prevWet = x->wet;
     x->prevDry = x->dry;
-}*/
+}
+
+SOUNDSTAGE_API void Delay_Process2(float buffer[], float timeBuffer[], float feedbackBuffer[], int n, int channels, DelayData* x)
+{
+    if(x->delayMode == DELAYMODE_INTERPOLATED)
+        Delay_ProcessInterpolated2(buffer, n, channels, timeBuffer, feedbackBuffer, x);
+    else if (x->delayMode == DELAYMODE_PADDED)
+        Delay_ProcessPadded(buffer, n, channels, x);
+    else if(x->delayMode == DELAYMODE_SIMPLE)
+        Delay_ProcessSimple(buffer, n, channels, x);
+}
 
 SOUNDSTAGE_API void Delay_Process(float buffer[], int n, int channels, DelayData* x)
 {
@@ -433,8 +439,10 @@ SOUNDSTAGE_API struct DelayData *Delay_New(int n)
     x->tap = FrameRingBuffer_New(n);
     x->temp = (float*)_malloc(DELAY_MAXVECTORSIZE * sizeof(float));
     x->temp2 = (float*)_malloc(DELAY_MAXVECTORSIZE * sizeof(float));
+    x->cTime = (float*)_malloc(DELAY_MAXVECTORSIZE * sizeof(float));
     _fZero(x->temp, DELAY_MAXVECTORSIZE);
     _fZero(x->temp2, DELAY_MAXVECTORSIZE);
+    _fZero(x->cTime, DELAY_MAXVECTORSIZE);
     x->wet = 1;
     x->dry = 0.7f;
     x->time = n;
@@ -456,5 +464,7 @@ SOUNDSTAGE_API void Delay_Free(struct DelayData *x)
     else
         RingBuffer_Free((RingBuffer*)x->tap);
     _free(x->temp);
+    _free(x->temp2);
+    _free(x->cTime);
     _free(x);
 }

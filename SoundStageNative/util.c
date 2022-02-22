@@ -606,8 +606,7 @@ extern "C" {
     {
         for(int i = 0; i < n; i++)
         {
-            src[i] = _min(max, src[i]);
-            src[i] = _max(min, src[i]);
+            src[i] = _min(max, _max(min, src[i]));
         }
     }
     
@@ -638,7 +637,7 @@ extern "C" {
     
     void _fDownSample(float *buf, int factor, int n)
     {
-        _clamp(factor, 1, 1000000);
+        _clamp(factor, 1, 64);
         
         if(factor == 1)
             return;

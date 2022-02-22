@@ -4,6 +4,8 @@
 ///The delay time is determined by the oversampling factor used to write/read to the buffer.
 ///This results in the characteristic "pitch-shift" effect when changing the delay time while there is still signal in the delay buffer.
 ///
+///Note that the delay ignores multi-channel input: The first channel is used as input and copied to all output channels.
+///
 ///All functions are not thread-safe, hence the caller must avoid simultaneous access from multiple threads.
 
 #ifndef Delay_h
@@ -37,6 +39,7 @@ struct DelayData
     void *tap; //either RingBuffer or FrameRingBuffer, depending on the delay's current mode
     float *temp;
     float *temp2;
+    float *cTime; //control signal for delay time
 };
 
 #ifdef __cplusplus
@@ -47,6 +50,7 @@ extern "C" {
 
 ///Processes 1 block of interleaved audio data.
 SOUNDSTAGE_API void Delay_Process(float buffer[], int n, int channels, DelayData* x);
+SOUNDSTAGE_API void Delay_Process2(float buffer[], float timeBuffer[], float feedbackBuffer[], int n, int channels, DelayData* x);
 ///Clears the delay buffer.
 SOUNDSTAGE_API void Delay_Clear(DelayData* x);
 

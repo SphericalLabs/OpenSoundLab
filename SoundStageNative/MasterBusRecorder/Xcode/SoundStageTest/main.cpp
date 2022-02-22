@@ -882,7 +882,7 @@ int main(int argc, const char * argv[]) {
     
     //createResampleTable();
     
-    Artefact_Process(NULL, 0, 0, 0);
+    //Artefact_Process(NULL, 0, 0, 0);
     
     printv("Bye, World!\n");
     return 0;

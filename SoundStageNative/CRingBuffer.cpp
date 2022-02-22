@@ -295,7 +295,7 @@ float FrameRingBuffer_Read2(float* dest, int n, int offsetTotal, float* offsets,
     double samplesInFrame;
     double samplesNeeded = (double)-offsetTotal;
     FrameHeader *header;
-    double oversampling = (double)x->n / *offsets;
+    double oversampling = (double)x->n / *offsets; //only used if singleValueDelay == true
     
     ///1. Back-trace the frame headers to find where to start reading from
     while(samplesNeeded > 0)
