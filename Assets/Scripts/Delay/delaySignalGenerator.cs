@@ -113,7 +113,7 @@ public class delaySignalGenerator : signalGenerator
     }
 
     [DllImport("SoundStageNative")]
-    private static extern void Delay_Process(float[] buffer, int length, int channels, float cTime, float cFeedback, IntPtr x);
+    private static extern void Delay_Process(float[] buffer, int length, int channels, IntPtr x);
 
     [DllImport("SoundStageNative")]
     private static extern IntPtr Delay_New(int maxDelayTimeSamples);
@@ -172,7 +172,7 @@ public class delaySignalGenerator : signalGenerator
         //bc there could be unconsumed samples from a previous input left in the delay line.
         //To optimize, we could store the timestamp when the last input connection was removed.
         //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed. 
-        Delay_Process(buffer, buffer.Length, channels, cTime, cFeedback, x);
+        Delay_Process(buffer, buffer.Length, channels, x);
     }
 }
 

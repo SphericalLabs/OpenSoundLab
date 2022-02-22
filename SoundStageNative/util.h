@@ -119,6 +119,22 @@ extern "C" {
 
     void _fLerp(float* src, float* dest, float gain1, float gain2, int n);
 
+    void _fClamp(float *src, float min, float max, int n);
+
+    void _fNoiseDestructive(float *buf, float amount, int n);
+
+    /* Adds noise to the input signal. Overall amplitudes are preserved. 0 corresponds to no noise, 1 corresponds to "only noise". */
+    void _fNoiseAdditive(float *buf, float amount, int n);
+
+    /* Reduces the sample rate of the input signal by factor. */
+    void _fDownSample(float *buf, int factor, int n);
+
+    /* Adds jitter to the input signal. An amount of 1 corresponds to jitter of 2/samplerate. An amount of 0 corresponds to no jitter at all. */
+    void _fJitter(float *buf, float amount, int n);
+
+    /* Reduces the bit depth of the input signal. */
+    void _fBitCrush(float *buf, int bitReduction, int n);
+
     /* Evaluates y = ab^x with slope ym. x will be clamped to [0..1]. ym < 0.5 yields an exponential curve, ym > 0.5 yields a logarithmic curve. Return val will be in range [0..1]. */
     float _expCurve(float x, float ym);
 

@@ -289,6 +289,96 @@ float FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, i
     return fPtr;
 }
 
+float FrameRingBuffer_Read2(float* dest, int n, int offsetTotal, float* offsets, int singleValueDelay, int interpolation, FrameRingBuffer *x)
+{
+    int headerIndex = x->headers.size();
+    double samplesInFrame;
+    double samplesNeeded = (double)-offsetTotal;
+    FrameHeader *header;
+    double oversampling = (double)x->n / *offsets;
+    
+    ///1. Back-trace the frame headers to find where to start reading from
+    while(samplesNeeded > 0)
+    {
+        headerIndex--;
+        if(headerIndex < 0)
+            headerIndex = x->headers.size() - 1;
+        header = &(x->headers[headerIndex]);
+        samplesInFrame = _normalize((double)header->length, (double)header->oversampling);
+        samplesNeeded -= samplesInFrame;
+    }
+    
+    int ptr;
+    double fPtr = header->head; //the start index of the frame in which the first sample to read is located
+    
+    /// At this point, samplesNeeded is either 0 or negative; negative meaning we backtracked "too far", so we have to start reading somewhere in the middle of the frame.
+    /// In other words: The position to start reading from is in the current frame with an offset of (-samplesNeeded).
+    samplesNeeded = -samplesNeeded;
+    float frac, a, b;
+    int wsincPtr;
+    
+    /// 2. Copy n samples into the destination buffer
+    for(int i = 0; i < n; i++)
+    {
+        /// To advance 1 sample from the reader's perspective, we have to take into account oversampling rates as follows:
+        fPtr += _convert(samplesNeeded, 1.0, (double)header->oversampling);
+        if(fPtr >= x->n)
+            fPtr -= x->n;
+
+        if(interpolation == INTERPOLATION_LINEAR)
+        {
+            ptr = (int)fPtr;
+            frac = fPtr - ptr;
+            a = x->data[ptr];
+            b = x->data[(ptr + 1) % x->n];
+            
+            dest[i] = a + frac * (b - a); //bc (1-c)a + cb = a + c(b-a)
+        }
+        else if(interpolation == INTERPOLATION_NONE)
+        {
+            ptr = (int)(fPtr + 0.5f) % x->n;
+            /// Sometimes it still happens that ptr == tail, which is not correct, ptr should always be < tail... reason is probably floating point imprecision / rounding errors. Quickfix for now:
+            if(ptr == header->tail)
+                ptr = _MAX(0, ptr - 1);
+            dest[i] = x->data[ptr];
+        }
+        else if(interpolation == INTERPOLATION_WSINC)
+        {
+            ptr = (int)(fPtr + 0.5f);
+            frac = fPtr - ptr;
+            ptr = ptr % x->n;
+            wsincPtr = ptr - ZEROCROSSINGS_PER_AXIS;
+            if(wsincPtr < 0)
+                wsincPtr += x->n;
+            for(int j = 0; j < CONV_LENGTH; j++)
+            {
+                wsinc_convBuffer[j] = x->data[wsincPtr];
+                wsincPtr = (wsincPtr + 1) % x->n;
+            }
+            dest[i] = wsinc_resample(wsinc_convBuffer, -frac);
+        }
+        
+        ///we advanced samplesNeeded samples into the frame, so they are not available anymore.
+        samplesInFrame -= samplesNeeded;
+        
+        ///We copied a sample, so we need 1 whole new sample now.
+        samplesNeeded = singleValueDelay ? oversampling : (double)x->n / offsets[i];
+        
+        ///Skip frame(s) if they don't contain the next sample to read:
+        while(samplesInFrame < samplesNeeded)
+        {
+            //assert(i != 0); //in first iteration we should always be in the correct frame
+            samplesNeeded -= samplesInFrame;
+            headerIndex = (headerIndex + 1) % x->headers.size();
+            header = &x->headers[headerIndex];
+            samplesInFrame = _normalize((double)header->length, (double)header->oversampling);
+            fPtr = header->head;
+        }
+    }
+    
+    return fPtr;
+}
+
 void FrameRingBuffer_Clear(FrameRingBuffer *x)
 {
     _fZero(x->data, x->n);

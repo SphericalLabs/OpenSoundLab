@@ -53,6 +53,8 @@ void FrameRingBuffer_Write(float* src, int n, float oversampling, FrameRingBuffe
 ///Reads n samples from the FrameRingBuffer. Stride between samples is calculated based on the specified oversampling as well as the oversampling in the frame headers.
 ///Returns the index of the last sample that was read. Note that this index is fracitonal, in other words, it can be located between two samples.
 float FrameRingBuffer_Read(float* dest, int n, int offset, float oversampling, int interpolation, FrameRingBuffer *x);
+
+float FrameRingBuffer_Read2(float* dest, int n, int offset, float* oversampling, int singleValueOversampling, int interpolation, FrameRingBuffer *x);
 ///Fills the FrameRingBuffer with 0's.
 void FrameRingBuffer_Clear(FrameRingBuffer *x);
 int FrameRingBuffer_Warn(float stride, FrameRingBuffer *x);

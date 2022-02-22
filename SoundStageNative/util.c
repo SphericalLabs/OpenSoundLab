@@ -182,6 +182,8 @@ extern "C" {
 
     void _fScale(float *src, float *dest, float factor, int n)
     {
+        if(factor == 1)
+            return;
 #if __APPLE_VDSP_DONTUSE
         /* vDSP is slower than Neon here for small vector sizes (up to 1024) */
         vDSP_vsmul(src, 1, &factor, dest, 1, n);
@@ -590,6 +592,12 @@ extern "C" {
     
     void _fLerp(float* src, float* dest, float gain1, float gain2, int n)
     {
+        if(gain1 == gain2)
+        {
+            _fScale(src, dest, gain2, n);
+            return;
+        }
+        
         float gain;
         float gainDelta = gain2 - gain1;
         float max = (float)(n-1);
@@ -597,6 +605,92 @@ extern "C" {
         {
             gain = gain1 + i/max * gainDelta;
             dest[i] = gain * src[i];
+        }
+    }
+    
+    void _fClamp(float *src, float min, float max, int n)
+    {
+        for(int i = 0; i < n; i++)
+        {
+            src[i] = _min(max, src[i]);
+            src[i] = _max(min, src[i]);
+        }
+    }
+    
+    void _fNoiseDestructive(float *buf, float amount, int n)
+    {
+        if(amount == 0)
+            return;
+        
+        for(int i = 0; i < n; i++)
+        {
+            buf[i] = ((float)rand() / RAND_MAX * 2 - 1) * amount;
+        }
+    }
+    
+    void _fNoiseAdditive(float *buf, float amount, int n)
+    {
+        _clamp(amount, 0, 1);
+        
+        if(amount == 0)
+            return;
+        
+        float inverse = 1 - amount;
+        for(int i = 0; i < n; i++)
+        {
+            buf[i] = inverse * buf[i] + buf[i] * ((float)rand() / RAND_MAX * 2 - 1) * amount;
+        }
+    }
+    
+    void _fDownSample(float *buf, int factor, int n)
+    {
+        _clamp(factor, 1, 1000000);
+        
+        if(factor == 1)
+            return;
+        
+        float sample;
+        for(int i = 0; i < n; i++)
+        {
+            if(i % factor == 0)
+                sample = buf[i];
+            buf[i] = sample;
+        }
+    }
+    
+    void _fJitter(float *buf, float amount, int n)
+    {
+        _clamp(amount, 0, 1);
+        
+        if(amount == 0)
+            return;
+        
+        float frac;
+        int s1, s2;
+        for(int i = 1; i < n-1; i++)
+        {
+            frac = amount * ( (float)rand() / RAND_MAX * 2 - 0.999f );
+            s1 = (int)(i + frac); //either i or i-1
+            s2 = s1 + 1; //either i or i+1
+            if(frac < 0)
+                frac = 1 + frac;
+            
+            buf[i] = buf[s1] + frac * (buf[s2] - buf[s1]); //a + c(b-a)
+        }
+    }
+    
+    void _fBitCrush(float *buf, int bitReduction, int n)
+    {
+        if(bitReduction == 0 || bitReduction > 32)
+            return;
+        
+        int64_t sample;
+        for(int i = 0; i < n; i++)
+        {
+            sample = (((int64_t)((double)buf[i] * 2147483640 + 2147483648.5)) - 2147483648);
+            sample = sample >> bitReduction;
+            sample = sample << bitReduction;
+            buf[i] = ((float)sample) / 2147483648;
         }
     }
     
