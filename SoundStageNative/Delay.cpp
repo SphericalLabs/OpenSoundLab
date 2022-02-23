@@ -310,6 +310,10 @@ void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeB
     _fLerp(x->cTime, x->cTime, prevTime, time, nPerChannel);
     if(timeBuffer != NULL)
     {
+        //Crude way for timeBuffer = timeBuffer^3:
+        _fMultiply(timeBuffer, timeBuffer, timeBuffer, nPerChannel);
+        _fMultiply(timeBuffer, timeBuffer, timeBuffer, nPerChannel);
+        
         _fScale(timeBuffer, timeBuffer, (float)x->maxTime, nPerChannel); //convert PCM float range [-1...1] to [-maxtime...maxtime]
         //alternatively we could scale to [0...maxtime:]
         //_fAdd(x->cTime, timeBuffer, timeBuffer, nPerChannel); //assuming x->cTime is padded with 1's at this moment
@@ -317,7 +321,7 @@ void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeB
         _fAdd(timeBuffer, x->cTime, x->cTime, nPerChannel);
         _fClamp(x->cTime, 1, x->maxTime, nPerChannel);
     }
-    float oversampling = x->maxTime / _fAverageSumOfMags(x->cTime, nPerChannel); //this is the "average" oversampling over the whole buffer. We use this to avoid many small frames in the ringbuffer, as this affects read performance negatively.
+    float oversampling = x->maxTime / _fAverageSumOfMags(x->cTime, nPerChannel); //this is the "average" oversampling over the whole input buffer. For writing, we use this to avoid many small frames in the ringbuffer, as this affects read performance negatively.
         
     ///We first read from the delay buffer and then write the new samples to it. If the delay buffer is smaller than n (the DSP vector size), we have to repeat this procedure until we consumed all n samples.
     while(r)
