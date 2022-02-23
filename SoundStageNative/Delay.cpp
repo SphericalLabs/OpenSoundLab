@@ -19,6 +19,7 @@ enum DelayParams
     P_N
 };
 
+/* This version uses oversampling at write time and is extremely expensive with small delay times. */
 void Delay_ProcessPadded(float buffer[], int n, int channels, DelayData* x)
 {
     RingBuffer *tap = (RingBuffer*)x->tap;
@@ -120,6 +121,7 @@ void Delay_ProcessPadded(float buffer[], int n, int channels, DelayData* x)
     x->prevDry = x->dry;
 }
 
+/* This version is very cheap but also very basic. */
 void Delay_ProcessSimple(float buffer[], int n, int channels, DelayData* x) {
     RingBuffer *tap = (RingBuffer*)x->tap;
 
@@ -199,6 +201,7 @@ SOUNDSTAGE_API void Delay_SetMode(int mode, DelayData* x)
     printv("Delay is now in mode %d\n", mode);
 }
 
+/* This version is deprecated but stays here for now. */
 void Delay_ProcessInterpolated(float buffer[], int n, int channels, DelayData* x)
 {
     FrameRingBuffer *tap = (FrameRingBuffer*)x->tap;
@@ -285,6 +288,7 @@ void Delay_ProcessInterpolated(float buffer[], int n, int channels, DelayData* x
     x->prevDry = x->dry;
 }
 
+/* This is the version we are using right now. */
 void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeBuffer[], float feedbackBuffer[], DelayData* x)
 {
     FrameRingBuffer *tap = (FrameRingBuffer*)x->tap;
