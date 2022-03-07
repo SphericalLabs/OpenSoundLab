@@ -36,6 +36,7 @@ public class menuItem : manipObject {
     AD,
     ADSR,
     Airhorn,
+    Artefact,
     Camera,
     Compressor,
     ControlCube,

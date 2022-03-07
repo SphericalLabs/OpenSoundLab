@@ -32,11 +32,17 @@
 #define WAV_BIG_ENDIAN 0
 #define WAV_LITTLE_ENDIAN 1
 
+#define INTERPOLATION_NONE 1
+#define INTERPOLATION_LINEAR 2
+#define INTERPOLATION_WSINC 3
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+    /* Allocate n bytes of memory. */
     void *_malloc(size_t n);
 
+    /* Frees a previously allocated pointer. */
     void _free(void *x);
 
     /* Converts millisceonds to samples */
@@ -53,6 +59,9 @@ extern "C" {
 
     /* Clamps f between min and max */
     float _clamp(float f, float min, float max);
+
+    /* Performs linear interpolation between two samples. The output is the hypothetical sample at position [a + frac]. */
+    float _interpolate_linear(float a, float b, float frac);
 
     /* Converts a 32bit float to a 16bit signed int */
     int16_t _float32toint16(float f);
@@ -105,6 +114,36 @@ extern "C" {
 
     /* De-interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory addresses, a slightly faster in-place operation is performed. */
     void _fDeinterleave(const float* src, float *dest, int n, int channels);
+
+    /* Executes a linear crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves power with totally correlated signals. */
+    void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n);
+
+    /* Executes a logarithmic crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves power with totally uncorrelated signals. */
+    /* If destructive is set true (or >= 1), lookup tables ares used for calculation and the source arrays are used to store immediate results. You are advised to use the destructive version whenever possible, as the computation is MUCH faster. */
+    void _fCrossfadeLogarithmic(float* src1, float* src2, float* dest, int destructive, int n);
+
+    /* Multiplies the src array with a linear ramp that starts at gain1 and ends at gain2.
+     * If gain1 == gain2, the more efficient _fScale operation is called.
+     */
+    void _fLerp(float* src, float* dest, float gain1, float gain2, int n);
+
+    /* Clamps all values in src array. */
+    void _fClamp(float *src, float min, float max, int n);
+
+    /* Fills the input buffer with white noise of the specified amplitude. */
+    void _fNoise(float *buf, float amplitude, int n);
+
+    /* Adds noise to the input signal. Overall amplitudes are preserved. 0 corresponds to no noise, 1 corresponds to "only noise". */
+    void _fNoiseAdditive(float *buf, float amount, int n);
+
+    /* Reduces the sample rate of the input signal by factor. */
+    void _fDownSample(float *buf, int factor, int n);
+
+    /* Adds jitter to the input signal. An amount of 1 corresponds to jitter of 2/samplerate. An amount of 0 corresponds to no jitter at all. */
+    void _fJitter(float *buf, float amount, int n);
+
+    /* Reduces the bit depth of the input signal. */
+    void _fBitCrush(float *buf, int bitReduction, int n);
 
     /* Evaluates y = ab^x with slope ym. x will be clamped to [0..1]. ym < 0.5 yields an exponential curve, ym > 0.5 yields a logarithmic curve. Return val will be in range [0..1]. */
     float _expCurve(float x, float ym);

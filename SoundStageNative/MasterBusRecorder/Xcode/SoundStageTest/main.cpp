@@ -15,6 +15,8 @@
 #include "Delay.h"
 #include "CompressedRingBuffer.h"
 #include "CRingBuffer.hpp"
+#include "resample.h"
+#include "Artefact.h"
 
 #define VECTORSIZE 512
 #define ITERATIONS 100000
@@ -150,7 +152,7 @@ void RingBufferPaddedWriteTest(int iterations)
     for(int i = 0; i < iterations; i++)
     {
         printv("\n\niteration %d:", i);
-        int wrt = RingBuffer_WritePadded(a, k, writeStride, x);
+        int wrt = RingBuffer_WritePadded(a, k, writeStride, INTERPOLATION_NONE, x);
         //int wrt = RingBuffer_WritePadded(a, k, writeStride, x);
         
         RingBuffer_ReadPadded(result, k, offset, readStride, x);
@@ -213,7 +215,7 @@ void BufferComparison(int iterations, float writeStride, float readStride, int r
     
     for(int i = 0; i < iterations; i++)
     {
-        RingBuffer_WritePadded(src2, dspSize, writeStride, rb);
+        RingBuffer_WritePadded(src2, dspSize, writeStride, INTERPOLATION_NONE, rb);
         RingBuffer_ReadPadded(src2, dspSize, readOffset, readStride, rb);
     }
     
@@ -232,7 +234,7 @@ void BufferComparison(int iterations, float writeStride, float readStride, int r
     for(int i = 0; i < iterations; i++)
     {
         FrameRingBuffer_Write(src3, dspSize, writeStride, fb);
-        FrameRingBuffer_Read(src3, dspSize, readOffset, readStride, fb);
+        FrameRingBuffer_Read(src3, dspSize, readOffset, readStride, INTERPOLATION_NONE, fb);
     }
     
     endTime = _wallTime();
@@ -279,11 +281,12 @@ void DelayTest(int iterations)
 {
     printv("%s\n", __func__);
     
-    int maxTime = 346;
-    int n = 64;
+    int maxTime = 480000;
+    int n = 256;
     int channels = 1;
     
     DelayData *x = Delay_New(maxTime);
+    Delay_SetParam(INTERPOLATION_LINEAR, 5, x);
     
     float buf[n];
     float temp[n];
@@ -318,16 +321,17 @@ void DelayTest(int iterations)
         }
         printv("----\n");*/
         
-        if(i % 20 == 0)
+        if(i % 2 == 0)
         {
             float f = rand() / (float)RAND_MAX;
             int delay = 1 + (int)(f * (maxTime-1));
+            //int delay = 100000;
             printv("delay : %d\n", delay);
             
             Delay_SetParam(delay, 0, x);
         }
         
-        Delay_Process(buf, n, channels, 0, 0, x);
+        Delay_Process(buf, n, channels, x);
         
         //FrameRingBuffer_Validate(x->tap);
         
@@ -643,6 +647,85 @@ void MapTest(int iterations)
     }
 }
 
+void FrameBufferStressTest(int iterations)
+{
+    int n = 44100;
+    float src[n];
+    float dest[n];
+    for(int i = 0; i < n; i++)
+    {
+        src[i] = (float)((double)rand() / INT_MAX);
+    }
+    _fZero(dest, n);
+    
+    FrameRingBuffer *x = FrameRingBuffer_New(n);
+    
+    int lower = 256;
+    int upper = 512;
+    
+    for(int i = 0; i < iterations; i++)
+    {
+        int m = (rand() % (upper - lower + 1)) + lower;
+        float sr = (float)rand()/(float)(RAND_MAX/300.0f);
+        sr += 0.0001f;
+        printv("m = %d, sr = %f\n", m, sr);
+        
+        FrameRingBuffer_Write(src, m, sr, x);
+        FrameRingBuffer_Validate(x);
+    }
+    
+    /*for(int i = 0; i < iterations; i++)
+    {
+        int m = (rand() % (upper - lower + 1)) + lower;
+        float sr = (float)rand()/(float)(RAND_MAX/1.0f);
+        int offset = (rand() % (upper - lower + 1)) + lower;
+        sr += 0.0001f;
+        printv("m = %d, sr = %f\n", m, sr);
+        
+        FrameRingBuffer_Read(src, m, -offset, sr, x);
+    }*/
+    
+    printv("===========\n");
+    FrameRingBuffer_Print(x);
+    printv("===========\n");
+    for(int i = 0; i < iterations; i++)
+    {
+        //printv("%d: ", i);
+        int m = (rand() % (upper - lower + 1)) + lower;
+        float sr = (float)rand()/(float)(RAND_MAX/300.0f);
+        int offset = (rand() % (upper - lower + 1)) + lower;
+        //FrameRingBuffer_Read(dest, 1, -n+i, 5000.0f, x);
+        FrameRingBuffer_Read(src, m, -offset, sr, INTERPOLATION_NONE, x);
+        //printv("\n");
+    }
+    
+    ///Same stride always:
+    
+    /*float sr = (float)rand()/(float)(RAND_MAX/300.0f);
+    sr += 0.0001f;
+    for(int i = 0; i < iterations; i++)
+    {
+        int m = (rand() % (upper - lower + 1)) + lower;
+        printv("m = %d, sr = %f\n", m, sr);
+        
+        FrameRingBuffer_Write(src, m, sr, x);
+        
+        //float f = 75.0f;
+        //FrameRingBuffer_Write(&f, 2, 1.0f, x);
+    }
+    
+    sr = (float)rand()/(float)(RAND_MAX/1.0f);
+    sr += 0.0001f;
+    for(int i = 0; i < iterations; i++)
+    {
+        int m = (rand() % (upper - lower + 1)) + lower;
+        int offset = (rand() % (upper - lower + 1)) + lower;
+        printv("m = %d, sr = %f\n", m, sr);
+        
+        FrameRingBuffer_Read(src, m, -offset, sr, x);
+    }*/
+}
+
 void FrameBufferTest(int iterations)
 {
     int n = 32;
@@ -659,25 +742,25 @@ void FrameBufferTest(int iterations)
     FrameRingBuffer *x = FrameRingBuffer_New(n);
     
     FrameRingBuffer_Write(src, 10, 1, x);
-    FrameRingBuffer_Validate(x);
-    FrameRingBuffer_Read(dest, 32, -1, 1, x);
-    FrameRingBuffer_Print(x);
+    //FrameRingBuffer_Validate(x);
+    FrameRingBuffer_Read(dest, 32, -1, 1, INTERPOLATION_NONE, x);
+    //FrameRingBuffer_Print(x);
     
     FrameRingBuffer_Write(src, 20, 0.9f, x);
-    FrameRingBuffer_Validate(x);
-    FrameRingBuffer_Read(dest, n, -1, 1, x);
-    FrameRingBuffer_Print(x);
+    //FrameRingBuffer_Validate(x);
+    FrameRingBuffer_Read(dest, n, -1, 1, INTERPOLATION_NONE, x);
+    //FrameRingBuffer_Print(x);
     
     FrameRingBuffer_Write(src, 24, 0.0023f, x);
-    FrameRingBuffer_Validate(x);
-    FrameRingBuffer_Read(dest, n, -1, 1, x);
-    FrameRingBuffer_Print(x);
+    //FrameRingBuffer_Validate(x);
+    FrameRingBuffer_Read(dest, n, -1, 1, INTERPOLATION_NONE, x);
+    //FrameRingBuffer_Print(x);
     
     FrameRingBuffer_Write(src, 5, 1.05f, x);
-    FrameRingBuffer_Validate(x);
-    FrameRingBuffer_Read(dest, n, -n, 1, x);
+    //FrameRingBuffer_Validate(x);
+    FrameRingBuffer_Read(dest, n, -n, 1, INTERPOLATION_NONE, x);
     
-    FrameRingBuffer_Print(x);
+    //FrameRingBuffer_Print(x);
     printv("dest array (x->ptr == %d):\n", x->ptr);
     for(int i = 0; i < n; i++)
     {
@@ -689,13 +772,34 @@ void FrameBufferTest(int iterations)
     //FrameRingBuffer_Validate(x);
     
     //FrameRingBuffer_Print(x);
+}
+
+void Xfade_Log_Test(int iterations)
+{
+    printv("%s\n", __func__);
     
+    int n = 256;
+    float src1[n];
+    float src2[n];
     
+    for(int i = 0; i < n; i++)
+    {
+        src1[i] = rand() / (float)RAND_MAX;
+        src2[i] = rand() / (float)RAND_MAX;
+        //src1[i] = 0.5f;
+        //src2[i] = 0.0f;
+    }
     
-    
-    
-    
-    
+    for(int i = 0; i < iterations; i++)
+    {
+        //_fCrossfadeLinear(src1, src2, src2, n);
+        _fCrossfadeLogarithmic(src1, src2, src2, true, n);
+        /*for(int j = 0; j < n; j++)
+        {
+            printv("%f, ", src2[j]);
+        }
+        printv("\n\n");*/
+    }
 }
 
 void MeasuredTestCase(void (*foo)(void), int iterations)
@@ -733,7 +837,7 @@ int main(int argc, const char * argv[]) {
     //CompressorTest();
     //RingBufferTest();
     //MeasuredNestedTestCase(StereoVerbTest, 1);
-    //MeasuredNestedTestCase(DelayTest, 40);
+    MeasuredNestedTestCase(DelayTest, 4000);
     //MeasuredNestedTestCase(CompressedRingBufferTest, 1000);
     //MeasuredNestedTestCase(RingBufferPaddedWriteTest, 1);
     
@@ -743,6 +847,7 @@ int main(int argc, const char * argv[]) {
     //BufferComparison(1000, 1, 1, -1000);
     
     //FrameBufferTest(1);
+    //FrameBufferStressTest(200);
     
     //MeasuredTestCase(InterleaveTest, 100000);
     //MeasuredNestedTestCase(InterleaveTest, 1);
@@ -773,18 +878,11 @@ int main(int argc, const char * argv[]) {
     //printv("w is %f\n", w);
     //printv("x is %f\n", x);
     
-    int8_t dest8[9] = {0,0,0,0,0,0,0,0,0};
-    int16_t dest16[3] = {0,0,0};
-    float f[3] = { -0.5f, 0.0f, 0.5f };
-    _float32toint16buffer(f, dest16, 3);
-    _float32toint24buffer(f, dest8, WAV_LITTLE_ENDIAN, 3);
+    //MeasuredNestedTestCase(Xfade_Log_Test, 100000);
     
-    for(int i = 0; i < 3; i++)
-    {
-        //printf("%d - %d: %d\n", i, i+2, dest16[i]);
-        printf("%d - %d: %d | %d | %d\n", i, i+2, dest8[3*i], dest8[3*i+1], dest8[3*i+2]);
-    }
+    //createResampleTable();
     
+    //Artefact_Process(NULL, 0, 0, 0);
     
     printv("Bye, World!\n");
     return 0;
