@@ -191,6 +191,9 @@ MonoBehaviour:
   ID: -1
   outputPlug: 0
   connected: {fileID: 0}
+  omniCableMat: {fileID: 2100000, guid: 41637aa3b196c8940bdc21b41301b0e2, type: 2}
+  omniCableSelectedMat: {fileID: 2100000, guid: 24c5efdae9238a94eb9ea7e05efaeb47,
+    type: 2}
   otherPlug: {fileID: 0}
   signal: {fileID: 0}
 --- !u!1 &1000010961994966
