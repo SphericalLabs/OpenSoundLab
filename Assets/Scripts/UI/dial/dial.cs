@@ -29,8 +29,11 @@ public class dial : manipObject {
 
   Material glowDiskMat, littleDiskMat, littleDiskSelectedMat, littleDiskGrabbedMat;
 
-  public float deltaRot = 0;
+  public float controllerRot = 0f;
+  public float lastControllerRot = 0;
+  public float rotAtBeginningOfGrab = 0;
   public float curRot = 0;
+  
   public float realRot = 0f;
   public float prevShakeRot = 0f;
   public float fineMult = 5f;
@@ -86,7 +89,7 @@ public class dial : manipObject {
       || (selectObj.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawButton.B))))
       {
         setPercent(defaultPercent);
-        deltaRot = controllerRot - curRot;
+        rotAtBeginningOfGrab = controllerRot - curRot;
       }
     }
 
@@ -115,7 +118,7 @@ public class dial : manipObject {
     dialFeedback.PercentUpdate();
   }
 
-  public float controllerRot = 0f;
+  
 
   // begin grab, this sets the entry rotation via deltaRot
   public override void setState(manipState state) {
@@ -132,16 +135,11 @@ public class dial : manipObject {
         if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
         _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
       }
-
+      
       Vector2 temp = dialCoordinates(manipulatorObj.up);
-      controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
-
-      //if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
-      //{
-      //  deltaRot = controllerRot - curRot * fineMult;        
-      //} else {
-        deltaRot = controllerRot - curRot;
-      //}
+      controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x); 
+      rotAtBeginningOfGrab = controllerRot - curRot;
+      lastControllerRot = (controllerRot - rotAtBeginningOfGrab) * speedUp; // update relative values here so that it doesnt jump on first grab
       
     } else if(curState == manipState.selected) {
       setMaterials(glowDiskMat, littleDiskSelectedMat);
@@ -150,24 +148,33 @@ public class dial : manipObject {
     }
   }
 
-  
-  
+
+  Vector2 dialCoordinates(Vector3 vec)
+  {
+    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
+    return new Vector2(flat.x, flat.z);
+  }
+
+  float speedUp = 1.4f;
+
   public override void grabUpdate(Transform t)
   {
     Vector2 temp = dialCoordinates(manipulatorObj.up);
-    controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
+    controllerRot = (Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - rotAtBeginningOfGrab) * speedUp;
     
-    curRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - deltaRot;
-
     // fine tune modifier
     // https://developer.oculus.com/documentation/unity/unity-ovrinput
     // only raw input worked properly
-    //if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
-    //|| (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f))
-    //  curRot /= fineMult;
+    if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
+    || (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f)) {
+      curRot += (controllerRot - lastControllerRot) / fineMult;
+    } else {
+      curRot += controllerRot - lastControllerRot;
+    }
+      
+    lastControllerRot = controllerRot;
 
     curRot = Mathf.Clamp(curRot, -150f, 150f);
-
 
     // catch naughty fliparounds, use realRot as lastRot
     if (realRot == -150f && curRot > 0f) return;
@@ -190,20 +197,14 @@ public class dial : manipObject {
       prevShakeRot = realRot;
       turnCount++;
     }
+
   }
 
 
-  Vector2 dialCoordinates(Vector3 vec)
-  {
-    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
-    return new Vector2(flat.x, flat.z);
-  }
 
 
   // code for first steps guidance below, currently not enabled
-
   int turnCount = 0;
-
   Coroutine _dialCheckRoutine;
   IEnumerator dialCheckRoutine()
   {
