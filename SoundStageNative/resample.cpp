@@ -11,6 +11,10 @@
 #include "math.h"
 #include "resample_tables.h"
 
+#ifdef _WIN32
+#define M_PI 3.14159265
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
