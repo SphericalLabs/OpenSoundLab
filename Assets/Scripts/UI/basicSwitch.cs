@@ -23,14 +23,12 @@ public class basicSwitch : manipObject {
   float rotationIncrement = 45f;
   public Transform glowTrans;
   Material mat;
-  Color customColor;
 
   public bool redOption = true;
 
   public override void Awake() {
     base.Awake();
-    mat = glowTrans.GetComponent<Renderer>().material;
-    customColor = Color.HSVToRGB(.6f, .5f, .1f);
+    mat = glowTrans.GetComponent<Renderer>().material;    
     mat.SetColor("_TintColor", Color.black);
 
     if (onLabel != null && offLabel != null) {
@@ -75,9 +73,9 @@ public class basicSwitch : manipObject {
     if (curState == manipState.none) {
       mat.SetColor("_TintColor", Color.black);
     } else if (curState == manipState.selected) {
-      mat.SetColor("_TintColor", customColor * 0.5f);
+      mat.SetColor("_TintColor", Color.white * 0.4f);
     } else if (curState == manipState.grabbed) {
-      mat.SetColor("_TintColor", customColor);
+      mat.SetColor("_TintColor", Color.white * 0.8f);
       offset = transform.InverseTransformPoint(manipulatorObj.position).z;
     }
   }

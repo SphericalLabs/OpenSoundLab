@@ -27,6 +27,8 @@ public class dial : manipObject {
   GameObject littleDisk;
   glowDisk dialFeedback;
 
+  Material glowDiskMat, littleDiskMat, littleDiskSelectedMat, littleDiskGrabbedMat;
+
   public float deltaRot = 0;
   public float curRot = 0;
   public float realRot = 0f;
@@ -45,20 +47,29 @@ public class dial : manipObject {
     littleDisk = transform.Find("littleDisk").gameObject;
     dialFeedback = transform.parent.Find("glowDisk").GetComponent<glowDisk>();
 
-    setMaterials(dialColor);
+    loadMaterials(dialColor);
+    setMaterials(glowDiskMat, littleDiskMat);
     //setGlowState(manipState.none); // no glow variant to save draw calls
 
   }
 
-  void setMaterials(dialColors colorVariant){
+  void loadMaterials(dialColors colorVariant){
     
     string str = Enum.GetName(typeof(dialColors), colorVariant); // gets the string name of the enum
 
     // Please note: setting a material using .material does not immediately instantiate a copy of that material - only if its properties are accessed!
     // Using sharedMaterial here, but the shader has alpha and therefore cannot be fully batched.
-    littleDisk.GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "LittleDisk");
-    transform.parent.Find("glowDisk").GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "GlowDisk");
 
+    glowDiskMat = Resources.Load<Material>("Materials/" + str + "GlowDisk");
+    littleDiskMat = Resources.Load<Material>("Materials/" + str + "LittleDisk");
+    littleDiskSelectedMat = Resources.Load<Material>("Materials/selectedLittleDisk");
+    littleDiskGrabbedMat = Resources.Load<Material>("Materials/grabbedLittleDisk");
+
+  }
+
+  void setMaterials(Material mat1, Material mat2){
+    littleDisk.GetComponent<Renderer>().sharedMaterial = mat2;
+    transform.parent.Find("glowDisk").GetComponent<Renderer>().sharedMaterial = mat1;
   }
 
 
@@ -112,8 +123,10 @@ public class dial : manipObject {
     //setGlowState(state);
 
     if (curState == manipState.grabbed) {
+      setMaterials(glowDiskMat, littleDiskGrabbedMat); 
+      
       turnCount = 0;
-
+      
       // trigger beginners guidance
       if (!masterControl.instance.dialUsed) { 
         if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
@@ -130,6 +143,10 @@ public class dial : manipObject {
         deltaRot = controllerRot - curRot;
       //}
       
+    } else if(curState == manipState.selected) {
+      setMaterials(glowDiskMat, littleDiskSelectedMat);
+    } else if (curState == manipState.none){
+      setMaterials(glowDiskMat, littleDiskMat);
     }
   }
 
