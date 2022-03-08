@@ -30,7 +30,7 @@
     <ProjectGuid>{0C2474D3-4453-45B3-B87D-54844668DC70}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SoundStageNative</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -236,6 +236,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Compressor.cpp" />
+    <ClCompile Include="CRingBuffer.cpp" />
     <ClCompile Include="Delay.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="FreeVerb\freeverb\components\allpass.cpp" />
@@ -244,6 +245,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MasterBusRecorder\AudioPluginUtil.cpp" />
     <ClCompile Include="MasterBusRecorder\MasterBusRecorder.cpp" />
+    <ClCompile Include="resample.cpp" />
     <ClCompile Include="RingBuffer.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
@@ -257,6 +259,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Compressor.h" />
+    <ClInclude Include="CRingBuffer.hpp" />
     <ClInclude Include="Delay.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="FreeVerb\dfx-library\dfxsmoothedvalue.h" />
@@ -266,10 +269,13 @@
     <ClInclude Include="FreeVerb\freeverb\components\comb.hpp" />
     <ClInclude Include="FreeVerb\freeverb\components\revmodel.hpp" />
     <ClInclude Include="FreeVerb\freeverb\components\tuning.h" />
+    <ClInclude Include="lookup_tables.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MasterBusRecorder\AudioPluginInterface.h" />
     <ClInclude Include="MasterBusRecorder\AudioPluginUtil.h" />
     <ClInclude Include="MasterBusRecorder\PluginList.h" />
+    <ClInclude Include="resample.h" />
+    <ClInclude Include="resample_tables.h" />
     <ClInclude Include="RingBuffer.h" />
     <ClInclude Include="StereoVerb.h" />
     <ClInclude Include="util.h" />
