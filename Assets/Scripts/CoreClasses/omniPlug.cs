@@ -457,7 +457,7 @@ public class omniPlug : manipObject {
   }
 
   public void setCableHighlighted(bool on){
-    lr.material = on ? omniCableSelectedMat : omniCableMat;
+    lr.sharedMaterial = on ? omniCableSelectedMat : omniCableMat;
   }
 
 }
