@@ -1,12 +1,8 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
-the Utilities SDK except in compliance with the License, which is provided at the time of installation
-or download, or which otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-https://developer.oculus.com/licenses/oculusmastersdk-1.0/
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -245,10 +241,11 @@ public static class OVRInput
 
 	public enum Handedness
 	{
-		Unsupported	              = OVRPlugin.Handedness.Unsupported,
+		Unsupported               = OVRPlugin.Handedness.Unsupported,
 		LeftHanded                = OVRPlugin.Handedness.LeftHanded,
 		RightHanded               = OVRPlugin.Handedness.RightHanded,
 	}
+
 
 	private static readonly float AXIS_AS_BUTTON_THRESHOLD = 0.5f;
 	private static readonly float AXIS_DEADZONE_THRESHOLD = 0.2f;
@@ -394,12 +391,15 @@ public static class OVRInput
 	/// </summary>
 	public static void FixedUpdate()
 	{
-		stepType = OVRPlugin.Step.Physics;
+		if (OVRPlugin.nativeXrApi != OVRPlugin.XrApi.OpenXR)
+		{
+			stepType = OVRPlugin.Step.Physics;
 
-		double predictionSeconds = (double)fixedUpdateCount * Time.fixedDeltaTime / Mathf.Max(Time.timeScale, 1e-6f);
-		fixedUpdateCount++;
+			double predictionSeconds = (double)fixedUpdateCount * Time.fixedDeltaTime / Mathf.Max(Time.timeScale, 1e-6f);
+			fixedUpdateCount++;
 
-		OVRPlugin.UpdateNodePhysicsPoses(0, predictionSeconds);
+			OVRPlugin.UpdateNodePhysicsPoses(0, predictionSeconds);
+		}
 	}
 
 	/// <summary>
@@ -695,6 +695,54 @@ public static class OVRInput
 			default:
 				return Vector3.zero;
 		}
+	}
+
+	/// <summary>
+	/// Gets the current position, rotation and velocity of given Controller local to its tracking space without prediction.
+	/// Only supported for Oculus LTouch and RTouch controllers, when using OpenXR backend
+	/// </summary>
+	public static bool GetLocalControllerStatesWithoutPrediction(OVRInput.Controller controllerType, out Vector3 position, out Quaternion rotation, out Vector3 velocity, out Vector3 angularVelocity)
+	{
+		position = Vector3.zero;
+		rotation = Quaternion.identity;
+		velocity = Vector3.zero;
+		angularVelocity = Vector3.zero;
+
+		if (OVRManager.loadedXRDevice != OVRManager.XRDevice.Oculus)
+			return false;
+
+		if (OVRPlugin.nativeXrApi != OVRPlugin.XrApi.OpenXR)
+			return false;
+
+		OVRPlugin.PoseStatef poseState;
+
+		switch (controllerType)
+		{
+			case Controller.LTouch:
+			case Controller.LHand:
+				poseState = OVRPlugin.GetNodePoseStateImmediate(OVRPlugin.Node.HandLeft);
+				break;
+			case Controller.RTouch:
+			case Controller.RHand:
+				poseState = OVRPlugin.GetNodePoseStateImmediate(OVRPlugin.Node.HandRight);
+				break;
+			default:
+				return false;
+		}
+
+		if (GetControllerPositionValid(controllerType))
+		{
+			position = poseState.Pose.ToOVRPose().position;
+			velocity = poseState.Velocity.FromFlippedZVector3f();
+		}
+
+		if (GetControllerOrientationValid(controllerType))
+		{
+			rotation = poseState.Pose.ToOVRPose().orientation;
+			angularVelocity = poseState.AngularVelocity.FromFlippedZVector3f();
+		}
+
+		return true;
 	}
 
 	/// <summary>
@@ -1530,6 +1578,7 @@ public static class OVRInput
 		}
 	}
 
+
 	/// <summary>
 	/// Returns the battery percentage remaining for the specified controller. Values range from 0 to 100.
 	/// Only applicable to controllers that report battery level.
@@ -2007,6 +2056,7 @@ public static class OVRInput
 		{
 			OVRPlugin.SetControllerVibration((uint)controllerType, frequency, amplitude);
 		}
+
 
 		public virtual byte GetBatteryPercentRemaining()
 		{
@@ -3021,6 +3071,7 @@ public static class OVRInput
 
 			OVR_GamepadController_SetVibration(gpcNode, gpcStrength, gpcFrequency);
 		}
+
 
 		private const string DllName = "OVRGamepad";
 

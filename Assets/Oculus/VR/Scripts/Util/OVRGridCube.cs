@@ -1,12 +1,8 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
-the Utilities SDK except in compliance with the License, which is provided at the time of installation
-or download, or which otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-https://developer.oculus.com/licenses/oculusmastersdk-1.0/
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -62,6 +58,8 @@ public class OVRGridCube : MonoBehaviour
 
 	void UpdateCubeGrid()
 	{
+		//todo: enable for Unity Input System
+#if ENABLE_LEGACY_INPUT_MANAGER
 		// Toggle the grid cube display on 'G'
 		if(Input.GetKeyDown(GridKey))
 		{
@@ -83,8 +81,9 @@ public class OVRGridCube : MonoBehaviour
 					CubeGrid.SetActive(false);
 			}
 		}
+#endif
 
-		if(CubeGrid != null)
+		if (CubeGrid != null)
 		{
 			// Set cube colors to let user know if camera is tracking
 			CubeSwitchColor = !OVRManager.tracker.isPositionTracked;
@@ -132,7 +131,7 @@ public class OVRGridCube : MonoBehaviour
 				Renderer r = cube.GetComponent<Renderer>();
 
 #if UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-                // Renderer.castShadows was deprecated starting in Unity 5.0
+				// Renderer.castShadows was deprecated starting in Unity 5.0
 				r.castShadows    = false;
 #else
 				r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;

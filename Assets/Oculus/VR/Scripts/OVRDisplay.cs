@@ -1,18 +1,15 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
-the Utilities SDK except in compliance with the License, which is provided at the time of installation
-or download, or which otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-https://developer.oculus.com/licenses/oculusmastersdk-1.0/
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 ANY KIND, either express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 ************************************************************************************/
+
 #if USING_XR_MANAGEMENT && USING_XR_SDK_OCULUS
 #define USING_XR_SDK
 #endif
@@ -165,7 +162,9 @@ public class OVRDisplay
 			currentInputSubsystem.TryRecenter();
 		}
 #elif !REQUIRES_XR_SDK
+#pragma warning disable 618
 		InputTracking.Recenter();
+#pragma warning restore 618
 #endif
 
 		// The current poses are cached for the current frame and won't be updated immediately
@@ -196,14 +195,14 @@ public class OVRDisplay
 		}
 	}
 
-    /// <summary>
-    /// Gets the current angular acceleration of the head in radians per second per second about each axis.
-    /// </summary>
-    public Vector3 angularAcceleration
-    {
-        get
-        {
-            if (!OVRManager.isHmdPresent)
+	/// <summary>
+	/// Gets the current angular acceleration of the head in radians per second per second about each axis.
+	/// </summary>
+	public Vector3 angularAcceleration
+	{
+		get
+		{
+			if (!OVRManager.isHmdPresent)
 				return Vector3.zero;
 
 			Vector3 retVec = Vector3.zero;
@@ -211,25 +210,25 @@ public class OVRDisplay
 				return retVec;
 			return Vector3.zero;
 
-        }
-    }
+		}
+	}
 
-    /// <summary>
-    /// Gets the current linear velocity of the head in meters per second.
-    /// </summary>
-    public Vector3 velocity
-    {
-        get
-        {
-            if (!OVRManager.isHmdPresent)
-                return Vector3.zero;
+	/// <summary>
+	/// Gets the current linear velocity of the head in meters per second.
+	/// </summary>
+	public Vector3 velocity
+	{
+		get
+		{
+			if (!OVRManager.isHmdPresent)
+				return Vector3.zero;
 
 			Vector3 retVec = Vector3.zero;
 			if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.Head, NodeStatePropertyType.Velocity, OVRPlugin.Node.Head, OVRPlugin.Step.Render, out retVec))
 				return retVec;
 			return Vector3.zero;
 		}
-    }
+	}
 
 	/// <summary>
 	/// Gets the current angular velocity of the head in radians per second about each axis.
@@ -250,7 +249,7 @@ public class OVRDisplay
 	/// <summary>
 	/// Gets the resolution and field of view for the given eye.
 	/// </summary>
-    public EyeRenderDesc GetEyeRenderDesc(UnityEngine.XR.XRNode eye)
+	public EyeRenderDesc GetEyeRenderDesc(UnityEngine.XR.XRNode eye)
 	{
 		return eyeDescs[(int)eye];
 	}
@@ -264,21 +263,21 @@ public class OVRDisplay
 			if (!OVRManager.isHmdPresent)
 				return new LatencyData();
 
-            string latency = OVRPlugin.latency;
+			string latency = OVRPlugin.latency;
 
-            var r = new Regex("Render: ([0-9]+[.][0-9]+)ms, TimeWarp: ([0-9]+[.][0-9]+)ms, PostPresent: ([0-9]+[.][0-9]+)ms", RegexOptions.None);
+			var r = new Regex("Render: ([0-9]+[.][0-9]+)ms, TimeWarp: ([0-9]+[.][0-9]+)ms, PostPresent: ([0-9]+[.][0-9]+)ms", RegexOptions.None);
 
-            var ret = new LatencyData();
+			var ret = new LatencyData();
 
-            Match match = r.Match(latency);
-            if (match.Success)
-            {
-                ret.render = float.Parse(match.Groups[1].Value);
-                ret.timeWarp = float.Parse(match.Groups[2].Value);
-                ret.postPresent = float.Parse(match.Groups[3].Value);
-            }
+			Match match = r.Match(latency);
+			if (match.Success)
+			{
+				ret.render = float.Parse(match.Groups[1].Value);
+				ret.timeWarp = float.Parse(match.Groups[2].Value);
+				ret.postPresent = float.Parse(match.Groups[3].Value);
+			}
 
-            return ret;
+			return ret;
 		}
 	}
 

@@ -1,12 +1,8 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
-the Utilities SDK except in compliance with the License, which is provided at the time of installation
-or download, or which otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-https://developer.oculus.com/licenses/oculusmastersdk-1.0/
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -24,11 +20,13 @@ public class OVRManagerEditor : Editor
 {
 	override public void OnInspectorGUI()
 	{
+		OVRRuntimeSettings runtimeSettings = OVRRuntimeSettings.GetRuntimeSettings();
+
 #if UNITY_ANDROID
 		OVRProjectConfig projectConfig = OVRProjectConfig.GetProjectConfig();
-        OVRProjectConfigEditor.DrawTargetDeviceInspector(projectConfig);
+		OVRProjectConfigEditor.DrawTargetDeviceInspector(projectConfig);
 
-        EditorGUILayout.Space();
+		EditorGUILayout.Space();
 #endif
 
 		DrawDefaultInspector();
@@ -40,13 +38,17 @@ public class OVRManagerEditor : Editor
 
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField("Display", EditorStyles.boldLabel);
-		OVREditorUtil.SetupBoolField(target, new GUIContent("Enable Specific Color Gamut",
-			"If checked, the target HMD will perform a color space transformation"), ref manager.enableColorGamut, ref modified);
 
-		if (manager.enableColorGamut)
+		OVRManager.ColorSpace colorGamut = runtimeSettings.colorSpace;
+		OVREditorUtil.SetupEnumField(target, new GUIContent("Color Gamut",
+			"The target color gamut when displayed on the HMD"), ref colorGamut, ref modified,
+			"https://developer.oculus.com/documentation/unity/unity-color-space/");
+		manager.colorGamut = colorGamut;
+
+		if (modified)
 		{
-			OVREditorUtil.SetupEnumField(target, new GUIContent("Color Gamut",
-			"The target color gamut when displayed on the HMD"), ref manager.colorGamut, ref modified);
+			runtimeSettings.colorSpace = colorGamut;
+			OVRRuntimeSettings.CommitRuntimeSettings(runtimeSettings);
 		}
 #endif
 
@@ -55,7 +57,7 @@ public class OVRManagerEditor : Editor
         OVRProjectConfigEditor.DrawProjectConfigInspector(projectConfig);
 
 		EditorGUILayout.Space();
-		EditorGUILayout.LabelField("Mixed Reality Capture for Quest (experimental)", EditorStyles.boldLabel);
+		EditorGUILayout.LabelField("Mixed Reality Capture for Quest", EditorStyles.boldLabel);
 		EditorGUI.indentLevel++;
 		OVREditorUtil.SetupEnumField(target, "ActivationMode", ref manager.mrcActivationMode, ref modified);
 		EditorGUI.indentLevel--;
@@ -63,8 +65,10 @@ public class OVRManagerEditor : Editor
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 		EditorGUILayout.Space();
-		EditorGUILayout.LabelField("Mixed Reality Capture", EditorStyles.boldLabel);
-		OVREditorUtil.SetupBoolField(target, "Show Properties", ref manager.expandMixedRealityCapturePropertySheet, ref modified);
+		EditorGUILayout.BeginHorizontal();
+		manager.expandMixedRealityCapturePropertySheet = EditorGUILayout.BeginFoldoutHeaderGroup(manager.expandMixedRealityCapturePropertySheet, "Mixed Reality Capture");
+		OVREditorUtil.DisplayDocLink("https://developer.oculus.com/documentation/unity/unity-mrc/");
+		EditorGUILayout.EndHorizontal();
 		if (manager.expandMixedRealityCapturePropertySheet)
 		{
 			string[] layerMaskOptions = new string[32];
@@ -79,10 +83,11 @@ public class OVRManagerEditor : Editor
 
 			EditorGUI.indentLevel++;
 
-			EditorGUILayout.Space();
 			OVREditorUtil.SetupBoolField(target, "enableMixedReality", ref manager.enableMixedReality, ref modified);
 			OVREditorUtil.SetupEnumField(target, "compositionMethod", ref manager.compositionMethod, ref modified);
 			OVREditorUtil.SetupLayerMaskField(target, "extraHiddenLayers", ref manager.extraHiddenLayers, layerMaskOptions, ref modified);
+			OVREditorUtil.SetupLayerMaskField(target, "extraVisibleLayers", ref manager.extraVisibleLayers, layerMaskOptions, ref modified);
+			OVREditorUtil.SetupBoolField(target, "dynamicCullingMask", ref manager.dynamicCullingMask, ref modified);
 
 			if (manager.compositionMethod == OVRManager.CompositionMethod.External)
 			{
@@ -92,6 +97,7 @@ public class OVRManagerEditor : Editor
 
 				OVREditorUtil.SetupColorField(target, "backdropColor (target, Rift)", ref manager.externalCompositionBackdropColorRift, ref modified);
 				OVREditorUtil.SetupColorField(target, "backdropColor (target, Quest)", ref manager.externalCompositionBackdropColorQuest, ref modified);
+				EditorGUI.indentLevel--;
 			}
 
 			if (manager.compositionMethod == OVRManager.CompositionMethod.Direct)
@@ -137,10 +143,33 @@ public class OVRManagerEditor : Editor
 			EditorGUI.indentLevel--;
 		}
 #endif
-        if (modified)
-        {
-            EditorUtility.SetDirty(target);
-        }
+
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_ANDROID
+		// Insight Passthrough section
+#if UNITY_ANDROID
+		bool passthroughCapabilityEnabled = projectConfig.insightPassthroughEnabled;
+		EditorGUI.BeginDisabledGroup(!passthroughCapabilityEnabled);
+		GUIContent enablePassthroughContent = new GUIContent("Enable Passthrough", "Enables passthrough functionality for the scene. Can be toggled at runtime. Passthrough Capability must be enabled in the project settings.");
+#else
+		GUIContent enablePassthroughContent = new GUIContent("Enable Passthrough", "Enables passthrough functionality for the scene. Can be toggled at runtime.");
+#endif
+		EditorGUILayout.Space();
+		EditorGUILayout.LabelField("Insight Passthrough", EditorStyles.boldLabel);
+#if UNITY_ANDROID
+		if (!passthroughCapabilityEnabled) {
+			EditorGUILayout.LabelField("Requires Passthrough Capability to be enabled in the General section of the Quest features.", EditorStyles.wordWrappedLabel);
+		}
+#endif
+		OVREditorUtil.SetupBoolField(target, enablePassthroughContent, ref manager.isInsightPassthroughEnabled, ref modified);
+#if UNITY_ANDROID
+		EditorGUI.EndDisabledGroup();
+#endif
+#endif
+
+		if (modified)
+		{
+			EditorUtility.SetDirty(target);
+		}
 	}
 
 }

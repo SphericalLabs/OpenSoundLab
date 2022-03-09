@@ -86,7 +86,6 @@ class OVREngineConfigurationUpdater
 
 		OVRPlugin.AddCustomMetadata("build_target", EditorUserBuildSettings.activeBuildTarget.ToString());
 		EnforceAndroidSettings();
-		EnforceInputManagerBindings();
 	}
 
 	static void OnUpdate()
@@ -112,7 +111,9 @@ class OVREngineConfigurationUpdater
 		}
 
 #if !USING_XR_SDK && !REQUIRES_XR_SDK
+#pragma warning disable 618
 		if (!PlayerSettings.virtualRealitySupported)
+#pragma warning restore 618
 		{
 			// NOTE: This value should not affect the main window surface
 			// when Built-in VR support is enabled.
@@ -141,7 +142,9 @@ class OVREngineConfigurationUpdater
 	static void EnforceVRSupport()
 	{
 #if !USING_XR_SDK && !REQUIRES_XR_SDK
+#pragma warning disable 618
 		if (PlayerSettings.virtualRealitySupported)
+#pragma warning restore 618
 			return;
 		
 		var mgrs = GameObject.FindObjectsOfType<OVRManager>();
@@ -150,7 +153,9 @@ class OVREngineConfigurationUpdater
 			if (mgrs [i].isActiveAndEnabled)
 			{
 				Debug.Log ("Enabling Unity VR support");
+#pragma warning disable 618
 				PlayerSettings.virtualRealitySupported = true;
+#pragma warning restore 618
 
 				bool oculusFound = false;
 				foreach (var device in UnityEngine.XR.XRSettings.supportedDevices)
@@ -167,110 +172,29 @@ class OVREngineConfigurationUpdater
 
 	private static void EnforceBundleId()
 	{
-		bool shouldEnforceBundleId = false;
-#if USING_XR_SDK
-		shouldEnforceBundleId = true;
-#elif !REQUIRES_XR_SDK
-		if (PlayerSettings.virtualRealitySupported)
-			shouldEnforceBundleId = true;
-#endif
-
-		if (shouldEnforceBundleId)
+#if !USING_XR_SDK && !REQUIRES_XR_SDK
+#pragma warning disable 618
+		if (!PlayerSettings.virtualRealitySupported)
 		{
-			if (PlayerSettings.applicationIdentifier == "" || PlayerSettings.applicationIdentifier == "com.Company.ProductName")
-			{
-				string defaultBundleId = "com.oculus.UnitySample";
-				Debug.LogWarning("\"" + PlayerSettings.applicationIdentifier + "\" is not a valid bundle identifier. Defaulting to \"" + defaultBundleId + "\".");
-				PlayerSettings.applicationIdentifier = defaultBundleId;
-			}
+			return;
 		}
+#pragma warning restore 618
+#endif
+		
+#if USING_XR_SDK || !REQUIRES_XR_SDK
+		if (PlayerSettings.applicationIdentifier == "" || PlayerSettings.applicationIdentifier == "com.Company.ProductName")
+		{
+			string defaultBundleId = "com.oculus.UnitySample";
+			Debug.LogWarning("\"" + PlayerSettings.applicationIdentifier + "\" is not a valid bundle identifier. Defaulting to \"" + defaultBundleId + "\".");
+			PlayerSettings.applicationIdentifier = defaultBundleId;
+		}
+#endif
 	}
 
 	private static void EnforceInstallLocation()
 	{
 		if (PlayerSettings.Android.preferredInstallLocation != AndroidPreferredInstallLocation.Auto)
 			PlayerSettings.Android.preferredInstallLocation = AndroidPreferredInstallLocation.Auto;
-	}
-
-	private static void EnforceInputManagerBindings()
-	{
-		try
-		{
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_Button2", positiveButton = "joystick button 0", gravity = 1000f, sensitivity = 1000f, type = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_Button4", positiveButton = "joystick button 2", gravity = 1000f, sensitivity = 1000f, type = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_PrimaryThumbstick", positiveButton = "joystick button 8", gravity = 0f, dead = 0f, sensitivity = 0.1f, type = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_SecondaryThumbstick", positiveButton = "joystick button 9", gravity = 0f, dead = 0f, sensitivity = 0.1f, type = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_PrimaryIndexTrigger", dead = 0.19f, type = 2, axis = 8, joyNum = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_SecondaryIndexTrigger", dead = 0.19f, type = 2, axis = 9, joyNum = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_PrimaryHandTrigger", dead = 0.19f, type = 2, axis = 10, joyNum = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_SecondaryHandTrigger", dead = 0.19f, type = 2, axis = 11, joyNum = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_PrimaryThumbstickHorizontal", dead = 0.19f, type = 2, axis = 0, joyNum = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_PrimaryThumbstickVertical", dead = 0.19f, type = 2, axis = 1, joyNum = 0, invert = true });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_SecondaryThumbstickHorizontal", dead = 0.19f, type = 2, axis = 3, joyNum = 0 });
-			BindAxis(new Axis() { name = "Oculus_CrossPlatform_SecondaryThumbstickVertical", dead = 0.19f, type = 2, axis = 4, joyNum = 0, invert = true });
-		}
-		catch
-		{
-			Debug.LogError("Failed to apply Oculus input manager bindings.");
-		}
-	}
-
-	private class Axis
-	{
-		public string name = String.Empty;
-		public string descriptiveName = String.Empty;
-		public string descriptiveNegativeName = String.Empty;
-		public string negativeButton = String.Empty;
-		public string positiveButton = String.Empty;
-		public string altNegativeButton = String.Empty;
-		public string altPositiveButton = String.Empty;
-		public float gravity = 0.0f;
-		public float dead = 0.001f;
-		public float sensitivity = 1.0f;
-		public bool snap = false;
-		public bool invert = false;
-		public int type = 2;
-		public int axis = 0;
-		public int joyNum = 0;
-	}
-
-	private static void BindAxis(Axis axis)
-	{
-		SerializedObject serializedObject = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/InputManager.asset")[0]);
-		SerializedProperty axesProperty = serializedObject.FindProperty("m_Axes");
-
-		SerializedProperty axisIter = axesProperty.Copy();
-		axisIter.Next(true);
-		axisIter.Next(true);
-		while (axisIter.Next(false))
-		{
-			if (axisIter.FindPropertyRelative("m_Name").stringValue == axis.name)
-			{
-				// Axis already exists. Don't create binding.
-				return;
-			}
-		}
-
-		axesProperty.arraySize++;
-		serializedObject.ApplyModifiedProperties();
-
-		SerializedProperty axisProperty = axesProperty.GetArrayElementAtIndex(axesProperty.arraySize - 1);
-		axisProperty.FindPropertyRelative("m_Name").stringValue = axis.name;
-		axisProperty.FindPropertyRelative("descriptiveName").stringValue = axis.descriptiveName;
-		axisProperty.FindPropertyRelative("descriptiveNegativeName").stringValue = axis.descriptiveNegativeName;
-		axisProperty.FindPropertyRelative("negativeButton").stringValue = axis.negativeButton;
-		axisProperty.FindPropertyRelative("positiveButton").stringValue = axis.positiveButton;
-		axisProperty.FindPropertyRelative("altNegativeButton").stringValue = axis.altNegativeButton;
-		axisProperty.FindPropertyRelative("altPositiveButton").stringValue = axis.altPositiveButton;
-		axisProperty.FindPropertyRelative("gravity").floatValue = axis.gravity;
-		axisProperty.FindPropertyRelative("dead").floatValue = axis.dead;
-		axisProperty.FindPropertyRelative("sensitivity").floatValue = axis.sensitivity;
-		axisProperty.FindPropertyRelative("snap").boolValue = axis.snap;
-		axisProperty.FindPropertyRelative("invert").boolValue = axis.invert;
-		axisProperty.FindPropertyRelative("type").intValue = axis.type;
-		axisProperty.FindPropertyRelative("axis").intValue = axis.axis;
-		axisProperty.FindPropertyRelative("joyNum").intValue = axis.joyNum;
-		serializedObject.ApplyModifiedProperties();
 	}
 }
 

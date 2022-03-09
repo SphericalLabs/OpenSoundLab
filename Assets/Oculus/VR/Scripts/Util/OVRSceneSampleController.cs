@@ -1,12 +1,8 @@
 /************************************************************************************
 Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
 
-Licensed under the Oculus Master SDK License Version 1.0 (the "License"); you may not use
-the Utilities SDK except in compliance with the License, which is provided at the time of installation
-or download, or which otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-https://developer.oculus.com/licenses/oculusmastersdk-1.0/
+Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
+https://developer.oculus.com/licenses/oculussdk/
 
 Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -137,8 +133,10 @@ public class OVRSceneSampleController : MonoBehaviour
         if (playerController != null)
             UpdateSpeedAndRotationScaleMultiplier();
 
-        // Toggle Fullscreen
-        if (Input.GetKeyDown(KeyCode.F11))
+		//todo: enable for Unity Input System
+#if ENABLE_LEGACY_INPUT_MANAGER
+		// Toggle Fullscreen
+		if (Input.GetKeyDown(KeyCode.F11))
             Screen.fullScreen = !Screen.fullScreen;
 
         if (Input.GetKeyDown(KeyCode.M))
@@ -149,19 +147,23 @@ public class OVRSceneSampleController : MonoBehaviour
         if (Input.GetKeyDown(quitKey))
             Application.Quit();
 #endif
+#endif
     }
-    #endregion
+#endregion
 
     /// <summary>
     /// Updates the vision mode.
     /// </summary>
     void UpdateVisionMode()
     {
-        if (Input.GetKeyDown(KeyCode.F2))
+		//todo: enable for Unity Input System
+#if ENABLE_LEGACY_INPUT_MANAGER
+		if (Input.GetKeyDown(KeyCode.F2))
         {
             visionMode ^= visionMode;
             OVRManager.tracker.isEnabled = visionMode;
         }
+#endif
     }
 
     /// <summary>
@@ -172,7 +174,9 @@ public class OVRSceneSampleController : MonoBehaviour
         float moveScaleMultiplier = 0.0f;
         playerController.GetMoveScaleMultiplier(ref moveScaleMultiplier);
 
-        if (Input.GetKeyDown(KeyCode.Alpha7))
+		//todo: enable for Unity Input System
+#if ENABLE_LEGACY_INPUT_MANAGER
+		if (Input.GetKeyDown(KeyCode.Alpha7))
         {
             moveScaleMultiplier -= speedRotationIncrement;
         }
@@ -180,13 +184,16 @@ public class OVRSceneSampleController : MonoBehaviour
         {
             moveScaleMultiplier += speedRotationIncrement;
         }
+#endif
 
         playerController.SetMoveScaleMultiplier(moveScaleMultiplier);
 
         float rotationScaleMultiplier = 0.0f;
         playerController.GetRotationScaleMultiplier(ref rotationScaleMultiplier);
 
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+		//todo: enable for Unity Input System
+#if ENABLE_LEGACY_INPUT_MANAGER
+		if (Input.GetKeyDown(KeyCode.Alpha9))
         {
             rotationScaleMultiplier -= speedRotationIncrement;
         }
@@ -194,6 +201,7 @@ public class OVRSceneSampleController : MonoBehaviour
         {
             rotationScaleMultiplier += speedRotationIncrement;
         }
+#endif
 
         playerController.SetRotationScaleMultiplier(rotationScaleMultiplier);
     }
@@ -203,7 +211,10 @@ public class OVRSceneSampleController : MonoBehaviour
     /// </summary>
     void UpdateRecenterPose()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+		//todo: enable for Unity Input System
+#if ENABLE_LEGACY_INPUT_MANAGER
+		if (Input.GetKeyDown(KeyCode.R))
             OVRManager.display.RecenterPose();
+#endif
     }
 }

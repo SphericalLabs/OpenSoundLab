@@ -35,7 +35,7 @@ public class platformSetup : MonoBehaviour {
       manips[0].transform.parent.localPosition = Vector3.zero;
       manips[1].transform.parent.localPosition = Vector3.zero;
 
-      if (UnityEngine.XR.XRSettings.loadedDeviceName == "Oculus") oculusSwitch();
+      /*if (UnityEngine.XR.XRSettings.loadedDeviceName == "Oculus")*/  oculusSwitch();
 
       manips[0].SetDeviceIndex(0);
       manips[1].SetDeviceIndex(1);
