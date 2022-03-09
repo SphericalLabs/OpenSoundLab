@@ -188,6 +188,7 @@ public class menuManager : MonoBehaviour {
       transform.position = pad.position;
       Vector3 camPos = Camera.main.transform.position;
       camPos.y -= .2f;
+      camPos.x += 0.01f; // half eye distance, so that it centers of middle of both eyes
       transform.LookAt(camPos, Vector3.up);
     }
     else {
