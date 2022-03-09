@@ -274,6 +274,14 @@ public class menuItem : manipObject {
     if (item == deviceType.Multiple) {
       g.transform.localPosition = new Vector3(.0185f, 0, .02f);
     }
+    if (item == deviceType.MultiMix)
+    {
+      g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+    }
+    if (item == deviceType.MultiSplit)
+    {
+      g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+    }
     if (item == deviceType.Sequencer) {
       g.transform.localScale = Vector3.one * .166f;
     }
