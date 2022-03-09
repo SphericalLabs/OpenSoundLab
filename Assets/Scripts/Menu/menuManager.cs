@@ -102,6 +102,19 @@ public class menuManager : MonoBehaviour {
       if ((menuItem.deviceType)i == menuItem.deviceType.Looper) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Reverb) continue;
 
+      // MultiMix and MultiSplit hack, want to have Multiple available for loading, but not in the menu palette
+      if ((menuItem.deviceType)i == menuItem.deviceType.Multiple) 
+      {
+        GameObject tmpObj2 = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
+        tmpObj2.transform.parent = rootNode.transform;
+        //menuItems.Add(tmpObj2);
+        menuItem m2 = tmpObj2.GetComponent<menuItem>();
+        refObjects[(menuItem.deviceType)i] = m2.Setup((menuItem.deviceType)i);
+        //menuItemScripts.Add(m); 
+        tmpObj2.SetActive(false);
+        continue; 
+      }
+
 
       if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue; // skip for windows, too, throws error otherwise
 

@@ -53,7 +53,9 @@ public class menuItem : manipObject {
     MIDIIN,
     MIDIOUT,
     Mixer,
-    Multiple,
+    Multiple, // Only MultiMix and MultiSplit are shown in the menu palette, but they will be serialized and loaded as preconfigured Multiples on save/load
+    MultiMix,
+    MultiSplit,
     Noise,
     Oscillator,
     Quantizer,

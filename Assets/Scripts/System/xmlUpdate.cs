@@ -84,6 +84,12 @@ public class xmlUpdate {
             case "Multiples":
               serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
+            case "MultiMixes":
+              serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "MultiSplits":
+              serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             case "Recorders":
               serializer = new XmlSerializer(typeof(RecorderData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;

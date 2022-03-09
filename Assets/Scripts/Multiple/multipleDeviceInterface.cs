@@ -30,14 +30,14 @@ public class multipleDeviceInterface : deviceInterface {
 
   int count = 0;
 
-  bool flow = true;
+  public bool isSplitter = true;
 
   public Material mixerMaterial;
   public Material splitterMaterial;
 
   public override void Awake() {
     signal = GetComponent<multipleSignalGenerator>();
-    flowSwitch = GetComponentInChildren<basicSwitch>();
+    //flowSwitch = GetComponentInChildren<basicSwitch>();
     signal.nodes = new List<multipleNodeSignalGenerator>();
 
     symbolA.sharedMaterial = mixerMaterial;
@@ -47,6 +47,7 @@ public class multipleDeviceInterface : deviceInterface {
 
     count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
     updateSplitterCount();
+    setFlow(isSplitter, true); // reads in default value from the prefab to enable MultiMix and MultiSplit
   }
 
   void updateSplitterCount() {
@@ -54,7 +55,7 @@ public class multipleDeviceInterface : deviceInterface {
     if (count > cur) {
       for (int i = 0; i < count - cur; i++) {
         multipleNodeSignalGenerator s = (Instantiate(splitterNodePrefab, transform, false) as GameObject).GetComponent<multipleNodeSignalGenerator>();
-        s.setup(signal, flow);
+        s.setup(signal, isSplitter);
         signal.nodes.Add(s);
         s.transform.localPosition = new Vector3(-.04f * signal.nodes.Count, 0, 0);
       }
@@ -73,11 +74,11 @@ public class multipleDeviceInterface : deviceInterface {
     handleB.localScale = new Vector3(.04f * (signal.nodes.Count + 1), 0.04f, 0.04f);
   }
 
-  void setFlow(bool on) {
-    if (flow == on) return;
-    flow = on;
+  void setFlow(bool on, bool init = false) {
+    if (isSplitter == on && !init) return;
+    isSplitter = on;
 
-    if (flow) {
+    if (isSplitter) {
       symbolA.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
       symbolA.transform.localRotation = Quaternion.Euler(0, 180, 0);
       symbolA.sharedMaterial = mixerMaterial;
@@ -104,12 +105,12 @@ public class multipleDeviceInterface : deviceInterface {
       output.signal = null;
     }
 
-    input.outgoing = !flow;
-    output.outgoing = flow;
+    input.outgoing = !isSplitter;
+    output.outgoing = isSplitter;
 
-    for (int i = 0; i < signal.nodes.Count; i++) signal.nodes[i].setFlow(flow);
+    for (int i = 0; i < signal.nodes.Count; i++) signal.nodes[i].setFlow(isSplitter);
 
-    signal.setFlow(flow);
+    signal.setFlow(isSplitter);
   }
 
   void Update() {
@@ -118,14 +119,14 @@ public class multipleDeviceInterface : deviceInterface {
     count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
     if (count != signal.nodes.Count) updateSplitterCount();
 
-    if (flow) {
+    if (isSplitter) {
       if (signal.incoming != input.signal) signal.incoming = input.signal;
     } else if (signal.incoming != output.signal) signal.incoming = output.signal;
 
 
-    if (flowSwitch.switchVal != flow) {
-      setFlow(flowSwitch.switchVal);
-    }
+    //if (flowSwitch.switchVal != isSplitter) {
+    //  setFlow(flowSwitch.switchVal);
+    //}
   }
 
   public override InstrumentData GetData() {
@@ -133,7 +134,7 @@ public class multipleDeviceInterface : deviceInterface {
     data.deviceType = menuItem.deviceType.Multiple;
     GetTransformData(data);
 
-    data.flowDir = flow;
+    data.isSplitter = isSplitter;
     data.jackInID = input.transform.GetInstanceID();
 
     data.jackCount = count + 1;
@@ -154,8 +155,8 @@ public class multipleDeviceInterface : deviceInterface {
 
     input.ID = data.jackInID;
 
-    setFlow(data.flowDir);
-    flowSwitch.setSwitch(flow);
+    setFlow(data.isSplitter);
+    //flowSwitch.setSwitch(isSplitter);
 
     if (data.jackCount < 2) {
       count = 1;
@@ -184,7 +185,7 @@ public class multipleDeviceInterface : deviceInterface {
 }
 
 public class MultipleData : InstrumentData {
-  public bool flowDir;
+  public bool isSplitter;
   public int jackOutAID;
   public int jackOutBID;
   public int jackCount;
