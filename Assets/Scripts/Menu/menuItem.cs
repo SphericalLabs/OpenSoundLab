@@ -61,6 +61,7 @@ public class menuItem : manipObject {
     Quantizer,
     Recorder,
     Reverb,
+    StereoVerb, // shown as Reverb
     SampleHold,
     Sampler,
     SARSCov2,
@@ -69,7 +70,6 @@ public class menuItem : manipObject {
     SequencerCV,
     Speaker,    
     Stereo,
-    StereoVerb,    
     Tapes,
     Timeline,
     TouchPad,
@@ -128,7 +128,7 @@ public class menuItem : manipObject {
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.SampleHold) label.text = "Sample / Hold";
     if (item == deviceType.Reverb) label.text = "Reverb";
-    if (item == deviceType.StereoVerb) label.text = "Freeverb";
+    if (item == deviceType.StereoVerb) label.text = "Reverb";
     if (item == deviceType.Quantizer) label.text = "Quant. / Trans.";
 
 
