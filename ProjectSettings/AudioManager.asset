@@ -12,6 +12,7 @@ AudioManager:
   m_DSPBufferSize: 256
   m_VirtualVoiceCount: 512
   m_RealVoiceCount: 64
+  m_EnableOutputSuspension: 0
   m_SpatializerPlugin: OculusSpatializer
   m_AmbisonicDecoderPlugin: OculusSpatializer
   m_DisableAudio: 0
