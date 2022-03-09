@@ -83,11 +83,17 @@ public class omniJack : manipObject {
 
         plugRep.SetActive(false);
       }
+      if(near != null) near.setCableHighlighted(true);
+      if(far != null) far.setCableHighlighted(true);
     }
 
     if (curState == manipState.none) {
       if (near == null) dimCoroutine = StartCoroutine(dimRoutine());
       else near.mouseoverEvent(false);
+
+      if (near != null) near.setCableHighlighted(false);
+      if (far != null) far.setCableHighlighted(false);
+
     } else if (curState == manipState.selected) {
       if (dimCoroutine != null) StopCoroutine(dimCoroutine);
       //jackColor = Color.HSVToRGB(findHue(), 0.8f, 0.2f);
@@ -96,6 +102,8 @@ public class omniJack : manipObject {
 
       if (near == null) plugRep.SetActive(true);
       else near.mouseoverEvent(true);
+      if (near != null) near.setCableHighlighted(true);
+      if (far != null) far.setCableHighlighted(true);
     }
   }
 

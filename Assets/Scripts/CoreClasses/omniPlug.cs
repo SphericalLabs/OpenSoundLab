@@ -25,6 +25,7 @@ public class omniPlug : manipObject {
 
   Color cordColor;
   LineRenderer lr;
+  public Material omniCableMat, omniCableSelectedMat;
   //Material mat;
 
   Transform plugTrans;
@@ -46,6 +47,7 @@ public class omniPlug : manipObject {
     gameObject.layer = 12; //jacks
     //mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
     lr = GetComponent<LineRenderer>();
+
     cordColor = new Color(Random.value, Random.value, Random.value);
     //lr.material.SetColor("_TintColor", cordColor);
     //mat.SetColor("_TintColor", cordColor);
@@ -431,11 +433,15 @@ public class omniPlug : manipObject {
 
     if (curState == manipState.none) {
       updateForceWireShow(false);
+      setCableHighlighted(false);
+      if (otherPlug != null) otherPlug.setCableHighlighted(false);
     }
 
     if (curState == manipState.selected) {
       updateForceWireShow(true);
       mouseoverFeedback.SetActive(true);
+      setCableHighlighted(true);
+      if (otherPlug != null) otherPlug.setCableHighlighted(true);
     }
 
     if (curState == manipState.grabbed) {
@@ -445,6 +451,13 @@ public class omniPlug : manipObject {
       transform.parent = manipulatorObj;
       updateJackList();
       foreach (omniJack j in targetJackList) j.flash(cordColor);
+      setCableHighlighted(true);
+      if (otherPlug != null) otherPlug.setCableHighlighted(true);
     }
   }
+
+  public void setCableHighlighted(bool on){
+    lr.sharedMaterial = on ? omniCableSelectedMat : omniCableMat;
+  }
+
 }

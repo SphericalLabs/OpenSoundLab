@@ -36,6 +36,7 @@ public class menuItem : manipObject {
     AD,
     ADSR,
     Airhorn,
+    Artefact,
     Camera,
     Compressor,
     ControlCube,
@@ -52,12 +53,15 @@ public class menuItem : manipObject {
     MIDIIN,
     MIDIOUT,
     Mixer,
-    Multiple,
+    Multiple, // Only MultiMix and MultiSplit are shown in the menu palette, but they will be serialized and loaded as preconfigured Multiples on save/load
+    MultiMix,
+    MultiSplit,
     Noise,
     Oscillator,
     Quantizer,
     Recorder,
     Reverb,
+    StereoVerb, // shown as Reverb
     SampleHold,
     Sampler,
     SARSCov2,
@@ -66,7 +70,6 @@ public class menuItem : manipObject {
     SequencerCV,
     Speaker,    
     Stereo,
-    StereoVerb,    
     Tapes,
     Timeline,
     TouchPad,
@@ -125,7 +128,7 @@ public class menuItem : manipObject {
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.SampleHold) label.text = "Sample / Hold";
     if (item == deviceType.Reverb) label.text = "Reverb";
-    if (item == deviceType.StereoVerb) label.text = "Freeverb";
+    if (item == deviceType.StereoVerb) label.text = "Reverb";
     if (item == deviceType.Quantizer) label.text = "Quant. / Trans.";
 
 
@@ -269,6 +272,14 @@ public class menuItem : manipObject {
       //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
     if (item == deviceType.Multiple) {
+      g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+    }
+    if (item == deviceType.MultiMix)
+    {
+      g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+    }
+    if (item == deviceType.MultiSplit)
+    {
       g.transform.localPosition = new Vector3(.0185f, 0, .02f);
     }
     if (item == deviceType.Sequencer) {

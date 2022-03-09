@@ -86,6 +86,7 @@ public class handle : manipObject {
 
   bool scaling = false;
   public override void grabUpdate(Transform t) {
+    
     if (otherHandle.curState == manipState.grabbed) {
       if (ID == 1) {
         scaleUpdate();

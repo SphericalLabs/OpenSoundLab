@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include "lookup_tables.h"
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
 #include <sys/time.h>
 #endif
@@ -110,6 +111,11 @@ extern "C" {
       return t > max ? max : t;
     }
     
+    float _interpolate_linear(float a, float b, float frac)
+    {
+        return a + frac * (b - a); //bc (1-c)a + cb = a + c(b-a)
+    }
+    
     inline int16_t _float32toint16(float f)
     {
         return ((int32_t)(f * 32760.0f + 32768.5f)) - 32768;
@@ -163,19 +169,16 @@ extern "C" {
     {
         memset(dest, 0, n*sizeof(float));
     }
-
+    
     void _fCopy(float *src, float *dest, int n)
     {
-#if __APPLE_VDSP__DONTUSE
-        /* This does not make a difference and probably just calls memcpy internally. */
-        cblas_scopy(n, src, 1, dest, 1);
-#else
         memcpy(dest, src,  n*sizeof(float));
-#endif
     }
 
     void _fScale(float *src, float *dest, float factor, int n)
     {
+        if(factor == 1)
+            return;
 #if __APPLE_VDSP_DONTUSE
         /* vDSP is slower than Neon here for small vector sizes (up to 1024) */
         vDSP_vsmul(src, 1, &factor, dest, 1, n);
@@ -526,6 +529,162 @@ extern "C" {
                     dest[j * m + i] = src[channels * i + j];
         }
 #endif
+    }
+    
+    void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n)
+    {
+        float frac = 0, step = 1.0f/(n-1);
+        dest[0] = src1[0];
+        dest[n-1] = src2[n-1];
+        for(int i = 1; i < n-1; i++)
+        {
+            frac += step;
+            dest[i] = src1[i] + frac * (src2[i] - src1[i]); //bc (1-c)a + cb = a + c(b-a)
+        }
+    }
+    
+    void _fCrossfadeLogarithmic(float* src1, float* src2, float* dest, int destructive, int n)
+    {
+        if(destructive)
+        {
+            if(n == 256)
+            {
+                _fMultiply(src1, xfade_log_256_desc, src1, 256);
+                _fMultiply(src2, xfade_log_256_asc, src2, 256);
+                _fAdd(src1, src2, dest, 256);
+                return;
+            }
+            else if (n == 512)
+            {
+                _fMultiply(src1, xfade_log_512_desc, src1, 512);
+                _fMultiply(src2, xfade_log_512_asc, src2, 512);
+                _fAdd(src1, src2, dest, 512);
+                return;
+            }
+            else if (n == 1024)
+            {
+                _fMultiply(src1, xfade_log_1024_desc, src1, 1024);
+                _fMultiply(src2, xfade_log_1024_asc, src2, 1024);
+                _fAdd(src1, src2, dest, 1024);
+                return;
+            }
+        }
+
+        //If we can't use the lookup tables, do it the naive way:
+        float mult, frac1, frac2;
+        int max = n-1;
+        dest[0] = src1[0];
+        dest[n-1] = src2[n-1];
+        for(int i = 1; i < n-1; i++)
+        {
+            mult = 2*i / (float)max - 1; // 2x/(n-1) - 1
+            frac1 = sqrtf(0.5f * (1 - mult));
+            frac2 = sqrtf(0.5f * (1 + mult));
+            dest[i] = frac1 * src1[i] + frac2 * src2[i];
+        }
+    }
+    
+    void _fLerp(float* src, float* dest, float gain1, float gain2, int n)
+    {
+        if(gain1 == gain2)
+        {
+            _fScale(src, dest, gain2, n);
+            return;
+        }
+        
+        float gain;
+        float gainDelta = gain2 - gain1;
+        float max = (float)(n-1);
+        for(int i = 0; i < n; i++)
+        {
+            gain = gain1 + i/max * gainDelta;
+            dest[i] = gain * src[i];
+        }
+    }
+    
+    void _fClamp(float *src, float min, float max, int n)
+    {
+        for(int i = 0; i < n; i++)
+        {
+            src[i] = _min(max, _max(min, src[i]));
+        }
+    }
+    
+    void _fNoise(float *buf, float amplitude, int n)
+    {
+        if(amplitude == 0)
+            return;
+        
+        for(int i = 0; i < n; i++)
+        {
+            buf[i] = ((float)rand() / RAND_MAX * 2 - 1) * amplitude;
+        }
+    }
+    
+    void _fNoiseAdditive(float *buf, float amount, int n)
+    {
+        _clamp(amount, 0, 1);
+        
+        if(amount == 0)
+            return;
+        
+        float inverse = 1 - amount;
+        for(int i = 0; i < n; i++)
+        {
+            buf[i] = inverse * buf[i] + buf[i] * ((float)rand() / RAND_MAX * 2 - 1) * amount;
+        }
+    }
+    
+    void _fDownSample(float *buf, int factor, int n)
+    {
+        _clamp(factor, 1, 64);
+        
+        if(factor == 1)
+            return;
+        
+        float sample;
+        for(int i = 0; i < n; i++)
+        {
+            if(i % factor == 0)
+                sample = buf[i];
+            buf[i] = sample;
+        }
+    }
+    
+    void _fJitter(float *buf, float amount, int n)
+    {
+        _clamp(amount, 0, 1);
+        
+        if(amount == 0)
+            return;
+        
+        float frac;
+        int s1, s2;
+        for(int i = 1; i < n-1; i++)
+        {
+            frac = amount * ( (float)rand() / RAND_MAX * 2 - 0.999f );
+            s1 = (int)(i + frac); //either i or i-1
+            s2 = s1 + 1; //either i or i+1
+            if(frac < 0)
+                frac = 1 + frac;
+            
+            buf[i] = buf[s1] + frac * (buf[s2] - buf[s1]); //a + c(b-a)
+        }
+    }
+    
+    void _fBitCrush(float *buf, int bitReduction, int n)
+    {
+        if(bitReduction == 0 || bitReduction > 32)
+            return;
+        
+        int64_t sample;
+        for(int i = 0; i < n; i++)
+        {
+            sample = (((int64_t)((double)buf[i] * 2147483640 + 2147483648.5)) - 2147483648);
+            sample = sample >> bitReduction;
+            sample = sample << bitReduction;
+            buf[i] = ((float)sample) / 2147483648;
+        }
     }
     
     float _expCurve(float x, float ym)

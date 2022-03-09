@@ -750,7 +750,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4855366220427110
 Transform:
   m_ObjectHideFlags: 0
@@ -1605,6 +1605,7 @@ MonoBehaviour:
   handleB: {fileID: 4825399506136268}
   symbolA: {fileID: 23376719225524200}
   symbolB: {fileID: 7032278708665888592}
+  isSplitter: 1
   mixerMaterial: {fileID: 2100000, guid: d1714881939c4bb449221a1ddd66ebf6, type: 2}
   splitterMaterial: {fileID: 2100000, guid: fd6ec927535bd064ebadec2c33162cd1, type: 2}
 --- !u!114 &114187759859482556

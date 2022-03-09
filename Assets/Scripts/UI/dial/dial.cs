@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using UnityEngine;
+using UnityEngine.XR;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class dial : manipObject {
 
@@ -27,8 +29,13 @@ public class dial : manipObject {
   GameObject littleDisk;
   glowDisk dialFeedback;
 
-  public float deltaRot = 0;
+  Material glowDiskMat, littleDiskMat, littleDiskSelectedMat, littleDiskGrabbedMat;
+
+  public float controllerRot = 0f;
+  public float lastControllerRot = 0;
+  public float rotAtBeginningOfGrab = 0;
   public float curRot = 0;
+  
   public float realRot = 0f;
   public float prevShakeRot = 0f;
   public float fineMult = 5f;
@@ -45,20 +52,29 @@ public class dial : manipObject {
     littleDisk = transform.Find("littleDisk").gameObject;
     dialFeedback = transform.parent.Find("glowDisk").GetComponent<glowDisk>();
 
-    setMaterials(dialColor);
+    loadMaterials(dialColor);
+    setMaterials(glowDiskMat, littleDiskMat);
     //setGlowState(manipState.none); // no glow variant to save draw calls
 
   }
 
-  void setMaterials(dialColors colorVariant){
+  void loadMaterials(dialColors colorVariant){
     
     string str = Enum.GetName(typeof(dialColors), colorVariant); // gets the string name of the enum
 
     // Please note: setting a material using .material does not immediately instantiate a copy of that material - only if its properties are accessed!
     // Using sharedMaterial here, but the shader has alpha and therefore cannot be fully batched.
-    littleDisk.GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "LittleDisk");
-    transform.parent.Find("glowDisk").GetComponent<Renderer>().sharedMaterial = Resources.Load<Material>("Materials/" + str + "GlowDisk");
 
+    glowDiskMat = Resources.Load<Material>("Materials/" + str + "GlowDisk");
+    littleDiskMat = Resources.Load<Material>("Materials/" + str + "LittleDisk");
+    littleDiskSelectedMat = Resources.Load<Material>("Materials/selectedLittleDisk");
+    littleDiskGrabbedMat = Resources.Load<Material>("Materials/grabbedLittleDisk");
+
+  }
+
+  void setMaterials(Material mat1, Material mat2){
+    littleDisk.GetComponent<Renderer>().sharedMaterial = mat2;
+    transform.parent.Find("glowDisk").GetComponent<Renderer>().sharedMaterial = mat1;
   }
 
 
@@ -71,11 +87,12 @@ public class dial : manipObject {
     if (curState == manipState.selected || curState == manipState.grabbed)
     {
       // reset dial to default
-      if ((selectObj.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawButton.Y)
-      || (selectObj.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawButton.B))))
+      //if ((selectObj.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawButton.Y)
+      //|| (selectObj.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawButton.B))))
+      if (OVRInput.Get(OVRInput.RawButton.Y) || OVRInput.Get(OVRInput.RawButton.B))
       {
         setPercent(defaultPercent);
-        deltaRot = controllerRot - curRot;
+        rotAtBeginningOfGrab = controllerRot - curRot;
       }
     }
 
@@ -104,7 +121,7 @@ public class dial : manipObject {
     dialFeedback.PercentUpdate();
   }
 
-  public float controllerRot = 0f;
+  
 
   // begin grab, this sets the entry rotation via deltaRot
   public override void setState(manipState state) {
@@ -112,45 +129,56 @@ public class dial : manipObject {
     //setGlowState(state);
 
     if (curState == manipState.grabbed) {
+      setMaterials(glowDiskMat, littleDiskGrabbedMat); 
+      
       turnCount = 0;
-
+      
       // trigger beginners guidance
       if (!masterControl.instance.dialUsed) { 
         if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
         _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
       }
-
-      Vector2 temp = dialCoordinates(manipulatorObj.up);
-      controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
-
-      //if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.2f || OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.2f)
-      //{
-      //  deltaRot = controllerRot - curRot * fineMult;        
-      //} else {
-        deltaRot = controllerRot - curRot;
-      //}
       
+      Vector2 temp = dialCoordinates(manipulatorObj.up);
+      controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x); 
+      rotAtBeginningOfGrab = controllerRot - curRot;
+      lastControllerRot = (controllerRot - rotAtBeginningOfGrab) * speedUp; // update relative values here so that it doesnt jump on first grab
+      
+    } else if(curState == manipState.selected) {
+      setMaterials(glowDiskMat, littleDiskSelectedMat);
+    } else if (curState == manipState.none){
+      setMaterials(glowDiskMat, littleDiskMat);
     }
   }
 
-  
-  
+
+  Vector2 dialCoordinates(Vector3 vec)
+  {
+    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
+    return new Vector2(flat.x, flat.z);
+  }
+
+  float speedUp = 1.4f;
+
   public override void grabUpdate(Transform t)
   {
     Vector2 temp = dialCoordinates(manipulatorObj.up);
-    controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
+    controllerRot = (Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - rotAtBeginningOfGrab) * speedUp;
     
-    curRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - deltaRot;
-
     // fine tune modifier
     // https://developer.oculus.com/documentation/unity/unity-ovrinput
     // only raw input worked properly
     //if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
-    //|| (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f))
-    //  curRot /= fineMult;
+    //|| (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f)) {
+    if (OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f || OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f) {
+      curRot += (controllerRot - lastControllerRot) / fineMult;
+    } else {
+      curRot += controllerRot - lastControllerRot;
+    }
+      
+    lastControllerRot = controllerRot;
 
     curRot = Mathf.Clamp(curRot, -150f, 150f);
-
 
     // catch naughty fliparounds, use realRot as lastRot
     if (realRot == -150f && curRot > 0f) return;
@@ -173,20 +201,14 @@ public class dial : manipObject {
       prevShakeRot = realRot;
       turnCount++;
     }
+
   }
 
 
-  Vector2 dialCoordinates(Vector3 vec)
-  {
-    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
-    return new Vector2(flat.x, flat.z);
-  }
 
 
   // code for first steps guidance below, currently not enabled
-
   int turnCount = 0;
-
   Coroutine _dialCheckRoutine;
   IEnumerator dialCheckRoutine()
   {

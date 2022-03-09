@@ -191,6 +191,9 @@ MonoBehaviour:
   ID: -1
   outputPlug: 0
   connected: {fileID: 0}
+  omniCableMat: {fileID: 2100000, guid: 41637aa3b196c8940bdc21b41301b0e2, type: 2}
+  omniCableSelectedMat: {fileID: 2100000, guid: 24c5efdae9238a94eb9ea7e05efaeb47,
+    type: 2}
   otherPlug: {fileID: 0}
   signal: {fileID: 0}
 --- !u!1 &1000010961994966
@@ -321,7 +324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4000014108934490
 Transform:
   m_ObjectHideFlags: 0
@@ -331,7 +334,7 @@ Transform:
   m_GameObject: {fileID: 1000012346800050}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
   m_LocalPosition: {x: 0, y: 0, z: 0.02}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1.1672869, y: 1.1672869, z: 1.1672869}
   m_Children: []
   m_Father: {fileID: 4000013736582086}
   m_RootOrder: 1
