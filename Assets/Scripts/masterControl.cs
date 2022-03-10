@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Oculus;
+using Unity.XR.Oculus;
 
 public class masterControl : MonoBehaviour {
 
@@ -95,11 +96,13 @@ public class masterControl : MonoBehaviour {
 
       //OVRPlugin.systemDisplayFrequency = 72;
 
-      Debug.Log("Current cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+      Debug.Log("Current cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
       Debug.Log("Trying to set levels to 4");
-      OVRManager.gpuLevel = 4;
-      OVRManager.cpuLevel = 4;
-      Debug.Log("New cpuLevel: " + OVRManager.cpuLevel + ", gpuLevel: " + OVRManager.gpuLevel);
+      Performance.TrySetCPULevel(4);
+      Performance.TrySetGPULevel(4);
+      Debug.Log("New cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
+      Debug.Log("Display refresh rate: " + Stats.AdaptivePerformance.RefreshRate);
+      Unity.XR.Oculus.Utils.SetFoveationLevel(4);
     }
 
     Debug.Log("Buffer size is: " + configuration.dspBufferSize);
@@ -109,6 +112,8 @@ public class masterControl : MonoBehaviour {
     //AudioSettings.SetDSPBufferSize(bufferSize, 2);
 
     //Debug.Log("Buffer size is now set to: " + AudioSettings.GetConfiguration().dspBufferSize);
+
+    OVRManager.eyeFovPremultipliedAlphaModeEnabled = false;
 
     if (!PlayerPrefs.HasKey("glowVal")) PlayerPrefs.SetFloat("glowVal", 1);
     if (!PlayerPrefs.HasKey("envSound")) PlayerPrefs.SetInt("envSound", 1);
