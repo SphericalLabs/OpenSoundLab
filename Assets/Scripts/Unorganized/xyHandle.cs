@@ -38,11 +38,7 @@ public class xyHandle : manipObject {
     base.Awake();
     rend = GetComponent<Renderer>();
     offMat = rend.sharedMaterial;
-    //if (usingGlowMat) {
-    //  offMat = rend.sharedMaterial;
-    //  //glowMat = new Material(onMat);
-    //  //glowMat.SetColor("_TintColor", glowColor);
-    //} else rend.material.SetColor("_TintColor", glowColor * .25f);
+    onMat = Resources.Load<Material>("Materials/highlightGrabbed");
   }
 
   void Start() {

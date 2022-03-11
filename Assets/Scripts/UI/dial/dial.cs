@@ -184,12 +184,13 @@ public class dial : manipObject {
     if (realRot == -150f && curRot > 0f) return;
     if (realRot ==  150f && curRot < 0f) return;
 
-    if (isNotched)
-    {
-      curRot = Utils.map(Mathf.Round(Utils.map(curRot, -150f, 150f, 0f, 1f) * (notchSteps - 1)), 0, notchSteps - 1, -150f, 150f);
-    }
 
     realRot = curRot; // for percent storing and viz
+
+    if (isNotched)
+    {
+      realRot = Utils.map(Mathf.Round(Utils.map(curRot, -150f, 150f, 0f, 1f) * (notchSteps - 1)), 0, notchSteps - 1, -150f, 150f);
+    }
 
     // apply
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
