@@ -24,8 +24,8 @@ public class handle : manipObject {
   public GameObject matTarg;
   public int ID = 0;
 
-  GameObject highlight;
   Material highlightMat;
+  Material highlightGrabbedMat;
 
   public override void Awake() {
     base.Awake();
@@ -33,55 +33,22 @@ public class handle : manipObject {
     masterObjParent = masterObj.parent;
     if (ID == 0) {
       if (GetComponent<Renderer>() == null) mat = matTarg.GetComponent<Renderer>().material;
-      else mat = GetComponent<Renderer>().material;
+      else mat = GetComponent<Renderer>().sharedMaterial;
     }
     handle[] temp = transform.parent.GetComponentsInChildren<handle>();
     for (int i = 0; i < temp.Length; i++) {
       if (temp[i] != this) otherHandle = temp[i];
     }
-    if (ID == 0) createHandleFeedback();
+
+    if (ID == 1) mat = otherHandle.GetComponent<Renderer>().sharedMaterial;
+    highlightMat = Resources.Load("Materials/Highlight") as Material;
+    highlightGrabbedMat = Resources.Load("Materials/HighlightGrabbed") as Material;
+
   }
 
   public void setObjectParent(Transform t) {
     masterObjParent = t;
     masterObj.parent = t;
-  }
-
-  void createHandleFeedback() {
-
-    highlight = new GameObject("highlight");
-
-    MeshFilter m = highlight.AddComponent<MeshFilter>();
-
-    if (GetComponent<Renderer>() == null) m.mesh = matTarg.GetComponent<MeshFilter>().mesh;
-    else m.mesh = GetComponent<MeshFilter>().mesh;
-
-
-    MeshRenderer r = highlight.AddComponent<MeshRenderer>();
-    r.material = Resources.Load("Materials/Highlight") as Material;
-    highlightMat = r.material;
-
-    highlight.transform.SetParent(transform, false);
-
-    if (transform.name == "keyboardSeating")
-      highlight.transform.localScale = new Vector3(1.03f, 1.1f, 1.1f);
-    else if (transform.name == "adsrFrame")
-      highlight.transform.localScale = new Vector3(1.03f, 1.05f, 1.1f);
-    else if (transform.name == "tapeDeck")
-      highlight.transform.localScale = new Vector3(1.03f, 1.1f, 1.1f);
-    else if (transform.name == "drumpadHandle")
-      highlight.transform.localScale = new Vector3(1.1f, 1.3f, 1.1f);
-    else if (transform.name == "xyloSide") {
-      highlight.transform.localScale = new Vector3(1.01f, 1.1f, 1.1f);
-      highlight.transform.localPosition = new Vector3(.01f, 0, 0);
-    } else if (transform.name == "title") highlight.transform.localScale = Vector3.one * 1.02f;
-    else highlight.transform.localScale = Vector3.one * 1.1f;
-
-    Color c = Color.HSVToRGB(.65f, .7f, .5f);
-    highlightMat.SetColor("_TintColor", c);
-    highlightMat.SetFloat("_EmissionGain", .2f);
-
-    highlight.SetActive(false);
   }
 
   bool scaling = false;
@@ -201,27 +168,23 @@ public class handle : manipObject {
 
     if (ID == 0) {
       if (curState == manipState.none) {
-        if (otherHandle.curState == manipState.none) highlight.SetActive(false);
+        if (otherHandle.curState == manipState.none) GetComponent<Renderer>().sharedMaterial = mat; 
       }
       if (curState == manipState.selected) {
-        highlight.SetActive(true);
-        highlightMat.SetFloat("_EmissionGain", .35f);
+        GetComponent<Renderer>().sharedMaterial = highlightMat;
       }
       if (curState == manipState.grabbed) {
-        highlight.SetActive(true);
-        highlightMat.SetFloat("_EmissionGain", .45f);
+        GetComponent<Renderer>().sharedMaterial = highlightGrabbedMat;
       }
     } else {
       if (curState == manipState.none) {
-        if (otherHandle.curState == manipState.none) otherHandle.highlight.SetActive(false);
+        if (otherHandle.curState == manipState.none) otherHandle.GetComponent<Renderer>().sharedMaterial = mat;
       }
       if (curState == manipState.selected) {
-        otherHandle.highlight.SetActive(true);
-        otherHandle.highlightMat.SetFloat("_EmissionGain", .35f);
+        otherHandle.GetComponent<Renderer>().sharedMaterial = highlightMat;
       }
       if (curState == manipState.grabbed) {
-        otherHandle.highlight.SetActive(true);
-        otherHandle.highlightMat.SetFloat("_EmissionGain", .45f);
+        otherHandle.GetComponent<Renderer>().sharedMaterial = highlightGrabbedMat;
       }
     }
     if (curState == manipState.grabbed) {

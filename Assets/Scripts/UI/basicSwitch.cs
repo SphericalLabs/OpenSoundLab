@@ -28,8 +28,9 @@ public class basicSwitch : manipObject {
 
   public override void Awake() {
     base.Awake();
-    mat = glowTrans.GetComponent<Renderer>().material;    
-    mat.SetColor("_TintColor", Color.black);
+    glowTrans.gameObject.SetActive(false);
+    //mat = glowTrans.GetComponent<Renderer>().sharedmaterial;    
+    //mat.SetColor("_TintColor", Color.black);
 
     if (onLabel != null && offLabel != null) {
       labelMats = new Material[2];
@@ -71,11 +72,11 @@ public class basicSwitch : manipObject {
   public override void setState(manipState state) {
     curState = state;
     if (curState == manipState.none) {
-      mat.SetColor("_TintColor", Color.black);
+      glowTrans.gameObject.SetActive(false);
     } else if (curState == manipState.selected) {
-      mat.SetColor("_TintColor", Color.white * 0.4f);
+      glowTrans.gameObject.SetActive(true);
     } else if (curState == manipState.grabbed) {
-      mat.SetColor("_TintColor", Color.white * 0.8f);
+      glowTrans.gameObject.SetActive(true);
       offset = transform.InverseTransformPoint(manipulatorObj.position).z;
     }
   }
