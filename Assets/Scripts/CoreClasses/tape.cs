@@ -17,12 +17,13 @@ using System.Collections;
 using System.IO;
 
 public class tape : manipObject {
-  public Material mat;
+  
   public Transform masterObj;
   public GameObject loadingPrefab;
 
   Transform deck;
   Transform tapeTrans;
+  Renderer tapeRend;
   public TextMesh labelMesh;
   public string label;
   public string filename;
@@ -32,23 +33,24 @@ public class tape : manipObject {
 
   public bool previewWhenGrabbed = false;
 
-  GameObject highlight;
-  Material highlightMat;
+  Material mat, highlightMat, highlightGrabbedMat;
   Color tapeColor;
   float tapeHue;
 
-  public override void Awake() {
+  public override void Awake() { 
     base.Awake();
     gameObject.layer = 13;
     tapeTrans = transform.GetChild(0);
-    mat = tapeTrans.GetComponent<Renderer>().material;
+    tapeRend = tapeTrans.GetComponent<Renderer>();
+    if (mat == null) mat = tapeRend.sharedMaterial;
+
     labelMesh = GetComponentInChildren<TextMesh>();
     labelMesh.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
     //tapeHue = Random.value;
     tapeHue = 0.5f;
     tapeColor = Color.HSVToRGB(tapeHue, .5f, 1);
     SetColor(tapeColor);
-    createHandleFeedback();
+    
   }
 
   public void setOrigTrans(Vector3 pos, Quaternion rot) {
@@ -82,23 +84,6 @@ public class tape : manipObject {
     return tapeColor;
   }
 
-  void createHandleFeedback() {
-    highlight = new GameObject("highlight");
-
-    MeshFilter m = highlight.AddComponent<MeshFilter>();
-
-    m.mesh = transform.GetChild(0).GetComponent<MeshFilter>().mesh;
-    MeshRenderer r = highlight.AddComponent<MeshRenderer>();
-    r.material = Resources.Load("Materials/Highlight") as Material;
-    highlightMat = r.material;
-
-    highlight.transform.SetParent(transform, false);
-    highlight.transform.localScale = Vector3.one * 2.3f;
-    highlightMat.SetColor("_TintColor", Color.HSVToRGB(tapeHue, .9f, .3f));
-    highlightMat.SetFloat("_EmissionGain", .3f);
-
-    highlight.SetActive(false);
-  }
 
   void SetColor(Color c) {
     mat.SetColor("_Color", c);
@@ -305,20 +290,22 @@ public class tape : manipObject {
 
     curState = state;
 
+    // had to place the material loading here, because this script is often deactivated and thus Awake() would not work
+    if(mat == null) mat = tapeRend.sharedMaterial;
+    if (highlightMat == null) highlightMat = Resources.Load("Materials/highlight") as Material;
+    if (highlightGrabbedMat == null) highlightGrabbedMat = Resources.Load("Materials/highlightGrabbed") as Material;
+
     if (curState == manipState.none) {
-      highlight.SetActive(false);
+      tapeRend.sharedMaterial = mat;
     }
     if (curState == manipState.selected) {
-      highlight.SetActive(true);
-      highlightMat.SetFloat("_EmissionGain", .3f);
+      tapeRend.sharedMaterial = highlightMat;
       if (deck == null) preview(true);
     }
-
     if (curState == manipState.grabbed) {
+      tapeRend.sharedMaterial = highlightGrabbedMat;
       if (returnRoutineID != null) StopCoroutine(returnRoutineID);
-      highlight.SetActive(true);
       flashEmptySamplers(true);
-      highlightMat.SetFloat("_EmissionGain", .5f);
       if (insertCoroutine != null) StopCoroutine(insertCoroutine);
       transform.parent = manipulatorObj.parent;
     }
