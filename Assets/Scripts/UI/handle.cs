@@ -30,7 +30,7 @@ public class handle : manipObject {
   public override void Awake() {
     base.Awake();
     if (masterObj == null) masterObj = transform.parent;
-    masterObjParent = masterObj.parent;
+    masterObjParent = GameObject.Find("PatchAnchor").transform; // move this to instantiation?
     if (ID == 0) {
       if (GetComponent<Renderer>() == null) mat = matTarg.GetComponent<Renderer>().material;
       else mat = GetComponent<Renderer>().sharedMaterial;

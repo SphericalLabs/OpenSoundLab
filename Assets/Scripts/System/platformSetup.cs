@@ -26,7 +26,7 @@ public class platformSetup : MonoBehaviour {
   void Awake() {
     masterControl MC = GetComponent<masterControl>();
 
-    if (MC.currentPlatform == masterControl.platform.Vive) {
+    if (MC.currentPlatform == masterControl.platform.Oculus) {
 
       Instantiate(hmdPrefab, hmdTargetVive, false);
       manips[0] = (Instantiate(controllerPrefab, controllerLTargetVive, false) as GameObject).GetComponentInChildren<manipulator>();

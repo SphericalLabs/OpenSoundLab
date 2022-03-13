@@ -575,7 +575,7 @@ public class manipulator : MonoBehaviour
     bool secondaryDown = false;
     bool secondaryUp = false;
 
-    if (masterControl.instance.currentPlatform == masterControl.platform.Vive)
+    if (masterControl.instance.currentPlatform == masterControl.platform.Oculus)
     {
       //      secondaryDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
       //      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
@@ -667,7 +667,7 @@ public class manipulator : MonoBehaviour
       currentControlChanged = true;
       lastControl = currentControl;
     }
-    if (masterControl.instance.currentPlatform == masterControl.platform.Vive)
+    if (masterControl.instance.currentPlatform == masterControl.platform.Oculus)
     {
       //      triggerButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger);
       //      triggerButtonUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Trigger);

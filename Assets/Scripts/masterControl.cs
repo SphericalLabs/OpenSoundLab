@@ -27,12 +27,12 @@ public class masterControl : MonoBehaviour {
   public static float versionNumber = .76f;
 
   public enum platform {
-    Vive,
+    Oculus,
     NoVR,
-    Oculus
+    Oculus_Deprecated
   };
 
-  public platform currentPlatform = platform.Vive;
+  public platform currentPlatform = platform.Oculus;
 
   public Color tipColor = new Color(88 / 255f, 114 / 255f, 174 / 255f);
 

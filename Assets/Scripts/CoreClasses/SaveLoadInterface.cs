@@ -51,10 +51,10 @@ public class SaveLoadInterface : MonoBehaviour {
         g.GetComponent<deviceInterface>().Load(dB);
       }
     }
-
+    Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
     int c = synthSet.InstrumentList.Count;
     for (int i = 0; i < c; i++) {
-      GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], Vector3.zero, Quaternion.identity) as GameObject;
+      GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor /*Vector3.zero, Quaternion.identity*/) as GameObject;
       g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i]);
     }
 
