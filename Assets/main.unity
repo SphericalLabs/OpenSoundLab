@@ -215,6 +215,7 @@ Transform:
   m_LocalRotation: {x: 0.22289477, y: 0.21155046, z: -0.049618695, w: 0.950317}
   m_LocalPosition: {x: -1.1065205, y: 51.1, z: -0.23420675}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
@@ -459,6 +460,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.38034707, y: 1.1837188, z: 0.27637067}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
@@ -748,6 +750,10 @@ PrefabInstance:
     - target: {fileID: 223627909, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: colorMapEditorType_
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 223627909, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+      propertyPath: projectionSurfaceType
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 223627909, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: colorMapEditorBrightness
@@ -1200,6 +1206,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 2.64, z: 0}
   m_LocalScale: {x: 1.7749, y: 1.7749, z: 1.7749}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
@@ -1286,7 +1293,7 @@ PrefabInstance:
     - target: {fileID: 168691358241275541, guid: f83ed151ef23f9549baf98c91a6c6a9f,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f83ed151ef23f9549baf98c91a6c6a9f, type: 3}
