@@ -448,7 +448,15 @@ public class omniPlug : manipObject {
       updateForceWireShow(true);
       collCandidates.Clear();
       if (connected != null) collCandidates.Add(connected.transform);
-      transform.parent = manipulatorObj;
+
+      // this fixes the grab position of the omniPlug, when the controller is compensated for passthrough overlay
+      transform.parent = manipulatorObj.parent;
+      Vector3 tmp = transform.localPosition;
+      tmp.z = 0.06f;
+      tmp.x = 0f;
+      tmp.y = 0f;
+      transform.localPosition = tmp;
+
       updateJackList();
       foreach (omniJack j in targetJackList) j.flash(cordColor);
       setCableHighlighted(true);
