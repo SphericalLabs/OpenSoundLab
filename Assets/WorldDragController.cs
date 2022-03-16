@@ -55,7 +55,7 @@ public class WorldDragController : MonoBehaviour
       //temp.eulerAngles = new Vector3(0f, newAngle - startAngle, 0f);
       //transform.rotation = temp;
 
-      transform.localPosition = startPosSpace + Vector3.Lerp(leftHandAnchor.localPosition - startPosLeft, rightHandAnchor.localPosition - startPosRight, 0.5f) * 1.3f;
+      transform.localPosition = startPosSpace + Vector3.Lerp(leftHandAnchor.localPosition - startPosLeft, rightHandAnchor.localPosition - startPosRight, 0.5f);
       
       //(midOfControllers, Vector3.up, Vector3.Angle(leftHandAnchor.localPosition, rightHandAnchor.localPosition) - startAngle);
     }

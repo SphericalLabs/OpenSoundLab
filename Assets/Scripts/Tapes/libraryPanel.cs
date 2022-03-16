@@ -22,7 +22,7 @@ public class libraryPanel : UIpanel {
   Renderer rend;
   Transform masterObj;
   float panelRadius = 1;
-  Color panelColor = new Color(18 / 255f, 67 / 255f, 96 / 255f, 87 / 255f);
+  public Color panelColor = new Color(18 / 255f, 67 / 255f, 96 / 255f, 120 / 255f);
 
   public GameObject loadingPrefab, ghostTapePrefab, ghostGroupPrefab;
   GameObject loaderObject, ghostTape, ghostGroup;
@@ -123,7 +123,7 @@ public class libraryPanel : UIpanel {
     }
 
     if (active && curState == manipState.none) {
-      rend.material.color = Color.Lerp(Color.clear, panelColor, z);
+      rend.material.color = panelColor;
       if (toggled) {
         textMat.SetColor("_TintColor", Color.Lerp(Color.clear, onColor, z));
         outlineRender.material.SetColor("_TintColor", Color.Lerp(Color.clear, onColor, z));
