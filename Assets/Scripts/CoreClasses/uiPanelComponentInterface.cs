@@ -36,7 +36,7 @@ public class uiPanelComponentInterface : componentInterface {
   int curSelect = -1;
 
   bool initialized = false;
-  void Awake() {
+  void Start() {
     panels = new List<UIpanel>();
     panelNodes = new List<Transform>();
     filenames = new List<string>();

@@ -17,7 +17,7 @@ using System.Collections;
 
 public class pauseMenuItem : manipObject {
   public TextMesh label;
-  public Texture2D tex;
+  //public Texture2D tex;
   Material mat;
   Material textMat;
   pauseMenu mainmenu;
@@ -27,8 +27,6 @@ public class pauseMenuItem : manipObject {
   Color normalColor;
   public override void Awake() {
     base.Awake();
-    mat = transform.GetChild(0).GetComponent<Renderer>().material;
-    mat.SetTexture("_MainTex", tex);
 
     normalColor = Color.HSVToRGB(.6f, .7f, .9f);
     if (itemType == pauseMenu.itemType.confirmItem) normalColor = Color.HSVToRGB(.4f, .7f, .9f);
@@ -54,8 +52,6 @@ public class pauseMenuItem : manipObject {
       }
     }
 
-    mat.SetColor("_TintColor", normalColor);
-    mat.SetFloat("_EmissionGain", .3f);
   }
 
   void Start() {
@@ -79,24 +75,18 @@ public class pauseMenuItem : manipObject {
   public override void setState(manipState state) {
     curState = state;
     if (curState == manipState.none) {
-      mat.SetColor("_TintColor", normalColor);
-      mat.SetFloat("_EmissionGain", .3f);
-
-
+      
       if (textMat != null) {
         textMat.SetColor("_TintColor", normalColor);
         textMat.SetFloat("_EmissionGain", .3f);
       }
     } else if (curState == manipState.selected) {
-      mat.SetColor("_TintColor", normalColor);
-      mat.SetFloat("_EmissionGain", .6f);
-
+      
       if (textMat != null) {
         textMat.SetColor("_TintColor", normalColor);
         textMat.SetFloat("_EmissionGain", .3f);
       }
     } else if (curState == manipState.grabbed) {
-      mat.SetColor("_TintColor", Color.white);
 
       if (textMat != null) {
         textMat.SetColor("_TintColor", normalColor);
@@ -116,8 +106,6 @@ public class pauseMenuItem : manipObject {
                 new Vector3(1,1,1)
       };
 
-      mat.SetFloat("_EmissionGain", .9f);
-
       transform.localScale = sizes[0];
       while (timer < 1) {
         timer = Mathf.Clamp01(timer + Time.deltaTime * 12);
@@ -128,7 +116,6 @@ public class pauseMenuItem : manipObject {
       timer = 0;
       while (timer < 1) {
         timer = Mathf.Clamp01(timer + Time.deltaTime * 6);
-        mat.SetFloat("_EmissionGain", Mathf.Lerp(.9f, .7f, timer));
         transform.localScale = Vector3.Lerp(sizes[1], sizes[2], timer);
         yield return null;
       }
@@ -136,7 +123,6 @@ public class pauseMenuItem : manipObject {
       timer = 0;
       while (timer < 1) {
         timer = Mathf.Clamp01(timer + Time.deltaTime * 10);
-        mat.SetFloat("_EmissionGain", Mathf.Lerp(.7f, .3f, timer));
         yield return null;
       }
     } else {
