@@ -46,12 +46,12 @@ public class WorldDragController : MonoBehaviour
     // do the drag
     if(isDragging){
 
-      //Debug.DrawLine(Vector3.zero, patchPositionAtBeginDrag, new Color(1f, 0f, 0f));
-      //Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * patchAngleAtBeginDrag), 0f, Mathf.Cos(Mathf.Deg2Rad * patchAngleAtBeginDrag)), new Color(0f, 1f, 0f));
-      //Debug.DrawLine(Vector3.zero, controllerMiddleAtBeginDrag, new Color(0f, 0f, 1f));
-      //Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * controllerAngleAtBeginDrag), 0f, Mathf.Cos(Mathf.Deg2Rad * controllerAngleAtBeginDrag)), new Color(1f, 1f, 0f));
-      //Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * currentControllerAngle), 0f, Mathf.Cos(Mathf.Deg2Rad * currentControllerAngle)), new Color(1f, 0f, 1f));
-      //Debug.DrawLine(Vector3.zero, getMiddle(leftHandAnchor, rightHandAnchor), new Color(0f, 1f, 1f));
+      Debug.DrawLine(Vector3.zero, patchPositionAtBeginDrag, new Color(1f, 0f, 0f));
+      Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * patchAngleAtBeginDrag), 0f, Mathf.Cos(Mathf.Deg2Rad * patchAngleAtBeginDrag)), new Color(0f, 1f, 0f));
+      Debug.DrawLine(Vector3.zero, controllerMiddleAtBeginDrag, new Color(0f, 0f, 1f));
+      Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * controllerAngleAtBeginDrag), 0f, Mathf.Cos(Mathf.Deg2Rad * controllerAngleAtBeginDrag)), new Color(1f, 1f, 0f));
+      Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * currentControllerAngle), 0f, Mathf.Cos(Mathf.Deg2Rad * currentControllerAngle)), new Color(1f, 0f, 1f));
+      Debug.DrawLine(Vector3.zero, getMiddle(leftHandAnchor, rightHandAnchor), new Color(0f, 1f, 1f));
 
       // translation
       //transform.position = patchPositionAtBeginDrag + getMiddle(leftHandAnchor, rightHandAnchor) - controllerMiddleAtBeginDrag;
