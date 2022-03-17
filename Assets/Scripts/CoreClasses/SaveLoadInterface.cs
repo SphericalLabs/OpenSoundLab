@@ -164,7 +164,7 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
-
+[XmlInclude(typeof(ArtefactData))]
 [XmlInclude(typeof(CompressorData))]
 [XmlInclude(typeof(StereoVerbData))]
 [XmlInclude(typeof(DelayData))]

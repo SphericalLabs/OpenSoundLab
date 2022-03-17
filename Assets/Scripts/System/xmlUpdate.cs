@@ -142,8 +142,8 @@ public class xmlUpdate {
               serializer = new XmlSerializer(typeof(FilterData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "Artefacts":
-                serializer = new XmlSerializer(typeof(ArtefactData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                break;
+              serializer = new XmlSerializer(typeof(ArtefactData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             default:
               serializer = new XmlSerializer(typeof(InstrumentData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -258,8 +258,8 @@ public class xmlUpdate {
               data[data.Count - 1].deviceType = menuItem.deviceType.Filter;
               break;
             case "Artefacts":
-                data[data.Count - 1].deviceType = menuItem.deviceType.Artefact;
-                break;
+              data[data.Count - 1].deviceType = menuItem.deviceType.Artefact;
+              break;
             default:
               break;
           }
