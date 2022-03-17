@@ -7,9 +7,9 @@ public class WorldDragController : MonoBehaviour
   public manipulator leftManip, rightManip;
   public Transform leftHandAnchor, rightHandAnchor;
 
-  Vector3 startPosSpace, startPosLeft, startPosRight, midOfControllers;
-  float startAngle;
-  float newAngle;
+  Vector3 patchPositionAtBeginDrag, controllerMiddleAtBeginDrag;
+  float controllerAngleAtBeginDrag, patchAngleAtBeginDrag;
+  float currentControllerAngle;
   bool isDragging = false;
 
   void Awake()
@@ -30,10 +30,11 @@ public class WorldDragController : MonoBehaviour
     if (!isDragging && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.5f && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.5f)
     {
       isDragging = true;
-      startPosSpace = transform.localPosition;
-      startPosLeft = leftHandAnchor.localPosition;
-      startPosRight = rightHandAnchor.localPosition;
-      startAngle = calcAngleBetweenControllers();
+      patchPositionAtBeginDrag = transform.localPosition;
+      patchAngleAtBeginDrag = transform.rotation.eulerAngles.y;
+
+      controllerMiddleAtBeginDrag = getMiddle(leftHandAnchor, rightHandAnchor);
+      controllerAngleAtBeginDrag = getAngleBetweenControllers();
     }
     
     // end of drag
@@ -46,18 +47,21 @@ public class WorldDragController : MonoBehaviour
     if(isDragging){
 
       // translation
-      transform.localPosition = startPosSpace + Vector3.Lerp(leftHandAnchor.localPosition - startPosLeft, rightHandAnchor.localPosition - startPosRight, 0.5f);
+      transform.localPosition = patchPositionAtBeginDrag + getMiddle(leftHandAnchor, rightHandAnchor) - controllerMiddleAtBeginDrag;
 
       // rotation
-      midOfControllers = Vector3.Lerp(leftHandAnchor.localPosition, rightHandAnchor.localPosition, 0.5f);
-      newAngle = calcAngleBetweenControllers();
+      currentControllerAngle = getAngleBetweenControllers();
       transform.rotation = Quaternion.identity; // first reset and then rotate, because RotateAround is adding up
-      transform.RotateAround(midOfControllers, Vector3.up, startAngle - newAngle);
+      transform.RotateAround(getMiddle(leftHandAnchor, rightHandAnchor), Vector3.up, patchAngleAtBeginDrag + controllerAngleAtBeginDrag - currentControllerAngle);
       
     }
   }
 
-  float calcAngleBetweenControllers(){
+  Vector3 getMiddle(Transform a, Transform b){
+    return Vector3.Lerp(a.localPosition, b.localPosition, 0.5f);
+  }
+
+  float getAngleBetweenControllers(){
     // on x,z plane
     return Mathf.Rad2Deg * Mathf.Atan2(leftHandAnchor.transform.localPosition.z - rightHandAnchor.transform.localPosition.z, leftHandAnchor.transform.localPosition.x - rightHandAnchor.transform.localPosition.x);
   }
