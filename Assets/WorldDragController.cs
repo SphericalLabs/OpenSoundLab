@@ -10,6 +10,7 @@ public class WorldDragController : MonoBehaviour
   Vector3 currentControllerMiddle, lastControllerMiddle;
   float currentControllerAngle, lastControllerAngle, currentControllerDistance, lastControllerDistance;
   bool isDragging = false;
+  Transform[] transArray;
 
   void Awake()
   {
@@ -40,6 +41,33 @@ public class WorldDragController : MonoBehaviour
     if (isDragging && (OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) < 0.3f || OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) < 0.3f) )
     {
       isDragging = false;
+
+      // move all children transform to parent, save list of transforms
+      transArray = new Transform[transform.childCount];
+      
+      // foreach(Transform child in transform){ // not working!
+      // populate array first, otherwise weird index/list bugs when moving transforms while iterating on them
+      for (int i = 0; i < transform.childCount; i++)
+      {
+        transArray[i] = transform.GetChild(i);
+      }
+
+      // move them up
+      for (int n = 0; n < transArray.Length; n++)
+      {
+        transArray[n].parent = transform.parent;
+      }
+
+      // fully reset parent transform
+      transform.position = Vector3.zero;
+      transform.rotation = Quaternion.identity;
+      transform.localScale = Vector3.one;
+
+      // move them back down again, burning the global drag transform into them
+      for(int n = 0; n < transArray.Length; n++){ 
+        transArray[n].parent = transform;
+      }
+
     }
 
     // do the drag
