@@ -60,10 +60,12 @@ public class sliderNotched : manipObject {
       titleLabel.GetComponent<Renderer>().material.SetColor("_TintColor", labelColor);
     }
     setVal(switchVal);
-  }
+    
+    
+}
 
-  float targetX = 0;
-  bool lastSwitchVal;
+float targetX = 0;
+  int lastSwitchVal = 0;
   float goalX = 0f;
   public override void grabUpdate(Transform t) {
     targetX = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset, -xBound, xBound);
@@ -72,7 +74,10 @@ public class sliderNotched : manipObject {
   }
 
   void updateSwitchVal() {
+    
     switchVal = Mathf.RoundToInt(percent * (notchCount - 1));
+    if(switchVal != lastSwitchVal) manipulatorObjScript.hapticPulse();
+
     float modPercent = switchVal / (float)(notchCount - 1);
     modPercent = Mathf.Lerp(modPercent, percent, .25f);
 
@@ -83,6 +88,7 @@ public class sliderNotched : manipObject {
     p.x = goalX;
     transform.localPosition = p;
     updateLabels();
+    lastSwitchVal = switchVal;
   }
 
   public void setValByPercent(float p){
