@@ -66,7 +66,7 @@ public class oscillatorSignalGenerator : signalGenerator
     if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
     if (syncGen != null) syncGen.processBuffer(syncBuffer, dspTime, channels);
     if (pwmGen != null) pwmGen.processBuffer(pwmBuffer, dspTime, channels);
-
+    
     OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
         freqExpGen != null, freqLinGen != null, ampGen != null, syncGen != null, pwmGen != null, _sampleDuration, ref dspTime);
 
