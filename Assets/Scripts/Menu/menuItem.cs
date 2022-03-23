@@ -58,6 +58,7 @@ public class menuItem : manipObject {
     MultiSplit,
     Noise,
     Oscillator,
+    Polarizer,
     Quantizer,
     Recorder,
     Reverb,
@@ -129,7 +130,8 @@ public class menuItem : manipObject {
     if (item == deviceType.SampleHold) label.text = "Sample / Hold";
     if (item == deviceType.Reverb) label.text = "Reverb";
     if (item == deviceType.StereoVerb) label.text = "Reverb";
-    if (item == deviceType.Quantizer) label.text = "Quant. / Trans.";
+    //if (item == deviceType.Quantizer) label.text = "Quantizer";
+    //if (item == deviceType.Polarizer) label.text = "Polarizer";
 
 
     label.gameObject.SetActive(true);

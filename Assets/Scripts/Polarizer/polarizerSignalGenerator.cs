@@ -14,35 +14,37 @@
 
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System;
 
-public class sequencerCV : signalGenerator
+public class polarizerSignalGenerator : signalGenerator
 {
-    public static float lowRange = 0.2f; // central place to set these ranges!
-    public static float highRange = 1f; // 
 
+  public signalGenerator incoming;
+  public bool uniToBi = true;
 
-    float outVal = 0f;
-    float rangeMultiplier = lowRange;
-
-    [DllImport("SoundStageNative")]
-    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-
-    public void setRange(float f)
-    {
-        rangeMultiplier = f;
-    }
-    public void setSignal(float f)
-    {
-        outVal = f;
+  public override void processBuffer(float[] buffer, double dspTime, int channels)
+  {
+    
+    if (incoming == null){
+      return;
+    } else {
+      incoming.processBuffer(buffer, dspTime, channels);
     }
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    if (uniToBi) // 0,1 -> -1,1
     {
-        SetArrayToSingleValue(buffer, buffer.Length, outVal * rangeMultiplier);
+      for (int n = 0; n < buffer.Length; n++)
+      {
+        buffer[n] = buffer[n] * 2f - 1f;
+      }
+    }
+    else // -1,1 -> 0,1
+    {
+      for (int n = 0; n < buffer.Length; n++)
+      {
+        buffer[n] = buffer[n] * 0.5f + 0.5f;
+      }
     }
 
+  }
 }
-

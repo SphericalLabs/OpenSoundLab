@@ -32,6 +32,9 @@ public class xmlUpdate {
           XmlSerializer serializer;
           switch (xmlNode.Name) {
 
+            case "Polarizers":
+              serializer = new XmlSerializer(typeof(PolarizerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             case "Compressors":
               serializer = new XmlSerializer(typeof(CompressorData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -152,6 +155,9 @@ public class xmlUpdate {
 
           switch (xmlNode.Name) {
 
+            case "Polarizers":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Polarizer;
+              break;
             case "Compressors":
               data[data.Count - 1].deviceType = menuItem.deviceType.Compressor;
               break;
