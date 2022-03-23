@@ -21,7 +21,8 @@ public class glideSignalGenerator : signalGenerator {
   public signalGenerator incoming;
   public bool active = true;
   public float time = 1f;
-  private float current = 0f;
+  private float glidedVal = 0f;
+  float lastTime= 0f;
 
   [Range(0.01f, 10)]
   public float power = 0.05f;
@@ -34,7 +35,7 @@ public class glideSignalGenerator : signalGenerator {
     {
       for (int n = 0; n < buffer.Length; n += 1)
       {
-        buffer[n] = time * 2 - 1; // normalize to [-1,1]
+        buffer[n] = Utils.lerp(lastTime, time, (float)n / buffer.Length) * 2 - 1; // -1,1
       }
     } else { // Glide
 
@@ -42,11 +43,11 @@ public class glideSignalGenerator : signalGenerator {
 
       for (int n = 0; n < buffer.Length; n += 2)
       {
-        current += (buffer[n] - current) * (1.001f - Mathf.Pow(time, power) ) / div;
-        buffer[n] = buffer[n + 1] = current;
+        glidedVal += (buffer[n] - glidedVal) * (1.001f - Mathf.Pow(time, power) ) / div;
+        buffer[n] = buffer[n + 1] = glidedVal;
       }
     }
-
+    lastTime = time;
 
   }
 }
