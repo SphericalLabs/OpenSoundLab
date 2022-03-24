@@ -32,6 +32,8 @@ public class ADSignalGenerator : signalGenerator
     int stage = 0;
     int counter = 0;
 
+    float glidedVal = 0f;
+
     bool isRunning = false;
 
     float[] pulseBuffer = new float[] { -1, -1 };
@@ -51,18 +53,18 @@ public class ADSignalGenerator : signalGenerator
 
     public void setRelease(float val)
     {
-        releaseLength = Mathf.RoundToInt(val * length) + 1;
+        releaseLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, 0.03f, 1f) * length) + 1;
     }
 
     public void setLinearity(float val)
     {
         if (val >= 0.5)
         {
-            linearity = Utils.map(val, 0.5f, 1f, 1f, 0.1f);
+            linearity = Utils.map(val, 0.5f, 1f, 1f, 0.05f);
         }
         else
         {
-            linearity = Utils.map(val, 0f, 0.5f, 10f, 1f);
+            linearity = Utils.map(val, 0f, 0.5f, 20f, 1f);
         }
     }
 
@@ -169,7 +171,10 @@ public class ADSignalGenerator : signalGenerator
                 //Debug.Log("release: " + releaseLengthFinal);
             }
 
-        }
+            glidedVal += (buffer[n] - glidedVal) * 1f; // seems to smooth via float rounding error
+            buffer[n] = buffer[n + 1] = glidedVal;
+
+    }
 
     }
 
