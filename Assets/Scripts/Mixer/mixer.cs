@@ -22,31 +22,24 @@ public class mixer : signalGenerator {
 
   [DllImport("SoundStageNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
   [DllImport("SoundStageNative")] public static extern void AddArrays(float[] a, float[] b, int length);
-  const int MAX_COUNT = 32; // It's very important to enforce this gracefully. Feel free to change the number, but must be enforced in game.
-  float[][] b;
+
+  float[] tempBuff;
 
   public override void Awake() {
     base.Awake();
-    b = new float[MAX_COUNT][];
-    for (int i = 0; i < MAX_COUNT; ++i) {
-      b[i] = new float[MAX_BUFFER_LENGTH];
-    }
+    tempBuff = new float[1];
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    int count = incoming.Count;
 
-    for (int i = 0; i < count; i++) {
-      if (buffer.Length != b[i].Length)
-        System.Array.Resize(ref b[i], buffer.Length);
+  if (tempBuff.Length != buffer.Length)
+      System.Array.Resize(ref tempBuff, buffer.Length);
 
-      SetArrayToSingleValue(b[i], buffer.Length, 0.0f);
+    SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
-      if (i < incoming.Count) {
-        if (incoming[i] != null) incoming[i].processBuffer(b[i], dspTime, channels);
-      }
+    foreach (signalGenerator gen in incoming){
+      gen.processBuffer(tempBuff, dspTime, channels);
+      AddArrays(buffer, tempBuff, buffer.Length);
     }
-
-    for (int i = 0; i < count; i++) AddArrays(buffer, b[i], buffer.Length);
   }
 }
