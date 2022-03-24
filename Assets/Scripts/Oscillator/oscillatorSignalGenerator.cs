@@ -45,6 +45,9 @@ public class oscillatorSignalGenerator : signalGenerator
   [DllImport("SoundStageNative")]
   public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
                               float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer, bool bFreqExpGen, bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, ref double dspTime);
+  
+  [DllImport("SoundStageNative")] 
+  public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void processBuffer(float[] buffer, double dspTime, int channels)
   {
@@ -60,6 +63,13 @@ public class oscillatorSignalGenerator : signalGenerator
       System.Array.Resize(ref syncBuffer, buffer.Length);
     if (pwmBuffer.Length != buffer.Length)
       System.Array.Resize(ref pwmBuffer, buffer.Length);
+
+    // we don't know if these will be overwritten upstream, so better make them fresh, see mixer bug.
+    if (freqExpGen != null) SetArrayToSingleValue(frequencyExpBuffer, frequencyExpBuffer.Length, 0f);
+    if (freqLinGen != null) SetArrayToSingleValue(frequencyLinBuffer, frequencyLinBuffer.Length, 0f);
+    if (ampGen != null) SetArrayToSingleValue(amplitudeBuffer, amplitudeBuffer.Length, 0f);
+    if (syncGen != null) SetArrayToSingleValue(syncBuffer, syncBuffer.Length, 0f);
+    if (pwmGen != null) SetArrayToSingleValue(pwmBuffer, pwmBuffer.Length, 0f);
 
     if (freqExpGen != null) freqExpGen.processBuffer(frequencyExpBuffer, dspTime, channels);
     if (freqLinGen != null) freqLinGen.processBuffer(frequencyLinBuffer, dspTime, channels);
