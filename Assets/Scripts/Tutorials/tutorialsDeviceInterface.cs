@@ -21,7 +21,7 @@ using UnityEngine.Video;
 public class tutorialsDeviceInterface : deviceInterface
 {
 
-  public button playButton, resetButton, jumpBackButton, jumpForthButton, scrollUpButton, scrollDownButton;
+  public button playButton, resetButton, jumpBackButton, jumpForthButton, scrollUpButton, scrollDownButton, showOnStartup;
   public GameObject videoContainer;
   public tutorialPanel panelPrefab;
   public Transform tutorialHolder;
@@ -46,7 +46,7 @@ public class tutorialsDeviceInterface : deviceInterface
   public override void Awake()
   {
     base.Awake();
-
+    showOnStartup.isHit = PlayerPrefs.GetInt("showTutorialsOnStartup") == 1;
   }
 
   void Start()
@@ -119,6 +119,11 @@ public class tutorialsDeviceInterface : deviceInterface
           videoPlayer.frame = (int)(videoPlayer.frame + 10 * videoPlayer.frameRate);
         }
         break;
+      case 5:
+        // show on startup
+        PlayerPrefs.SetInt("showTutorialsOnStartup", on ? 1 : 0);
+        PlayerPrefs.Save();
+        break;
       default:
         break;
     }
@@ -174,6 +179,12 @@ public class tutorialsDeviceInterface : deviceInterface
     //} else if (videoPlayer.isPaused) {
     //  videoPlayer.Play();
     //}
+  }
+
+  public void forcePlay(){
+    videoPlayer.frame = 0;
+    videoPlayer.Play();
+    playButton.isHit = true;
   }
 
 }

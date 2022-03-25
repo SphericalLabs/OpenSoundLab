@@ -1102,6 +1102,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
+      propertyPath: patchAnchor
+      value: 
+      objectReference: {fileID: 987231471}
+    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
       propertyPath: exampleSetups
       value: 
       objectReference: {fileID: 160860245}
@@ -1115,6 +1120,11 @@ PrefabInstance:
       propertyPath: currentPlatform
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: tutorialsPrefab
+      value: 
+      objectReference: {fileID: 191382, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
     - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
       propertyPath: hmdTargetVive

@@ -259,6 +259,27 @@ public class masterControl : MonoBehaviour {
     beatUpdateRunning = on;
   }
 
+  public GameObject tutorialsPrefab;
+  public Transform patchAnchor;
+  private void Start()
+  {
+    if(!PlayerPrefs.HasKey("showTutorialsOnStartup")){
+      PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
+      PlayerPrefs.Save();
+    }
+
+    if(PlayerPrefs.GetInt("showTutorialsOnStartup") == 1){
+      GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
+
+      //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
+      g.transform.position = new Vector3(0f, 1.3f, 0.75f); 
+      g.transform.Rotate(0f, -180f, 0f);
+
+      //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
+
+    }
+  }
+
   int lastBeat = -1;
   void Update() {
     // metronome plays bound to screen updates! 
