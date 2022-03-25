@@ -261,6 +261,8 @@ public class masterControl : MonoBehaviour {
 
   public GameObject tutorialsPrefab;
   public Transform patchAnchor;
+
+  Vector2 leftStick, rightStick;
   private void Start()
   {
     if(!PlayerPrefs.HasKey("showTutorialsOnStartup")){
@@ -281,6 +283,7 @@ public class masterControl : MonoBehaviour {
   }
 
   int lastBeat = -1;
+
   void Update() {
     // metronome plays bound to screen updates! 
     // Prone to jitter and CPU hanging! 
@@ -299,6 +302,19 @@ public class masterControl : MonoBehaviour {
     if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
     {
       nextBinauralSetting();
+    }
+
+    leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.LTouch);
+    rightStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+
+    if (leftStick.x > 0.5f && rightStick.x < -0.5f) // press both inwards
+    {
+      Camera.main.backgroundColor = Color.gray;
+    }
+
+    if (leftStick.x < -0.5f && rightStick.x > 0.5f) // press both outward
+    {
+      Camera.main.backgroundColor = new Color(0f,0f,0f,0f);
     }
 
   }
