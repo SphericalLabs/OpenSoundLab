@@ -66,4 +66,10 @@ public class Utils
         return x == 0 ? -96 : 20 * Mathf.Log10(x);
     }
 
+    static public float equalPowerCrossfadeGain(float lin)
+    {
+        float log = Mathf.Sqrt(0.5f * (1 + (2 * lin - 1)));
+        return log;
+    }
+
 }

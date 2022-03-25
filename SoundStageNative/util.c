@@ -531,6 +531,23 @@ extern "C" {
 #endif
     }
     
+    void _fDryWetLogarithmic(float *dryBuf, float* wetBuf, float* dest, float dry, float wet, int n)
+    {
+        dry = (2*dry) - 1;
+        dry = sqrtf(0.5 * (1 + dry));
+        wet = (2*wet) - 1;
+        wet = sqrtf(0.5 * (1 + wet));
+        _fDryWetLinear(dryBuf, wetBuf, dest, dry, wet, n);
+    }
+    
+    void _fDryWetLinear(float *dryBuf, float* wetBuf, float* dest, float dry, float wet, int n)
+    {
+        float ratio = dry / wet;
+        _fScale(dryBuf, dest, ratio, n);
+        _fAdd(wetBuf, dest, dest, n);
+        _fScale(dest, dest, wet, n);
+    }
+    
     void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n)
     {
         float frac = 0, step = 1.0f/(n-1);

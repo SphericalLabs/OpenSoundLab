@@ -17,7 +17,7 @@ using System.Collections;
 
 public class stereoVerbDeviceInterface : deviceInterface {
     stereoVerbSignalGenerator signal;
-    public dial size, damping, width, dry, wet;
+    public dial size, damping, width, mix;
     public basicSwitch freeze;
     public omniJack input, output;
     public AudioSource speaker;
@@ -37,8 +37,8 @@ public class stereoVerbDeviceInterface : deviceInterface {
         signal.SetParam(damping.percent, (int)stereoVerbSignalGenerator.Param.P_DAMPING);
         signal.SetParam(width.percent, (int)stereoVerbSignalGenerator.Param.P_WIDTH);
         signal.SetParam(freeze.switchVal ? 1 : 0, (int)stereoVerbSignalGenerator.Param.P_FREEZE);
-        signal.SetParam(wet.percent, (int)stereoVerbSignalGenerator.Param.P_WET);
-        signal.SetParam(dry.percent, (int)stereoVerbSignalGenerator.Param.P_DRY);
+        signal.SetParam(Utils.equalPowerCrossfadeGain(mix.percent), (int)stereoVerbSignalGenerator.Param.P_WET);
+        signal.SetParam(Utils.equalPowerCrossfadeGain(1 - mix.percent), (int)stereoVerbSignalGenerator.Param.P_DRY);
     }
 
     public override InstrumentData GetData() {
@@ -51,8 +51,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
 
         data.size = size.percent;
         data.damping = damping.percent;
-        data.wet = wet.percent;
-        data.dry = dry.percent;
+        data.mix = mix.percent;
         data.width = width.percent;
         data.freeze = freeze.switchVal;
 
@@ -67,15 +66,14 @@ public class stereoVerbDeviceInterface : deviceInterface {
 
         size.setPercent(data.size);
         damping.setPercent(data.size);
-        dry.setPercent(data.dry);
-        wet.setPercent(data.wet);
+        mix.setPercent(data.mix);
         width.setPercent(data.width);
         freeze.setSwitch(data.freeze, true);
     }
 }
 
 public class StereoVerbData : InstrumentData {
-    public float size, damping, dry, wet, width;
+    public float size, damping, mix, width;
     public bool freeze;
     public int jackOutID, jackInID;
 }
