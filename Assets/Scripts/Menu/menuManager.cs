@@ -98,7 +98,7 @@ public class menuManager : MonoBehaviour {
       if ((menuItem.deviceType)i == menuItem.deviceType.Drum) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Timeline) continue;      
       if ((menuItem.deviceType)i == menuItem.deviceType.Funktion) continue;
-      //if ((menuItem.deviceType)i == menuItem.deviceType.SARSCov2) continue;
+      if ((menuItem.deviceType)i == menuItem.deviceType.SARSCov2) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Looper) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Reverb) continue;
 
