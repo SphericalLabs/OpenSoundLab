@@ -46,11 +46,13 @@ public class tutorialsDeviceInterface : deviceInterface
   public override void Awake()
   {
     base.Awake();
-    showOnStartup.isHit = PlayerPrefs.GetInt("showTutorialsOnStartup") == 1;
   }
 
   void Start()
   {
+
+    showOnStartup.keyHit(PlayerPrefs.GetInt("showTutorialsOnStartup") == 1);
+
     maxProgressScale = progressTransform.localScale;
 
     tutorials = new tutorialPanel[tutorialRecords.Length];
