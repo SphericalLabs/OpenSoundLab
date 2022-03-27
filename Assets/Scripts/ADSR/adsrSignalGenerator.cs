@@ -58,6 +58,9 @@ public class adsrSignalGenerator : signalGenerator {
   [DllImport("SoundStageNative")]
   public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
 
+  [DllImport("SoundStageNative")]
+  public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
   public override void Awake() {
     base.Awake();
     pulseBuffer = new float[MAX_BUFFER_LENGTH];
@@ -148,6 +151,7 @@ public class adsrSignalGenerator : signalGenerator {
       if (pulseBuffer.Length != buffer.Length)
         System.Array.Resize(ref pulseBuffer, buffer.Length);
 
+      SetArrayToSingleValue(pulseBuffer, pulseBuffer.Length, 0f);
       incoming.processBuffer(pulseBuffer, dspTime, channels);
 
       for (int n = 0; n < buffer.Length; n += 2){

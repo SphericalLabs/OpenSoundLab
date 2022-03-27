@@ -61,6 +61,9 @@ public class clipPlayerComplex : clipPlayer {
   public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float [] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
 , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
 
+  [DllImport("SoundStageNative")]
+  public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
   public override void Awake() {
     base.Awake();
     freqExpBuffer = new float[MAX_BUFFER_LENGTH];
@@ -257,6 +260,12 @@ public class clipPlayerComplex : clipPlayer {
     if (tailBuffer.Length != buffer.Length)
       System.Array.Resize(ref tailBuffer, buffer.Length);
 
+    SetArrayToSingleValue(freqExpBuffer, freqExpBuffer.Length, 0f);
+    SetArrayToSingleValue(freqLinBuffer, freqLinBuffer.Length, 0f);
+    SetArrayToSingleValue(ampBuffer, ampBuffer.Length, 0f);
+    SetArrayToSingleValue(seqBuffer, seqBuffer.Length, 0f);
+    SetArrayToSingleValue(headBuffer, headBuffer.Length, 0f);
+    SetArrayToSingleValue(tailBuffer, tailBuffer.Length, 0f);
 
     if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
     if (freqLinGen != null) freqLinGen.processBuffer(freqLinBuffer, dspTime, channels);

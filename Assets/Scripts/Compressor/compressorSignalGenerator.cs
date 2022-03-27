@@ -8,6 +8,7 @@ using System;
 
 public class compressorSignalGenerator : signalGenerator
 {
+
     public enum Param : int
     {
         P_ATTACK,
@@ -104,11 +105,15 @@ public class compressorSignalGenerator : signalGenerator
 
     [DllImport("SoundStageNative")]
     private static extern bool Compressor_IsClipping(IntPtr x);
+    
+    [DllImport("SoundStageNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+   public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
         if (sidechainBuffer.Length != buffer.Length)
             System.Array.Resize(ref sidechainBuffer, buffer.Length);
+        SetArrayToSingleValue(sidechainBuffer, sidechainBuffer.Length, 0f);
 
         Compressor_SetParam(p[(int)Param.P_BYPASS], (int)Param.P_BYPASS, x);
         Compressor_SetParam(p[(int)Param.P_ATTACK], (int)Param.P_ATTACK, x);

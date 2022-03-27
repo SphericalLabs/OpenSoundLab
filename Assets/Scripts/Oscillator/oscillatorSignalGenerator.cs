@@ -64,12 +64,12 @@ public class oscillatorSignalGenerator : signalGenerator
     if (pwmBuffer.Length != buffer.Length)
       System.Array.Resize(ref pwmBuffer, buffer.Length);
 
-    // we don't know if these will be overwritten upstream, so better make them fresh, see mixer bug.
-    if (freqExpGen != null) SetArrayToSingleValue(frequencyExpBuffer, frequencyExpBuffer.Length, 0f);
-    if (freqLinGen != null) SetArrayToSingleValue(frequencyLinBuffer, frequencyLinBuffer.Length, 0f);
-    if (ampGen != null) SetArrayToSingleValue(amplitudeBuffer, amplitudeBuffer.Length, 0f);
-    if (syncGen != null) SetArrayToSingleValue(syncBuffer, syncBuffer.Length, 0f);
-    if (pwmGen != null) SetArrayToSingleValue(pwmBuffer, pwmBuffer.Length, 0f);
+    // we don't know if these will be overwritten upstream, so better make them fresh, see previous mixer bug.
+    SetArrayToSingleValue(frequencyExpBuffer, frequencyExpBuffer.Length, 0f);
+    SetArrayToSingleValue(frequencyLinBuffer, frequencyLinBuffer.Length, 0f);
+    SetArrayToSingleValue(amplitudeBuffer, amplitudeBuffer.Length, 0f);
+    SetArrayToSingleValue(syncBuffer, syncBuffer.Length, 0f);
+    SetArrayToSingleValue(pwmBuffer, pwmBuffer.Length, 0f);
 
     if (freqExpGen != null) freqExpGen.processBuffer(frequencyExpBuffer, dspTime, channels);
     if (freqLinGen != null) freqLinGen.processBuffer(frequencyLinBuffer, dspTime, channels);

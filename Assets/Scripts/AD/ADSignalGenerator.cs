@@ -84,6 +84,7 @@ public class ADSignalGenerator : signalGenerator
             if (pulseBuffer.Length != buffer.Length)
                 System.Array.Resize(ref pulseBuffer, buffer.Length);
 
+            SetArrayToSingleValue(pulseBuffer, pulseBuffer.Length, 0f);
             incoming.processBuffer(pulseBuffer, dspTime, channels);
         }
 
@@ -92,6 +93,7 @@ public class ADSignalGenerator : signalGenerator
             if (attackBuffer.Length != buffer.Length)
                 System.Array.Resize(ref attackBuffer, buffer.Length);
 
+            SetArrayToSingleValue(attackBuffer, attackBuffer.Length, 0f);
             attackInput.processBuffer(attackBuffer, dspTime, channels);
             attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + attackBuffer[0] * length, 0, length * 2)); // left only
         }
@@ -105,6 +107,7 @@ public class ADSignalGenerator : signalGenerator
             if (releaseBuffer.Length != buffer.Length)
                 System.Array.Resize(ref releaseBuffer, buffer.Length);
 
+            SetArrayToSingleValue(releaseBuffer, releaseBuffer.Length, 0f); 
             releaseInput.processBuffer(releaseBuffer, dspTime, channels);
             releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + releaseBuffer[0] * length, 0, length * 2)); // left only
         }

@@ -43,7 +43,7 @@ public class SampleHoldSignalGenerator : signalGenerator
         {
             if (incomingBuffer.Length != buffer.Length)
                 System.Array.Resize(ref incomingBuffer, buffer.Length);
-
+            SetArrayToSingleValue(incomingBuffer, incomingBuffer.Length, 0f);
             incoming.processBuffer(incomingBuffer, dspTime, channels);
 
             if (trigSig == null) // signal, but no hold, just passthru
@@ -54,7 +54,7 @@ public class SampleHoldSignalGenerator : signalGenerator
             {
                 if (trigBuffer.Length != buffer.Length)
                     System.Array.Resize(ref trigBuffer, buffer.Length);
-
+                SetArrayToSingleValue(trigBuffer, trigBuffer.Length, 0f);
                 trigSig.processBuffer(trigBuffer, dspTime, channels);
 
                 for (int n = 0; n < buffer.Length; n += 2)

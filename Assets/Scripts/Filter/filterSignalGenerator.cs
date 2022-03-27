@@ -82,12 +82,9 @@ public class filterSignalGenerator : signalGenerator
     if (frequencyBuffer.Length != buffer.Length)
       System.Array.Resize(ref frequencyBuffer, buffer.Length);
 
-    if (controlIncoming != null)
-    {
+    SetArrayToSingleValue(frequencyBuffer, frequencyBuffer.Length, 0f);
+    if (controlIncoming != null) 
       controlIncoming.processBuffer(frequencyBuffer, dspTime, channels);
-    } else {
-      SetArrayToSingleValue(frequencyBuffer, buffer.Length, 0f);
-    }
 
     // if silent, 0 out and return
     if (!incoming)

@@ -130,13 +130,19 @@ public class delaySignalGenerator : signalGenerator
     [DllImport("SoundStageNative")]
     private static extern void Delay_SetMode(int mode, IntPtr x);
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    [DllImport("SoundStageNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+  public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
         if (cTimeBuffer.Length != buffer.Length)
             System.Array.Resize(ref cTimeBuffer, buffer.Length);
 
         if (cFeedbackBuffer.Length != buffer.Length)
             System.Array.Resize(ref cFeedbackBuffer, buffer.Length);
+
+        SetArrayToSingleValue(cTimeBuffer, cTimeBuffer.Length, 0f);
+        SetArrayToSingleValue(cFeedbackBuffer, cFeedbackBuffer.Length, 0f);
 
         if (shouldClear)
         {

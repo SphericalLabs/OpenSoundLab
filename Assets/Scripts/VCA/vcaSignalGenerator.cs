@@ -23,14 +23,20 @@ public class vcaSignalGenerator : signalGenerator {
   public float amp = 1f;
   float lastAmp = 0f;
   float sign;
+  float[] controlBuffer = new float[1];
+
+
+  [DllImport("SoundStageNative")]
+  public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
 
+    if (controlBuffer.Length != buffer.Length)
+      System.Array.Resize(ref controlBuffer, buffer.Length);
 
-    float[] controlBuffer = new float[buffer.Length];
+    SetArrayToSingleValue(controlBuffer, controlBuffer.Length, 0f);
     if (controlSig != null) controlSig.processBuffer(controlBuffer, dspTime, channels);
     if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
-
 
     if (incoming != null) 
     { 
