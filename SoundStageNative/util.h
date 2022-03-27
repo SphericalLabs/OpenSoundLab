@@ -115,6 +115,11 @@ extern "C" {
     /* De-interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory addresses, a slightly faster in-place operation is performed. */
     void _fDeinterleave(const float* src, float *dest, int n, int channels);
 
+    void _fDryWetLogarithmic(float *dryBuf, float* wetBuf, float* dest, float dry, float wet, int n);
+
+    /* scales dryBuf by dry and wetBuf by wet, adding the result in dest. dryBuf and wetBuf are not modified. */
+    void _fDryWetLinear(float *dryBuf, float* wetBuf, float* dest, float dry, float wet, int n);
+
     /* Executes a linear crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves power with totally correlated signals. */
     void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n);
 

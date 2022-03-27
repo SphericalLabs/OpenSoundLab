@@ -162,14 +162,15 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 0.25
   dialColor: 0
-  deltaRot: 0
+  controllerRot: 0
+  lastControllerRot: 0
+  rotAtBeginningOfGrab: 0
   curRot: 0
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
   isNotched: 0
   notchSteps: 4
-  controllerRot: 0
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,8 +344,7 @@ MonoBehaviour:
   size: {fileID: 11493542}
   damping: {fileID: 3606635105746897460}
   width: {fileID: 8577778889699378278}
-  dry: {fileID: 7194427802102657371}
-  wet: {fileID: 637361531582137280}
+  mix: {fileID: 637361531582137280}
   freeze: {fileID: 2624455599027904119}
   input: {fileID: 114000012040633690}
   output: {fileID: 114000012859573534}
@@ -1477,14 +1477,15 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 0.25
   dialColor: 0
-  deltaRot: 0
+  controllerRot: 0
+  lastControllerRot: 0
+  rotAtBeginningOfGrab: 0
   curRot: 0
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
   isNotched: 0
   notchSteps: 4
-  controllerRot: 0
 --- !u!1 &454507887002074495
 GameObject:
   m_ObjectHideFlags: 0
@@ -1792,7 +1793,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 905867822051661136}
-  m_Text: WET
+  m_Text: MIX
   m_OffsetZ: 0
   m_CharacterSize: 0.03
   m_LineSpacing: 1
@@ -2047,14 +2048,15 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 0.8
   dialColor: 2
-  deltaRot: 0
+  controllerRot: 0
+  lastControllerRot: 0
+  rotAtBeginningOfGrab: 0
   curRot: 0
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
   isNotched: 0
   notchSteps: 4
-  controllerRot: 0
 --- !u!1 &2065796025243127433
 GameObject:
   m_ObjectHideFlags: 0
@@ -2602,7 +2604,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2750373780205009574
 Transform:
   m_ObjectHideFlags: 0
@@ -2689,14 +2691,15 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 1
   dialColor: 0
-  deltaRot: 0
+  controllerRot: 0
+  lastControllerRot: 0
+  rotAtBeginningOfGrab: 0
   curRot: 0
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
   isNotched: 0
   notchSteps: 4
-  controllerRot: 0
 --- !u!1 &3887077535399942463
 GameObject:
   m_ObjectHideFlags: 0
@@ -3087,7 +3090,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2800734803100735246}
   m_Layer: 0
-  m_Name: wetDial
+  m_Name: mixDial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3575,14 +3578,15 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 0.8
   dialColor: 2
-  deltaRot: 0
+  controllerRot: 0
+  lastControllerRot: 0
+  rotAtBeginningOfGrab: 0
   curRot: 0
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
   isNotched: 0
   notchSteps: 4
-  controllerRot: 0
 --- !u!1 &6226200893982103356
 GameObject:
   m_ObjectHideFlags: 0

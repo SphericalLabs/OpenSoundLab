@@ -19,7 +19,7 @@ using System;
 public class delayDeviceInterface : deviceInterface
 {
     public omniJack input, cTimeInput, cFeedbackInput, output;
-    public dial timeDial, feedbackDial, wetDial, dryDial;
+    public dial timeDial, feedbackDial, mixDial;
     public dial modeDial; //this one is special and does not go into the array
     public button panicButton;
     delaySignalGenerator signal;
@@ -29,7 +29,7 @@ public class delayDeviceInterface : deviceInterface
     {
         base.Awake();
         signal = GetComponent<delaySignalGenerator>();
-        dials = new dial[4] { timeDial, feedbackDial, wetDial, dryDial };
+        dials = new dial[3] { timeDial, feedbackDial, mixDial };
     }
 
     void Update()
@@ -38,10 +38,10 @@ public class delayDeviceInterface : deviceInterface
         if (signal.cFeedbackInput != cFeedbackInput.signal) signal.cFeedbackInput = cFeedbackInput.signal;
         if (signal.cTimeInput != cTimeInput.signal) signal.cTimeInput = cTimeInput.signal;
 
-        for (int i = 0; i < dials.Length; i++)
-        {
-            signal.SetParam(dials[i].percent, i);
-        }
+        signal.SetParam(timeDial.percent, (int)delaySignalGenerator.Param.P_TIME);
+        signal.SetParam(feedbackDial.percent, (int)delaySignalGenerator.Param.P_FEEDBACK);
+        signal.SetParam(Utils.equalPowerCrossfadeGain( mixDial.percent ), (int)delaySignalGenerator.Param.P_WET);
+        signal.SetParam(Utils.equalPowerCrossfadeGain(1 - mixDial.percent), (int)delaySignalGenerator.Param.P_DRY);
         if (panicButton.isHit)
             signal.SetParam(1, (int)delaySignalGenerator.Param.P_CLEAR);
 
@@ -56,8 +56,7 @@ public class delayDeviceInterface : deviceInterface
 
         data.timeState = timeDial.percent;
         data.feedbackState = feedbackDial.percent;
-        data.wetState = wetDial.percent;
-        data.dryState = dryDial.percent;
+        data.mixState = mixDial.percent;
         data.modeState = modeDial.percent;
 
         data.jackInID = input.transform.GetInstanceID();
@@ -80,8 +79,7 @@ public class delayDeviceInterface : deviceInterface
 
         timeDial.setPercent(data.timeState);
         feedbackDial.setPercent(data.feedbackState);
-        wetDial.setPercent(data.wetState);
-        dryDial.setPercent(data.dryState);
+        mixDial.setPercent(data.mixState);
         modeDial.setPercent(data.modeState);
     }
 }
@@ -90,8 +88,7 @@ public class DelayData : InstrumentData
 {
     public float timeState;
     public float feedbackState;
-    public float wetState;
-    public float dryState;
+    public float mixState;
     public float modeState;
 
     public int jackOutID;

@@ -75,10 +75,10 @@ public class delaySignalGenerator : signalGenerator
                 p[param] = value; //this is finally set in process method
                 break;
             case (int)Param.P_WET:
-                p[param] = Utils.dbToLin( Utils.map(value, 0, 1, MIN_WET, MAX_WET, 0.8f) );
+                p[param] = value;
                 break;
             case (int)Param.P_DRY:
-                p[param] = Utils.dbToLin( Utils.map(value, 0, 1, MIN_DRY, MAX_DRY, 0.8f) );
+                p[param] = value;
                 break;
             case (int)Param.P_CLEAR:
                 if (value != 0)
