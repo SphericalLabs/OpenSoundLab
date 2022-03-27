@@ -309,7 +309,7 @@ public class masterControl : MonoBehaviour {
 
     if (leftStick.x > 0.5f && rightStick.x < -0.5f) // press both inwards
     {
-      Camera.main.backgroundColor = Color.gray;
+      Camera.main.backgroundColor = Color.white;
     }
 
     if (leftStick.x < -0.5f && rightStick.x > 0.5f) // press both outward
