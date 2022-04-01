@@ -39,6 +39,7 @@ public class manipulator : MonoBehaviour
   public GameObject oculusObjects, viveObjects, oculusMenuButton, oculusTrigger;
   public Transform tipPackage, glowMenuTransform, oculusManipTarget, oculusParentTarget, viveMenuButtonTransform;
   public GameObject controllerRep;
+  public Transform leftQ2Controller, rightQ2Controller;
   bool usingOculus = false;
   public Color onColor = Color.HSVToRGB(208 / 359f, 234 / 255f, 93 / 255f);
 
@@ -75,6 +76,16 @@ public class manipulator : MonoBehaviour
   public void SetDeviceIndex(int index)
   {
     controllerIndex = index;
+    if (controllerIndex == 1)
+    {
+      rightQ2Controller.gameObject.SetActive(true);
+      leftQ2Controller.gameObject.SetActive(false);
+    }
+    else if (controllerIndex == 0)
+    {
+      rightQ2Controller.gameObject.SetActive(false);
+      leftQ2Controller.gameObject.SetActive(true);
+    }
   }
 
   bool grabbing;
@@ -477,8 +488,8 @@ public class manipulator : MonoBehaviour
 
       //glowMenuTransform.rotation = oculusMenuButton.transform.rotation;
       //glowMenuTransform.Translate(Vector3.up * .01f, Space.Self);
-      tipPackage.localPosition = oculusManipTarget.localPosition;
-      tipPackage.localRotation = oculusManipTarget.localRotation;
+      //tipPackage.localPosition = oculusManipTarget.localPosition;
+      //tipPackage.localRotation = oculusManipTarget.localRotation;
       triggerTrans = oculusTrigger.transform;
     }
   }
