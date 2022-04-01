@@ -141,16 +141,8 @@ MonoBehaviour:
   selectedTutorial: {fileID: 0}
   tutorials: []
   tutorialRecords:
-  - labelString: '#1 Creating winds and rumble'
-    videoString: adsr.mp4
-  - labelString: '#2 Creating retro sci-fi sounds'
-    videoString: gate.mp4
-  - labelString: '#3 Atmospheric Drones I (Oscillator-based)'
-    videoString: reverb.mp4
-  - labelString: '#4 Atmospheric Drones 2 (Sampler-based)'
-    videoString: reverb.mp4
-  - labelString: '#5 Granular synthesis and sample mangling'
-    videoString: reverb.mp4
+  - labelString: '#1 Welcome to SoundStage Lab (Alpha/Beta)'
+    videoString: Tutorials/welcomeClip.mp4
   videoPlayer: {fileID: 4995019661440197408}
   progressTransform: {fileID: 468380080905245851}
 --- !u!1 &1000010686554488
@@ -1879,7 +1871,7 @@ Transform:
   m_GameObject: {fileID: 4995019661440196863}
   m_LocalRotation: {x: -0, y: -0, z: 4.656613e-10, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.0206}
-  m_LocalScale: {x: 0.48000002, y: 0.27, z: 1}
+  m_LocalScale: {x: 0.27, y: 0.27, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4995019661440196635}
@@ -2316,7 +2308,7 @@ MonoBehaviour:
   labelEmission: 0.4
   glowEmission: 0.1
   startToggled: 0
-  disregardStartToggled: 0
+  disregardStartToggled: 1
   changeOverlayGlow: 0
   isHit: 0
 --- !u!1 &6128366969028315522
