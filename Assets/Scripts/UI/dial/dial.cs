@@ -56,6 +56,9 @@ public class dial : manipObject {
     setMaterials(glowDiskMat, littleDiskMat);
     //setGlowState(manipState.none); // no glow variant to save draw calls
 
+    CapsuleCollider coll = GetComponent<CapsuleCollider>(); // globally make them bigger
+    coll.radius *= 1.75f;
+
   }
 
   void loadMaterials(dialColors colorVariant){
