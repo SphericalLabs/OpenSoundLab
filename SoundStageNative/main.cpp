@@ -410,19 +410,7 @@ extern "C" {
 
         for (int i = 0; i < length; i += channels)
         {
-            if (seqGen)
-            {
-                if (seqBuffer[i] > lastSeqGen[1] && lastSeqGen[1] <= lastSeqGen[0])
-                {
-                    if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0];
-                    else floatingBufferCount = bufferCount = sampleBounds[1];
-                    active = true;
-                }
-
-                lastSeqGen[0] = lastSeqGen[1];
-                lastSeqGen[1] = seqBuffer[i];
-            }
-
+            
             float endAmplitude = amplitude;
             if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i / length); // slope limiting
             if (ampGen) endAmplitude = endAmplitude * (ampBuffer[i] * 0.5f + 0.5f); // -1,1 > 0,1
@@ -440,12 +428,12 @@ extern "C" {
             if (floatingBufferCount > sampleBounds[1])
             {
                 endOfSample = true;
-                floatingBufferCount = sampleBounds[0] + floatingBufferCount - sampleBounds[1]; // wrap over playhead offset
+                floatingBufferCount = sampleBounds[0] + 1 + floatingBufferCount - sampleBounds[1]; // wrap over playhead offset
             }
-            else if (floatingBufferCount < sampleBounds[0])
+            else if (floatingBufferCount < sampleBounds[0] + 1) // please note: sampleBounds[0] is incremented by 1 here in all occurences in order to avoid a weird glitch together with the linear interpolation
             {
                 endOfSample = true;
-                floatingBufferCount = sampleBounds[1] + floatingBufferCount - sampleBounds[0]; // wrap over playhead offset
+                floatingBufferCount = sampleBounds[1] + floatingBufferCount - sampleBounds[0] - 1; // wrap over playhead offset
             }
 
             if (endOfSample)
@@ -453,6 +441,19 @@ extern "C" {
                 if (!looping) active = false;
             }
 
+            if (seqGen)
+            {
+              if (seqBuffer[i] > lastSeqGen[1] && lastSeqGen[1] <= lastSeqGen[0])
+              {
+                if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1;
+                else floatingBufferCount = bufferCount = sampleBounds[1];
+                active = true;
+              }
+
+              lastSeqGen[0] = lastSeqGen[1];
+              lastSeqGen[1] = seqBuffer[i];
+            }
+            
             if (active)
             {
                 // linear interpolation

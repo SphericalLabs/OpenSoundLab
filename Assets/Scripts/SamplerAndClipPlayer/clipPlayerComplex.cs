@@ -344,6 +344,7 @@ public class clipPlayerComplex : clipPlayer {
 
     lastAmplitude = amplitude;
     lastPlaybackSpeed = playbackSpeed;
+
   }
 
   float[] lp_filter = new float[] { 0, 0 };
