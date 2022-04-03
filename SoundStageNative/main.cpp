@@ -442,22 +442,40 @@ extern "C" {
             }
 
             float endAmplitude = amplitude;
-            if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i/length); // slope limiting
+            if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i / length); // slope limiting
 
             float endPlaybackSpeed = playbackSpeed;
             if (lastPlayBackSpeed != playbackSpeed) endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float)i / length); // slope limiting
 
             if (active)
             {
+
                 if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, _clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
                 else floatingBufferCount += endPlaybackSpeed;
                 if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 10.f; // lin fm 
                 
-                if (ampGen) endAmplitude = endAmplitude * ampBuffer[i];
+                if (ampGen) endAmplitude = endAmplitude * ampBuffer[i] * 0.5f + 0.5f; // expects -1,1 for fading
 
-                buffer[i] = clipdata[bufferCount * clipChannels] * endAmplitude;
-                if (clipChannels == 2) buffer[i + 1] = clipdata[bufferCount * clipChannels + 1] * endAmplitude;
-                else buffer[i + 1] = buffer[i];
+                // linear interpolation
+                buffer[i] =
+                  lerp(
+                    clipdata[(int)floorf(floatingBufferCount) * clipChannels],
+                    clipdata[(int)ceilf(floatingBufferCount) > sampleBounds[1] ? sampleBounds[0] : (int)ceilf(floatingBufferCount) * clipChannels],
+                    fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
+                  * endAmplitude;
+
+                if (clipChannels == 2) {
+                  buffer[i + 1] =
+                    lerp(
+                      clipdata[(int)floorf(floatingBufferCount) * clipChannels + 1],
+                      clipdata[(int)ceilf(floatingBufferCount) > sampleBounds[1] ? sampleBounds[0] : (int)ceilf(floatingBufferCount) * clipChannels + 1],
+                      fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
+                    * endAmplitude;
+                }
+                else {
+                  buffer[i + 1] = buffer[i];
+                }
+
             }
         }
         return floatingBufferCount;
@@ -540,9 +558,10 @@ extern "C" {
             }
             if (bAmpGen)
             {
-                endAmplitude = endAmplitude * amplitudeBuffer[i]; // allows for negative inputs, will invert phase then
+                //endAmplitude = endAmplitude * amplitudeBuffer[i]; // expects 0,1 for fading, but allows for negative inputs, will invert phase then
+                endAmplitude = endAmplitude * amplitudeBuffer[i] * 0.5f + 0.5f; // expects -1,1 for fading
             }
-
+            
             //update phase for next sample
             _phase += _clamp(endFrequency, -24000.f, 24000.f) * _sampleDuration; // clamp to +/- 24kHz
 
