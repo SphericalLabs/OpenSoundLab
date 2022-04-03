@@ -309,7 +309,7 @@ public class clipPlayerComplex : clipPlayer {
         floatingBufferCount += amount;
 
         float endAmplitude = amplitude;
-        if (ampGen != null) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2f);
+        if (ampGen != null) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2f); // -1,1 > 0,1
         buffer[i] = lp_filter[0] = lp_filter[0] * .9f + .1f * clipSamples[bufferCount * clipChannels] * endAmplitude;
         if (clipChannels == 2) buffer[i + 1] = lp_filter[1] = lp_filter[1] * .9f + .1f * clipSamples[bufferCount * clipChannels + 1] * endAmplitude;
         else buffer[i + 1] = buffer[i];

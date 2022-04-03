@@ -423,17 +423,29 @@ extern "C" {
                 lastSeqGen[1] = seqBuffer[i];
             }
 
-            bufferCount = (int)(floatingBufferCount + 0.5f); // round to int
-            bool endOfSample = false;
-            if (bufferCount > sampleBounds[1])
-            {
-                endOfSample = true;
-                floatingBufferCount = bufferCount = playdirection ? sampleBounds[0] : sampleBounds[1];
+            float endAmplitude = amplitude;
+            if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i / length); // slope limiting
+            if (ampGen) endAmplitude = endAmplitude * (ampBuffer[i] * 0.5f + 0.5f); // -1,1 > 0,1
+
+            float endPlaybackSpeed = playbackSpeed;
+            if (lastPlayBackSpeed != playbackSpeed) endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float)i / length); // slope limiting
+
+            if(active){
+                if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, _clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
+                else floatingBufferCount += endPlaybackSpeed;
+                if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 10.f; // lin fm 
             }
-            else if (bufferCount < sampleBounds[0])
+
+            bool endOfSample = false;
+            if (floatingBufferCount > sampleBounds[1])
             {
                 endOfSample = true;
-                floatingBufferCount = bufferCount = playdirection ? sampleBounds[0] : sampleBounds[1];
+                floatingBufferCount = sampleBounds[0] + floatingBufferCount - sampleBounds[1]; // wrap over playhead offset
+            }
+            else if (floatingBufferCount < sampleBounds[0])
+            {
+                endOfSample = true;
+                floatingBufferCount = sampleBounds[1] + floatingBufferCount - sampleBounds[0]; // wrap over playhead offset
             }
 
             if (endOfSample)
@@ -441,26 +453,13 @@ extern "C" {
                 if (!looping) active = false;
             }
 
-            float endAmplitude = amplitude;
-            if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i / length); // slope limiting
-
-            float endPlaybackSpeed = playbackSpeed;
-            if (lastPlayBackSpeed != playbackSpeed) endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float)i / length); // slope limiting
-
             if (active)
             {
-
-                if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, _clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
-                else floatingBufferCount += endPlaybackSpeed;
-                if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 10.f; // lin fm 
-                
-                if (ampGen) endAmplitude = endAmplitude * ampBuffer[i] * 0.5f + 0.5f; // expects -1,1 for fading
-
                 // linear interpolation
                 buffer[i] =
                   lerp(
                     clipdata[(int)floorf(floatingBufferCount) * clipChannels],
-                    clipdata[(int)ceilf(floatingBufferCount) > sampleBounds[1] ? sampleBounds[0] : (int)ceilf(floatingBufferCount) * clipChannels],
+                    clipdata[(int)ceilf(floatingBufferCount) * clipChannels],
                     fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
                   * endAmplitude;
 
@@ -468,7 +467,7 @@ extern "C" {
                   buffer[i + 1] =
                     lerp(
                       clipdata[(int)floorf(floatingBufferCount) * clipChannels + 1],
-                      clipdata[(int)ceilf(floatingBufferCount) > sampleBounds[1] ? sampleBounds[0] : (int)ceilf(floatingBufferCount) * clipChannels + 1],
+                      clipdata[(int)ceilf(floatingBufferCount) * clipChannels + 1],
                       fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
                     * endAmplitude;
                 }
