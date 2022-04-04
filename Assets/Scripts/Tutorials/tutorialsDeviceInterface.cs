@@ -189,4 +189,23 @@ public class tutorialsDeviceInterface : deviceInterface
     playButton.isHit = true;
   }
 
+  public override InstrumentData GetData()
+  {
+    TutorialsData data = new TutorialsData();
+    data.deviceType = menuItem.deviceType.Tutorials;
+    GetTransformData(data);
+    return data;
+  }
+
+  public override void Load(InstrumentData d)
+  {
+    TutorialsData data = d as TutorialsData;
+    base.Load(data);
+  }
+
+  }
+
+public class TutorialsData : InstrumentData
+{
+
 }

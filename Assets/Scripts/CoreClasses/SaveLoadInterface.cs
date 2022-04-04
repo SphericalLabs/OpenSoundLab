@@ -108,7 +108,10 @@ public class SaveLoadInterface : MonoBehaviour {
 
     systemSave();
     deviceInterface[] devices = FindObjectsOfType(typeof(deviceInterface)) as deviceInterface[];
-    foreach (deviceInterface d in devices) synthSet.InstrumentList.Add(d.GetData());
+    foreach (deviceInterface d in devices)
+    {
+      synthSet.InstrumentList.Add(d.GetData());
+    }
 
     omniPlug[] plugs = FindObjectsOfType(typeof(omniPlug)) as omniPlug[];
     foreach (omniPlug p in plugs) {
@@ -164,6 +167,7 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
+[XmlInclude(typeof(TutorialsData))]
 [XmlInclude(typeof(PolarizerData))]
 [XmlInclude(typeof(ArtefactData))]
 [XmlInclude(typeof(CompressorData))]

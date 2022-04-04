@@ -31,7 +31,9 @@ public class xmlUpdate {
         foreach (XmlNode xmlNode in xmlNodeParent) {
           XmlSerializer serializer;
           switch (xmlNode.Name) {
-
+            case "Tutorialss":
+              serializer = new XmlSerializer(typeof(TutorialsData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             case "Polarizers":
               serializer = new XmlSerializer(typeof(PolarizerData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -154,7 +156,9 @@ public class xmlUpdate {
           data.Add((InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode)));
 
           switch (xmlNode.Name) {
-
+            case "Tutorialss":
+              data[data.Count - 1].deviceType = menuItem.deviceType.Tutorials;
+              break;
             case "Polarizers":
               data[data.Count - 1].deviceType = menuItem.deviceType.Polarizer;
               break;
