@@ -345,10 +345,8 @@ extern "C" {
         {
         case 0:
             return startVal + (volumes[0] - startVal) * frameCount / frames[0];
-
         case 1:
             return volumes[0] + (volumes[1] - volumes[0]) * (float)frameCount / (float)frames[1];
-
         case 2:
             return volumes[1];
         case 3:
@@ -413,7 +411,7 @@ extern "C" {
             
             float endAmplitude = amplitude;
             if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i / length); // slope limiting
-            if (ampGen) endAmplitude = endAmplitude * (ampBuffer[i] * 0.5f + 0.5f); // -1,1 > 0,1
+            if (ampGen) endAmplitude = endAmplitude * ampBuffer[i]; // -1,1, allows for ring modulation
 
             float endPlaybackSpeed = playbackSpeed;
             if (lastPlayBackSpeed != playbackSpeed) endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float)i / length); // slope limiting
@@ -558,8 +556,7 @@ extern "C" {
             }
             if (bAmpGen)
             {
-                //endAmplitude = endAmplitude * amplitudeBuffer[i]; // expects 0,1 for fading, but allows for negative inputs, will invert phase then
-                endAmplitude = endAmplitude * amplitudeBuffer[i] * 0.5f + 0.5f; // expects -1,1 for fading
+                endAmplitude = endAmplitude * amplitudeBuffer[i]; // expects 0,1 for fading, but allows for negative inputs, will invert phase then
             }
             
             //update phase for next sample
