@@ -9,8 +9,6 @@
 
 #include <algorithm>
 
-#include "util.h"
-
 namespace freeverb
 {
 
