@@ -31,7 +31,7 @@ public:
 
     void    clear();
 
-    void    processInterleaved(float* buffer, size_t length, size_t channels);
+    void    processInterleaved(float buffer[], size_t length, size_t channels);
     void    process(const float* inAudioL, const float* inAudioR, float* outAudioL, float* outAudioR, size_t frameCount);
     void    process(const float* inAudio, float* outAudio, size_t frameCount);
 

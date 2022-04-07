@@ -354,10 +354,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useNativeIfAvailable: 1
-  input: {fileID: 114000012040633690}
-  cTimeInput: {fileID: 2810740477773686349}
-  cFeedbackInput: {fileID: 6518975777099845550}
-  output: {fileID: 114000012859573534}
+  omniJackIn: {fileID: 114000012040633690}
+  omniJackModTime: {fileID: 2810740477773686349}
+  omniJackModFeedback: {fileID: 6518975777099845550}
+  omniJackModTrigger: {fileID: 7382565002978976597}
+  omniJackModMix: {fileID: 6030985900164152747}
+  omniJackOut: {fileID: 114000012859573534}
   timeDial: {fileID: 11493542}
   feedbackDial: {fileID: 4452449050945597988}
   mixDial: {fileID: 3606635105746897460}
@@ -380,9 +382,11 @@ MonoBehaviour:
   useNativeIfAvailable: 1
   minTime: 1
   maxTime: 1
-  input: {fileID: 0}
-  cTimeInput: {fileID: 0}
-  cFeedbackInput: {fileID: 0}
+  sigIn: {fileID: 0}
+  sigModTime: {fileID: 0}
+  sigModFeedback: {fileID: 0}
+  sigModTrigger: {fileID: 0}
+  sigModMix: {fileID: 0}
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0

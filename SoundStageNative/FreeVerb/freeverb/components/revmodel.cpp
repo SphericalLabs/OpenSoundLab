@@ -9,6 +9,7 @@
 
 #include <algorithm>
 
+#include "util.h"
 
 namespace freeverb
 {
@@ -49,7 +50,7 @@ void ReverbModel::clear()
     std::for_each(mAllPassFiltersR.begin(), mAllPassFiltersR.end(), clearItem);
 }
 
-void ReverbModel::processInterleaved(float* buffer, size_t length, size_t channels)
+void ReverbModel::processInterleaved(float buffer[], size_t length, size_t channels)
 {
     assert(channels == 2);
     

@@ -16,7 +16,7 @@
 #include "CompressedRingBuffer.h"
 #include "CRingBuffer.hpp"
 
-#define DELAYMODE_SIMPLE 0
+//#define DELAYMODE_SIMPLE 0 //deprecated
 #define DELAYMODE_PADDED 1
 #define DELAYMODE_INTERPOLATED 2
 
@@ -49,8 +49,7 @@ extern "C" {
 /* Processing audio */
 
 ///Processes 1 block of interleaved audio data.
-SOUNDSTAGE_API void Delay_Process(float buffer[], int n, int channels, DelayData* x);
-SOUNDSTAGE_API void Delay_Process2(float buffer[], float timeBuffer[], float feedbackBuffer[], int n, int channels, DelayData* x);
+SOUNDSTAGE_API void Delay_Process(float buffer[], float timeBuffer[], float feedbackBuffer[], float mixBuffer[], int n, int channels, DelayData* x);
 ///Clears the delay buffer.
 SOUNDSTAGE_API void Delay_Clear(DelayData* x);
 

@@ -19,7 +19,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
     stereoVerbSignalGenerator signal;
     public dial size, damping, width, mix;
     public basicSwitch freeze;
-    public omniJack input, output;
+    public omniJack omniJackIn, omniJackOut, omniJackModSize, omniJackModFreeze, omniJackModMix;
     public AudioSource speaker;
 
     private dial[] dials;
@@ -31,7 +31,10 @@ public class stereoVerbDeviceInterface : deviceInterface {
     }
 
     void Update() {
-        if (input.signal != signal.incoming) signal.incoming = input.signal;
+        if (omniJackIn.signal != signal.sigIn) signal.sigIn = omniJackIn.signal;
+        if (omniJackModSize.signal != signal.sigModSize) signal.sigModSize = omniJackModSize.signal;
+        if (omniJackModFreeze.signal != signal.sigModFreeze) signal.sigModFreeze = omniJackModFreeze.signal;
+        if (omniJackModMix.signal != signal.sigModMix) signal.sigModMix = omniJackModMix.signal;
 
         signal.SetParam(size.percent, (int)stereoVerbSignalGenerator.Param.P_ROOMSIZE);
         signal.SetParam(damping.percent, (int)stereoVerbSignalGenerator.Param.P_DAMPING);
@@ -46,8 +49,11 @@ public class stereoVerbDeviceInterface : deviceInterface {
         data.deviceType = menuItem.deviceType.StereoVerb;
         GetTransformData(data);
 
-        data.jackInID = input.transform.GetInstanceID();
-        data.jackOutID = output.transform.GetInstanceID();
+        data.jackInID = omniJackIn.transform.GetInstanceID();
+        data.jackOutID = omniJackOut.transform.GetInstanceID();
+        data.cSizeID = omniJackModSize.transform.GetInstanceID();
+        data.cFreezeID = omniJackModFreeze.transform.GetInstanceID();
+        data.cMixID = omniJackModMix.transform.GetInstanceID();
 
         data.size = size.percent;
         data.damping = damping.percent;
@@ -61,8 +67,11 @@ public class stereoVerbDeviceInterface : deviceInterface {
     public override void Load(InstrumentData d) {
         StereoVerbData data = d as StereoVerbData;
         base.Load(data);
-        input.ID = data.jackInID;
-        output.ID = data.jackOutID;
+        omniJackIn.ID = data.jackInID;
+        omniJackOut.ID = data.jackOutID;
+        omniJackModSize.ID = data.cSizeID;
+        omniJackModFreeze.ID = data.cFreezeID;
+        omniJackModMix.ID = data.cMixID;
 
         size.setPercent(data.size);
         damping.setPercent(data.size);
@@ -76,4 +85,5 @@ public class StereoVerbData : InstrumentData {
     public float size, damping, mix, width;
     public bool freeze;
     public int jackOutID, jackInID;
+    public int cSizeID, cFreezeID, cMixID;
 }

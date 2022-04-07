@@ -34,6 +34,8 @@
 		974D48A227B158580087EC11 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 974D48A027B158430087EC11 /* Accelerate.framework */; };
 		974D48AA27B1D5F20087EC11 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 974D48A627B1D5F20087EC11 /* util.c */; };
 		974D48AB27B1D5F20087EC11 /* RingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 974D48A927B1D5F20087EC11 /* RingBuffer.cpp */; };
+		975B0E9A27FB48F60071290D /* Biquad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 975B0E9827FB48F60071290D /* Biquad.cpp */; };
+		975B0E9B27FB48F60071290D /* Biquad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 975B0E9827FB48F60071290D /* Biquad.cpp */; };
 		9776B8BE27C3EDAF00AEFF84 /* resample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9788526E27BE79EE00CCE8AA /* resample.cpp */; };
 		977BDEF327C5305000502F4F /* Artefact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977BDEF127C5305000502F4F /* Artefact.cpp */; };
 		977BDEF427C5305000502F4F /* Artefact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977BDEF127C5305000502F4F /* Artefact.cpp */; };
@@ -92,6 +94,8 @@
 		974D48A827B1D5F20087EC11 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = ../../util.h; sourceTree = "<group>"; };
 		974D48A927B1D5F20087EC11 /* RingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RingBuffer.cpp; path = ../../RingBuffer.cpp; sourceTree = "<group>"; };
 		974D48AC27B1D94E0087EC11 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = main.h; path = ../../main.h; sourceTree = "<group>"; };
+		975B0E9827FB48F60071290D /* Biquad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Biquad.cpp; path = ../../Biquad.cpp; sourceTree = "<group>"; };
+		975B0E9927FB48F60071290D /* Biquad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Biquad.h; path = ../../Biquad.h; sourceTree = "<group>"; };
 		9776B8BD27C3E7C000AEFF84 /* resample_tables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = resample_tables.h; path = ../../resample_tables.h; sourceTree = "<group>"; };
 		977BDEF127C5305000502F4F /* Artefact.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Artefact.cpp; path = ../../Artefact.cpp; sourceTree = "<group>"; };
 		977BDEF227C5305000502F4F /* Artefact.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Artefact.h; path = ../../Artefact.h; sourceTree = "<group>"; };
@@ -167,6 +171,8 @@
 				974096FB27B2B7BA00367733 /* Delay.cpp */,
 				9740970027B2B7BA00367733 /* Filter.h */,
 				974096F927B2B7BA00367733 /* Filter.cpp */,
+				975B0E9827FB48F60071290D /* Biquad.cpp */,
+				975B0E9927FB48F60071290D /* Biquad.h */,
 				97BC62D527C3C9E700728E40 /* lookup_tables.h */,
 				974D489727B14D120087EC11 /* MasterBusRecorder.cpp */,
 				974D48AC27B1D94E0087EC11 /* main.h */,
@@ -373,6 +379,7 @@
 				9740970C27B2B7BA00367733 /* Compressor.cpp in Sources */,
 				9740970D27B2B7BA00367733 /* CRingBuffer.cpp in Sources */,
 				9740980327B2B94900367733 /* revmodel.cpp in Sources */,
+				975B0E9A27FB48F60071290D /* Biquad.cpp in Sources */,
 				974D48AB27B1D5F20087EC11 /* RingBuffer.cpp in Sources */,
 				9776B8BE27C3EDAF00AEFF84 /* resample.cpp in Sources */,
 				9740970A27B2B7BA00367733 /* Delay.cpp in Sources */,
@@ -390,6 +397,7 @@
 				972153B827B42F93006DDB29 /* Delay.cpp in Sources */,
 				972153B727B42F93006DDB29 /* Compressor.cpp in Sources */,
 				972153B427B42F65006DDB29 /* main.cpp in Sources */,
+				975B0E9B27FB48F60071290D /* Biquad.cpp in Sources */,
 				977BDEF427C5305000502F4F /* Artefact.cpp in Sources */,
 				972153BB27B42F93006DDB29 /* CRingBuffer.cpp in Sources */,
 				972153B527B42F93006DDB29 /* RingBuffer.cpp in Sources */,

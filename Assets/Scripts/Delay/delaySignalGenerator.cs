@@ -22,7 +22,7 @@ public class delaySignalGenerator : signalGenerator
     const int INTERPOLATION_NONE = 1;
     const int INTERPOLATION_LINEAR = 2;
 
-    const int DELAYMODE_SIMPLE = 0;
+    //const int DELAYMODE_SIMPLE = 0; deprecated
     const int DELAYMODE_OVERAMPLED = 1;
     const int DELAYMODE_EFFICIENT = 2;
 
@@ -40,15 +40,18 @@ public class delaySignalGenerator : signalGenerator
 
     int sampleRate;
 
-    public signalGenerator input, cTimeInput, cFeedbackInput;
+    public signalGenerator sigIn, sigModTime, sigModFeedback, sigModTrigger, sigModMix;
 
     private IntPtr x;
     private float[] p = new float[(int)Param.P_N];
     private bool shouldClear = false;
 
-    private float[] cTimeBuffer = new float[0];
-    private float[] cFeedbackBuffer = new float[0];
-    private float cFeedback;
+    private float[] modTimeBuffer = null;
+    private float[] modFeedbackBuffer = null;
+    private float[] modTriggerBuffer = null;
+    private float[] modMixBuffer = null;
+    private bool modTriggerState = false;
+    private float modFeedbackVal;
 
     public override void Awake()
     {
@@ -88,7 +91,7 @@ public class delaySignalGenerator : signalGenerator
     }
 
 
-    public void SetMode(int mode)
+    public void SetTimeRange(int mode)
     {
         switch (mode)
         {
@@ -113,7 +116,7 @@ public class delaySignalGenerator : signalGenerator
 
     [DllImport("SoundStageNative")]
     //private static extern void Delay_Process(float[] buffer, int length, int channels, IntPtr x);
-    private static extern void Delay_Process2(float[] buffer, float[] timeBuffer, float[] feedbackBuffer, int n, int channels, IntPtr x);
+    private static extern void Delay_Process(float[] buffer, float[] timeBuffer, float[] feedbackBuffer, float[] mixBuffer, int n, int channels, IntPtr x);
 
     [DllImport("SoundStageNative")]
     private static extern IntPtr Delay_New(int maxDelayTimeSamples);
@@ -135,53 +138,90 @@ public class delaySignalGenerator : signalGenerator
 
   public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
-        if (cTimeBuffer.Length != buffer.Length)
-            System.Array.Resize(ref cTimeBuffer, buffer.Length);
+        //Create mod buffers as soon as needed:
+        if (sigModTime != null && modTimeBuffer == null)
+            modTimeBuffer = new float[buffer.Length];
 
-        if (cFeedbackBuffer.Length != buffer.Length)
-            System.Array.Resize(ref cFeedbackBuffer, buffer.Length);
+        if (sigModFeedback != null && modFeedbackBuffer == null)
+            modFeedbackBuffer = new float[buffer.Length];
 
-        SetArrayToSingleValue(cTimeBuffer, cTimeBuffer.Length, 0f);
-        SetArrayToSingleValue(cFeedbackBuffer, cFeedbackBuffer.Length, 0f);
+        if (sigModTrigger != null && modTriggerBuffer == null)
+            modTriggerBuffer = new float[buffer.Length];
 
+        if (sigModMix != null && modMixBuffer == null)
+            modMixBuffer = new float[buffer.Length];
+
+        //Process mod inputs if plugged in:
+        if (sigModTrigger != null)
+        {
+            SetArrayToSingleValue(modTriggerBuffer, modTriggerBuffer.Length, 0f);
+            sigModTrigger.processBuffer(modTriggerBuffer, dspTime, channels);
+            if(modTriggerBuffer[0] > 0 && !modTriggerState)
+            {
+                modTriggerState = true;
+                shouldClear = true;
+            }
+            else if(modTriggerBuffer[0] < 0 && modTriggerState)
+            {
+                modTriggerState = false;
+            }
+        }
+
+        modFeedbackVal = 0;
+
+        if (sigModTime != null)
+        {
+            SetArrayToSingleValue(modTimeBuffer, modTimeBuffer.Length, 0f);
+            sigModTime.processBuffer(modTimeBuffer, dspTime, channels);
+            //We do not have to choose a value here bc time modulation works on audiorate; we just pass the whole buffer to the native code later
+        }
+
+        if (sigModFeedback != null)
+        {
+            SetArrayToSingleValue(modFeedbackBuffer, modFeedbackBuffer.Length, 0f);
+            sigModFeedback.processBuffer(modFeedbackBuffer, dspTime, channels);
+            modFeedbackVal = modFeedbackBuffer[0];
+        }
+
+        float wet = p[(int)Param.P_WET];
+        float dry = p[(int)Param.P_DRY];
+        if (sigModMix != null)
+        {
+            SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
+            sigModMix.processBuffer(modMixBuffer, dspTime, channels);
+            float tmp = Mathf.Pow(wet, 2) + modMixBuffer[0]; //expecting input values in range [-1...1]
+            tmp = Mathf.Clamp01(tmp);
+            //TODO: not sure if sqrt crossfade is the best solution here; the signals obviously do have SOME correlation...
+            wet = Utils.equalPowerCrossfadeGain(tmp);
+            dry = Utils.equalPowerCrossfadeGain(1 - tmp);
+        }
+
+        //Clear buffer if necessary:
         if (shouldClear)
         {
             Delay_Clear(x);
             shouldClear = false;
         }
 
-        if (input != null)
+        //process input signal:
+        if (sigIn != null)
         {
-            input.processBuffer(buffer, dspTime, channels);
+            sigIn.processBuffer(buffer, dspTime, channels);
         }
 
-        cFeedback = 0;
-
-        if (cTimeInput != null)
-        {
-            cTimeInput.processBuffer(cTimeBuffer, dspTime, channels);
-        }
-
-        if (cFeedbackInput != null)
-        {
-            cFeedbackInput.processBuffer(cFeedbackBuffer, dspTime, channels);
-            cFeedback = cFeedbackBuffer[0];
-        }
-
+        //Set all delay params:
         Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME]), 3), 0, 1, minTime, maxTime), (int)Param.P_TIME, x);
-        Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + cFeedback), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
-        Delay_SetParam(p[(int)Param.P_WET], (int)Param.P_WET, x);
-        Delay_SetParam(p[(int)Param.P_DRY], (int)Param.P_DRY, x);
+        Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + modFeedbackVal), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
+        Delay_SetParam(wet, (int)Param.P_WET, x);
+        Delay_SetParam(dry, (int)Param.P_DRY, x);
 
+        //Process delay:
         //We need to process the delay even if there is currently no input,
         //bc there could be unconsumed samples from a previous input left in the delay line.
         //To optimize, we could store the timestamp when the last input connection was removed.
         //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed. 
         //Delay_Process(buffer, buffer.Length, channels, x);
-        if(cTimeInput == null)
-            Delay_Process2(buffer, null, null, buffer.Length, channels, x);
-        else
-            Delay_Process2(buffer, cTimeBuffer, null, buffer.Length, channels, x);
+        Delay_Process(buffer, modTimeBuffer, null, modMixBuffer, buffer.Length, channels, x);
     }
 }
 

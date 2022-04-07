@@ -66,6 +66,10 @@ public class Utils
         return x == 0 ? -96 : 20 * Mathf.Log10(x);
     }
 
+    /// <summary>
+    /// At the moment, equal power crossfade just takes the square root, which is only ideal for totally uncorrelated signals.
+    /// Maybe in the future a more complex routine will be implemented.
+    /// </summary>
     static public float equalPowerCrossfadeGain(float lin)
     {
         float log = Mathf.Sqrt(lin);

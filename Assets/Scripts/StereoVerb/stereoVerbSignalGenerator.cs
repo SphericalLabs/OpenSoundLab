@@ -42,7 +42,11 @@ public class stereoVerbSignalGenerator : signalGenerator {
     const float MIN_DRY = 0;
     const float MAX_DRY = 1;
 
-    public signalGenerator incoming;
+    public signalGenerator sigIn, sigModSize, sigModFreeze, sigModMix;
+
+    private float[] modSizeBuffer = null;
+    private float[] modFreezeBuffer = null;
+    private float[] modMixBuffer = null;
 
     private IntPtr x;
     private float[] p = new float[(int)Param.P_N];
@@ -56,6 +60,8 @@ public class stereoVerbSignalGenerator : signalGenerator {
     private static extern void StereoVerb_SetParam(int param, float value, IntPtr x);
     [DllImport("SoundStageNative")]
     private static extern float StereoVerb_GetParam(int param, IntPtr x);
+    [DllImport("SoundStageNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void Awake() {
         base.Awake();
@@ -100,14 +106,47 @@ public class stereoVerbSignalGenerator : signalGenerator {
     }
 
     public override void processBuffer(float[] buffer, double dspTime, int channels) {
+        //Process mod inputs (& create mod buffers as soon as needed)
+        if(sigModSize != null)
+        {
+            if (modSizeBuffer == null)
+                modSizeBuffer = new float[buffer.Length];
+            SetArrayToSingleValue(modSizeBuffer, modSizeBuffer.Length, 0f);
+            sigModSize.processBuffer(modSizeBuffer, dspTime, channels);
+            p[(int)Param.P_ROOMSIZE] += modSizeBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
+            p[(int)Param.P_ROOMSIZE] = Mathf.Clamp01(p[(int)Param.P_ROOMSIZE]);
+        }
+
+        if (sigModFreeze != null)
+        {
+            if (modFreezeBuffer == null)
+                modFreezeBuffer = new float[buffer.Length];
+            SetArrayToSingleValue(modFreezeBuffer, modFreezeBuffer.Length, 0f);
+            sigModFreeze.processBuffer(modFreezeBuffer, dspTime, channels);
+            p[(int)Param.P_FREEZE] = modFreezeBuffer[0] > 0 ? 1 : 0;
+        }
+
+        if (sigModMix != null)
+        {
+            if (modMixBuffer == null)
+                modMixBuffer = new float[buffer.Length];
+            SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
+            sigModMix.processBuffer(modMixBuffer, dspTime, channels);
+            float tmp = Mathf.Pow(p[(int)Param.P_WET], 2) + modMixBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
+            tmp = Mathf.Clamp01(tmp);
+            //TODO: not sure if sqrt crossfade is the best solution here; the signals obviously do have SOME correlation...
+            p[(int)Param.P_WET] = Utils.equalPowerCrossfadeGain(tmp);
+            p[(int)Param.P_DRY] = Utils.equalPowerCrossfadeGain(1 - tmp);
+        }
+
         //Set new parameters
         for (int i = 0; i < (int)Param.P_N; i++)
         {
             StereoVerb_SetParam(i, p[i], x);
         }
 
-        if(incoming != null)
-            incoming.processBuffer(buffer, dspTime, channels);
+        if (sigIn != null)
+            sigIn.processBuffer(buffer, dspTime, channels);
         //We process the reverb even if there is no input available, to make sure reverb tails decay to the end, and to enable spacy freeze pads.
         StereoVerb_Process(buffer, buffer.Length, channels, x);
     }

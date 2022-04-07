@@ -18,25 +18,24 @@ using System;
 
 public class delayDeviceInterface : deviceInterface
 {
-    public omniJack input, cTimeInput, cFeedbackInput, output;
-    public dial timeDial, feedbackDial, mixDial;
-    public dial modeDial; //this one is special and does not go into the array
+    public omniJack omniJackIn, omniJackModTime, omniJackModFeedback, omniJackModTrigger, omniJackModMix, omniJackOut;
+    public dial timeDial, feedbackDial, mixDial, modeDial;
     public button panicButton;
     delaySignalGenerator signal;
-    private dial[] dials;
 
     public override void Awake()
     {
         base.Awake();
         signal = GetComponent<delaySignalGenerator>();
-        dials = new dial[3] { timeDial, feedbackDial, mixDial };
     }
 
     void Update()
     {
-        if (signal.input != input.signal) signal.input = input.signal;
-        if (signal.cFeedbackInput != cFeedbackInput.signal) signal.cFeedbackInput = cFeedbackInput.signal;
-        if (signal.cTimeInput != cTimeInput.signal) signal.cTimeInput = cTimeInput.signal;
+        if (signal.sigIn != omniJackIn.signal) signal.sigIn = omniJackIn.signal;
+        if (signal.sigModFeedback != omniJackModFeedback.signal) signal.sigModFeedback = omniJackModFeedback.signal;
+        if (signal.sigModTime != omniJackModTime.signal) signal.sigModTime = omniJackModTime.signal;
+        if (signal.sigModMix != omniJackModMix.signal) signal.sigModMix = omniJackModMix.signal;
+        if (signal.sigModTrigger != omniJackModTrigger.signal) signal.sigModTrigger = omniJackModTrigger.signal;
 
         signal.SetParam(timeDial.percent, (int)delaySignalGenerator.Param.P_TIME);
         signal.SetParam(feedbackDial.percent, (int)delaySignalGenerator.Param.P_FEEDBACK);
@@ -45,7 +44,7 @@ public class delayDeviceInterface : deviceInterface
         if (panicButton.isHit)
             signal.SetParam(1, (int)delaySignalGenerator.Param.P_CLEAR);
 
-        signal.SetMode(Mathf.RoundToInt(modeDial.percent * 3));
+        signal.SetTimeRange(Mathf.RoundToInt(modeDial.percent * 3));
     }
 
     public override InstrumentData GetData()
@@ -59,10 +58,12 @@ public class delayDeviceInterface : deviceInterface
         data.mixState = mixDial.percent;
         data.modeState = modeDial.percent;
 
-        data.jackInID = input.transform.GetInstanceID();
-        data.jackOutID = output.transform.GetInstanceID();
-        data.jackTimeID = cTimeInput.transform.GetInstanceID();
-        data.jackFeedbackID = cFeedbackInput.transform.GetInstanceID();
+        data.jackInID = omniJackIn.transform.GetInstanceID();
+        data.jackOutID = omniJackOut.transform.GetInstanceID();
+        data.cTimeID = omniJackModTime.transform.GetInstanceID();
+        data.cFeedbackID = omniJackModFeedback.transform.GetInstanceID();
+        data.cMixID = omniJackModMix.transform.GetInstanceID();
+        data.cTriggerID = omniJackModTrigger.transform.GetInstanceID();
 
         return data;
     }
@@ -72,10 +73,12 @@ public class delayDeviceInterface : deviceInterface
         DelayData data = d as DelayData;
         base.Load(data);
 
-        input.ID = data.jackInID;
-        output.ID = data.jackOutID;
-        cTimeInput.ID = data.jackTimeID;
-        cFeedbackInput.ID = data.jackFeedbackID;
+        omniJackIn.ID = data.jackInID;
+        omniJackOut.ID = data.jackOutID;
+        omniJackModTime.ID = data.cTimeID;
+        omniJackModFeedback.ID = data.cFeedbackID;
+        omniJackModTrigger.ID = data.cTriggerID;
+        omniJackModMix.ID = data.cMixID;
 
         timeDial.setPercent(data.timeState);
         feedbackDial.setPercent(data.feedbackState);
@@ -94,7 +97,5 @@ public class DelayData : InstrumentData
     public int jackOutID;
     public int jackInID;
 
-    public int jackTimeID;
-    public int jackFeedbackID;
-
+    public int cTimeID, cFeedbackID, cMixID, cTriggerID;
 }

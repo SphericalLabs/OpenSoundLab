@@ -59,11 +59,6 @@ SOUNDSTAGE_API float StereoVerb_GetParam(int param, freeverb::ReverbModel *x)
 SOUNDSTAGE_API void StereoVerb_Clear(freeverb::ReverbModel *x) { x->clear(); }
 SOUNDSTAGE_API void StereoVerb_Process(float buffer[], int length, int channels, freeverb::ReverbModel *x)
 {
-    //This calls a modified FreeVerb function that operates on interleaved audio buffers:
+    //This calls a modified FreeVerb function that operates on interleaved audio buffers and also considers the modulation buffers:
     x->processInterleaved(buffer, length, channels);
-    
-    //If instead you prefer to de-interleave the buffers first and use FreeVerb's original function, you can do so like this:
-    //_fDeinterleave(buffer, buffer, length, channels);
-    //x->process(buffer, buffer+length/2, buffer, buffer+length/2, length/2);
-    //_fInterleave(buffer, buffer, length, channels);
 }

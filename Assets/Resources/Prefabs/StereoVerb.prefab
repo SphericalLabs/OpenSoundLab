@@ -359,8 +359,11 @@ MonoBehaviour:
   width: {fileID: 8577778889699378278}
   mix: {fileID: 637361531582137280}
   freeze: {fileID: 2624455599027904119}
-  input: {fileID: 114000012040633690}
-  output: {fileID: 114000012859573534}
+  omniJackIn: {fileID: 114000012040633690}
+  omniJackOut: {fileID: 114000012859573534}
+  omniJackModSize: {fileID: 2309542297795237025}
+  omniJackModFreeze: {fileID: 1320461210019160784}
+  omniJackModMix: {fileID: 1471026596246119907}
   speaker: {fileID: 7507733278664232353}
 --- !u!114 &7628936705920694903
 MonoBehaviour:
@@ -377,7 +380,10 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
-  incoming: {fileID: 0}
+  sigIn: {fileID: 0}
+  sigModSize: {fileID: 0}
+  sigModFreeze: {fileID: 0}
+  sigModMix: {fileID: 0}
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0
