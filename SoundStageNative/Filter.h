@@ -30,7 +30,7 @@ extern "C"
 {
 	//filter
 //    SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfA, FilterData* mfB);
-    SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, float filterBuffer[], float resonance);
+    SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float filterBuffer[], float resonance);
 }
 
 

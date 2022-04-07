@@ -41,9 +41,9 @@ public class filterDeviceInterface : deviceInterface {
       filter.incoming = input.signal;
     }
 
-    if (filter.controlIncoming != controlInput.signal)
+    if (filter.freqIncoming != controlInput.signal)
     {
-      filter.controlIncoming = controlInput.signal;
+      filter.freqIncoming = controlInput.signal;
     }
 
     if (freqPercent != frequencyDial.percent) updateFrequency();

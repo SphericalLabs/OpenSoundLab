@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 public class filterSignalGenerator : signalGenerator
 {
 
-  public signalGenerator incoming, controlIncoming;
+  public signalGenerator incoming, freqIncoming;
 
   //MonoFilter[] filters;
 
@@ -57,7 +57,7 @@ public class filterSignalGenerator : signalGenerator
   public static extern void AddArrays(float[] a, float[] b, int length);
 
   [DllImport("SoundStageNative")]
-  public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, float[] frequencyBuffer, float resonance);
+  public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float[] frequencyBuffer, float resonance);
    
     // create structs for passing to native code
   mfValues mf1L = new mfValues();
@@ -83,8 +83,8 @@ public class filterSignalGenerator : signalGenerator
       System.Array.Resize(ref frequencyBuffer, buffer.Length);
 
     SetArrayToSingleValue(frequencyBuffer, frequencyBuffer.Length, 0f);
-    if (controlIncoming != null) 
-      controlIncoming.processBuffer(frequencyBuffer, dspTime, channels);
+    if (freqIncoming != null) 
+      freqIncoming.processBuffer(frequencyBuffer, dspTime, channels);
 
     // if silent, 0 out and return
     if (!incoming)
@@ -99,17 +99,17 @@ public class filterSignalGenerator : signalGenerator
     if (curType != filterType.Notch && curType != filterType.BP) // not a double filter setup, either LP or HP
     {
       mf1R.LP = mf1L.LP = curType == filterType.LP;
-      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, frequencyBuffer, resonance);
+      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, freqIncoming != null,  frequencyBuffer, resonance);
     }
     else if (curType == filterType.Notch) // duplicate buffer in order to process two filters in parallel
     {
       CopyArray(buffer, bufferCopy, buffer.Length);
 
       mf1R.LP = mf1L.LP = true;
-      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, frequencyBuffer, resonance * 0.7f); // less resonance for double filter mode
+      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f); // less resonance for double filter mode
 
       mf2R.LP = mf2L.LP = false;
-      processStereoFilter(bufferCopy, bufferCopy.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, frequencyBuffer, resonance * 0.7f);
+      processStereoFilter(bufferCopy, bufferCopy.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f);
 
       AddArrays(buffer, bufferCopy, buffer.Length);
     }
@@ -118,10 +118,10 @@ public class filterSignalGenerator : signalGenerator
     {
 
       mf1R.LP = mf1L.LP = false;
-      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, frequencyBuffer, resonance * 0.7f);
+      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f);
 
       mf2R.LP = mf2L.LP = true;
-      processStereoFilter(buffer, buffer.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, frequencyBuffer, resonance * 0.7f);
+      processStereoFilter(buffer, buffer.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f);
     }
 
     CopyArray(buffer, bufferCopy, buffer.Length);

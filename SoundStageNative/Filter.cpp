@@ -36,7 +36,7 @@ extern "C" {
 		else return input - fd->b4;
 	}
 
-    void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, float frequencyBuffer[], float resonance)
+    void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float frequencyBuffer[], float resonance)
     {
 
         //resonance = _clamp(resonance, 0.f, 1.f);
@@ -50,20 +50,25 @@ extern "C" {
 
             if (!sameCutoff) cut = lerp(lastCutoffFrequency, cutoffFrequency, (float)i / length); // slope limiting for dial
 
-            // exponential 1/Oct, freqMod taken from left channel only
-            // clamp fm mod -1,1 and effective frequencies 1,260000
-            //frequencyBuffer[i] = frequencyBuffer[i + 1] = _clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) * freqDiv, 0.f, 1.f);
-            frequencyBuffer[i] = frequencyBuffer[i + 1] = _clamp(261.6256f * powf(2, (_clamp(frequencyBuffer[i], -1.f, 1.f) + cutoffFrequency) * 10.f) * freqDiv, 0.f, 1.f);
+            if (!sameCutoff || freqGen) {
 
-            mfL->q = 1.0f - frequencyBuffer[i];
-            mfL->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfL->q;
-            mfL->f = mfL->p + mfL->p - 1.0f;
-            mfL->q = resonance * (1.0f + 0.5f * mfL->q * (1.0f - mfL->q + 5.6f * mfL->q * mfL->q));
+                frequencyBuffer[i] *= 0.01f; // avoid overload
 
-            mfR->q = 1.0f - frequencyBuffer[i+1];
-            mfR->p = frequencyBuffer[i+1] + 0.8f * frequencyBuffer[i+1] * mfR->q;
-            mfR->f = mfR->p + mfR->p - 1.0f;
-            mfR->q = resonance * (1.0f + 0.5f * mfR->q * (1.0f - mfR->q + 5.6f * mfR->q * mfR->q));
+                // exponential 1/Oct, freqMod taken from left channel only
+                // clamp fm mod -1,1 and effective frequencies 1,260000
+                // frequencyBuffer[i] = frequencyBuffer[i + 1] = _clamp((261.6256f * powf(2, (frequencyBuffer[i] + cutoffFrequency) * 10.f)) * freqDiv, 0.f, 1.f);
+                frequencyBuffer[i] = frequencyBuffer[i + 1] = _clamp(261.6256f * powf(2, (_clamp(frequencyBuffer[i], -1.f, 1.f) + cutoffFrequency) * 10.f) * freqDiv, 0.f, 1.f);
+
+                mfL->q = 1.0f - frequencyBuffer[i];
+                mfL->p = frequencyBuffer[i] + 0.8f * frequencyBuffer[i] * mfL->q;
+                mfL->f = mfL->p + mfL->p - 1.0f;
+                mfL->q = resonance * (1.0f + 0.5f * mfL->q * (1.0f - mfL->q + 5.6f * mfL->q * mfL->q));
+
+                mfR->q = 1.0f - frequencyBuffer[i+1];
+                mfR->p = frequencyBuffer[i+1] + 0.8f * frequencyBuffer[i+1] * mfR->q;
+                mfR->f = mfR->p + mfR->p - 1.0f;
+                mfR->q = resonance * (1.0f + 0.5f * mfR->q * (1.0f - mfR->q + 5.6f * mfR->q * mfR->q));
+            }
 
             buffer[i] = ProcessSample(mfL, buffer[i]);
             buffer[i + 1] = ProcessSample(mfR, buffer[i + 1]);
