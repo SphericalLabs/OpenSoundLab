@@ -22,6 +22,13 @@ public class touchpadDeviceInterface : deviceInterface {
   basicSwitch modeSelector;
   button touchPad;
   public bool switchedOn = false;
+  bool wasToggleInPreviousFrame = false;
+
+  void Update()
+  {
+    if (!wasToggleInPreviousFrame && modeSelector.switchVal) touchPad.keyHit(false);
+    wasToggleInPreviousFrame = modeSelector.switchVal;
+  }
 
   public override void Awake() {
     base.Awake();

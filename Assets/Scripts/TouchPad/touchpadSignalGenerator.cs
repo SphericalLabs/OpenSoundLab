@@ -23,7 +23,7 @@ public class touchpadSignalGenerator : signalGenerator {
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    float val = signalOn ? 1.0f : -1.0f;
+    float val = signalOn ? 1.0f : 0.0f;
     SetArrayToSingleValue(buffer, buffer.Length, val);
   }
 }

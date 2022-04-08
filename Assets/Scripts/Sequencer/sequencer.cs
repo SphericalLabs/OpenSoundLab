@@ -36,14 +36,14 @@ public class sequencer : signalGenerator
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
 
-        SetArrayToSingleValue(buffer, buffer.Length, -1);
+        SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
         if (newSignal)
         {
             if ((sigTime == -1 || sigTime == dspTime) && signalOn)
             {
                 sigTime = dspTime;
-                buffer[0] = buffer[1] = 1;
+                buffer[0] = buffer[1] = 1f;
             }
             else
             {
