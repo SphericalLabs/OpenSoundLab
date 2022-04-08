@@ -57,12 +57,12 @@ public class filterDeviceInterface : deviceInterface {
 
   void updateFrequency(){
     freqPercent = frequencyDial.percent;
-    filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -0.6f, 0.7f); // 13 octaves around C4
+    filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -0.5f, 0.5f); // 13 octaves around C4
   }
 
   void updateResonance(){
     resPercent = resonanceDial.percent;
-    filter.resonance = resonanceDial.percent * 0.9f; // will crash often if higher than 1f
+    filter.resonance = resonanceDial.percent; 
   }
   void updateMode(){
     modePercent = modeDial.percent;
