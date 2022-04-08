@@ -20,8 +20,8 @@ public class compressorDeviceInterface : deviceInterface
 {
     public omniJack input, sidechain, output;
     public dial attackDial, releaseDial, thresholdDial, ratioDial, makeupDial;
-    public basicSwitch bypassSwitch;
-    public glowDisk attenuationDisplay;
+    public button bypassSwitch;
+    public Transform attenuationDisplay;
     //public GameObject clippingDisplay;
     compressorSignalGenerator signal;
     private dial[] dials;
@@ -32,7 +32,7 @@ public class compressorDeviceInterface : deviceInterface
         signal = GetComponent<compressorSignalGenerator>();
         dials = new dial[5] { attackDial, releaseDial, thresholdDial, ratioDial, makeupDial };
         //clippingDisplay.SetActive(false);
-        attenuationDisplay.percent = 0;
+        attenuationDisplay.localScale = Vector3.up * 0f;
     }
 
     void Update()
@@ -45,14 +45,13 @@ public class compressorDeviceInterface : deviceInterface
         signal.SetParam(thresholdDial.percent, (int)compressorSignalGenerator.Param.P_THRESHOLD);
         signal.SetParam(ratioDial.percent, (int)compressorSignalGenerator.Param.P_RATIO);
         signal.SetParam(makeupDial.percent, (int)compressorSignalGenerator.Param.P_MAKEUP);
-        signal.SetParam(bypassSwitch.switchVal ? 0 : 1, (int)compressorSignalGenerator.Param.P_BYPASS);
+        signal.SetParam(bypassSwitch.isHit ? 1 : 0, (int)compressorSignalGenerator.Param.P_BYPASS);
 
-        float attenuation = signal.attenuation;
-
-        float attenuationPercent = Mathf.Min( (attenuation / -40.0f), 1);
-        attenuationDisplay.percent = attenuationPercent * 0.85f;
-        attenuationDisplay.PercentUpdate();
-
+        //float attenuation = signal.attenuation;
+        //float attenuationPercent = Mathf.Min( (attenuation / -40.0f), 1);
+        
+        attenuationDisplay.localScale = new Vector3(1f, 1f, Mathf.Min((signal.attenuation / -40.0f), 1));
+    
         //clippingDisplay.SetActive(signal.isClipping);
     }
 
@@ -67,7 +66,7 @@ public class compressorDeviceInterface : deviceInterface
         data.thresholdState = thresholdDial.percent;
         data.ratioState = ratioDial.percent;
         data.makeupState = makeupDial.percent;
-        data.bypassState = bypassSwitch.switchVal;
+        data.bypassState = bypassSwitch.isHit;
 
         data.jackInID = input.transform.GetInstanceID();
         data.jackOutID = output.transform.GetInstanceID();
@@ -90,7 +89,7 @@ public class compressorDeviceInterface : deviceInterface
         thresholdDial.setPercent(data.thresholdState);
         ratioDial.setPercent(data.ratioState);
         makeupDial.setPercent(data.makeupState);
-        bypassSwitch.setSwitch(data.bypassState, true);
+        bypassSwitch.keyHit(data.bypassState);
     }
 }
 
