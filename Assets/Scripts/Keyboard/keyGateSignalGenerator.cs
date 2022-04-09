@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 public class keyGateSignalGenerator : signalGenerator {
 
   public bool isHigh = false;
+  public bool newKeyWasPressed = false;
 
   [DllImport("SoundStageNative")]
   public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
@@ -26,6 +27,12 @@ public class keyGateSignalGenerator : signalGenerator {
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
 
     SetArrayToSingleValue(buffer, buffer.Length, isHigh ? 1f : 0f);
+    if (newKeyWasPressed)
+    {
+      buffer[0] = buffer[1] = 0f;
+      newKeyWasPressed = false;
+    }
 
   }
+
 }

@@ -128,6 +128,7 @@ public class keyboardDeviceInterface : deviceInterface {
         if (_midiOut != null) _midiOut.OutputNote(on, ID);
         freqSignal.UpdateKey(curKey);
         gateSignal.isHigh = true;
+        gateSignal.newKeyWasPressed = true;
       }
     } else {
       if (curKey == ID) {
