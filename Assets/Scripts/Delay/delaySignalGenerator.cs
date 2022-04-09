@@ -52,6 +52,7 @@ public class delaySignalGenerator : signalGenerator
     private float[] modMixBuffer = null;
     private bool modTriggerState = false;
     private float modFeedbackVal;
+    private float lastTriggerFloat = 0f;
 
     public override void Awake()
     {
@@ -136,6 +137,18 @@ public class delaySignalGenerator : signalGenerator
     [DllImport("SoundStageNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
+    private bool containsTrigger(float[] buffer){
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            if (buffer[i] > 0f && lastTriggerFloat <= 0f)
+            { 
+                return true;
+            }
+            lastTriggerFloat = buffer[i];
+        }
+        return false;
+    }
+
   public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
         //Create mod buffers as soon as needed:
@@ -154,17 +167,18 @@ public class delaySignalGenerator : signalGenerator
         //Process mod inputs if plugged in:
         if (sigModTrigger != null)
         {
-            SetArrayToSingleValue(modTriggerBuffer, modTriggerBuffer.Length, 0f);
-            sigModTrigger.processBuffer(modTriggerBuffer, dspTime, channels);
-            if(modTriggerBuffer[0] > 0 && !modTriggerState)
-            {
-                modTriggerState = true;
-                shouldClear = true;
-            }
-            else if(modTriggerBuffer[0] < 0 && modTriggerState)
-            {
-                modTriggerState = false;
-            }
+          SetArrayToSingleValue(modTriggerBuffer, modTriggerBuffer.Length, 0f);
+          sigModTrigger.processBuffer(modTriggerBuffer, dspTime, channels);
+
+          if (containsTrigger(modTriggerBuffer))
+          {
+            modTriggerState = true;
+            shouldClear = true;
+          }
+          else
+          {
+            modTriggerState = false;
+          }
         }
 
         modFeedbackVal = 0;

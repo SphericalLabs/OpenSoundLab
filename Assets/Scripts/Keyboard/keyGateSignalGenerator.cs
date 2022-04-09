@@ -29,7 +29,7 @@ public class keyGateSignalGenerator : signalGenerator {
     SetArrayToSingleValue(buffer, buffer.Length, isHigh ? 1f : 0f);
     if (newKeyWasPressed)
     {
-      buffer[0] = buffer[1] = 0f;
+      buffer[buffer.Length - 1] = buffer[buffer.Length - 2] = 0f;
       newKeyWasPressed = false;
     }
 
