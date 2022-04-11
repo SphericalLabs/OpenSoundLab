@@ -25,14 +25,14 @@ public class keyGateSignalGenerator : signalGenerator {
   public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
     
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     SetArrayToSingleValue(buffer, buffer.Length, isHigh ? 1f : 0f);
     if (newKeyWasPressed)
     {
       buffer[buffer.Length - 1] = buffer[buffer.Length - 2] = 0f;
       newKeyWasPressed = false;
     }
-
+    recursionCheckPost();
   }
 
 }

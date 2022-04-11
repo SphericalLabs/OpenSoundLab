@@ -106,6 +106,7 @@ public class stereoVerbSignalGenerator : signalGenerator {
     }
 
     public override void processBuffer(float[] buffer, double dspTime, int channels) {
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
         //Process mod inputs (& create mod buffers as soon as needed)
         if(sigModSize != null)
         {
@@ -149,5 +150,6 @@ public class stereoVerbSignalGenerator : signalGenerator {
             sigIn.processBuffer(buffer, dspTime, channels);
         //We process the reverb even if there is no input available, to make sure reverb tails decay to the end, and to enable spacy freeze pads.
         StereoVerb_Process(buffer, buffer.Length, channels, x);
+        recursionCheckPost();
     }
 }

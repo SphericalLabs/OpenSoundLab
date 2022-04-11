@@ -151,6 +151,8 @@ public class delaySignalGenerator : signalGenerator
 
   public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+
         //Create mod buffers as soon as needed:
         if (sigModTime != null && modTimeBuffer == null)
             modTimeBuffer = new float[buffer.Length];
@@ -236,6 +238,8 @@ public class delaySignalGenerator : signalGenerator
         //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed. 
         //Delay_Process(buffer, buffer.Length, channels, x);
         Delay_Process(buffer, modTimeBuffer, null, modMixBuffer, buffer.Length, channels, x);
+
+        recursionCheckPost();
     }
 }
 

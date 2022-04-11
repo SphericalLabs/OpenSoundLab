@@ -34,7 +34,7 @@ public class SampleHoldSignalGenerator : signalGenerator
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
-
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
         if (incoming == null) // no signal, just 0
         {
             SetArrayToSingleValue(buffer, buffer.Length, 0f);
@@ -69,5 +69,6 @@ public class SampleHoldSignalGenerator : signalGenerator
                 }
             }
         }
+        recursionCheckPost();
     }
 }

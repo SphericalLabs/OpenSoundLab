@@ -22,6 +22,7 @@ public class artefactSignalGenerator : signalGenerator
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
         if (input != null)
         {
             input.processBuffer(buffer, dspTime, channels);
@@ -35,5 +36,6 @@ public class artefactSignalGenerator : signalGenerator
 
             Artefact_Process(buffer, noise, dwnmpl, jitter, bitrdx, channels, buffer.Length);
         }
-    }
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+  }
 }

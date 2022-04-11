@@ -31,6 +31,8 @@ public class glideSignalGenerator : signalGenerator {
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
     
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+
     if (incoming == null) // DC Gen
     {
       for (int n = 0; n < buffer.Length; n += 1)
@@ -49,5 +51,6 @@ public class glideSignalGenerator : signalGenerator {
     }
     lastTime = time;
 
+    recursionCheckPost();
   }
 }

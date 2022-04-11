@@ -63,7 +63,7 @@ public class quantizerSignalGenerator : signalGenerator {
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (incoming != null)
     {
       incoming.processBuffer(buffer, dspTime, channels);
@@ -124,5 +124,6 @@ public class quantizerSignalGenerator : signalGenerator {
     }
 
     SetArrayToSingleValue(buffer, buffer.Length, output * 0.1f); // downscale to 0.1/Oct
+    recursionCheckPost();
   }
 }

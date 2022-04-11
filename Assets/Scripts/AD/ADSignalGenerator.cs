@@ -79,6 +79,8 @@ public class ADSignalGenerator : signalGenerator
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+
         if (incoming != null)
         {
             if (pulseBuffer.Length != buffer.Length)
@@ -177,8 +179,8 @@ public class ADSignalGenerator : signalGenerator
             glidedVal += (buffer[n] - glidedVal) * 1f; // seems to smooth via float rounding error
             buffer[n] = buffer[n + 1] = glidedVal;
 
-    }
-
+        }
+        recursionCheckPost();
     }
 
 }

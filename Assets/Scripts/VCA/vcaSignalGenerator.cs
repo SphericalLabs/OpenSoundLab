@@ -30,7 +30,7 @@ public class vcaSignalGenerator : signalGenerator {
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (controlBuffer.Length != buffer.Length)
       System.Array.Resize(ref controlBuffer, buffer.Length);
 
@@ -67,6 +67,6 @@ public class vcaSignalGenerator : signalGenerator {
     }
 
     lastAmp = amp;
-
+    recursionCheckPost();
   }
 }

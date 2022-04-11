@@ -27,7 +27,7 @@ public class gainSignalGenerator : signalGenerator {
 
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
 
     for(int n = 0; n < buffer.Length; n++) 
@@ -36,5 +36,6 @@ public class gainSignalGenerator : signalGenerator {
       buffer[n] *= Utils.lerp(lastAmp, amp, (float) n / buffer.Length) * muteFader;
     }
     lastAmp = amp;
+    recursionCheckPost();
   }
 }

@@ -94,6 +94,7 @@ public class filterSignalGenerator : signalGenerator
 
   public override void processBuffer(float[] buffer, double dspTime, int channels)
   {
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (bufferCopy.Length != buffer.Length)
       System.Array.Resize(ref bufferCopy, buffer.Length);
 
@@ -145,6 +146,7 @@ public class filterSignalGenerator : signalGenerator
     CopyArray(buffer, bufferCopy, buffer.Length);
 
     lastCutoffFrequency = cutoffFrequency; // for slope limiting in native code
+    recursionCheckPost();
   }
 }
 

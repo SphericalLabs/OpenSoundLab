@@ -17,6 +17,8 @@ using System.Collections;
 
 public class signalGenerator : MonoBehaviour
 {
+    protected bool hasAlreadyBeenCalledInThisBufferRun = false;
+
     public int index = 0;
 
     protected double _sampleRate;
@@ -43,7 +45,7 @@ public class signalGenerator : MonoBehaviour
 
     public virtual void updateTape(string s)
     {
-       
+        
     }
   
     public virtual void trigger(int c)
@@ -64,6 +66,20 @@ public class signalGenerator : MonoBehaviour
     public virtual void processBuffer(float[] buffer, double dspTime, int channels)
     {
 
+    }
+
+    protected bool recursionCheckPre(){
+        if (hasAlreadyBeenCalledInThisBufferRun)
+        {
+          hasAlreadyBeenCalledInThisBufferRun = false;
+          return false;
+        }
+        hasAlreadyBeenCalledInThisBufferRun = true;
+        return true;
+    }
+
+    protected void recursionCheckPost(){
+        hasAlreadyBeenCalledInThisBufferRun = false;
     }
 
     public virtual float[] getBuffer(double dspTime, int channels, int bufferLength, bool modFreq = false, float requestedFreq = 440f, float detuneAmount = 0)

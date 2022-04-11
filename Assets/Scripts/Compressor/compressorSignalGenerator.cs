@@ -110,7 +110,9 @@ public class compressorSignalGenerator : signalGenerator
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
    public override void processBuffer(float[] buffer, double dspTime, int channels)
-    {
+   {
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+
         if (sidechainBuffer.Length != buffer.Length)
             System.Array.Resize(ref sidechainBuffer, buffer.Length);
         SetArrayToSingleValue(sidechainBuffer, sidechainBuffer.Length, 0f);
@@ -138,6 +140,7 @@ public class compressorSignalGenerator : signalGenerator
 
         attenuation = Compressor_GetAttenuation(x);
         //isClipping = Compressor_IsClipping(x);
-    }
+        recursionCheckPost();
+   }
 }
 

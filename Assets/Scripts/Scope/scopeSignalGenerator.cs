@@ -49,6 +49,7 @@ public class scopeSignalGenerator : signalGenerator
 
   public override void processBuffer(float[] buffer, double dspTime, int channels)
   {
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (bufferCopy.Length != buffer.Length)
       System.Array.Resize(ref bufferCopy, buffer.Length);
 
@@ -70,5 +71,6 @@ public class scopeSignalGenerator : signalGenerator
     if(isMuted){
       SetArrayToSingleValue(buffer, buffer.Length, 0.0f); // clear after usage before passing on. todo: this could be made more efficient and click-free
     }
+    recursionCheckPost();
   }
 }

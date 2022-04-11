@@ -29,7 +29,7 @@ public class stereoSignalGenerator : signalGenerator {
   // how to avoid double calculation of the channels? store buffer and check dsptime?
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
 
     for(int n = 0; n < buffer.Length; n+=2) 
@@ -43,5 +43,6 @@ public class stereoSignalGenerator : signalGenerator {
         buffer[n + 1] = buffer[n + 1];
       }
     }
+    recursionCheckPost();
   }
 }

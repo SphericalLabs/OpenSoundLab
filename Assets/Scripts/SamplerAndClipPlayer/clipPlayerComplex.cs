@@ -243,6 +243,7 @@ public class clipPlayerComplex : clipPlayer {
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (!loaded) return;
     floatingBufferCount = _lastBuffer;
 
@@ -344,7 +345,7 @@ public class clipPlayerComplex : clipPlayer {
 
     lastAmplitude = amplitude;
     lastPlaybackSpeed = playbackSpeed;
-
+    recursionCheckPost();
   }
 
   float[] lp_filter = new float[] { 0, 0 };

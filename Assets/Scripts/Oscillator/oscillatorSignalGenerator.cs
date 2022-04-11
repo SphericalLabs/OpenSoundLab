@@ -49,8 +49,11 @@ public class oscillatorSignalGenerator : signalGenerator
   [DllImport("SoundStageNative")] 
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
+
   public override void processBuffer(float[] buffer, double dspTime, int channels)
   {
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+
     lastIncomingDspTime = dspTime;
 
     if (frequencyExpBuffer.Length != buffer.Length)
@@ -71,12 +74,18 @@ public class oscillatorSignalGenerator : signalGenerator
     SetArrayToSingleValue(syncBuffer, syncBuffer.Length, 0f);
     SetArrayToSingleValue(pwmBuffer, pwmBuffer.Length, 0f);
 
-    if (freqExpGen != null) freqExpGen.processBuffer(frequencyExpBuffer, dspTime, channels);
-    if (freqLinGen != null) freqLinGen.processBuffer(frequencyLinBuffer, dspTime, channels);
-    if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
-    if (syncGen != null) syncGen.processBuffer(syncBuffer, dspTime, channels);
-    if (pwmGen != null) pwmGen.processBuffer(pwmBuffer, dspTime, channels);
-    
+    try
+    {
+      if (freqExpGen != null) freqExpGen.processBuffer(frequencyExpBuffer, dspTime, channels);
+      if (freqLinGen != null) freqLinGen.processBuffer(frequencyLinBuffer, dspTime, channels);
+      if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
+      if (syncGen != null) syncGen.processBuffer(syncBuffer, dspTime, channels);
+      if (pwmGen != null) pwmGen.processBuffer(pwmBuffer, dspTime, channels);
+  } catch (System.StackOverflowException e) {
+      Debug.LogWarning("catched a stackoverflow because of recursive patch connections");
+    }
+
+
     OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
         freqExpGen != null, freqLinGen != null, ampGen != null, syncGen != null, pwmGen != null, _sampleDuration, ref dspTime);
 
@@ -87,7 +96,8 @@ public class oscillatorSignalGenerator : signalGenerator
     // memory for next go around
     prevAmplitude = amplitude;
     prevFrequency = frequency;
-    //counter++;
+
+    recursionCheckPost();
   }
 
 }
