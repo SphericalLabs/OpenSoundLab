@@ -155,7 +155,19 @@ public class SaveLoadInterface : MonoBehaviour {
     if (g.GetComponent<deviceInterface>() != null) {
       InstrumentData data = g.GetComponent<deviceInterface>().GetData();
       GameObject g2 = Instantiate(instrumentPrefabs[data.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
-      g2.GetComponent<deviceInterface>().Load(data);
+      deviceInterface device = g2.GetComponent<deviceInterface>();
+      device.Load(data);
+
+      if (device is oscillatorDeviceInterface) {
+        oscillatorDeviceInterface osc = (oscillatorDeviceInterface) device;
+        osc.ampDial.setPercent(0f);
+      }
+
+      if (device is samplerDeviceInterface)
+      {
+        samplerDeviceInterface sampler = (samplerDeviceInterface)device;
+        sampler.volumeDial.setPercent(0f);
+      }
 
       g2.transform.position = g.transform.position;
       g2.transform.rotation = g.transform.rotation;
