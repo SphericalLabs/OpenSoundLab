@@ -154,6 +154,7 @@ public class SaveLoadInterface : MonoBehaviour {
   public void Copy(GameObject g, manipulator m) {
     if (g.GetComponent<deviceInterface>() != null) {
       InstrumentData data = g.GetComponent<deviceInterface>().GetData();
+
       GameObject g2 = Instantiate(instrumentPrefabs[data.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
       deviceInterface device = g2.GetComponent<deviceInterface>();
       device.Load(data);
@@ -173,6 +174,10 @@ public class SaveLoadInterface : MonoBehaviour {
       g2.transform.rotation = g.transform.rotation;
       g2.transform.localScale = g.transform.localScale;
 
+      Vector3 v = g.transform.localScale;
+      if(v.x < 0) v.x *= -1; // needs mirroring if dragged while copyijg, because left controller was always mirrored and this copies down to the duplicate
+      g2.transform.localScale = v;
+      
       m.ForceGrab(g2.GetComponentInChildren<handle>());
     }
   }
