@@ -98,8 +98,8 @@ public class masterControl : MonoBehaviour {
 
       Debug.Log("Current cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
       Debug.Log("Trying to set levels to 4");
-      Debug.Log("TrySetCPULevel returned " + Performance.TrySetCPULevel(4));
-      Debug.Log("TrySetGPULevel returned " + Performance.TrySetGPULevel(4));
+      Debug.Log("TrySetCPULevel returned " + Performance.TrySetCPULevel(3)); // from 0-3
+      Debug.Log("TrySetGPULevel returned " + Performance.TrySetGPULevel(3)); // from 0-3
       Debug.Log("New cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
       Debug.Log("Display refresh rate: " + Stats.AdaptivePerformance.RefreshRate);
       Unity.XR.Oculus.Utils.SetFoveationLevel(4);
