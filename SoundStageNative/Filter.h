@@ -30,7 +30,7 @@ extern "C"
 {
   typedef void(*LoggerFuncPtr)(int level, const char*); // Unity Delegate
 
-	SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float filterBuffer[], float resonance, LoggerFuncPtr logger);
+	SOUNDSTAGE_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float filterBuffer[], float resonance/*, LoggerFuncPtr logger*/);
 }
 
 

@@ -58,7 +58,7 @@ public class filterSignalGenerator : signalGenerator
   public static extern void AddArrays(float[] a, float[] b, int length);
 
   [DllImport("SoundStageNative")]
-  public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float[] frequencyBuffer, float resonance, IntPtr logger);
+  public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float[] frequencyBuffer, float resonance/*, IntPtr logger*/);
    
     // create structs for passing to native code
   mfValues mf1L = new mfValues();
@@ -67,7 +67,7 @@ public class filterSignalGenerator : signalGenerator
   mfValues mf2L = new mfValues();
   mfValues mf2R = new mfValues();
 
-  IntPtr delegatePtr;
+  //IntPtr delegatePtr;
 
   public override void Awake()
   {
@@ -75,12 +75,12 @@ public class filterSignalGenerator : signalGenerator
     bufferCopy = new float[MAX_BUFFER_LENGTH];
     frequencyBuffer = new float[MAX_BUFFER_LENGTH];
 
-    LogDelegate callback_delegate = new LogDelegate(LogCallback);
-    delegatePtr = Marshal.GetFunctionPointerForDelegate(callback_delegate);
+    //LogDelegate callback_delegate = new LogDelegate(LogCallback);
+    //delegatePtr = Marshal.GetFunctionPointerForDelegate(callback_delegate);
   }
 
-  [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-  public delegate void LogDelegate(int level, string str);
+  //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+  //public delegate void LogDelegate(int level, string str);
 
   static void LogCallback(int level, string msg)
   {
@@ -118,17 +118,17 @@ public class filterSignalGenerator : signalGenerator
     if (curType != filterType.Notch && curType != filterType.BP) // not a double filter setup, either LP or HP
     {
       mf1R.LP = mf1L.LP = curType == filterType.LP;
-      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, freqIncoming != null,  frequencyBuffer, resonance, delegatePtr);
+      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, freqIncoming != null,  frequencyBuffer, resonance/*, delegatePtr*/);
     }
     else if (curType == filterType.Notch) // duplicate buffer in order to process two filters in parallel
     {
       CopyArray(buffer, bufferCopy, buffer.Length);
 
       mf1R.LP = mf1L.LP = true;
-      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f, delegatePtr); // less resonance for double filter mode
+      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/); // less resonance for double filter mode
 
       mf2R.LP = mf2L.LP = false;
-      processStereoFilter(bufferCopy, bufferCopy.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f, delegatePtr);
+      processStereoFilter(bufferCopy, bufferCopy.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/);
 
       AddArrays(buffer, bufferCopy, buffer.Length);
     }
@@ -137,10 +137,10 @@ public class filterSignalGenerator : signalGenerator
     {
 
       mf1R.LP = mf1L.LP = false;
-      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f, delegatePtr);
+      processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/);
 
       mf2R.LP = mf2L.LP = true;
-      processStereoFilter(buffer, buffer.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f, delegatePtr);
+      processStereoFilter(buffer, buffer.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/);
     }
 
     CopyArray(buffer, bufferCopy, buffer.Length);

@@ -46,7 +46,7 @@ extern "C" {
 	  }
   
 
-    void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float frequencyBuffer[], float resonance, LoggerFuncPtr log)
+    void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float frequencyBuffer[], float resonance/*, LoggerFuncPtr log*/)
     {
 
         //resonance = _clamp(resonance, 0.f, 1.f);
