@@ -72,26 +72,28 @@ public class samplerDeviceInterface : deviceInterface {
       if (headSlider.percent != player.trackBounds.x)
       {
         player.trackBounds.x = headSlider.percent;
-        player.updateTrackBounds();
+        player.updateSampleBounds();
       }
       headSlider.bounds.x = tailSlider.transform.localPosition.x;
-    } else {
-      headSlider.setPercent(Mathf.Clamp01(player.headOffset)); // map cv to slider
+    } else if (player.loaded){
+      headSlider.setPercent(Mathf.Clamp01((float)player.sampleBounds[0] / player.consolidatedSampleLength)); // map cv to slider 
     }
 
     if(tailInput.signal == null) { // tail cv not plugged in
       if (tailSlider.percent != player.trackBounds.y)
       {
         player.trackBounds.y = tailSlider.percent;
-        player.updateTrackBounds();
+        player.updateSampleBounds();
       }
       tailSlider.bounds.y = headSlider.transform.localPosition.x;
-    } else {
-      tailSlider.setPercent(Mathf.Clamp01(player.tailOffset)); // map cv to slider
+    }
+    else if(player.loaded) {
+      tailSlider.setPercent(Mathf.Clamp01((float)player.sampleBounds[1] / player.consolidatedSampleLength)); // map cv to slider
     }
     
-    if (headSlider.percent >= tailSlider.percent) // maybe just suboptimal, how to deal with invalid head/tail values? seems to work for now
-      tailSlider.percent = headSlider.percent + 0.02f;
+    if (headSlider.percent >= tailSlider.percent) 
+      tailSlider.percent = Mathf.Clamp01(headSlider.percent + 0.04f);
+    
     
     
   }
@@ -113,6 +115,8 @@ public class samplerDeviceInterface : deviceInterface {
     data.jackInFreqLinID = freqLinInput.transform.GetInstanceID();
     data.jackInSeqID = controlInput.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
+    data.jackHeadID = headInput.transform.GetInstanceID();
+    data.jackTailID = tailInput.transform.GetInstanceID();
     data.dirSwitch = dirSwitch.switchVal;
     data.loopSwitch = loopSwitch.switchVal;
     data.headPos = headSlider.percent;
@@ -139,6 +143,8 @@ public class samplerDeviceInterface : deviceInterface {
     volumeInput.ID = data.jackInAmpID;
     freqExpInput.ID = data.jackInFreqExpID;
     controlInput.ID = data.jackInSeqID;
+    tailInput.ID = data.jackTailID;
+    headInput.ID = data.jackHeadID;
     output.ID = data.jackOutID;
 
     playButton.startToggled = data.playToggle;
@@ -165,6 +171,8 @@ public class SamplerData : InstrumentData {
   public int jackInFreqLinID;
   public int jackInSeqID;
   public int jackOutID;
+  public int jackHeadID;
+  public int jackTailID;
   public bool dirSwitch;
 
   public bool playToggle;

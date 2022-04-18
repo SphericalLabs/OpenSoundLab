@@ -43,8 +43,8 @@ public class clipPlayerComplex : clipPlayer {
   public Renderer waverend;
   public Color32 waveBG = Color.black; // currently overridden in prefab
   public Color32 waveLine = Color.white;
-  int wavewidth = 512*2;
-  int waveheight = 64*4;
+  int wavewidth = 512 * 2;
+  int waveheight = 64 * 4;
   Color32[] wavepixels;
 
   float[] freqExpBuffer;
@@ -58,7 +58,7 @@ public class clipPlayerComplex : clipPlayer {
   float lastAmplitude = 0f;
 
   [DllImport("SoundStageNative")]
-  public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float [] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
+  public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
 , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
 
   [DllImport("SoundStageNative")]
@@ -130,20 +130,57 @@ public class clipPlayerComplex : clipPlayer {
 
   public float headOffset = 0f;
   public float tailOffset = 0f;
-  public void updateTrackBounds() {
+  public int consolidatedSampleLength; // sample length regardless of channel count
+  int padding = 10; // should not load sample smaller than padding samples
+  int[] tempBounds = new int[] { 0, 0 };
+
+  public void updateSampleBounds() {
     if (!loaded) return;
-    sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (headGen == null) ? trackBounds.x : headOffset ));
-    sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * Mathf.Clamp01( (tailGen == null) ? trackBounds.y : tailOffset ));
-    if (sampleBounds[0] >= sampleBounds[1])
+
+    // todo: only calc on sample load?
+    // otherwise NaN errors at times
+    consolidatedSampleLength = (int)(clipSamples.Length / clipChannels - 1); 
+
+    if(checkBounds()){
+      sampleBounds[0] = tempBounds[0];
+      sampleBounds[1] = tempBounds[1];
+    }
+
+  }
+
+  bool checkBounds(){
+    tempBounds[0] = (int)(consolidatedSampleLength * Mathf.Clamp01((headGen == null) ? trackBounds.x : headOffset));
+    tempBounds[1] = (int)(consolidatedSampleLength * Mathf.Clamp01((tailGen == null) ? trackBounds.y : tailOffset));
+
+    if (
+      tempBounds[0] >= 0
+      && tempBounds[0] < consolidatedSampleLength - padding
+      && tempBounds[1] > 0
+      && tempBounds[1] <= consolidatedSampleLength
+      && tempBounds[0] <= tempBounds[1] - padding
+      )
     {
-      if(sampleBounds[0] <= 0){ // left end
-        sampleBounds[0] = 0;
-        sampleBounds[1] = 1;
-      } else { // right end
-        sampleBounds[0] = clipSamples.Length / clipChannels - 2;
-        sampleBounds[1] = clipSamples.Length / clipChannels - 1;
-      }    
-    }      
+      return true;
+    } else {
+      return false;
+    }
+      
+
+    //if (tempBounds[0] < 0) sampleBounds[0] = 0;
+    //if (tempBounds[0] > consolidatedSampleLength) sampleBounds[0] = consolidatedSampleLength - padding;
+    //if (tempBounds[1] > consolidatedSampleLength) sampleBounds[1] = consolidatedSampleLength;
+    //if (tempBounds[0] >= tempBounds[1])
+    //{
+    //  if (tempBounds[1] >= padding)
+    //  {
+    //    tempBounds[0] = tempBounds[1] - padding;
+    //  }
+    //  else
+    //  {
+    //    tempBounds[1] = consolidatedSampleLength;
+    //    tempBounds[0] = consolidatedSampleLength - padding;
+    //  }
+    //}
   }
 
   public override void DrawClipTex() {
@@ -276,7 +313,7 @@ public class clipPlayerComplex : clipPlayer {
     if (headGen != null)
     {
       headGen.processBuffer(headBuffer, dspTime, channels);
-      headOffset = headBuffer[0] + headTrim; // use buffer for offset, take only first sample of buffer
+      headOffset = Mathf.Clamp01(headBuffer[0] + headTrim); // use buffer for offset, take only first sample of buffer
     } else {
       headOffset = 0f;
     }
@@ -284,14 +321,15 @@ public class clipPlayerComplex : clipPlayer {
     if (tailGen != null)
     {
       tailGen.processBuffer(tailBuffer, dspTime, channels);
-      tailOffset = tailBuffer[0] + tailTrim; // use buffer for offset, take only first sample of buffer
+      tailOffset = Mathf.Clamp01(tailBuffer[0] + tailTrim); // use buffer for offset, take only first sample of buffer
     }
     else
     {
       tailOffset = 0f;
     }
 
-    updateTrackBounds(); // might be overkill!
+
+    updateSampleBounds(); // might be overkill!
 
     if (!scrubGrabbed && !turntableGrabbed) {
       bool curActive = active;
