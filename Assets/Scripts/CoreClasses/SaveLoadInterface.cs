@@ -184,6 +184,8 @@ public class SaveLoadInterface : MonoBehaviour {
 
 }
 
+
+[XmlInclude(typeof(DCData))]
 [XmlInclude(typeof(TutorialsData))]
 [XmlInclude(typeof(PolarizerData))]
 [XmlInclude(typeof(ArtefactData))]

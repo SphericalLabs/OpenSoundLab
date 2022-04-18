@@ -37,6 +37,7 @@ public class menuItem : manipObject {
     ADSR,
     Airhorn,
     Artefact,
+    DC,
     Camera,
     Compressor,
     ControlCube,
@@ -117,8 +118,8 @@ public class menuItem : manipObject {
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
     // Please use the first letter of the original enum name for proper sorting in the menu!
-    if (item == deviceType.VCA) label.text = "VCA / Atten";
-    if (item == deviceType.Glide) label.text = "Glide / DC";
+    if (item == deviceType.VCA) label.text = "VCA";
+    if (item == deviceType.Glide) label.text = "Glide";
     if (item == deviceType.Gain) label.text = "Gain / Mute";
     if (item == deviceType.MIDIIN) label.text = "MIDI In";
     if (item == deviceType.MIDIOUT) label.text = "MIDI Out";
@@ -127,9 +128,10 @@ public class menuItem : manipObject {
     if (item == deviceType.Timeline) label.text = "Sequencer III";
     if (item == deviceType.ControlCube) label.text = "ControlCube";
     if (item == deviceType.Microphone) label.text = "Mic";
-    if (item == deviceType.SampleHold) label.text = "Sample / Hold";
+    if (item == deviceType.SampleHold) label.text = "Sample & Hold";
     if (item == deviceType.Reverb) label.text = "Reverb";
     if (item == deviceType.StereoVerb) label.text = "Reverb";
+    if (item == deviceType.DC) label.text = "DC";
     //if (item == deviceType.Quantizer) label.text = "Quantizer";
     //if (item == deviceType.Polarizer) label.text = "Polarizer";
 

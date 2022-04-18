@@ -21,7 +21,7 @@ using System.Collections.Generic;
 public class dial : manipObject {
 
   public float percent = 0f;
-  float defaultPercent; 
+  public float defaultPercent; 
 
   public enum dialColors {generic, frequency, amplitude};
   public dialColors dialColor = dialColors.generic; // dropdown, defaulting to white

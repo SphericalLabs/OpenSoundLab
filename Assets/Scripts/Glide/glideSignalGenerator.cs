@@ -33,13 +33,7 @@ public class glideSignalGenerator : signalGenerator {
     
     if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
-    if (incoming == null) // DC Gen
-    {
-      for (int n = 0; n < buffer.Length; n += 1)
-      {
-        buffer[n] = Utils.lerp(lastTime, time, (float)n / buffer.Length) * 2 - 1; // -1,1
-      }
-    } else { // Glide
+    if (incoming != null) { 
 
       incoming.processBuffer(buffer, dspTime, channels);
 
