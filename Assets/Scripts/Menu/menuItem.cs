@@ -128,12 +128,12 @@ public class menuItem : manipObject {
     if (item == deviceType.Timeline) label.text = "Sequencer III";
     if (item == deviceType.ControlCube) label.text = "ControlCube";
     if (item == deviceType.Microphone) label.text = "Mic";
-    if (item == deviceType.SampleHold) label.text = "Sample & Hold";
+    if (item == deviceType.SampleHold) label.text = "S&H";
     if (item == deviceType.Reverb) label.text = "Reverb";
     if (item == deviceType.StereoVerb) label.text = "Reverb";
     if (item == deviceType.DC) label.text = "DC";
     //if (item == deviceType.Quantizer) label.text = "Quantizer";
-    //if (item == deviceType.Polarizer) label.text = "Polarizer";
+    //if (item == deviceType.Polarizer) label.text = "Uni / Bi";
 
 
     label.gameObject.SetActive(true);
