@@ -130,7 +130,7 @@ public class clipPlayerComplex : clipPlayer {
 
   public float headOffset = 0f;
   public float tailOffset = 0f;
-  public int consolidatedSampleLength; // sample length regardless of channel count
+  public int consolidatedSampleLength = -1; // sample length regardless of channel count
   int padding = 10; // should not load sample smaller than padding samples
   int[] tempBounds = new int[] { 0, 0 };
 
@@ -141,14 +141,14 @@ public class clipPlayerComplex : clipPlayer {
     // otherwise NaN errors at times
     consolidatedSampleLength = (int)(clipSamples.Length / clipChannels - 1); 
 
-    if(checkBounds()){
+    if(calcAndCheckTempBounds()){
       sampleBounds[0] = tempBounds[0];
       sampleBounds[1] = tempBounds[1];
     }
 
   }
 
-  bool checkBounds(){
+  bool calcAndCheckTempBounds(){
     tempBounds[0] = (int)(consolidatedSampleLength * Mathf.Clamp01((headGen == null) ? trackBounds.x : headOffset));
     tempBounds[1] = (int)(consolidatedSampleLength * Mathf.Clamp01((tailGen == null) ? trackBounds.y : tailOffset));
 

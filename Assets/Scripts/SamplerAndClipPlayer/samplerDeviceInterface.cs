@@ -14,6 +14,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Runtime;
 
 public class samplerDeviceInterface : deviceInterface {
   public dial speedDial, volumeDial, headTrimDial, tailTrimDial;
@@ -46,6 +47,8 @@ public class samplerDeviceInterface : deviceInterface {
   }
 
   int[] lastSignal = new int[] { 0, 0 };
+  float tmp;
+  
   void Update() {
     float mod = dirSwitch.switchVal ? 1 : -1;
     if (dirSwitch.switchVal != player.playdirection) player.playdirection = dirSwitch.switchVal;
@@ -75,8 +78,10 @@ public class samplerDeviceInterface : deviceInterface {
         player.updateSampleBounds();
       }
       headSlider.bounds.x = tailSlider.transform.localPosition.x;
-    } else if (player.loaded){
-      headSlider.setPercent(Mathf.Clamp01((float)player.sampleBounds[0] / player.consolidatedSampleLength)); // map cv to slider 
+    } else if (player.loaded) 
+    {
+      tmp = Mathf.Clamp01((float)player.sampleBounds[0] / player.consolidatedSampleLength);
+      if(!double.IsNaN(tmp)) headSlider.setPercent(tmp); // map cv to slider 
     }
 
     if(tailInput.signal == null) { // tail cv not plugged in
@@ -88,13 +93,12 @@ public class samplerDeviceInterface : deviceInterface {
       tailSlider.bounds.y = headSlider.transform.localPosition.x;
     }
     else if(player.loaded) {
-      tailSlider.setPercent(Mathf.Clamp01((float)player.sampleBounds[1] / player.consolidatedSampleLength)); // map cv to slider
+      tmp = Mathf.Clamp01((float)player.sampleBounds[1] / player.consolidatedSampleLength);
+      if (!double.IsNaN(tmp)) tailSlider.setPercent(tmp); // map cv to slider 
     }
     
     if (headSlider.percent >= tailSlider.percent) 
       tailSlider.percent = Mathf.Clamp01(headSlider.percent + 0.04f);
-    
-    
     
   }
 
@@ -142,9 +146,10 @@ public class samplerDeviceInterface : deviceInterface {
 
     volumeInput.ID = data.jackInAmpID;
     freqExpInput.ID = data.jackInFreqExpID;
+    freqLinInput.ID = data.jackInFreqLinID;
     controlInput.ID = data.jackInSeqID;
-    tailInput.ID = data.jackTailID;
-    headInput.ID = data.jackHeadID;
+    headInput.ID = data.jackHeadID; 
+    tailInput.ID = data.jackTailID;    
     output.ID = data.jackOutID;
 
     playButton.startToggled = data.playToggle;
