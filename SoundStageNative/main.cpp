@@ -426,12 +426,15 @@ extern "C" {
             if (floatingBufferCount > sampleBounds[1])
             {
                 endOfSample = true;
-                floatingBufferCount = sampleBounds[0] + 1 + floatingBufferCount - sampleBounds[1]; // wrap over playhead offset
+                floatingBufferCount = sampleBounds[0] + 1 + fmod(floatingBufferCount, (double) sampleBounds[1] - sampleBounds[0]); // wrap over playhead offset
             }
-            else if (floatingBufferCount < sampleBounds[0] + 1) // please note: sampleBounds[0] is incremented by 1 here in all occurences in order to avoid a weird glitch together with the linear interpolation
+            // please note: sampleBounds[0] is incremented by 1 here in all occurences 
+            // in order to avoid a weird glitch together with the linear interpolation
+            // todo: try to get rid of it, is it still necessary with fmod looping?
+            else if (floatingBufferCount < sampleBounds[0] + 1) 
             {
                 endOfSample = true;
-                floatingBufferCount = sampleBounds[1] + floatingBufferCount - sampleBounds[0] - 1; // wrap over playhead offset
+                floatingBufferCount = sampleBounds[1] - fmod(floatingBufferCount, (double)sampleBounds[1] - sampleBounds[0]); // wrap over playhead offset
             }
 
             if (endOfSample)
