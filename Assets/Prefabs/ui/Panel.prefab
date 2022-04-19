@@ -208,6 +208,8 @@ MonoBehaviour:
   onColor: {r: 0, g: 0, b: 0, a: 0}
   offColor: {r: 0, g: 0, b: 0, a: 0}
   outlineRender: {fileID: 0}
+  panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
+  panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   _componentInterface: {fileID: 0}
   buttonID: 0
   isHit: 0

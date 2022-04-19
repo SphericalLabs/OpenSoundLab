@@ -19,6 +19,8 @@ public class UIpanelCancel : manipObject {
 
   public TextMesh label;
   public GameObject outline;
+  Renderer panelRend;
+  public Material panelMat, panelMatSelected;
   Material textMat;
   Color onColor, offColor;
 
@@ -27,6 +29,10 @@ public class UIpanelCancel : manipObject {
 
   public override void Awake() {
     base.Awake();
+
+    panelRend = transform.Find("Outline").gameObject.GetComponent<Renderer>();
+    panelRend.sharedMaterial = panelMat;
+
     if (transform.parent) _compInterface = transform.parent.GetComponent<componentInterface>();
 
     offColor = Color.HSVToRGB(0, 230f / 255, 118f / 255);
@@ -53,8 +59,10 @@ public class UIpanelCancel : manipObject {
 
     if (curState == manipState.none) {
       if (!toggled) textMat.SetColor("_TintColor", offColor);
+      panelRend.sharedMaterial = panelMat;
     } else if (curState == manipState.selected) {
       textMat.SetColor("_TintColor", onColor);
+      panelRend.sharedMaterial = panelMatSelected;
     } else if (curState == manipState.grabbed) {
       textMat.SetColor("_TintColor", onColor);
       keyHit(true);

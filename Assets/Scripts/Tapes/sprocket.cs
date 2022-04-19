@@ -96,8 +96,8 @@ public class sprocket : manipObject {
     z = Mathf.Clamp01(z / sprocketRadius) + mod;
     if (z > 0) {
       rend.enabled = coll.enabled = true;
-      rend.material.SetFloat("_EmissionGain", glowEmission * z);
-      rend.material.SetColor("_TintColor", Color.Lerp(Color.clear, glowColor, z));
+      rend.sharedMaterial.SetFloat("_EmissionGain", glowEmission * z);
+      rend.sharedMaterial.SetColor("_TintColor", Color.Lerp(Color.clear, glowColor, z));
     } else {
       rend.enabled = coll.enabled = false;
     }

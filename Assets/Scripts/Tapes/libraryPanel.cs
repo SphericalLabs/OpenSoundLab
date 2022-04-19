@@ -19,18 +19,16 @@ using System.IO;
 public class libraryPanel : UIpanel {
   panelRingComponentInterface _panelRing;
 
-  Renderer rend;
   Transform masterObj;
   float panelRadius = 1;
-  public Color panelColor = new Color(18 / 255f, 67 / 255f, 96 / 255f, 120 / 255f);
-
+  //public Color panelColor = new Color(18 / 255f, 67 / 255f, 96 / 255f, 120 / 255f);
+  
   public GameObject loadingPrefab, ghostTapePrefab, ghostGroupPrefab;
   GameObject loaderObject, ghostTape, ghostGroup;
 
   bool secondary = false;
 
   public override void AwakeB() {
-    rend = GetComponent<Renderer>();
     masterObj = transform.parent;
     _panelRing = GetComponentInParent<panelRingComponentInterface>();
   }
@@ -123,7 +121,6 @@ public class libraryPanel : UIpanel {
     }
 
     if (active && curState == manipState.none) {
-      rend.material.color = panelColor;
       if (toggled) {
         textMat.SetColor("_TintColor", Color.Lerp(Color.clear, onColor, z));
         outlineRender.material.SetColor("_TintColor", Color.Lerp(Color.clear, onColor, z));

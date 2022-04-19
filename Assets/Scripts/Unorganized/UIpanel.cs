@@ -23,6 +23,8 @@ public class UIpanel : manipObject {
   public Color onColor, offColor;
 
   public Renderer outlineRender;
+  Renderer rend;
+  public Material panelMat, panelMatSelected;
 
   public componentInterface _componentInterface;
   public int buttonID;
@@ -33,15 +35,18 @@ public class UIpanel : manipObject {
 
     onColor = Color.HSVToRGB(182f / 359, 1f, 118f / 255);
     offColor = Color.HSVToRGB(182f / 359, 0f, 118f / 255);
-    textMat = label.GetComponent<Renderer>().material;
+    textMat = label.GetComponent<Renderer>().sharedMaterial;
     setTextState(false);
 
     outlineRender = outline.GetComponent<Renderer>();
-    outlineRender.material.SetColor("_TintColor", onColor);
-    outlineRender.material.SetFloat("_EmissionGain", .428f);
-    outlineRender.material.SetFloat("_InvFade", 1f);
+    outlineRender.sharedMaterial.SetColor("_TintColor", onColor);
+    outlineRender.sharedMaterial.SetFloat("_EmissionGain", .428f);
+    outlineRender.sharedMaterial.SetFloat("_InvFade", 1f);
 
     outline.SetActive(false);
+
+    rend = GetComponent<Renderer>();
+    rend.sharedMaterial = panelMat;
 
     AwakeB();
   }
@@ -66,9 +71,11 @@ public class UIpanel : manipObject {
     curState = state;
     if (curState == manipState.none) {
       if (!toggled) setTextState(false);
+      rend.sharedMaterial = panelMat;
     } else if (curState == manipState.selected) {
       selectEvent(true);
       setTextState(true);
+      rend.sharedMaterial = panelMatSelected;
     } else if (curState == manipState.grabbed) {
       setTextState(true);
       keyHit(true);

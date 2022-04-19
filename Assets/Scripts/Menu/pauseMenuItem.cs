@@ -18,7 +18,8 @@ using System.Collections;
 public class pauseMenuItem : manipObject {
   public TextMesh label;
   //public Texture2D tex;
-  Material mat;
+  Renderer panelRend;
+  public Material panelMat, panelMatSelected;
   Material textMat;
   pauseMenu mainmenu;
   public pauseMenu.itemType itemType;
@@ -28,12 +29,15 @@ public class pauseMenuItem : manipObject {
   public override void Awake() {
     base.Awake();
 
+    panelRend = transform.Find("Quad").gameObject.GetComponent<Renderer>();
+    panelRend.sharedMaterial = panelMat;
+
     normalColor = Color.HSVToRGB(.6f, .7f, .9f);
     if (itemType == pauseMenu.itemType.confirmItem) normalColor = Color.HSVToRGB(.4f, .7f, .9f);
     else if (itemType == pauseMenu.itemType.cancelItem) normalColor = Color.HSVToRGB(0, .7f, .9f);
 
     if (label != null) {
-      textMat = label.GetComponent<Renderer>().material;
+      textMat = label.GetComponent<Renderer>().sharedMaterial;
       textMat.SetColor("_TintColor", normalColor);
     }
     if (itemType == pauseMenu.itemType.tooltipItem) {
@@ -75,13 +79,13 @@ public class pauseMenuItem : manipObject {
   public override void setState(manipState state) {
     curState = state;
     if (curState == manipState.none) {
-      
+      panelRend.sharedMaterial = panelMat;
       if (textMat != null) {
         textMat.SetColor("_TintColor", normalColor);
         textMat.SetFloat("_EmissionGain", .3f);
       }
     } else if (curState == manipState.selected) {
-      
+      panelRend.sharedMaterial = panelMatSelected;
       if (textMat != null) {
         textMat.SetColor("_TintColor", normalColor);
         textMat.SetFloat("_EmissionGain", .3f);
