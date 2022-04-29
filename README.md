@@ -17,8 +17,9 @@ Hannes Barfuss, Ludwig Zeller
 ###### CONSULTING
 Anselm Bauer
 
-###### GRAPHICS
-Iman Khoshniataram
+###### MENU SYMBOLS
+Iman Khoshniataram 
+(The menu symbols of SoundStage Lab are licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/))
 
 ###### SPONSORING
 [IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)
