@@ -4,7 +4,7 @@ SoundStage Lab is a fork of Logan Olson's magnificent [SoundStage VR](https://gi
 
 SoundStage Lab is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep downstream users in sync with our ongoing development.
 
-Binaries will soon be made available on SideQuest, Oculus App Lab and the Oculus Quest Store as well. The project is partially funded by an educational grant of the University of Applied Sciences Northwestern Switzerland (FHNW).
+Binaries will soon be made available on SideQuest, Oculus App Lab and the Oculus Quest Store as well. The project is partially funded by an educational grant of the University of Applied Sciences Northwestern Switzerland ([IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)).
 
 [Quick Start Manual](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)
 
@@ -24,7 +24,7 @@ Iman Khoshniataram
 (The menu symbols of SoundStage Lab are licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/))
 
 ###### SPONSORING
-[IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)
+IDCE FHNW
 
 
 ### Original Credits for SoundStage VR
