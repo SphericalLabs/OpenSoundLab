@@ -16,12 +16,12 @@ Ludwig Zeller
 ###### PROGRAMMING
 Hannes Barfuss, Ludwig Zeller
 
-###### CONSULTING
-Anselm Bauer
-
 ###### MENU SYMBOLS
 Iman Khoshniataram 
 (The menu symbols of SoundStage Lab are licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/))
+
+###### CONSULTING
+Anselm Bauer
 
 ###### SPONSORING
 IDCE FHNW
