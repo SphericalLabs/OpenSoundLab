@@ -117,6 +117,7 @@ public class menuItem : manipObject {
   public GameObject Setup(deviceType d) {
     item = d;
     tex = Resources.Load("Textures/" + item.ToString() + "Symbol") as Texture;
+    if (tex != null) tex.mipMapBias = -1f; // shift mipmap by one level, improves clarity of menu symbols
     symbol.material.SetTexture("_MainTex", tex);
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
