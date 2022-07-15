@@ -8,6 +8,7 @@ The project is partially funded by an educational grant of the University of App
 
 This repository is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep downstream users in sync with our ongoing development. Binaries will soon be made available on SideQuest and Meta Quest App Lab. 
 
+### Instructions
 [Quick Start Manual](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)
 
 ### Project Team for OpenSoundLab
