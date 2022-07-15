@@ -25,13 +25,13 @@ public class trashcan : MonoBehaviour {
 
   public AudioClip trashAct, trashOn, trashOff;
 
-  Color offColor = new Color(.5f, .5f, .1f);
+  Color offColor = new Color(.6f, .6f, .6f);
   Color onColor = new Color(1, 1, 1);
 
   void Awake() {
     mat = transform.GetChild(0).GetComponent<Renderer>().material;
     manager = transform.parent.parent.GetComponent<menuManager>();
-    offColor = Color.HSVToRGB(.6f, .7f, .9f);
+    //offColor = new Color(.85f, .85f, .85f);
     mat.SetColor("_TintColor", offColor);
     mat.SetFloat("_EmissionGain", .2f);
   }

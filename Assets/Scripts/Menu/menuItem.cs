@@ -103,7 +103,7 @@ public class menuItem : manipObject {
 
   public override void Awake() {
     base.Awake();
-    disabledColor = normalColor = selectColor = new Color(0.5f, 0.5f, 0.5f);
+    disabledColor = normalColor = selectColor = new Color(0.6f, 0.6f, 0.6f);
     
     label = GetComponentInChildren<TextMesh>();
     labelMat = label.GetComponent<Renderer>().material;
