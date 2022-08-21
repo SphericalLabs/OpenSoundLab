@@ -26,7 +26,7 @@ public class filterDeviceInterface : deviceInterface {
 
   filterSignalGenerator filter;
 
-  float freqPercent, resPercent, modePercent = 0f;
+  float freqPercent, resPercent, modePercent; 
   //public float bandwidthPercent = 0f;
 
 

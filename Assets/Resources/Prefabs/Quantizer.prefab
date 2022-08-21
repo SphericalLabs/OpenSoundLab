@@ -68,6 +68,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
+  defaultPercent: 0
   dialColor: 1
   controllerRot: 0
   lastControllerRot: 0
@@ -76,8 +77,8 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
-  isNotched: 0
-  notchSteps: 4
+  isNotched: 1
+  notchSteps: 23
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0
@@ -2497,6 +2498,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0
+  defaultPercent: 0
   dialColor: 1
   controllerRot: 0
   lastControllerRot: 0

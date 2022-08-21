@@ -136,8 +136,7 @@ public class menuItem : manipObject {
     if (item == deviceType.Reverb) label.text = "Reverb";
     if (item == deviceType.StereoVerb) label.text = "Reverb";
     if (item == deviceType.DC) label.text = "DC";
-    //if (item == deviceType.Quantizer) label.text = "Quantizer";
-    //if (item == deviceType.Polarizer) label.text = "Uni / Bi";
+    if (item == deviceType.Polarizer) label.text = "Polarity";
 
 
     label.gameObject.SetActive(true);

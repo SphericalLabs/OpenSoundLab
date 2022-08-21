@@ -33,7 +33,7 @@ public class quantizerDeviceInterface : deviceInterface {
   void Update() {
 
     signal.selectedScale = Mathf.RoundToInt(scaleDial.percent * 3);
-    signal.transpose = Utils.map(transposeDial.percent, 0f, 1f, -0.3f, 0.3f);
+    signal.transpose = Utils.map(transposeDial.percent, 0f, 1f, -1f, 1f);
 
     if (signal.incoming != input.signal) signal.incoming = input.signal;
   }

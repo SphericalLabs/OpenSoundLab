@@ -78,55 +78,59 @@ public class quantizerSignalGenerator : signalGenerator {
     if (selectedScale == 3)
     {
       SetArrayToSingleValue(buffer, buffer.Length, Mathf.Round((buffer[0] + transpose) * 10f) * 0.1f); // transpose -5,5 octaves
-      return;
+
     }
-    
-    integerPart = Mathf.Floor(buffer[0] * 10 + transpose * 2); // transpose -1,1 octaves
-    decimalPart = buffer[0] * 10 + transpose * 2 - integerPart; 
-    
-
-    // incoming signals and transpose dial need to be upscaled 0.1/Oct to 1/Oct
-    // scales need to be adjusted for semi steps in 1/Oct by multiplying semiMult
-
-
-    i = 0;
-    while (i < scales[selectedScale].Length)
+    else // other quantisation modes
     {
-      if (decimalPart < scales[selectedScale][i])
-      {        
-        break;
+
+      integerPart = Mathf.Floor(buffer[0] * 10 + transpose * 2); // transpose -1,1 octaves
+      decimalPart = buffer[0] * 10 + transpose * 2 - integerPart;
+
+
+      // incoming signals and transpose dial need to be upscaled 0.1/Oct to 1/Oct
+      // scales need to be adjusted for semi steps in 1/Oct by multiplying semiMult
+
+
+      i = 0;
+      while (i < scales[selectedScale].Length)
+      {
+        if (decimalPart < scales[selectedScale][i])
+        {
+          break;
+        }
+        i++;
       }
-      i++;
+
+      i--; // undo last increment, otherwise to high
+
+
+      if (i == scales[selectedScale].Length - 1) // edge case: last value, need wrap around
+      {
+
+        if (Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(1 - decimalPart)) // higher than last value
+        {
+          output = integerPart + scales[selectedScale][i];
+        }
+        else
+        {
+          output = integerPart + 1 + scales[selectedScale][0]; // last part is actually zero, no need to compute
+        }
+      }
+      else // normal case
+      {
+        if (Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(decimalPart - scales[selectedScale][i + 1]))
+        {
+          output = integerPart + scales[selectedScale][i];
+        }
+        else
+        {
+          output = integerPart + scales[selectedScale][i + 1];
+        }
+      }
+
+      SetArrayToSingleValue(buffer, buffer.Length, output * 0.1f); // downscale to 0.1/Oct
+
     }
-
-    i--; // undo last increment, otherwise to high
-
-        
-    if (i == scales[selectedScale].Length - 1) // edge case: last value, need wrap around
-    {
-      
-      if (Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(1 - decimalPart) ) // higher than last value
-      {
-        output = integerPart + scales[selectedScale][i];
-      } 
-      else 
-      {
-        output = integerPart + 1 + scales[selectedScale][0]; // last part is actually zero, no need to compute
-      }
-    } 
-    else // normal case
-    {
-      if (Mathf.Abs(decimalPart - scales[selectedScale][i]) <= Mathf.Abs(decimalPart - scales[selectedScale][i+1]))
-      {
-        output = integerPart + scales[selectedScale][i];
-      }
-      else
-      {
-        output = integerPart + scales[selectedScale][i+1];
-      }
-    }
-
-    SetArrayToSingleValue(buffer, buffer.Length, output * 0.1f); // downscale to 0.1/Oct
     recursionCheckPost();
   }
 }
