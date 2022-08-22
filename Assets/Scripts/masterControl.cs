@@ -105,9 +105,11 @@ public class masterControl : MonoBehaviour {
       Debug.Log("TrySetGPULevel returned " + Performance.TrySetGPULevel(3)); // from 0-3
       Debug.Log("New cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
       Debug.Log("Display refresh rate: " + Stats.AdaptivePerformance.RefreshRate);
-      Unity.XR.Oculus.Utils.SetFoveationLevel(4);
+      Unity.XR.Oculus.Utils.SetFoveationLevel(3);
       
     }
+
+    UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.45f;
 
     Debug.Log("Buffer size is: " + configuration.dspBufferSize);
     //configuration.dspBufferSize = bufferSize;
@@ -130,7 +132,7 @@ public class masterControl : MonoBehaviour {
       muteEnvToggle.isOn = true;
     }
 
-    SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "SoundStage";
+    SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "OpenSoundLab";
     ReadFileLocConfig();
     Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
     Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");

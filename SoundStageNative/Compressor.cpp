@@ -117,7 +117,7 @@ SOUNDSTAGE_API void Compressor_Process(float buffer[], float sc[], int length, i
             ///apply threshold, ratio, knee: eq.4
             tmp = 2*(xG - threshold);
             ///signal is below treshold and not within knee, no attenuation at all:
-            if(tmp < -(knee)) yG = xG;
+            if(tmp <= -(knee)) yG = xG;
             ///signal is above threshold and not within knee, full attenuation:
             else if ((tmp > knee)) yG = threshold + (xG - threshold) / ratio;
             ///signal is within knee, attenuate smoothly:
