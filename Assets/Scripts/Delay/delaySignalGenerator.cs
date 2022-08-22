@@ -23,7 +23,7 @@ public class delaySignalGenerator : signalGenerator
     const int INTERPOLATION_LINEAR = 2;
 
     //const int DELAYMODE_SIMPLE = 0; deprecated
-    const int DELAYMODE_OVERAMPLED = 1;
+    const int DELAYMODE_OVERSAMPLED = 1;
     const int DELAYMODE_EFFICIENT = 2;
 
     public const float MAX_TIME = 12.5f; // * 1000 ms.
