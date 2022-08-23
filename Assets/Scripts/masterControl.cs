@@ -27,7 +27,8 @@ public class masterControl : MonoBehaviour {
 
   public static masterControl instance;
   public UnityEngine.Audio.AudioMixer masterMixer;
-  public static float versionNumber = .76f;
+  
+  public static float versionNumber;
 
   public enum platform {
     Oculus,
@@ -73,6 +74,19 @@ public class masterControl : MonoBehaviour {
 
   void Awake() {
     instance = this;
+
+    float f = -1f;
+    try
+    {
+      f = float.Parse(UnityEditor.PlayerSettings.bundleVersion);
+    }
+    catch (System.Exception e)
+    {
+      Debug.LogError("Could not parse bundleVersion.");
+    }
+
+    versionNumber = f;
+
     _measurePhase = 0;
     _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
 
