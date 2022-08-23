@@ -33,8 +33,10 @@ public class cubeZone : manipObject {
     _deviceInterface = GetComponentInParent<ControlCubeDeviceInterface>();
   }
 
+  Vector3 p;
   public override void grabUpdate(Transform t) {
-    Vector3 p = transform.InverseTransformPoint(t.position);
+    Transform tip = t.Find("manipCollViz").transform; 
+    p = transform.InverseTransformPoint(tip.position);
     updatePercent(p);
     manipulatorObjScript.hapticPulse((ushort)(750f * (_deviceInterface.percent.x + _deviceInterface.percent.y + _deviceInterface.percent.z) / 3));
   }

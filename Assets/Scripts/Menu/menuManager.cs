@@ -98,11 +98,11 @@ public class menuManager : MonoBehaviour {
       if ((menuItem.deviceType)i == menuItem.deviceType.Stereo) continue; // remove completely?
       //if ((menuItem.deviceType)i == menuItem.deviceType.ADSR) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Maracas) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.Drum) continue;
+      //if ((menuItem.deviceType)i == menuItem.deviceType.Drum) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Timeline) continue;      
       if ((menuItem.deviceType)i == menuItem.deviceType.Funktion) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.SARSCov2) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.Looper) continue;
+      //if ((menuItem.deviceType)i == menuItem.deviceType.Looper) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Reverb) continue;
 
       // MultiMix and MultiSplit hack, want to have Multiple available for loading, but not in the menu palette
@@ -188,10 +188,11 @@ public class menuManager : MonoBehaviour {
         menuItemScripts[i].Appear(on);
         //menuItemScripts[i].transform.localScale = Vector3.one;
       }
-      transform.position = pad.position;
+      transform.position = pad.Find("manipCollViz").position;
+      transform.Translate(Vector3.left * -0.03f); // somehow this is only applied from the second menu spawn on
       Vector3 camPos = Camera.main.transform.position;
       camPos.y -= .2f;
-      camPos.x += 0.01f; // half eye distance, so that it centers of middle of both eyes
+      camPos.x += 0.04f; // half eye distance, so that it centers of middle of both eyes
       transform.LookAt(camPos, Vector3.up);
     }
     else {

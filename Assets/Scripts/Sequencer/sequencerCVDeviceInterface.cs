@@ -157,7 +157,7 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         for (int i = 0; i < curDimensions[1]; i++)
         {
-            if (samplerList[i].seqMuted) continue;
+            if (samplerList[i].seqMuted) return;
             seqList[i].setSignal(cubeBools[targetStep][i]);      
             cvSeqList[i].setSignal(cubeFloats[targetStep][i] * 2f - 1f);   
         }
