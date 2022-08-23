@@ -139,18 +139,22 @@ public class button : manipObject {
     isHit = on;
     toggled = on;
 
+    if(manipulatorObjScript != null) manipulatorObjScript.bigHaptic((ushort)3000, 0.02f);
+
     if (on) {
       if (singleID) _componentInterface.hit(on, buttonID);
       else _componentInterface.hit(on, button2DID[0], button2DID[1]);
 
       if (glowMatOnToggle) rend.material = glowMat;
       if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", labelEmission);
+      selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(1f, 1f, 1f));
     } else {
       if (singleID) _componentInterface.hit(on, buttonID);
       else _componentInterface.hit(on, button2DID[0], button2DID[1]);
 
       if (glowMatOnToggle) rend.material = offMat;
       if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", .1f);
+      selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(0.5f, 0.5f, 0.5f));
     }
 
   }
@@ -166,12 +170,15 @@ public class button : manipObject {
     }
     curState = state;
     if (curState == manipState.none) {
-      if (!singleID) _componentInterface.onSelect(false, button2DID[0], button2DID[1]);
+      if (!singleID) _componentInterface.onSelect(false, button2DID[0], button2DID[1]);      
       selectOverlay.SetActive(false);
+      selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(0.5f, 0.5f, 0.5f));
     } else if (curState == manipState.selected) {
       if (!singleID) _componentInterface.onSelect(true, button2DID[0], button2DID[1]);
+      selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(0.7f, 0.7f, 0.7f));
       selectOverlay.SetActive(true);
     } else if (curState == manipState.grabbed) {
+      selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(1f, 1f, 1f));
       if (!singleID) _componentInterface.onSelect(true, button2DID[0], button2DID[1]);
       if (isToggle) {
         toggled = !toggled;
