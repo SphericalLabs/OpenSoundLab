@@ -16,6 +16,7 @@
 // along with OpenSoundLab.  If not, see <http://www.gnu.org/licenses/>.
 
 using UnityEngine;
+using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -74,18 +75,6 @@ public class masterControl : MonoBehaviour {
 
   void Awake() {
     instance = this;
-
-    float f = -1f;
-    try
-    {
-      f = float.Parse(UnityEditor.PlayerSettings.bundleVersion);
-    }
-    catch (System.Exception e)
-    {
-      Debug.LogError("Could not parse bundleVersion.");
-    }
-
-    versionNumber = f;
 
     _measurePhase = 0;
     _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
@@ -300,7 +289,19 @@ public class masterControl : MonoBehaviour {
   Vector2 leftStick, rightStick;
   private void Start()
   {
-    if(!PlayerPrefs.HasKey("showTutorialsOnStartup")){
+
+    float f = -1f;
+    try
+    {
+      f = float.Parse(Application.version);
+    }
+    catch (System.Exception e)
+    {
+      Debug.LogError("Could not parse bundleVersion.");
+    }
+    versionNumber = f;
+
+    if (!PlayerPrefs.HasKey("showTutorialsOnStartup")){
       PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
       PlayerPrefs.Save();
     }
