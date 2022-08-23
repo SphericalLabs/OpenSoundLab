@@ -26,6 +26,8 @@ public class button : manipObject {
   public int[] button2DID = new int[] { 0, 0 };
   public bool glowMatOnToggle = true;
   public Material onMat;
+  public Material highlightMat;
+
   Renderer rend;
   Material offMat;
   Material glowMat;
@@ -84,12 +86,15 @@ public class button : manipObject {
     keyHit(startToggled);
   }
 
-  public void Highlight(bool on) {
+  // used for sequencer highlighting
+  public void Highlight(bool on) {    
     if (on) {
-      glowMat.SetFloat("_EmissionGain", .3f);
+      rend.sharedMaterial = isHit ? glowMat : highlightMat;
+      //glowMat.SetColor("_TintColor", new Color(1f, 1f, 1f));
       //offMat.SetColor("_Color", glowColor);
     } else {
-      glowMat.SetFloat("_EmissionGain", .0f);
+      rend.sharedMaterial = isHit ? glowMat : offMat;
+      //glowMat.SetColor("_TintColor", new Color(0.3f, 0.3f, 0.3f));
       //offMat.SetColor("_Color", offColor);
     }
   }
@@ -135,6 +140,7 @@ public class button : manipObject {
   }
 
   public bool isHit = false;
+
   public void keyHit(bool on) {
     isHit = on;
     toggled = on;

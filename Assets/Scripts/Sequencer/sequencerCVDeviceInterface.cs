@@ -36,8 +36,6 @@ public class sequencerCVDeviceInterface : deviceInterface
     public int[] dimensions = new int[] { 1, 1 };
     int[] curDimensions = new int[] { 0, 0 };
 
-    public List<List<Transform>> cubeList;
-
     public List<Transform> jackTriggerList;
     public List<Transform> jackCvList;
     public List<sequencer> seqList; // trigger generators
@@ -48,6 +46,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     public bool[][] cubeBools;  // the step sequencer button values
     public float[][] cubeFloats; // the step sequencer dial values
 
+    public List<List<Transform>> cubeList;
     public List<List<dial>> cubeDials;  // the step sequencer dials, keep them so that you don't have to search them in the scene graph on Update()
 
     public bool[] rowMute; 
@@ -158,7 +157,7 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         for (int i = 0; i < curDimensions[1]; i++)
         {
-            seqList[i].setSignal(cubeBools[targetStep][i]);
+            seqList[i].setSignal(cubeBools[targetStep][i]);      
             cvSeqList[i].setSignal(cubeFloats[targetStep][i] * 2f - 1f);   
         }
     }
