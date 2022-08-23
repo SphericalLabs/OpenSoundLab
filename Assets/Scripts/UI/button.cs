@@ -145,7 +145,7 @@ public class button : manipObject {
     isHit = on;
     toggled = on;
 
-    if(manipulatorObjScript != null) manipulatorObjScript.bigHaptic((ushort)3000, 0.02f);
+    if(manipulatorObjScript != null) manipulatorObjScript.bigHaptic((ushort)3999, 0.015f);
 
     if (on) {
       if (singleID) _componentInterface.hit(on, buttonID);
