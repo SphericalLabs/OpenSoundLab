@@ -162,7 +162,7 @@ public class sampleManager : MonoBehaviour {
 
   public void Init() {
 
-#if UNITY_ANDROID
+    #if UNITY_ANDROID
         //if Samples directory doesn't exist, extract default data...
         if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
         {
@@ -176,9 +176,9 @@ public class sampleManager : MonoBehaviour {
             //delete tgz
             File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
         }
-#endif
+    #endif
 
-        instance = this;
+    instance = this;
     sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
 
     string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";

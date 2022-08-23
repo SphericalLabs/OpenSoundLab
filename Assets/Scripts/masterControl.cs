@@ -133,9 +133,25 @@ public class masterControl : MonoBehaviour {
     }
 
     SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "OpenSoundLab";
-    ReadFileLocConfig();
-    Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
+    ReadFileLocConfig();    
     Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");
+
+    #if UNITY_ANDROID 
+      //if Examples doesn't exist, extract default data...
+      if (Directory.Exists(SaveDir + Path.DirectorySeparatorChar + "Saves") == false)
+      {
+        //Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples");
+        Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
+        //copy tgz to directory where we can extract it
+        WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Examples.tgz");
+        while (!www.isDone) { }
+        System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", www.bytes);
+        //extract it
+        Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", SaveDir + Path.DirectorySeparatorChar + "Saves");
+        //delete tgz
+        File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz");
+      }
+    #endif
 
     beatUpdateEvent += beatUpdateEventLocal;
     beatResetEvent += beatResetEventLocal;
