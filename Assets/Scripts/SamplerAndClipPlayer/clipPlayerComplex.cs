@@ -26,6 +26,8 @@ public class clipPlayerComplex : clipPlayer {
   public float amplitude = 1;
   public float headTrim = 0.5f;
   public float tailTrim = 0.5f;
+  public float windowing = 0f;
+  int windowLength = 0;
 
   public samplerDeviceInterface _sampleInterface;
 
@@ -62,7 +64,7 @@ public class clipPlayerComplex : clipPlayer {
 
   [DllImport("SoundStageNative")]
   public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
-, int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active);
+, int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
 
   [DllImport("SoundStageNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
@@ -336,8 +338,10 @@ public class clipPlayerComplex : clipPlayer {
 
     if (!scrubGrabbed && !turntableGrabbed) {
       bool curActive = active;
+      windowLength = Mathf.FloorToInt(windowing * 4800);
+
       floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, freqLinBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, freqLinGen != null, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
-          playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, playdirection, looping, _sampleDuration, bufferCount, ref active);
+          playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, playdirection, looping, _sampleDuration, bufferCount, ref active, windowLength);
       if (curActive != active) _sampleInterface.playEvent(active);
 
       lp_filter[0] = buffer[buffer.Length - 2];

@@ -404,7 +404,7 @@ extern "C" {
     }
 
     float ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
-        , int sampleBounds[2], float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active)
+        , int sampleBounds[2], float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active, int windowLength = 0)
     {
 
         float* clipdata = reinterpret_cast<float*>(clip);
@@ -457,6 +457,17 @@ extern "C" {
               lastSeqGen[0] = lastSeqGen[1];
               lastSeqGen[1] = seqBuffer[i];
             }
+
+            float windowing = 1.f; 
+            if(windowLength != 0){
+              if (floatingBufferCount < sampleBounds[0] + windowLength) { // 480 samples = 10ms
+                  windowing = _map(floatingBufferCount, sampleBounds[0], sampleBounds[0] + windowLength, 0.f, 1.f, 0.5f);
+              } else if (floatingBufferCount > sampleBounds[1] - windowLength) {
+                  windowing = _map(floatingBufferCount, sampleBounds[1] - windowLength, sampleBounds[1], 1.f, 0.f, 0.5f);
+              } else {
+                windowing = 1.f;
+              }
+            }
             
             if (active)
             {
@@ -466,7 +477,7 @@ extern "C" {
                     clipdata[(int)floorf(floatingBufferCount) * clipChannels],
                     clipdata[(int)ceilf(floatingBufferCount) * clipChannels],
                     fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
-                  * endAmplitude;
+                  * endAmplitude * windowing;                  ;
 
                 if (clipChannels == 2) {
                   buffer[i + 1] =
@@ -474,7 +485,7 @@ extern "C" {
                       clipdata[(int)floorf(floatingBufferCount) * clipChannels + 1],
                       clipdata[(int)ceilf(floatingBufferCount) * clipChannels + 1],
                       fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
-                    * endAmplitude;
+                    * endAmplitude * windowing;
                 }
                 else {
                   buffer[i + 1] = buffer[i];

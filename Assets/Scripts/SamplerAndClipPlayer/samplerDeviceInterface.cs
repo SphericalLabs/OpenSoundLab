@@ -20,7 +20,7 @@ using System.Collections;
 using System.Runtime;
 
 public class samplerDeviceInterface : deviceInterface {
-  public dial speedDial, volumeDial, headTrimDial, tailTrimDial;
+  public dial speedDial, volumeDial, headTrimDial, tailTrimDial, windowingDial;
   public omniJack freqExpInput, freqLinInput, volumeInput, controlInput, output;
   public omniJack headInput, tailInput;
   public basicSwitch dirSwitch, loopSwitch;
@@ -61,6 +61,7 @@ public class samplerDeviceInterface : deviceInterface {
 
     player.headTrim = headTrimDial.percent;
     player.tailTrim = tailTrimDial.percent;
+    player.windowing = windowingDial.percent;
 
     if (loopSwitch.switchVal != player.looping) player.looping = loopSwitch.switchVal;
 
@@ -73,6 +74,7 @@ public class samplerDeviceInterface : deviceInterface {
 
     if (player.headGen != headInput.signal) player.headGen = headInput.signal;
     if (player.tailGen != tailInput.signal) player.tailGen = tailInput.signal;
+    
 
     if(headInput.signal == null){ // head cv not plugged in
       if (headSlider.percent != player.trackBounds.x)
@@ -128,6 +130,7 @@ public class samplerDeviceInterface : deviceInterface {
     data.loopSwitch = loopSwitch.switchVal;
     data.headPos = headSlider.percent;
     data.tailPos = tailSlider.percent;
+    data.windowingDial = windowingDial.percent;
 
     data.playToggle = playButton.isHit;
 
@@ -145,6 +148,7 @@ public class samplerDeviceInterface : deviceInterface {
     volumeDial.setPercent(data.ampDial);
     headTrimDial.setPercent(data.headTrimDial);
     tailTrimDial.setPercent(data.tailTrimDial);
+    windowingDial.setPercent(data.windowingDial);
     GetComponent<samplerLoad>().SetSample(data.label, data.file);
 
     volumeInput.ID = data.jackInAmpID;
@@ -174,6 +178,7 @@ public class SamplerData : InstrumentData {
   public float speedDial;
   public float headTrimDial;
   public float tailTrimDial;
+  public float windowingDial;
   public int jackInAmpID;
   public int jackInFreqExpID;
   public int jackInFreqLinID;
