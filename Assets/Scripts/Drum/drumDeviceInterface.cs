@@ -27,7 +27,7 @@ public class drumDeviceInterface : deviceInterface {
   drumpad pad;
   samplerLoad samp;
   public AudioSource defaultAudioSource;
-  public AudioClip offClip;
+  //public AudioClip offClip;
 
   public override void Awake() {
     base.Awake();
@@ -76,7 +76,7 @@ public class drumDeviceInterface : deviceInterface {
   public override void hit(bool on, int ID = -1) {
     if (on) {
       if (sigOut.near == null && sampOut.near == null && !samp.hasTape()) {
-        defaultAudioSource.PlayOneShot(offClip, .4f);
+        //defaultAudioSource.PlayOneShot(offClip, .4f);
       }
     }
     drumSig.setKeyActive(on, ID);
