@@ -828,10 +828,10 @@ PlayerSettings:
       PointOfService: False
       RecordedCallsFolder: False
       Contacts: False
+      InternetClient: False
       Proximity: False
       CodeGeneration: False
       BackgroundMediaPlayback: False
-      InternetClient: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
