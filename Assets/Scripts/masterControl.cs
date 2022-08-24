@@ -112,7 +112,7 @@ public class masterControl : MonoBehaviour {
       
     }
 
-    UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.45f;
+    UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.55f;
 
     Debug.Log("Buffer size is: " + configuration.dspBufferSize);
     //configuration.dspBufferSize = bufferSize;
