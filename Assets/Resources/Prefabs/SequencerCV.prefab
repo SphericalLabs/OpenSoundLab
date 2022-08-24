@@ -68,6 +68,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
+  defaultPercent: 0
   dialColor: 0
   controllerRot: 0
   lastControllerRot: 0
@@ -1078,6 +1079,7 @@ MonoBehaviour:
   button2DID: 0000000000000000
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 1000011786095284}
   glowHue: 0.4
@@ -1692,7 +1694,7 @@ MonoBehaviour:
   switchVal: 2
   notchCount: 7
   labelHolder: {fileID: 4000014263945196}
-  glowMat: {fileID: 2100000, guid: 45fde5fa853ca544ea832ac3c37357bc, type: 2}
+  glowMat: {fileID: 2100000, guid: dd285dc554c2def4d84c43d49bec8a9d, type: 2}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1000013168785748}

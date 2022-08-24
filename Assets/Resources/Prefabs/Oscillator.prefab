@@ -2292,7 +2292,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 968aff1bdb7797449b200e80168986c7, type: 2}
+  - {fileID: 2100000, guid: 45fde5fa853ca544ea832ac3c37357bc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2337,7 +2337,7 @@ MonoBehaviour:
   switchVal: 0
   notchCount: 4
   labelHolder: {fileID: 4425607156694208929}
-  glowMat: {fileID: 2100000, guid: 45fde5fa853ca544ea832ac3c37357bc, type: 2}
+  glowMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   labelsPresent: 1
   labelObjects: []
   titleLabel: {fileID: 0}
@@ -2973,6 +2973,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0
+  defaultPercent: 0
   dialColor: 2
   controllerRot: 0
   lastControllerRot: 0
@@ -3685,6 +3686,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
+  defaultPercent: 0
   dialColor: 1
   controllerRot: 0
   lastControllerRot: 0
