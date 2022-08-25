@@ -34,7 +34,7 @@ public class oscillatorDeviceInterface : deviceInterface
   public AudioSource speaker;
 
   // current values
-  float freqPercent, ampPercent, wavePercent;
+  float freqPercent, ampPercent, wavePercent = -1f;
 
   oscillatorSignalGenerator signal;
   int bufferSize;

@@ -26,7 +26,8 @@ public class microphoneDeviceInterface : deviceInterface {
   omniPlug outputplug;
   dial ampDial;
 
-  float amp = .25f;
+  float amp = -1f;
+
   public override void Awake() {
     base.Awake();
     signal = GetComponent<MicrophoneSignalGenerator>();

@@ -23,6 +23,7 @@ public class gainDeviceInterface : deviceInterface {
   dial ampDial;
   gainSignalGenerator signal;
   basicSwitch activeSwitch;
+  float lastAmpValue = -1f;
 
   public override void Awake() {
     base.Awake();
@@ -33,7 +34,11 @@ public class gainDeviceInterface : deviceInterface {
 
   void Update() {
 
-    signal.amp = Mathf.Pow(2, ampDial.percent * 6); // 36db gain, 6 db per duplication, log(36) * 6 = 6 * 6 = 36
+    if (ampDial.percent != lastAmpValue)
+    {
+      signal.amp = Mathf.Pow(2, ampDial.percent * 6); // 36db gain, 6 db per duplication, log(36) * 6 = 6 * 6 = 36
+      lastAmpValue = ampDial.percent;
+    }
 
     signal.active = activeSwitch.switchVal;
     if (signal.incoming != input.signal) signal.incoming = input.signal;

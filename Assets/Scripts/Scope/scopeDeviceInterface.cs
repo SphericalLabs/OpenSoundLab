@@ -34,7 +34,7 @@ public class scopeDeviceInterface : deviceInterface {
   public button muteButton;
 
   public int bufferSize;
-  float lastPeriodDialPercent = 0f;
+  float lastPeriodDialPercent = -1f;
 
   public override void Awake() {
     base.Awake();
