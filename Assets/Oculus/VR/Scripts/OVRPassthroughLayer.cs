@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using System.Collections.Generic;
@@ -234,28 +242,44 @@ public class OVRPassthroughLayer : MonoBehaviour
 	}
 
 	/// <summary>
-	/// This method allows to generate a color map from a set of color controls. Contrast, brightness and posterization is
-	/// applied to the grayscale passthrough value, which is finally mapped to a color according to
-	/// the provided gradient. The gradient can be null, in which case no colorization takes place.
+	/// This method allows to generate (and apply) a color map from the set of controls which is also available in
+	/// inspector.
 	/// </summary>
 	/// <param name="contrast">The contrast value. Range from -1 (minimum) to 1 (maximum). </param>
 	/// <param name="brightness">The brightness value. Range from 0 (minimum) to 1 (maximum). </param>
 	/// <param name="posterize">The posterize value. Range from 0 to 1, where 0 = no posterization (no effect), 1 = reduce to two colors. </param>
-	/// <param name="gradient">The gradient will be evaluated from 0 (no intensity) to 1 (maximum intensity). </param>
-	public void SetColorMapControls(float contrast, float brightness = 0.0f, float posterize = 0.0f, Gradient gradient = null)
+	/// <param name="gradient">The gradient will be evaluated from 0 (no intensity) to 1 (maximum intensity).
+	/// 	This parameter only has an effect if `colorMapType` is `GrayscaleToColor`.</param>
+	/// <param name="colorMapType">Type of color map which should be generated. Supported values: `Grayscale` and `GrayscaleToColor`.</param>
+	public void SetColorMapControls(
+		float contrast,
+		float brightness = 0.0f,
+		float posterize = 0.0f,
+		Gradient gradient = null,
+		ColorMapEditorType colorMapType = ColorMapEditorType.GrayscaleToColor)
 	{
-		colorMapEditorType = ColorMapEditorType.Controls;
+		if (!(colorMapType == ColorMapEditorType.Grayscale || colorMapType == ColorMapEditorType.GrayscaleToColor)) {
+			Debug.LogError("Unsupported color map type specified");
+			return;
+		}
+
+		colorMapEditorType = colorMapType;
 		colorMapEditorContrast = contrast;
 		colorMapEditorBrightness = brightness;
 		colorMapEditorPosterize = posterize;
-		if (gradient != null)
-		{
-			colorMapEditorGradient = gradient;
-		}
-		else if (!colorMapEditorGradient.Equals(colorMapNeutralGradient))
-		{
-			// Leave gradient untouched if it's already neutral to avoid unnecessary memory allocations.
-			colorMapEditorGradient = CreateNeutralColorMapGradient();
+
+		if (colorMapType == ColorMapEditorType.GrayscaleToColor) {
+			if (gradient != null)
+			{
+				colorMapEditorGradient = gradient;
+			}
+			else if (!colorMapEditorGradient.Equals(colorMapNeutralGradient))
+			{
+				// Leave gradient untouched if it's already neutral to avoid unnecessary memory allocations.
+				colorMapEditorGradient = CreateNeutralColorMapGradient();
+			}
+		} else if (gradient != null) {
+			Debug.LogWarning("Gradient parameter is ignored for color map types other than GrayscaleToColor");
 		}
 	}
 
@@ -278,6 +302,26 @@ public class OVRPassthroughLayer : MonoBehaviour
 	}
 
 	/// <summary>
+	/// This method allows to configure brightness and contrast adjustment for Passthrough images.
+	/// </summary>
+	/// <param name="brightness">Modify the brightness of Passthrough. Valid range: [-1, 1]. A
+	///   value of 0 means that brightness is left unchanged.</param>
+	/// <param name="contrast">Modify the contrast of Passthrough. Valid range: [-1, 1]. A value of 0
+  ///   means that contrast is left unchanged.</param>
+	/// <param name="saturation">Ignored, reserved for future use.</param>
+	public void SetBrightnessContrastSaturation(float brightness = 0.0f, float contrast = 0.0f, float saturation = 0.0f)
+	{
+		colorMapType = ColorMapType.BrightnessContrastSaturation;
+		colorMapEditorType = ColorMapEditorType.ColorAdjustment;
+		AllocateColorMapData();
+		colorMapEditorBrightness = brightness;
+		colorMapEditorContrast = contrast;
+
+		UpdateColorMapFromControls();
+	}
+
+
+	/// <summary>
 	/// Disables color mapping. Use this to remove any effects.
 	/// </summary>
 	public void DisableColorMap()
@@ -294,9 +338,12 @@ public class OVRPassthroughLayer : MonoBehaviour
 	/// </summary>
 	public enum ColorMapEditorType
 	{
-		None, ///< Will clear the colormap
-		Controls, ///< Will update the colormap from the inspector controls
-		Custom ///< Will not update the colormap
+		None = 0, ///< No color map is applied
+		GrayscaleToColor = 1, ///< Map input color to an RGB color, optionally with brightness/constrast adjustment or posterization applied.
+		Controls = GrayscaleToColor, ///< Deprecated - use GrayscaleToColor instead.
+		Custom = 2, ///< Color map is specified using one of the class setters.
+		Grayscale = 3, ///< Map input color to a grayscale color, optionally with brightness/constrast adjustment or posterization applied.
+		ColorAdjustment = 4 ///< Adjust brightness and contrast
 	}
 
 	[SerializeField]
@@ -325,8 +372,16 @@ public class OVRPassthroughLayer : MonoBehaviour
 						DeallocateColorMapData();
 						styleDirty = true;
 						break;
-					case ColorMapEditorType.Controls:
+					case ColorMapEditorType.Grayscale:
+						colorMapType = ColorMapType.MonoToMono;
+						UpdateColorMapFromControls(true);
+						break;
+					case ColorMapEditorType.GrayscaleToColor:
 						colorMapType = ColorMapType.MonoToRgba;
+						UpdateColorMapFromControls(true);
+						break;
+					case ColorMapEditorType.ColorAdjustment:
+						colorMapType = ColorMapType.BrightnessContrastSaturation;
 						UpdateColorMapFromControls(true);
 						break;
 					case ColorMapEditorType.Custom:
@@ -519,6 +574,8 @@ public class OVRPassthroughLayer : MonoBehaviour
 				Debug.LogWarning("Passthrough color map data handle is not expected to be allocated at time of buffer allocation");
 			}
 			colorMapDataHandle = GCHandle.Alloc(colorMapData, GCHandleType.Pinned);
+
+			tmpColorMapData = new byte[256];
 		}
 	}
 
@@ -536,6 +593,7 @@ public class OVRPassthroughLayer : MonoBehaviour
 				colorMapDataHandle.Free();
 			}
 			colorMapData = null;
+			tmpColorMapData = null;
 		}
 	}
 
@@ -557,51 +615,68 @@ public class OVRPassthroughLayer : MonoBehaviour
 
 	private void UpdateColorMapFromControls(bool forceUpdate = false)
 	{
-		if (colorMapEditorType != ColorMapEditorType.Controls)
+		bool contrastBrightnessPosterizeNeedsUpdate = (colorMapEditorType == ColorMapEditorType.Grayscale
+				|| colorMapEditorType == ColorMapEditorType.ColorAdjustment
+				|| colorMapEditorType == ColorMapEditorType.GrayscaleToColor)
+			&& (colorMapEditorBrightness_ != colorMapEditorBrightness
+				|| colorMapEditorContrast_ != colorMapEditorContrast
+				|| colorMapEditorPosterize_ != colorMapEditorPosterize);
+		bool gradientNeedsUpdate = colorMapEditorType == ColorMapEditorType.GrayscaleToColor
+			&& !colorMapEditorGradient.Equals(colorMapEditorGradientOld);
+
+		if (!(contrastBrightnessPosterizeNeedsUpdate || gradientNeedsUpdate || forceUpdate))
 			return;
 
 		AllocateColorMapData();
 
-		if (forceUpdate ||
-			!colorMapEditorGradient.Equals(colorMapEditorGradientOld) ||
-			colorMapEditorContrast_ != colorMapEditorContrast ||
-			colorMapEditorBrightness_ != colorMapEditorBrightness ||
-			colorMapEditorPosterize_ != colorMapEditorPosterize)
+		colorMapEditorGradientOld.CopyFrom(colorMapEditorGradient);
+		colorMapEditorBrightness_ = colorMapEditorBrightness;
+		colorMapEditorContrast_ = colorMapEditorContrast;
+		colorMapEditorPosterize_ = colorMapEditorPosterize;
+
+		switch (colorMapEditorType)
 		{
-			colorMapEditorGradientOld.CopyFrom(colorMapEditorGradient);
-			colorMapEditorContrast_ = colorMapEditorContrast;
-			colorMapEditorBrightness_ = colorMapEditorBrightness;
-			colorMapEditorPosterize_ = colorMapEditorPosterize;
-
-			AllocateColorMapData();
-
-			// Populate colorMapData
-			for (int i = 0; i < 256; i++)
-			{
-				// Apply contrast, brightness and posterization on the grayscale value
-				double value = (double)i / 255.0;
-				// Constrast and brightness
-				double contrastFactor = colorMapEditorContrast + 1; // UI runs from -1 to 1
-				value = (value - 0.5) * contrastFactor + 0.5 + colorMapEditorBrightness;
-				// Posterization
-				if (colorMapEditorPosterize > 0.0f)
+			case ColorMapEditorType.Grayscale:
+				computeBrightnessContrastPosterizeMap(colorMapData, colorMapEditorBrightness, colorMapEditorContrast, colorMapEditorPosterize);
+				styleDirty = true;
+				break;
+			case ColorMapEditorType.GrayscaleToColor:
+				computeBrightnessContrastPosterizeMap(tmpColorMapData, colorMapEditorBrightness, colorMapEditorContrast, colorMapEditorPosterize);
+				for (int i = 0; i < 256; i++)
 				{
-					// The posterization slider feels more useful if the progression is exponential. The function is emprically tuned.
-					const double posterizationBase = 50.0;
-					double posterize = (Math.Pow(posterizationBase, colorMapEditorPosterize) - 1.0) / (posterizationBase - 1.0);
-					value = Math.Round(value / posterize) * posterize;
+					Color color = colorMapEditorGradient.Evaluate(tmpColorMapData[i]  / 255.0f);
+					WriteColorToColorMap(i, ref color);
 				}
+				styleDirty = true;
+				break;
+			case ColorMapEditorType.ColorAdjustment:
+				WriteBrightnessContrastSaturationColorMap(colorMapEditorBrightness_, colorMapEditorContrast_, 0.0f);
+				styleDirty = true;
+				break;
 
-				// Clamp to [0, 1]
-				value = Math.Min(Math.Max(value, 0.0), 1.0);
+		}
+	}
 
-				// Map to value to color
-				Color color = colorMapEditorGradient.Evaluate((float)value);
+	static private void computeBrightnessContrastPosterizeMap(byte[] result, float brightness, float contrast, float posterize)
+	{
+		for (int i = 0; i < 256; i++)
+		{
+			// Apply contrast, brightness and posterization on the grayscale value
+			float value = i / 255.0f;
+			// Constrast and brightness
+			float contrastFactor = contrast + 1; // UI runs from -1 to 1
+			value = (value - 0.5f) * contrastFactor + 0.5f + brightness;
 
-				WriteColorToColorMap(i, ref color);
+			// Posterization
+			if (posterize > 0.0f)
+			{
+				// The posterization slider feels more useful if the progression is exponential. The function is emprically tuned.
+				const float posterizationBase = 50.0f;
+				float quantization = (Mathf.Pow(posterizationBase, posterize) - 1.0f) / (posterizationBase - 1.0f);
+				value = Mathf.Round(value / quantization) * quantization;
 			}
 
-			styleDirty = true;
+			result[i] = (byte)(Mathf.Min(Mathf.Max(value, 0.0f), 1.0f) * 255.0f);
 		}
 	}
 
@@ -613,6 +688,24 @@ public class OVRPassthroughLayer : MonoBehaviour
 			byte[] bytes = BitConverter.GetBytes(color[c]);
 			Buffer.BlockCopy(bytes, 0, colorMapData, colorIndex * 16 + c * 4, 4);
 		}
+	}
+
+	private void WriteFloatToColorMap(int index, float value)
+	{
+		byte[] bytes = BitConverter.GetBytes(value);
+		Buffer.BlockCopy(bytes, 0, colorMapData, index * sizeof(float), sizeof(float));
+	}
+
+	private void WriteBrightnessContrastSaturationColorMap(float brightness, float contrast, float saturation)
+	{
+		// Brightness: input is in range [-1, 1], output [0, 100]
+		WriteFloatToColorMap(0, brightness * 100.0f);
+
+		// Contrast: input is in range [-1, 1], output [0, 2]
+		WriteFloatToColorMap(1, contrast + 1.0f);
+
+		// Saturation: input is in range [-1, 1], output [0, 2]
+		WriteFloatToColorMap(2, saturation + 1.0f);
 	}
 
 	private void SyncToOverlay()
@@ -642,6 +735,14 @@ public class OVRPassthroughLayer : MonoBehaviour
 
 			passthroughOverlay.currentOverlayShape = overlayShape;
 		}
+
+		// Disable the overlay when passthrough is disabled as a whole so the layer doesn't get submitted.
+		// Both the desired (`isInsightPassthroughEnabled`) and the actual (IsInsightPassthroughInitialized()) PT
+		// initialization state are taken into account s.t. the overlay gets disabled as soon as PT is flagged to be
+		// disabled, and enabled only when PT is up and running again.
+		passthroughOverlay.enabled = OVRManager.instance != null &&
+			OVRManager.instance.isInsightPassthroughEnabled &&
+			OVRManager.IsInsightPassthroughInitialized();
 	}
 
 	#endregion
@@ -691,6 +792,9 @@ public class OVRPassthroughLayer : MonoBehaviour
 
 	// Passthrough color map data gets allocated and deallocated on demand.
 	private byte[] colorMapData = null;
+
+	// Buffer used to store intermediate results for color map computations.
+	private byte[] tmpColorMapData = null;
 
 	// Passthrough color map data gets pinned in the GC on allocation so it can be passed to the native side safely.
 	// In remains pinned for its lifecycle to avoid pinning per frame and the resulting memory allocation and GC pressure.
@@ -786,6 +890,9 @@ public class OVRPassthroughLayer : MonoBehaviour
 							break;
 						case ColorMapType.MonoToMono:
 							style.TextureColorMapDataSize = 256;
+							break;
+						case ColorMapType.BrightnessContrastSaturation:
+							style.TextureColorMapDataSize = 3 * sizeof(float);
 							break;
 						default:
 							Debug.LogError("Unexpected texture color map type");

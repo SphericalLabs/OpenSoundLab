@@ -1,14 +1,22 @@
-﻿/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+﻿/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -16,13 +24,13 @@ using UnityEngine.Assertions;
 namespace Oculus.Interaction.Input
 {
     public abstract class
-        DataModifier<TData, TConfig> : DataSource<TData, TConfig>
+        DataModifier<TData> : DataSource<TData>
         where TData : class, ICopyFrom<TData>, new()
     {
         [Header("Data Modifier")]
         [SerializeField, Interface(nameof(_modifyDataFromSource))]
         protected MonoBehaviour _iModifyDataFromSourceMono;
-        private IDataSource<TData, TConfig> _modifyDataFromSource;
+        private IDataSource<TData> _modifyDataFromSource;
 
         [SerializeField]
         [Tooltip("If this is false, then this modifier will simply pass through " +
@@ -33,12 +41,11 @@ namespace Oculus.Interaction.Input
         private static TData InvalidAsset { get; } = new TData();
         private TData _thisDataAsset;
         private TData _currentDataAsset = InvalidAsset;
-        private TConfig _configCache;
 
         protected override TData DataAsset => _currentDataAsset;
 
-        public virtual IDataSource<TData, TConfig> ModifyDataFromSource => _modifyDataFromSource == null
-            ? (_modifyDataFromSource = _iModifyDataFromSourceMono as IDataSource<TData, TConfig>)
+        public virtual IDataSource<TData> ModifyDataFromSource => _modifyDataFromSource == null
+            ? (_modifyDataFromSource = _iModifyDataFromSourceMono as IDataSource<TData>)
             : _modifyDataFromSource;
 
         public override int CurrentDataVersion
@@ -51,12 +58,11 @@ namespace Oculus.Interaction.Input
             }
         }
 
-        public void ResetSources(IDataSource<TData, TConfig> modifyDataFromSource, IDataSource updateAfter, UpdateModeFlags updateMode)
+        public void ResetSources(IDataSource<TData> modifyDataFromSource, IDataSource updateAfter, UpdateModeFlags updateMode)
         {
             ResetUpdateAfter(updateAfter, updateMode);
             _modifyDataFromSource = modifyDataFromSource;
             _currentDataAsset = InvalidAsset;
-            _configCache = default;
         }
 
         protected override void UpdateData()
@@ -86,25 +92,15 @@ namespace Oculus.Interaction.Input
             Assert.IsNotNull(ModifyDataFromSource);
         }
 
-        public override TConfig Config
-        {
-            get
-            {
-                return _configCache != null
-                    ? _configCache
-                    : (_configCache = ModifyDataFromSource.Config);
-            }
-        }
-
         #region Inject
-        public void InjectAllDataModifier(UpdateModeFlags updateMode, IDataSource updateAfter, IDataSource<TData, TConfig> modifyDataFromSource, bool applyModifier)
+        public void InjectAllDataModifier(UpdateModeFlags updateMode, IDataSource updateAfter, IDataSource<TData> modifyDataFromSource, bool applyModifier)
         {
             base.InjectAllDataSource(updateMode, updateAfter);
             InjectModifyDataFromSource(modifyDataFromSource);
             InjectApplyModifier(applyModifier);
         }
 
-        public void InjectModifyDataFromSource(IDataSource<TData, TConfig> modifyDataFromSource)
+        public void InjectModifyDataFromSource(IDataSource<TData> modifyDataFromSource)
         {
             _modifyDataFromSource = modifyDataFromSource;
         }

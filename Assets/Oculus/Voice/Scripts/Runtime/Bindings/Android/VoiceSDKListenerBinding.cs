@@ -1,15 +1,24 @@
-﻿/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
+﻿/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
-
+using Facebook.WitAi;
 using Facebook.WitAi.Events;
 using Facebook.WitAi.Lib;
 using UnityEngine;
@@ -18,79 +27,101 @@ namespace Oculus.Voice.Bindings.Android
 {
     public class VoiceSDKListenerBinding : AndroidJavaProxy
     {
-        private VoiceEvents voiceEvents;
+        private IVoiceService _voiceService;
+        private readonly IVCBindingEvents _bindingEvents;
 
-        public VoiceEvents VoiceEvents => voiceEvents;
+        public VoiceEvents VoiceEvents => _voiceService.VoiceEvents;
 
-        public VoiceSDKListenerBinding(VoiceEvents voiceEvents) : base(
-            "com.oculus.assistant.api.unity.dictation.UnityDictationListener")
+        public VoiceSDKListenerBinding(IVoiceService voiceService, IVCBindingEvents bindingEvents) : base(
+            "com.oculus.assistant.api.voicesdk.immersivevoicecommands.IVCEventsListener")
         {
-            this.voiceEvents = voiceEvents;
+            _voiceService = voiceService;
+            _bindingEvents = bindingEvents;
         }
 
-        public void onResponse(string response)
+        public void onResponse(string responseJson)
         {
-            voiceEvents.OnResponse?.Invoke(WitResponseNode.Parse(response));
+            WitResponseNode responseNode = WitResponseJson.Parse(responseJson);
+            responseNode.HandleResponse((transcription, final) =>
+            {
+                VoiceEvents.onFullTranscription?.Invoke(transcription);
+            }, (response, final) =>
+            {
+                VoiceEvents.OnResponse?.Invoke(response);
+            });
         }
 
-        public void onError(string error, string message)
+        public void onPartialResponse(string responseJson)
         {
-            voiceEvents.OnError?.Invoke(error, message);
+            WitResponseNode responseNode = WitResponseJson.Parse(responseJson);
+            responseNode.HandleResponse((transcription, final) =>
+            {
+                VoiceEvents.onPartialTranscription?.Invoke(transcription);
+            }, (response, final) =>
+            {
+
+            });
+        }
+
+        public void onError(string error, string message, string errorBody)
+        {
+            VoiceEvents.OnError?.Invoke(error, message);
+        }
+
+        public void onAborted()
+        {
+            VoiceEvents.OnAborted?.Invoke();
+        }
+
+        public void onRequestCompleted()
+        {
+            VoiceEvents.OnRequestCompleted?.Invoke();
         }
 
         public void onMicLevelChanged(float level)
         {
-            voiceEvents.OnMicLevelChanged?.Invoke(level);
+            VoiceEvents.OnMicLevelChanged?.Invoke(level);
         }
 
         public void onRequestCreated()
         {
-            voiceEvents.OnRequestCreated?.Invoke(null);
+            VoiceEvents.OnRequestCreated?.Invoke(null);
         }
 
         public void onStartListening()
         {
-            voiceEvents.OnStartListening?.Invoke();
+            VoiceEvents.OnStartListening?.Invoke();
         }
 
-        public void onStoppedListening()
+        public void onStoppedListening(int reason)
         {
-            voiceEvents.OnStoppedListening?.Invoke();
-        }
-
-        public void onStoppedListeningDueToInactivity()
-        {
-            voiceEvents.OnStoppedListeningDueToInactivity?.Invoke();
-        }
-
-        public void onStoppedListeningDueToTimeout()
-        {
-            voiceEvents.OnStoppedListeningDueToTimeout?.Invoke();
-        }
-
-        public void onStoppedListeningDueToDeactivation()
-        {
-            voiceEvents.OnStoppedListeningDueToDeactivation?.Invoke();
+            VoiceEvents.OnStoppedListening?.Invoke();
         }
 
         public void onMicDataSent()
         {
-            voiceEvents.OnMicDataSent?.Invoke();
+            VoiceEvents.OnMicDataSent?.Invoke();
         }
 
         public void onMinimumWakeThresholdHit()
         {
-            voiceEvents.OnMinimumWakeThresholdHit?.Invoke();
+            VoiceEvents.OnMinimumWakeThresholdHit?.Invoke();
         }
 
         public void onPartialTranscription(string transcription)
         {
-            voiceEvents.OnPartialTranscription?.Invoke(transcription);
+            VoiceEvents.OnPartialTranscription?.Invoke(transcription);
         }
 
         public void onFullTranscription(string transcription)
         {
-            voiceEvents.OnFullTranscription?.Invoke(transcription);
+            VoiceEvents.OnFullTranscription?.Invoke(transcription);
+        }
+
+        public void onServiceNotAvailable(string error, string message)
+        {
+            Debug.LogWarning($"Platform service is not available: {error} - {message}");
+            _bindingEvents.OnServiceNotAvailable(error, message);
         }
     }
 }

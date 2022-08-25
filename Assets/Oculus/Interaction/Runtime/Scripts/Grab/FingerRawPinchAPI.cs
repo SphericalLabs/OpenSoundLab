@@ -1,20 +1,33 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using Oculus.Interaction.Input;
 using UnityEngine;
 
 namespace Oculus.Interaction.GrabAPI
 {
+    /// <summary>
+    /// This FingerAPI uses the the Pinch value as it comes from the Hand data to detect
+    /// if they are grabbing. It is specially useful with Controllers As Hands since this
+    /// value is directly driven by the trigger presses.
+    /// </summary>
     public class FingerRawPinchAPI : IFingerAPI
     {
         private class FingerPinchData
@@ -24,8 +37,7 @@ namespace Oculus.Interaction.GrabAPI
 
             public float PinchStrength;
             public bool IsPinching;
-            public bool IsPinchingChanged;
-
+            public bool IsPinchingChanged { get; private set; }
             public Vector3 TipPosition { get; private set; }
 
             public FingerPinchData(HandFinger fingerId)
@@ -46,8 +58,16 @@ namespace Oculus.Interaction.GrabAPI
             {
                 PinchStrength = hand.GetFingerPinchStrength(_finger);
                 bool isPinching = hand.GetFingerIsPinching(_finger);
-                IsPinchingChanged = isPinching != IsPinching;
+                if(isPinching != IsPinching)
+                {
+                    IsPinchingChanged = true;
+                }
                 IsPinching = isPinching;
+            }
+
+            public void ClearState()
+            {
+                IsPinchingChanged = false;
             }
         }
 
@@ -91,18 +111,26 @@ namespace Oculus.Interaction.GrabAPI
                    _fingersPinchData[(int)finger].IsPinching == targetPinchState;
         }
 
-        public float GetFingerGrabStrength(HandFinger finger)
+        public float GetFingerGrabScore(HandFinger finger)
         {
             return _fingersPinchData[(int)finger].PinchStrength;
         }
 
         public void Update(IHand hand)
         {
+            ClearState();
             for (int i = 0; i < Constants.NUM_FINGERS; ++i)
             {
                 _fingersPinchData[i].UpdateIsPinching(hand);
             }
+        }
 
+        private void ClearState()
+        {
+            for (int i = 0; i < Constants.NUM_FINGERS; ++i)
+            {
+                _fingersPinchData[i].ClearState();
+            }
         }
     }
 }

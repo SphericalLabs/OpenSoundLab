@@ -19,26 +19,19 @@ Shader "Oculus/Interaction/UIStyle"
 			[HideInInspector] _texcoord("", 2D) = "white" {}
 		}
 
-			SubShader
+		SubShader
 		{
-			Tags{ "RenderType" = "Transparent"  "Queue" = "Transparent+0" }
+			Tags{ "RenderType" = "Transparent"  "Queue" = "Transparent+0"}
 			LOD 100
 
 			CGINCLUDE
 			#pragma target 3.0
 			ENDCG
 			Blend SrcAlpha OneMinusSrcAlpha
-			AlphaToMask Off
-			Cull Back
-			ColorMask RGBA
-			ZWrite Off
-			ZTest LEqual
-			Offset 0 , 0
 
 			Pass
 			{
 				Name "Base"
-				Tags { "LightMode" = "ForwardBase" }
 				CGPROGRAM
 
 				#ifndef UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX
@@ -52,7 +45,7 @@ Shader "Oculus/Interaction/UIStyle"
 				#include "UnityCG.cginc"
 				#include "UnityShaderVariables.cginc"
 
-				struct vertexInput
+				struct VertexInput
 				{
 					float4 vertex : POSITION;
                     half4 vertexColor : COLOR;
@@ -60,7 +53,7 @@ Shader "Oculus/Interaction/UIStyle"
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 				};
 
-				struct vertexOutput
+				struct VertexOutput
 				{
 					float4 vertex : SV_POSITION;
 					float3 worldPos : TEXCOORD0;
@@ -70,16 +63,11 @@ Shader "Oculus/Interaction/UIStyle"
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
-
-
 				uniform half4 _Color;
 
-
-
-
-				vertexOutput vert(vertexInput v)
+				VertexOutput vert(VertexInput v)
 				{
-					vertexOutput o;
+					VertexOutput o;
 					UNITY_SETUP_INSTANCE_ID(v);
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 					UNITY_TRANSFER_INSTANCE_ID(v, o);
@@ -94,9 +82,7 @@ Shader "Oculus/Interaction/UIStyle"
 					return o;
 				}
 
-
-
-				fixed4 frag(vertexOutput i) : SV_Target
+				half4 frag(VertexOutput i) : SV_Target
 				{
 					UNITY_SETUP_INSTANCE_ID(i);
 					UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);

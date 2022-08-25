@@ -16,7 +16,8 @@ MonoBehaviour:
   allowOptional3DofHeadTracking: 0
   handTrackingSupport: 0
   handTrackingFrequency: 0
-  spatialAnchorsSupport: 0
+  handTrackingVersion: 0
+  anchorSupport: 0
   renderModelSupport: 0
   trackedKeyboardSupport: 0
   disableBackups: 1

@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using Oculus.Interaction.Input;
 using UnityEngine;
@@ -23,11 +31,9 @@ namespace Oculus.Interaction
         private MonoBehaviour _hand;
         public IHand Hand { get; private set; }
 
-        [FormerlySerializedAs("_jointId")]
         [SerializeField]
         private HandJointId _handJointId;
 
-        [FormerlySerializedAs("_offset")]
         [SerializeField]
         private Vector3 _localPositionOffset;
 
@@ -92,7 +98,7 @@ namespace Oculus.Interaction
         {
             if (_started)
             {
-                Hand.HandUpdated += HandleHandUpdated;
+                Hand.WhenHandUpdated += HandleHandUpdated;
             }
         }
 
@@ -100,7 +106,7 @@ namespace Oculus.Interaction
         {
             if (_started)
             {
-                Hand.HandUpdated -= HandleHandUpdated;
+                Hand.WhenHandUpdated -= HandleHandUpdated;
             }
         }
 

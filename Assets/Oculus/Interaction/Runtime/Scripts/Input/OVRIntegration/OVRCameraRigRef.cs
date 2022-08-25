@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using UnityEngine;
@@ -32,7 +40,7 @@ namespace Oculus.Interaction.Input
         Transform LeftController { get; }
         Transform RightController { get; }
 
-        event Action OnAnchorsUpdated;
+        event Action<bool> WhenInputDataDirtied;
     }
 
     /// <summary>
@@ -46,7 +54,7 @@ namespace Oculus.Interaction.Input
     {
         [Header("Configuration")]
         [SerializeField]
-        private OVRCameraRig _ovrCameraRig;
+        private InteractionOVRCameraRig _ovrCameraRig;
 
         [SerializeField]
         private bool _requireOvrHands = true;
@@ -61,7 +69,7 @@ namespace Oculus.Interaction.Input
         public Transform LeftController => _ovrCameraRig.leftControllerAnchor;
         public Transform RightController => _ovrCameraRig.rightControllerAnchor;
 
-        public event Action OnAnchorsUpdated = delegate { };
+        public event Action<bool> WhenInputDataDirtied = delegate { };
 
         protected bool _started = false;
 
@@ -76,7 +84,7 @@ namespace Oculus.Interaction.Input
         {
             if (_started)
             {
-                _ovrCameraRig.UpdatedAnchors += OnUpdateAnchors;
+                _ovrCameraRig.WhenInputDataDirtied += HandleInputDataDirtied;
             }
         }
 
@@ -84,7 +92,7 @@ namespace Oculus.Interaction.Input
         {
             if (_started)
             {
-                _ovrCameraRig.UpdatedAnchors -= OnUpdateAnchors;
+                _ovrCameraRig.WhenInputDataDirtied -= HandleInputDataDirtied;
             }
         }
 
@@ -104,19 +112,19 @@ namespace Oculus.Interaction.Input
             return cachedValue;
         }
 
-        private void OnUpdateAnchors(OVRCameraRig ovrCameraRig)
+        private void HandleInputDataDirtied(bool isLateUpdate)
         {
-            OnAnchorsUpdated();
+            WhenInputDataDirtied(isLateUpdate);
         }
 
         #region Inject
-        public void InjectAllOVRCameraRigRef(OVRCameraRig ovrCameraRig, bool requireHands)
+        public void InjectAllOVRCameraRigRef(InteractionOVRCameraRig ovrCameraRig, bool requireHands)
         {
-            InjectOVRCameraRig(ovrCameraRig);
+            InjectInteractionOVRCameraRig(ovrCameraRig);
             InjectRequireHands(requireHands);
         }
 
-        public void InjectOVRCameraRig(OVRCameraRig ovrCameraRig)
+        public void InjectInteractionOVRCameraRig(InteractionOVRCameraRig ovrCameraRig)
         {
             _ovrCameraRig = ovrCameraRig;
             // Clear the cached values to force new values to be read on next access

@@ -1,21 +1,28 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
-
-using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 
 namespace Oculus.Interaction
 {
@@ -27,6 +34,7 @@ namespace Oculus.Interaction
     {
         [SerializeField, Interface(typeof(IInteractable))]
         private List<MonoBehaviour> _interactables;
+
         private List<IInteractable> Interactables;
 
         public int InteractorsCount
@@ -36,7 +44,7 @@ namespace Oculus.Interaction
                 int count = 0;
                 foreach (IInteractable interactable in Interactables)
                 {
-                    count += interactable.InteractorsCount;
+                    count += interactable.InteractorViews.Count();
                 }
 
                 return count;
@@ -50,12 +58,23 @@ namespace Oculus.Interaction
                 int count = 0;
                 foreach (IInteractable interactable in Interactables)
                 {
-                    count += interactable.SelectingInteractorsCount;
+                    count += interactable.SelectingInteractorViews.Count();
                 }
 
                 return count;
             }
         }
+
+        public IEnumerable<IInteractorView> InteractorViews =>
+            Interactables.SelectMany(interactable => interactable.InteractorViews).ToList();
+
+        public IEnumerable<IInteractorView> SelectingInteractorViews =>
+            Interactables.SelectMany(interactable => interactable.SelectingInteractorViews).ToList();
+
+        public event Action<IInteractorView> WhenInteractorViewAdded = delegate { };
+        public event Action<IInteractorView> WhenInteractorViewRemoved = delegate { };
+        public event Action<IInteractorView> WhenSelectingInteractorViewAdded = delegate { };
+        public event Action<IInteractorView> WhenSelectingInteractorViewRemoved = delegate { };
 
         public int MaxInteractors
         {
@@ -84,9 +103,6 @@ namespace Oculus.Interaction
                 return max;
             }
         }
-
-        public event Action WhenInteractorsCountUpdated = delegate { };
-        public event Action WhenSelectingInteractorsCountUpdated = delegate { };
 
         public event Action<InteractableStateChangeArgs> WhenStateChanged = delegate { };
 
@@ -145,6 +161,10 @@ namespace Oculus.Interaction
                 foreach (IInteractable interactable in Interactables)
                 {
                     interactable.WhenStateChanged += HandleStateChange;
+                    interactable.WhenInteractorViewAdded += WhenInteractorViewAdded;
+                    interactable.WhenInteractorViewRemoved += WhenInteractorViewRemoved;
+                    interactable.WhenSelectingInteractorViewAdded += WhenSelectingInteractorViewAdded;
+                    interactable.WhenSelectingInteractorViewRemoved += WhenSelectingInteractorViewRemoved;
                 }
             }
         }
@@ -156,6 +176,11 @@ namespace Oculus.Interaction
                 foreach (IInteractable interactable in Interactables)
                 {
                     interactable.WhenStateChanged -= HandleStateChange;
+                    interactable.WhenStateChanged -= HandleStateChange;
+                    interactable.WhenInteractorViewAdded -= WhenInteractorViewAdded;
+                    interactable.WhenInteractorViewRemoved -= WhenInteractorViewRemoved;
+                    interactable.WhenSelectingInteractorViewAdded -= WhenSelectingInteractorViewAdded;
+                    interactable.WhenSelectingInteractorViewRemoved -= WhenSelectingInteractorViewRemoved;
                 }
             }
         }

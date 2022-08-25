@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using Oculus.Interaction.Input;
 using UnityEngine;
@@ -35,18 +43,21 @@ namespace Oculus.Interaction.PoseDetection
             public TransformProperties(Pose centerEyePos,
                 Pose wristPose,
                 Handedness handedness,
-                Vector3 trackingSystemUp)
+                Vector3 trackingSystemUp,
+                Vector3 trackingSystemForward)
             {
                 CenterEyePose = centerEyePos;
                 WristPose = wristPose;
                 Handedness = handedness;
                 TrackingSystemUp = trackingSystemUp;
+                TrackingSystemForward = trackingSystemForward;
             }
 
             public readonly Pose CenterEyePose;
             public readonly Pose WristPose;
             public readonly Handedness Handedness;
             public readonly Vector3 TrackingSystemUp;
+            public readonly Vector3 TrackingSystemForward;
         }
 
         public static float GetValue(TransformFeature transformFeature, TransformJointData transformJointData,
@@ -54,7 +65,8 @@ namespace Oculus.Interaction.PoseDetection
         {
             TransformProperties transformProps =
                 new TransformProperties(transformJointData.CenterEyePose, transformJointData.WristPose,
-                    transformJointData.Handedness, transformJointData.TrackingSystemUp);
+                    transformJointData.Handedness, transformJointData.TrackingSystemUp,
+                    transformJointData.TrackingSystemForward);
             switch (transformFeature)
             {
                 case TransformFeature.WristDown:
@@ -85,7 +97,8 @@ namespace Oculus.Interaction.PoseDetection
         {
             TransformProperties transformProps =
                 new TransformProperties(transformJointData.CenterEyePose, transformJointData.WristPose,
-                    transformJointData.Handedness, transformJointData.TrackingSystemUp);
+                    transformJointData.Handedness, transformJointData.TrackingSystemUp,
+                    transformJointData.TrackingSystemForward);
             return GetHandVectorForFeature(transformFeature, in transformProps, in transformConfig);
         }
 
@@ -129,7 +142,8 @@ namespace Oculus.Interaction.PoseDetection
         {
             TransformProperties transformProps =
                 new TransformProperties(transformJointData.CenterEyePose, transformJointData.WristPose,
-                    transformJointData.Handedness, transformJointData.TrackingSystemUp);
+                    transformJointData.Handedness, transformJointData.TrackingSystemUp,
+                    transformJointData.TrackingSystemForward);
             return GetTargetVectorForFeature(transformFeature, in transformProps, in transformConfig);
         }
 
@@ -143,7 +157,7 @@ namespace Oculus.Interaction.PoseDetection
                 case TransformFeature.WristDown:
                 case TransformFeature.PalmDown:
                 case TransformFeature.FingersDown:
-                    targetVector = OffsetVectorWithRotation(
+                    targetVector = OffsetVectorWithRotation(transformProps,
                         GetVerticalVector(transformProps.CenterEyePose,
                             transformProps.TrackingSystemUp, false,
                             in transformConfig),
@@ -152,24 +166,24 @@ namespace Oculus.Interaction.PoseDetection
                 case TransformFeature.WristUp:
                 case TransformFeature.PalmUp:
                 case TransformFeature.FingersUp:
-                    targetVector = OffsetVectorWithRotation(
+                    targetVector = OffsetVectorWithRotation(transformProps,
                         GetVerticalVector(transformProps.CenterEyePose,
                             transformProps.TrackingSystemUp, true,
                             in transformConfig),
                         in transformConfig);
                     break;
                 case TransformFeature.PalmTowardsFace:
-                    targetVector = OffsetVectorWithRotation(
+                    targetVector = OffsetVectorWithRotation(transformProps,
                         -1.0f * transformProps.CenterEyePose.forward,
                         in transformConfig);
                     break;
                 case TransformFeature.PalmAwayFromFace:
-                    targetVector = OffsetVectorWithRotation(
+                    targetVector = OffsetVectorWithRotation(transformProps,
                         transformProps.CenterEyePose.forward,
                         in transformConfig);
                     break;
                 case TransformFeature.PinchClear:
-                    targetVector = OffsetVectorWithRotation(
+                    targetVector = OffsetVectorWithRotation(transformProps,
                         -1.0f * transformProps.CenterEyePose.forward,
                         in transformConfig);
                     break;
@@ -295,11 +309,29 @@ namespace Oculus.Interaction.PoseDetection
             }
         }
 
-        private static Vector3 OffsetVectorWithRotation(in Vector3 originalVector,
+        private static Vector3 OffsetVectorWithRotation(in TransformProperties transformProps,
+            in Vector3 originalVector,
             in TransformConfig transformConfig)
         {
-            Quaternion rotationAmount = Quaternion.Euler(transformConfig.RotationOffset);
-            return rotationAmount * originalVector;
+            Quaternion baseRotation;
+            switch (transformConfig.UpVectorType)
+            {
+                case UpVectorType.Head:
+                    baseRotation = transformProps.CenterEyePose.rotation;
+                    break;
+                case UpVectorType.Tracking:
+                    baseRotation =
+                        Quaternion.LookRotation(transformProps.TrackingSystemForward,
+                                                transformProps.TrackingSystemUp);
+                    break;
+                case UpVectorType.World:
+                default:
+                    baseRotation = Quaternion.identity;
+                    break;
+            }
+
+            Quaternion offset = Quaternion.Euler(transformConfig.RotationOffset);
+            return baseRotation * offset * Quaternion.Inverse(baseRotation) * originalVector;
         }
     }
 }

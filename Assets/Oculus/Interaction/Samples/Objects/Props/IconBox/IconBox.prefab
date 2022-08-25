@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 493681581}
   - component: {fileID: 493681582}
-  - component: {fileID: 493681583}
   m_Layer: 0
   m_Name: HandGrabInteractable
   m_TagString: Untagged
@@ -46,10 +45,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxInteractors: -1
   _maxSelectingInteractors: -1
-  _relativeTo: {fileID: 7001587203448011866}
+  _pointableElement: {fileID: 6418746134552452932}
   _rigidbody: {fileID: 4289706931025778868}
-  _releaseDistance: 0
-  _physicsObject: {fileID: 0}
+  _resetGrabOnGrabsUpdated: 1
+  _physicsGrabbable: {fileID: 0}
   _scoringModifier:
     _maxDistance: 0.1
     _positionRotationWeight: 0.5
@@ -58,8 +57,8 @@ MonoBehaviour:
     _thumbRequirement: 2
     _indexRequirement: 1
     _middleRequirement: 1
-    _ringRequirement: 1
-    _pinkyRequirement: 1
+    _ringRequirement: 0
+    _pinkyRequirement: 0
     _unselectMode: 1
   _palmGrabRules:
     _thumbRequirement: 1
@@ -68,23 +67,9 @@ MonoBehaviour:
     _ringRequirement: 2
     _pinkyRequirement: 1
     _unselectMode: 0
-  _snapType: 3
-  _travelSpeed: 1
-  _handGrabPoints: []
---- !u!114 &493681583
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 493681580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81bef07654562f541951b59629ceeeb6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _transformable: {fileID: 6418746134552452932}
-  _pointableInteractable: {fileID: 493681582}
+  _movementProvider: {fileID: 0}
+  _handAligment: 0
+  _handGrabPoses: []
 --- !u!1 &47957625437475666
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,10 +239,7 @@ GameObject:
   - component: {fileID: 7001587203448011866}
   - component: {fileID: 4289706931025778868}
   - component: {fileID: 6418746134552452932}
-  - component: {fileID: 1992290839681091323}
-  - component: {fileID: 9162302280582078494}
-  - component: {fileID: 6848297348879492211}
-  - component: {fileID: 374390826}
+  - component: {fileID: 732246028235456904}
   m_Layer: 0
   m_Name: IconBox
   m_TagString: Untagged
@@ -310,12 +292,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _transferHandOnSecondGrab: 1
-  _maxGrabPoints: -1
+  _transferOnSecondSelection: 1
+  _addNewPointsToFront: 0
+  _forwardElement: {fileID: 0}
   _oneGrabTransformer: {fileID: 0}
   _twoGrabTransformer: {fileID: 0}
-  _pointables: []
---- !u!114 &1992290839681091323
+  _maxGrabPoints: -1
+--- !u!114 &732246028235456904
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -324,26 +307,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7665534328767522528}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3236b8f205019504589358e7e0412a38, type: 3}
+  m_Script: {fileID: 11500000, guid: e2f8f6e9e6f3e114b9bf9a57c2160615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _snapPoints:
-  - {fileID: 374390826}
-  _snapPointPositionEaseTime: 0.1
-  _snapPointRotationEaseTime: 0
---- !u!114 &9162302280582078494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7665534328767522528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1464721f2283eb14e94a33e812b47be4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interactableView: {fileID: 374390822}
+  _pointable: {fileID: 6418746134552452932}
   _whenHover:
     m_PersistentCalls:
       m_Calls: []
@@ -380,63 +347,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  _whenInteractorsCountUpdated:
+  _whenMove:
     m_PersistentCalls:
       m_Calls: []
-  _whenSelectingInteractorsCountUpdated:
+  _whenCancel:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6848297348879492211
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7665534328767522528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f5531e0e19dff046a5b9f58ee68fe2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _transformable: {fileID: 6418746134552452932}
-  _onAdd:
-    m_PersistentCalls:
-      m_Calls: []
-  _onRemove:
-    m_PersistentCalls:
-      m_Calls: []
-  _onTransfer:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5269040000147794287}
-        m_TargetAssemblyTypeName: Oculus.Interaction.AudioTrigger, Oculus.Interaction.Samples
-        m_MethodName: PlayAudio
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _onUpdate:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &374390826
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7665534328767522528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89a13a0be922f9948b2ff97c9a6cd527, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _collider: {fileID: 171120777133373743}
-  _distanceThreshold: 0
 --- !u!1 &7767784525905204192
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,6 +500,7 @@ MonoBehaviour:
   _vectorProperties: []
   _colorProperties: []
   _floatProperties: []
+  _updateEveryFrame: 1
 --- !u!114 &374390822
 MonoBehaviour:
   m_ObjectHideFlags: 0

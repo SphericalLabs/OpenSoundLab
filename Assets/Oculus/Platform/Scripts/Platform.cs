@@ -566,10 +566,6 @@ namespace Oculus.Platform
     }
   }
 
-  public static partial class AbuseReport
-  {
-  }
-
   public static partial class Achievements
   {
     /// Add 'count' to the achievement with the given name. This must be a COUNT
@@ -928,10 +924,6 @@ namespace Oculus.Platform
 
   }
 
-  public static partial class Avatar
-  {
-  }
-
   public static partial class Cal
   {
   }
@@ -1269,10 +1261,6 @@ namespace Oculus.Platform
 
   }
 
-  public static partial class Colocation
-  {
-  }
-
   public static partial class Entitlements
   {
     /// Returns whether the current user is entitled to the current app.
@@ -1288,10 +1276,6 @@ namespace Oculus.Platform
       return null;
     }
 
-  }
-
-  public static partial class GraphAPI
-  {
   }
 
   public static partial class GroupPresence
@@ -2787,6 +2771,20 @@ namespace Oculus.Platform
       return null;
     }
 
+    /// Return the IDs of users entitled to use the current app that are blocked by
+    /// the specified user
+    ///
+    public static Request<Models.BlockedUserList> GetBlockedUsers()
+    {
+      if (Core.IsInitialized())
+      {
+        return new Request<Models.BlockedUserList>(CAPI.ovr_User_GetBlockedUsers());
+      }
+
+      Debug.LogError(Oculus.Platform.Core.PlatformUninitializedError);
+      return null;
+    }
+
     /// Retrieve the currently signed in user. This call is available offline.
     ///
     /// NOTE: This will not return the user's presence as it should always be
@@ -2911,6 +2909,22 @@ namespace Oculus.Platform
       return null;
     }
 
+    /// Launch the flow for blocking the given user. You can't be friended,
+    /// invited, or searched by a blocked user, for example. You can remove the
+    /// block via ovr_User_LaunchUnblockFlow.
+    /// \param userID User ID of user being blocked
+    ///
+    public static Request<Models.LaunchBlockFlowResult> LaunchBlockFlow(UInt64 userID)
+    {
+      if (Core.IsInitialized())
+      {
+        return new Request<Models.LaunchBlockFlowResult>(CAPI.ovr_User_LaunchBlockFlow(userID));
+      }
+
+      Debug.LogError(Oculus.Platform.Core.PlatformUninitializedError);
+      return null;
+    }
+
     /// Launch the flow for sending a friend request to a user.
     /// \param userID User ID of user to send a friend request to
     ///
@@ -2919,6 +2933,20 @@ namespace Oculus.Platform
       if (Core.IsInitialized())
       {
         return new Request<Models.LaunchFriendRequestFlowResult>(CAPI.ovr_User_LaunchFriendRequestFlow(userID));
+      }
+
+      Debug.LogError(Oculus.Platform.Core.PlatformUninitializedError);
+      return null;
+    }
+
+    /// Launch the flow for unblocking a user that the viewer has blocked.
+    /// \param userID User ID of user to unblock
+    ///
+    public static Request<Models.LaunchUnblockFlowResult> LaunchUnblockFlow(UInt64 userID)
+    {
+      if (Core.IsInitialized())
+      {
+        return new Request<Models.LaunchUnblockFlowResult>(CAPI.ovr_User_LaunchUnblockFlow(userID));
       }
 
       Debug.LogError(Oculus.Platform.Core.PlatformUninitializedError);
@@ -3398,6 +3426,27 @@ namespace Oculus.Platform
   }
 
   public static partial class Users {
+    public static Request<Models.BlockedUserList> GetNextBlockedUserListPage(Models.BlockedUserList list) {
+      if (!list.HasNextPage)
+      {
+        Debug.LogWarning("Oculus.Platform.GetNextBlockedUserListPage: List has no next page");
+        return null;
+      }
+
+      if (Core.IsInitialized())
+      {
+        return new Request<Models.BlockedUserList>(
+          CAPI.ovr_HTTP_GetWithMessageType(
+            list.NextUrl,
+            (int)Message.MessageType.User_GetNextBlockedUserArrayPage
+          )
+        );
+      }
+
+      Debug.LogError(Oculus.Platform.Core.PlatformUninitializedError);
+      return null;
+    }
+
     public static Request<Models.UserAndRoomList> GetNextUserAndRoomListPage(Models.UserAndRoomList list) {
       if (!list.HasNextPage)
       {
@@ -3432,6 +3481,27 @@ namespace Oculus.Platform
           CAPI.ovr_HTTP_GetWithMessageType(
             list.NextUrl,
             (int)Message.MessageType.User_GetNextUserArrayPage
+          )
+        );
+      }
+
+      Debug.LogError(Oculus.Platform.Core.PlatformUninitializedError);
+      return null;
+    }
+
+    public static Request<Models.UserCapabilityList> GetNextUserCapabilityListPage(Models.UserCapabilityList list) {
+      if (!list.HasNextPage)
+      {
+        Debug.LogWarning("Oculus.Platform.GetNextUserCapabilityListPage: List has no next page");
+        return null;
+      }
+
+      if (Core.IsInitialized())
+      {
+        return new Request<Models.UserCapabilityList>(
+          CAPI.ovr_HTTP_GetWithMessageType(
+            list.NextUrl,
+            (int)Message.MessageType.User_GetNextUserCapabilityArrayPage
           )
         );
       }

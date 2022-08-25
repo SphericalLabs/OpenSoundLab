@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using System.Collections;
@@ -143,19 +151,34 @@ public class OVROverlayEditor : Editor
 		EditorGUILayout.Space();
 
 		EditorGUILayout.LabelField(new GUIContent("Overlay Shape", "The shape of this overlay"), EditorStyles.boldLabel);
-		int currentShapeIndex = Array.IndexOf(selectableShapeValues, overlay.currentOverlayShape);
-		if (currentShapeIndex == -1) {
-			Debug.LogError("Invalid shape encountered");
-			currentShapeIndex = 0;
+		// If the overlay shape has been set to a passthrough shape (via scripting), do not allow to change it.
+		if (!OVROverlay.IsPassthroughShape(overlay.currentOverlayShape))
+		{
+			int currentShapeIndex = Array.IndexOf(selectableShapeValues, overlay.currentOverlayShape);
+			if (currentShapeIndex == -1)
+			{
+				Debug.LogError("Invalid shape encountered");
+				currentShapeIndex = 0;
+			}
+			currentShapeIndex = EditorGUILayout.Popup(new GUIContent("Overlay Shape", "The shape of this overlay"), currentShapeIndex, selectableShapeNames);
+			overlay.currentOverlayShape = selectableShapeValues[currentShapeIndex];
 		}
-		currentShapeIndex = EditorGUILayout.Popup(new GUIContent("Overlay Shape", "The shape of this overlay"), currentShapeIndex, selectableShapeNames);
-		overlay.currentOverlayShape = selectableShapeValues[currentShapeIndex];
+
+		if (overlay.currentOverlayShape == OVROverlay.OverlayShape.Cubemap)
+		{
+			overlay.useLegacyCubemapRotation = EditorGUILayout.Toggle(new GUIContent("Use Legacy Cubemap Rotation",
+				"Whether the cubemap should use the legacy rotation which was rotated 180 degrees around the Y axis comapred to Unity's definition of cubemaps. This setting will be deprecated in the near future, therefore it is recommended to fix the cubemap texture instead."), overlay.useLegacyCubemapRotation);
+		}
 
 		EditorGUILayout.Space();
 
 		EditorGUILayout.LabelField("Layer Properties", EditorStyles.boldLabel);
 		overlay.useBicubicFiltering = EditorGUILayout.Toggle(new GUIContent("Bicubic Filtering",
 			"Whether this layer should use bicubic filtering. This can increase quality for small details on text and icons being viewed at farther distances."), overlay.useBicubicFiltering);
+		overlay.useEfficientSupersample = EditorGUILayout.Toggle(new GUIContent("Super Sample",
+			"Whether this layer should use an efficient super sample filter. This can help reduce flicker artifacts."), overlay.useEfficientSupersample);
+		overlay.useEfficientSharpen = EditorGUILayout.Toggle(new GUIContent("Sharpen",
+			"Whether this layer should use a sharpen filter. This amplifies contrast and fine details"), overlay.useEfficientSharpen);
 
 		EditorGUILayout.Space();
 

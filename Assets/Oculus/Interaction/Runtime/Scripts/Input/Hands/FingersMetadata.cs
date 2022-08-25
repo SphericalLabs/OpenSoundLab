@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 namespace Oculus.Interaction.Input
 {
@@ -83,6 +91,42 @@ namespace Oculus.Interaction.Input
             new[] {13,14,15,16}
         };
 
+        public static readonly HandJointId[][] FINGER_TO_JOINTS = new[]
+        {
+            new HandJointId[]
+            {
+                HandJointId.HandThumb0,
+                HandJointId.HandThumb1,
+                HandJointId.HandThumb2,
+                HandJointId.HandThumb3
+            },
+            new HandJointId[]
+            {
+                HandJointId.HandIndex1,
+                HandJointId.HandIndex2,
+                HandJointId.HandIndex3
+            },
+            new HandJointId[]
+            {
+                HandJointId.HandMiddle1,
+                HandJointId.HandMiddle2,
+                HandJointId.HandMiddle3
+            },
+            new HandJointId[]
+            {
+                HandJointId.HandRing1,
+                HandJointId.HandRing2,
+                HandJointId.HandRing3
+            },
+            new HandJointId[]
+            {
+                HandJointId.HandPinky0,
+                HandJointId.HandPinky1,
+                HandJointId.HandPinky2,
+                HandJointId.HandPinky3
+            }
+        };
+
         /// <summary>
         /// Array order following HAND_JOINT_IDS that indicates if the i joint
         /// can spread (rotate around Y). Should be true for the root of the fingers
@@ -110,11 +154,12 @@ namespace Oculus.Interaction.Input
         };
 
         /// <summary>
-        /// Sorted like HAND_JOINT_IDS, this array is used to retrieve the finger
-        /// each joint belongs to.
+        /// Map HandJointId to HandFinger
         /// </summary>
-        public static readonly HandFinger[] HAND_FINGER_ID = new HandFinger[]
+        public static readonly HandFinger[] JOINT_TO_FINGER = new HandFinger[]
         {
+            HandFinger.Invalid,
+            HandFinger.Invalid,
             HandFinger.Thumb,
             HandFinger.Thumb,
             HandFinger.Thumb,
@@ -131,7 +176,20 @@ namespace Oculus.Interaction.Input
             HandFinger.Pinky,
             HandFinger.Pinky,
             HandFinger.Pinky,
+            HandFinger.Pinky,
+            HandFinger.Thumb,
+            HandFinger.Index,
+            HandFinger.Middle,
+            HandFinger.Ring,
             HandFinger.Pinky
+        };
+
+        /// <summary>
+        /// Map HandJointId to HandFinger
+        /// </summary>
+        public static readonly int[] JOINT_TO_FINGER_INDEX = new int[]
+        {
+            -1, -1, 0, 1, 2, 3, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 3, 4, 3, 3, 3, 4
         };
     }
 }

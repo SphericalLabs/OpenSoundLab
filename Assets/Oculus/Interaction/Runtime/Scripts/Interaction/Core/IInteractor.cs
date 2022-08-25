@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 
@@ -26,12 +34,18 @@ namespace Oculus.Interaction
     public interface IInteractorView
     {
         int Identifier { get; }
+
+        bool HasCandidate { get; }
+        object Candidate { get; }
+
         bool HasInteractable { get; }
         bool HasSelectedInteractable { get; }
 
         InteractorState State { get; }
         event Action<InteractorStateChangeArgs> WhenStateChanged;
-        event Action WhenInteractorUpdated;
+        event Action WhenPreprocessed;
+        event Action WhenProcessed;
+        event Action WhenPostprocessed;
     }
 
     /// <summary>
@@ -40,40 +54,24 @@ namespace Oculus.Interaction
     /// </summary>
     public interface IInteractor : IInteractorView
     {
+
+        void Preprocess();
+        void Process();
+        void Postprocess();
+
+        void ProcessCandidate();
         void Enable();
         void Disable();
-
-        void UpdateInteractor();
         void Hover();
+        void Unhover();
         void Select();
         void Unselect();
 
-        bool HasCandidate { get; }
+        bool ShouldHover { get; }
+        bool ShouldUnhover { get; }
         bool ShouldSelect { get; }
         bool ShouldUnselect { get; }
-    }
 
-    /// <summary>
-    /// IInteractorView{out TInteractable} defines an InteractorView with concretely typed
-    /// Interactable members.
-    /// </summary>
-    public interface IInteractorView<out TInteractable> : IInteractorView
-    {
-        MAction<TInteractable> WhenInteractableSet { get; }
-        MAction<TInteractable> WhenInteractableUnset { get; }
-        MAction<TInteractable> WhenInteractableSelected { get; }
-        MAction<TInteractable> WhenInteractableUnselected { get; }
-        TInteractable Candidate { get; }
-        TInteractable Interactable { get; }
-        TInteractable SelectedInteractable { get; }
-    }
-
-    /// <summary>
-    /// IInteractor{out TInteractable} defines an IInteractor with concretely typed
-    /// Interactable members.
-    /// </summary>
-    public interface IInteractor<TInteractable> : IInteractor, IInteractorView<TInteractable>
-    {
-        bool IsFilterPassedBy(TInteractable interactable);
+        bool IsRootDriver { get; set; }
     }
 }

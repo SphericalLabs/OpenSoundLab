@@ -148,10 +148,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trackingEnabled: 1
+  connectionRequired: 1
+  showUntracked: 0
   keyboardQueryFlags: 2
   presentation: 0
   PassthroughBorderMultiplier: 0.2
-  keyboardModelShader: {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
+  keyboardModelShader: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
+  keyboardModelAlphaBlendShader: {fileID: 10750, guid: 0000000000000000f000000000000000,
+    type: 0}
   KeyLabelModeShader: {fileID: 10750, guid: 0000000000000000f000000000000000, type: 0}
   PassthroughShader: {fileID: 4800000, guid: 8120257754b48344b8a1a0961bad0c46, type: 3}
   projectedPassthroughRoot: {fileID: 1142419901555515376}

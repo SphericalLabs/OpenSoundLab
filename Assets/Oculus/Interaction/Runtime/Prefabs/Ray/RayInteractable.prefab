@@ -222,5 +222,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxInteractors: -1
   _maxSelectingInteractors: -1
+  _pointableElement: {fileID: 0}
   _collider: {fileID: 4178831829584330291}
-  _pointablePlane: {fileID: 0}
+  _surface: {fileID: 0}

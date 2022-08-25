@@ -23,7 +23,6 @@ public class BuildAssetPackages
     {
         string[] assets = AssetDatabase.FindAssets("t:Object", null).Select(s=>AssetDatabase.GUIDToAssetPath(s)).ToArray();
         assets = assets.Where(s=>
-            s.StartsWith("Assets/Oculus/Avatar/") ||
             s.StartsWith("Assets/Oculus/AudioManager/") ||
             s.StartsWith("Assets/Oculus/LipSync/") ||
             s.StartsWith("Assets/Oculus/Platform/") ||

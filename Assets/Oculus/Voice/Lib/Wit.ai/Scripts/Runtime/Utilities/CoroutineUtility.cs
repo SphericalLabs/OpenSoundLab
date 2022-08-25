@@ -1,41 +1,43 @@
 ﻿/*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
  *
  * This source code is licensed under the license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
-using System;
 using UnityEngine;
-using UnityEngine.Events;
 using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Facebook.WitAi.Utilities
 {
     public static class CoroutineUtility
     {
         // Start coroutine
-        public static CoroutinePerformer StartCoroutine(IEnumerator asyncMethod)
+        public static CoroutinePerformer StartCoroutine(IEnumerator asyncMethod, bool useUpdate = false)
         {
             CoroutinePerformer performer = GetPerformer();
-            performer.CoroutineBegin(asyncMethod);
+            performer.CoroutineBegin(asyncMethod, useUpdate);
             return performer;
         }
         // Get performer
         private static CoroutinePerformer GetPerformer()
         {
             CoroutinePerformer performer = new GameObject("Coroutine").AddComponent<CoroutinePerformer>();
-            //performer.gameObject.hideFlags = HideFlags.DontSave;
             performer.gameObject.hideFlags = HideFlags.HideAndDontSave;
             return performer;
         }
         // Coroutine performer
         public class CoroutinePerformer : MonoBehaviour
         {
-            // Coroutine
-            public bool isRunning { get; private set; }
-            private Coroutine _runtimeCoroutine;
+            // Whether currently running
+            public bool IsRunning { get; private set; }
+
+            // Settings & fields
+            private bool _useUpdate;
+            private IEnumerator _method;
+            private Coroutine _coroutine;
 
             // Dont destroy
             private void Awake()
@@ -44,100 +46,148 @@ namespace Facebook.WitAi.Utilities
             }
 
             // Perform coroutine
-            public void CoroutineBegin(IEnumerator asyncMethod)
+            public void CoroutineBegin(IEnumerator asyncMethod, bool useUpdate)
             {
                 // Cannot call twice
-                if (isRunning)
+                if (IsRunning)
                 {
                     return;
                 }
 
                 // Begin running
-                isRunning = true;
+                IsRunning = true;
 
+                // Use update in batch mode
+                if (Application.isBatchMode)
+                {
+                    useUpdate = true;
+                }
 #if UNITY_EDITOR
-                // Editor mode
+                // Use update in editor mode
                 if (!Application.isPlaying)
                 {
-                    _editorMethod = asyncMethod;
-                    UnityEditor.EditorApplication.update += EditorCoroutineIterate;
-                    return;
+                    useUpdate = true;
+                    UnityEditor.EditorApplication.update += EditorUpdate;
                 }
 #endif
 
+                // Set whether to use update or coroutine implementation
+                _useUpdate = useUpdate;
+                _method = asyncMethod;
+
+                // Begin with initial update
+                if (_useUpdate)
+                {
+                    CoroutineIterateUpdate();
+                }
                 // Begin coroutine
-                _runtimeCoroutine = StartCoroutine(RuntimeCoroutineIterate(asyncMethod));
+                else
+                {
+                    _coroutine = StartCoroutine(CoroutineIterateEnumerator());
+                }
             }
 
 #if UNITY_EDITOR
             // Editor iterate
-            private IEnumerator _editorMethod;
-            private void EditorCoroutineIterate()
+            private void EditorUpdate()
             {
-                if (_editorMethod != null)
-                {
-                    if (!_editorMethod.MoveNext())
-                    {
-                        CoroutineComplete();
-                    }
-                }
+                CoroutineIterateUpdate();
             }
 #endif
             // Runtime iterate
-            private IEnumerator RuntimeCoroutineIterate(IEnumerator asyncMethod)
+            private IEnumerator CoroutineIterateEnumerator()
             {
                 // Wait for completion
-                yield return StartCoroutine(asyncMethod);
+                yield return _method;
                 // Complete
                 CoroutineComplete();
             }
-
-            // Cancel on destroy
-            private void OnDestroy()
+            // Update
+            private void Update()
             {
-                if (isRunning)
+                if (_useUpdate)
+                {
+                    CoroutineIterateUpdate();
+                }
+            }
+            // Batch iterate
+            private void CoroutineIterateUpdate()
+            {
+                // Destroyed
+                if (this == null || _method == null)
                 {
                     CoroutineCancel();
                 }
-            }
-            // Cancel coroutine
-            public void CoroutineCancel()
-            {
-                if (isRunning)
+                // Continue
+                else if (!MoveNext(_method))
                 {
                     CoroutineComplete();
                 }
+            }
+            // Move through queue
+            private bool MoveNext(IEnumerator method)
+            {
+                // Move sub coroutine
+                object current = method.Current;
+                if (current != null && current.GetType().GetInterfaces().Contains(typeof(IEnumerator)))
+                {
+                    if (MoveNext(current as IEnumerator))
+                    {
+                        return true;
+                    }
+                }
+                // Move this
+                return method.MoveNext();
+            }
+            // Cancel on destroy
+            private void OnDestroy()
+            {
+                CoroutineUnload();
+            }
+            // Cancel current coroutine
+            public void CoroutineCancel()
+            {
+                CoroutineComplete();
             }
             // Completed
             private void CoroutineComplete()
             {
                 // Ignore unless running
-                if (!isRunning)
+                if (!IsRunning)
                 {
                     return;
                 }
 
-                // Done
-                isRunning = false;
-
-#if UNITY_EDITOR
-                // Complete
-                if (_editorMethod != null)
-                {
-                    UnityEditor.EditorApplication.update -= EditorCoroutineIterate;
-                    _editorMethod = null;
-                }
-#endif
-
-                // Stop coroutine
-                if (_runtimeCoroutine != null)
-                {
-                    StopCoroutine(_runtimeCoroutine);
-                    _runtimeCoroutine = null;
-                }
+                // Unload
+                CoroutineUnload();
 
                 // Destroy
-                DestroyImmediate(gameObject);
+                if (this != null && gameObject != null)
+                {
+                    DestroyImmediate(gameObject);
+                }
+            }
+            // Unload
+            private void CoroutineUnload()
+            {
+                // Done
+                IsRunning = false;
+
+                // Complete
+                if (_method != null)
+                {
+#if UNITY_EDITOR
+                    UnityEditor.EditorApplication.update -= EditorUpdate;
+#endif
+                    _method = null;
+                }
+
+                // Stop coroutine
+                if (_coroutine != null)
+                {
+                    StopCoroutine(_coroutine);
+                    _coroutine = null;
+                }
             }
         }
     }

@@ -301,7 +301,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4171210596153234763}
   - component: {fileID: 3494393462330821194}
-  - component: {fileID: 1784097173527018851}
+  - component: {fileID: 3718601612112823234}
   m_Layer: 0
   m_Name: OculusInteractionSamplePokeButton
   m_TagString: Untagged
@@ -340,14 +340,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxInteractors: -1
   _maxSelectingInteractors: -1
+  _pointableElement: {fileID: 0}
   _proximityField: {fileID: 6553429281188994657}
-  _triggerPlaneTransform: {fileID: 9221139118573929147}
+  _surface: {fileID: 4625356660798671994}
   _maxDistance: 0.01
+  _enterHoverDistance: 0.01
   _releaseDistance: 0.1
   _horizontalDragThreshold: 0.1
   _verticalDragThreshold: 0.1
   _volumeMask: {fileID: 0}
---- !u!114 &1784097173527018851
+  _positionPinning:
+    Enabled: 0
+    MaxPinDistance: 0
+--- !u!114 &3718601612112823234
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -356,10 +361,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 4171210596153234762}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1464721f2283eb14e94a33e812b47be4, type: 3}
+  m_Script: {fileID: 11500000, guid: e2f8f6e9e6f3e114b9bf9a57c2160615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interactableView: {fileID: 3494393462330821194}
+  _pointable: {fileID: 3494393462330821194}
+  _whenRelease:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3599234313286101947}
+        m_TargetAssemblyTypeName: Oculus.Interaction.AudioTrigger, Oculus.Interaction.Samples
+        m_MethodName: PlayAudio
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   _whenHover:
     m_PersistentCalls:
       m_Calls: []
@@ -383,23 +403,11 @@ MonoBehaviour:
         m_CallState: 2
   _whenUnselect:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3599234313286101947}
-        m_TargetAssemblyTypeName: Oculus.Interaction.AudioTrigger, Oculus.Interaction.Samples
-        m_MethodName: PlayAudio
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _whenInteractorsCountUpdated:
+      m_Calls: []
+  _whenMove:
     m_PersistentCalls:
       m_Calls: []
-  _whenSelectingInteractorsCountUpdated:
+  _whenCancel:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &6124062343383677172
@@ -559,6 +567,7 @@ MonoBehaviour:
   _vectorProperties: []
   _colorProperties: []
   _floatProperties: []
+  _updateEveryFrame: 1
 --- !u!114 &2778893221137343601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -719,8 +728,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9221139118573929147}
+  - component: {fileID: 4625356660798671994}
   m_Layer: 0
-  m_Name: TriggerPlane
+  m_Name: Surface
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -740,6 +750,20 @@ Transform:
   m_Father: {fileID: 5074392215883782687}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4625356660798671994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9221139118573929146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf2a74d69b1c1e41916d2a7afdff5be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _facing: 0
+  _doubleSided: 1
 --- !u!1001 &6279692076500133922
 PrefabInstance:
   m_ObjectHideFlags: 0

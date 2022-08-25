@@ -1,27 +1,26 @@
-/************************************************************************************
-
-Copyright   :   Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Licensed under the Oculus SDK License Version 3.4.1 (the "License");
-you may not use the Oculus SDK except in compliance with the License,
-which is provided at the time of installation or download, or which
-otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-
-https://developer.oculus.com/licenses/sdk-3.4.1
-
-Unless required by applicable law or agreed to in writing, the Oculus SDK
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 //#define BUILDSESSION
 
-#if USING_XR_MANAGEMENT && USING_XR_SDK_OCULUS
+#if USING_XR_MANAGEMENT && (USING_XR_SDK_OCULUS || USING_XR_SDK_OPENXR)
 #define USING_XR_SDK
 #endif
 
@@ -41,6 +40,11 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.Android;
 #endif
 
+#if USING_XR_SDK_OPENXR
+using UnityEngine.XR.OpenXR;
+using UnityEditor.XR.OpenXR.Features;
+#endif
+
 [InitializeOnLoad]
 public class OVRGradleGeneration
 	: IPreprocessBuildWithReport, IPostprocessBuildWithReport
@@ -51,7 +55,9 @@ public class OVRGradleGeneration
 	public OVRADBTool adbTool;
 	public Process adbProcess;
 
-	public int callbackOrder { get { return 3; } }
+	private int _callbackOrder = 3;
+
+	public int callbackOrder { get { return _callbackOrder; } }
 	static private System.DateTime buildStartTime;
 	static private System.Guid buildGuid;
 
@@ -91,6 +97,48 @@ public class OVRGradleGeneration
 
 	public void OnPreprocessBuild(BuildReport report)
 	{
+		bool useOpenXR = OVRPluginUpdater.IsOVRPluginOpenXRActivated();
+
+#if USING_XR_SDK_OPENXR
+		UnityEngine.Debug.LogWarning("The installation of Unity OpenXR Plugin is detected, which should NOT be used in production when developing Oculus apps for production. Please uninstall the package, and install the Oculus XR Plugin from the Package Manager.");
+
+		// OpenXR Plugin will remove all native plugins if they are not under the Feature folder. Include OVRPlugin to the build if OculusXRFeature is enabled.
+		var oculusXRFeature = FeatureHelpers.GetFeatureWithIdForBuildTarget(report.summary.platformGroup, Oculus.XR.OculusXRFeature.featureId);
+		if (oculusXRFeature.enabled)
+		{
+			if (!useOpenXR)
+			{
+				throw new BuildFailedException("OpenXR backend for Oculus Plugin is disabled, which is required to support Unity OpenXR Plugin. Please enable OpenXR backend for Oculus Plugin through the 'Oculus -> Tools -> OpenXR' menu.");
+			}
+
+			string ovrRootPath = OVRPluginUpdater.GetUtilitiesRootPath();
+			var importers = PluginImporter.GetAllImporters();
+			foreach (var importer in importers)
+			{
+				if (!importer.GetCompatibleWithPlatform(report.summary.platform))
+					continue;
+				string fullAssetPath = Path.Combine(Directory.GetCurrentDirectory(), importer.assetPath);
+#if UNITY_EDITOR_WIN
+				fullAssetPath = fullAssetPath.Replace("/", "\\");
+#endif
+				if (fullAssetPath.StartsWith(ovrRootPath) && fullAssetPath.Contains("OVRPlugin"))
+				{
+					UnityEngine.Debug.LogFormat("[Oculus] Native plugin included in build because of enabled OculusXRFeature: {0}", importer.assetPath);
+					importer.SetIncludeInBuildDelegate(path => true);
+				}
+				if (!fullAssetPath.StartsWith(ovrRootPath) && fullAssetPath.Contains("libopenxr_loader.so"))
+				{
+					UnityEngine.Debug.LogFormat("[Oculus] libopenxr_loader.so from other packages will be disabled because of enabled OculusXRFeature: {0}", importer.assetPath);
+					importer.SetIncludeInBuildDelegate(path => false);
+				}
+			}
+		}
+		else
+		{
+			UnityEngine.Debug.LogWarning("OculusXRFeature is not enabled in OpenXR Settings. Oculus Integration scripts will not be functional.");
+		}
+#endif
+
 #if UNITY_ANDROID && !(USING_XR_SDK && UNITY_2019_3_OR_NEWER)
 		// Generate error when Vulkan is selected as the perferred graphics API, which is not currently supported in Unity XR
 		if (!PlayerSettings.GetUseDefaultGraphicsAPIs(BuildTarget.Android))
@@ -104,7 +152,6 @@ public class OVRGradleGeneration
 #endif
 
 #if UNITY_ANDROID
-		bool useOpenXR = OVRPluginUpdater.IsOVRPluginOpenXRActivated();
 #if USING_XR_SDK
 		if (useOpenXR)
 		{

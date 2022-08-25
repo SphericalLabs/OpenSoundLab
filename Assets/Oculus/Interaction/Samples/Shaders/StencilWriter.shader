@@ -10,55 +10,64 @@ ANY KIND, either express or implied. See the License for the specific language g
 permissions and limitations under the License.
 ************************************************************************************/
 
-Shader "Oculus/Interaction/StencilWriter"{
-	Properties{
+Shader "Oculus/Interaction/StencilWriter"
+{
+	Properties
+	{
 		[IntRange] _StencilRef("Stencil Reference Value", Range(0,255)) = 0
 	}
 
 	SubShader{
 
-		Tags {   "Queue" = "Geometry+501"} // stuck way up here so that it sorts with transparent objects
+		Tags {"Queue" = "Geometry+501"} // stuck way up here so that it sorts with transparent objects
 
 		ZWrite Off
 
 		ColorMask 0 // Don't write to any colour channels
-		//Blend Zero One
-		Stencil{
+		Stencil
+		{
 			Ref[_StencilRef]
 			Comp Always
 			Pass Replace
 		}
 
-
-
-		Pass {
-
-
-
+		Pass
+		{
 			CGPROGRAM
 
-			// pragmas
 			#pragma vertex vert
 			#pragma fragment frag
 
-			// base input structs
-			struct vertexInput {
+			#include "UnityCG.cginc"
+
+			struct VertexInput
+			{
 				half4 vertex : POSITION;
-			};
-			struct vertexOutput {
-				half4 pos : SV_POSITION;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
-			// vertex function
-			vertexOutput vert(vertexInput v) {
-				vertexOutput o;
+			struct VertexOutput
+			{
+				half4 pos : SV_POSITION;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+				UNITY_VERTEX_OUTPUT_STEREO
+			};
+
+			VertexOutput vert(VertexInput v)
+			{
+				VertexOutput o;
+				UNITY_SETUP_INSTANCE_ID(v);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
+
 				o.pos = UnityObjectToClipPos(v.vertex);
 				return o;
 			}
 
-			// fragment function
-			fixed4 frag(vertexOutput i) : COLOR
+			half4 frag(VertexOutput i) : COLOR
 			{
+				UNITY_SETUP_INSTANCE_ID(i);
+				UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 				return 0;
 			}
 

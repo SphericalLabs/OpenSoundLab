@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using UnityEngine;
@@ -24,7 +32,7 @@ namespace Oculus.Interaction
         [SerializeField]
         private bool _grabFlag;
 
-        public event Action<PointerArgs> OnPointerEvent;
+        public event Action<PointerEvent> WhenPointerEventRaised = delegate { };
 
         private UniqueIdentifier _id;
         private bool _currentlyGrabbing;
@@ -41,24 +49,25 @@ namespace Oculus.Interaction
                 _currentlyGrabbing = _grabFlag;
                 if (_currentlyGrabbing)
                 {
-                    OnPointerEvent(new PointerArgs(_id.ID, PointerEvent.Hover, transform.position,
-                        transform.rotation));
-                    OnPointerEvent(new PointerArgs(_id.ID, PointerEvent.Select, transform.position,
-                        transform.rotation));
+                    WhenPointerEventRaised(new PointerEvent(_id.ID, PointerEventType.Hover,
+                        transform.GetPose()));
+                    WhenPointerEventRaised(new PointerEvent(_id.ID, PointerEventType.Select,
+                        transform.GetPose()));
                 }
                 else
                 {
-                    OnPointerEvent(new PointerArgs(_id.ID, PointerEvent.Unselect, transform.position,
-                        transform.rotation));
-                    OnPointerEvent(new PointerArgs(_id.ID, PointerEvent.Unhover, transform.position, transform.rotation));
+                    WhenPointerEventRaised(new PointerEvent(_id.ID, PointerEventType.Unselect,
+                        transform.GetPose()));
+                    WhenPointerEventRaised(new PointerEvent(_id.ID, PointerEventType.Unhover,
+                        transform.GetPose()));
                 }
                 return;
             }
 
             if (_currentlyGrabbing)
             {
-                OnPointerEvent(new PointerArgs(_id.ID, PointerEvent.Move, transform.position,
-                    transform.rotation));
+                WhenPointerEventRaised(new PointerEvent(_id.ID, PointerEventType.Move,
+                    transform.GetPose()));
             }
         }
 

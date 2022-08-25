@@ -82,6 +82,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EnableConfidence: 0
     - _Fresnel: 1
     - _FresnelOpacity: 0
     - _FresnelOpacityPower: 3.66
@@ -112,6 +113,7 @@ Material:
     - _TextureOpacity: 1
     - _UVSec: 0
     - _UseTexture: 0
+    - _WristFade: 1
     - _WristRange: 0.06
     - _ZWrite: 1
     - __dirty: 0
@@ -127,6 +129,7 @@ Material:
     - _OutlineColorBottom: {r: 0, g: 0.19427729, b: 1, a: 1}
     - _OutlineColorTop: {r: 1, g: 0, b: 0, a: 1}
     - _OutlineGlowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineJointColor: {r: 1, g: 0, b: 0, a: 1}
     - _PinchColor: {r: 1, g: 1, b: 1, a: 1}
     - _PinchPosition: {r: 0, g: 0, b: 0, a: 0}
     - _WristPosition: {r: 0, g: 0, b: 0, a: 0}

@@ -1,8 +1,11 @@
 {
     "name": "Oculus.VR.Editor",
+    "rootNamespace": "",
     "references": [
-        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
-        "GUID:4af21795022437d4bb139a86514b9ff9"
+        "Oculus.VR",
+        "Unity.XR.Oculus",
+        "Unity.XR.OpenXR",
+        "Unity.XR.OpenXR.Editor"
     ],
     "includePlatforms": [
         "Editor"

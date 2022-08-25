@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +35,7 @@ namespace Oculus.Interaction.UnityCanvas
         protected CanvasRenderTexture _canvasRenderTexture;
 
         [SerializeField, Optional]
-        private MeshCollider _meshCollider = null;
+        protected MeshCollider _meshCollider = null;
 
         [Tooltip("If non-zero it will cause the position of the canvas to be offset by this amount at runtime, while " +
          "the renderer will remain where it was at edit time. This can be used to prevent the two representations from overlapping.")]
@@ -58,8 +66,9 @@ namespace Oculus.Interaction.UnityCanvas
         {
             Vector3 localToImposter =
                 _imposterFilter.transform.InverseTransformPoint(worldPosition);
-            Vector3 canvasLocalPosition = MeshInverseTransform(localToImposter);
-            Vector3 transformedWorldPosition = _canvasRenderTexture.transform.TransformPoint(canvasLocalPosition / _canvasRenderTexture.transform.lossyScale.x);
+            Vector3 canvasLocalPosition = MeshInverseTransform(localToImposter) /
+                                          _canvasRenderTexture.transform.localScale.x;
+            Vector3 transformedWorldPosition = _canvasRenderTexture.transform.TransformPoint(canvasLocalPosition);
             return transformedWorldPosition;
         }
 
@@ -126,7 +135,7 @@ namespace Oculus.Interaction.UnityCanvas
             UpdateImposter();
         }
 
-        protected void UpdateImposter()
+        protected virtual void UpdateImposter()
         {
             Profiler.BeginSample("InterfaceRenderer.UpdateImposter");
             try

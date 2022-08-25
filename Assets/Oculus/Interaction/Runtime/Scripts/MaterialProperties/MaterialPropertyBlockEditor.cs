@@ -1,18 +1,25 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace Oculus.Interaction
@@ -53,10 +60,69 @@ namespace Oculus.Interaction
         [SerializeField]
         private List<MaterialPropertyFloat> _floatProperties;
 
-        public List<Renderer> Renderers => _renderers;
-        public List<MaterialPropertyVector> VectorProperties => _vectorProperties;
-        public List<MaterialPropertyColor> ColorProperties => _colorProperties;
-        public List<MaterialPropertyFloat> FloatProperties => _floatProperties;
+        [SerializeField]
+        private bool _updateEveryFrame = true;
+
+        public List<Renderer> Renderers
+        {
+            get
+            {
+                return _renderers;
+            }
+            set
+            {
+                _renderers = value;
+            }
+        }
+
+        public List<MaterialPropertyVector> VectorProperties
+        {
+            get
+            {
+                return _vectorProperties;
+            }
+            set
+            {
+                _vectorProperties = value;
+            }
+        }
+
+        public List<MaterialPropertyColor> ColorProperties
+        {
+            get
+            {
+                return _colorProperties;
+            }
+            set
+            {
+                _colorProperties = value;
+            }
+        }
+
+        public List<MaterialPropertyFloat> FloatProperties
+        {
+            get
+            {
+                return _floatProperties;
+            }
+            set
+            {
+                _floatProperties = value;
+            }
+        }
+
+        public MaterialPropertyBlock MaterialPropertyBlock
+        {
+            get
+            {
+                if (_materialPropertyBlock == null)
+                {
+                    _materialPropertyBlock = new MaterialPropertyBlock();
+                }
+
+                return _materialPropertyBlock;
+            }
+        }
 
         private MaterialPropertyBlock _materialPropertyBlock = null;
 
@@ -74,24 +140,6 @@ namespace Oculus.Interaction
                 }
             }
             UpdateMaterialPropertyBlock();
-        }
-
-        protected virtual void Start()
-        {
-            UpdateMaterialPropertyBlock();
-        }
-
-        public MaterialPropertyBlock MaterialPropertyBlock
-        {
-            get
-            {
-                if (_materialPropertyBlock == null)
-                {
-                    _materialPropertyBlock = new MaterialPropertyBlock();
-                }
-
-                return _materialPropertyBlock;
-            }
         }
 
         public void UpdateMaterialPropertyBlock()
@@ -133,7 +181,10 @@ namespace Oculus.Interaction
 
         protected virtual void Update()
         {
-            UpdateMaterialPropertyBlock();
+            if (_updateEveryFrame)
+            {
+                UpdateMaterialPropertyBlock();
+            }
         }
     }
 }

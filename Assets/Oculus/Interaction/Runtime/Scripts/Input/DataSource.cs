@@ -1,19 +1,26 @@
-﻿/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+﻿/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 
 namespace Oculus.Interaction.Input
 {
@@ -24,13 +31,12 @@ namespace Oculus.Interaction.Input
         event Action InputDataAvailable;
     }
 
-    public interface IDataSource<TData, TConfig> : IDataSource
+    public interface IDataSource<TData> : IDataSource
     {
         TData GetData();
-        TConfig Config { get; }
     }
 
-    public abstract class DataSource<TData, TConfig> : MonoBehaviour, IDataSource<TData, TConfig>
+    public abstract class DataSource<TData> : MonoBehaviour, IDataSource<TData>
         where TData : class, ICopyFrom<TData>, new()
     {
         public bool Started { get; private set; }
@@ -153,7 +159,7 @@ namespace Oculus.Interaction.Input
 
         protected bool RequiresUpdate()
         {
-            return Started && _requiresUpdate && isActiveAndEnabled;
+            return _requiresUpdate;
         }
 
         /// <summary>
@@ -176,9 +182,6 @@ namespace Oculus.Interaction.Input
         /// Null if no call to GetData has been made since this data source was initialized.
         /// </returns>
         protected abstract TData DataAsset { get; }
-
-        public abstract TConfig Config { get; }
-
 
         #region Inject
         public void InjectAllDataSource(UpdateModeFlags updateMode, IDataSource updateAfter)

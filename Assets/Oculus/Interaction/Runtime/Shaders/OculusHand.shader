@@ -12,235 +12,348 @@ permissions and limitations under the License.
 
 Shader "Interaction/OculusHand"
 {
-    Properties
-    {
-        [Header(General)]
-        _ColorTop("Color Top", Color) = (0.1960784, 0.2039215, 0.2117647, 1)
-        _ColorBottom("Color Bottom", Color) = (0.1215686, 0.1254902, 0.1294117, 1)
-        _Opacity("Opacity", Range( 0 , 1)) = 0.8
+	Properties
+	{
+		[Header(General)]
+		_ColorTop("Color Top", Color) = (0.1960784, 0.2039215, 0.2117647, 1)
+		_ColorBottom("Color Bottom", Color) = (0.1215686, 0.1254902, 0.1294117, 1)
+		_FingerGlowColor("Finger Glow Color", Color) = (1,1,1,1)
+		_Opacity("Opacity", Range(0 , 1)) = 0.8
 
-        [Header(Fresnel)]
-        _FresnelPower("FresnelPower", Range( 0 , 5)) = 0.16
+		[Header(Fresnel)]
+		_FresnelPower("FresnelPower", Range(0 , 5)) = 0.16
 
-        [Header(Outline)]
-        _OutlineColor("Outline Color", Color) = (0.5377358,0.5377358,0.5377358,1)
-        _OutlineWidth("Outline Width", Range( 0 , 0.005)) = 0.00134
-        _OutlineOpacity("Outline Opacity", Range( 0 , 1)) = 0.4
-        _OutlineIntensity("Outline Intensity", Range( 0 , 1)) = 1
-        _OutlinePinchRange("Outline Pinch Range", Float) = 0.15
-        _OutlineGlowIntensity("Outline Glow Intensity", Range( 0 , 1)) = 0
-        _OutlineGlowColor("Outline Glow Color", Color) = (1,1,1,1)
-        _OutlineSphereHardness("Outline Sphere Hardness", Range( 0 , 1)) = 0.3
+		[Header(Outline)]
+		_OutlineColor("Outline Color", Color) = (0.5377358,0.5377358,0.5377358,1)
+		_OutlineJointColor("Outline Joint Error Color", Color) = (1,0,0,1)
+		_OutlineWidth("Outline Width", Range(0 , 0.005)) = 0.00134
+		_OutlineOpacity("Outline Opacity", Range(0 , 1)) = 0.4
 
-        [Header(Pinch)]
-        _PinchPosition("Pinch Position", Vector) = (0,0,0,0)
-        _PinchRange("Pinch Range", Float) = 0.03
-        _PinchIntensity("Pinch Intensity", Range( 0 , 1)) = 0
-        _PinchColor("Pinch Color", Color) = (0.95,0.95,0.95,1)
+		[Header(Wrist)]
+		_WristFade("Wrist Fade", Range(0 , 1)) = 0.5
 
-        [Header(Wrist)]
-        _WristLocalOffset("Wrist Local Offset", Vector) = (0,0,0,0)
-        _WristRange("Wrist Range", Float) = 0.06
-        _WristScale("Wrist Scale", Float) = 1.0
+		[Header(Finger Glow)]
+		_FingerGlowMask("Finger Glow Mask", 2D) = "white" {}
+		[Toggle(CONFIDENCE)] _EnableConfidence("Show Low Confidence", Float) = 0
 
-        [Header(Finger Glow)]
-        _FingerGlowMask("Finger Glow Mask", 2D) = "white" {}
-        _FingerGlowColor("Finger Glow Color", Color) = (1,1,1,1)
+		[HideInInspector] _texcoord("", 2D) = "white" {}
+	}
 
-        [HideInInspector] _texcoord( "", 2D ) = "white" {}
-    }
+	CGINCLUDE
+	#include "Lighting.cginc"
+	#pragma target 3.0
 
-    SubShader
-    {
-        Tags
-        {
-            "Queue" = "Transparent" "RenderType" = "Transparent" "IgnoreProjector" = "True"
-        }
-        LOD 200
+	// General
+	uniform float4 _ColorTop;
+	uniform float4 _ColorBottom;
+	uniform float _Opacity;
+	uniform float _FresnelPower;
 
-        //==============================================================================
-        // Depth Pass
-        //==============================================================================
+	// Outline
+	uniform float4 _OutlineColor;
+	uniform half4 _OutlineJointColor;
+	uniform float _OutlineWidth;
+	uniform float _OutlineOpacity;
 
-        Pass
-        {
-            ZWrite On
-            Cull Off
-            ColorMask 0
-        }
+	// Wrist
+	uniform half _WristFade;
 
+	// Finger Glow
+	uniform sampler2D _FingerGlowMask;
+	uniform float4 _FingerGlowColor;
 
-        //==============================================================================
-        // Outline Pass
-        //==============================================================================
+	uniform float _ThumbGlowValue;
+	uniform float _IndexGlowValue;
+	uniform float _MiddleGlowValue;
+	uniform float _RingGlowValue;
+	uniform float _PinkyGlowValue;
 
-        Tags
-        {
-            "RenderType" = "Transparent" "Queue" = "Transparent+0"
-        }
-        Cull Front
-        Blend SrcAlpha OneMinusSrcAlpha
+	uniform half _JointsGlow[18];
+	ENDCG
 
-        CGPROGRAM
-        #pragma target 3.0
-#pragma surface outlineSurf Outline nofog keepalpha noshadow noambient novertexlights nolightmap nodynlightmap nodirlightmap nometa noforwardadd vertex:outlineVertexDataFunc
+	SubShader
+	{
+		LOD 100
+		Tags
+		{
+			"RenderType" = "Transparent" "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderPipeline" = "UniversalPipeline"
+		}
 
-        void outlineVertexDataFunc(inout appdata_full v, out Input o) {
-            UNITY_INITIALIZE_OUTPUT(Input, o);
-            v.vertex.xyz += v.normal * _OutlineWidth; // Outline
-        }
+		Pass
+		{
+			Name "Interior"
+			Tags
+			{
+				"RenderType" = "Transparent" "Queue" = "Transparent" "IgnoreProjector" = "True" "IsEmissive" = "true"
+			}
 
-        inline half4 LightingOutline(SurfaceOutput s, half3 lightDir, half atten) {
-            return half4(0, 0, 0, s.Alpha);
-        }
+			Blend SrcAlpha OneMinusSrcAlpha
 
-        void outlineSurf(Input i, inout SurfaceOutput o) {
-            // Sphere mask
-            float3 mask = ((i.worldPos - _PinchPosition) / _OutlinePinchRange);
-            float dotValue = clamp(dot(mask, mask), 0.0, 1.0);
-            float sphereMask = pow(dotValue, _OutlineSphereHardness);
+			CGPROGRAM
+			#pragma vertex baseVertex
+			#pragma fragment baseFragment
+			#pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
 
-            // Compute outline color
-            float3 outlineGlow = saturate(1.0 - sphereMask) * _OutlineGlowIntensity *
-                    _OutlineGlowColor.rgb;
+			struct VertexInput
+			{
+				float4 vertex : POSITION;
+				half3 normal : NORMAL;
+				half4 vertexColor : COLOR;
+				float4 texcoord : TEXCOORD0;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+			};
 
-            // Wrist
-            float3 wristPosition = mul(unity_ObjectToWorld, _WristLocalOffset).xyz;
-            float wristSphere = length(wristPosition - i.worldPos);
-            float wristRangeScaled = _WristRange * _WristScale;
-            float wristSphereStep = smoothstep(wristRangeScaled * 0.333, wristRangeScaled, wristSphere);
+			struct VertexOutput
+			{
+				float4 vertex : SV_POSITION;
+				float3 worldPos : TEXCOORD1;
+				float3 worldNormal : TEXCOORD2;
+				half4 glowColor : COLOR;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+				UNITY_VERTEX_OUTPUT_STEREO
+			};
 
-            // Output
-            o.Emission = (_OutlineColor.rgb * _OutlineIntensity) + outlineGlow;
-            o.Alpha = _OutlineOpacity * wristSphereStep;
-            if (o.Alpha < 0.1)
-            {
-                discard;
-            }
-        }
-        ENDCG
+			VertexOutput baseVertex(VertexInput v)
+			{
+				VertexOutput o;
+				UNITY_SETUP_INSTANCE_ID(v);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
 
-        //==============================================================================
-        // Fesnel / Color / Alpha Pass
-        //==============================================================================
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+				o.worldNormal = UnityObjectToWorldNormal(v.normal);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 
-        Tags
-        {
-            "RenderType" = "MaskedOutline" "Queue" = "Transparent+0" "IgnoreProjector" = "True" "IsEmissive" = "true"
-        }
-        Cull Back
-        Blend SrcAlpha OneMinusSrcAlpha
+				half4 maskPixelColor = tex2Dlod(_FingerGlowMask, v.texcoord);
+				int glowMaskR = maskPixelColor.r * 255;
 
-        CGINCLUDE
-        #include "UnityPBSLighting.cginc"
-#include "Lighting.cginc"
-#pragma target 3.0
+				int thumbMask = (glowMaskR >> 3) & 0x1;
+				int indexMask = (glowMaskR >> 4) & 0x1;
+				int middleMask = (glowMaskR >> 5) & 0x1;
+				int ringMask = (glowMaskR >> 6) & 0x1;
+				int pinkyMask = (glowMaskR >> 7) & 0x1;
 
-        struct Input {
-            float3 worldPos;
-            float3 worldNormal;
-            float2 uv_FingerGlowMask;
-        };
+				half glowIntensity = saturate(
+					maskPixelColor.g *
+					(thumbMask * _ThumbGlowValue
+						+ indexMask * _IndexGlowValue
+						+ middleMask * _MiddleGlowValue
+						+ ringMask * _RingGlowValue
+						+ pinkyMask * _PinkyGlowValue));
 
-        // General
-        uniform float4 _ColorTop;
-        uniform float4 _ColorBottom;
-        uniform float _Opacity;
-        uniform float _FresnelPower;
+				half4 glow = glowIntensity * _FingerGlowColor;
+				o.glowColor.rgb = glow.rgb;
+				o.glowColor.a = saturate(maskPixelColor.a + _WristFade) * _Opacity;
+				return o;
+			}
 
-        // Outline
-        uniform float _OutlineWidth;
-        uniform float _OutlineIntensity;
-        uniform float4 _OutlineColor;
-        uniform float _OutlinePinchRange;
-        uniform float _OutlineSphereHardness;
-        uniform float _OutlineGlowIntensity;
-        uniform float4 _OutlineGlowColor;
-        uniform float _OutlineOpacity;
+			half4 baseFragment(VertexOutput i) : SV_Target
+			{
+				float3 worldViewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
 
-        // Pinch
-        uniform float _PinchRange;
-        uniform float3 _PinchPosition;
-        uniform float _PinchIntensity;
-        uniform float4 _PinchColor;
+				float fresnelNdot = dot(i.worldNormal, worldViewDir);
+				float fresnel = 1.0 * pow(1.0 - fresnelNdot, _FresnelPower);
+				float4 color = lerp(_ColorTop, _ColorBottom, fresnel);
 
-        // Wrist
-        uniform float4 _WristLocalOffset;
-        uniform float _WristRange;
-        uniform float _WristScale;
+				half3 glowColor = saturate(color + i.glowColor.rgb);
+				return half4(glowColor, i.glowColor.a);
+			}
 
-        // Finger Glow
-        uniform sampler2D _FingerGlowMask;
-        uniform float4 _FingerGlowColor;
-        uniform float _ThumbGlowValue;
-        uniform float _IndexGlowValue;
-        uniform float _MiddleGlowValue;
-        uniform float _RingGlowValue;
-        uniform float _PinkyGlowValue;
+			ENDCG
+		}
+	}
+	
+	SubShader
+	{
+		LOD 200
+		Tags
+		{
+			"Queue" = "Transparent" "RenderType" = "Transparent" "IgnoreProjector" = "True"
+		}
 
-        void vertexDataFunc(inout appdata_full v, out Input o) {
-            UNITY_INITIALIZE_OUTPUT(Input, o);
-        }
+		Pass
+		{
+			Name "Depth"
+			ZWrite On
+			ColorMask 0
+		}
 
-        inline half4 LightingUnlit(SurfaceOutput s, half3 lightDir, half atten) {
-            return half4(0, 0, 0, s.Alpha);
-        }
+		Pass
+		{	
+			Name "Outline"
+			Tags
+			{
+				"RenderType" = "Transparent" "Queue" = "Transparent" "IgnoreProjector" = "True"
+			}
+			Cull Front
+			Blend SrcAlpha OneMinusSrcAlpha
 
-        void surf(Input i, inout SurfaceOutput o) {
-            float3 wristPosition = mul(unity_ObjectToWorld, _WristLocalOffset).xyz;
-            float3 worldViewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
+			CGPROGRAM
+			#pragma vertex outlineVertex
+			#pragma fragment outlineFragment
+			#pragma multi_compile_local __ CONFIDENCE
 
-            // Fresnel + color
-            float fresnelNdot = dot(i.worldNormal, worldViewDir);
-            float fresnel = 1.0 * pow(1.0 - fresnelNdot, _FresnelPower);
-            float4 color = lerp(_ColorTop, _ColorBottom, fresnel);
+			struct OutlineVertexInput
+			{
+				float4 vertex : POSITION;
+				float3 normal : NORMAL;
+				float4 texcoord : TEXCOORD0;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+			};
 
-            // Pinch sphere
-            float pinchSphere = length(_PinchPosition - i.worldPos);
-            float pinchSphereStep = smoothstep(_PinchRange - 0.01, _PinchRange, pinchSphere);
-            float4 pinchColor = float4(
-                    saturate((1.0 - pinchSphereStep) * _PinchIntensity * _PinchColor.rgb),
-                    0.0);
+			struct OutlineVertexOutput
+			{
+				float4 vertex : SV_POSITION;
+				half4 glowColor : TEXCOORD1;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+				UNITY_VERTEX_OUTPUT_STEREO
+			};
 
-            // Wrist fade
-            //
-            // Visually this means that at approx 33% of the sphere range we want full transparency (map to 0)
-            // to 100% of our sphere range to be opaque.
-            float wristSphere = length(wristPosition - i.worldPos);
-            float wristRangeScaled = _WristRange * _WristScale;
-            float wristSphereStep = smoothstep(wristRangeScaled * 0.333, wristRangeScaled, wristSphere);
+			OutlineVertexOutput outlineVertex(OutlineVertexInput v)
+			{
+				OutlineVertexOutput o;
+				UNITY_SETUP_INSTANCE_ID(v);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
+				v.vertex.xyz += v.normal * _OutlineWidth;
+				o.vertex = UnityObjectToClipPos(v.vertex);
 
-            // Finger glows
-            //
-            // the value is packed into a texture where each pixel has two bytes (red and green channels):
-            //
-            // the red channel is used to mask each glow area, currently every finger,
-            // with the thumb being the 1st bit and pinky the 5th bit (6-8 currently unused).
-            //
-            // the green channel is used to indicate the intensity of the glow. This works only because the glow maps
-            // between fingers do not overlap.
+				half4 maskPixelColor = tex2Dlod(_FingerGlowMask, v.texcoord);
+				
+#if CONFIDENCE
+				int glowMaskR = maskPixelColor.r * 255;
+				int jointMaskB = maskPixelColor.b * 255;
 
-            float3 glowMaskPixelColor = tex2D(_FingerGlowMask, i.uv_FingerGlowMask);
-            int glowMaskR = glowMaskPixelColor.r * 255;
-            float glowIntensity = saturate(
-                    glowMaskPixelColor.g *
-                    ((glowMaskR & 0x1) * _ThumbGlowValue +
-                        ((glowMaskR >> 1) & 0x1) * _IndexGlowValue +
-                        ((glowMaskR >> 2) & 0x1) * _MiddleGlowValue +
-                        ((glowMaskR >> 3) & 0x1) * _RingGlowValue +
-                        ((glowMaskR >> 4) & 0x1) * _PinkyGlowValue));
+				int thumbMask = (glowMaskR >> 3) & 0x1;
+				int indexMask = (glowMaskR >> 4) & 0x1;
+				int middleMask = (glowMaskR >> 5) & 0x1;
+				int ringMask = (glowMaskR >> 6) & 0x1;
+				int pinkyMask = (glowMaskR >> 7) & 0x1;
 
-            float4 glowColor = glowIntensity * _FingerGlowColor;
+				int joint0 = (jointMaskB >> 4) & 0x1;
+				int joint1 = (jointMaskB >> 5) & 0x1;
+				int joint2 = (jointMaskB >> 6) & 0x1;
+				int joint3 = (jointMaskB >> 7) & 0x1;
 
-            // Emission + Opacity
-            o.Emission = saturate(color + pinchColor + glowColor).rgb;
-            o.Alpha = _Opacity * wristSphereStep;
-        }
-        ENDCG
+				half jointIntensity = saturate(
+					((1 - saturate(glowMaskR)) * _JointsGlow[0])
+					+ thumbMask * (joint0 * _JointsGlow[1]
+						+ joint1 * _JointsGlow[2]
+						+ joint2 * _JointsGlow[3]
+						+ joint3 * _JointsGlow[4])
+					+ indexMask * (joint1 * _JointsGlow[5]
+						+ joint2 * _JointsGlow[6]
+						+ joint3 * _JointsGlow[7])
+					+ middleMask * (joint1 * _JointsGlow[8]
+						+ joint2 * _JointsGlow[9]
+						+ joint3 * _JointsGlow[10])
+					+ ringMask * (joint1 * _JointsGlow[11]
+						+ joint2 * _JointsGlow[12]
+						+ joint3 * _JointsGlow[13])
+					+ pinkyMask * (joint0 * _JointsGlow[14]
+						+ joint1 * _JointsGlow[15]
+						+ joint2 * _JointsGlow[16]
+						+ joint3 * _JointsGlow[17]));
 
-        CGPROGRAM
-        #pragma surface surf Unlit keepalpha vertex:vertexDataFunc
-        ENDCG
-    }
-    Fallback "Diffuse"
+				half4 glow = lerp(_OutlineColor, _OutlineJointColor, jointIntensity);
+				o.glowColor.rgb = glow.rgb;
+				o.glowColor.a = saturate(maskPixelColor.a + _WristFade) * glow.a * _OutlineOpacity;
+#else
+				o.glowColor.rgb = _OutlineColor;
+				o.glowColor.a = saturate(maskPixelColor.a + _WristFade) * _OutlineColor.a * _OutlineOpacity;
+#endif
+
+				return o;
+			}
+
+			half4 outlineFragment(OutlineVertexOutput i) : SV_Target
+			{
+				UNITY_SETUP_INSTANCE_ID(i);
+				UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+				return i.glowColor;
+			}
+			ENDCG
+		}
+
+		Pass
+		{
+			Name "Interior"
+			Tags
+			{
+				"RenderType" = "MaskedOutline" "Queue" = "Transparent" "IgnoreProjector" = "True" "IsEmissive" = "true"
+			}
+			Blend SrcAlpha OneMinusSrcAlpha
+
+			CGPROGRAM
+			#pragma vertex baseVertex
+			#pragma fragment baseFragment
+			#pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+			struct VertexInput
+			{
+				float4 vertex : POSITION;
+				half3 normal : NORMAL;
+				half4 vertexColor : COLOR;
+				float4 texcoord : TEXCOORD0;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+			};
+
+			struct VertexOutput
+			{
+				float4 vertex : SV_POSITION;
+				float3 worldPos : TEXCOORD1;
+				float3 worldNormal : TEXCOORD2;
+				half4 glowColor : COLOR;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
+				UNITY_VERTEX_OUTPUT_STEREO
+			};
+
+			VertexOutput baseVertex(VertexInput v)
+			{
+				VertexOutput o;
+				UNITY_SETUP_INSTANCE_ID(v);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
+
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+				o.worldNormal = UnityObjectToWorldNormal(v.normal);
+				o.vertex = UnityObjectToClipPos(v.vertex);
+
+				half4 maskPixelColor = tex2Dlod(_FingerGlowMask, v.texcoord);
+				int glowMaskR = maskPixelColor.r * 255;
+
+				int thumbMask = (glowMaskR >> 3) & 0x1;
+				int indexMask = (glowMaskR >> 4) & 0x1;
+				int middleMask = (glowMaskR >> 5) & 0x1;
+				int ringMask = (glowMaskR >> 6) & 0x1;
+				int pinkyMask = (glowMaskR >> 7) & 0x1;
+
+				half glowIntensity = saturate(
+					maskPixelColor.g *
+					(thumbMask * _ThumbGlowValue
+						+ indexMask * _IndexGlowValue
+						+ middleMask * _MiddleGlowValue
+						+ ringMask * _RingGlowValue
+						+ pinkyMask * _PinkyGlowValue));
+
+				half4 glow = glowIntensity * _FingerGlowColor;
+				o.glowColor.rgb = glow.rgb;
+				o.glowColor.a = saturate(maskPixelColor.a + _WristFade) * _Opacity;
+				return o;
+			}
+
+			half4 baseFragment(VertexOutput i) : SV_Target
+			{
+				float3 worldViewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
+				float fresnelNdot = dot(i.worldNormal, worldViewDir);
+				float fresnel = 1.0 * pow(1.0 - fresnelNdot, _FresnelPower);
+				float4 color = lerp(_ColorTop, _ColorBottom, fresnel);
+
+				half3 glowColor = saturate(color + i.glowColor.rgb);
+				return half4(glowColor, i.glowColor.a);
+			}
+
+			ENDCG
+		}
+	}
 }

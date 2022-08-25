@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using System.Collections.Generic;
@@ -92,6 +100,8 @@ public class OVRSkeleton : MonoBehaviour
 	private bool _updateRootScale = false;
 	[SerializeField]
 	private bool _enablePhysicsCapsules = false;
+	[SerializeField]
+	private bool _applyBoneTranslations = true;
 
 	private GameObject _bonesGO;
 	private GameObject _bindPosesGO;
@@ -175,6 +185,8 @@ public class OVRSkeleton : MonoBehaviour
 		}
 	}
 
+	protected virtual Transform GetBoneTransform(BoneId boneId) => null;
+
 	protected virtual void InitializeBones()
 	{
 		bool flipX = (_skeletonType == SkeletonType.HandLeft || _skeletonType == SkeletonType.HandRight);
@@ -200,10 +212,24 @@ public class OVRSkeleton : MonoBehaviour
 			bone.Id = (OVRSkeleton.BoneId)_skeleton.Bones[i].Id;
 			bone.ParentBoneIndex = _skeleton.Bones[i].ParentBoneIndex;
 
-			Transform trans = bone.Transform ??
-			                  (bone.Transform = new GameObject(BoneLabelFromBoneId(_skeletonType, bone.Id)).transform);
-			trans.localPosition = flipX ? _skeleton.Bones[i].Pose.Position.FromFlippedXVector3f() : _skeleton.Bones[i].Pose.Position.FromFlippedZVector3f();
-			trans.localRotation = flipX ? _skeleton.Bones[i].Pose.Orientation.FromFlippedXQuatf() : _skeleton.Bones[i].Pose.Orientation.FromFlippedZQuatf();
+			bone.Transform = GetBoneTransform(bone.Id);
+			if (bone.Transform == null)
+			{
+				bone.Transform = new GameObject(BoneLabelFromBoneId(_skeletonType, bone.Id)).transform;
+			}
+
+			var pose = _skeleton.Bones[i].Pose;
+
+			if (_applyBoneTranslations)
+			{
+				bone.Transform.localPosition = flipX
+					? pose.Position.FromFlippedXVector3f()
+					: pose.Position.FromFlippedZVector3f();
+			}
+
+			bone.Transform.localRotation = flipX
+				? pose.Orientation.FromFlippedXQuatf()
+				: pose.Orientation.FromFlippedZQuatf();
 		}
 
 		for (int i = 0; i < _bones.Count; ++i)
@@ -243,8 +269,8 @@ public class OVRSkeleton : MonoBehaviour
 			bindPoseBone.Id = bone.Id;
 			bindPoseBone.ParentBoneIndex = bone.ParentBoneIndex;
 
-			Transform trans = bindPoseBone.Transform ?? (bindPoseBone.Transform =
-				                  new GameObject(BoneLabelFromBoneId(_skeletonType, bindPoseBone.Id)).transform);
+			Transform trans = bindPoseBone.Transform ? bindPoseBone.Transform : (bindPoseBone.Transform =
+				new GameObject(BoneLabelFromBoneId(_skeletonType, bindPoseBone.Id)).transform);
 			trans.localPosition = bone.Transform.localPosition;
 			trans.localRotation = bone.Transform.localRotation;
 		}
@@ -370,21 +396,20 @@ public class OVRSkeleton : MonoBehaviour
 
 			for (var i = 0; i < _bones.Count; ++i)
 			{
-				if (_bones[i].Transform != null)
+				var boneTransform = _bones[i].Transform;
+				if (boneTransform == null) continue;
+				if (_skeletonType == SkeletonType.HandLeft || _skeletonType == SkeletonType.HandRight)
 				{
-					if (_skeletonType == SkeletonType.HandLeft || _skeletonType == SkeletonType.HandRight)
-					{
-						_bones[i].Transform.localRotation = data.BoneRotations[i].FromFlippedXQuatf();
+					boneTransform.localRotation = data.BoneRotations[i].FromFlippedXQuatf();
 
-						if (_bones[i].Id == BoneId.Hand_WristRoot)
-						{
-							_bones[i].Transform.localRotation *= wristFixupRotation;
-						}
-					}
-					else
+					if (_bones[i].Id == BoneId.Hand_WristRoot)
 					{
-						_bones[i].Transform.localRotation = data.BoneRotations[i].FromFlippedZQuatf();
+						boneTransform.localRotation *= wristFixupRotation;
 					}
+				}
+				else
+				{
+					boneTransform.localRotation = data.BoneRotations[i].FromFlippedZQuatf();
 				}
 			}
 		}

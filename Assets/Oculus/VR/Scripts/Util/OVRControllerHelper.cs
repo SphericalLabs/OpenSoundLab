@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using UnityEngine;
 
@@ -59,6 +67,8 @@ public class OVRControllerHelper : MonoBehaviour
 
 	private GameObject m_activeController;
 
+	private bool m_controllerModelsInitialized = false;
+
 	private bool m_hasInputFocus = true;
 	private bool m_hasInputFocusPrev = false;
 
@@ -76,6 +86,17 @@ public class OVRControllerHelper : MonoBehaviour
 
 	void Start()
 	{
+		if (OVRManager.OVRManagerinitialized)
+		{
+			InitializeControllerModels();
+		}
+	}
+
+	void InitializeControllerModels()
+	{
+		if (m_controllerModelsInitialized)
+			return;
+	
 		OVRPlugin.SystemHeadset headset = OVRPlugin.GetSystemHeadsetType();
 		switch (headset)
 		{
@@ -85,12 +106,15 @@ public class OVRControllerHelper : MonoBehaviour
 			case OVRPlugin.SystemHeadset.Oculus_Quest_2:
 				activeControllerType = ControllerType.Quest2;
 				break;
+			case OVRPlugin.SystemHeadset.Oculus_Link_Quest_2:
+				activeControllerType = ControllerType.Quest2;
+				break;
 			default:
 				activeControllerType = ControllerType.QuestAndRiftS;
 				break;
 		}
 
-		Debug.LogFormat("OVRControllerHelp: Active controller type: {0} for product {1}", activeControllerType, OVRPlugin.productName);
+		Debug.LogFormat("OVRControllerHelp: Active controller type: {0} for product {1} (headset {2})", activeControllerType, OVRPlugin.productName, headset);
 
 		// Hide all controller models until controller get connected
 		m_modelOculusTouchQuestAndRiftSLeftController.SetActive(false);
@@ -102,10 +126,24 @@ public class OVRControllerHelper : MonoBehaviour
 
 		OVRManager.InputFocusAcquired += InputFocusAquired;
 		OVRManager.InputFocusLost += InputFocusLost;
+
+		m_controllerModelsInitialized = true;
 	}
 
 	void Update()
 	{
+		if (!m_controllerModelsInitialized)
+		{
+			if (OVRManager.OVRManagerinitialized)
+			{
+				InitializeControllerModels();
+			}
+			else
+			{
+				return;
+			}
+		}
+
 		bool controllerConnected = OVRInput.IsControllerConnected(m_controller);
 
 		if ((controllerConnected != m_prevControllerConnected) || !m_prevControllerConnectedCached || (m_hasInputFocus != m_hasInputFocusPrev))

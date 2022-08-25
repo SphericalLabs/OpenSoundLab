@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using UnityEngine;
 
@@ -139,28 +147,28 @@ namespace Oculus.Interaction
         /// <summary>
         /// Get the position/rotation difference between two transforms.
         /// </summary>
-        /// <param name="to">The base transform.</param>
-        /// <param name="from">The target transform.</param>
+        /// <param name="from">The base transform.</param>
+        /// <param name="to">The target transform.</param>
         /// <returns>A Pose indicating the position/rotation change</returns>
-        public static Pose RelativeOffset(this Transform to, Transform from)
+        public static Pose Delta(this Transform from, Transform to)
         {
-            return RelativeOffset(from.position, from.rotation, to.position, to.rotation);
+            return Delta(from.position, from.rotation, to.position, to.rotation);
         }
 
         /// <summary>
         /// Get the position/rotation difference between a transform and a pose.
         /// </summary>
-        /// <param name="to">The base transform.</param>
-        /// <param name="from">The target pose.</param>
-        /// <returns>A Pose indicating the offset.</returns>
-        public static Pose RelativeOffset(this Transform to, in Pose from)
+        /// <param name="from">The base transform.</param>
+        /// <param name="to">The target pose.</param>
+        /// <returns>A Pose indicating the delta.</returns>
+        public static Pose Delta(this Transform from, in Pose to)
         {
-            return RelativeOffset(from.position, from.rotation, to.position, to.rotation);
+            return Delta(from.position, from.rotation, to.position, to.rotation);
         }
 
-        public static void RelativeOffset(this Transform to, in Pose from, ref Pose result)
+        public static void Delta(this Transform from, in Pose to, ref Pose result)
         {
-            RelativeOffset(from.position, from.rotation, to.position, to.rotation, ref result);
+            Delta(from.position, from.rotation, to.position, to.rotation, ref result);
         }
 
         /// <summary>
@@ -168,21 +176,10 @@ namespace Oculus.Interaction
         /// </summary>
         /// <param name="from">The base pose.</param>
         /// <param name="to">The target pose.</param>
-        /// <returns>A Pose indicating the offset.</returns>
-        public static Pose RelativeOffset(in Pose from, in Pose to)
+        /// <returns>A Pose indicating the delta.</returns>
+        public static Pose Delta(in Pose from, in Pose to)
         {
-            return RelativeOffset(from.position, from.rotation, to.position, to.rotation);
-        }
-
-        /// <summary>
-        /// Get the position/rotation difference between two poses.
-        /// </summary>
-        /// <param name="from">The base pose.</param>
-        /// <param name="to">The target pose.</param>
-        /// <param name="result">>A Pose indicating the offset.</param>
-        public static void RelativeOffset(in Pose from, in Pose to, ref Pose result)
-        {
-            RelativeOffset(from.position, from.rotation, to.position, to.rotation, ref result);
+            return Delta(from.position, from.rotation, to.position, to.rotation);
         }
 
         /// <summary>
@@ -192,19 +189,19 @@ namespace Oculus.Interaction
         /// <param name="fromRotation">The base rotation.</param>
         /// <param name="toPosition">The target position.</param>
         /// <param name="toRotation">The target rotation.</param>
-        /// <returns>A Pose indicating the offset.</returns>
-        public static Pose RelativeOffset(Vector3 fromPosition, Quaternion fromRotation, Vector3 toPosition, Quaternion toRotation)
+        /// <returns>A Pose indicating the delta.</returns>
+        private static Pose Delta(Vector3 fromPosition, Quaternion fromRotation, Vector3 toPosition, Quaternion toRotation)
         {
             Pose result = new Pose();
-            RelativeOffset(fromPosition, fromRotation, toPosition, toRotation, ref result);
+            Delta(fromPosition, fromRotation, toPosition, toRotation, ref result);
             return result;
         }
 
-        public static void RelativeOffset(Vector3 fromPosition, Quaternion fromRotation, Vector3 toPosition, Quaternion toRotation, ref Pose result)
+        private static void Delta(Vector3 fromPosition, Quaternion fromRotation, Vector3 toPosition, Quaternion toRotation, ref Pose result)
         {
-            Quaternion inverseTo = Quaternion.Inverse(toRotation);
-            result.position = inverseTo * (fromPosition - toPosition);
-            result.rotation = inverseTo * fromRotation;
+            Quaternion inverseFromRot = Quaternion.Inverse(fromRotation);
+            result.position = inverseFromRot * (toPosition - fromPosition);
+            result.rotation = inverseFromRot * toRotation;
         }
 
         /// <summary>
@@ -227,7 +224,7 @@ namespace Oculus.Interaction
         /// <param name="to">Second pose to compare.</param>
         /// <param name="maxDistance">The max distance in which the poses can be similar.</param>
         /// <returns>0 indicates no similitude, 1 for equal poses</returns>
-        public static float Similarity(in Pose from, in Pose to, HandPosing.PoseMeasureParameters scoringModifier)
+        public static float Similarity(in Pose from, in Pose to, HandGrab.PoseMeasureParameters scoringModifier)
         {
             float rotationDifference = RotationalSimilarity(from.rotation, to.rotation);
             float positionDifference = PositionalSimilarity(from.position, to.position, scoringModifier.MaxDistance);
@@ -278,12 +275,12 @@ namespace Oculus.Interaction
         public static Pose MirrorPoseRotation(this in Pose pose, Vector3 normal, Vector3 tangent)
         {
             Pose mirrorPose = pose;
-            Vector3 forward = pose.rotation * Vector3.forward;
+            Vector3 forward = pose.rotation * -Vector3.forward;
             Vector3 projectedForward = Vector3.ProjectOnPlane(forward, normal);
             float angleForward = Vector3.SignedAngle(projectedForward, tangent, normal);
             Vector3 mirrorForward = Quaternion.AngleAxis(2 * angleForward, normal) * forward;
 
-            Vector3 up = pose.rotation * Vector3.up;
+            Vector3 up = pose.rotation * -Vector3.up;
             Vector3 projectedUp = Vector3.ProjectOnPlane(up, normal);
             float angleUp = Vector3.SignedAngle(projectedUp, tangent, normal);
             Vector3 mirrorUp = Quaternion.AngleAxis(2 * angleUp, normal) * up;

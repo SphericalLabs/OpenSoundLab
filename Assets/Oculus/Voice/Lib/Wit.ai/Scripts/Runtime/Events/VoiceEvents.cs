@@ -1,18 +1,21 @@
 ﻿/*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
  *
  * This source code is licensed under the license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
 using System;
+using Facebook.WitAi.Interfaces;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Facebook.WitAi.Events
 {
     [Serializable]
-    public class VoiceEvents
+    public class VoiceEvents : ITranscriptionEvent
     {
         [Header("Activation Result Events")]
         [Tooltip("Called when a response from Wit.ai has been received")]
@@ -21,6 +24,10 @@ namespace Facebook.WitAi.Events
         [Tooltip(
             "Called when there was an error with a WitRequest  or the RuntimeConfiguration is not properly configured.")]
         public WitErrorEvent OnError = new WitErrorEvent();
+
+        [Tooltip(
+            "Called when the activation is about to be aborted by a direct user interaction.")]
+        public UnityEvent OnAborting = new UnityEvent();
 
         [Tooltip(
             "Called when the activation stopped because the network request was aborted. This can be via a timeout or call to AbortActivation.")]
@@ -68,10 +75,21 @@ namespace Facebook.WitAi.Events
         public UnityEvent OnMinimumWakeThresholdHit = new UnityEvent();
 
         [Header("Transcription Events")]
+        [FormerlySerializedAs("OnPartialTranscription")]
         [Tooltip("Message fired when a partial transcription has been received.")]
-        public WitTranscriptionEvent OnPartialTranscription = new WitTranscriptionEvent();
+        public WitTranscriptionEvent onPartialTranscription = new WitTranscriptionEvent();
 
+        [FormerlySerializedAs("OnFullTranscription")]
         [Tooltip("Message received when a complete transcription is received.")]
-        public WitTranscriptionEvent OnFullTranscription = new WitTranscriptionEvent();
+        public WitTranscriptionEvent onFullTranscription = new WitTranscriptionEvent();
+
+        [Header("Data")]
+        public WitByteDataEvent OnByteDataReady = new WitByteDataEvent();
+        public WitByteDataEvent OnByteDataSent = new WitByteDataEvent();
+
+        #region Shared Event API
+        public WitTranscriptionEvent OnPartialTranscription => onPartialTranscription;
+        public WitTranscriptionEvent OnFullTranscription => onFullTranscription;
+        #endregion
     }
  }

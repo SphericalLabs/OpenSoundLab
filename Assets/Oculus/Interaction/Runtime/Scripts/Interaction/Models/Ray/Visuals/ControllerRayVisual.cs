@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -19,6 +27,9 @@ namespace Oculus.Interaction
     {
         [SerializeField]
         private RayInteractor _rayInteractor;
+
+        [SerializeField]
+        private Renderer _renderer;
 
         [SerializeField]
         private MaterialPropertyBlockEditor _materialPropertyBlockEditor;
@@ -116,6 +127,7 @@ namespace Oculus.Interaction
         {
             this.BeginStart(ref _started);
             Assert.IsNotNull(_rayInteractor);
+            Assert.IsNotNull(_renderer);
             Assert.IsNotNull(_materialPropertyBlockEditor);
             this.EndStart(ref _started);
         }
@@ -124,7 +136,8 @@ namespace Oculus.Interaction
         {
             if (_started)
             {
-                _rayInteractor.WhenInteractorUpdated += UpdateVisual;
+                _rayInteractor.WhenPostprocessed += UpdateVisual;
+                _rayInteractor.WhenStateChanged += HandleStateChanged;
             }
         }
 
@@ -132,12 +145,25 @@ namespace Oculus.Interaction
         {
             if (_started)
             {
-                _rayInteractor.WhenInteractorUpdated -= UpdateVisual;
+                _rayInteractor.WhenPostprocessed -= UpdateVisual;
+                _rayInteractor.WhenStateChanged -= HandleStateChanged;
             }
+        }
+
+        private void HandleStateChanged(InteractorStateChangeArgs obj)
+        {
+            UpdateVisual();
         }
 
         private void UpdateVisual()
         {
+            if (_rayInteractor.State == InteractorState.Disabled)
+            {
+                _renderer.enabled = false;
+                return;
+            }
+
+            _renderer.enabled = true;
             transform.SetPositionAndRotation(_rayInteractor.Origin, _rayInteractor.Rotation);
 
             transform.localScale = new Vector3(
@@ -151,15 +177,23 @@ namespace Oculus.Interaction
 
         #region Inject
 
-        public void InjectAllControllerRayVisual(RayInteractor rayInteractor, MaterialPropertyBlockEditor materialPropertyBlockEditor)
+        public void InjectAllControllerRayVisual(RayInteractor rayInteractor,
+            Renderer renderer,
+            MaterialPropertyBlockEditor materialPropertyBlockEditor)
         {
             InjectRayInteractor(rayInteractor);
+            InjectRenderer(renderer);
             InjectMaterialPropertyBlockEditor(materialPropertyBlockEditor);
         }
 
         public void InjectRayInteractor(RayInteractor rayInteractor)
         {
             _rayInteractor = rayInteractor;
+        }
+
+        public void InjectRenderer(Renderer renderer)
+        {
+            _renderer = renderer;
         }
 
         public void InjectMaterialPropertyBlockEditor(

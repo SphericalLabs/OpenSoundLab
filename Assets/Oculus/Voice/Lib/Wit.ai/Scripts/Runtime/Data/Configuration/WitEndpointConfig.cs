@@ -1,5 +1,6 @@
 ﻿/*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
  *
  * This source code is licensed under the license found in the
  * LICENSE file in the root directory of this source tree.
@@ -28,6 +29,7 @@ namespace Facebook.WitAi.Configuration
         public string UriScheme => string.IsNullOrEmpty(uriScheme) ? WitRequest.URI_SCHEME : uriScheme;
         public string Authority =>
             string.IsNullOrEmpty(authority) ? WitRequest.URI_AUTHORITY : authority;
+        public int Port => port <= 0 ? WitRequest.URI_DEFAULT_PORT : port;
         public string WitApiVersion => string.IsNullOrEmpty(witApiVersion)
             ? WitRequest.WIT_API_VERSION
             : witApiVersion;

@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
@@ -77,21 +85,21 @@ namespace Oculus.Interaction
         private Dictionary<int, Pointer> _pointerMap = new Dictionary<int, Pointer>();
         private List<RaycastResult> _raycastResultCache = new List<RaycastResult>();
         private List<Pointer> _pointersForDeletion = new List<Pointer>();
-        private Dictionary<IPointableCanvas, Action<PointerArgs>> _pointerCanvasActionMap =
-            new Dictionary<IPointableCanvas, Action<PointerArgs>>();
+        private Dictionary<IPointableCanvas, Action<PointerEvent>> _pointerCanvasActionMap =
+            new Dictionary<IPointableCanvas, Action<PointerEvent>>();
 
         private void AddPointerCanvas(IPointableCanvas pointerCanvas)
         {
-            Action<PointerArgs> pointerCanvasAction = (args) => HandlePointerEvent(pointerCanvas.Canvas, args);
+            Action<PointerEvent> pointerCanvasAction = (args) => HandlePointerEvent(pointerCanvas.Canvas, args);
             _pointerCanvasActionMap.Add(pointerCanvas, pointerCanvasAction);
-            pointerCanvas.OnPointerEvent += pointerCanvasAction;
+            pointerCanvas.WhenPointerEventRaised += pointerCanvasAction;
         }
 
         private void RemovePointerCanvas(IPointableCanvas pointerCanvas)
         {
-            Action<PointerArgs> pointerCanvasAction = _pointerCanvasActionMap[pointerCanvas];
+            Action<PointerEvent> pointerCanvasAction = _pointerCanvasActionMap[pointerCanvas];
             _pointerCanvasActionMap.Remove(pointerCanvas);
-            pointerCanvas.OnPointerEvent -= pointerCanvasAction;
+            pointerCanvas.WhenPointerEventRaised -= pointerCanvasAction;
 
             List<int> pointerIDs = new List<int>(_pointerMap.Keys);
             foreach (int pointerID in pointerIDs)
@@ -101,43 +109,51 @@ namespace Oculus.Interaction
                 {
                     continue;
                 }
+                ClearPointerSelection(pointer.PointerEventData);
                 pointer.MarkForDeletion();
                 _pointersForDeletion.Add(pointer);
                 _pointerMap.Remove(pointerID);
             }
         }
 
-        private void HandlePointerEvent(Canvas canvas, PointerArgs args)
+        private void HandlePointerEvent(Canvas canvas, PointerEvent evt)
         {
             Pointer pointer;
 
-            switch (args.PointerEvent)
+            switch (evt.Type)
             {
-                case PointerEvent.Hover:
+                case PointerEventType.Hover:
                     pointer = new Pointer(canvas);
                     pointer.PointerEventData = new PointerEventData(eventSystem);
-                    pointer.SetPosition(args.Position);
-                    _pointerMap.Add(args.Identifier, pointer);
+                    pointer.SetPosition(evt.Pose.position);
+                    _pointerMap.Add(evt.Identifier, pointer);
                     break;
-                case PointerEvent.Unhover:
-                    pointer = _pointerMap[args.Identifier];
-                    _pointerMap.Remove(args.Identifier);
+                case PointerEventType.Unhover:
+                    pointer = _pointerMap[evt.Identifier];
+                    _pointerMap.Remove(evt.Identifier);
                     pointer.MarkForDeletion();
                     _pointersForDeletion.Add(pointer);
                     break;
-                case PointerEvent.Select:
-                    pointer = _pointerMap[args.Identifier];
-                    pointer.SetPosition(args.Position);
+                case PointerEventType.Select:
+                    pointer = _pointerMap[evt.Identifier];
+                    pointer.SetPosition(evt.Pose.position);
                     pointer.Press();
                     break;
-                case PointerEvent.Unselect:
-                    pointer = _pointerMap[args.Identifier];
-                    pointer.SetPosition(args.Position);
+                case PointerEventType.Unselect:
+                    pointer = _pointerMap[evt.Identifier];
+                    pointer.SetPosition(evt.Pose.position);
                     pointer.Release();
                     break;
-                case PointerEvent.Move:
-                    pointer = _pointerMap[args.Identifier];
-                    pointer.SetPosition(args.Position);
+                case PointerEventType.Move:
+                    pointer = _pointerMap[evt.Identifier];
+                    pointer.SetPosition(evt.Pose.position);
+                    break;
+                case PointerEventType.Cancel:
+                    pointer = _pointerMap[evt.Identifier];
+                    _pointerMap.Remove(evt.Identifier);
+                    ClearPointerSelection(pointer.PointerEventData);
+                    pointer.MarkForDeletion();
+                    _pointersForDeletion.Add(pointer);
                     break;
             }
         }
@@ -213,7 +229,7 @@ namespace Oculus.Interaction
 
         protected override void Start()
         {
-            this.BeginStart(ref _started, base.Start);
+            this.BeginStart(ref _started, () => base.Start());
             this.EndStart(ref _started);
         }
 
@@ -529,17 +545,22 @@ namespace Oculus.Interaction
                 // And clear selection!
                 if (pointerEvent.pointerPress != pointerEvent.pointerDrag)
                 {
-                    ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent,
-                        ExecuteEvents.pointerUpHandler);
-
-                    pointerEvent.eligibleForClick = false;
-                    pointerEvent.pointerPress = null;
-                    pointerEvent.rawPointerPress = null;
+                    ClearPointerSelection(pointerEvent);
                 }
 
                 ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent,
                     ExecuteEvents.dragHandler);
             }
+        }
+
+        private void ClearPointerSelection(PointerEventData pointerEvent)
+        {
+            ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent,
+                ExecuteEvents.pointerUpHandler);
+
+            pointerEvent.eligibleForClick = false;
+            pointerEvent.pointerPress = null;
+            pointerEvent.rawPointerPress = null;
         }
 
         /// <summary>

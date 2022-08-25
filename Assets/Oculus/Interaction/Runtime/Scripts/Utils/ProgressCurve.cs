@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System;
 using UnityEngine;
@@ -34,6 +42,8 @@ namespace Oculus.Interaction
 
         private float _animationStartTime;
 
+        public float AnimationLength => _animationLength;
+
         public ProgressCurve()
         {
             _animationCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -55,7 +65,7 @@ namespace Oculus.Interaction
 
         public void Start()
         {
-            _animationStartTime = Time.realtimeSinceStartup;
+            _animationStartTime = Time.time;
         }
 
         public float Progress()
@@ -65,13 +75,29 @@ namespace Oculus.Interaction
                 return _animationCurve.Evaluate(1.0f);
             }
 
-            float normalizedTimeProgress = Mathf.Clamp01((Time.realtimeSinceStartup - _animationStartTime) / _animationLength);
+            float normalizedTimeProgress = Mathf.Clamp01(ProgressTime() / _animationLength);
             return _animationCurve.Evaluate(normalizedTimeProgress);
+        }
+
+        public float ProgressIn(float time)
+        {
+            if (_animationLength <= 0f)
+            {
+                return _animationCurve.Evaluate(1.0f);
+            }
+
+            float normalizedTimeProgress = Mathf.Clamp01((ProgressTime() + time) / _animationLength);
+            return _animationCurve.Evaluate(normalizedTimeProgress);
+        }
+
+        public float ProgressTime()
+        {
+            return Mathf.Clamp(Time.time - _animationStartTime, 0f, _animationLength);
         }
 
         public void End()
         {
-            _animationStartTime = Time.realtimeSinceStartup - _animationLength;
+            _animationStartTime = Time.time - _animationLength;
         }
     }
 }

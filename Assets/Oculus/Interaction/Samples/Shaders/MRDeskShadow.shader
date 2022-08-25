@@ -20,27 +20,19 @@ Shader "Oculus/Interaction/deskShadow"
 			[HideInInspector] _texcoord("", 2D) = "white" {}
 		}
 
-			SubShader
+		SubShader
 		{
-			Tags{ "RenderType" = "Transparent"  "Queue" = "Transparent+0" }
+			Tags{ "RenderType" = "Transparent"  "Queue" = "Transparent+0"}
 			LOD 100
 
 			CGINCLUDE
 			#pragma target 3.0
 			ENDCG
-			//Blend SrcAlpha OneMinusSrcAlpha
 			Blend DstColor Zero
-			AlphaToMask Off
-			Cull Back
-			ColorMask RGBA
-			ZWrite Off
-			ZTest LEqual
-			Offset 0 , 0
 
 			Pass
 			{
 				Name "Base"
-				Tags { "LightMode" = "ForwardBase" }
 				CGPROGRAM
 
 				#ifndef UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX
@@ -69,13 +61,9 @@ Shader "Oculus/Interaction/deskShadow"
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
-
 				uniform sampler2D _MainTex;
 				uniform half4 _MainTex_ST;
                 uniform half4 _Color;
-
-
-
 
 				vertexOutput vert(vertexInput v)
 				{
@@ -88,8 +76,6 @@ Shader "Oculus/Interaction/deskShadow"
 					return o;
 				}
 
-
-
 				fixed4 frag(vertexOutput i) : SV_Target
 				{
 					UNITY_SETUP_INSTANCE_ID(i);
@@ -100,9 +86,5 @@ Shader "Oculus/Interaction/deskShadow"
 				}
 				ENDCG
 			}
-
-
-
-
 	}
 }

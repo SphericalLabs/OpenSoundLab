@@ -1,14 +1,22 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using Oculus.Interaction.Input;
 using System.Collections.Generic;
@@ -77,10 +85,14 @@ namespace Oculus.Interaction.Throw
             public void BufferNewValue(Pose newPose, float delta)
             {
                 Vector3 newPosition = newPose.position;
-                Vector3 newVelocity = _previousPosition.HasValue ?
-                    ((newPosition - _previousPosition.Value) / delta) : Vector3.zero;
+                Vector3 newVelocity = Vector3.zero;
+                if (delta > Mathf.Epsilon && _previousPosition.HasValue)
+                {
+                    newVelocity = (newPosition - _previousPosition.Value)
+                        / delta;
+                }
                 int nextWritePos = (_lastWritePos < 0) ? 0 :
-                (_lastWritePos + 1) % _bufferLength;
+                    (_lastWritePos + 1) % _bufferLength;
                 if (Velocities.Count <= nextWritePos)
                 {
                     Velocities.Add(newVelocity);
@@ -96,12 +108,17 @@ namespace Oculus.Interaction.Throw
 
             public Vector3 GetAverageVelocityVector()
             {
+                int numVelocities = Velocities.Count;
+                if (numVelocities == 0)
+                {
+                    return Vector3.zero;
+                }
                 Vector3 average = Vector3.zero;
                 foreach (var speed in Velocities)
                 {
                     average += speed;
                 }
-                average /= Velocities.Count;
+                average /= numVelocities;
                 return average;
             }
 
@@ -125,7 +142,7 @@ namespace Oculus.Interaction.Throw
 
         public bool GetRootPose(out Pose pose)
         {
-            pose = new Pose();
+            pose = Pose.identity;
             if (!IsInputValid)
             {
                 return false;
@@ -137,7 +154,7 @@ namespace Oculus.Interaction.Throw
                 return false;
             }
 
-            Pose palmOffset = new Pose();
+            Pose palmOffset = Pose.identity;
             if (!Hand.GetPalmPoseLocal(out palmOffset))
             {
                 return false;
@@ -184,22 +201,22 @@ namespace Oculus.Interaction.Throw
 
             _jointPoseInfoArray = new[]
             {
-            new HandJointPoseMetaData(HandFinger.Thumb,
-                HandJointId.HandThumb3,
-                _bufferSize),
-            new HandJointPoseMetaData(HandFinger.Index,
-                HandJointId.HandIndex3,
-                _bufferSize),
-            new HandJointPoseMetaData(HandFinger.Middle,
-                HandJointId.HandMiddle3,
-                _bufferSize),
-            new HandJointPoseMetaData(HandFinger.Ring,
-                HandJointId.HandRing3,
-                _bufferSize),
-            new HandJointPoseMetaData(HandFinger.Pinky,
-                HandJointId.HandPinky3,
-                _bufferSize)
-        };
+                new HandJointPoseMetaData(HandFinger.Thumb,
+                    HandJointId.HandThumb3,
+                    _bufferSize),
+                new HandJointPoseMetaData(HandFinger.Index,
+                    HandJointId.HandIndex3,
+                    _bufferSize),
+                new HandJointPoseMetaData(HandFinger.Middle,
+                    HandJointId.HandMiddle3,
+                    _bufferSize),
+                new HandJointPoseMetaData(HandFinger.Ring,
+                    HandJointId.HandRing3,
+                    _bufferSize),
+                new HandJointPoseMetaData(HandFinger.Pinky,
+                    HandJointId.HandPinky3,
+                    _bufferSize)
+            };
         }
 
         private bool GetFingerIsHighConfidence(HandFinger handFinger)
@@ -210,7 +227,7 @@ namespace Oculus.Interaction.Throw
 
         private bool GetJointPose(HandJointId handJointId, out Pose pose)
         {
-            pose = new Pose();
+            pose = Pose.identity;
             if (!Hand.IsTrackedDataValid)
             {
                 return false;
@@ -246,7 +263,8 @@ namespace Oculus.Interaction.Throw
 
         public (Vector3, Vector3) GetExternalVelocities()
         {
-            if (_jointPoseInfoArray == null)
+            if (_jointPoseInfoArray == null ||
+                _jointPoseInfoArray.Length == 0)
             {
                 return (Vector3.zero, Vector3.zero);
             }

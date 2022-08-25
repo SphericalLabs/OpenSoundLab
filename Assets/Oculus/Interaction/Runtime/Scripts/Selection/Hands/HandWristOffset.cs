@@ -1,19 +1,26 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using Oculus.Interaction.Input;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 
 namespace Oculus.Interaction
 {
@@ -27,12 +34,42 @@ namespace Oculus.Interaction
         public IHand Hand { get; private set; }
 
         [SerializeField]
+        [HideInInspector]
         private Vector3 _offset;
 
         [SerializeField]
+        [HideInInspector]
         private Quaternion _rotation = Quaternion.identity;
 
+        [SerializeField, Optional]
+        [HideInInspector]
+        private Transform _relativeTransform;
+
         private Pose _cachedPose = Pose.identity;
+
+        public Vector3 Offset
+        {
+            get
+            {
+                return _offset;
+            }
+            set
+            {
+                _offset = value;
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get
+            {
+                return _rotation;
+            }
+            set
+            {
+                _rotation = value;
+            }
+        }
 
         private static readonly Quaternion LEFT_MIRROR_ROTATION = Quaternion.Euler(180f, 0f, 0f);
 
@@ -54,7 +91,7 @@ namespace Oculus.Interaction
         {
             if (_started)
             {
-                Hand.HandUpdated += HandleHandUpdated;
+                Hand.WhenHandUpdated += HandleHandUpdated;
             }
         }
 
@@ -62,7 +99,7 @@ namespace Oculus.Interaction
         {
             if (_started)
             {
-                Hand.HandUpdated -= HandleHandUpdated;
+                Hand.WhenHandUpdated -= HandleHandUpdated;
             }
         }
 
@@ -83,14 +120,19 @@ namespace Oculus.Interaction
                 return;
             }
 
-            if (Hand.Handedness == Handedness.Left)
+            GetOffset(ref pose, Hand.Handedness, Hand.Scale);
+        }
+
+        public void GetOffset(ref Pose pose, Handedness handedness, float scale)
+        {
+            if (handedness == Handedness.Left)
             {
-                pose.position = -_offset * Hand.Scale;
+                pose.position = -_offset * scale;
                 pose.rotation = _rotation * LEFT_MIRROR_ROTATION;
             }
             else
             {
-                pose.position = _offset * Hand.Scale;
+                pose.position = _offset * scale;
                 pose.rotation = _rotation;
             }
         }

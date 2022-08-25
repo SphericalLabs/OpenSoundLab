@@ -1,24 +1,30 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
-
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 
 namespace Oculus.Interaction
 {
-    public class GrabInteractable : Interactable<GrabInteractor, GrabInteractable>,
-                                      IPointable, IRigidbodyRef
+    public class GrabInteractable : PointerInteractable<GrabInteractor, GrabInteractable>,
+                                      IRigidbodyRef
     {
         private Collider[] _colliders;
         public Collider[] Colliders => _colliders;
@@ -27,22 +33,63 @@ namespace Oculus.Interaction
         Rigidbody _rigidbody;
         public Rigidbody Rigidbody => _rigidbody;
 
+        [SerializeField, Optional]
+        private Transform _grabSource;
+
+        [SerializeField]
+        private bool _useClosestPointAsGrabSource;
+
         [SerializeField]
         private float _releaseDistance = 0f;
-        public float ReleaseDistance => _releaseDistance;
+
+        [SerializeField]
+        private bool _resetGrabOnGrabsUpdated = true;
 
         [SerializeField, Optional]
-        private PhysicsTransformable _physicsObject = null;
+        private PhysicsGrabbable _physicsGrabbable = null;
 
         private static CollisionInteractionRegistry<GrabInteractor, GrabInteractable> _grabRegistry = null;
 
-        public event Action<PointerArgs> OnPointerEvent = delegate { };
-        private PointableDelegate<GrabInteractor> _pointableDelegate;
-
-        protected bool _started = false;
-
-        protected virtual void Awake()
+        #region Properties
+        public bool UseClosestPointAsGrabSource
         {
+            get
+            {
+                return _useClosestPointAsGrabSource;
+            }
+            set
+            {
+                _useClosestPointAsGrabSource = value;
+            }
+        }
+        public float ReleaseDistance
+        {
+            get
+            {
+                return _releaseDistance;
+            }
+            set
+            {
+                _releaseDistance = value;
+            }
+        }
+
+        public bool ResetGrabOnGrabsUpdated
+        {
+            get
+            {
+                return _resetGrabOnGrabsUpdated;
+            }
+            set
+            {
+                _resetGrabOnGrabsUpdated = value;
+            }
+        }
+        #endregion
+
+        protected override void Awake()
+        {
+            base.Awake();
             if (_grabRegistry == null)
             {
                 _grabRegistry = new CollisionInteractionRegistry<GrabInteractor, GrabInteractable>();
@@ -50,69 +97,47 @@ namespace Oculus.Interaction
             }
         }
 
-        protected virtual void Start()
+        protected override void Start()
         {
-            this.BeginStart(ref _started);
-
+            this.BeginStart(ref _started, () => base.Start());
             Assert.IsNotNull(Rigidbody);
             _colliders = Rigidbody.GetComponentsInChildren<Collider>();
             Assert.IsTrue(Colliders.Length > 0,
             "The associated Rigidbody must have at least one Collider.");
-
-            _pointableDelegate =
-                new PointableDelegate<GrabInteractor>(this, ComputePointer);
-
             this.EndStart(ref _started);
+        }
+
+        public Pose GetGrabSourceForTarget(Pose target)
+        {
+            if (_grabSource == null && !_useClosestPointAsGrabSource)
+            {
+                return target;
+            }
+
+            if (_useClosestPointAsGrabSource)
+            {
+                return new Pose(
+                    Collisions.ClosestPointToColliders(target.position, _colliders),
+                    target.rotation);
+            }
+
+            return _grabSource.GetPose();
         }
 
         public void ApplyVelocities(Vector3 linearVelocity, Vector3 angularVelocity)
         {
-            if (_physicsObject == null)
+            if (_physicsGrabbable == null)
             {
                 return;
             }
-            _physicsObject.ApplyVelocities(linearVelocity, angularVelocity);
-        }
-
-        private void ComputePointer(GrabInteractor interactor, out Vector3 position, out Quaternion rotation)
-        {
-            position = interactor.GrabPosition;
-            rotation = interactor.GrabRotation;
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (_started)
-            {
-                _pointableDelegate.OnPointerEvent += InvokeOnPointerEvent;
-            }
-        }
-
-        protected override void OnDisable()
-        {
-            if (_started)
-            {
-                _pointableDelegate.OnPointerEvent -= InvokeOnPointerEvent;
-            }
-            base.OnDisable();
-        }
-
-        private void InvokeOnPointerEvent(PointerArgs args)
-        {
-            OnPointerEvent(args);
-        }
-
-        protected virtual void OnDestroy()
-        {
-            _pointableDelegate = null;
+            _physicsGrabbable.ApplyVelocities(linearVelocity, angularVelocity);
         }
 
         #region Inject
 
         public void InjectAllGrabInteractable(Rigidbody rigidbody)
         {
-             InjectRigidbody(rigidbody);
+            InjectRigidbody(rigidbody);
         }
 
         public void InjectRigidbody(Rigidbody rigidbody)
@@ -120,14 +145,19 @@ namespace Oculus.Interaction
             _rigidbody = rigidbody;
         }
 
+        public void InjectOptionalGrabSource(Transform grabSource)
+        {
+            _grabSource = grabSource;
+        }
+
         public void InjectOptionalReleaseDistance(float releaseDistance)
         {
             _releaseDistance = releaseDistance;
         }
 
-        public void InjectOptionalPhysicsObject(PhysicsTransformable physicsObject)
+        public void InjectOptionalPhysicsGrabbable(PhysicsGrabbable physicsGrabbable)
         {
-            _physicsObject = physicsObject;
+            _physicsGrabbable = physicsGrabbable;
         }
 
         #endregion
