@@ -296,7 +296,6 @@ MonoBehaviour:
   sigOut: {fileID: 114000014014702960}
   sampOut: {fileID: 114000010119618080}
   defaultAudioSource: {fileID: 82000013022896272}
-  offClip: {fileID: 8300000, guid: d0ad8c664d1a1bd459120f974560dae2, type: 3}
 --- !u!1 &130724
 GameObject:
   m_ObjectHideFlags: 0
@@ -486,7 +485,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &400300
 Transform:
   m_ObjectHideFlags: 0
