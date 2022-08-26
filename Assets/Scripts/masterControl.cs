@@ -16,7 +16,6 @@
 // along with OpenSoundLab.  If not, see <http://www.gnu.org/licenses/>.
 
 using UnityEngine;
-using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -28,8 +27,7 @@ public class masterControl : MonoBehaviour {
 
   public static masterControl instance;
   public UnityEngine.Audio.AudioMixer masterMixer;
-  
-  public static float versionNumber;
+  public static float versionNumber = .76f;
 
   public enum platform {
     Oculus,
@@ -75,7 +73,6 @@ public class masterControl : MonoBehaviour {
 
   void Awake() {
     instance = this;
-
     _measurePhase = 0;
     _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
 
@@ -99,22 +96,7 @@ public class masterControl : MonoBehaviour {
     else if (Application.platform == RuntimePlatform.Android)
     {
       bufferSize = 256;
-
-      OVRPlugin.systemDisplayFrequency = 90f;
-
-      Debug.Log("Current cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
-      Debug.Log("Trying to set levels to 4");
-      Debug.Log("TrySetCPULevel returned " + Performance.TrySetCPULevel(3)); // from 0-3
-      Debug.Log("TrySetGPULevel returned " + Performance.TrySetGPULevel(3)); // from 0-3
-      Debug.Log("New cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
-      Debug.Log("Display refresh rate: " + Stats.AdaptivePerformance.RefreshRate);
-
-      Unity.XR.Oculus.Utils.SetFoveationLevel(3);
-      OVRPlugin.fixedFoveatedRenderingLevel = OVRPlugin.FixedFoveatedRenderingLevel.High;
-      
     }
-
-    UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.55f;
 
     Debug.Log("Buffer size is: " + configuration.dspBufferSize);
     //configuration.dspBufferSize = bufferSize;
@@ -123,8 +105,6 @@ public class masterControl : MonoBehaviour {
     //AudioSettings.SetDSPBufferSize(bufferSize, 2);
 
     //Debug.Log("Buffer size is now set to: " + AudioSettings.GetConfiguration().dspBufferSize);
-
-    //OVRManager.eyeFovPremultipliedAlphaModeEnabled = false;
 
     if (!PlayerPrefs.HasKey("glowVal")) PlayerPrefs.SetFloat("glowVal", 1);
     if (!PlayerPrefs.HasKey("envSound")) PlayerPrefs.SetInt("envSound", 1);
@@ -138,25 +118,9 @@ public class masterControl : MonoBehaviour {
     }
 
     SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "OpenSoundLab";
-    ReadFileLocConfig();    
+    ReadFileLocConfig();
+    Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
     Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");
-
-    #if UNITY_ANDROID 
-      //if Examples doesn't exist, extract default data...
-      if (Directory.Exists(SaveDir + Path.DirectorySeparatorChar + "Saves") == false)
-      {
-        //Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples");
-        Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
-        //copy tgz to directory where we can extract it
-        WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Examples.tgz");
-        while (!www.isDone) { }
-        System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", www.bytes);
-        //extract it
-        Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz", SaveDir + Path.DirectorySeparatorChar + "Saves");
-        //delete tgz
-        File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Examples.tgz");
-      }
-    #endif
 
     beatUpdateEvent += beatUpdateEventLocal;
     beatResetEvent += beatResetEventLocal;
@@ -291,19 +255,7 @@ public class masterControl : MonoBehaviour {
   Vector2 leftStick, rightStick;
   private void Start()
   {
-
-    float f = -1f;
-    try
-    {
-      f = float.Parse(Application.version);
-    }
-    catch (System.Exception e)
-    {
-      Debug.LogError("Could not parse bundleVersion.");
-    }
-    versionNumber = f;
-
-    if (!PlayerPrefs.HasKey("showTutorialsOnStartup")){
+    if(!PlayerPrefs.HasKey("showTutorialsOnStartup")){
       PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
       PlayerPrefs.Save();
     }
@@ -322,13 +274,14 @@ public class masterControl : MonoBehaviour {
   }
 
   int lastBeat = -1;
-
+  
   void Update() {
-    // metronome plays bound to screen updates! 
-    // Prone to jitter and CPU hanging! 
-    // Do not trust the metronome! Build your own one!
-    // Other sequencers avoid Update calls, continue even if Update call stack hangs
-    if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { 
+    
+      // metronome plays bound to screen updates! 
+      // Prone to jitter and CPU hanging! 
+      // Do not trust the metronome! Build your own one!
+      // Other sequencers avoid Update calls, continue even if Update call stack hangs
+      if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { 
       //metronomeClick.Play();
       lastBeat = Mathf.FloorToInt(curCycle * 8f);
     }
