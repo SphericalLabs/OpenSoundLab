@@ -124,14 +124,14 @@ public class libraryDeviceInterface : deviceInterface {
       note.gameObject.SetActive(true);
 
       if (s == "Custom") {
-        note.text = "Add custom samples from the desktop.\n" +
-                    "(Take off your headset and look at the menu\n" +
-                    "on the desktop view of the game)";
+        note.text = "You can add more samples from your computer.\n" +                    
+                    "Please check the manual for instructions.";
       } else if (s == "Recordings") {
         note.text = "Sounds saved with the\n" +
-                    "RECORDER will show up here.";
-      } else {
-        note.text = "[category empty]";
+                    "Recorder module will show up here.";
+      } else if (s == "Sessions") {
+        note.text = "Sounds saved with the master bus recorder\n" +
+                    "in the metronome will show up here.";
       }
     } else {
       note.gameObject.SetActive(false);

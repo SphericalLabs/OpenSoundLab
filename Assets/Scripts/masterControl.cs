@@ -119,8 +119,23 @@ public class masterControl : MonoBehaviour {
 
     SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "OpenSoundLab";
     ReadFileLocConfig();
-    Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
-    Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");
+    //Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");
+
+    #if UNITY_ANDROID
+      //if Saves doesn't exist, extract example data... 
+      if (Directory.Exists(SaveDir + Path.DirectorySeparatorChar + "Saves") == false)
+      {
+        Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
+        //copy tgz to directory where we can extract it
+        WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Examples.tgz");
+        while (!www.isDone) { }
+        System.IO.File.WriteAllBytes(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz", www.bytes);
+        //extract it
+        Utility_SharpZipCommands.ExtractTGZ(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz", SaveDir + Path.DirectorySeparatorChar + "Saves");
+        //delete tgz
+        File.Delete(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz");
+      }
+    #endif
 
     beatUpdateEvent += beatUpdateEventLocal;
     beatResetEvent += beatResetEventLocal;

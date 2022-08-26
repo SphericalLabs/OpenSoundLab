@@ -162,35 +162,36 @@ public class sampleManager : MonoBehaviour {
 
   public void Init() {
 
-    #if UNITY_ANDROID
-        //if Samples directory doesn't exist, extract default data...
-        if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
-        {
-            Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
-            //copy tgz to directory where we can extract it
-            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
-            while (!www.isDone) { }
-            System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
-            //extract it
-            Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
-            //delete tgz
-            File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
-        }
-    #endif
+    // used for bundled samples, not used anymore
+    //#if UNITY_ANDROID
+    //    //if Samples directory doesn't exist, extract default data...
+    //    if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
+    //    {
+    //        Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
+    //        //copy tgz to directory where we can extract it
+    //        WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+    //        while (!www.isDone) { }
+    //        System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
+    //        //extract it
+    //        Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
+    //        //delete tgz
+    //        File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
+    //    }
+    //#endif
 
     instance = this;
     sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
 
-    string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";
-    loadSampleDictionary(dir, "APP");
+    // used for bundled samples, not used anymore
+    //string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";
+    //loadSampleDictionary(dir, "APP");
 
-
-    dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
+    string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
     Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Custom");
     Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Recordings");
     Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Sessions");
     loadSampleDictionary(dir, "DOC");
-    AddCustomSamples();
+    //AddCustomSamples();
 
   }
 }
