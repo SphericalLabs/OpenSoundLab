@@ -82,9 +82,7 @@ public class spectrumDisplay : MonoBehaviour
     if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
 
     // init black screen
-    RenderTexture.active = offlineTexture;
-    GL.Clear(false, true, Color.black);
-    Graphics.CopyTexture(offlineTexture, onlineTexture);
+    clearRenderTexture();
 
   }
 
@@ -97,6 +95,12 @@ public class spectrumDisplay : MonoBehaviour
     source.GetSpectrumData(spectrum, 0, fftWin);
     RenderGLToTexture(width, height, offlineMaterial);
     
+  }
+
+  void clearRenderTexture(){
+    RenderTexture.active = offlineTexture;
+    GL.Clear(false, true, Color.black);
+    Graphics.CopyTexture(offlineTexture, onlineTexture);
   }
 
   // Via https://forum.unity.com/threads/rendering-gl-to-a-texture2d-immediately-in-unity4.158918/
@@ -159,7 +163,8 @@ public class spectrumDisplay : MonoBehaviour
   {
     if (active == on) return;
     active = on;
-    onlineMaterial.mainTexture = on ? onlineTexture : Texture2D.blackTexture;
+    //onlineMaterial.mainTexture = on ? onlineTexture : Texture2D.blackTexture;
+    clearRenderTexture();
   }
 
 }

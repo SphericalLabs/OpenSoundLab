@@ -112,9 +112,7 @@ public class waveViz : MonoBehaviour
     if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
 
     // init black screen
-    RenderTexture.active = offlineTexture;
-    GL.Clear(false, true, Color.black);
-    Graphics.CopyTexture(offlineTexture, onlineTexture);
+    clearRenderTexture();
 
   }
 
@@ -146,6 +144,12 @@ public class waveViz : MonoBehaviour
   bool foundZeroCrossing = false;
 
   int kk;
+
+  void clearRenderTexture(){
+    RenderTexture.active = offlineTexture;
+    GL.Clear(false, true, Color.black);
+    Graphics.CopyTexture(offlineTexture, onlineTexture);
+  }
 
   void RenderGLToTexture(int width, int height, Material material)
   {
@@ -221,7 +225,10 @@ public class waveViz : MonoBehaviour
   {
     if (active == on) return;
     active = on;
-    onlineMaterial.mainTexture = on ? onlineTexture : Texture2D.blackTexture;
+    //onlineMaterial.mainTexture = on ? onlineTexture : Texture2D.blackTexture;
+    RenderTexture.active = offlineTexture;
+    GL.Clear(false, true, Color.black);
+    Graphics.CopyTexture(offlineTexture, onlineTexture);
   }
 
 }
