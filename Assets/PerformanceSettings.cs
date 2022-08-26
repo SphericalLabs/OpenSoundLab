@@ -57,6 +57,7 @@ public class PerformanceSettings : MonoBehaviour
       //Unity.XR.Oculus.Utils.SetFoveationLevel(Mathf.FloorToInt(fovDialVal * fovDial.notchSteps));
       
       OVRManager.fixedFoveatedRenderingLevel = (OVRManager.FixedFoveatedRenderingLevel) Enum.ToObject(typeof(OVRManager.FixedFoveatedRenderingLevel), Mathf.RoundToInt(fovDialVal * (fovDial.notchSteps - 1)));
+      Debug.Log(Mathf.RoundToInt(fovDialVal * (fovDial.notchSteps - 1)));
     }
 
     if (scaleDialVal != scaleDial.percent)
