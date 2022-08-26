@@ -70,6 +70,7 @@ public class scopeDeviceInterface : deviceInterface {
     {
       scopeSignal.incoming = input.signal;
       displayFft.toggleActive(scopeSignal.incoming != null);
+      displayOsc.toggleActive(scopeSignal.incoming != null);
     }
 
   }

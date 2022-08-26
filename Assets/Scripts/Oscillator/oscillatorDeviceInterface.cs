@@ -48,6 +48,7 @@ public class oscillatorDeviceInterface : deviceInterface
     signal = GetComponent<oscillatorSignalGenerator>();
     active = true;
     viz.sampleStep = lfo ? bufferSize : 1;
+    viz.toggleActive(true); // always on, unlike the waveViz on the Scope
 
     UpdateLFO();
     UpdateAmp();

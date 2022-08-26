@@ -33,7 +33,7 @@ public class spectrumDisplay : MonoBehaviour
   RenderTexture offlineTexture;
   Material offlineMaterial;
 
-  Texture2D onlineTexture;
+  public Texture2D onlineTexture;
   public Material onlineMaterial;
   public Renderer displayRenderer;
 
@@ -53,7 +53,7 @@ public class spectrumDisplay : MonoBehaviour
   public FilterMode fm = FilterMode.Bilinear;
   public int ani = 4;
 
-  void Start()
+  void Awake()
   {
     spectrum = new float[fftBins];
 
@@ -72,14 +72,19 @@ public class spectrumDisplay : MonoBehaviour
 
 
     // these are the ones that you will actually see
-    onlineTexture = new Texture2D(width, height, TextureFormat.ARGB32, true);
+    onlineTexture = new Texture2D(width, height, TextureFormat.RGBA32, true);
     onlineMaterial = Instantiate(onlineMaterial);
-    GetComponent<Renderer>().material = onlineMaterial;
-    onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), Texture2D.blackTexture);
+    displayRenderer.material = onlineMaterial;    
+    onlineMaterial.mainTexture = onlineTexture; 
 
     if (onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
     if (onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
     if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
+
+    // init black screen
+    RenderTexture.active = offlineTexture;
+    GL.Clear(false, true, Color.black);
+    Graphics.CopyTexture(offlineTexture, onlineTexture);
 
   }
 
@@ -154,7 +159,7 @@ public class spectrumDisplay : MonoBehaviour
   {
     if (active == on) return;
     active = on;
-    onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), on ? onlineTexture : Texture2D.blackTexture);
+    onlineMaterial.mainTexture = on ? onlineTexture : Texture2D.blackTexture;
   }
 
 }

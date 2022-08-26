@@ -39,6 +39,8 @@ public class waveViz : MonoBehaviour
   public int sampleStep = 512; // should not be higher than buffer size, otherwise looped data?
   public bool doTriggering = false;
 
+  public bool active = false;
+
   FilterMode fm = FilterMode.Bilinear;
   int ani = 4;
   public int offset = 0;
@@ -103,23 +105,17 @@ public class waveViz : MonoBehaviour
     onlineTexture = new Texture2D(waveWidth, waveHeight, TextureFormat.RGBA32, true);
     onlineMaterial = Instantiate(onlineMaterial);
     displayRenderer.material = onlineMaterial;
-    onlineMaterial.SetTexture(Shader.PropertyToID("_MainTex"), onlineTexture);
+    onlineMaterial.mainTexture = onlineTexture;
 
     if (onlineTexture.filterMode != fm) onlineTexture.filterMode = fm;
     if (onlineTexture.anisoLevel != ani) onlineTexture.anisoLevel = ani;
     if (onlineTexture.mipMapBias != -0.15f) onlineTexture.mipMapBias = -0.15f;
 
-  }
-
-  void Start()
-  {
-    onlineMaterial.mainTexture = onlineTexture;
-
-
     // init black screen
     RenderTexture.active = offlineTexture;
     GL.Clear(false, true, Color.black);
     Graphics.CopyTexture(offlineTexture, onlineTexture);
+
   }
 
   int tempIndex;
@@ -139,12 +135,11 @@ public class waveViz : MonoBehaviour
 
   void Update()
   {
+    if (!active) return;
+    if (!displayRenderer.isVisible) return;
 
-    if (displayRenderer.isVisible)
-    {
-      RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
-    }
-
+    RenderGLToTexture(waveWidth, waveHeight, offlineMaterial);
+    
   }
 
   bool lastWasPositive = false;
@@ -220,6 +215,13 @@ public class waveViz : MonoBehaviour
     }
 
     RingBuffer_Free(ringBufferPtr);
+  }
+
+  public void toggleActive(bool on)
+  {
+    if (active == on) return;
+    active = on;
+    onlineMaterial.mainTexture = on ? onlineTexture : Texture2D.blackTexture;
   }
 
 }
