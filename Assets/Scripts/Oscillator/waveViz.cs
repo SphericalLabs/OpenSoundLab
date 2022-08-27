@@ -225,7 +225,7 @@ public class waveViz : MonoBehaviour
   {
     if (active == on) return;
     active = on;
-    //onlineMaterial.mainTexture = on ? onlineTexture : Texture2D.blackTexture;
+    if (offlineTexture || onlineTexture == null) return; // for Oscillator viz
     RenderTexture.active = offlineTexture;
     GL.Clear(false, true, Color.black);
     Graphics.CopyTexture(offlineTexture, onlineTexture);
