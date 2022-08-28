@@ -18,6 +18,7 @@ Material:
     RenderType: Transparent
   disabledShaderPasses:
   - DepthOnly
+  - SHADOWCASTER
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -116,7 +117,7 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 0.5911949, g: 0.8120465, b: 1, a: 0.16470589}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.5911949, g: 0.8120465, b: 1, a: 0.16470589}
     - _DiffuseColor: {r: 0.6838235, g: 0.50281143, b: 0.50281143, a: 0.428}
     - _EmissionColor: {r: 0, g: 0.030324623, b: 0.33823532, a: 0.159}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
