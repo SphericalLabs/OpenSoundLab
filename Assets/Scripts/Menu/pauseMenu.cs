@@ -178,6 +178,7 @@ public class pauseMenu : MonoBehaviour {
   public void clearInstruments() {
     GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("instrument");
     for (int i = 0; i < gameObjects.Length; i++) {
+      if (gameObjects[i].name == "Tutorials(Clone)") continue; // Tutorials stays persistent
       Destroy(gameObjects[i]);
     }
 

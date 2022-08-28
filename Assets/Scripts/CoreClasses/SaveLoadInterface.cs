@@ -115,6 +115,7 @@ public class SaveLoadInterface : MonoBehaviour {
     deviceInterface[] devices = FindObjectsOfType(typeof(deviceInterface)) as deviceInterface[];
     foreach (deviceInterface d in devices)
     {
+      if (d is tutorialsDeviceInterface) continue; // exclude Tutorials from saves
       synthSet.InstrumentList.Add(d.GetData());
     }
 
