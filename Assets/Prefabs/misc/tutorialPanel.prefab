@@ -30,6 +30,7 @@ Transform:
   m_LocalRotation: {x: 0.50000006, y: 0.5, z: 0.5, w: 0.49999997}
   m_LocalPosition: {x: 0.040299993, y: 0.19220008, z: 0.0744}
   m_LocalScale: {x: 0.96, y: 0.96, z: 2.412039}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5669030578085051886}
   m_Father: {fileID: 0}
@@ -54,10 +55,12 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -82,6 +85,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &5172951741096141700
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -120,8 +124,7 @@ MonoBehaviour:
   activeMat: {fileID: 2100000, guid: 45fde5fa853ca544ea832ac3c37357bc, type: 2}
   tutorialsManager: {fileID: 0}
   isActive: 0
-  labelString: '#1 Creating wind sounds'
-  videoFile: oscillator.ogv
+  videoString: 
 --- !u!1 &7444186012782604103
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,6 +153,7 @@ Transform:
   m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
   m_LocalPosition: {x: -0.0007, y: 0.0099, z: 0.07046}
   m_LocalScale: {x: 0.00018242311, y: 0.00041411322, z: 0.00020540251}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 575029559506108905}
   m_RootOrder: 0
@@ -165,14 +169,16 @@ MeshRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 103c84419e72e2640a3e483eb3a63951, type: 2}
+  - {fileID: 2100000, guid: dd86df1dc844915489225f32919c94ff, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -193,6 +199,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!102 &2153336038684593805
 TextMesh:
   serializedVersion: 3
@@ -211,7 +218,7 @@ TextMesh:
   m_FontSize: 80
   m_FontStyle: 0
   m_RichText: 1
-  m_Font: {fileID: 12800000, guid: 69e5561f64171f44d9066bead6065df5, type: 3}
+  m_Font: {fileID: 12800000, guid: 31a7f34e01049fa479a7f2d4c8942f55, type: 3}
   m_Color:
     serializedVersion: 2
     rgba: 4278190080
