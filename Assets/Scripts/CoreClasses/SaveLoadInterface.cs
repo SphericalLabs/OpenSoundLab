@@ -91,6 +91,7 @@ public class SaveLoadInterface : MonoBehaviour {
     SystemData s = new SystemData();
     s.version = masterControl.versionNumber;
     s.BPM = masterControl.instance.bpm;
+    s.binauralMode = (int)masterControl.BinauralSetting;
     synthSet.SystemList.Add(s);
   }
 
@@ -98,6 +99,7 @@ public class SaveLoadInterface : MonoBehaviour {
     if (justpreview) return s.version;
 
     masterControl.instance.setBPM(s.BPM);
+    masterControl.updateBinaural(s.binauralMode);
     nome.SetBPM(s.BPM);
     synthSet.SystemList.Add(s);
     return s.version;
@@ -250,6 +252,7 @@ public class InstrumentData {
 
 public class SystemData {
   public float BPM;
+  public int binauralMode;
   public float version;
 }
 

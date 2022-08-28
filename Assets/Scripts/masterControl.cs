@@ -151,6 +151,7 @@ public class masterControl : MonoBehaviour {
   //public void resetMasterClockDSPTime(bool wasChanged){
   //  if (wasChanged) resetClock();
   //}
+  //}
 
   public void toggleInstrumentVolume(bool on) {
     masterMixer.SetFloat("instrumentVolume", on ? 0 : -18);
@@ -354,24 +355,23 @@ public class masterControl : MonoBehaviour {
     return (new System.Uri(path)).AbsoluteUri;
   }
 
-  public enum BinauralMode {
-    None,
+  public enum BinauralMode {    
     Speaker,
     All
   };
-  public BinauralMode BinauralSetting = BinauralMode.None;
+  public static BinauralMode BinauralSetting = BinauralMode.Speaker;
 
-  public void updateBinaural(int num) {
+  public static void updateBinaural(int num) {
     if (BinauralSetting == (BinauralMode)num) {
       return;
     }
     BinauralSetting = (BinauralMode)num;
 
     speakerDeviceInterface[] standaloneSpeakers = FindObjectsOfType<speakerDeviceInterface>();
-    for (int i = 0; i < standaloneSpeakers.Length; i++) {
-      if (BinauralSetting == BinauralMode.None) standaloneSpeakers[i].audio.spatialize = false;
-      else standaloneSpeakers[i].audio.spatialize = true;
-    }
+    //for (int i = 0; i < standaloneSpeakers.Length; i++) {
+    //  if (BinauralSetting == BinauralMode.None) standaloneSpeakers[i].audio.spatialize = false;
+    //  else standaloneSpeakers[i].audio.spatialize = true;
+    //}
     embeddedSpeaker[] embeddedSpeakers = FindObjectsOfType<embeddedSpeaker>();
     for (int i = 0; i < embeddedSpeakers.Length; i++) {
       if (BinauralSetting == BinauralMode.All) embeddedSpeakers[i].audio.spatialize = true;
@@ -400,11 +400,11 @@ public class masterControl : MonoBehaviour {
 
   public void nextWireSetting()
   {
-    updateWireSetting((WireSetting.GetHashCode() + 1) % 3); // modolo for sneaky wrapping
+    updateWireSetting((WireSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(WireMode)).Length);
   }
 
   public void nextBinauralSetting()
   {
-    updateBinaural((BinauralSetting.GetHashCode() + 1 ) % 3); 
+    updateBinaural((BinauralSetting.GetHashCode() + 1 ) % System.Enum.GetNames(typeof(BinauralMode)).Length); 
   }
 }
