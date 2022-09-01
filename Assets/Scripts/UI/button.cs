@@ -200,13 +200,16 @@ public class button : manipObject {
 
   public override void onTouch(bool on, manipulator m) {
     if (m != null) {
-      if (m.emptyGrab) {
+      if (m.emptyGrab) {        
         if (!on) {
           if (!isToggle) keyHit(false);
           if (!glowMatOnToggle) {
             rend.material = offMat;
           }
         } else {
+
+          m.hapticPulse();
+
           if (isToggle) {
             toggled = !toggled;
             if (toggled) keyHit(true);

@@ -74,7 +74,7 @@ public class tutorialPanel : manipObject {
       if (m.emptyGrab)
       {
         setActivated(true);
-        m.hapticPulse(700);
+        m.hapticPulse(2000);
       }
     }
   }
