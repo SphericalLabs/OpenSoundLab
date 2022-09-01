@@ -31,7 +31,7 @@ public class trashcan : MonoBehaviour {
   void Awake() {
     mat = transform.GetChild(0).GetComponent<Renderer>().material;
     manager = transform.parent.parent.GetComponent<menuManager>();
-    //offColor = new Color(.85f, .85f, .85f);
+    offColor = new Color(.85f, .85f, .85f);
     mat.SetColor("_TintColor", offColor);
     mat.SetFloat("_EmissionGain", .2f);
   }

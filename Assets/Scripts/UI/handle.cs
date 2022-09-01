@@ -109,7 +109,7 @@ public class handle : manipObject {
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(1000);
       else if (otherHandle.manipulatorObjScript != null) otherHandle.manipulatorObjScript.hapticPulse(1000);
       trashReady = true;
-      soundUtils.SetupMaterialWithBlendMode(mat, soundUtils.BlendMode.Fade);
+      //soundUtils.SetupMaterialWithBlendMode(mat, soundUtils.BlendMode.Fade); // this caused a glitch where text was not visible on most objects anymore
     }
   }
 
@@ -120,7 +120,7 @@ public class handle : manipObject {
       else if (otherHandle.manipulatorObjScript != null) otherHandle.manipulatorObjScript.hapticPulse(1000);
       curTrash = null;
       trashReady = false;
-      soundUtils.SetupMaterialWithBlendMode(mat, soundUtils.BlendMode.Opaque);
+      //soundUtils.SetupMaterialWithBlendMode(mat, soundUtils.BlendMode.Opaque);
     }
   }
 

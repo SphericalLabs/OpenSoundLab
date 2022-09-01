@@ -3534,6 +3534,7 @@ MonoBehaviour:
   heightPadding: 2
   sampleStep: 512
   doTriggering: 0
+  active: 0
   offset: 0
 --- !u!1 &1000014130592554
 GameObject:
@@ -3942,7 +3943,7 @@ TextMesh:
 
     LIN. TZ FM
 
-    V / HZ'
+    HZ / V'
   m_OffsetZ: 0
   m_CharacterSize: 0.03
   m_LineSpacing: 1
