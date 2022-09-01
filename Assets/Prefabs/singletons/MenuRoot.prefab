@@ -10922,7 +10922,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0
+  percent: 0.8
   defaultPercent: 0
   dialColor: 0
   controllerRot: 0
@@ -11333,7 +11333,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3493321527676278305}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01730001, y: 0.0065000057, z: -0.026000015}
+  m_LocalPosition: {x: 0.0201, y: 0.0065000057, z: -0.026000015}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12124,7 +12124,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 831
+  m_VersionIndex: 834
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []

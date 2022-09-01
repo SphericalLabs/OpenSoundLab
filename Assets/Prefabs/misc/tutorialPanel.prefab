@@ -97,7 +97,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.030000024, y: 0.015000026, z: 0.15000005}
+  m_Size: {x: 0.02, y: 0.015000026, z: 0.15000005}
   m_Center: {x: 0.000000007450581, y: 0, z: -0.0000000021682354}
 --- !u!114 &523827124700607691
 MonoBehaviour:
@@ -121,7 +121,7 @@ MonoBehaviour:
   panelRenderer: {fileID: 575029559503815433}
   normalMat: {fileID: 2100000, guid: 968aff1bdb7797449b200e80168986c7, type: 2}
   selectedMat: {fileID: 2100000, guid: 45fde5fa853ca544ea832ac3c37357bc, type: 2}
-  activeMat: {fileID: 2100000, guid: 45fde5fa853ca544ea832ac3c37357bc, type: 2}
+  activeMat: {fileID: 2100000, guid: deb65283edf18824e96029ebd9515b2c, type: 2}
   tutorialsManager: {fileID: 0}
   isActive: 0
   videoString: 

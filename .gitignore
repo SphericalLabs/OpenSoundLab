@@ -279,6 +279,9 @@ MonoBleedingEdge/etc/mono/config
 MonoBleedingEdge/etc/mono/mconfig/config.xml
 UnityCrashHandler64.exe
 UnityPlayer.dll
+
+Assets/StreamingAssets/Tutorials/*.mp4*
+
 =======
 /Samples/Testing
 # This .gitignore file should be placed at the root of your Unity project directory
@@ -298,7 +301,7 @@ UnityPlayer.dll
 /[Mm]emoryCaptures/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
-!/[Aa]ssets/**/*.meta
+#!/[Aa]ssets/**/*.meta
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*

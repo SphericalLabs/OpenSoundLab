@@ -195,23 +195,13 @@ PrefabInstance:
     - target: {fileID: 124512545865607688, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 834
+      value: 837
       objectReference: {fileID: 0}
     - target: {fileID: 1189296954540883849, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 743926980}
-    - target: {fileID: 1361951119329476139, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4021495038623004498, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
-        type: 3}
-      propertyPath: percent
-      value: 0.8
-      objectReference: {fileID: 0}
     - target: {fileID: 7657181334817952640, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: m_Mesh

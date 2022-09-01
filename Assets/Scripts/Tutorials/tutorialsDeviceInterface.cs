@@ -166,6 +166,7 @@ public class tutorialsDeviceInterface : deviceInterface
     videoPlayer.renderMode = VideoRenderMode.MaterialOverride;
     videoPlayer.targetMaterialRenderer = videoPlayer.GetComponentInChildren<Renderer>();
     videoPlayer.targetMaterialProperty = "_MainTex";
+    forcePlay();
   }
 
   public void playPauseVideo()
@@ -189,7 +190,8 @@ public class tutorialsDeviceInterface : deviceInterface
   public void forcePlay(){
     videoPlayer.frame = 0;
     videoPlayer.Play();
-    playButton.isHit = true;
+    //playButton.isHit = true;
+    playButton.keyHit(true);
   }
 
   public override InstrumentData GetData()

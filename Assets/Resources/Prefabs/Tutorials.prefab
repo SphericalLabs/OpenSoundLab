@@ -141,8 +141,28 @@ MonoBehaviour:
   selectedTutorial: {fileID: 0}
   tutorials: []
   tutorialRecords:
-  - labelString: '#1 Welcome to SoundStage Lab (Alpha/Beta)'
-    videoString: Tutorials/welcomeClip.mp4
+  - labelString: T00 Welcome to OpenSoundLab
+    videoString: Tutorials/T00.mp4
+  - labelString: T01 Generative Wind
+    videoString: Tutorials/T01.mp4
+  - labelString: T02 Generative Data Sounds
+    videoString: Tutorials/T02.mp4
+  - labelString: T03 Robot Voice
+    videoString: Tutorials/T03.mp4
+  - labelString: T04 Generative Reverb Space
+    videoString: Tutorials/T04.mp4
+  - labelString: T05 Binaural Chord Space
+    videoString: Tutorials/T05.mp4
+  - labelString: T06 Generative Delay Space
+    videoString: Tutorials/T06.mp4
+  - labelString: T07 Binaural Sample Garden
+    videoString: Tutorials/T07.mp4
+  - labelString: T08 Simple Granular
+    videoString: Tutorials/T08.mp4
+  - labelString: T09 Generative Pluck Space
+    videoString: Tutorials/T09.mp4
+  - labelString: T10 Generative Sweep Space
+    videoString: Tutorials/T10.mp4
   videoPlayer: {fileID: 4995019661440197408}
   progressTransform: {fileID: 468380080905245851}
 --- !u!1 &1000010686554488
@@ -367,6 +387,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 1000012830027198}
   glowHue: 0.2
@@ -485,8 +506,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1325446074675020}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.2068, y: 0.2771, z: -0.11117}
-  m_LocalScale: {x: 0.62277853, y: 0.62277853, z: 0.62277853}
+  m_LocalPosition: {x: 0.34569, y: 0.436, z: -0.20756}
+  m_LocalScale: {x: 1.0411612, y: 1.0411612, z: 1.0411612}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4995019661440196635}
@@ -799,6 +820,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 1580475930168066}
   glowHue: 0.4
@@ -1056,6 +1078,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 6485317428233337457}
   glowHue: 0.4
@@ -1388,6 +1411,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 4995616472851647558}
   glowHue: 0.4
@@ -1729,7 +1753,7 @@ AudioSource:
   m_Pitch: 1
   Loop: 0
   Mute: 0
-  Spatialize: 0
+  Spatialize: 1
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
@@ -2300,6 +2324,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 5341431898352895280}
   glowHue: 0.4
@@ -2435,6 +2460,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 3364776317455700504}
   glowHue: 0.4
@@ -2912,6 +2938,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 5383534969862543500}
   glowHue: 0.4

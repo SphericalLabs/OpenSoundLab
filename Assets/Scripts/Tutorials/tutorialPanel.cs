@@ -57,63 +57,25 @@ public class tutorialPanel : manipObject {
   public override void setState(manipState state) {
     if(state == manipState.none && !isActive){
       panelRenderer.sharedMaterial = normalMat;
-    } else if(state == manipState.selected){
+    } else if(state == manipState.selected && !isActive){
       panelRenderer.sharedMaterial = selectedMat;
     } else if(state == manipState.grabbed){
       setActivated(true);
       manipulatorObjScript.hapticPulse(700);
     }
-    //if (curState == manipState.selected && curState != state) selectEvent(false);
-    //else if (curState == manipState.grabbed && curState != state) grabEvent(false);
 
-
-    //curState = state;
-    //if (curState == manipState.none) {
-    //  if (!toggled) setTextState(false);
-    //} else if (curState == manipState.selected) {
-    //  selectEvent(true);
-    //  setTextState(true);
-    //} else if (curState == manipState.grabbed) {
-    //  setTextState(true);
-    //  keyHit(true);
-    //  grabEvent(true);
-    //}
   }
 
-  //public virtual void grabEvent(bool on) {
 
-  //}
-
-  //public virtual void selectEvent(bool on) {
-
-  //}
-
-  //public bool isHit = false;
-  //public bool toggled = false;
-  //public void keyHit(bool on) {
-  //  isHit = on;
-  //  toggled = on;
-  //  if (on) {
-  //    if (_componentInterface != null) _componentInterface.hit(on, buttonID);
-  //    setToggleAppearance(true);
-  //  } else {
-  //    if (_componentInterface != null) _componentInterface.hit(on, buttonID);
-  //    setToggleAppearance(false);
-  //  }
-  //}
-
-  //public void setToggleAppearance(bool on) {
-  //  outline.SetActive(on);
-  //  setTextState(on);
-  //}
-
-  //public override void onTouch(bool on, manipulator m) {
-  //  if (m != null) {
-  //    if (m.emptyGrab) {
-  //      if (on) {
-  //        keyHit(true);
-  //      }
-  //    }
-  //  }
-  //}
+  public override void onTouch(bool on, manipulator m)
+  {
+    if (m != null)
+    {
+      if (m.emptyGrab)
+      {
+        setActivated(true);
+        m.hapticPulse(700);
+      }
+    }
+  }
 }
