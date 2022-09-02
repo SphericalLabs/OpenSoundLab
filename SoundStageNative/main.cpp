@@ -426,10 +426,10 @@ extern "C" {
             }
 
             bool endOfSample = false;
-            if (floatingBufferCount > sampleBounds[1])
+            if (floatingBufferCount > sampleBounds[1]) 
             {
                 endOfSample = true;
-                floatingBufferCount = fmod((double) floatingBufferCount - sampleBounds[0], (double) sampleBounds[1] - sampleBounds[0]) + sampleBounds[0]; // wrap over playhead offset
+                floatingBufferCount = fmod((double) floatingBufferCount - sampleBounds[0], (double) sampleBounds[1] - sampleBounds[0]) + sampleBounds[0] + 1; // wrap over playhead offset
             } else if (floatingBufferCount < sampleBounds[0] + 1) 
             {
                 endOfSample = true;
