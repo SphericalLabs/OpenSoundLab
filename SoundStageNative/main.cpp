@@ -408,6 +408,7 @@ extern "C" {
     {
 
         float* clipdata = reinterpret_cast<float*>(clip);
+        float sampleBoundsCenter = (sampleBounds[0] + sampleBounds[1]) * 0.5f;
 
         for (int i = 0; i < length; i += channels)
         {
@@ -456,7 +457,7 @@ extern "C" {
 
             float windowing = 1.f; 
             if(windowLength != 0){
-              if (floatingBufferCount < sampleBounds[0] + windowLength) { // 480 samples = 10ms
+              if (floatingBufferCount < sampleBounds[0] + windowLength && floatingBufferCount <= sampleBoundsCenter) { 
                   windowing = _map(floatingBufferCount, sampleBounds[0], sampleBounds[0] + windowLength, 0.f, 1.f, 0.5f);
               } else if (floatingBufferCount > sampleBounds[1] - windowLength) {
                   windowing = _map(floatingBufferCount, sampleBounds[1] - windowLength, sampleBounds[1], 1.f, 0.f, 0.5f);
