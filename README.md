@@ -16,7 +16,7 @@ At the moment you have to use [sideloading](https://uploadvr.com/sideloading-que
 ### Mailing list
 Please subscribe to our [mailing list](http://eepurl.com/h-9PsD) in order to get updates about new releases.
 
-### Support and Community
+### Discord
 Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980) on Discord in order to stay up-to-date, receive support, present your experiments and get to know other OSL users.
 
 ### Instructions
