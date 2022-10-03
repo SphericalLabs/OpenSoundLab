@@ -34,7 +34,7 @@ public class drumSignalGenerator : signalGenerator
 
     void Start()
     {
-        hitdur = AudioSettings.outputSampleRate / 10;
+      hitdur = AudioSettings.outputSampleRate / 10;      
     }
 
     public void setKeyActive(bool on, int ID)
