@@ -292,7 +292,7 @@ MonoBehaviour:
   _phase: 0
   useNativeIfAvailable: 1
   incoming: {fileID: 0}
-  controlIncoming: {fileID: 0}
+  freqIncoming: {fileID: 0}
   cutoffFrequency: 0
   bandWidthHalfed: 0.1
   resonance: 0.5
@@ -973,7 +973,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   volume: 1
-  incoming: {fileID: 114000011805596204}
+  incoming: {fileID: 0}
   monoMode: 0
   leftOn: 1
 --- !u!1 &1000013466286474
@@ -1715,6 +1715,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
+  defaultPercent: 0
   dialColor: 1
   controllerRot: 0
   lastControllerRot: 0
@@ -1876,6 +1877,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.25
+  defaultPercent: 0
   dialColor: 1
   controllerRot: 0
   lastControllerRot: 0
@@ -2329,6 +2331,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0
+  defaultPercent: 0
   dialColor: 1
   controllerRot: 0
   lastControllerRot: 0
@@ -2407,6 +2410,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
+  defaultPercent: 0
   dialColor: 0
   controllerRot: 0
   lastControllerRot: 0
@@ -4127,7 +4131,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 5876
+  m_VersionIndex: 5879
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []

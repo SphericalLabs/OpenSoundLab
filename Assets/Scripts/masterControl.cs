@@ -371,7 +371,7 @@ public class masterControl : MonoBehaviour {
     }
     BinauralSetting = (BinauralMode)num;
 
-    speakerDeviceInterface[] standaloneSpeakers = FindObjectsOfType<speakerDeviceInterface>();
+    //speakerDeviceInterface[] standaloneSpeakers = FindObjectsOfType<speakerDeviceInterface>();
     //for (int i = 0; i < standaloneSpeakers.Length; i++) {
     //  if (BinauralSetting == BinauralMode.None) standaloneSpeakers[i].audio.spatialize = false;
     //  else standaloneSpeakers[i].audio.spatialize = true;
