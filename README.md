@@ -9,7 +9,7 @@ The project is partially funded by an educational grant of the University of App
 This repository is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep other users in sync with our ongoing development. 
 
 ### Binaries
-[OpenSoundLab-0.47.apk](https://github.com/ludzeller/OpenSoundLab/releases/download/0.47/OpenSoundLab-0.47.apk) (BETA, 22-10-04)
+[OpenSoundLab-0.47.apk](https://github.com/ludzeller/OpenSoundLab/releases/download/0.47/OpenSoundLab-0.47.apk) (BETA 2022-10-04)
 
 At the moment you have to use [sideloading](https://uploadvr.com/sideloading-quest-how-to/) in order to install the binary. You need to register as a developer with Meta, enable the developer mode on your headset with the mobile companion app and use adb or SideQuest to copy the binary to your headset via USB or WiFi. That way you can also manage samples and download your recordings. Having your headset in developer mode is therefore pretty much a requirement for using OpenSoundLab.
 
