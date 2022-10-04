@@ -47,9 +47,9 @@ public class stereoVerbSignalGenerator : signalGenerator {
 
     public signalGenerator sigIn, sigModSize, sigModFreeze, sigModMix;
 
-    private float[] modSizeBuffer = null;
-    private float[] modFreezeBuffer = null;
-    private float[] modMixBuffer = null;
+    private float[] modSizeBuffer = new float[0];
+    private float[] modFreezeBuffer = new float[0];
+    private float[] modMixBuffer = new float[0];
 
     private IntPtr x;
     private float[] p = new float[(int)Param.P_N];
@@ -110,12 +110,24 @@ public class stereoVerbSignalGenerator : signalGenerator {
 
     public override void processBuffer(float[] buffer, double dspTime, int channels) {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        //Process mod inputs (& create mod buffers as soon as needed)
-        if(sigModSize != null)
+
+        if (modSizeBuffer.Length != buffer.Length)
+          System.Array.Resize(ref modSizeBuffer, buffer.Length);
+        if (modFreezeBuffer.Length != buffer.Length)
+          System.Array.Resize(ref modFreezeBuffer, buffer.Length);
+        if (modMixBuffer.Length != buffer.Length)
+          System.Array.Resize(ref modMixBuffer, buffer.Length);
+
+        SetArrayToSingleValue(modSizeBuffer, modSizeBuffer.Length, 0f);
+        SetArrayToSingleValue(modFreezeBuffer, modFreezeBuffer.Length, 0f);
+        SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
+
+        //Process mod inputs
+        if (sigModSize != null)
         {
             if (modSizeBuffer == null)
                 modSizeBuffer = new float[buffer.Length];
-            SetArrayToSingleValue(modSizeBuffer, modSizeBuffer.Length, 0f);
+            
             sigModSize.processBuffer(modSizeBuffer, dspTime, channels);
             p[(int)Param.P_ROOMSIZE] += modSizeBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
             p[(int)Param.P_ROOMSIZE] = Mathf.Clamp01(p[(int)Param.P_ROOMSIZE]);
@@ -125,7 +137,7 @@ public class stereoVerbSignalGenerator : signalGenerator {
         {
             if (modFreezeBuffer == null)
                 modFreezeBuffer = new float[buffer.Length];
-            SetArrayToSingleValue(modFreezeBuffer, modFreezeBuffer.Length, 0f);
+            
             sigModFreeze.processBuffer(modFreezeBuffer, dspTime, channels);
             p[(int)Param.P_FREEZE] = modFreezeBuffer[0] > 0 ? 1 : 0;
         }
@@ -134,7 +146,7 @@ public class stereoVerbSignalGenerator : signalGenerator {
         {
             if (modMixBuffer == null)
                 modMixBuffer = new float[buffer.Length];
-            SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
+            
             sigModMix.processBuffer(modMixBuffer, dspTime, channels);
             float tmp = Mathf.Pow(p[(int)Param.P_WET], 2) + modMixBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
             tmp = Mathf.Clamp01(tmp);

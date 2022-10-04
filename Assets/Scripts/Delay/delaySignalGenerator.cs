@@ -46,10 +46,11 @@ public class delaySignalGenerator : signalGenerator
     private float[] p = new float[(int)Param.P_N];
     private bool shouldClear = false;
 
-    private float[] modTimeBuffer = null;
-    private float[] modFeedbackBuffer = null;
-    private float[] modTriggerBuffer = null;
-    private float[] modMixBuffer = null;
+    private float[] modTimeBuffer = new float[0];
+    private float[] modFeedbackBuffer = new float[0];
+    private float[] modTriggerBuffer = new float[0];
+    private float[] modMixBuffer = new float[0];
+
     private bool modTriggerState = false;
     private float modFeedbackVal;
     private float lastTriggerFloat = 0f;
@@ -153,23 +154,24 @@ public class delaySignalGenerator : signalGenerator
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
-        //Create mod buffers as soon as needed:
-        if (sigModTime != null && modTimeBuffer == null)
-            modTimeBuffer = new float[buffer.Length];
+    if (modTimeBuffer.Length != buffer.Length)
+      System.Array.Resize(ref modTimeBuffer, buffer.Length);
+    if (modFeedbackBuffer.Length != buffer.Length)
+      System.Array.Resize(ref modFeedbackBuffer, buffer.Length);
+    if (modTriggerBuffer.Length != buffer.Length)
+      System.Array.Resize(ref modTriggerBuffer, buffer.Length);
+    if (modMixBuffer.Length != buffer.Length)
+      System.Array.Resize(ref modMixBuffer, buffer.Length);
 
-        if (sigModFeedback != null && modFeedbackBuffer == null)
-            modFeedbackBuffer = new float[buffer.Length];
+    // we don't know if these will be overwritten upstream, so better make them fresh, see previous mixer bug.
+    SetArrayToSingleValue(modTimeBuffer, modTimeBuffer.Length, 0f);
+    SetArrayToSingleValue(modFeedbackBuffer, modFeedbackBuffer.Length, 0f);
+    SetArrayToSingleValue(modTriggerBuffer, modTriggerBuffer.Length, 0f);
+    SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
 
-        if (sigModTrigger != null && modTriggerBuffer == null)
-            modTriggerBuffer = new float[buffer.Length];
-
-        if (sigModMix != null && modMixBuffer == null)
-            modMixBuffer = new float[buffer.Length];
-
-        //Process mod inputs if plugged in:
-        if (sigModTrigger != null)
+    //Process mod inputs if plugged in:
+    if (sigModTrigger != null)
         {
-          SetArrayToSingleValue(modTriggerBuffer, modTriggerBuffer.Length, 0f);
           sigModTrigger.processBuffer(modTriggerBuffer, dspTime, channels);
 
           if (containsTrigger(modTriggerBuffer))
@@ -187,14 +189,12 @@ public class delaySignalGenerator : signalGenerator
 
         if (sigModTime != null)
         {
-            SetArrayToSingleValue(modTimeBuffer, modTimeBuffer.Length, 0f);
             sigModTime.processBuffer(modTimeBuffer, dspTime, channels);
             //We do not have to choose a value here bc time modulation works on audiorate; we just pass the whole buffer to the native code later
         }
 
         if (sigModFeedback != null)
         {
-            SetArrayToSingleValue(modFeedbackBuffer, modFeedbackBuffer.Length, 0f);
             sigModFeedback.processBuffer(modFeedbackBuffer, dspTime, channels);
             modFeedbackVal = modFeedbackBuffer[0];
         }
@@ -203,7 +203,6 @@ public class delaySignalGenerator : signalGenerator
         float dry = p[(int)Param.P_DRY];
         if (sigModMix != null)
         {
-            SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
             sigModMix.processBuffer(modMixBuffer, dspTime, channels);
             float tmp = Mathf.Pow(wet, 2) + modMixBuffer[0]; //expecting input values in range [-1...1]
             tmp = Mathf.Clamp01(tmp);
