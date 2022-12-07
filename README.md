@@ -47,7 +47,7 @@ At the moment you have to use [sideloading](https://uploadvr.com/sideloading-que
 - Sampler: Added linear interpolation, linear through-zero FM, modulation for in/out, windowing
 - Optimized rendering performance for Meta Quest
 - Switched to ARM64 and recent versions of Unity, Oculus SDK and Vulkan
-- Improved performance waveform displays by rendering them on the GPU
+- Improved performance of waveform displays by rendering them on the GPU
 - TouchPad: Added latched mode
 - Keyboard: Added CV and Gate outputs
 
