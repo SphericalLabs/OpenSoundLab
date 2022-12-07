@@ -1,6 +1,6 @@
 # OpenSoundLab
 
-[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)
+[[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)]
 
 OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
 
