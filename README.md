@@ -30,8 +30,8 @@ At the moment you have to use [sideloading](https://uploadvr.com/sideloading-que
 - Gain: 36db gain module
 - Polarity: Convert between unipolar and bipolar signals
 - Artefact: Jitter, bit crush, downsample and noise
-- Compressor: Dynamics processor with attack, decay, threshold, ratio, bypass, gain and sidechaining
-- DC: Bipolar DC signal generator
+- Compressor: Dynamics processor with attack, release, threshold, ratio, bypass, gain and sidechaining
+- DC: Bipolar signal generator
 - Glide: Slope limiter
 - S&H: Sample and hold module
 - Tutorials: Player console for video tutorials
@@ -44,8 +44,8 @@ At the moment you have to use [sideloading](https://uploadvr.com/sideloading-que
 - CVSequencer: Added CV sequencing and both dials and modulation inputs for volume and pitch
 - Filter: tracks at audio rate, allows more extreme resonances and modulations
 - Oscillator: Added linear through-zero FM, reset, PWM and triangle
-- Sampler: Added linear interpolation, linear through-zero FM, modulation for in/out, windowing
-- Optimized rendering performance for Meta Quest
+- Sampler: Added linear interpolation, linear through-zero FM, modulation for loop in/out, windowing
+- Optimized rendering performance for Meta Quest 2 and Pro
 - Switched to ARM64 and recent versions of Unity, Oculus SDK and Vulkan
 - Improved performance of waveform displays by rendering them on the GPU
 - TouchPad: Added latched mode
