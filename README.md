@@ -15,7 +15,7 @@ This repository is work-in-progress. Please always link to this repository if yo
 
 At the moment you have to use [sideloading](https://uploadvr.com/sideloading-quest-how-to/) in order to install the binary. You need to register as a developer with Meta, enable the developer mode on your headset with the mobile companion app and use adb or SideQuest to copy the binary to your headset via USB or WiFi. That way you can also manage samples and download your recordings. Having your headset in developer mode is therefore pretty much a requirement for using OSL.
 
-### Changes in comparison to [SoundStage VR](https://github.com/googlearchive/soundstagevr)
+### Changes in comparison to SoundStage VR
 
 #### New features
 - Mixed-reality passthrough mode
@@ -35,7 +35,7 @@ At the moment you have to use [sideloading](https://uploadvr.com/sideloading-que
 - Glide: Slope limiter
 - S&H: Sample and hold module
 - Tutorials: Player console for video tutorials
-- VCA: Added VCA with ring modulation
+- VCA: Added amplifier with modulation and ring modulation
 - Added performance menu to adjust framerate, resolution, foveated rendering and CPU/GPU levels
 - Added nudging for tempo sync with other clocks
 - Added navigation by dragging and scaling the complete patch
