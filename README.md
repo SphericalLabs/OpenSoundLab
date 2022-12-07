@@ -19,7 +19,7 @@ At the moment you have to use [sideloading](https://uploadvr.com/sideloading-que
 
 #### New features
 - Mixed-reality passthrough mode
-- Master bus recorder in 48 kHz, 24 bit, WAV format
+- Master bus recorder in 48kHz, 24bit, WAV
 - Master bus overload warning
 - AD: Two stage envelope generator with lin/exp control and CV modulation
 - Delay: A highly flexible delay line, buffer can range from 1ms to 12.5s, CV modulation
@@ -46,14 +46,16 @@ At the moment you have to use [sideloading](https://uploadvr.com/sideloading-que
 - Oscillator: Added linear through-zero FM, reset, PWM and triangle
 - Sampler: Added linear interpolation, linear through-zero FM, modulation for in/out, windowing
 - Optimized rendering performance for Meta Quest
-- Switched to ARM64, current versions of Unity, Oculus SDK and Vulkan
+- Switched to ARM64 and recent versions of Unity, Oculus SDK and Vulkan
 - Improved performance waveform displays by rendering them on the GPU
 - TouchPad: Added latched mode
+- Keyboard: Added CV and Gate outputs
 
 #### Removed features
 - Removed default samples
-- Removed Airhorn
-- Removed oscillator from ADSR
+- Disabled Airhorn
+- Disabled Maraca
+- Removed oscillator from ADSR, ControlCube, Keyboard
 
 
 ### Mailing list
