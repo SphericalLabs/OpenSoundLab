@@ -1,6 +1,6 @@
 # OpenSoundLab
 
-[[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)]
+[[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)] [[Binary](https://github.com/ludzeller/OpenSoundLab/releases/download/0.47/OpenSoundLab-0.47.apk)]
 
 OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
 
@@ -10,7 +10,7 @@ The project received generous funding by an educational grant of the University 
 
 This repository is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep other users in sync with our ongoing development. 
 
-### Binaries
+### Installation
 [OpenSoundLab-0.47.apk](https://github.com/ludzeller/OpenSoundLab/releases/download/0.47/OpenSoundLab-0.47.apk) (BETA 2022-10-04)
 
 At the moment you have to use [sideloading](https://uploadvr.com/sideloading-quest-how-to/) in order to install the binary. You need to register as a developer with Meta, enable the developer mode on your headset with the mobile companion app and use adb or SideQuest to copy the binary to your headset via USB or WiFi. That way you can also manage samples and download your recordings. Having your headset in developer mode is therefore pretty much a requirement for using OSL.
