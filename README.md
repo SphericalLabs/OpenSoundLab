@@ -1,6 +1,6 @@
 # OpenSoundLab
 
-[[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)] [[Binary](https://github.com/ludzeller/OpenSoundLab/releases/download/0.47/OpenSoundLab-0.47.apk)] [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.com/channels/1020228980583976980)]
+[[Trailer](https://youtu.be/HYn9THRtBvs)] [[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)] [[Download](https://github.com/ludzeller/OpenSoundLab/releases/download/0.47/OpenSoundLab-0.47.apk)]  [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.com/channels/1020228980583976980)] [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)]
 
 OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
 
