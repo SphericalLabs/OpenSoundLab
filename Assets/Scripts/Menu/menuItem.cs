@@ -97,8 +97,6 @@ public class menuItem : manipObject {
 
     GetComponent<Collider>().enabled = !disabled;
 
-    if (!disabled) symbol.material.SetColor("_TintColor", normalColor);
-    else symbol.material.SetColor("_TintColor", disabledColor);
   }
 
   public override void Awake() {
@@ -107,8 +105,7 @@ public class menuItem : manipObject {
     
     label = GetComponentInChildren<TextMesh>();
     labelMat = label.GetComponent<Renderer>().material;
-    symbol.material.SetColor("_TintColor", normalColor);
-
+    
     labelMat.SetColor("_TintColor", normalColor);
     glowRend.gameObject.SetActive(false);
     glowMat = glowRend.material;
@@ -118,7 +115,7 @@ public class menuItem : manipObject {
     item = d;
     tex = Resources.Load("Textures/" + item.ToString() + "Symbol") as Texture;
     if (tex != null) tex.mipMapBias = -1f; // shift mipmap by one level, improves clarity of menu symbols
-    symbol.material.SetTexture("_MainTex", tex);
+    symbol.material.SetTexture("_BaseMap", tex);
     itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
     label.text = item.ToString();
     // Please use the first letter of the original enum name for proper sorting in the menu!
@@ -361,14 +358,14 @@ public class menuItem : manipObject {
       symbol.gameObject.SetActive(true);
       g.SetActive(false);
     } else if (curState == manipState.selected) {
-      symbol.material.SetColor("_TintColor", normalColor);
+      //symbol.material.SetColor("_TintColor", normalColor);
       labelMat.SetColor("_TintColor", normalColor);
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(true);
       g.SetActive(true);
       manager.SelectAudio();
     } else if (curState == manipState.grabbed) {
-      symbol.material.SetColor("_TintColor", selectColor);
+      //symbol.material.SetColor("_TintColor", selectColor);
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(true);
       g.SetActive(true);
