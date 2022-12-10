@@ -444,15 +444,13 @@ extern "C" {
 
             if (seqGen)
             {
-              if (seqBuffer[i] > lastSeqGen[1] && lastSeqGen[1] <= lastSeqGen[0])
+              if (seqBuffer[i] > 0.f && lastSeqGen[0] <= 0.f)
               {
                 if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1;
                 else floatingBufferCount = bufferCount = sampleBounds[1];
                 active = true;
               }
-
-              lastSeqGen[0] = lastSeqGen[1];
-              lastSeqGen[1] = seqBuffer[i];
+              lastSeqGen[0] = seqBuffer[i];
             }
 
             float windowing = 1.f; 

@@ -45,7 +45,7 @@ public class clipPlayerSimple : clipPlayer
 
 
     [DllImport("SoundStageNative")]
-    public static extern void SetArrayToFixedValue(float[] buffer, int length, float value);
+    public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
 
     float[] freqExpBuffer = new float[0];
     float[] ampBuffer = new float[0];
@@ -54,7 +54,7 @@ public class clipPlayerSimple : clipPlayer
     void Start()
     {
         lastSeqGen = new float[] { 0, 0 };
-    }
+  }
 
     public void Play(float speed = 1)
     {
@@ -81,12 +81,11 @@ public class clipPlayerSimple : clipPlayer
         if (ampBuffer.Length != buffer.Length)
             System.Array.Resize(ref ampBuffer, buffer.Length);
 
-        if (!seqMuted)
-        {
-            if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
-        } else {
-            SetArrayToFixedValue(seqBuffer, buffer.Length, -1f);
-        }
+        SetArrayToSingleValue(seqBuffer, buffer.Length, 0f);
+        SetArrayToSingleValue(freqExpBuffer, buffer.Length, 0f);
+        SetArrayToSingleValue(ampBuffer, buffer.Length, 0f);
+
+        if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
         if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
         if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
 
