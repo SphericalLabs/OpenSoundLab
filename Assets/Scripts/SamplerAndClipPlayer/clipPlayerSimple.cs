@@ -54,7 +54,7 @@ public class clipPlayerSimple : clipPlayer
     void Start()
     {
         lastSeqGen = new float[] { 0, 0 };
-  }
+    }
 
     public void Play(float speed = 1)
     {

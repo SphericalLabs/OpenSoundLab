@@ -807,7 +807,7 @@ PlayerSettings:
   metroSplashScreenUseBackgroundColor: 1
   platformCapabilities:
     WindowsStoreApps:
-      CodeGeneration: False
+      EnterpriseAuthentication: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -841,8 +841,8 @@ PlayerSettings:
       Contacts: False
       InternetClient: False
       Proximity: False
+      CodeGeneration: False
       BackgroundMediaPlayback: False
-      EnterpriseAuthentication: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
