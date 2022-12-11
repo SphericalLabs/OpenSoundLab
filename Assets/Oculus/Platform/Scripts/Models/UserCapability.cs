@@ -10,9 +10,14 @@ namespace Oculus.Platform.Models
 
   public class UserCapability
   {
+    /// Human readable description of the capability describing what possessing it
+    /// entails for a given user
     public readonly string Description;
+    /// Whether the capability is currently enabled for the user
     public readonly bool IsEnabled;
+    /// Unique identifer for the capability
     public readonly string Name;
+    /// If present, specifies the reason the capability was enabled or disabled
     public readonly string ReasonCode;
 
 

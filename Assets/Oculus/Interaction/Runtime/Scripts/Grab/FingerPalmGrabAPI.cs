@@ -20,7 +20,10 @@
 
 using Oculus.Interaction.Input;
 using Oculus.Interaction.PoseDetection;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Oculus.Interaction.GrabAPI
 {
@@ -29,140 +32,140 @@ namespace Oculus.Interaction.GrabAPI
     /// </summary>
     public class FingerPalmGrabAPI : IFingerAPI
     {
-        private Vector3 _poseVolumeCenterOffset = Vector3.zero;
-
-        private static readonly Vector3 POSE_VOLUME_OFFSET_RIGHT = new Vector3(0.07f, -0.03f, 0.0f);
-        private static readonly Vector3 POSE_VOLUME_OFFSET_LEFT = new Vector3(-0.07f, 0.03f, 0.0f);
-
-        private static readonly float START_THRESHOLD = 0.9f;
-        private static readonly float RELEASE_THRESHOLD = 0.6f;
-
-        private static readonly Vector2[] CURL_RANGE = new Vector2[5]
+        // Temporary structure used to pass data to and from native components
+        [StructLayout(LayoutKind.Sequential)]
+        public class HandData
         {
-            new Vector2(190f, 220f),
-            new Vector2(180f, 250f),
-            new Vector2(180f, 250f),
-            new Vector2(180f, 250f),
-            new Vector2(180f, 245f),
-        };
+            private const int NumHandJoints = 24;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = NumHandJoints * 7, ArraySubType = UnmanagedType.R4)]
+            private float[] jointValues;
+            private float _rootRotX;
+            private float _rootRotY;
+            private float _rootRotZ;
+            private float _rootRotW;
+            private float _rootPosX;
+            private float _rootPosY;
+            private float _rootPosZ;
+            private int _handedness;
 
-        private FingerShapes _fingerShapes = new FingerShapes();
-
-        private class FingerGrabData
-        {
-            private readonly HandFinger _fingerID;
-            private readonly Vector2 _curlNormalizationParams;
-            public float GrabStrength;
-            public bool IsGrabbing;
-            public bool IsGrabbingChanged { get; private set; }
-
-            public FingerGrabData(HandFinger fingerId)
+            public HandData()
             {
-                _fingerID = fingerId;
-                Vector2 range = CURL_RANGE[(int)_fingerID];
-                _curlNormalizationParams = new Vector2(range.x, range.y - range.x);
+                jointValues = new float[NumHandJoints * 7];
             }
 
-            public void UpdateGrabStrength(IHand hand, FingerShapes fingerShapes)
+            public void SetData(IReadOnlyList<Pose> joints, Pose root, Handedness handedness)
             {
-                float curlAngle = fingerShapes.GetCurlValue(_fingerID, hand);
-
-                if (_fingerID != HandFinger.Thumb)
+                Assert.AreEqual(NumHandJoints, joints.Count);
+                int jointValueIndex = 0;
+                for (int jointIndex = 0; jointIndex < NumHandJoints; jointIndex++)
                 {
-                    curlAngle = (curlAngle * 2 + fingerShapes.GetFlexionValue(_fingerID, hand)) / 3f;
+                    Pose joint = joints[jointIndex];
+                    jointValues[jointValueIndex++] = joint.rotation.x;
+                    jointValues[jointValueIndex++] = joint.rotation.y;
+                    jointValues[jointValueIndex++] = joint.rotation.z;
+                    jointValues[jointValueIndex++] = joint.rotation.w;
+                    jointValues[jointValueIndex++] = joint.position.x;
+                    jointValues[jointValueIndex++] = joint.position.y;
+                    jointValues[jointValueIndex++] = joint.position.z;
                 }
-
-                GrabStrength = Mathf.Clamp01((curlAngle - _curlNormalizationParams.x) / _curlNormalizationParams.y);
-            }
-
-            public void UpdateIsGrabbing(float startThreshold, float releaseThreshold)
-            {
-                if (GrabStrength > startThreshold)
-                {
-                    if (!IsGrabbing)
-                    {
-                        IsGrabbing = true;
-                        IsGrabbingChanged = true;
-                    }
-                    return;
-                }
-
-                if (GrabStrength < releaseThreshold)
-                {
-                    if (IsGrabbing)
-                    {
-                        IsGrabbing = false;
-                        IsGrabbingChanged = true;
-                    }
-                }
-            }
-
-            public void ClearState()
-            {
-                IsGrabbingChanged = false;
+                this._rootRotX = root.rotation.x;
+                this._rootRotY = root.rotation.y;
+                this._rootRotZ = root.rotation.z;
+                this._rootRotW = root.rotation.w;
+                this._rootPosX = root.position.x;
+                this._rootPosY = root.position.y;
+                this._rootPosZ = root.position.z;
+                this._handedness = (int)handedness;
             }
         }
 
-        private readonly FingerGrabData[] _fingersGrabData = {
-            new FingerGrabData(HandFinger.Thumb),
-            new FingerGrabData(HandFinger.Index),
-            new FingerGrabData(HandFinger.Middle),
-            new FingerGrabData(HandFinger.Ring),
-            new FingerGrabData(HandFinger.Pinky)
-        };
+        #region DLLImports
+        enum ReturnValue { Success = 0, Failure = -1 };
+
+
+        [DllImport("InteractionSdk")]
+        private static extern int isdk_FingerPalmGrabAPI_Create();
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPalmGrabAPI_UpdateHandData(int handle, [In] HandData data);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPalmGrabAPI_GetFingerIsGrabbing(int handle, HandFinger finger, out bool grabbing);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPalmGrabAPI_GetFingerIsGrabbingChanged(int handle, HandFinger finger, bool targetGrabState, out bool changed);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPalmGrabAPI_GetFingerGrabScore(int handle, HandFinger finger, out float score);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPalmGrabAPI_GetCenterOffset(int handle, out Vector3 score);
+
+        #endregion
+
+        private int apiHandle_ = -1;
+        private HandData handData_;
+
+        public FingerPalmGrabAPI()
+        {
+            handData_ = new HandData();
+        }
+
+        private int GetHandle()
+        {
+
+            if (apiHandle_ == -1)
+            {
+                apiHandle_ = isdk_FingerPalmGrabAPI_Create();
+                Debug.Assert(apiHandle_ != -1, "FingerPalmGrabAPI: isdk_FingerPalmGrabAPI_Create failed");
+            }
+
+            return apiHandle_;
+        }
 
         public bool GetFingerIsGrabbing(HandFinger finger)
         {
-            return _fingersGrabData[(int)finger].IsGrabbing;
+            ReturnValue rv = isdk_FingerPalmGrabAPI_GetFingerIsGrabbing(GetHandle(), finger, out bool grabbing);
+            Debug.Assert(rv != ReturnValue.Failure, "FingerPalmGrabAPI: isdk_FingerPalmGrabAPI_GetFingerIsGrabbing failed");
+            return grabbing;
         }
 
         public bool GetFingerIsGrabbingChanged(HandFinger finger, bool targetGrabState)
         {
-            return _fingersGrabData[(int)finger].IsGrabbingChanged &&
-                   _fingersGrabData[(int)finger].IsGrabbing == targetGrabState;
+            ReturnValue rv = isdk_FingerPalmGrabAPI_GetFingerIsGrabbingChanged(GetHandle(), finger, targetGrabState, out bool grabbing);
+            Debug.Assert(rv != ReturnValue.Failure, "FingerPalmGrabAPI: isdk_FingerPalmGrabAPI_GetFingerIsGrabbingChanged failed");
+            return grabbing;
         }
 
         public float GetFingerGrabScore(HandFinger finger)
         {
-            return _fingersGrabData[(int)finger].GrabStrength;
+            ReturnValue rv = isdk_FingerPalmGrabAPI_GetFingerGrabScore(GetHandle(), finger, out float score);
+            Debug.Assert(rv != ReturnValue.Failure, "FingerPalmGrabAPI: isdk_FingerPalmGrabAPI_GetFingerGrabScore failed");
+            return score;
         }
 
         public void Update(IHand hand)
         {
-            ClearState();
-
-            if (hand == null || !hand.IsTrackedDataValid)
+            if (!hand.GetRootPose(out Pose rootPose))
             {
                 return;
             }
 
-            UpdateVolumeCenter(hand);
-
-            for (int i = 0; i < Constants.NUM_FINGERS; ++i)
+            if (!hand.GetJointPosesFromWrist(out ReadOnlyHandJointPoses poses))
             {
-                _fingersGrabData[i].UpdateGrabStrength(hand, _fingerShapes);
-                _fingersGrabData[i].UpdateIsGrabbing(START_THRESHOLD, RELEASE_THRESHOLD);
+                return;
             }
-        }
 
-        private void UpdateVolumeCenter(IHand hand)
-        {
-            _poseVolumeCenterOffset = hand.Handedness == Handedness.Left
-                ? POSE_VOLUME_OFFSET_LEFT
-                : POSE_VOLUME_OFFSET_RIGHT;
-        }
-
-        private void ClearState()
-        {
-            for (int i = 0; i < Constants.NUM_FINGERS; ++i)
-            {
-                _fingersGrabData[i].ClearState();
-            }
+            handData_.SetData(poses, rootPose, hand.Handedness);
+            ReturnValue rv = isdk_FingerPalmGrabAPI_UpdateHandData(GetHandle(), handData_);
+            Debug.Assert(rv != ReturnValue.Failure, "FingerPalmGrabAPI: isdk_FingerPalmGrabAPI_UpdateHandData failed");
         }
 
         public Vector3 GetCenterOffset()
         {
-            return _poseVolumeCenterOffset;
+            ReturnValue rv = isdk_FingerPalmGrabAPI_GetCenterOffset(GetHandle(), out Vector3 center);
+            Debug.Assert(rv != ReturnValue.Failure, "FingerPalmGrabAPI: isdk_FingerPalmGrabAPI_GetCenterOffset failed");
+            return center;
         }
     }
 }

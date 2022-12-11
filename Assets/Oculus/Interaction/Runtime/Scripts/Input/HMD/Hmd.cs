@@ -28,7 +28,7 @@ namespace Oculus.Interaction.Input
         public ITrackingToWorldTransformer TrackingToWorldTransformer =>
           GetData().Config.TrackingToWorldTransformer;
 
-        public event Action HmdUpdated = delegate { };
+        public event Action WhenUpdated = delegate { };
 
         protected override void Apply(HmdDataAsset data)
         {
@@ -41,7 +41,7 @@ namespace Oculus.Interaction.Input
 
             if (Started)
             {
-                HmdUpdated();
+                WhenUpdated();
             }
         }
 

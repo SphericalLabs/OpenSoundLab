@@ -18,13 +18,13 @@
  * limitations under the License.
  */
 
-using Oculus.Voice.Core.Bindings.Android;
 using UnityEngine;
 
-namespace Oculus.Voice.Bindings.Android
+namespace Oculus.Voice.Core.Bindings.Android.PlatformLogger
 {
     public class VoiceSDKLoggerBinding : BaseServiceBinding
     {
+        [UnityEngine.Scripting.Preserve]
         public VoiceSDKLoggerBinding(AndroidJavaObject loggerInstance) : base(loggerInstance) {}
 
         public void Connect()

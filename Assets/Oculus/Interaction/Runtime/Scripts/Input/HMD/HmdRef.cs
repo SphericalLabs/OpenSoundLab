@@ -33,10 +33,10 @@ namespace Oculus.Interaction.Input
         private MonoBehaviour _hmd;
         private IHmd Hmd;
 
-        public event Action HmdUpdated
+        public event Action WhenUpdated
         {
-            add => Hmd.HmdUpdated += value;
-            remove => Hmd.HmdUpdated -= value;
+            add => Hmd.WhenUpdated += value;
+            remove => Hmd.WhenUpdated -= value;
         }
 
         protected virtual void Awake()

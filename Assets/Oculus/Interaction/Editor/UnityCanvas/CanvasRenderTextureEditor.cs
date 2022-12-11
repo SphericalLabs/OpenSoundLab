@@ -33,8 +33,6 @@ namespace Oculus.Interaction.UnityCanvas.Editor
     [CustomEditor(typeof(CanvasRenderTexture))]
     public class CanvasRenderTextureEditor : EditorBase
     {
-        private const string DEFAULT_UI_NAME = "UI/Default";
-
         private static List<CanvasRenderer> _tmpRenderers = new List<CanvasRenderer>();
         private static List<Graphic> _tmpGraphics = new List<Graphic>();
 
@@ -46,13 +44,9 @@ namespace Oculus.Interaction.UnityCanvas.Editor
             }
         }
 
-        private Func<bool> _isOverlayMode = () => false;
-
         protected override void OnEnable()
         {
-            var renderingMode = serializedObject.FindProperty(props.RenderingMode);
-            _isOverlayMode = () => renderingMode.intValue == (int)RenderingMode.OVR_Overlay ||
-                                   renderingMode.intValue == (int)RenderingMode.OVR_Underlay;
+            var canvasProp = serializedObject.FindProperty(props.Canvas);
 
             Draw(props.Resolution, props.DimensionDriveMode, (resProp, modeProp) =>
             {
@@ -71,7 +65,7 @@ namespace Oculus.Interaction.UnityCanvas.Editor
 
                 GUI.Label(labelRect, resProp.displayName);
 
-                if (modeProp.intValue == (int)CanvasRenderTexture.DriveMode.Auto)
+                if (modeProp.intValue == (int)CanvasRenderTexture.DriveMode.Auto && canvasProp.objectReferenceValue != null)
                 {
                     using (new EditorGUI.DisabledScope(true))
                     {
@@ -86,49 +80,14 @@ namespace Oculus.Interaction.UnityCanvas.Editor
                 EditorGUI.PropertyField(dropdownRect, modeProp, GUIContent.none);
             });
 
-            Draw(props.PixelsPerUnit, p =>
+            Draw(props.PixelsPerUnit, props.GenerateMipMaps, (pixelsPerUnit, mipmaps) =>
             {
                 var driveMode = serializedObject.FindProperty(props.DimensionDriveMode);
                 if (driveMode.intValue == (int)CanvasRenderTexture.DriveMode.Auto)
                 {
-                    EditorGUILayout.PropertyField(p);
+                    EditorGUILayout.PropertyField(pixelsPerUnit);
                 }
-            });
-
-            Draw(props.GenerateMips, p =>
-            {
-                if (!_isOverlayMode())
-                {
-                    EditorGUILayout.PropertyField(p);
-                }
-            });
-
-            Draw(props.UseAlphaToMask, props.AlphaCutoutThreshold, (maskProp, cutoutProp) =>
-             {
-                 if (renderingMode.intValue == (int)RenderingMode.AlphaCutout)
-                 {
-                     EditorGUILayout.PropertyField(maskProp);
-
-                     if (maskProp.boolValue == false)
-                     {
-                         EditorGUILayout.PropertyField(cutoutProp);
-                     }
-                 }
-             });
-
-            Draw(props.UseExpensiveSuperSample, props.EmulateWhileInEditor, props.DoUnderlayAA, (sampleProp, emulateProp, aaProp) =>
-            {
-                if (_isOverlayMode())
-                {
-                    EditorGUILayout.PropertyField(sampleProp);
-
-                    if (renderingMode.intValue == (int)RenderingMode.OVR_Underlay)
-                    {
-                        EditorGUILayout.PropertyField(aaProp);
-                    }
-
-                    EditorGUILayout.PropertyField(emulateProp);
-                }
+                EditorGUILayout.PropertyField(mipmaps);
             });
         }
 
@@ -139,7 +98,6 @@ namespace Oculus.Interaction.UnityCanvas.Editor
             bool isEmpty;
 
             AutoFix(AutoFixIsUsingScreenSpaceCanvas(), AutoFixSetToWorldSpaceCamera, "The OverlayRenderer only supports Canvases that are set to World Space.");
-            AutoFix(AutoFixIsUsingDefaultUIShader(), AutoFixAssignOverlayShaderToGraphics, "Some Canvas Graphics are using the default UI shader, which has rendering issues when combined with Overlay rendering.");
 
             AutoFix(isEmpty = AutoFixIsMaskEmpty(), AutoFixAssignUIToMask, "The rendering Mask is empty, it needs to contain at least one layer for rendering to function.");
 
@@ -190,89 +148,6 @@ namespace Oculus.Interaction.UnityCanvas.Editor
             }
         }
 
-        private bool AutoFixIsUsingDefaultUIShader()
-        {
-            if (UnityInfo.Version_2020_3_Or_Newer())
-            {
-                return false;
-            }
-
-            if (target.DefaultUIMaterial == null)
-            {
-                return false;
-            }
-
-            target.GetComponentsInChildren(_tmpGraphics);
-            foreach (var graphic in _tmpGraphics)
-            {
-                if (AutoFixIsExceptionCaseForDefaultUIShader(graphic))
-                {
-                    continue;
-                }
-
-                Material mat = graphic.material;
-                if (mat == null)
-                {
-                    return true;
-                }
-
-                Shader shader = mat.shader;
-                if (shader == null)
-                {
-                    continue;
-                }
-
-                if (shader.name == DEFAULT_UI_NAME)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void AutoFixAssignOverlayShaderToGraphics()
-        {
-            target.GetComponentsInChildren(_tmpGraphics);
-            foreach (var graphic in _tmpGraphics)
-            {
-                if (AutoFixIsExceptionCaseForDefaultUIShader(graphic))
-                {
-                    continue;
-                }
-
-                Material mat = graphic.material;
-                if (mat == null)
-                {
-                    Undo.RecordObject(graphic, "Set Graphic Material");
-                    graphic.material = target.DefaultUIMaterial;
-                    EditorUtility.SetDirty(graphic);
-                    continue;
-                }
-
-                Shader shader = mat.shader;
-                if (shader == null)
-                {
-                    continue;
-                }
-
-                if (shader.name == DEFAULT_UI_NAME)
-                {
-                    Undo.RecordObject(graphic, "Set Graphic Material");
-                    graphic.material = target.DefaultUIMaterial;
-                    EditorUtility.SetDirty(graphic);
-                    continue;
-                }
-            }
-        }
-
-        private bool AutoFixIsExceptionCaseForDefaultUIShader(Graphic graphic)
-        {
-            //Hardcoded edge-cases
-            return graphic.GetType().Namespace == "TMPro" ||
-                   graphic.GetType().Name == "OCText";
-        }
-
         private bool AutoFixIsMaskEmpty()
         {
             var layerProp = serializedObject.FindProperty(props.RenderLayers);
@@ -289,7 +164,15 @@ namespace Oculus.Interaction.UnityCanvas.Editor
 
         private bool AutoFixAnyRenderersOnUnrenderedLayers()
         {
-            target.GetComponentsInChildren(_tmpRenderers);
+            var canvasProp = serializedObject.FindProperty(props.Canvas);
+            Canvas canvas = canvasProp.objectReferenceValue as Canvas;
+
+            if (canvas == null)
+            {
+                return false;
+            }
+
+            canvas.gameObject.GetComponentsInChildren(_tmpRenderers);
             foreach (var renderer in _tmpRenderers)
             {
                 int layer = renderer.gameObject.layer;
@@ -304,10 +187,18 @@ namespace Oculus.Interaction.UnityCanvas.Editor
 
         private void AutoFixMoveRenderersToMaskedLayers()
         {
+            var canvasProp = serializedObject.FindProperty(props.Canvas);
+            Canvas canvas = canvasProp.objectReferenceValue as Canvas;
+
+            if (canvas == null)
+            {
+                return;
+            }
+
             var maskedLayers = AutoFixGetMaskedLayers();
             var targetLayer = maskedLayers.FirstOrDefault();
 
-            target.GetComponentsInChildren(_tmpRenderers);
+            canvas.gameObject.GetComponentsInChildren(_tmpRenderers);
             foreach (var renderer in _tmpRenderers)
             {
                 int layer = renderer.gameObject.layer;
@@ -361,6 +252,6 @@ namespace Oculus.Interaction.UnityCanvas.Editor
             }
             return maskedLayers;
         }
-#endregion
+        #endregion
     }
 }

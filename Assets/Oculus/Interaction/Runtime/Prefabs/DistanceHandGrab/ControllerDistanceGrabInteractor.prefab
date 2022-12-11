@@ -154,7 +154,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _activeState: {fileID: 5979516266493034131}
   _interactableFilters: []
-  MaxIterationsPerFrame: 3
   _selector: {fileID: 5021159392599816142}
   _selectionFrustum: {fileID: 2492800384500457778}
   _grabCenter: {fileID: 1736233816523549768}
@@ -223,4 +222,4 @@ MonoBehaviour:
   _minLength: 0
   _maxLength: 5
   _radiusStart: 0.03
-  _apertureDegrees: 3
+  _apertureDegrees: 10

@@ -30,8 +30,11 @@ namespace Oculus.Interaction.Input
         bool IsPoseValid { get; }
         bool TryGetPose(out Pose pose);
         bool TryGetPointerPose(out Pose pose);
+        float Scale { get; }
         bool IsButtonUsageAnyActive(ControllerButtonUsage buttonUsage);
         bool IsButtonUsageAllActive(ControllerButtonUsage buttonUsage);
-        event Action ControllerUpdated;
+        event Action WhenUpdated;
+
+        bool TryGetAspect<TAspect>(out TAspect aspect) where TAspect : class;
     }
 }

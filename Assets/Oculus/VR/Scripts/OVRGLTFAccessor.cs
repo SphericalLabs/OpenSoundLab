@@ -136,6 +136,32 @@ public class OVRGLTFAccessor
 		}
 	}
 
+	public void ReadAsFloat(OVRBinaryChunk chunk, ref float[] data, int offset)
+	{
+		if (dataType != OVRGLTFType.SCALAR)
+		{
+			Debug.LogError("Tried to read non-scalar data as a uint array.");
+			return;
+		}
+
+		if (chunk.chunkLength != bufferLength)
+		{
+			Debug.LogError("Chunk length is not equal to buffer length.");
+			return;
+		}
+
+		byte[] bufferData = new byte[byteLength];
+
+		chunk.chunkStream.Seek(chunk.chunkStart + byteOffset + additionalOffset, SeekOrigin.Begin);
+		chunk.chunkStream.Read(bufferData, 0, byteLength);
+
+		int stride = byteStride > 0 ? byteStride : GetStrideForType(componentType);
+		for (int i = 0; i < dataCount; i++)
+		{
+			data[offset + i] = ReadElementAsFloat(bufferData, i * stride);
+		}
+	}
+
 	public void ReadAsVector2(OVRBinaryChunk chunk, ref Vector2[] data, int offset)
 	{
 		if (dataType != OVRGLTFType.VEC2)

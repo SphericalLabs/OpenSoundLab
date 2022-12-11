@@ -87,7 +87,7 @@ namespace Oculus.Interaction.PoseDetection.Debug
 
             foreach (var activeState in _transformRecognizerActiveStates)
             {
-                bool foundAspect = activeState.Hand.GetHandAspect(out TransformFeatureStateProvider stateProvider);
+                bool foundAspect = activeState.Hand.TryGetAspect(out TransformFeatureStateProvider stateProvider);
                 Assert.IsTrue(foundAspect);
 
                 var featureConfigs = activeState.FeatureConfigs;

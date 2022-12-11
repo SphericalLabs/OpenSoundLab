@@ -19,7 +19,6 @@ using Facebook.WitAi.Data;
 using Facebook.WitAi.Data.Configuration;
 using Facebook.WitAi.Lib;
 using UnityEngine;
-using SystemInfo = UnityEngine.SystemInfo;
 using Facebook.WitAi.Utilities;
 
 #if UNITY_EDITOR
@@ -77,11 +76,12 @@ namespace Facebook.WitAi
         public const string URI_AUTHORITY = "api.wit.ai";
         public const int URI_DEFAULT_PORT = 0;
 
-        public const string WIT_API_VERSION = "20220608";
-        public const string WIT_SDK_VERSION = "0.0.44";
+        public const string WIT_API_VERSION = "20220728";
+        public const string WIT_SDK_VERSION = "0.0.46";
 
         public const string WIT_ENDPOINT_SPEECH = "speech";
         public const string WIT_ENDPOINT_MESSAGE = "message";
+        public const string WIT_ENDPOINT_DICTATION = "dictation";
         public const string WIT_ENDPOINT_ENTITIES = "entities";
         public const string WIT_ENDPOINT_INTENTS = "intents";
         public const string WIT_ENDPOINT_TRAITS = "traits";
@@ -95,9 +95,8 @@ namespace Facebook.WitAi
 
         public QueryParam[] queryParams;
 
-        //private HttpWebRequest request;
-        private IRequest _request;
-        private HttpWebResponse response;
+        private HttpWebRequest _request;
+        private Stream _writeStream;
 
         private WitResponseNode responseData;
 
@@ -206,8 +205,6 @@ namespace Facebook.WitAi
         public string StatusDescription => statusDescription;
 
         public int Timeout => configuration ? configuration.timeoutMS : 10000;
-
-        public IRequest RequestProvider { get; internal set; }
 
         private bool configurationRequired;
         private string serverToken;
@@ -333,10 +330,13 @@ namespace Facebook.WitAi
                 onPreSendRequest(ref uri, out customHeaders);
             }
 
-            WrapHttpWebRequest wr = new WrapHttpWebRequest((HttpWebRequest)WebRequest.Create(uri.AbsoluteUri));
+            // Create http web request
+            _request = WebRequest.Create(uri.AbsoluteUri) as HttpWebRequest;
+            if (Application.isBatchMode)
+            {
+                _request.KeepAlive = false;
+            }
 
-            //request = (IRequest)(HttpWebRequest) WebRequest.Create(uri);
-            _request = wr;
             if (isServerAuthRequired)
             {
                 _request.Headers["Authorization"] =
@@ -356,7 +356,8 @@ namespace Facebook.WitAi
             }
 
             // Configure additional headers
-            if (WitEndpointConfig.GetEndpointConfig(configuration).Speech == command)
+            if (WitEndpointConfig.GetEndpointConfig(configuration).Speech == command ||
+                WitEndpointConfig.GetEndpointConfig(configuration).Dictation == command)
             {
                 _request.ContentType = audioEncoding.ToString();
                 _request.Method = "POST";
@@ -383,7 +384,7 @@ namespace Facebook.WitAi
 
             _request.UserAgent = GetUserAgent(configuration);
 
-            requestStartTime = DateTimeUtility.UtcNow;
+            requestStartTime = DateTime.UtcNow;
             isActive = true;
             statusCode = 0;
             statusDescription = "Starting request";
@@ -428,8 +429,8 @@ namespace Facebook.WitAi
         public static string GetUserAgent(WitConfiguration configuration)
         {
             // Setup if needed
-            if (_operatingSystem == null) _operatingSystem = SystemInfo.operatingSystem;
-            if (_deviceModel == null) _deviceModel = SystemInfo.deviceModel;
+            if (_operatingSystem == null) _operatingSystem = UnityEngine.SystemInfo.operatingSystem;
+            if (_deviceModel == null) _deviceModel = UnityEngine.SystemInfo.deviceModel;
             if (_appIdentifier == null) _appIdentifier = Application.identifier;
             if (_unityVersion == null) _unityVersion = Application.unityVersion;
 
@@ -470,32 +471,30 @@ namespace Facebook.WitAi
             }
 
             // Return full string
-            return $"voice-sdk-43.0.0.172.173,wit-unity-{WIT_SDK_VERSION},{_operatingSystem},{_deviceModel},{configId},{_appIdentifier},{userEditor},{_unityVersion}{customUserAgents}";
+            return $"voice-sdk-46.0.0.244.0,wit-unity-{WIT_SDK_VERSION},{_operatingSystem},{_deviceModel},{configId},{_appIdentifier},{userEditor},{_unityVersion}{customUserAgents}";
         }
 
         private bool RequestRequiresBody(string command)
         {
-            return command == WitEndpointConfig.GetEndpointConfig(configuration).Speech;
+            return command == WitEndpointConfig.GetEndpointConfig(configuration).Speech ||
+                   command == WitEndpointConfig.GetEndpointConfig(configuration).Dictation;
         }
 
         private void StartResponse()
         {
-            var result = _request.BeginGetResponse(HandleResponse, _request);
-            ThreadPool.RegisterWaitForSingleObject(result.AsyncWaitHandle, HandleTimeoutTimer,
-                _request, Timeout, true);
+            var asyncResult = _request.BeginGetResponse(HandleResponse, _request);
+            ThreadPool.RegisterWaitForSingleObject(asyncResult.AsyncWaitHandle, HandleTimeoutTimer, _request, Timeout, true);
         }
 
-        private void HandleTimeoutTimer(object state, bool timedout)
+        private void HandleTimeoutTimer(object state, bool timeout)
         {
-            if (!timedout) return;
+            if (!timeout) return;
 
             // Clean up the current request if it is still going
-            //var request = (HttpWebRequest) state;
-            var request = (IRequest)state;
             if (null != _request)
             {
-                Debug.Log("Request timed out after " + (DateTimeUtility.UtcNow - requestStartTime));
-                request.Abort();
+                Debug.Log("Request timed out after " + (DateTime.UtcNow - requestStartTime));
+                _request.Abort();
             }
 
             isActive = false;
@@ -510,74 +509,76 @@ namespace Facebook.WitAi
             SafeInvoke(onResponse);
         }
 
-        private void HandleResponse(IAsyncResult ar)
+        private void HandleResponse(IAsyncResult asyncResult)
         {
             bool sentResponse = false;
             string stringResponse = "";
             responseStarted = true;
             try
             {
-                response = (HttpWebResponse) _request.EndGetResponse(ar);
-
-                statusCode = (int) response.StatusCode;
-                statusDescription = response.StatusDescription;
+                WebResponse response = _request.EndGetResponse(asyncResult);
 
                 try
                 {
-                    var responseStream = response.GetResponseStream();
-                    if (response.Headers["Transfer-Encoding"] == "chunked")
+                    HttpWebResponse httpResponse = response as HttpWebResponse;
+                    statusCode = (int) httpResponse.StatusCode;
+                    statusDescription = httpResponse.StatusDescription;
+                    using (var responseStream = httpResponse.GetResponseStream())
                     {
-                        byte[] buffer = new byte[10240];
-                        int bytes = 0;
-                        int offset = 0;
-                        int totalRead = 0;
-                        while ((bytes = responseStream.Read(buffer, offset, buffer.Length - offset)) > 0)
+                        if (response.Headers["Transfer-Encoding"] == "chunked")
                         {
-                            totalRead += bytes;
-                            stringResponse = Encoding.UTF8.GetString(buffer, 0, totalRead);
-                            if (stringResponse.EndsWith("\r\n"))
+                            byte[] buffer = new byte[10240];
+                            int bytes = 0;
+                            int offset = 0;
+                            int totalRead = 0;
+                            while ((bytes = responseStream.Read(buffer, offset, buffer.Length - offset)) > 0)
                             {
-                                try
+                                totalRead += bytes;
+                                stringResponse = Encoding.UTF8.GetString(buffer, 0, totalRead);
+                                if (stringResponse.EndsWith("\r\n"))
                                 {
-                                    offset = 0;
-                                    totalRead = 0;
-                                    sentResponse |= ProcessStringResponse(stringResponse);
+                                    try
+                                    {
+                                        offset = 0;
+                                        totalRead = 0;
+                                        sentResponse |= ProcessStringResponse(stringResponse);
+                                    }
+                                    catch (JSONParseException e)
+                                    {
+                                        offset = bytes;
+                                        Debug.LogWarning(
+                                            "Received what appears to be a partial response or invalid json. Attempting to continue reading. Parsing error: " +
+                                            e.Message + "\n" + stringResponse);
+                                    }
                                 }
-                                catch (JSONParseException e)
+                                else
                                 {
-                                    offset = bytes;
-                                    Debug.LogWarning("Received what appears to be a partial response or invalid json. Attempting to continue reading. Parsing error: " + e.Message + "\n" + stringResponse);
+                                    offset = totalRead;
                                 }
                             }
-                            else
+
+                            // If the final transmission didn't end with \r\n process it as the final
+                            // result
+                            if (!stringResponse.EndsWith("\r\n") && !string.IsNullOrEmpty(stringResponse))
                             {
-                                offset = totalRead;
+                                sentResponse |= ProcessStringResponse(stringResponse);
+                            }
+
+                            if (stringResponse.Length > 0 && null != responseData)
+                            {
+                                MainThreadCallback(() => onRawResponse?.Invoke(stringResponse));
                             }
                         }
-
-                        // If the final transmission didn't end with \r\n process it as the final
-                        // result
-                        if (!stringResponse.EndsWith("\r\n") && !string.IsNullOrEmpty(stringResponse))
+                        else
                         {
-                            sentResponse |= ProcessStringResponse(stringResponse);
-                        }
-
-                        if (stringResponse.Length > 0 && null != responseData)
-                        {
-                            MainThreadCallback(() => onRawResponse?.Invoke(stringResponse));
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                stringResponse = reader.ReadToEnd();
+                                MainThreadCallback(() => onRawResponse?.Invoke(stringResponse));
+                                responseData = WitResponseJson.Parse(stringResponse);
+                            }
                         }
                     }
-                    else
-                    {
-                        using (StreamReader reader = new StreamReader(responseStream))
-                        {
-                            stringResponse = reader.ReadToEnd();
-                            MainThreadCallback(() => onRawResponse?.Invoke(stringResponse));
-                            responseData = WitResponseJson.Parse(stringResponse);
-                        }
-                    }
-
-                    responseStream.Close();
                 }
                 catch (JSONParseException e)
                 {
@@ -586,6 +587,17 @@ namespace Facebook.WitAi
                     statusCode = ERROR_CODE_INVALID_DATA_FROM_SERVER;
                     statusDescription = "Server returned invalid data.";
                 }
+                catch (WebException e)
+                {
+                    // Ensure was not cancelled
+                    if (e.Status != WebExceptionStatus.RequestCanceled)
+                    {
+                        Debug.LogError(
+                            $"{e.Message}\nRequest Stack Trace:\n{callingStackTrace}\nResponse Stack Trace:\n{e.StackTrace}");
+                        statusCode = (int) e.Status;
+                        statusDescription = e.Message;
+                    }
+                }
                 catch (Exception e)
                 {
                     Debug.LogError(
@@ -593,8 +605,10 @@ namespace Facebook.WitAi
                     statusCode = ERROR_CODE_GENERAL;
                     statusDescription = e.Message;
                 }
-
-                response.Close();
+                finally
+                {
+                    response.Close();
+                }
             }
             catch (WebException e)
             {
@@ -602,17 +616,18 @@ namespace Facebook.WitAi
                 if (e.Response is HttpWebResponse errorResponse)
                 {
                     statusCode = (int) errorResponse.StatusCode;
-
                     try
                     {
-                        var stream = errorResponse.GetResponseStream();
-                        if (null != stream)
+                        using (var errorStream = errorResponse.GetResponseStream())
                         {
-                            using (StreamReader reader = new StreamReader(stream))
+                            if (errorStream != null)
                             {
-                                stringResponse = reader.ReadToEnd();
-                                MainThreadCallback(() => onRawResponse?.Invoke(stringResponse));
-                                responseData = WitResponseJson.Parse(stringResponse);
+                                using (StreamReader errorReader = new StreamReader(errorStream))
+                                {
+                                    stringResponse = errorReader.ReadToEnd();
+                                    MainThreadCallback(() => onRawResponse?.Invoke(stringResponse));
+                                    responseData = WitResponseJson.Parse(stringResponse);
+                                }
                             }
                         }
                     }
@@ -683,7 +698,12 @@ namespace Facebook.WitAi
             responseData = WitResponseJson.Parse(stringResponse);
 
             // Handle responses
-            bool isFinal = responseData.HandleResponse((transcription, final) =>
+            bool hasResponse = responseData.HasResponse();
+            bool final = hasResponse && responseData.GetIsFinal();
+
+            // Return transcription
+            string transcription = responseData.GetTranscription();
+            if (!string.IsNullOrEmpty(transcription) && (!hasResponse || final))
             {
                 // Call partial transcription
                 if (!final)
@@ -695,19 +715,25 @@ namespace Facebook.WitAi
                 {
                     MainThreadCallback(() => onFullTranscription?.Invoke(transcription));
                 }
-            }, (response, final) =>
+            }
+
+            // No response
+            if (!hasResponse)
             {
-                // Call partial response
-                SafeInvoke(onPartialResponse);
-                // Call final response
-                if (final)
-                {
-                    SafeInvoke(onResponse);
-                }
-            });
+                return false;
+            }
+
+            // Call partial response
+            SafeInvoke(onPartialResponse);
+
+            // Call final response
+            if (final)
+            {
+                SafeInvoke(onResponse);
+            }
 
             // Return final
-            return isFinal;
+            return final;
         }
         private void HandleRequestStream(IAsyncResult ar)
         {
@@ -736,7 +762,7 @@ namespace Facebook.WitAi
                     }
                 }
 
-                writeStream = stream;
+                _writeStream = stream;
             }
             catch (WebException e)
             {
@@ -777,7 +803,11 @@ namespace Facebook.WitAi
         public void AbortRequest()
         {
             CloseActiveStream();
-            _request.Abort();
+            if (null != _request)
+            {
+                _request.Abort();
+                _request = null;
+            }
             if (statusCode == 0)
             {
                 statusCode = ERROR_CODE_ABORTED;
@@ -808,10 +838,17 @@ namespace Facebook.WitAi
             lock (streamLock)
             {
                 isRequestStreamActive = false;
-                if (null != writeStream)
+                if (null != _writeStream)
                 {
-                    writeStream.Close();
-                    writeStream = null;
+                    try
+                    {
+                        _writeStream.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"Write Stream - Close Failed\n{e}");
+                    }
+                    _writeStream = null;
                 }
             }
         }
@@ -829,7 +866,7 @@ namespace Facebook.WitAi
         {
             try
             {
-                writeStream.Write(data, offset, length);
+                _writeStream.Write(data, offset, length);
                 bytesWritten += length;
             }
             catch (ObjectDisposedException)
@@ -862,7 +899,6 @@ namespace Facebook.WitAi
         private CoroutineUtility.CoroutinePerformer _performer = null;
         // All actions
         private ConcurrentQueue<Action> _mainThreadCallbacks = new ConcurrentQueue<Action>();
-        private Stream writeStream;
 
         // Called from background thread
         private void MainThreadCallback(Action action)

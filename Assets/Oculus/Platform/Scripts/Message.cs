@@ -74,6 +74,7 @@ namespace Oculus.Platform
     { //TODO - rename this to type; it's already in Message class
       Unknown,
 
+      AbuseReport_ReportRequestHandled                    = 0x4B8EFC86,
       Achievements_AddCount                               = 0x03E76231,
       Achievements_AddFields                              = 0x14AA2129,
       Achievements_GetAllDefinitions                      = 0x03D3458D,
@@ -138,6 +139,7 @@ namespace Oculus.Platform
       GroupPresence_LaunchRosterPanel                     = 0x35728882,
       GroupPresence_SendInvites                           = 0x0DCBD364,
       GroupPresence_Set                                   = 0x675F5C24,
+      GroupPresence_SetDeeplinkMessageOverride            = 0x521ADF0D,
       GroupPresence_SetDestination                        = 0x4C5B268A,
       GroupPresence_SetIsJoinable                         = 0x2A8F1055,
       GroupPresence_SetLobbySession                       = 0x48FF55BE,
@@ -234,6 +236,10 @@ namespace Oculus.Platform
       Voip_GetMicrophoneAvailability                      = 0x744CE345,
       Voip_SetSystemVoipSuppressed                        = 0x453FC9AA,
 
+      /// The user has tapped the report button in the panel that appears after
+      /// pressing the Oculus button.
+      Notification_AbuseReport_ReportButtonPressed = 0x24472F6C,
+
       /// Sent when a launch intent is received (for both cold and warm starts). The
       /// payload is the type of the intent. ApplicationLifecycle.GetLaunchDetails()
       /// should be called to get the other details.
@@ -242,9 +248,13 @@ namespace Oculus.Platform
       /// Sent to indicate download progress for asset files.
       Notification_AssetFile_DownloadUpdate = 0x2FDD0CCD,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Result of a leader picking an application for CAL launch.
       Notification_Cal_FinalizeApplication = 0x750C5099,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Application that the group leader has proposed for a CAL launch.
       Notification_Cal_ProposeApplication = 0x2E7451F5,
 
@@ -275,6 +285,8 @@ namespace Oculus.Platform
       /// livestreaming status.
       Notification_Livestreaming_StatusChange = 0x2247596E,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Indicates that a match has been found, for example after calling
       /// Matchmaking.Enqueue(). Use Message.GetRoom() to extract the matchmaking
       /// room.
@@ -287,15 +299,21 @@ namespace Oculus.Platform
       /// new list of sessions.
       Notification_NetSync_SessionsChanged = 0x387E7F36,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Indicates that a connection has been established or there's been an error.
       /// Use NetworkingPeer.GetState() to get the result; as above,
       /// NetworkingPeer.GetID() returns the ID of the peer this message is for.
       Notification_Networking_ConnectionStateChange = 0x5E02D49A,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Indicates that another user is attempting to establish a P2P connection
       /// with us. Use NetworkingPeer.GetID() to extract the ID of the peer.
       Notification_Networking_PeerConnectRequest = 0x4D31E2CF,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Generated in response to Net.Ping(). Either contains ping time in
       /// microseconds or indicates that there was a timeout.
       Notification_Networking_PingResult = 0x51153012,
@@ -303,6 +321,8 @@ namespace Oculus.Platform
       /// Indicates that party has been updated
       Notification_Party_PartyUpdate = 0x1D118AB2,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Indicates that the user has accepted an invitation, for example in Oculus
       /// Home. Use Message.GetString() to extract the ID of the room that the user
       /// has been inivted to as a string. Then call ovrID_FromString() to parse it
@@ -311,18 +331,23 @@ namespace Oculus.Platform
       /// Note that you must call Rooms.Join() if you want to actually join the room.
       Notification_Room_InviteAccepted = 0x6D1071B1,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Handle this to notify the user when they've received an invitation to join
       /// a room in your game. You can use this in lieu of, or in addition to,
       /// polling for room invitations via
       /// Notifications.GetRoomInviteNotifications().
       Notification_Room_InviteReceived = 0x6A499D54,
 
+      /// DEPRECATED. Will be removed from headers at version v49.
+      ///
       /// Indicates that the current room has been updated. Use Message.GetRoom() to
       /// extract the updated room.
       Notification_Room_RoomUpdate = 0x60EC3C2F,
 
       /// DEPRECATED. Do not use or expose further. Use
-      /// MessageType.Notification_GroupPresence_InvitationsSent instead
+      /// MessageType.Notification_GroupPresence_InvitationsSent instead. Will be
+      /// removed from headers at version v49.
       Notification_Session_InvitationsSent = 0x07F9C880,
 
       /// Sent when another user is attempting to establish a VoIP connection. Use
@@ -606,6 +631,7 @@ namespace Oculus.Platform
           message = new MessageWithDestinationList(messageHandle);
           break;
 
+        case Message.MessageType.AbuseReport_ReportRequestHandled:
         case Message.MessageType.ApplicationLifecycle_RegisterSessionKey:
         case Message.MessageType.Challenges_Delete:
         case Message.MessageType.Entitlement_GetIsViewerEntitled:
@@ -613,6 +639,7 @@ namespace Oculus.Platform
         case Message.MessageType.GroupPresence_LaunchMultiplayerErrorDialog:
         case Message.MessageType.GroupPresence_LaunchRosterPanel:
         case Message.MessageType.GroupPresence_Set:
+        case Message.MessageType.GroupPresence_SetDeeplinkMessageOverride:
         case Message.MessageType.GroupPresence_SetDestination:
         case Message.MessageType.GroupPresence_SetIsJoinable:
         case Message.MessageType.GroupPresence_SetLobbySession:
@@ -809,6 +836,7 @@ namespace Oculus.Platform
         case Message.MessageType.ApplicationLifecycle_GetSessionKey:
         case Message.MessageType.Application_LaunchOtherApp:
         case Message.MessageType.CloudStorage2_GetUserDirectoryPath:
+        case Message.MessageType.Notification_AbuseReport_ReportButtonPressed:
         case Message.MessageType.Notification_ApplicationLifecycle_LaunchIntentChanged:
         case Message.MessageType.Notification_Room_InviteAccepted:
         case Message.MessageType.Notification_Voip_MicrophoneAvailabilityStateUpdate:
@@ -872,7 +900,7 @@ namespace Oculus.Platform
         case Message.MessageType.Notification_Voip_ConnectRequest:
         case Message.MessageType.Notification_Voip_StateChange:
           message = new MessageWithNetworkingPeer(messageHandle);
-        break;
+          break;
 
         case Message.MessageType.Notification_Voip_SystemVoipState:
           message = new MessageWithSystemVoipState(messageHandle);
@@ -896,7 +924,8 @@ namespace Oculus.Platform
             Debug.LogError(string.Format("Unrecognized message type {0}\n", message_type));
           }
           break;
-          // OVR_MESSAGE_TYPE_END
+
+        // OVR_MESSAGE_TYPE_END
       }
 
       return message;

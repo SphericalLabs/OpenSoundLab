@@ -176,6 +176,16 @@ namespace Oculus.Interaction
             _activeTransformer = null;
         }
 
+        protected override void OnDisable()
+        {
+            if (_started)
+            {
+                EndTransform();
+            }
+
+            base.OnDisable();
+        }
+
         #region Inject
 
         public void InjectOptionalOneGrabTransformer(ITransformer transformer)

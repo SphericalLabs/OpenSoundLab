@@ -27,11 +27,10 @@ namespace Oculus.Interaction.DistanceReticles
         [SerializeField, Optional]
         private Transform _targetPoint;
 
-        public Transform Target => _targetPoint != null ? _targetPoint : this.transform;
-
-        public Vector3 GetTargetHit(ConicalFrustum frustum)
+        public Vector3 ProcessHitPoint(Vector3 hitPoint)
         {
-            return Target.position;
+            return _targetPoint != null ? _targetPoint.position 
+                : this.transform.position;
         }
     }
 }

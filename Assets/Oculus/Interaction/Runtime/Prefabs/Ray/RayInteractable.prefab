@@ -141,6 +141,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4178831829584330290}
   - component: {fileID: 4178831829584330291}
+  - component: {fileID: 4628751021272877255}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -175,6 +176,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4628751021272877255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4178831829584330288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2140d2b457bea84881488302059889b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 4178831829584330291}
 --- !u!1 &4178831829691947617
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,8 +234,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb86ba9d4c5126e48bfef9b0c9550e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interactorFilters: []
   _maxInteractors: -1
   _maxSelectingInteractors: -1
   _pointableElement: {fileID: 0}
-  _collider: {fileID: 4178831829584330291}
-  _surface: {fileID: 0}
+  _surface: {fileID: 4628751021272877255}
+  _selectSurface: {fileID: 0}
+  _movementProvider: {fileID: 0}

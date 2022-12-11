@@ -18,8 +18,6 @@
  * limitations under the License.
  */
 
-using System;
-
 namespace Oculus.Voice.Bindings.Android
 {
     public interface IVCBindingEvents

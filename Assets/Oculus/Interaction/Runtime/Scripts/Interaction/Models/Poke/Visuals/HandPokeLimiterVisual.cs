@@ -109,7 +109,9 @@ namespace Oculus.Interaction
             }
 
             Vector3 positionDelta = rootPose.position - _pokeInteractor.Origin;
-            Vector3 targetPosePosition = _pokeInteractor.TouchPoint + positionDelta;
+            Vector3 targetPosePosition = _pokeInteractor.TouchPoint + positionDelta +
+                                         _pokeInteractor.Radius *
+                                         _pokeInteractor.TouchNormal;
             Pose wristPoseOverride = new Pose(targetPosePosition, rootPose.rotation);
 
             _syntheticHand.LockWristPose(wristPoseOverride, 1.0f, SyntheticHand.WristLockMode.Full, true, true);

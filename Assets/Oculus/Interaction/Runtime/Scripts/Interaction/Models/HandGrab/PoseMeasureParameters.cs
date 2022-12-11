@@ -21,7 +21,7 @@
 using System;
 using UnityEngine;
 
-namespace Oculus.Interaction.HandGrab
+namespace Oculus.Interaction.Grab
 {
     [Serializable]
     public struct PoseMeasureParameters

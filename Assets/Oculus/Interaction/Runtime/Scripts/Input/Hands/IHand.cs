@@ -158,7 +158,7 @@ namespace Oculus.Interaction.Input
         /// hand, if one exists.
         /// <returns>true if an aspect of the requested type was found, false otherwise</returns>
         /// </summary>
-        bool GetHandAspect<TComponent>(out TComponent foundComponent) where TComponent : class;
+        bool TryGetAspect<TAspect>(out TAspect aspect) where TAspect : class;
 
         event Action WhenHandUpdated;
     }

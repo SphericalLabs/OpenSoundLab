@@ -25,6 +25,7 @@ using System.Diagnostics;
 using System.Linq;
 using UnityEngine.Serialization;
 using Debug = UnityEngine.Debug;
+using System.Collections;
 
 /// <summary>
 /// A manager for <see cref="OVRSceneAnchor"/>s created using the Guardian's Room Capture feature.
@@ -58,6 +59,12 @@ public class OVRSceneManager : MonoBehaviour
     [FormerlySerializedAs("verboseLogging")]
     [Tooltip("When enabled, verbose debug logs will be emitted.")]
     public bool VerboseLogging;
+
+    /// <summary>
+    /// The maximum number of scene anchors that will be updated each frame.
+    /// </summary>
+    [Tooltip("The maximum number of scene anchors that will be updated each frame.")]
+    public int MaxSceneAnchorUpdatesPerFrame = 3;
 
     #region Events
     /// <summary>
@@ -202,6 +209,9 @@ public class OVRSceneManager : MonoBehaviour
     private readonly Dictionary<OVRSpace, OVRPlugin.SpaceQueryResult> _pendingLocatable =
         new Dictionary<OVRSpace, OVRPlugin.SpaceQueryResult>();
 
+    private OVRCameraRig _cameraRig;
+    private int _sceneAnchorUpdateIndex;
+
     #endregion
 
     internal struct LogForwarder
@@ -257,6 +267,35 @@ public class OVRSceneManager : MonoBehaviour
         }
     }
 
+    private static void OnTrackingSpaceChanged(Transform trackingSpace)
+    {
+        // Tracking space changed, update all scene anchors using their cache
+        UpdateAllSceneAnchors();
+    }
+
+    private void Update()
+    {
+        UpdateSomeSceneAnchors();
+    }
+
+    private static void UpdateAllSceneAnchors()
+    {
+        foreach (var sceneAnchor in OVRSceneAnchor.SceneAnchorsList)
+        {
+            sceneAnchor.TryUpdateTransform(true);
+        }
+    }
+
+    private void UpdateSomeSceneAnchors()
+    {
+        for (var i = 0; i < Math.Min(OVRSceneAnchor.SceneAnchorsList.Count, MaxSceneAnchorUpdatesPerFrame); i++)
+        {
+            _sceneAnchorUpdateIndex %= OVRSceneAnchor.SceneAnchorsList.Count;
+            var anchor = OVRSceneAnchor.SceneAnchorsList[_sceneAnchorUpdateIndex++];
+            anchor.TryUpdateTransform(false);
+        }
+    }
+
     /// <summary>
     /// Loads the scene model from the Guardian.
     /// </summary>
@@ -297,6 +336,21 @@ public class OVRSceneManager : MonoBehaviour
         OVRManager.SpaceQueryComplete += OVRManager_SpaceQueryComplete;
         OVRManager.SceneCaptureComplete += OVRManager_SceneCaptureComplete;
         OVRManager.SpaceSetComponentStatusComplete += OVRManager_SpaceSetComponentStatusComplete;
+
+        if (OVRManager.display != null)
+        {
+            OVRManager.display.RecenteredPose += UpdateAllSceneAnchors;
+        }
+
+        if (!_cameraRig)
+        {
+            _cameraRig = FindObjectOfType<OVRCameraRig>();
+        }
+
+        if (_cameraRig)
+        {
+            _cameraRig.TrackingSpaceChanged += OnTrackingSpaceChanged;
+        }
     }
 
     private void OnDisable()
@@ -305,6 +359,16 @@ public class OVRSceneManager : MonoBehaviour
         OVRManager.SpaceQueryComplete -= OVRManager_SpaceQueryComplete;
         OVRManager.SceneCaptureComplete -= OVRManager_SceneCaptureComplete;
         OVRManager.SpaceSetComponentStatusComplete -= OVRManager_SpaceSetComponentStatusComplete;
+
+        if (OVRManager.display != null)
+        {
+            OVRManager.display.RecenteredPose -= UpdateAllSceneAnchors;
+        }
+
+        if (_cameraRig)
+        {
+            _cameraRig.TrackingSpaceChanged -= OnTrackingSpaceChanged;
+        }
     }
 
     private bool LoadSpatialEntities()
@@ -317,63 +381,46 @@ public class OVRSceneManager : MonoBehaviour
         }
 
         RoomLayout = new RoomLayoutInformation();
-
-        var queryInfo = new OVRPlugin.SpaceQueryInfo
+        var options = new OVRSpaceQuery.Options
         {
             QueryType = OVRPlugin.SpaceQueryType.Action,
-            MaxQuerySpaces = 100,
+            MaxResults = 100,
             Timeout = 0,
-            Location = OVRPlugin.SpaceStorageLocation.Local,
+            Location = OVRSpace.StorageLocation.Local,
             ActionType = OVRPlugin.SpaceQueryActionType.Load,
-            FilterType = OVRPlugin.SpaceQueryFilterType.None
         };
 
         if (_currentQueryMode == QueryMode.QueryByUuid)
         {
-            queryInfo.FilterType = OVRPlugin.SpaceQueryFilterType.Ids;
-            queryInfo.IdInfo = new OVRPlugin.SpaceFilterInfoIds
-            {
-                NumIds = Math.Min(OVRPlugin.SpaceFilterInfoIdsMaxSize, _uuidsToQuery.Count),
-                Ids = new Guid[OVRPlugin.SpaceFilterInfoIdsMaxSize]
-            };
-            for (int i = 0; i < queryInfo.IdInfo.NumIds; ++i)
-            {
-                queryInfo.IdInfo.Ids[i] = _uuidsToQuery[i];
-                Verbose?.Log(nameof(OVRSceneManager),
-                    $"{nameof(LoadSpatialEntities)}() UUID to query [{_uuidsToQuery[i]}]");
-            }
+            options.UuidFilter = _uuidsToQuery;
         }
-        else if (_currentQueryMode == QueryMode.QueryAllRoomLayoutEnabledForAllEntitiesInside || _currentQueryMode == QueryMode.QueryAllBounded2DEnabled || _currentQueryMode == QueryMode.QueryAllRoomLayoutEnabledForRoomBox)
+        else if (_currentQueryMode == QueryMode.QueryAllRoomLayoutEnabledForAllEntitiesInside ||
+                 _currentQueryMode == QueryMode.QueryAllBounded2DEnabled ||
+                 _currentQueryMode == QueryMode.QueryAllRoomLayoutEnabledForRoomBox)
         {
-            queryInfo.FilterType = OVRPlugin.SpaceQueryFilterType.Components;
-            queryInfo.ComponentsInfo = new OVRPlugin.SpaceFilterInfoComponents
-            {
-                Components = new OVRPlugin.SpaceComponentType[OVRPlugin.SpaceFilterInfoComponentsMaxSize],
-                NumComponents = 1,
-            };
             if (_currentQueryMode == QueryMode.QueryAllRoomLayoutEnabledForAllEntitiesInside || _currentQueryMode == QueryMode.QueryAllRoomLayoutEnabledForRoomBox)
             {
-                queryInfo.ComponentsInfo.Components[0] = OVRPlugin.SpaceComponentType.RoomLayout;
+                options.ComponentFilter = OVRSpaceQuery.ComponentType.RoomLayout;
             }
             else
             {
-                queryInfo.ComponentsInfo.Components[0] = OVRPlugin.SpaceComponentType.Bounded2D;
+                options.ComponentFilter = OVRSpaceQuery.ComponentType.Bounded2D;
             }
         }
 
-        if (OVRPlugin.QuerySpaces(queryInfo, out var requestId))
+        if (options.TryQuerySpaces(out var requestId))
         {
             // We save this request id to ensure that when we trap a SpaceQueryResults event
             // it's indeed one of our requests.
             _individualRequestIds.Add(requestId);
             Verbose?.Log(nameof(OVRSceneManager),
-                $"{nameof(LoadSpatialEntities)}() calling {nameof(OVRPlugin)}.{nameof(OVRPlugin.QuerySpaces)}(). Request id [{requestId}] added to the request list.");
+                $"{nameof(LoadSpatialEntities)}() calling {nameof(OVRSpaceQuery)}.{nameof(OVRSpaceQuery.Options)}.{nameof(options.TryQuerySpaces)}(). Request id [{requestId}] added to the request list.");
 
             return true;
         }
 
         Verbose?.LogWarning(nameof(OVRSceneManager),
-            $"{nameof(LoadSpatialEntities)}() {nameof(OVRPlugin)}.{nameof(OVRPlugin.QuerySpaces)}() failed.");
+            $"{nameof(LoadSpatialEntities)}() {nameof(OVRSpaceQuery)}.{nameof(OVRSpaceQuery.Options)}.{nameof(options.TryQuerySpaces)}() failed.");
         return false;
     }
 
@@ -432,7 +479,7 @@ public class OVRSceneManager : MonoBehaviour
     private static bool IsComponentEnabled(OVRSpace space, OVRPlugin.SpaceComponentType componentType) =>
         OVRPlugin.GetSpaceComponentStatus(space, componentType, out var enabled, out _) && enabled;
 
-    private OVRSceneAnchor InstantiateSceneAnchor(OVRSpace space, Guid uuid, OVRSceneAnchor prefab)
+    internal OVRSceneAnchor InstantiateSceneAnchor(OVRSpace space, Guid uuid, OVRSceneAnchor prefab)
     {
         // Query for the semantic classification of the object
         var hasSemanticLabels = OVRPlugin.GetSpaceSemanticLabels(space, out var labelString);
@@ -512,12 +559,19 @@ public class OVRSceneManager : MonoBehaviour
 
         _individualRequestIds.Remove(requestId);
 
-        if (!result) return;
+        if (!result)
+        {
+            Development.LogError(nameof(OVRSceneManager),
+                $"{nameof(OVRPlugin.QuerySpaces)}() asynchronously returned a failed result. " +
+                $"Invoking {nameof(NoSceneModelToLoad)}.");
+            NoSceneModelToLoad?.Invoke();
+            return;
+        }
 
         if (!OVRPlugin.RetrieveSpaceQueryResults(requestId, out var results))
         {
             Development.LogError(nameof(OVRSceneManager),
-                $"{nameof(OVRPlugin.RetrieveSpaceQueryResults)}() Could not retrieve results.");
+                $"{nameof(OVRPlugin.RetrieveSpaceQueryResults)}() could not retrieve results.");
             return;
         }
 

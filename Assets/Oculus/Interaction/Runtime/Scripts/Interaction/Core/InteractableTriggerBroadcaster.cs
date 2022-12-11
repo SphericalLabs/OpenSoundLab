@@ -33,8 +33,8 @@ namespace Oculus.Interaction
     /// </summary>
     public class InteractableTriggerBroadcaster : MonoBehaviour
     {
-        public Action<IInteractable, Rigidbody> OnTriggerEntered = delegate { };
-        public Action<IInteractable, Rigidbody> OnTriggerExited = delegate { };
+        public Action<IInteractable, Rigidbody> WhenTriggerEntered = delegate { };
+        public Action<IInteractable, Rigidbody> WhenTriggerExited = delegate { };
 
         private IInteractable _interactable;
         private Dictionary<Rigidbody, bool> _rigidbodyTriggers;
@@ -68,7 +68,7 @@ namespace Oculus.Interaction
 
             if (!_rigidbodyTriggers.ContainsKey(rigidbody))
             {
-                OnTriggerEntered(_interactable, rigidbody);
+                WhenTriggerEntered(_interactable, rigidbody);
                 _rigidbodyTriggers.Add(rigidbody, true);
             }
             else
@@ -103,7 +103,7 @@ namespace Oculus.Interaction
                 if (_rigidbodyTriggers[rigidbody] == false)
                 {
                     _rigidbodyTriggers.Remove(rigidbody);
-                    OnTriggerExited(_interactable, rigidbody);
+                    WhenTriggerExited(_interactable, rigidbody);
                 }
                 else
                 {
@@ -119,10 +119,19 @@ namespace Oculus.Interaction
                 // Clean up any remaining active triggers
                 foreach (Rigidbody rigidbody in _rigidbodyTriggers.Keys)
                 {
-                    OnTriggerExited(_interactable, rigidbody);
+                    WhenTriggerExited(_interactable, rigidbody);
                 }
                 _broadcasters.Remove(this);
                 _rigidbodies.Clear();
+            }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (_started)
+            {
+                WhenTriggerEntered = null;
+                WhenTriggerExited = null;
             }
         }
 

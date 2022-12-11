@@ -137,9 +137,9 @@ namespace Oculus.Interaction.Input
             return Hand.GetCenterEyePose(out pose);
         }
 
-        public bool GetHandAspect<TComponent>(out TComponent foundComponent) where TComponent : class
+        public bool TryGetAspect<TAspect>(out TAspect aspect) where TAspect : class
         {
-            return Hand.GetHandAspect(out foundComponent);
+            return Hand.TryGetAspect(out aspect);
         }
 
         #region Inject

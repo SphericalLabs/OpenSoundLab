@@ -59,30 +59,14 @@ namespace Oculus.Interaction.HandGrab
         public Action<IHandGrabState> WhenHandGrabStarted { get; set; } = delegate { };
         public Action<IHandGrabState> WhenHandGrabEnded { get; set; } = delegate { };
 
-        public override bool ShouldSelect
+        protected override bool ComputeShouldSelect()
         {
-            get
-            {
-                if (State != InteractorState.Hover)
-                {
-                    return false;
-                }
-
-                return _candidate == _interactable && _handUseShouldSelect;
-            }
+            return _handUseShouldSelect;
         }
 
-        public override bool ShouldUnselect
+        protected override bool ComputeShouldUnselect()
         {
-            get
-            {
-                if (State != InteractorState.Select)
-                {
-                    return false;
-                }
-
-                return _handUseShouldUnselect || SelectedInteractable == null;
-            }
+            return _handUseShouldUnselect || SelectedInteractable == null;
         }
 
         protected override void Awake()

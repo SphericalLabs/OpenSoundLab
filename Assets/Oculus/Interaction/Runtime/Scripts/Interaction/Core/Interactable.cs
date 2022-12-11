@@ -36,7 +36,6 @@ namespace Oculus.Interaction
                                         where TInteractor : Interactor<TInteractor, TInteractable>
                                         where TInteractable : Interactable<TInteractor, TInteractable>
     {
-
         [SerializeField, Interface(typeof(IGameObjectFilter)), Optional]
         private List<MonoBehaviour> _interactorFilters = new List<MonoBehaviour>();
         private List<IGameObjectFilter> InteractorFilters = null;
@@ -51,6 +50,10 @@ namespace Oculus.Interaction
 
         [SerializeField]
         private int _maxSelectingInteractors = -1;
+
+        [SerializeField, Optional]
+        private UnityEngine.Object _data = null;
+        public object Data { get; protected set; } = null;
 
         #region Properties
         public int MaxInteractors
@@ -113,11 +116,7 @@ namespace Oculus.Interaction
                 if (_state == value) return;
                 InteractableState previousState = _state;
                 _state = value;
-                WhenStateChanged(new InteractableStateChangeArgs
-                {
-                    PreviousState = previousState,
-                    NewState = _state
-                });
+                WhenStateChanged(new InteractableStateChangeArgs(previousState,_state));
             }
         }
 
@@ -323,8 +322,7 @@ namespace Oculus.Interaction
 
         protected virtual void Awake()
         {
-            InteractorFilters =
-                _interactorFilters.ConvertAll(mono => mono as IGameObjectFilter);
+            InteractorFilters = _interactorFilters.ConvertAll(mono => mono as IGameObjectFilter);
         }
 
         protected virtual void Start()
@@ -332,6 +330,12 @@ namespace Oculus.Interaction
             foreach (IGameObjectFilter filter in InteractorFilters)
             {
                 Assert.IsNotNull(filter);
+            }
+
+            if (Data == null)
+            {
+                _data = this;
+                Data = _data;
             }
         }
 
@@ -359,12 +363,20 @@ namespace Oculus.Interaction
         }
 
         #region Inject
+
         public void InjectOptionalInteractorFilters(List<IGameObjectFilter> interactorFilters)
         {
             InteractorFilters = interactorFilters;
             _interactorFilters = interactorFilters.ConvertAll(interactorFilter =>
                                     interactorFilter as MonoBehaviour);
         }
+
+        public void InjectOptionalData(object data)
+        {
+            _data = data as UnityEngine.Object;
+            Data = data;
+        }
+
         #endregion
     }
 }

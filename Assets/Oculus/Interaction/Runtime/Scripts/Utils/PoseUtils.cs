@@ -218,54 +218,6 @@ namespace Oculus.Interaction
         }
 
         /// <summary>
-        /// Indicates how similar two poses are.
-        /// </summary>
-        /// <param name="from">First pose to compare.</param>
-        /// <param name="to">Second pose to compare.</param>
-        /// <param name="maxDistance">The max distance in which the poses can be similar.</param>
-        /// <returns>0 indicates no similitude, 1 for equal poses</returns>
-        public static float Similarity(in Pose from, in Pose to, HandGrab.PoseMeasureParameters scoringModifier)
-        {
-            float rotationDifference = RotationalSimilarity(from.rotation, to.rotation);
-            float positionDifference = PositionalSimilarity(from.position, to.position, scoringModifier.MaxDistance);
-            return positionDifference * (1f - scoringModifier.PositionRotationWeight)
-                + rotationDifference * (scoringModifier.PositionRotationWeight);
-        }
-
-        /// <summary>
-        /// Get how similar two positions are.
-        /// It uses a maximum value to normalize the output
-        /// </summary>
-        /// <param name="from">The first position.</param>
-        /// <param name="to">The second position.</param>
-        /// <param name="maxDistance">The Maximum distance used to normalise the output</param>
-        /// <returns>0 when the input positions are further than maxDistance, 1 for equal positions.</returns>
-        public static float PositionalSimilarity(in Vector3 from, in Vector3 to, float maxDistance)
-        {
-            float distance = Vector3.Distance(from, to);
-            if (distance == 0)
-            {
-                return 1f;
-            }
-            return 1f - Mathf.Clamp01(distance / maxDistance);
-        }
-
-        /// <summary>
-        /// Get how similar two rotations are.
-        /// Since the Quaternion.Dot is bugged in unity. We compare the
-        /// dot products of the forward and up vectors of the rotations.
-        /// </summary>
-        /// <param name="from">The first rotation.</param>
-        /// <param name="to">The second rotation.</param>
-        /// <returns>0 for opposite rotations, 1 for equal rotations.</returns>
-        public static float RotationalSimilarity(in Quaternion from, in Quaternion to)
-        {
-            float forwardDifference = Vector3.Dot(from * Vector3.forward, to * Vector3.forward) * 0.5f + 0.5f;
-            float upDifference = Vector3.Dot(from * Vector3.up, to * Vector3.up) * 0.5f + 0.5f;
-            return forwardDifference * upDifference;
-        }
-
-        /// <summary>
         /// Rotate a pose around an axis.
         /// </summary>
         /// <param name="pose">The pose to mirror.</param>

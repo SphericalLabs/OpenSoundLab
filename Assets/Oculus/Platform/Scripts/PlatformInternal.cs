@@ -67,6 +67,7 @@ namespace Oculus.Platform
       User_CancelRecordingForReportFlow      = 0x03E0D149,
       User_GetLinkedAccounts                 = 0x5793F456,
       User_GetUserCapabilities               = 0x121C317C,
+      User_LaunchProfile                     = 0x0A397297,
       User_LaunchReportFlow                  = 0x5662A011,
       User_LaunchReportFlow2                 = 0x7F835863,
       User_NewEntitledTestUser               = 0x11741F03,
@@ -75,7 +76,8 @@ namespace Oculus.Platform
       User_StartRecordingForReportFlow       = 0x6C6E33E3,
       User_StopRecordingAndLaunchReportFlow  = 0x60788C8B,
       User_StopRecordingAndLaunchReportFlow2 = 0x19C2B32B,
-      User_TestUserCreateDeviceManifest      = 0x6570B2BD
+      User_TestUserCreateDeviceManifest      = 0x6570B2BD,
+      Voip_ReportAppVoipSessions             = 0x185251CE
     };
 
     public static void CrashApplication() {
@@ -118,7 +120,9 @@ namespace Oculus.Platform
         case MessageTypeInternal.RichPresence_SetLobbySession:
         case MessageTypeInternal.RichPresence_SetMatchSession:
         case MessageTypeInternal.User_CancelRecordingForReportFlow:
+        case MessageTypeInternal.User_LaunchProfile:
         case MessageTypeInternal.User_TestUserCreateDeviceManifest:
+        case MessageTypeInternal.Voip_ReportAppVoipSessions:
           message = new Message(messageHandle);
           break;
 

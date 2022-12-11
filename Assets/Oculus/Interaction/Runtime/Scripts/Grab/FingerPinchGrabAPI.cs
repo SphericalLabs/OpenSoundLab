@@ -20,309 +20,162 @@
 
 using Oculus.Interaction.Input;
 using UnityEngine;
+using System;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace Oculus.Interaction.GrabAPI
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public class HandPinchData
+    {
+        private const int NumHandJoints = 24;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = NumHandJoints * 3, ArraySubType = UnmanagedType.R4)]
+        private readonly float[] _jointPositions;
+
+        public HandPinchData()
+        {
+            int floatCount = NumHandJoints * 3;
+            _jointPositions = new float[floatCount];
+        }
+
+        public void SetJoints(IReadOnlyList<Pose> poses)
+        {
+            Assert.AreEqual(NumHandJoints, poses.Count);
+            int floatIndex = 0;
+            for (int jointIndex = 0; jointIndex < NumHandJoints; jointIndex++)
+            {
+                Vector3 position = poses[jointIndex].position;
+                _jointPositions[floatIndex++] = position.x;
+                _jointPositions[floatIndex++] = position.y;
+                _jointPositions[floatIndex++] = position.z;
+            }
+        }
+
+        public void SetJoints(IReadOnlyList<Vector3> positions)
+        {
+            Assert.AreEqual(NumHandJoints, positions.Count);
+            int floatIndex = 0;
+            for (int jointIndex = 0; jointIndex < NumHandJoints; jointIndex++)
+            {
+                Vector3 position = positions[jointIndex];
+                _jointPositions[floatIndex++] = position.x;
+                _jointPositions[floatIndex++] = position.y;
+                _jointPositions[floatIndex++] = position.z;
+            }
+        }
+    }
+
     /// <summary>
     /// This Finger API uses an advanced calculation for the pinch value of the fingers
     /// to detect if they are grabbing
     /// </summary>
     public class FingerPinchGrabAPI : IFingerAPI
     {
-        private bool _isPinchVisibilityGood;
-        private float DistanceStart => _isPinchVisibilityGood ? PINCH_HQ_DISTANCE_START : PINCH_DISTANCE_START;
-        private float DistanceStopMax => _isPinchVisibilityGood ? PINCH_HQ_DISTANCE_STOP_MAX : PINCH_DISTANCE_STOP_MAX;
-        private float DistanceStopOffset => _isPinchVisibilityGood ? PINCH_HQ_DISTANCE_STOP_OFFSET : PINCH_DISTANCE_STOP_OFFSET;
+        enum ReturnValue { Success = 0, Failure = -1 };
 
-        private const float PINCH_DISTANCE_START = 0.02f;
-        private const float PINCH_DISTANCE_STOP_MAX = 0.1f;
-        private const float PINCH_DISTANCE_STOP_OFFSET = 0.04f;
+        #region DLLImports
 
-        private const float PINCH_HQ_DISTANCE_START = 0.016f;
-        private const float PINCH_HQ_DISTANCE_STOP_MAX = 0.1f;
-        private const float PINCH_HQ_DISTANCE_STOP_OFFSET = 0.016f;
+        [DllImport("InteractionSdk")]
+        private static extern int isdk_FingerPinchGrabAPI_Create();
 
-        private const float PINCH_HQ_VIEW_ANGLE_THRESHOLD = 40f;
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_UpdateHandData(int handle, [In] HandPinchData data);
 
-        private readonly HandJointId[] THUMB_JOINTS_SELECT = new[]
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_UpdateHandWristHMDData(int handle, [In] HandPinchData data, in Vector3 wristForward, in Vector3 hmdForward);
+
+        [DllImport("InteractionSdk", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
+        private static extern bool isdk_FingerPinchGrabAPI_GetString(int handle, [MarshalAs(UnmanagedType.LPStr)] string name, out IntPtr val);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetFingerIsGrabbing(int handle, int index, out bool grabbing);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetFingerIsGrabbingChanged(int handle, int index, bool targetState, out bool grabbing);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetFingerGrabScore(int handle, HandFinger finger, out float outScore);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetCenterOffset(int handle, out Vector3 outCenter);
+
+        [DllImport("InteractionSdk")]
+        private static extern int isdk_Common_GetVersion(out IntPtr versionStringPtr);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetPinchHasGoodVisibility(int handle, out bool isGood);
+        #endregion
+
+        private int _fingerPinchGrabAPIHandle = -1;
+        private HandPinchData _pinchData = new HandPinchData();
+
+        private int GetHandle()
         {
-            HandJointId.HandThumb3,
-            HandJointId.HandThumbTip
-        };
-
-        private readonly HandJointId[] THUMB_JOINTS_MAINTAIN = new[]
-        {
-            HandJointId.HandThumb2,
-            HandJointId.HandThumb3,
-            HandJointId.HandThumbTip
-        };
-
-        private class FingerPinchData
-        {
-            private readonly HandJointId _tipId;
-            private float _minPinchDistance;
-
-            public Vector3 TipPosition { get; private set; }
-            public bool IsPinchingChanged { get; private set; }
-            public float PinchStrength;
-            public bool IsPinching;
-
-            public FingerPinchData(HandFinger fingerId)
+            if (_fingerPinchGrabAPIHandle == -1)
             {
-                _tipId = HandJointUtils.GetHandFingerTip(fingerId);
+                _fingerPinchGrabAPIHandle = isdk_FingerPinchGrabAPI_Create();
+                Debug.Assert(_fingerPinchGrabAPIHandle != -1, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_Create failed");
             }
 
-            public void UpdateTipPosition(IHand hand)
-            {
-                if (hand.GetJointPoseFromWrist(_tipId, out Pose pose))
-                {
-                    TipPosition = pose.position;
-                }
-            }
-
-            public void UpdateIsPinching(float distance, float start, float stopOffset, float stopMax)
-            {
-                if (!IsPinching)
-                {
-                    if (distance < start)
-                    {
-                        IsPinching = true;
-                        IsPinchingChanged = true;
-                        _minPinchDistance = distance;
-                    }
-                }
-                else
-                {
-                    _minPinchDistance = Mathf.Min(_minPinchDistance, distance);
-                    if (distance > stopMax ||
-                        distance > _minPinchDistance + stopOffset)
-                    {
-                        IsPinching = false;
-                        IsPinchingChanged = true;
-                        _minPinchDistance = float.MaxValue;
-                    }
-                }
-            }
-
-            public void ClearState()
-            {
-                IsPinchingChanged = false;
-            }
+            return _fingerPinchGrabAPIHandle;
         }
-
-        private readonly FingerPinchData[] _fingersPinchData =
-        {
-            new FingerPinchData(HandFinger.Thumb),
-            new FingerPinchData(HandFinger.Index),
-            new FingerPinchData(HandFinger.Middle),
-            new FingerPinchData(HandFinger.Ring),
-            new FingerPinchData(HandFinger.Pinky)
-        };
 
         public bool GetFingerIsGrabbing(HandFinger finger)
         {
-            if (finger == HandFinger.Thumb)
-            {
-                for (int i = 1; i < Constants.NUM_FINGERS; ++i)
-                {
-                    if (_fingersPinchData[i].IsPinching)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            return _fingersPinchData[(int)finger].IsPinching;
+            ReturnValue rc = isdk_FingerPinchGrabAPI_GetFingerIsGrabbing(GetHandle(), (int)finger, out bool grabbing);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetFingerIsGrabbing failed");
+            return grabbing;
         }
 
         public Vector3 GetCenterOffset()
         {
-            float maxStrength = float.NegativeInfinity;
-            Vector3 thumbTip = _fingersPinchData[0].TipPosition;
-            Vector3 center = thumbTip;
-
-            for (int i = 1; i < Constants.NUM_FINGERS; ++i)
-            {
-                float strength = _fingersPinchData[i].PinchStrength;
-                if (strength > maxStrength)
-                {
-                    maxStrength = strength;
-                    Vector3 fingerTip = _fingersPinchData[i].TipPosition;
-                    center = (thumbTip + fingerTip) * 0.5f;
-                }
-            }
-
+            ReturnValue rc = isdk_FingerPinchGrabAPI_GetCenterOffset(GetHandle(), out Vector3 center);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetCenterOffset failed");
             return center;
         }
 
         public bool GetFingerIsGrabbingChanged(HandFinger finger, bool targetPinchState)
         {
-            if (finger == HandFinger.Thumb)
-            {
-                // Thumb pinching changed logic only happens on
-                // the first finger pinching changed when pinching,
-                // or any finger pinching changed when not pinching
-                bool pinching = GetFingerIsGrabbing(finger);
-                if (pinching != targetPinchState)
-                {
-                    return false;
-                }
-
-                if (pinching)
-                {
-                    for (int i = 1; i < Constants.NUM_FINGERS; ++i)
-                    {
-                        if (_fingersPinchData[i].IsPinching == pinching &&
-                            !_fingersPinchData[i].IsPinchingChanged)
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    for (int i = 1; i < Constants.NUM_FINGERS; ++i)
-                    {
-                        if (_fingersPinchData[i].IsPinchingChanged)
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }
-            }
-
-            return _fingersPinchData[(int)finger].IsPinchingChanged &&
-                   _fingersPinchData[(int)finger].IsPinching == targetPinchState;
+            ReturnValue rc = isdk_FingerPinchGrabAPI_GetFingerIsGrabbingChanged(GetHandle(), (int)finger, targetPinchState, out bool changed);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetFingerIsGrabbingChanged failed");
+            return changed;
         }
 
         public float GetFingerGrabScore(HandFinger finger)
         {
-            if (finger == HandFinger.Thumb)
-            {
-                float max = 0.0f;
-                for (int i = 1; i < Constants.NUM_FINGERS; ++i)
-                {
-                    max = Mathf.Max(max, _fingersPinchData[i].PinchStrength);
-                }
-                return max;
-            }
-
-            return _fingersPinchData[(int)finger].PinchStrength;
+            ReturnValue rc = isdk_FingerPinchGrabAPI_GetFingerGrabScore(GetHandle(), finger, out float score);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetFingerGrabScore failed");
+            return score;
         }
 
         public void Update(IHand hand)
         {
-            ClearState();
+            hand.GetJointPosesFromWrist(out ReadOnlyHandJointPoses poses);
 
-            _isPinchVisibilityGood = PinchHasGoodVisibility(hand);
-
-            _fingersPinchData[0].UpdateTipPosition(hand);
-            for (int i = 1; i < Constants.NUM_FINGERS; ++i)
+            if (poses.Count > 0)
             {
-                _fingersPinchData[i].UpdateTipPosition(hand);
+                _pinchData.SetJoints(poses);
 
-                float distance = float.PositiveInfinity;
-                if (_fingersPinchData[i].IsPinching)
+                if (hand.GetJointPose(HandJointId.HandWristRoot, out Pose wristPose) && hand.GetCenterEyePose(out Pose centerEyePose))
                 {
-                    distance = GetClosestDistanceToThumb(hand, _fingersPinchData[i].TipPosition, THUMB_JOINTS_MAINTAIN);
+                    Vector3 wristForward = -1.0f * wristPose.forward;
+                    Vector3 hmdForward = -1.0f * centerEyePose.forward;
+                    if (hand.Handedness == Handedness.Right)
+                    {
+                        wristForward = -wristForward;
+                    }
+
+                    ReturnValue rc = isdk_FingerPinchGrabAPI_UpdateHandWristHMDData(GetHandle(), _pinchData, wristForward, hmdForward);
+                    Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_UpdateHandData failed");
                 }
-                if (IsPointNearThumb(hand, _fingersPinchData[i].TipPosition, THUMB_JOINTS_SELECT))
+                else
                 {
-                    distance = GetClosestDistanceToThumb(hand, _fingersPinchData[i].TipPosition, THUMB_JOINTS_SELECT);
+                    ReturnValue rc = isdk_FingerPinchGrabAPI_UpdateHandData(GetHandle(), _pinchData);
+                    Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_UpdateHandData failed");
                 }
-
-                _fingersPinchData[i].UpdateIsPinching(distance,
-                    DistanceStart, DistanceStopOffset, DistanceStopMax);
-                float pinchPercent = (distance - DistanceStart) /
-                    (DistanceStopMax - DistanceStart);
-
-                float pinchStrength = 1f - Mathf.Clamp01(pinchPercent);
-                _fingersPinchData[i].PinchStrength = pinchStrength;
             }
-        }
-
-        private void ClearState()
-        {
-            for (int i = 0; i < Constants.NUM_FINGERS; ++i)
-            {
-                _fingersPinchData[i].ClearState();
-            }
-        }
-
-        private bool IsPointNearThumb(IHand hand, Vector3 position, HandJointId[] thumbJoints)
-        {
-            if (!hand.GetJointPoseFromWrist(thumbJoints[0], out Pose boneStart))
-            {
-                return false;
-            }
-            if (!hand.GetJointPoseFromWrist(thumbJoints[1], out Pose boneEnd))
-            {
-                return false;
-            }
-            Vector3 p0 = boneStart.position;
-            Vector3 p1 = boneEnd.position;
-            Vector3 lineVec = p1 - p0;
-            Vector3 fromP0 = position - p0;
-            Vector3 projectedPos = Vector3.Project(fromP0, lineVec.normalized);
-            return Vector3.Dot(projectedPos, lineVec) > 0;
-        }
-
-        private float GetClosestDistanceToThumb(IHand hand, Vector3 position, HandJointId[] thumbJoints)
-        {
-            float minDistance = float.PositiveInfinity;
-            for (int i = 0; i < thumbJoints.Length - 1; i++)
-            {
-                if (!hand.GetJointPoseFromWrist(thumbJoints[i], out Pose boneStart))
-                {
-                    return float.PositiveInfinity;
-                }
-                if (!hand.GetJointPoseFromWrist(thumbJoints[i + 1], out Pose boneEnd))
-                {
-                    return float.PositiveInfinity;
-                }
-
-                minDistance = Mathf.Min(minDistance,
-                    ClosestDistanceToLineSegment(position, boneStart.position, boneEnd.position));
-            }
-
-            return minDistance;
-        }
-
-        private float ClosestDistanceToLineSegment(Vector3 position, Vector3 p0, Vector3 p1)
-        {
-            Vector3 lineVec = p1 - p0;
-            Vector3 fromP0 = position - p0;
-            float normalizedProjection = Vector3.Dot(fromP0, lineVec) / Vector3.Dot(lineVec, lineVec);
-            float closestT = Mathf.Clamp01(normalizedProjection);
-            Vector3 closestPoint = p0 + closestT * lineVec;
-            return (closestPoint - position).magnitude;
-
-        }
-
-        private bool PinchHasGoodVisibility(IHand hand)
-        {
-            if (!hand.GetJointPose(HandJointId.HandWristRoot, out Pose wristPose)
-                || !hand.GetCenterEyePose(out Pose centerEyePose))
-            {
-                return false;
-            }
-
-            Vector3 handVector = -1.0f * wristPose.forward;
-            Vector3 targetVector = -1.0f * centerEyePose.forward;
-
-            if (hand.Handedness == Handedness.Right)
-            {
-                handVector = -handVector;
-            }
-
-            float angle = Vector3.Angle(handVector, targetVector);
-            return angle <= PINCH_HQ_VIEW_ANGLE_THRESHOLD;
         }
     }
 }

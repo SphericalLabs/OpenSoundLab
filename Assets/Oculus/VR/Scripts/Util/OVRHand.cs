@@ -184,7 +184,7 @@ public class OVRHand : MonoBehaviour,
 		return data;
 	}
 
-	OVRSkeletonRenderer.SkeletonRendererData OVRSkeletonRenderer.IOVRSkeletonRendererDataProvider.GetSkeletonRendererData()
+    OVRSkeletonRenderer.SkeletonRendererData OVRSkeletonRenderer.IOVRSkeletonRendererDataProvider.GetSkeletonRendererData()
 	{
 		var data = new OVRSkeletonRenderer.SkeletonRendererData();
 

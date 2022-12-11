@@ -49,13 +49,33 @@ namespace Facebook.WitAi.Data.Configuration
         /// <summary>
         /// When set to true, will use Conduit to dispatch voice commands.
         /// </summary>
-        //[Tooltip("Conduit enables manifest-based dispatching to invoke callbacks with native types directly without requiring manual parsing.")]
-        public bool useConduit => false;
+        [Tooltip("Conduit enables manifest-based dispatching to invoke callbacks with native types directly without requiring manual parsing.")]
+        [SerializeField] public bool useConduit;
 
         /// <summary>
         /// The path to the Conduit manifest.
         /// </summary>
         [SerializeField] public string manifestLocalPath;
+
+        public string WitApplicationId
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(application?.id))
+                {
+                    // NOTE: If a dev only provides a client token we may not have the application id.
+                    if (!string.IsNullOrEmpty(clientAccessToken))
+                    {
+                        return INVALID_APP_ID_WITH_CLIENT_TOKEN;
+                    }
+
+                    return INVALID_APP_ID_NO_CLIENT_TOKEN;
+                }
+
+                return application.id;
+            }
+        }
+
 
         #if UNITY_EDITOR
         // Manifest editor path
@@ -88,6 +108,11 @@ namespace Facebook.WitAi.Data.Configuration
         /// </summary>
         [SerializeField] public bool openManifestOnGeneration = false;
 
+        public const string INVALID_APP_ID_NO_CLIENT_TOKEN = "App Info Not Set - No Client Token";
+
+        public const string INVALID_APP_ID_WITH_CLIENT_TOKEN =
+            "App Info Not Set - Has Client Token";
+
         public WitApplication Application => application;
 
         private void OnEnable()
@@ -106,6 +131,15 @@ namespace Facebook.WitAi.Data.Configuration
             }
 
             #endif
+        }
+
+        public void ResetData()
+        {
+            application = null;
+            clientAccessToken = null;
+            entities = null;
+            intents = null;
+            traits = null;
         }
     }
 }

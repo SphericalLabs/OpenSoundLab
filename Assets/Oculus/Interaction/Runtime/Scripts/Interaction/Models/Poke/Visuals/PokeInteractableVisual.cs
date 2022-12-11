@@ -94,7 +94,10 @@ namespace Oculus.Interaction
             foreach (PokeInteractor pokeInteractor in _pokeInteractors)
             {
                 // Scalar project the poke interactor's position onto the button base's normal vector
-                float pokeDistance = Vector3.Dot(pokeInteractor.Origin - _buttonBaseTransform.position, -1f * _buttonBaseTransform.forward);
+                float pokeDistance =
+                    Vector3.Dot(pokeInteractor.Origin - _buttonBaseTransform.position,
+                        -1f * _buttonBaseTransform.forward);
+                pokeDistance -= pokeInteractor.Radius;
                 if (pokeDistance < 0f)
                 {
                     pokeDistance = 0f;

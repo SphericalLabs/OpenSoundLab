@@ -146,7 +146,7 @@ namespace Oculus.Interaction.HandGrab.Editor
             mirrorPoint.LoadData(mirrorData, originalPoint.RelativeTo);
             if (originalPoint.SnapSurface != null)
             {
-                SnapSurfaces.ISnapSurface mirroredSurface = originalPoint.SnapSurface.CreateMirroredSurface(mirrorPoint.gameObject);
+                Grab.GrabSurfaces.IGrabSurface mirroredSurface = originalPoint.SnapSurface.CreateMirroredSurface(mirrorPoint.gameObject);
                 mirrorPoint.InjectOptionalSurface(mirroredSurface);
             }
         }
@@ -157,7 +157,7 @@ namespace Oculus.Interaction.HandGrab.Editor
             targetPoint.LoadData(mirrorData, originalPoint.RelativeTo);
             if (originalPoint.SnapSurface != null)
             {
-                SnapSurfaces.ISnapSurface mirroredSurface = originalPoint.SnapSurface.CreateDuplicatedSurface(targetPoint.gameObject);
+                Grab.GrabSurfaces.IGrabSurface mirroredSurface = originalPoint.SnapSurface.CreateDuplicatedSurface(targetPoint.gameObject);
                 targetPoint.InjectOptionalSurface(mirroredSurface);
             }
         }

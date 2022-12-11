@@ -46,7 +46,6 @@ MonoBehaviour:
   _hand: {fileID: 5346183831593185114}
   _pokeInteractor: {fileID: 482801000701448007}
   _syntheticHand: {fileID: 0}
-  _maxDistanceFromTouchPoint: 0.1
 --- !u!1 &5419937293532398298
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,33 +109,9 @@ MonoBehaviour:
   _activeState: {fileID: 5346183831593185114}
   _interactableFilters: []
   _pointTransform: {fileID: 5419937294994736466}
+  _radius: 0.005
   _touchReleaseThreshold: 0.002
-  _dragStartCurve:
-    _animationCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    _animationLength: 1
+  _equalDistanceThreshold: 0.001
 --- !u!114 &7235919250664999267
 MonoBehaviour:
   m_ObjectHideFlags: 0

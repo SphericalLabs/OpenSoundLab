@@ -107,9 +107,9 @@ CapsuleCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.025
-  m_Height: 0.06
+  m_Height: 0.09
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.013425885, z: 0}
 --- !u!1 &2781004746544239580
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,7 +272,7 @@ MonoBehaviour:
   _rigidbody: {fileID: 3282029262929392819}
   _handGrabApi: {fileID: 2165145697951878349}
   _supportedGrabTypes: -1
-  _canHoverWithoutStrength: 0
+  _hoverOnZeroStrength: 0
   _gripPoint: {fileID: 479229219}
   _gripCollider: {fileID: 3414864589318482299}
   _pinchPoint: {fileID: 2089408844803092864}

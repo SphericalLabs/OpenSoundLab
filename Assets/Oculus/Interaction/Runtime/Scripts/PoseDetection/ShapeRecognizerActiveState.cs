@@ -65,7 +65,7 @@ namespace Oculus.Interaction.PoseDetection
                 }
             }
 
-            bool foundAspect = Hand.GetHandAspect(out IFingerFeatureStateProvider state);
+            bool foundAspect = Hand.TryGetAspect(out IFingerFeatureStateProvider state);
             Assert.IsTrue(foundAspect);
             FingerFeatureStateProvider = state;
 

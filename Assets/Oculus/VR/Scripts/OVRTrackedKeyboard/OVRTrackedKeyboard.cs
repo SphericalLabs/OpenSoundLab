@@ -255,6 +255,16 @@ public class OVRTrackedKeyboard : MonoBehaviour
 	         "These are both suggestions and may not always be available.")]
 	private KeyboardPresentation presentation = KeyboardPresentation.PreferOpaque;
 
+	[SerializeField]
+	[Tooltip("Changes the Texture Quality setting of the currently used texture. Affects visualization quality only " +
+			 "A value of -1 means no filtering. Bilinear is 0 (Unity Default) up to Aniso 16x which is 9.")]
+	public OVRTextureQualityFiltering textureFiltering = OVRTextureQualityFiltering.Aniso2x;
+
+	[SerializeField]
+	[Tooltip("Changes the MipMap Bias of the currently used texture. Affects visualization quality only.")]
+	[Range(-1.0f, 1.0f)]
+	public float mipmapBias = -0.3f;
+
 	/// <summary>
 	/// How large of a passthrough area to show surrounding the keyboard when using Key Label presentation.
 	/// </summary>
@@ -282,6 +292,8 @@ public class OVRTrackedKeyboard : MonoBehaviour
 	private MeshRenderer activeKeyboardMeshRenderer_;
 	private GameObject passthroughQuad_;
 	private Shader opaqueShader_;
+	// This is a copy of the texture loaded from the glb. The original texture might be read-only on the GPU (impossible to modify).
+	private Texture2D dynamicQualityTexture_;
 	private Vector3 untrackedPosition_;
 
 	// These properties generally don't need to be modified by the user of the prefab
@@ -740,7 +752,6 @@ public class OVRTrackedKeyboard : MonoBehaviour
 		}
 
 		opaqueShader_ = activeKeyboardMeshRenderer_.material.shader;
-		activeKeyboardMeshRenderer_.material.shader = KeyLabelModeShader;
 
 		passthroughQuad_ = GameObject.CreatePrimitive(PrimitiveType.Quad);
 		passthroughQuad_.transform.localPosition = new Vector3(0.0f, -0.01f, 0.0f);
@@ -764,7 +775,35 @@ public class OVRTrackedKeyboard : MonoBehaviour
 
 		ActiveKeyboardTransform.localRotation = Quaternion.identity;
 
+		// Make a copy of the current main texture (created by the OVRGLTFLoader) to apply our quality setting more freely
+		Texture readonlyTexture = activeKeyboardMeshRenderer_.material.mainTexture;
+		if (readonlyTexture != null)
+		{
+			dynamicQualityTexture_ = Texture2D.CreateExternalTexture(
+				readonlyTexture.width,
+				readonlyTexture.height,
+				TextureFormat.BC7,
+				mipChain: true, linear: true,
+				readonlyTexture.GetNativeTexturePtr());
+		}
+		UpdateTextureQuality();
 		UpdateKeyboardVisibility();
+	}
+
+	/// <summary>
+	/// Apply the current texture quality settings and reapplies texture to material
+	/// </summary>
+	void UpdateTextureQuality()
+	{
+		if (dynamicQualityTexture_ == null)
+			return;
+
+		OVRGLTFLoader.ApplyTextureQuality(textureFiltering, ref dynamicQualityTexture_);
+		Material currentMat = activeKeyboardMeshRenderer_.material;
+		currentMat.mainTexture = dynamicQualityTexture_;
+		if (currentMat.HasProperty("_MainTexMMBias"))
+			currentMat.SetFloat("_MainTexMMBias", mipmapBias);
+		activeKeyboardMeshRenderer_.material = currentMat;
 	}
 
 	void UpdatePresentation(bool isVisible)
@@ -829,7 +868,7 @@ public class OVRTrackedKeyboard : MonoBehaviour
 								OVRGLTFLoader gltfLoader = new OVRGLTFLoader(data);
 								gltfLoader.SetModelShader(keyboardModelShader);
 								gltfLoader.SetModelAlphaBlendShader(keyboardModelAlphaBlendShader);
-								OVRGLTFScene scene = gltfLoader.LoadGLB(false);
+								OVRGLTFScene scene = gltfLoader.LoadGLB(supportAnimation: false, loadMips: true);
 								return scene.root;
 							}
 						}
@@ -848,6 +887,9 @@ public class OVRTrackedKeyboard : MonoBehaviour
 	/// </summary>
 	public void UpdateKeyboardVisibility()
 	{
+		if (activeKeyboardMesh_ == null)
+			return;
+
 		var isVisible = GetKeyboardVisibility();
 		UpdatePresentation(isVisible);
 
@@ -931,6 +973,10 @@ public class OVRTrackedKeyboard : MonoBehaviour
 				}
 			case TrackedKeyboardState.Valid:
 				return true;
+			default:
+				if (showUntracked)
+					return true;
+				break;
 		}
 
 		return false;

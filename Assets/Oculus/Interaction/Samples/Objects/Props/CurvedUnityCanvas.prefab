@@ -10,6 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8935686536591869976}
   - component: {fileID: 5493972335466592047}
+  - component: {fileID: 2985875327630501294}
+  - component: {fileID: 3771412294384680115}
+  - component: {fileID: 2444969357377947119}
   m_Layer: 0
   m_Name: Canvas Mesh
   m_TagString: Untagged
@@ -44,14 +47,85 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canvasRenderTexture: {fileID: 1134468468563343773}
+  _meshFilter: {fileID: 3771412294384680115}
   _meshCollider: {fileID: 5166167232978179736}
-  _runtimeOffset: {x: 0, y: 0, z: 0}
+  _cylinder: {fileID: 470775373127492019}
+  _orientation: 1
   _meshGeneration:
     VerticesPerDegree: 1.4
     MaxHorizontalResolution: 128
     MaxVerticalResolution: 32
-  _cylinder: {fileID: 470775373127492019}
-  _orientation: 1
+--- !u!114 &2985875327630501294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945097615866765664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e79beb32c1e430c42aa2376685d99ae7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvasRenderTexture: {fileID: 1134468468563343773}
+  _meshRenderer: {fileID: 2444969357377947119}
+  _renderingMode: 1
+  _useAlphaToMask: 1
+  _alphaCutoutThreshold: 0.5
+  _canvasMesh: {fileID: 5493972335466592047}
+  _runtimeOffset: {x: 0, y: 0, z: 0}
+  _enableSuperSampling: 1
+  _doUnderlayAntiAliasing: 0
+  _emulateWhileInEditor: 1
+--- !u!33 &3771412294384680115
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945097615866765664}
+  m_Mesh: {fileID: 0}
+--- !u!23 &2444969357377947119
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945097615866765664}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6860809024666361331
 GameObject:
   m_ObjectHideFlags: 0
@@ -112,7 +186,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cylinder: {fileID: 470775373127492019}
   _facing: 1
-  _surfaceOrientation: 1
   _height: 0
 --- !u!114 &8486259948616120778
 MonoBehaviour:
@@ -2428,6 +2501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 317e663e2bb60ea408fe22b908b59295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interactorFilters: []
   _maxInteractors: -1
   _maxSelectingInteractors: -1
   _pointableElement: {fileID: 8852292918159927502}
@@ -2436,9 +2510,40 @@ MonoBehaviour:
   _maxDistance: 0.01
   _enterHoverDistance: 0
   _releaseDistance: 0.1
-  _horizontalDragThreshold: 0.01
-  _verticalDragThreshold: 0.01
   _volumeMask: {fileID: 0}
+  _dragThresholding:
+    Enabled: 1
+    SurfaceThreshold: 0.01
+    ZThreshold: 0.01
+    DragEaseCurve:
+      _animationCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      _animationLength: 0.05
+  _positionPinning:
+    Enabled: 0
+    MaxPinDistance: 0
 --- !u!114 &7114770129336771052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2470,7 +2575,7 @@ MonoBehaviour:
   _transferOnSecondSelection: 0
   _addNewPointsToFront: 0
   _forwardElement: {fileID: 7114770129336771052}
-  _canvasRenderTextureMesh: {fileID: 5493972335466592047}
+  _canvasMesh: {fileID: 5493972335466592047}
 --- !u!114 &7114770129336771048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7187,21 +7292,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7ecff74e52843a41ab3a441ac81379e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _canvas: {fileID: 7114770130731238581}
   _renderScale: 1
   _dimensionsDriveMode: 0
   _resolution: {x: 128, y: 128}
-  _pixelsPerUnit: 2048
-  _renderingMode: 1
   _generateMipMaps: 0
-  _useAlphaToMask: 1
-  _alphaCutoutThreshold: 0.5
-  _enableSuperSampling: 1
-  _doUnderlayAntiAliasing: 0
-  _emulateWhileInEditor: 1
+  _pixelsPerUnit: 2048
   _renderingLayers:
     serializedVersion: 2
     m_Bits: 32
-  _defaultUIMaterial: {fileID: 2100000, guid: bc9f80a2ae0e0a24d870176e48ab1b93, type: 2}
 --- !u!1 &7114770130762944031
 GameObject:
   m_ObjectHideFlags: 0

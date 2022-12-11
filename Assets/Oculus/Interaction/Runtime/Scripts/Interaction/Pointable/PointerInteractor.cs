@@ -49,7 +49,8 @@ namespace Oculus.Interaction
                 }
             }
 
-            interactable.PublishPointerEvent(new PointerEvent(Identifier, pointerEventType, pose));
+            interactable.PublishPointerEvent(
+                new PointerEvent(Identifier, pointerEventType, pose, Data));
         }
 
         protected virtual void HandlePointerEventRaised(PointerEvent evt)

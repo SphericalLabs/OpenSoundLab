@@ -18,15 +18,13 @@
  * limitations under the License.
  */
 
-using System;
-using System.Diagnostics;
-using Facebook.WitAi.Utilities;
-using Oculus.Voice.Core.Bindings.Android;
-using Oculus.Voice.Interfaces;
+
+using Oculus.Voice.Core.Bindings.Interfaces;
+using Oculus.Voice.Core.Utilities;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Oculus.Voice.Bindings.Android
+namespace Oculus.Voice.Core.Bindings.Android.PlatformLogger
 {
     public class VoiceSDKConsoleLoggerImpl : IVoiceSDKLogger
     {

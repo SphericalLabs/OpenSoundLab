@@ -6,7 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-using System;
 using System.Text;
 using System.Collections.Generic;
 using Facebook.WitAi.Configuration;
@@ -14,7 +13,6 @@ using Facebook.WitAi.Data.Configuration;
 using Facebook.WitAi.Data.Entities;
 using Facebook.WitAi.Interfaces;
 using Facebook.WitAi.Lib;
-using UnityEngine;
 
 namespace Facebook.WitAi
 {
@@ -169,6 +167,26 @@ namespace Facebook.WitAi
             var path = WitEndpointConfig.GetEndpointConfig(config).Speech;
             WitRequest request = new WitRequest(config, path, queryParams.ToArray());
 
+            if (null != requestOptions)
+            {
+                request.onResponse += requestOptions.onResponse;
+                request.requestId = requestOptions.requestID;
+            }
+
+            return request;
+        }
+
+        /// <summary>
+        /// Creates a request for getting the transcription from the mic data
+        /// </summary>
+        ///<param name="config"></param>
+        /// <param name="requestOptions"></param>
+        /// <returns>WitRequest</returns>
+        public static WitRequest DictationRequest(this WitConfiguration config, WitRequestOptions requestOptions)
+        {
+            List<WitRequest.QueryParam> queryParams = new List<WitRequest.QueryParam>();
+            var path = WitEndpointConfig.GetEndpointConfig(config).Dictation;
+            WitRequest request = new WitRequest(config, path, queryParams.ToArray());
             if (null != requestOptions)
             {
                 request.onResponse += requestOptions.onResponse;

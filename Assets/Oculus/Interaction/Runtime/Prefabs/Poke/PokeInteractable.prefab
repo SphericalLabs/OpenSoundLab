@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _facing: 0
-  _doubleSided: 1
+  _doubleSided: 0
 --- !u!1 &4556222279012277189
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,17 +326,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 317e663e2bb60ea408fe22b908b59295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interactorFilters: []
   _maxInteractors: -1
   _maxSelectingInteractors: -1
   _pointableElement: {fileID: 0}
-  _proximityField: {fileID: 3545893600555203920}
   _surface: {fileID: 7896607432929550461}
+  _proximityField: {fileID: 3545893600555203920}
   _maxDistance: 0.015
   _enterHoverDistance: 0
   _releaseDistance: 0.1
-  _horizontalDragThreshold: 0
-  _verticalDragThreshold: 0
+  _tiebreakerScore: 0
   _volumeMask: {fileID: 0}
+  _dragThresholding:
+    Enabled: 1
+    SurfaceThreshold: 0.01
+    ZThreshold: 0.01
+    DragEaseCurve:
+      _animationCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      _animationLength: 0.05
+  _positionPinning:
+    Enabled: 0
+    MaxPinDistance: 0
 --- !u!1 &6818260453226087683
 GameObject:
   m_ObjectHideFlags: 0

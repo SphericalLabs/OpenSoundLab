@@ -26,11 +26,10 @@ using UnityEngine.Serialization;
 namespace Oculus.Interaction
 {
     /// <summary>
-    /// The SnapInteractor referes to an element that can snap to a SnapInteractable.
-    /// This interactor moves itself into the Pose specified by the intereactable.
-    /// Additionally, it can specify a preferred SnapInteractable and a TimeOut time, and it
-    /// will automatically snap there if its Pointable element has not been used (hovered, selected)
-    /// for a certain time.
+    /// SnapInteractors can snap to poses provided by SnapInteractables.
+    /// SnapInteractors select and unselect in response to a PointableElement.
+    /// SnapInteractors hover when the PointableElement has selecting pointers and snap to the best
+    /// SnapInteractable pose when the PointableElement has no more selecting pointers.
     /// </summary>
     public class SnapInteractor : Interactor<SnapInteractor, SnapInteractable>,
         IRigidbodyRef
@@ -42,19 +41,26 @@ namespace Oculus.Interaction
         private Rigidbody _rigidbody;
         public Rigidbody Rigidbody => _rigidbody;
 
-        [SerializeField, Optional]
-        [FormerlySerializedAs("_dropPoint")]
-        private Transform _snapPoint;
-        public Pose SnapPose => _snapPoint.GetPose();
+        [SerializeField]
+        private float _distanceThreshold = 0.01f;
 
-        [Header("Time out")]
         [SerializeField, Optional]
-        private SnapInteractable _timeOutInteractable;
+        [FormerlySerializedAs("_snapPoint")]
+        [FormerlySerializedAs("_dropPoint")]
+        private Transform _snapPoseTransform;
+        public Pose SnapPose => _snapPoseTransform.GetPose();
+
+        [SerializeField, Optional]
+        private SnapInteractable _defaultInteractable = null;
+
+        [SerializeField, Optional]
+        private SnapInteractable _timeOutInteractable = null;
+
         [SerializeField, Optional]
         private float _timeOut = 0f;
 
         private float _idleStarted = -1f;
-        private IMovement _movement;
+        private IMovement _movement = null;
 
         #region Editor events
         private void Reset()
@@ -64,21 +70,33 @@ namespace Oculus.Interaction
         }
         #endregion
 
-        #region Unity Lifecycle
-        protected override void Awake()
+        #region Properties
+
+        public float DistanceThreshold
         {
-            base.Awake();
-            _pointableElement = _pointableElement as PointableElement;
+            get
+            {
+                return _distanceThreshold;
+            }
+
+            set
+            {
+                _distanceThreshold = value;
+            }
         }
+
+        #endregion
+
+        #region Unity Lifecycle
 
         protected override void Start()
         {
             this.BeginStart(ref _started, () => base.Start());
-            Assert.IsNotNull(_pointableElement, "Pointable element can not be null");
-            Assert.IsNotNull(Rigidbody, "Rigidbody can not be null");
-            if (_snapPoint == null)
+            Assert.IsNotNull(_pointableElement);
+            Assert.IsNotNull(Rigidbody);
+            if (_snapPoseTransform == null)
             {
-                _snapPoint = this.transform;
+                _snapPoseTransform = this.transform;
             }
 
             this.EndStart(ref _started);
@@ -90,6 +108,11 @@ namespace Oculus.Interaction
             if (_started)
             {
                 _pointableElement.WhenPointerEventRaised += HandlePointerEventRaised;
+                if (_defaultInteractable != null)
+                {
+                    SetComputeCandidateOverride(() => _defaultInteractable, true);
+                    SetComputeShouldSelectOverride(()=>true, true);
+                }
             }
         }
 
@@ -106,77 +129,51 @@ namespace Oculus.Interaction
 
         #region Interactor Lifecycle
 
-        public override bool ShouldSelect
+        protected override bool ComputeShouldSelect()
         {
-            get
-            {
-                if (State != InteractorState.Hover)
-                {
-                    return false;
-                }
-
-                return _pointableElement.SelectingPointsCount == 0;
-            }
+            return _shouldSelect;
         }
 
-        public override bool ShouldUnselect {
-            get
-            {
-                if (State != InteractorState.Select)
-                {
-                    return false;
-                }
-
-                return _shouldUnselect;
-            }
+        protected override bool ComputeShouldUnselect()
+        {
+            return _shouldUnselect;
         }
-
 
         protected override void DoHoverUpdate()
         {
             base.DoHoverUpdate();
+
+            _shouldUnselect = false;
 
             if (Interactable == null)
             {
                 return;
             }
 
+            GeneratePointerEvent(PointerEventType.Move);
             Interactable.InteractorHoverUpdated(this);
         }
 
+        private bool _shouldSelect = false;
         private bool _shouldUnselect = false;
 
         protected override void DoSelectUpdate()
         {
             base.DoSelectUpdate();
 
-            _shouldUnselect = false;
-
-            if (_movement == null)
+            if (_movement == null || Interactable == null)
             {
                 _shouldUnselect = true;
                 return;
             }
 
-            if (Interactable != null)
+            if (Interactable.PoseForInteractor(this, out Pose targetPose))
             {
-                if (Interactable.PoseForInteractor(this, out Pose targetPose))
-                {
-                    _movement.UpdateTarget(targetPose);
-                    _movement.Tick();
-                    GeneratePointerEvent(PointerEventType.Move);
-                }
-                else
-                {
-                    _shouldUnselect = true;
-                }
+                _movement.UpdateTarget(targetPose);
+                _movement.Tick();
+                GeneratePointerEvent(PointerEventType.Move);
             }
             else
-            {
-                _shouldUnselect = true;
-            }
-
-            if (_pointableElement.SelectingPointsCount > 1)
             {
                 _shouldUnselect = true;
             }
@@ -203,9 +200,10 @@ namespace Oculus.Interaction
         protected override void InteractableSelected(SnapInteractable interactable)
         {
             base.InteractableSelected(interactable);
+            _shouldSelect = false;
             if (interactable != null)
             {
-                _movement = interactable.GenerateMovement(_snapPoint.GetPose(), this);
+                _movement = interactable.GenerateMovement(_snapPoseTransform.GetPose(), this);
                 if (_movement != null)
                 {
                     GeneratePointerEvent(PointerEventType.Select);
@@ -230,36 +228,45 @@ namespace Oculus.Interaction
 
         protected virtual void HandlePointerEventRaised(PointerEvent evt)
         {
-            if (_pointableElement.PointsCount == 0
-                && (evt.Type == PointerEventType.Cancel
-                    || evt.Type == PointerEventType.Unhover
-                    || evt.Type == PointerEventType.Unselect))
+            if (_pointableElement.SelectingPointsCount == 0 &&
+                evt.Identifier != Identifier &&
+                evt.Type == PointerEventType.Unselect)
             {
-                _idleStarted = Time.time;
-            }
-            else
-            {
-                _idleStarted = -1f;
+                if (Interactable != null)
+                {
+                    _shouldSelect = true;
+                }
             }
 
-            if (evt.Identifier == Identifier
-                && evt.Type == PointerEventType.Cancel
-                && Interactable != null)
+            if (evt.Identifier == Identifier &&
+                evt.Type == PointerEventType.Cancel &&
+                Interactable != null)
             {
                 Interactable.RemoveInteractorByIdentifier(Identifier);
             }
         }
 
-
-        public void GeneratePointerEvent(PointerEventType pointerEventType, Pose pose)
-        {
-            _pointableElement.ProcessPointerEvent(new PointerEvent(Identifier, pointerEventType, pose));
-        }
-
         private void GeneratePointerEvent(PointerEventType pointerEventType)
         {
             Pose pose = ComputePointerPose();
-            _pointableElement.ProcessPointerEvent(new PointerEvent(Identifier, pointerEventType, pose));
+            _pointableElement.ProcessPointerEvent(
+                new PointerEvent(
+                    Identifier, pointerEventType, pose, Data));
+        }
+
+        protected override void DoPreprocess()
+        {
+            if (_pointableElement.Points.Count == 0)
+            {
+                if (_idleStarted < 0)
+                {
+                    _idleStarted = Time.time;
+                }
+            }
+            else
+            {
+                _idleStarted = -1;
+            }
         }
 
         protected Pose ComputePointerPose()
@@ -282,43 +289,57 @@ namespace Oculus.Interaction
 
         protected override SnapInteractable ComputeCandidate()
         {
-            SnapInteractable interactable = ComputeIntersectingCandidate();
             if (TimedOut())
             {
-                return interactable != null ? interactable : _timeOutInteractable;
+                _shouldSelect = true;
+                return _timeOutInteractable;
             }
-            return interactable;
-        }
 
-        private SnapInteractable ComputeIntersectingCandidate()
-        {
-            Vector3 position = Rigidbody.transform.position;
+            if (_pointableElement.SelectingPointsCount == 0)
+            {
+                if (!_shouldSelect)
+                {
+                    return null;
+                }
+                else
+                {
+                    return Interactable;
+                }
+            }
+
+            float distanceThresholdSqr = _distanceThreshold * _distanceThreshold;
+
             SnapInteractable closestInteractable = null;
-            float bestScore = float.MaxValue;
-            float score = bestScore;
-            bool closestPointIsInside = false;
+            float bestPositionDeltaSqr = float.MaxValue;
+            float bestAngularDelta = float.MaxValue;
 
             IEnumerable<SnapInteractable> interactables = SnapInteractable.Registry.List(this);
             foreach (SnapInteractable interactable in interactables)
             {
-                Collider[] colliders = interactable.Colliders;
-                foreach (Collider collider in colliders)
+                if (!interactable.PoseForInteractor(this, out Pose pose))
                 {
-                    bool isPointInsideCollider = Collisions.IsPointWithinCollider(position, collider);
-                    if (!isPointInsideCollider && closestPointIsInside)
-                    {
-                        continue;
-                    }
-                    Vector3 measuringPoint = isPointInsideCollider ? collider.bounds.center : collider.ClosestPoint(position);
-                    score = (position - measuringPoint).sqrMagnitude;
-                    if (score < bestScore || (isPointInsideCollider && !closestPointIsInside))
-                    {
-                        bestScore = score;
-                        closestInteractable = interactable;
-                        closestPointIsInside = isPointInsideCollider;
-                    }
+                    continue;
                 }
+
+                float positionDeltaSqr = (pose.position - _snapPoseTransform.position).sqrMagnitude;
+                if (positionDeltaSqr > bestPositionDeltaSqr)
+                {
+                    continue;
+                }
+
+                float angularDist = Quaternion.Angle(pose.rotation, _snapPoseTransform.rotation);
+                if (Mathf.Abs(positionDeltaSqr - bestPositionDeltaSqr) < distanceThresholdSqr &&
+                    angularDist >= bestAngularDelta)
+                {
+                    continue;
+                }
+
+                bestPositionDeltaSqr = positionDeltaSqr;
+                bestAngularDelta = angularDist;
+                closestInteractable = interactable;
+
             }
+
             return closestInteractable;
         }
 
@@ -340,9 +361,9 @@ namespace Oculus.Interaction
             _rigidbody = rigidbody;
         }
 
-        public void InjectOptionalSnapPoint(Transform snapPoint)
+        public void InjectOptionalSnapPoseTransform(Transform snapPoint)
         {
-            _snapPoint = snapPoint;
+            _snapPoseTransform = snapPoint;
         }
 
         public void InjectOptionalTimeOutInteractable(SnapInteractable interactable)

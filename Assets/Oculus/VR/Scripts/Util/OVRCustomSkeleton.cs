@@ -30,6 +30,79 @@ public class OVRCustomSkeleton : OVRSkeleton, ISerializationCallbackReceiver
 	private List<Transform> _customBones_V2;
 
 #if UNITY_EDITOR
+	private static readonly string[] _fbxBodyBoneNames =
+	{
+		"Root",
+		"Hips",
+		"SpineLower",
+		"SpineMiddle",
+		"SpineUpper",
+		"Chest",
+		"Neck",
+		"Head",
+		"LeftShoulder",
+		"LeftScapula",
+		"LeftArmUpper",
+		"LeftArmLower",
+		"LeftHandWristTwist",
+		"RightShoulder",
+		"RightScapula",
+		"RightArmUpper",
+		"RightArmLower",
+		"RightHandWristTwist",
+		"LeftHandPalm",
+		"LeftHandWrist",
+		"LeftHandThumbMetacarpal",
+		"LeftHandThumbProximal",
+		"LeftHandThumbDistal",
+		"LeftHandThumbTip",
+		"LeftHandIndexMetacarpal",
+		"LeftHandIndexProximal",
+		"LeftHandIndexIntermediate",
+		"LeftHandIndexDistal",
+		"LeftHandIndexTip",
+		"LeftHandMiddleMetacarpal",
+		"LeftHandMiddleProximal",
+		"LeftHandMiddleIntermediate",
+		"LeftHandMiddleDistal",
+		"LeftHandMiddleTip",
+		"LeftHandRingMetacarpal",
+		"LeftHandRingProximal",
+		"LeftHandRingIntermediate",
+		"LeftHandRingDistal",
+		"LeftHandRingTip",
+		"LeftHandLittleMetacarpal",
+		"LeftHandLittleProximal",
+		"LeftHandLittleIntermediate",
+		"LeftHandLittleDistal",
+		"LeftHandLittleTip",
+		"RightHandPalm",
+		"RightHandWrist",
+		"RightHandThumbMetacarpal",
+		"RightHandThumbProximal",
+		"RightHandThumbDistal",
+		"RightHandThumbTip",
+		"RightHandIndexMetacarpal",
+		"RightHandIndexProximal",
+		"RightHandIndexIntermediate",
+		"RightHandIndexDistal",
+		"RightHandIndexTip",
+		"RightHandMiddleMetacarpal",
+		"RightHandMiddleProximal",
+		"RightHandMiddleIntermediate",
+		"RightHandMiddleDistal",
+		"RightHandMiddleTip",
+		"RightHandRingMetacarpal",
+		"RightHandRingProximal",
+		"RightHandRingIntermediate",
+		"RightHandRingDistal",
+		"RightHandRingTip",
+		"RightHandLittleMetacarpal",
+		"RightHandLittleProximal",
+		"RightHandLittleIntermediate",
+		"RightHandLittleDistal",
+		"RightHandLittleTip"
+	};
 
 	private static readonly string[] _fbxHandSidePrefix = { "l_", "r_" };
 	private static readonly string _fbxHandBonePrefix = "b_";
@@ -82,6 +155,13 @@ public class OVRCustomSkeleton : OVRSkeleton, ISerializationCallbackReceiver
 				string fbxBoneName = FbxBoneNameFromBoneId(skeletonType, (BoneId)bi);
 				Transform t = transform.FindChildRecursive(fbxBoneName);
 
+				if (t == null && skeletonType == SkeletonType.Body)
+				{
+					var legacyBoneName = fbxBoneName
+						.Replace("Little", "Pinky")
+						.Replace("Metacarpal", "Meta");
+					t = transform.FindChildRecursive(legacyBoneName);
+				}
 
 				if (t != null)
 				{
@@ -93,6 +173,11 @@ public class OVRCustomSkeleton : OVRSkeleton, ISerializationCallbackReceiver
 
 	private static string FbxBoneNameFromBoneId(SkeletonType skeletonType, BoneId bi)
 	{
+		if (skeletonType == SkeletonType.Body)
+		{
+			return _fbxBodyBoneNames[(int)bi];
+		}
+		else
 		{
 			if (bi >= BoneId.Hand_ThumbTip && bi <= BoneId.Hand_PinkyTip)
 			{

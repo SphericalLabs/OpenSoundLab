@@ -8,6 +8,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using Meta.Conduit.Editor;
 using Facebook.WitAi.Configuration;
 using Facebook.WitAi.Data.Configuration;
@@ -26,7 +27,7 @@ namespace Facebook.WitAi.Windows
         private bool _initialized = false;
         public bool drawHeader = true;
         private bool _foldout = true;
-        private int _requestTab = -1;
+        private int _requestTab = 0;
         private bool manifestAvailable = false;
 
         private static ConduitStatistics _statistics;
@@ -117,34 +118,30 @@ namespace Facebook.WitAi.Windows
             string manifestPath = configuration.ManifestEditorPath;
             manifestAvailable = File.Exists(manifestPath);
 
-            /*
             var useConduit = (GUILayout.Toggle(configuration.useConduit, "Use Conduit (Beta)"));
             if (configuration.useConduit != useConduit)
             {
                 configuration.useConduit = useConduit;
                 EditorUtility.SetDirty(configuration);
             }
-            */
 
             EditorGUI.BeginDisabledGroup(!configuration.useConduit);
             {
                 EditorGUI.indentLevel++;
                 GUILayout.Space(EditorGUI.indentLevel * WitStyles.ButtonMargin);
                 {
-                    if (manifestAvailable)
+                    GUILayout.BeginHorizontal();
+                    if (WitEditorUI.LayoutTextButton(manifestAvailable ? "Update Manifest" : "Generate Manifest"))
                     {
-                        if (WitEditorUI.LayoutTextButton("Select Manifest"))
-                        {
-                            Selection.activeObject = AssetDatabase.LoadAssetAtPath<TextAsset>(configuration.ManifestEditorPath);
-                        }
+                        GenerateManifest(configuration, configuration.openManifestOnGeneration);
                     }
-                    else
+                    GUI.enabled = manifestAvailable;
+                    if (WitEditorUI.LayoutTextButton("Select Manifest") && manifestAvailable)
                     {
-                        if (WitEditorUI.LayoutTextButton("Generate Manifest"))
-                        {
-                            GenerateManifest(configuration, configuration.openManifestOnGeneration);
-                        }
+                        Selection.activeObject = AssetDatabase.LoadAssetAtPath<TextAsset>(configuration.ManifestEditorPath);
                     }
+                    GUI.enabled = true;
+                    GUILayout.EndHorizontal();
                     GUILayout.Space(WitStyles.ButtonMargin);
                     configuration.autoGenerateManifest = (GUILayout.Toggle(configuration.autoGenerateManifest, "Auto Generate"));
                 }
@@ -180,6 +177,7 @@ namespace Facebook.WitAi.Windows
                     GUI.enabled = isValid;
                     if (WitEditorUI.LayoutTextButton(WitTexts.Texts.ConfigurationRefreshButtonLabel))
                     {
+                        configuration.ResetData();
                         ApplyServerToken(_serverToken);
                     }
                 }
@@ -189,7 +187,7 @@ namespace Facebook.WitAi.Windows
                     GUI.enabled = !isRefreshing;
                     if (WitEditorUI.LayoutTextButton(isRefreshing ? WitTexts.Texts.ConfigurationRefreshingButtonLabel : WitTexts.Texts.ConfigurationRefreshButtonLabel))
                     {
-                        SafeRefresh();
+                        SafeRefresh(true);
                     }
                 }
             }
@@ -206,8 +204,9 @@ namespace Facebook.WitAi.Windows
                 // Server access token
                 bool updated = false;
                 WitEditorUI.LayoutPasswordField(WitTexts.ConfigurationServerTokenContent, ref _serverToken, ref updated);
-                if (updated)
+                if (updated && WitConfigurationUtility.IsServerTokenValid(_serverToken))
                 {
+                    configuration.ResetData();
                     ApplyServerToken(_serverToken);
                 }
 
@@ -260,7 +259,12 @@ namespace Facebook.WitAi.Windows
         // Apply server token
         public void ApplyServerToken(string newToken)
         {
-            _serverToken = newToken;
+            if (newToken != _serverToken)
+            {
+                _serverToken = newToken;
+                configuration.ResetData();
+            }
+
             configuration.SetServerToken(_serverToken);
         }
         // Whether or not to allow a configuration to refresh
@@ -374,6 +378,22 @@ namespace Facebook.WitAi.Windows
         // Determine if tab should show
         protected virtual bool ShouldTabShow(WitConfiguration configuration, string tabID)
         {
+            if(null == configuration.application ||
+                   string.IsNullOrEmpty(configuration.application.id))
+            {
+                return false;
+            }
+
+            switch (tabID)
+            {
+                case TAB_INTENTS_ID:
+                    return null != configuration.intents;
+                case TAB_ENTITIES_ID:
+                    return null != configuration.entities;
+                case TAB_TRAITS_ID:
+                    return null != configuration.traits;
+            }
+
             return true;
         }
         // Get tab text
@@ -392,9 +412,22 @@ namespace Facebook.WitAi.Windows
             }
             return string.Empty;
         }
-        // Safe refresh
+
         protected virtual void SafeRefresh()
         {
+            SafeRefresh(false);
+        }
+
+        // Safe refresh
+        private void SafeRefresh(bool resetData)
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+
+            if (resetData)
+            {
+                configuration.ResetData();
+            }
+
             if (WitConfigurationUtility.IsServerTokenValid(_serverToken))
             {
                 configuration.SetServerToken(_serverToken);
@@ -423,21 +456,33 @@ namespace Facebook.WitAi.Windows
         /// <param name="openManifest">If true, will open the manifest file in the code editor.</param>
         private static void GenerateManifest(WitConfiguration configuration, bool openManifest)
         {
+            // Generate
             var startGenerationTime = DateTime.UtcNow;
             var manifest = ManifestGenerator.GenerateManifest(configuration.application.name,
                 configuration.application.id);
-
             var endGenerationTime = DateTime.UtcNow;
-            // Generate resource directory
-            string resourcesDirectory = Application.dataPath + "/Oculus/Voice/Resources";
-            IOUtility.CreateDirectory(resourcesDirectory, true);
 
-            // Get full path
-            string fullPath = resourcesDirectory + "/" + configuration.manifestLocalPath;
-            var writer = new StreamWriter(fullPath);
+            // Get file path
+            string fullPath = configuration.ManifestEditorPath;
+            if (string.IsNullOrEmpty(fullPath) || !File.Exists(fullPath))
+            {
+                string directory = Application.dataPath + "/Oculus/Voice/Resources";
+                IOUtility.CreateDirectory(directory, true);
+                fullPath = directory + "/" + configuration.manifestLocalPath;
+            }
 
-            writer.WriteLine(manifest);
-            writer.Close();
+            // Write to file
+            try
+            {
+                var writer = new StreamWriter(fullPath);
+                writer.WriteLine(manifest);
+                writer.Close();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Wit Configuration Editor - Conduit Manifest Creation Failed\nPath: {fullPath}\n{e}");
+                return;
+            }
 
             Statistics.SuccessfulGenerations++;
             Statistics.AddFrequencies(AssemblyMiner.SignatureFrequency);

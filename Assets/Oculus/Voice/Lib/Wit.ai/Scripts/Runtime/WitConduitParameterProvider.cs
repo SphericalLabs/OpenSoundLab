@@ -8,6 +8,7 @@
 
 using System;
 using System.Reflection;
+using Facebook.WitAi.Data;
 using Facebook.WitAi.Lib;
 using Meta.Conduit;
 
@@ -16,25 +17,23 @@ namespace Facebook.WitAi
     internal class WitConduitParameterProvider : ParameterProvider
     {
         public const string WitResponseNodeReservedName = "@WitResponseNode";
+        public const string VoiceSessionReservedName = "@VoiceSession";
         protected override object GetSpecializedParameter(ParameterInfo formalParameter)
         {
-            if (formalParameter.ParameterType != typeof(WitResponseNode))
+            if (formalParameter.ParameterType == typeof(WitResponseNode) && ActualParameters.ContainsKey(WitResponseNodeReservedName))
             {
-                throw new ArgumentException(nameof(formalParameter));
+                return ActualParameters[WitResponseNodeReservedName];
             }
-            
-            var parameterValue = this.ActualParameters[WitResponseNodeReservedName];
-            if (parameterValue == null)
+            else if (formalParameter.ParameterType == typeof(VoiceSession) && ActualParameters.ContainsKey(VoiceSessionReservedName))
             {
-                throw new NotSupportedException("Missing node parameter");
+                return ActualParameters[VoiceSessionReservedName];
             }
-
-            return parameterValue;
+            return null;
         }
 
         protected override bool SupportedSpecializedParameter(ParameterInfo formalParameter)
         {
-            return formalParameter.ParameterType == typeof(WitResponseNode);
+            return formalParameter.ParameterType == typeof(WitResponseNode) || formalParameter.ParameterType == typeof(VoiceSession);
         }
     }
 }

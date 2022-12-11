@@ -110,7 +110,7 @@ namespace Oculus.Interaction
 
         public IMovement GenerateMovement(in Pose to)
         {
-            Pose source = RelativeTo.GetPose();
+            Pose source = _grabSource.GetPose();
             IMovement movement = MovementProvider.CreateMovement();
             movement.StopAndSetPose(source);
             movement.MoveTo(to);

@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-namespace Oculus.Voice.Interfaces
+namespace Oculus.Voice.Core.Bindings.Interfaces
 {
     public interface IVoiceSDKLogger
     {

@@ -72,7 +72,7 @@ namespace Oculus.Interaction.PoseDetection.Debug
             _hand = hand;
             _initialized = true;
 
-            bool foundAspect = hand.GetHandAspect(out _featureState);
+            bool foundAspect = hand.TryGetAspect(out _featureState);
             Assert.IsTrue(foundAspect);
 
             var featureValueProvider = _featureState.GetValueProvider(finger);

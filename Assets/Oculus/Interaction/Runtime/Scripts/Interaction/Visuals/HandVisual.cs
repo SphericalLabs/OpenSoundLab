@@ -125,8 +125,8 @@ namespace Oculus.Interaction
             {
                 if (_root != null && Hand.GetRootPose(out Pose handRootPose))
                 {
-                    _root.localPosition = handRootPose.position;
-                    _root.localRotation = handRootPose.rotation;
+                    _root.position = handRootPose.position;
+                    _root.rotation = handRootPose.rotation;
                 }
             }
 
@@ -134,7 +134,8 @@ namespace Oculus.Interaction
             {
                 if (_root != null)
                 {
-                    _root.localScale = new Vector3(Hand.Scale, Hand.Scale, Hand.Scale);
+                    float parentScale = _root.parent != null ? _root.parent.lossyScale.x : 1f;
+                    _root.localScale = Hand.Scale / parentScale * Vector3.one;
                 }
             }
 

@@ -29,7 +29,7 @@ namespace Oculus.Interaction
     /// This ISnapSlotsProvider uses a ordered list of individual Slots and will
     /// push the elements back or forth to make room for the new element.
     /// </summary>
-    public class SequentialSlotsProvider : MonoBehaviour, ISnapPoseProvider
+    public class SequentialSlotsProvider : MonoBehaviour, ISnapPoseDelegate
     {
         [SerializeField]
         private List<Transform> _slots;
@@ -48,66 +48,66 @@ namespace Oculus.Interaction
             this.EndStart(ref _started);
         }
 
-        public void TrackInteractor(SnapInteractor interactor)
+        public void TrackElement(int id, Pose pose)
         {
-            int desiredIndex = FindBestSlotIndex(interactor.SnapPose.position);
+            int desiredIndex = FindBestSlotIndex(pose.position);
             if (TryOccupySlot(desiredIndex))
             {
-                _slotInteractors[desiredIndex] = interactor.Identifier;
+                _slotInteractors[desiredIndex] = id;
             }
         }
 
-        public void UntrackInteractor(SnapInteractor interactor)
+        public void UntrackElement(int id)
         {
-            if (TryFindIndexForInteractor(interactor, out int index))
+            if (TryFindIndexForInteractor(id, out int index))
             {
                 _slotInteractors[index] = 0;
             }
         }
 
-        public void SnapInteractor(SnapInteractor interactor)
+        public void SnapElement(int id, Pose pose)
         {
         }
 
-        public void UnsnapInteractor(SnapInteractor interactor)
+        public void UnsnapElement(int id)
         {
         }
 
-        public void UpdateTrackedInteractor(SnapInteractor interactor)
+        public void MoveTrackedElement(int id, Pose pose)
         {
-            int desiredIndex = FindBestSlotIndex(interactor.SnapPose.position);
-            if (TryFindIndexForInteractor(interactor, out int index))
+            int desiredIndex = FindBestSlotIndex(pose.position);
+            if (TryFindIndexForInteractor(id, out int index))
             {
                 if (desiredIndex != index)
                 {
                     _slotInteractors[index] = 0;
                     if (TryOccupySlot(desiredIndex))
                     {
-                        _slotInteractors[desiredIndex] = interactor.Identifier;
+                        _slotInteractors[desiredIndex] = id;
                     }
                 }
             }
             else if (TryOccupySlot(desiredIndex))
             {
-                _slotInteractors[desiredIndex] = interactor.Identifier;
+                _slotInteractors[desiredIndex] = id;
             }
         }
 
-        private bool TryFindIndexForInteractor(SnapInteractor interactor, out int index)
+        private bool TryFindIndexForInteractor(int id, out int index)
         {
             //FindIndex is not ideal, but this single line simplifies this sample SlotsProvider a lot.
-            index = Array.FindIndex(_slotInteractors, i => i == interactor.Identifier);
+            index = Array.FindIndex(_slotInteractors, i => i == id);
             return index >= 0;
         }
 
-        public bool PoseForInteractor(SnapInteractor interactor, out Pose pose)
+        public bool SnapPoseForElement(int id, Pose pose, out Pose result)
         {
-            if (TryFindIndexForInteractor(interactor, out int index))
+            if (TryFindIndexForInteractor(id, out int index))
             {
-                pose = _slots[index].GetPose();
+                result = _slots[index].GetPose();
                 return true;
             }
-            pose = Pose.identity;
+            result = Pose.identity;
             return false;
         }
 

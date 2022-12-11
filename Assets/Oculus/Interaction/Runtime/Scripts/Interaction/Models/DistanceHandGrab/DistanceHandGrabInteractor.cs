@@ -113,7 +113,25 @@ namespace Oculus.Interaction.HandGrab
 
         #endregion
 
-        public ConicalFrustum PointerFrustum => _detectionFrustums.SelectionFrustum;
+        public Pose Origin
+        {
+            get
+            {
+                return new Pose(_detectionFrustums.SelectionFrustum.StartPoint,
+                    Quaternion.LookRotation(_detectionFrustums.SelectionFrustum.Direction));
+            }
+        }
+
+        public Vector3 HitPoint
+        {
+            get
+            {
+                return _originalHitPoint;
+            }
+
+        }
+
+        public IDistanceInteractable DistanceInteractable => this.Interactable;
 
         #region IHandGrabSource
 
@@ -160,7 +178,6 @@ namespace Oculus.Interaction.HandGrab
             Assert.IsNotNull(Hand, "Hand can not be null");
             Assert.IsNotNull(_handGrabApi, "HandGrabAPI can not be null");
             Assert.IsNotNull(_grabOrigin);
-            Assert.IsNotNull(PointerFrustum, "The selector frustum can not be null");
             if (_velocityCalculator != null)
             {
                 Assert.IsNotNull(VelocityCalculator, "The provided Velocity Calculator is not an IVelocityCalculator");
@@ -193,30 +210,14 @@ namespace Oculus.Interaction.HandGrab
             }
         }
 
-        public override bool ShouldSelect
+        protected override bool ComputeShouldSelect()
         {
-            get
-            {
-                if (State != InteractorState.Hover)
-                {
-                    return false;
-                }
-
-                return _candidate == _interactable && _handGrabShouldSelect;
-            }
+            return _handGrabShouldSelect;
         }
 
-        public override bool ShouldUnselect
+        protected override bool ComputeShouldUnselect()
         {
-            get
-            {
-                if (State != InteractorState.Select)
-                {
-                    return false;
-                }
-
-                return _handGrabShouldUnselect;
-            }
+            return _handGrabShouldUnselect;
         }
 
         protected override void DoHoverUpdate()
@@ -340,7 +341,7 @@ namespace Oculus.Interaction.HandGrab
                 Pose fromPose = _currentTarget.WorldGrabPose;
                 _movement = SelectedInteractable.GenerateMovement(fromPose, grabPose);
                 SelectedInteractable.PointableElement.ProcessPointerEvent(
-                    new PointerEvent(Identifier, PointerEventType.Move, fromPose));
+                    new PointerEvent(Identifier, PointerEventType.Move, fromPose, Data));
             }
         }
 

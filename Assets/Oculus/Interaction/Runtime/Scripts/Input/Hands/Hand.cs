@@ -263,11 +263,11 @@ namespace Oculus.Interaction.Input
             return poseOrigin == PoseOrigin.None;
         }
 
-        public bool GetHandAspect<TComponent>(out TComponent foundComponent) where TComponent : class
+        public bool TryGetAspect<TAspect>(out TAspect foundComponent) where TAspect : class
         {
             foreach (Component aspect in _aspects)
             {
-                foundComponent = aspect as TComponent;
+                foundComponent = aspect as TAspect;
                 if (foundComponent != null)
                 {
                     return true;

@@ -67,6 +67,12 @@ namespace Oculus.XR
 			"XR_FB_spatial_entity " +
 			"XR_FB_spatial_entity_query " +
 			"XR_FB_spatial_entity_storage " +
+			"XR_META_performance_metrics " +
+			"XR_FB_scene " +
+			"XR_FB_spatial_entity_container " +
+			"XR_FB_scene_capture " +
+			"XR_FB_face_tracking " +
+			"XR_FB_eye_tracking " +
 			"XR_FB_keyboard_tracking " +
 			"XR_FB_passthrough " +
 			"XR_FB_triangle_mesh " +
@@ -77,6 +83,8 @@ namespace Oculus.XR
 			"XR_FB_hand_tracking_capsules " +
 			"XR_FB_hand_tracking_mesh " +
 			"XR_FB_hand_tracking_aim " +
+			"XR_FB_touch_controller_pro " +
+			"XR_FB_touch_controller_extras " +
 			""
 			;
 	}

@@ -26,48 +26,64 @@ namespace Oculus.Interaction
 {
     public class RayInteractable : PointerInteractable<RayInteractor, RayInteractable>
     {
-        [SerializeField]
-        private Collider _collider;
-        public Collider Collider { get => _collider; }
+        [SerializeField, Interface(typeof(ISurface))]
+        private MonoBehaviour _surface;
+        public ISurface Surface { get; private set; }
 
-        [SerializeField, Optional, Interface(typeof(IPointableSurface))]
-        private MonoBehaviour _surface = null;
+        [SerializeField, Optional, Interface(typeof(ISurface))]
+        private MonoBehaviour _selectSurface = null;
+        private ISurface SelectSurface;
 
         [SerializeField, Optional, Interface(typeof(IMovementProvider))]
         private MonoBehaviour _movementProvider;
         private IMovementProvider MovementProvider { get; set; }
 
-        private IPointableSurface Surface;
+        [SerializeField, Optional]
+        private int _tiebreakerScore = 0;
+
+        #region Properties
+        public int TiebreakerScore
+        {
+            get
+            {
+                return _tiebreakerScore;
+            }
+            set
+            {
+                _tiebreakerScore = value;
+            }
+        }
+        #endregion
 
         protected override void Awake()
         {
             base.Awake();
-            Surface = _surface as IPointableSurface;
+            Surface = _surface as ISurface;
+            SelectSurface = _selectSurface as ISurface;
             MovementProvider = _movementProvider as IMovementProvider;
         }
 
         protected override void Start()
         {
             this.BeginStart(ref _started, () => base.Start());
-            Assert.IsNotNull(_collider);
+            Assert.IsNotNull(Surface);
+            if (_selectSurface != null)
+            {
+                Assert.IsNotNull(SelectSurface);
+            }
+            else
+            {
+                SelectSurface = Surface;
+                _selectSurface = SelectSurface as MonoBehaviour;
+            }
             this.EndStart(ref _started);
         }
 
-        public bool Raycast(Ray ray, out SurfaceHit hit, in float maxDistance, in bool useSurface)
+        public bool Raycast(Ray ray, out SurfaceHit hit, in float maxDistance, bool selectSurface)
         {
             hit = new SurfaceHit();
-            if (Collider.Raycast(ray, out RaycastHit raycastHit, maxDistance))
-            {
-                hit.Point = raycastHit.point;
-                hit.Normal = raycastHit.normal;
-                hit.Distance = raycastHit.distance;
-                return true;
-            }
-            else if (useSurface && Surface != null)
-            {
-                return Surface.Raycast(ray, out hit, maxDistance);
-            }
-            return false;
+            ISurface surface = selectSurface ? SelectSurface : Surface;
+            return surface.Raycast(ray, out hit, maxDistance);
         }
 
         public IMovement GenerateMovement(in Pose to, in Pose source)
@@ -84,20 +100,21 @@ namespace Oculus.Interaction
 
         #region Inject
 
-        public void InjectAllRayInteractable(Collider collider)
+        public void InjectAllRayInteractable(ISurface surface)
         {
-            InjectCollider(collider);
+            InjectSurface(surface);
         }
 
-        public void InjectCollider(Collider collider)
-        {
-            _collider = collider;
-        }
-
-        public void InjectOptionalSurface(IPointableSurface surface)
+        public void InjectSurface(ISurface surface)
         {
             Surface = surface;
             _surface = surface as MonoBehaviour;
+        }
+
+        public void InjectOptionalSelectSurface(ISurface surface)
+        {
+            SelectSurface = surface;
+            _selectSurface = surface as MonoBehaviour;
         }
 
         public void InjectOptionalMovementProvider(IMovementProvider provider)

@@ -19,6 +19,9 @@
  */
 
 using Oculus.Interaction.Input;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -33,6 +36,7 @@ namespace Oculus.Interaction.GrabAPI
     {
         [SerializeField, Interface(typeof(IHand))]
         private MonoBehaviour _hand;
+
         public IHand Hand { get; private set; }
 
         private IFingerAPI _fingerPinchGrabAPI = new FingerPinchGrabAPI();
@@ -350,7 +354,6 @@ namespace Oculus.Interaction.GrabAPI
         {
             _fingerPalmGrabAPI = fingerGrabAPI;
         }
-
         #endregion
     }
 }

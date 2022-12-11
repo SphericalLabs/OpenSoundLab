@@ -94,8 +94,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f026be10edaad42429c52aa2200881dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _visibleDuringSelect: 0
   _distanceInteractor: {fileID: 0}
   _renderer: {fileID: 3162044330543675396}
   _centerEye: {fileID: 0}
-  _defaultIcon: {fileID: 2800000, guid: d1673393f1b430145b8704ac3ece5918, type: 3}
+  _defaultIcon: {fileID: 2800000, guid: 4aa4a1b9a03d9b54d80515831235fbe9, type: 3}
   _constantScreenSize: 1

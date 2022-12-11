@@ -21,42 +21,37 @@
 using Oculus.Interaction.HandGrab;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 namespace Oculus.Interaction
 {
     /// <summary>
-    /// The SnapInteractable, specifies a volume in space in which
-    /// SnapInteractors can snap to. How the slots are organised is configured via a custom
-    /// IDropZoneSlotsProvider. If none is provided the SnapInteractable has one single slot at its own transform.
+    /// SnapInteractables provide Pose targets for SnapInteractors to translate and rotate towards.
     /// </summary>
     public class SnapInteractable : Interactable<SnapInteractor, SnapInteractable>,
         IRigidbodyRef
     {
-        /// <summary>
-        /// The movement provider specifies how the objects will align to this SnapInteractable.
-        /// When none is provided a continuous translation over time will be applied.
-        /// </summary>
-        [SerializeField, Optional, Interface(typeof(IMovementProvider))]
-        private MonoBehaviour _movementProvider;
-        private IMovementProvider MovementProvider { get; set; }
-
-        /// <summary>
-        /// By default SnapInteractables contain just one slot at their own pose.
-        /// But with the SlotsProvider one can assign multiple slots and indicate
-        /// which one the items should snap to or even move items from one slot to another.
-        /// Useful for implementing inventory systems or boards with multiple slots.
-        /// </summary>
-        [SerializeField, Optional, Interface(typeof(ISnapPoseProvider))]
-        [UnityEngine.Serialization.FormerlySerializedAs("_slotsProvider")]
-        private MonoBehaviour _snapPosesProvider;
-        private ISnapPoseProvider SnapPosesProvider { get; set; }
-
         [SerializeField]
         private Rigidbody _rigidbody;
         public Rigidbody Rigidbody => _rigidbody;
 
-        private Collider[] _colliders;
-        public Collider[] Colliders => _colliders;
+        /// <summary>
+        /// By default will use the transform pose as the target pose.
+        /// A SnapPoseDelegate can be provided to supply custom target pose logic.
+        /// </summary>
+        [FormerlySerializedAs("_snapPosesProvider")]
+        [FormerlySerializedAs("_posesProvider")]
+        [SerializeField, Optional, Interface(typeof(ISnapPoseDelegate))]
+        private MonoBehaviour _snapPoseDelegate;
+        private ISnapPoseDelegate SnapPoseDelegate { get; set; }
+
+        /// <summary>
+        /// By default SnapInteractors will ease towards SnapInteractables.
+        /// A MovementProvider can be provided to supply custom movement logic.
+        /// </summary>
+        [SerializeField, Optional, Interface(typeof(IMovementProvider))]
+        private MonoBehaviour _movementProvider;
+        private IMovementProvider MovementProvider { get; set; }
 
         private bool _started;
 
@@ -73,14 +68,13 @@ namespace Oculus.Interaction
         {
             base.Awake();
             MovementProvider = _movementProvider as IMovementProvider;
-            SnapPosesProvider = _snapPosesProvider as ISnapPoseProvider;
+            SnapPoseDelegate = _snapPoseDelegate as ISnapPoseDelegate;
         }
 
         protected override void Start()
         {
             this.BeginStart(ref _started, () => base.Start());
-            Assert.IsNotNull(Rigidbody, "The rigidbody is missing");
-            _colliders = Rigidbody.GetComponentsInChildren<Collider>();
+            Assert.IsNotNull(Rigidbody);
             if (_registry == null)
             {
                 _registry = new CollisionInteractionRegistry<SnapInteractor, SnapInteractable>();
@@ -88,8 +82,8 @@ namespace Oculus.Interaction
             }
             if (MovementProvider == null)
             {
-                FollowTargetProvider movementProvider = this.gameObject.AddComponent<FollowTargetProvider>();
-                InjectOptionalMovementProvider(movementProvider);
+                MovementProvider = this.gameObject.AddComponent<MoveTowardsTargetProvider>();
+                _movementProvider = MovementProvider as MonoBehaviour;
             }
             this.EndStart(ref _started);
         }
@@ -97,55 +91,58 @@ namespace Oculus.Interaction
         protected override void InteractorAdded(SnapInteractor interactor)
         {
             base.InteractorAdded(interactor);
-            if (SnapPosesProvider != null)
+            if (SnapPoseDelegate != null)
             {
-                SnapPosesProvider.TrackInteractor(interactor);
+                SnapPoseDelegate.TrackElement(interactor.Identifier, interactor.SnapPose);
             }
         }
 
         protected override void InteractorRemoved(SnapInteractor interactor)
         {
             base.InteractorRemoved(interactor);
-            if (SnapPosesProvider != null)
+            if (SnapPoseDelegate != null)
             {
-                SnapPosesProvider.UntrackInteractor(interactor);
+                SnapPoseDelegate.UntrackElement(interactor.Identifier);
             }
         }
 
         protected override void SelectingInteractorAdded(SnapInteractor interactor)
         {
             base.SelectingInteractorAdded(interactor);
-            if (SnapPosesProvider != null)
+            if (SnapPoseDelegate != null)
             {
-                SnapPosesProvider.SnapInteractor(interactor);
+                SnapPoseDelegate.SnapElement(interactor.Identifier, interactor.SnapPose);
             }
         }
 
         protected override void SelectingInteractorRemoved(SnapInteractor interactor)
         {
             base.SelectingInteractorRemoved(interactor);
-            if (SnapPosesProvider != null)
+            if (SnapPoseDelegate != null)
             {
-                SnapPosesProvider.UnsnapInteractor(interactor);
+                SnapPoseDelegate.UnsnapElement(interactor.Identifier);
             }
         }
 
         public void InteractorHoverUpdated(SnapInteractor interactor)
         {
-            if (SnapPosesProvider != null)
+            if (SnapPoseDelegate != null)
             {
-                SnapPosesProvider.UpdateTrackedInteractor(interactor);
+                SnapPoseDelegate.MoveTrackedElement(interactor.Identifier, interactor.SnapPose);
             }
         }
 
-        public bool PoseForInteractor(SnapInteractor interactor, out Pose slot)
+        public bool PoseForInteractor(SnapInteractor interactor, out Pose result)
         {
-            if (SnapPosesProvider != null)
+            if (SnapPoseDelegate != null)
             {
-                return SnapPosesProvider.PoseForInteractor(interactor, out slot);
+                return SnapPoseDelegate.SnapPoseForElement(
+                    interactor.Identifier,
+                    interactor.SnapPose,
+                    out result);
             }
 
-            slot = this.transform.GetPose();
+            result = this.transform.GetPose();
             return true;
         }
 
@@ -178,10 +175,10 @@ namespace Oculus.Interaction
             MovementProvider = provider;
         }
 
-        public void InjectOptionalSnapPosesProvider(ISnapPoseProvider snapPosesProvider)
+        public void InjectOptionalSnapPoseDelegate(ISnapPoseDelegate snapPoseDelegate)
         {
-            _snapPosesProvider = snapPosesProvider as MonoBehaviour;
-            SnapPosesProvider = snapPosesProvider;
+            _snapPoseDelegate = snapPoseDelegate as MonoBehaviour;
+            SnapPoseDelegate = snapPoseDelegate;
         }
 
         #endregion

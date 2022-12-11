@@ -39,9 +39,9 @@ namespace Oculus.Voice.Core.Bindings.Android
 
         #region Service Connection
 
-        public virtual void Connect()
+        public virtual void Connect(string version)
         {
-            serviceConnection.Connect();
+            serviceConnection.Connect(version);
             var serviceInstance = serviceConnection.GetService();
             if (null == serviceInstance)
             {

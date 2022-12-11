@@ -80,7 +80,7 @@ namespace Oculus.Interaction.PoseDetection.Debug
 
         protected virtual void Start()
         {
-            bool foundAspect = _shapeRecognizerActiveState.Hand.GetHandAspect(out FingerFeatureStateProvider stateProvider);
+            bool foundAspect = _shapeRecognizerActiveState.Hand.TryGetAspect(out FingerFeatureStateProvider stateProvider);
             Assert.IsTrue(foundAspect);
 
             Vector3 fingerOffset = Vector3.zero;

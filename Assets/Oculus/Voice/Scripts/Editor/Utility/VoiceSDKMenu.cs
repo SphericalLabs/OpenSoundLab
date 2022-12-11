@@ -26,6 +26,8 @@ using Facebook.WitAi.Data.Configuration;
 using Facebook.WitAi.Data.Intents;
 using Facebook.WitAi.Data.Entities;
 using Facebook.WitAi.Data.Traits;
+using Facebook.WitAi.TTS;
+using Facebook.WitAi.TTS.Editor;
 using Facebook.WitAi.TTS.Editor.Preload;
 using Oculus.Voice.Windows;
 
@@ -100,7 +102,28 @@ namespace Oculus.Voice.Utility
                 Selection.activeObject = asset;
             }
         }
-        [MenuItem("Assets/Create/Voice SDK/TTS Preload Settings")]
+        #endregion
+
+        #region TTS
+
+        [MenuItem("Assets/Create/Voice SDK/TTS/Add Default TTS Setup", false, 0)]
+        public static void CreateDefaultTTSSetup()
+        {
+            TTSEditorUtilities.CreateDefaultSetup();
+        }
+
+        [MenuItem("Assets/Create/Voice SDK/TTS/Add TTS Service to Scene", false, 100)]
+        public static void CreateTTSService()
+        {
+            TTSEditorUtilities.CreateService();
+        }
+
+        [MenuItem("Assets/Create/Voice SDK/TTS/Add TTS Speaker to Scene", false, 100)]
+        public static void CreateTTSSpeaker()
+        {
+            TTSEditorUtilities.CreateSpeaker();
+        }
+        [MenuItem("Assets/Create/Voice SDK/TTS/Preload Settings", false, 200)]
         public static void CreateTTSPreloadSettings()
         {
             TTSPreloadUtility.CreatePreloadSettings();

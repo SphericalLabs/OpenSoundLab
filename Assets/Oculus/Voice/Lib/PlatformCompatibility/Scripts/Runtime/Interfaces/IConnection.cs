@@ -22,7 +22,7 @@ namespace Oculus.Voice.Core.Bindings.Interfaces
 {
     public interface IConnection
     {
-        void Connect();
+        void Connect(string version);
         void Disconnect();
 
         bool IsConnected { get; }

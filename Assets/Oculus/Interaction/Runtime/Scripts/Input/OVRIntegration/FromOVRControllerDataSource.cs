@@ -289,7 +289,9 @@ namespace Oculus.Interaction.Input
 
 
             // Convert controller pointer pose from local to tracking space.
-            Pose pointerPose = PoseUtils.Multiply(worldRoot, _pointerPoseSelector.LocalPointerPose);
+            Pose pointerPose =
+                new Pose(ovrController.transform.TransformPoint(_pointerPoseSelector.LocalPointerPose.position),
+                    worldRoot.rotation * _pointerPoseSelector.LocalPointerPose.rotation);
             _controllerDataAsset.PointerPose.position = worldToTrackingSpace.MultiplyPoint3x4(pointerPose.position);
             _controllerDataAsset.PointerPose.rotation = worldToTrackingSpace.rotation * pointerPose.rotation;
             _controllerDataAsset.PointerPoseOrigin = PoseOrigin.RawTrackedPose;

@@ -22,9 +22,18 @@ namespace Facebook.WitAi.TTS.Integrations
     [Serializable]
     public class TTSWitVoiceSettings : TTSVoiceSettings
     {
-        // Attributes
-        public string voice;
-        public string style;
+        // Default values
+        public const string DEFAULT_VOICE = "Charlie";
+        public const string DEFAULT_STYLE = "default";
+
+        /// <summary>
+        /// Unique voice name
+        /// </summary>
+        public string voice = DEFAULT_VOICE;
+        /// <summary>
+        /// Voice style (ex. formal, fast)
+        /// </summary>
+        public string style = DEFAULT_STYLE;
         [Range(50, 200)]
         public int speed = 100;
         [Range(25, 400)]
@@ -85,6 +94,24 @@ namespace Facebook.WitAi.TTS.Integrations
         // Requests bly clip id
         private Dictionary<string, WitUnityRequest> _webStreams = new Dictionary<string, WitUnityRequest>();
 
+        // Whether TTSService is valid
+        public override string IsValid()
+        {
+            string validText = base.IsValid();
+            if (!string.IsNullOrEmpty(validText))
+            {
+                return validText;
+            }
+            if (RequestSettings.configuration == null)
+            {
+                return "No WitConfiguration Set";
+            }
+            if (string.IsNullOrEmpty(RequestSettings.configuration.clientAccessToken))
+            {
+                return "No WitConfiguration Client Token";
+            }
+            return string.Empty;
+        }
         // Ensures text can be sent to wit web service
         public string IsTextValid(string textToSpeak) => WitUnityRequest.IsTextValid(textToSpeak);
 
@@ -243,16 +270,7 @@ namespace Facebook.WitAi.TTS.Integrations
             {
                 if (_presetVoiceSettings == null || _presetVoiceSettings.Length == 0)
                 {
-                    _presetVoiceSettings = new TTSWitVoiceSettings[1];
-                    _presetVoiceSettings[0] = new TTSWitVoiceSettings
-                    {
-                        settingsID = "DEFAULT",
-                        voice = "Charlie",
-                        style = "default",
-                        speed = 100,
-                        pitch = 100,
-                        gain = 50
-                    };
+                    _presetVoiceSettings = new TTSWitVoiceSettings[] { new TTSWitVoiceSettings() };
                 }
                 return _presetVoiceSettings;
             }
@@ -260,7 +278,18 @@ namespace Facebook.WitAi.TTS.Integrations
         // Default voice setting uses the first voice in the list
         public TTSVoiceSettings VoiceDefaultSettings => PresetVoiceSettings[0];
 
+        #if UNITY_EDITOR
+        // Apply settings
+        public void SetVoiceSettings(TTSWitVoiceSettings[] newVoiceSettings)
+        {
+            _presetVoiceSettings = newVoiceSettings;
+        }
+        #endif
+
         // Convert voice settings into dictionary to be used with web requests
+        private const string SETTINGS_KEY = "settingsID";
+        private const string VOICE_KEY = "voice";
+        private const string STYLE_KEY = "style";
         public Dictionary<string, string> EncodeVoiceSettings(TTSVoiceSettings voiceSettings)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -268,7 +297,7 @@ namespace Facebook.WitAi.TTS.Integrations
             {
                 foreach (FieldInfo field in voiceSettings.GetType().GetFields())
                 {
-                    if (!string.Equals(field.Name, "settingsID", StringComparison.CurrentCultureIgnoreCase))
+                    if (!string.Equals(field.Name, SETTINGS_KEY, StringComparison.CurrentCultureIgnoreCase))
                     {
                         // Get field value
                         object fieldVal = field.GetValue(voiceSettings);
@@ -289,22 +318,33 @@ namespace Facebook.WitAi.TTS.Integrations
                         parameters[field.Name] = fieldVal.ToString();
                     }
                 }
+
+                // Set default if no voice is provided
+                if (!parameters.ContainsKey(VOICE_KEY) || string.IsNullOrEmpty(parameters[VOICE_KEY]))
+                {
+                    parameters[VOICE_KEY] = TTSWitVoiceSettings.DEFAULT_VOICE;
+                }
+                // Set default if no style is given
+                if (!parameters.ContainsKey(STYLE_KEY) || string.IsNullOrEmpty(parameters[STYLE_KEY]))
+                {
+                    parameters[STYLE_KEY] = TTSWitVoiceSettings.DEFAULT_STYLE;
+                }
             }
             return parameters;
         }
         // Returns an error if request is not valid
         private string IsRequestValid(TTSClipData clipData, WitConfiguration configuration)
         {
+            // Invalid tts
+            string valid = IsValid();
+            if (!string.IsNullOrEmpty(valid))
+            {
+                return valid;
+            }
             // Invalid clip
             if (clipData == null)
             {
                 return "No clip data provided";
-            }
-            // Invalid configuration
-            if (RequestSettings.configuration == null ||
-                string.IsNullOrEmpty(RequestSettings.configuration.clientAccessToken))
-            {
-                return "No wit configuration provided";
             }
             // Success
             return string.Empty;

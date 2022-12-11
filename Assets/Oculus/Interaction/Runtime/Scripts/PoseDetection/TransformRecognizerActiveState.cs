@@ -73,7 +73,7 @@ namespace Oculus.Interaction.PoseDetection
             this.BeginStart(ref _started);
             Assert.IsNotNull(Hand);
 
-            bool foundAspect = Hand.GetHandAspect(out TransformFeatureStateProvider aspect);
+            bool foundAspect = Hand.TryGetAspect(out TransformFeatureStateProvider aspect);
             Assert.IsTrue(foundAspect);
             FeatureStateProvider = aspect;
 

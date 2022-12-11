@@ -245,7 +245,12 @@ namespace Oculus.Interaction
 
             _material.SetFloat(_scaleShaderID, _lineScaleFactor);
             _material.SetMatrix(_localToWorldShaderID, _matrix);
-            Graphics.DrawMeshInstancedIndirect(_baseMesh, 0, _material, _bounds, _argsBuffer);
+
+            Bounds bounds = new Bounds(
+                _matrix.MultiplyPoint(_bounds.center),
+                _matrix.MultiplyVector(_bounds.extents));
+
+            Graphics.DrawMeshInstancedIndirect(_baseMesh, 0, _material, bounds, _argsBuffer);
         }
 
         public void SetTransform(Transform transform)

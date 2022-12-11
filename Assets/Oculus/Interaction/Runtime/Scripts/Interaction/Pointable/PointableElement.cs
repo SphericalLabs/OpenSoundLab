@@ -119,6 +119,11 @@ namespace Oculus.Interaction
         {
             if (_started)
             {
+                while (_selectingPoints.Count > 0)
+                {
+                    Cancel(new PointerEvent(_selectingPointIds[0], PointerEventType.Cancel, _selectingPoints[0]));
+                }
+
                 if (ForwardElement != null)
                 {
                     ForwardElement.WhenPointerEventRaised -= HandlePointerEventRaised;
@@ -264,7 +269,6 @@ namespace Oculus.Interaction
 
             PointableElementUpdated(evt);
         }
-
 
         protected virtual void PointableElementUpdated(PointerEvent evt)
         {

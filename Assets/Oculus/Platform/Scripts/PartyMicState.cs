@@ -22,6 +22,9 @@ namespace Oculus.Platform
     [Description("INACTIVE")]
     Inactive,
 
+    [Description("INPUT_SHARED")]
+    InputShared,
+
   }
 
 }
