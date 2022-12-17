@@ -151,7 +151,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7444186012782604103}
   m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: -0.0007, y: 0.0099, z: 0.07046}
+  m_LocalPosition: {x: 0.0008, y: 0.0099, z: 0.07046}
   m_LocalScale: {x: 0.00018242311, y: 0.00041411322, z: 0.00020540251}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -215,7 +215,7 @@ TextMesh:
   m_Anchor: 3
   m_Alignment: 0
   m_TabSize: 0
-  m_FontSize: 80
+  m_FontSize: 98
   m_FontStyle: 0
   m_RichText: 1
   m_Font: {fileID: 12800000, guid: 31a7f34e01049fa479a7f2d4c8942f55, type: 3}

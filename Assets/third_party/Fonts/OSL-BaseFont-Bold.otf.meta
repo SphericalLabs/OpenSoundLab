@@ -1,8 +1,7 @@
 fileFormatVersion: 2
-guid: a1d797002c4f4514090210c8b54100ca
-timeCreated: 1475878209
-licenseType: Pro
+guid: 31a7f34e01049fa479a7f2d4c8942f55
 TrueTypeFontImporter:
+  externalObjects: {}
   serializedVersion: 4
   fontSize: 16
   forceTextureCase: -2
@@ -10,11 +9,13 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Coolvetica
+  - Myriad Pro
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
   userData: 
   assetBundleName: 
   assetBundleVariant: 

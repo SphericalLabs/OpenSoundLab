@@ -166,6 +166,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
+  defaultPercent: 0
   dialColor: 0
   controllerRot: 0
   lastControllerRot: 0
@@ -593,7 +594,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010291414624}
   m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: -0.0192, y: -0.0003, z: -0}
+  m_LocalPosition: {x: -0.0177, y: -0.0003, z: -0}
   m_LocalScale: {x: 0.085205145, y: 0.08520482, z: 0.08520478}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -690,7 +691,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010608960708}
   m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: -0.5}
-  m_LocalPosition: {x: 0.0192, y: 0, z: -0}
+  m_LocalPosition: {x: 0.0176, y: -0, z: -0.0008}
   m_LocalScale: {x: 0.08520515, y: 0.085204825, z: 0.08520479}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -872,7 +873,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012278325560}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071067}
-  m_LocalPosition: {x: 0.0788, y: 0.0067000003, z: -0.0017}
+  m_LocalPosition: {x: 0.0788, y: 0.0093, z: -0.0053}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1000,7 +1001,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012869793228}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071067}
-  m_LocalPosition: {x: -0.1302, y: 0.0067000003, z: -0.0017}
+  m_LocalPosition: {x: -0.1302, y: 0.0093, z: -0.004}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1209,7 +1210,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1971971717807134}
   m_LocalRotation: {x: 0.70710707, y: 0.00000021342929, z: 0.00000015020916, w: 0.7071066}
-  m_LocalPosition: {x: -0, y: -0.0106, z: -0.0151}
+  m_LocalPosition: {x: 0, y: -0.0106, z: -0.0181}
   m_LocalScale: {x: 0.06, y: 0.060000006, z: 0.059999984}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1348,6 +1349,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.5
+  defaultPercent: 0
   dialColor: 2
   controllerRot: 0
   lastControllerRot: 0
@@ -1887,6 +1889,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.2
+  defaultPercent: 0
   dialColor: 0
   controllerRot: 0
   lastControllerRot: 0
@@ -3073,6 +3076,7 @@ MonoBehaviour:
   stickyGrip: 0
   canBeDeleted: 0
   percent: 0.66
+  defaultPercent: 0
   dialColor: 0
   controllerRot: 0
   lastControllerRot: 0
@@ -4230,7 +4234,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4613558777773001520}
   m_LocalRotation: {x: 0.70710707, y: 0.00000021342929, z: 0.00000015020916, w: 0.7071066}
-  m_LocalPosition: {x: -0, y: -0.0106, z: -0.0151}
+  m_LocalPosition: {x: 0, y: -0.0106, z: -0.0181}
   m_LocalScale: {x: 0.06, y: 0.060000006, z: 0.059999984}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4445,7 +4449,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5231278527944689653}
   m_LocalRotation: {x: 0.70710707, y: 0.00000021342929, z: 0.00000015020916, w: 0.7071066}
-  m_LocalPosition: {x: -0, y: -0.0106, z: -0.0151}
+  m_LocalPosition: {x: 0, y: -0.0106, z: -0.0181}
   m_LocalScale: {x: 0.06, y: 0.060000006, z: 0.059999984}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4641,6 +4645,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 0}
   selectOverlay: {fileID: 8920474426398894388}
   glowHue: 0
@@ -4678,7 +4683,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5742712347249619496}
   m_LocalRotation: {x: 1, y: 0.00000032558373, z: 0.0000004200518, w: -0.000000268221}
-  m_LocalPosition: {x: -0.001, y: 0.0306, z: 0.0175}
+  m_LocalPosition: {x: -0.001, y: 0.0367, z: 0.0125}
   m_LocalScale: {x: 0.12, y: 0.12, z: 0.11999995}
   m_ConstrainProportionsScale: 0
   m_Children: []

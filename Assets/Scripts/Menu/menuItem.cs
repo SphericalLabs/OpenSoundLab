@@ -87,9 +87,9 @@ public class menuItem : manipObject {
     Pano
   };
 
-  Color disabledColor;
-  Color normalColor;
-  Color selectColor;
+  //Color disabledColor;
+  //Color normalColor;
+  //Color selectColor;
 
   public void disable(bool on) {
     if (disabled == on) return;
@@ -101,12 +101,12 @@ public class menuItem : manipObject {
 
   public override void Awake() {
     base.Awake();
-    disabledColor = normalColor = selectColor = new Color(0.6f, 0.6f, 0.6f);
+    //disabledColor = normalColor = selectColor = new Color(0.6f, 0.6f, 0.6f);
     
     label = GetComponentInChildren<TextMesh>();
-    labelMat = label.GetComponent<Renderer>().material;
+    //labelMat = label.GetComponent<Renderer>().material;
     
-    labelMat.SetColor("_TintColor", normalColor);
+    //labelMat.SetColor("_TintColor", normalColor);
     glowRend.gameObject.SetActive(false);
     glowMat = glowRend.material;
   }
@@ -359,7 +359,7 @@ public class menuItem : manipObject {
       g.SetActive(false);
     } else if (curState == manipState.selected) {
       //symbol.material.SetColor("_TintColor", normalColor);
-      labelMat.SetColor("_TintColor", normalColor);
+      //labelMat.SetColor("_TintColor", normalColor);
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(true);
       g.SetActive(true);
@@ -369,7 +369,7 @@ public class menuItem : manipObject {
       label.gameObject.SetActive(true);
       symbol.gameObject.SetActive(true);
       g.SetActive(true);
-      labelMat.SetColor("_TintColor", selectColor);
+      //labelMat.SetColor("_TintColor", selectColor);
       manager.GrabAudio();
       StartCoroutine(flash());
       createItem();

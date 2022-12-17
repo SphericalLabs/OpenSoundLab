@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000011655196390}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.03999869, z: -0.03}
+  m_LocalPosition: {x: 0, y: 0.016, z: -0.03}
   m_LocalScale: {x: 1, y: 3.0452929, z: 9.135879}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -53,7 +53,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 56ff045222b65554d8299b34d149db47, type: 2}
+  - {fileID: 2100000, guid: 31a7f34e01049fa479a7f2d4c8942f55, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -90,10 +90,10 @@ TextMesh:
   m_Anchor: 4
   m_Alignment: 1
   m_TabSize: 4
-  m_FontSize: 50
+  m_FontSize: 40
   m_FontStyle: 0
   m_RichText: 1
-  m_Font: {fileID: 12800000, guid: 740c8e42bc7f34c478aae7230187584b, type: 3}
+  m_Font: {fileID: 12800000, guid: 31a7f34e01049fa479a7f2d4c8942f55, type: 3}
   m_Color:
     serializedVersion: 2
     rgba: 4294967295
@@ -108,8 +108,8 @@ GameObject:
   - component: {fileID: 4000010495560308}
   - component: {fileID: 33000013811618548}
   - component: {fileID: 23000011020583262}
-  - component: {fileID: 136000012333614554}
   - component: {fileID: 114000012862031628}
+  - component: {fileID: 5222724992315365314}
   m_Layer: 0
   m_Name: PanelLibrary
   m_TagString: Untagged
@@ -184,20 +184,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &136000012333614554
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000013476113652}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.4
-  m_Height: 1
-  m_Direction: 0
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114000012862031628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,6 +220,19 @@ MonoBehaviour:
     type: 3}
   ghostGroupPrefab: {fileID: 1000012051455410, guid: 5dc7e378caa1d2d418c4a3291f1f2612,
     type: 3}
+--- !u!65 &5222724992315365314
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013476113652}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1.6263542}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1000013598449744
 GameObject:
   m_ObjectHideFlags: 0

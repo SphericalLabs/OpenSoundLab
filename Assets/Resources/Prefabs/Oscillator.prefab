@@ -768,7 +768,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010946069216}
   m_LocalRotation: {x: 0.7071068, y: -1.4210855e-14, z: 0.00000023040464, w: -0.7071067}
-  m_LocalPosition: {x: -0.0003, y: -0.001, z: 0.0006}
+  m_LocalPosition: {x: -0.0003, y: -0.001, z: 0.0001}
   m_LocalScale: {x: 0.057390667, y: 0.057390526, z: 0.05739051}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -828,7 +828,6 @@ TextMesh:
   m_Text: 'PITCH 1
 
     CV IN
-
 
 
 
@@ -1041,7 +1040,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000011117445750}
   m_LocalRotation: {x: 0.7071068, y: -1.4210855e-14, z: 0.00000023040464, w: -0.7071067}
-  m_LocalPosition: {x: -0.0001, y: -0.0005, z: 0.0006}
+  m_LocalPosition: {x: -0.0001, y: -0.0005, z: 0.0001}
   m_LocalScale: {x: 0.057390667, y: 0.057390492, z: 0.057390474}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1101,7 +1100,6 @@ TextMesh:
   m_Text: 'AMPLITUDE
 
     CV IN
-
 
 
 
@@ -3876,7 +3874,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1964471474113421827}
   m_LocalRotation: {x: 0.7071068, y: -1.4210855e-14, z: 0.00000023040464, w: -0.7071067}
-  m_LocalPosition: {x: -0.0003, y: -0.001, z: 0.0006}
+  m_LocalPosition: {x: -0.0003, y: -0.001, z: 0.0001}
   m_LocalScale: {x: 0.057390667, y: 0.057390526, z: 0.05739051}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3936,7 +3934,6 @@ TextMesh:
   m_Text: 'PITCH 2
 
     CV IN
-
 
 
 
