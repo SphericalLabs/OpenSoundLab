@@ -44,8 +44,9 @@ public class quantizerSignalGenerator : signalGenerator {
   public signalGenerator incoming;
   public bool isOctave = false;
   public float transpose = 0f;
+  public float octave = 0f;
 
-  List<float[]> scales = new List<float[]>();
+  public List<float[]> scales = new List<float[]>();
   public int selectedScale = 0;
 
   float integerPart = 0f;
@@ -65,14 +66,30 @@ public class quantizerSignalGenerator : signalGenerator {
   {
     base.Awake();
 
-    // Noted in semitone steps, 0 is C
+    // Keys          C  C# D  D# E  F  F# G  G# A  A# B
+    // Index         0  1  2  3  4  5  6  7  8  9  10 11 
+    // Semitone      x  x  x  x  x  x  x  x  x  x  x  x
+    // Maj           x     x     x  x     x     x     x
+    // Min           x     x  x     x     x  x     x
+    // HarmonicMaj   x     x     x  x     x  x        x    
+    // HarmonicMin   x     x  x     x     x  x        x
+    // PentaMaj      x     x     x        x     x          
+    // PentaMin      x        x     x     x        x       
+    // Octave        x
+
+    
+    // Noted in semitone steps, 0 is C  
     scales.Add(new float[] {0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f}); // Semitones
     scales.Add(new float[] {0f,     2f,     4f, 5f,     7f,     9f,      11f}); // Major
-    scales.Add(new float[] {0f,     2f, 3f,     5f,     7f,     9f,      11f}); // Minor
-    scales.Add(new float[] {0f}); // Octaves -> please note, this is hardcoded to index 3 below!
-    //Chrom  1 b2 2 b3 3 4 b5 5 b6 6 b7 7
-    //Major  1    2    3 4    5    6    7
-    //Minor  1    2 b3   4    5    6    7;
+    scales.Add(new float[] {0f,     2f, 3f,     5f,     7f, 8f,     10f,    }); // Minor
+    scales.Add(new float[] {0f, 1f,         4f, 5f,     7f, 8f,          11f}); // Harmonic Major
+    scales.Add(new float[] {0f, 1f,     3f,     5f,     7f, 8f,          11f}); // Harmonic Minor
+    scales.Add(new float[] {0f, 1f,         4f,         7f,     9f,         }); // Pentatonic Major
+    scales.Add(new float[] {0f, 1f,     3f,             7f, 8f,             }); // Pentatonic Minor
+
+    scales.Add(new float[] {0f}); // Octaves -> please note, this is hardcoded to index (length - 1) below!
+
+
 
     //pre-multiply semitone factor in order to comply 1/Oct
     for(int j = 0; j < scales.Count; j++){
@@ -91,17 +108,16 @@ public class quantizerSignalGenerator : signalGenerator {
       SetArrayToSingleValue(buffer, buffer.Length, 0f);
     }
 
-    // hard coded OCTAVE!
-    if (selectedScale == 3)
+    // hard coded octave, last element of the scale dial
+    if (selectedScale == scales.Count)
     {
-      SetArrayToSingleValue(buffer, buffer.Length, Mathf.Round((buffer[0] + transpose) * 10f) * 0.1f); // transpose -5,5 octaves
-
+      SetArrayToSingleValue(buffer, buffer.Length, Mathf.Round((buffer[0]) * 10f) * 0.1f + transpose + octave); 
     }
     else // other quantisation modes
     {
 
-      integerPart = Mathf.Floor(buffer[0] * 10 + transpose * 2); // transpose -1,1 octaves
-      decimalPart = buffer[0] * 10 + transpose * 2 - integerPart;
+      integerPart = Mathf.Floor(buffer[0] * 10); // transpose -1,1 octaves
+      decimalPart = buffer[0] * 10 - integerPart;
 
 
       // incoming signals and transpose dial need to be upscaled 0.1/Oct to 1/Oct
@@ -145,7 +161,7 @@ public class quantizerSignalGenerator : signalGenerator {
         }
       }
 
-      SetArrayToSingleValue(buffer, buffer.Length, output * 0.1f); // downscale to 0.1/Oct
+      SetArrayToSingleValue(buffer, buffer.Length, output * 0.1f + transpose + octave); // downscale to 0.1/Oct
 
     }
     recursionCheckPost();

@@ -38,6 +38,7 @@ using System.Collections;
 public class quantizerDeviceInterface : deviceInterface {
   public omniJack input, output;
   public dial transposeDial;
+  public dial octaveDial;
   public dial scaleDial; 
   quantizerSignalGenerator signal;
   
@@ -49,8 +50,9 @@ public class quantizerDeviceInterface : deviceInterface {
 
   void Update() {
 
-    signal.selectedScale = Mathf.RoundToInt(scaleDial.percent * 3);
-    signal.transpose = Utils.map(transposeDial.percent, 0f, 1f, -1f, 1f);
+    signal.selectedScale = Mathf.RoundToInt(scaleDial.percent * signal.scales.Count);
+    signal.transpose = Utils.map(transposeDial.percent, 0f, 1f, 0f, 1f);
+    signal.octave = Utils.map(octaveDial.percent, 0f, 1f, -0.5f, 0.5f); // +/- 5 octaves
 
     if (signal.incoming != input.signal) signal.incoming = input.signal;
   }
