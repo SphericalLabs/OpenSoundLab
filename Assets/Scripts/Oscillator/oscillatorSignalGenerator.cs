@@ -105,7 +105,6 @@ public class oscillatorSignalGenerator : signalGenerator
       Debug.LogWarning("catched a stackoverflow because of recursive patch connections");
     }
 
-
     OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
         freqExpGen != null, freqLinGen != null, ampGen != null, syncGen != null, pwmGen != null, _sampleDuration, ref dspTime);
 

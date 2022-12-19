@@ -440,7 +440,7 @@ extern "C" {
             if(active){
                 if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, _clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
                 else floatingBufferCount += endPlaybackSpeed;
-                if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 10.f; // lin fm 
+                if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 20.f; // lin fm 
             }
 
             bool endOfSample = false;
@@ -581,7 +581,7 @@ extern "C" {
                 endFrequency = endFrequency * powf(2, _clamp(frequencyExpBuffer[i], -1.f, 1.f) * 10.f); // convert 0.1V/Oct to 1V/Oct; this has to be clamped, could crash the system otherwise, think 2^320
             }
             if (bFreqLinGen) {
-                endFrequency = endFrequency + frequencyLinBuffer[i] * 10.f * 100.f; // add lin fm, thru zero, 1V / 100Hz
+                endFrequency = endFrequency + frequencyLinBuffer[i] * 8000.f; // add lin fm, thru zero, 1V / 100Hz
             }
             if (bAmpGen)
             {
