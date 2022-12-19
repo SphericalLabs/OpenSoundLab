@@ -332,9 +332,6 @@ public class clipPlayerComplex : clipPlayer {
     if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
     if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
 
-    for (int i = 0; i < buffer.Length; i++)
-      freqLinBuffer[i] *= 1f;
-
     if (headGen != null)
     {
       headGen.processBuffer(headBuffer, dspTime, channels);
