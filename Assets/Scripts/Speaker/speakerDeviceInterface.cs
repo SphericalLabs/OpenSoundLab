@@ -61,21 +61,12 @@ public class speakerDeviceInterface : deviceInterface {
     ID = prevIDs[0];
     input.ID = prevIDs[1];
   }
-
-  float lastScale = 0;
-
+    
   void Update() {
     if (output.incoming != input.signal) {
       output.incoming = input.signal;
       if (output.incoming == null) speakerRim.SetActive(false);
       else speakerRim.SetActive(true);
-    }
-
-    if (output.incoming != null) {
-      if (lastScale != transform.localScale.x) {
-        lastScale = transform.localScale.x;
-        output.volume = Mathf.Pow(lastScale + .2f, 2);
-      }
     }
 
     output.leftOn = channelSwitcher.switchVal;
