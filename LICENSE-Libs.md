@@ -11,16 +11,16 @@ Copyright © Facebook Technologies, LLC and its affiliates. All rights reserved.
 
 Please also see 
 
-Assets/Oculus/Interaction/LICENSE
-Assets/Oculus/Interaction/Runtime/ThirdParty/InterfaceSupport/LICENSE.txt 
-Assets/Oculus/Interaction/Runtime/ThirdParty/LeapMotion/LICENSE-2.0.txt
-Assets/Oculus/Interaction/Samples/ThirdParty/Textures/EnvironmentMaps/license.txt
-Assets/Oculus/SampleFramework/Core/Video/Plugins/Android/Audio360/NOTICE.txt
-Assets/Oculus/SampleFramework/Core/Video/Plugins/Android/Audio360/ThirdPartyNotices.txt
-Assets/Oculus/SampleFramework/license.txt
-Assets/Oculus/Voice/Lib/Wit.ai/LICENSE
-Assets/Oculus/VR/LICENSE.txt
-Assets/Oculus/VR/NOTICE.txt
+[Assets/Oculus/Interaction/LICENSE](Assets/Oculus/Interaction/LICENSE)  
+[Assets/Oculus/Interaction/Runtime/ThirdParty/InterfaceSupport/LICENSE.txt](Assets/Oculus/Interaction/Runtime/ThirdParty/InterfaceSupport/LICENSE.txt)  
+[Assets/Oculus/Interaction/Runtime/ThirdParty/LeapMotion/LICENSE-2.0.txt](Assets/Oculus/Interaction/Runtime/ThirdParty/LeapMotion/LICENSE-2.0.txt)  
+[Assets/Oculus/Interaction/Samples/ThirdParty/Textures/EnvironmentMaps/license.txt](Assets/Oculus/Interaction/Samples/ThirdParty/Textures/EnvironmentMaps/license.txt)  
+[Assets/Oculus/SampleFramework/Core/Video/Plugins/Android/Audio360/NOTICE.txt](Assets/Oculus/SampleFramework/Core/Video/Plugins/Android/Audio360/NOTICE.txt)  
+[Assets/Oculus/SampleFramework/Core/Video/Plugins/Android/Audio360/ThirdPartyNotices.txt](Assets/Oculus/SampleFramework/Core/Video/Plugins/Android/Audio360/ThirdPartyNotices.txt)  
+[Assets/Oculus/SampleFramework/license.txt](Assets/Oculus/SampleFramework/license.txt)  
+[Assets/Oculus/Voice/Lib/Wit.ai/LICENSE](Assets/Oculus/Voice/Lib/Wit.ai/LICENSE)  
+[Assets/Oculus/VR/LICENSE.txt](Assets/Oculus/VR/LICENSE.txt)  
+[Assets/Oculus/VR/NOTICE.txt](Assets/Oculus/VR/NOTICE.txt)  
 
 for further license and copyright notices.
 
