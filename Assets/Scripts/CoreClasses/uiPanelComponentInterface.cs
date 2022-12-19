@@ -125,7 +125,7 @@ public class uiPanelComponentInterface : componentInterface {
         float xMod = 1;
         if (panelHeightCount < 6) yMod = -.02f * (6 - panelHeightCount);
         g.transform.localPosition = new Vector3(-.13f * (nodeIndex - xMod), .06f + yMod, 0);
-        currentText.transform.localPosition = new Vector3(.19f, .08f + yMod, 0);
+        currentText.transform.localPosition = new Vector3(.19f, 0.08f + yMod, 0);
         g.transform.localRotation = Quaternion.identity;
       }
 
