@@ -1,8 +1,8 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
-// 
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
+//
+// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
