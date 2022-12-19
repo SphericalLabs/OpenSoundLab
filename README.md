@@ -32,7 +32,7 @@ Coming later...
 - Reverb: Classic Freeverb stereo reverb with CV modulation
 - Scope: Oscilloscope / spectral analyser with trigger on rise
 - Added 1V/Oct tracking scheme for Oscillator, Keyboard, Sampler, etc.
-- Quantizer: Simple quantizer and transposer featuring Chromatic, Major, Minor and Octave
+- Quantizer: Featuring Sem, Maj, Min, HMaj, HMin, PMaj, PMin, Oct scales and root key, octave
 - Gain: 36db gain module
 - Polarity: Convert between unipolar and bipolar signals
 - Artefact: Jitter, bit crush, downsample and noise
