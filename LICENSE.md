@@ -23,7 +23,7 @@ Licenses of third-party libraries are listed in [LICENSE-Libs.md](LICENSE-Libs.m
 
 The video tutorials are copyright © 2022 Ludwig Zeller and licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
-You can obtain the source code of OpenSoundLab from [https://github.com/ludzeller/OpenSoundLab](https://github.com/ludzeller/OpenSoundLab) or [https://www.opensoundlab.org](https://www.opensoundlab.org).
+You can obtain the source code of OpenSoundLab from [https://github.com/ludzeller/OpenSoundLab](https://github.com/ludzeller/OpenSoundLab) or [http://www.opensoundlab.org](http://www.opensoundlab.org).
 
 # SoundStage VR
 
