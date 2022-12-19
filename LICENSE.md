@@ -19,16 +19,16 @@ OpenSoundLab is based on a version SoundStage VR that has been altered by Maximi
 
 OpenSoundLab is a ™ trademark represented by Ludwig Zeller. You are not allowed to use this trademark for your own derivate software, but are allowed to give a new name to your project.
 
-Licenses of third-party libraries are listed in LICENSES-Libs.
+Licenses of third-party libraries are listed in [LICENSE-Libs.md](LICENSE-Libs.md).
 
-The video tutorials are copyright © 2020-2022 Ludwig Zeller and licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+The video tutorials are copyright © 2022 Ludwig Zeller and licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
 
 # SoundStage VR
 
-Copyright © 2020 Apache 2.0 Maximilian Maroe
-Copyright © 2019-2020 Apache 2.0 James Surine
-Copyright © 2017 Apache 2.0 Google LLC
+Copyright © 2020 Apache 2.0 Maximilian Maroe  
+Copyright © 2019-2020 Apache 2.0 James Surine  
+Copyright © 2017 Apache 2.0 Google LLC  
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
