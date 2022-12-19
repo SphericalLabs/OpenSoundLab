@@ -50,9 +50,9 @@ public class quantizerDeviceInterface : deviceInterface {
 
   void Update() {
 
-    signal.selectedScale = Mathf.RoundToInt(scaleDial.percent * signal.scales.Count);
-    signal.transpose = Utils.map(transposeDial.percent, 0f, 1f, 0f, 1f);
-    signal.octave = Utils.map(octaveDial.percent, 0f, 1f, -0.5f, 0.5f); // +/- 5 octaves
+    signal.selectedScale = Mathf.RoundToInt(scaleDial.percent * (signal.scales.Count - 1));
+    signal.transpose = transposeDial.percent * 0.1f;
+    signal.octave = Utils.map(octaveDial.percent, 0f, 1f, -0.4f, 0.4f); // +/- 4 octaves
 
     if (signal.incoming != input.signal) signal.incoming = input.signal;
   }
@@ -64,6 +64,7 @@ public class quantizerDeviceInterface : deviceInterface {
 
     data.transposeState = transposeDial.percent;
     data.scaleState = scaleDial.percent;
+    data.octaveState = octaveDial.percent;
 
     data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
@@ -80,12 +81,14 @@ public class quantizerDeviceInterface : deviceInterface {
 
     transposeDial.setPercent(data.transposeState);
     scaleDial.setPercent(data.scaleState);
+    octaveDial.setPercent(data.octaveState);
   }
 }
 
 public class QuantizerData : InstrumentData {
   public float transposeState;
   public float scaleState;
+  public float octaveState;
   public int jackOutID;
   public int jackInID;
   public int jackControlID;

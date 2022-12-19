@@ -123,6 +123,9 @@ public class dial : manipObject {
   }
 
   public void setPercent(float p) {
+    
+    if (float.IsNaN(p)) return; // this is used for skipping missing data fields in old save xmls
+
     percent = Mathf.Clamp01(p);
     if (isNotched)
     {
