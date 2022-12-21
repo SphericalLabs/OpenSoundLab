@@ -73,7 +73,7 @@ public class ADSignalGenerator : signalGenerator
 
     public void setRelease(float val)
     {
-        releaseLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, 0.03f, 1f) * length) + 1;
+        releaseLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, 0.01f, 1f) * length) + 1;
     }
 
     public void setLinearity(float val)
@@ -117,7 +117,7 @@ public class ADSignalGenerator : signalGenerator
 
             SetArrayToSingleValue(attackBuffer, attackBuffer.Length, 0f);
             attackInput.processBuffer(attackBuffer, dspTime, channels);
-            attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + attackBuffer[0] * length, 0, length * 2)); // left only
+            attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + attackBuffer[0] * length, 0, length)); // left only
         }
         else
         {
@@ -131,7 +131,7 @@ public class ADSignalGenerator : signalGenerator
 
             SetArrayToSingleValue(releaseBuffer, releaseBuffer.Length, 0f); 
             releaseInput.processBuffer(releaseBuffer, dspTime, channels);
-            releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + releaseBuffer[0] * length, 0, length * 2)); // left only
+            releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + releaseBuffer[0] * length, 0, length)); // left only
         }
         else
         {
@@ -160,7 +160,9 @@ public class ADSignalGenerator : signalGenerator
                 if (stage == 0)
                 {
                     // need speed up with pre-calculated lookups at some point?
+
                     buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / (float)attackLengthFinal, linearity);
+                    
                     counter++;
                     if (counter > attackLengthFinal)
                     {
@@ -170,7 +172,7 @@ public class ADSignalGenerator : signalGenerator
                 }
                 else if (stage == 1)
                 {
-                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / (float)releaseLengthFinal, linearity);
+                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / (float) releaseLengthFinal, linearity);
                     counter++;
                     if (counter > releaseLengthFinal)
                     {
@@ -190,10 +192,12 @@ public class ADSignalGenerator : signalGenerator
             if (System.Single.IsNaN(buffer[n]))
             {
                 buffer[n] = buffer[n + 1] = 0f;
-                //Debug.Log("NaN in stage: " + stage);
-                //Debug.Log("counter: " + counter);
-                //Debug.Log("attack: " + attackLengthFinal);
-                //Debug.Log("release: " + releaseLengthFinal);
+            }
+
+            // hotfix for when attack is modulated and glidedVal is stalled as NaN
+            if (System.Single.IsNaN(glidedVal))
+            {
+              glidedVal = 0f;
             }
 
             glidedVal += (buffer[n] - glidedVal) * 1f; // seems to smooth via float rounding error
