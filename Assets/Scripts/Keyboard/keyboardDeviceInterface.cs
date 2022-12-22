@@ -76,6 +76,11 @@ public class keyboardDeviceInterface : deviceInterface {
     SpawnKeys();
 
     for (int i = 0; i < keyCount; i++) keyStates[i] = new keyState(false);
+
+  }
+
+  void Start(){
+    enableSequencer(false);
   }
 
   void SpawnKeys() {
@@ -167,7 +172,7 @@ public class keyboardDeviceInterface : deviceInterface {
     _midiOut.gameObject.SetActive(on);
   }
 
-  void toggleSequencer(bool on) {
+  void enableSequencer(bool on) {
     _timeline.gameObject.SetActive(on);
   }
 
@@ -178,7 +183,7 @@ public class keyboardDeviceInterface : deviceInterface {
     } else if (ID == -3) {
       toggleMIDIout(on);
     } else if (ID == -4) {
-      toggleSequencer(on);
+      enableSequencer(on);
     } else {
       asynchKeyHit(on, ID, keyInput.touch);
     }

@@ -96,6 +96,9 @@ public class xylorollDeviceInterface : deviceInterface {
   void Start() {
     _beatManager.setTriggers(arpStep, resetArp);
     _beatManager.updateBeat(arpSpeed + 2);
+
+    enableSequencer(false);
+
   }
 
   void SpawnKeys() {
