@@ -62,6 +62,7 @@ Coming later...
 - Disabled Airhorn
 - Disabled Maraca
 - Removed oscillator from ADSR, ControlCube, Keyboard
+- Disabled timeline and MIDI for XyloRoll and Keyboard
 
 
 ### Mailing list
