@@ -356,11 +356,43 @@ public class menuItem : manipObject {
   }
 
   void createItem() {
-    GameObject g = Instantiate(itemPrefab, transform.position, manipulatorObj.rotation) as GameObject;
 
-    if (item == deviceType.Tapes) {
-      g.transform.Translate(.1f, .02f, -.185f, Space.Self);
-    } else if (item != deviceType.Filter && item != deviceType.Scope && item != deviceType.Airhorn && item != deviceType.ADSR) g.transform.Rotate(0, 180, 0, Space.Self);
+    // Get the direction from the object to the camera
+    Vector3 direction = Camera.main.transform.position - transform.position;
+
+    // Generate a quaternion that looks towards the camera
+    Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+    GameObject g = Instantiate(itemPrefab, transform.position /*+ new Vector3(-0f, 0f, -0.04f)*/, lookRotation) as GameObject;
+
+
+    if (item == deviceType.Tapes)
+    {
+      g.transform.Translate(.1f, .02f, .15f, Space.Self);
+      g.transform.Rotate(0, 180, 0, Space.Self);
+    }
+
+    if (item == deviceType.ControlCube)
+      g.transform.Translate(0f, 0f, -0.15f, Space.Self);
+
+    if (item == deviceType.XyloRoll)
+    {
+      g.transform.Rotate(90, 0, 0, Space.Self);
+      g.transform.Translate(0.15f, 0f, -0.05f, Space.Self);
+    }
+
+    if (item == deviceType.Drum)
+      g.transform.Rotate(90, 0, 0, Space.Self);
+
+    if (item == deviceType.Keyboard)
+      g.transform.Rotate(90, 0, 0, Space.Self);
+
+    if (item == deviceType.Mixer)
+      g.transform.Rotate(90, 0, 0, Space.Self);
+
+
+
+    //else if (item != deviceType.Filter && item != deviceType.Scope && item != deviceType.Airhorn && item != deviceType.ADSR) /*g.transform.Rotate(0, 180, 0, Space.Self);*/
 
     manipulatorObj.GetComponent<manipulator>().ForceGrab(g.GetComponentInChildren<handle>());
   }
