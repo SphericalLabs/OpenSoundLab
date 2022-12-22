@@ -36,48 +36,43 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class DCSignalGenerator : signalGenerator {
+public class DCSignalGenerator : signalGenerator
+{
 
-  //public signalGenerator incoming;
+  public signalGenerator incoming;
   public bool active = true;
   bool isBipolar = true;
-  public float attenDialValue = 0f;
-  float lastAttenDialValue = 0.5f;
-  
-  float[] controlBuffer = new float[1];
+  public float attenVal = 0f;
+  float lastAttenVal = 0f;
+
 
   [DllImport("SoundStageNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBuffer(float[] buffer, double dspTime, int channels)
+  {
 
-    //if(!recursionCheckPre()) return; // checks and avoids fatal recursions
+    if (incoming != null) // attennuverter mode
+    {
+      if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
-    //if (incoming != null) // attennuverter mode
-    //{
-    //  incoming.processBuffer(buffer, dspTime, channels);
-    //  if (isBipolar)
-    //  {
-    //    for (int i = 0; i < buffer.Length; i++)
-    //      buffer[i] = buffer[i] * (Utils.lerp(lastAttenDialValue, attenDialValue, (float)i / (buffer.Length - 1)) * 2f - 1f); // linear attenuverter
-    //  }
-    //  else
-    //  {
-    //    for (int i = 0; i < buffer.Length; i++)
-    //      buffer[i] = buffer[i] * Mathf.Pow(Utils.lerp(lastAttenDialValue, attenDialValue, (float)i / (buffer.Length - 1)), 2); // exponential attenuator
-    //  }
+      incoming.processBuffer(buffer, dspTime, channels);
 
-    //} else { // nothing plugged, DC gen mode
-      if(isBipolar){
-        for(int i = 0; i < buffer.Length; i += channels)
-          buffer[i] = buffer[i + 1] = Utils.lerp(lastAttenDialValue, attenDialValue, (float)i / (buffer.Length - 1)) * 2f - 1f;
-      } else {
-        for (int i = 0; i < buffer.Length; i += channels)
-          buffer[i] = buffer[i + 1] = Utils.lerp(lastAttenDialValue, attenDialValue, (float)i / (buffer.Length - 1));
-      }
-    //}
+      for (int i = 0; i < buffer.Length; i++)
+        buffer[i] = buffer[i] * (Utils.lerp(lastAttenVal, attenVal, (float)i / (buffer.Length - 1))); // linear attenuverter
 
-    lastAttenDialValue = attenDialValue;
-    //recursionCheckPost();
+      recursionCheckPost();
+    }
+    else
+    { // nothing plugged, DC gen mode
+
+      for (int i = 0; i < buffer.Length; i += channels)
+        buffer[i] = buffer[i + 1] = Utils.lerp(lastAttenVal, attenVal, (float)i / (buffer.Length - 1));
+
+    }
+
+    lastAttenVal = attenVal;
+
   }
+
 }

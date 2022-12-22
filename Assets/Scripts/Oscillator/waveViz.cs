@@ -157,7 +157,7 @@ public class waveViz : MonoBehaviour
     
   }
 
-  bool lastWasPositive = false;
+  bool lastWasNegative = false;
   bool foundZeroCrossing = false;
 
   int kk;
@@ -177,18 +177,18 @@ public class waveViz : MonoBehaviour
       kk = 0;
 
       RingBuffer_Read(fullBuffer, fullBuffer.Length, 0, ringBufferPtr); // first scan on data, TODO: move trigger code to RingBuffer
-      lastWasPositive = fullBuffer[fullBuffer.Length - 1 - kk] >= 0f; // take first sample
+      lastWasNegative = fullBuffer[fullBuffer.Length - 1 - kk] <= 0f; // take first sample
       foundZeroCrossing = false;
       kk++;
 
       while (kk < fullBuffer.Length - renderBuffer.Length)
       { // search for first 0-pass from right and then take as offset
-        if ((fullBuffer[fullBuffer.Length - 1 - kk] > 0f && !lastWasPositive) /*(fullBuffer[fullBuffer.Length - 1 - kk] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
+        if ((fullBuffer[fullBuffer.Length - 1 - kk] < 0f && !lastWasNegative) /*(fullBuffer[fullBuffer.Length - 1 - kk] < 0f && lastWasPositive)*/) // triggers on rising zero crossing only
         {
           foundZeroCrossing = true;
           break;
         }
-        lastWasPositive = fullBuffer[fullBuffer.Length - 1 - kk] >= 0f;
+        lastWasNegative = fullBuffer[fullBuffer.Length - 1 - kk] <= 0f;
         kk++;
       }
       

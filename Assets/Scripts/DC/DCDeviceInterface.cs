@@ -36,10 +36,11 @@ using UnityEngine;
 using System.Collections;
 
 public class DCDeviceInterface : deviceInterface {
-  public omniJack /*input, */output;
+  public omniJack input, output;
   //basicSwitch isBipolar;
   dial attenDial;
   //AudioSource speaker;
+  public TextMesh valueDisplay;
 
   DCSignalGenerator signal;
 
@@ -61,13 +62,14 @@ public class DCDeviceInterface : deviceInterface {
     //  attenDial.defaultPercent = isBipolar.switchVal ? 0.5f : 0f;
     //}
     
-    signal.attenDialValue = attenDial.percent;
+    signal.attenVal = attenDial.percent * 2f - 1f;
+    valueDisplay.text = signal.attenVal.ToString("F3");
 
-    //if (signal.incoming != input.signal)
-    //{
-    //  signal.incoming = input.signal;
-    //  //speaker.volume = signal.incoming == null ? 0f : 1f;
-    //}
+    if (signal.incoming != input.signal)
+    {
+      signal.incoming = input.signal;
+      //speaker.volume = signal.incoming == null ? 0f : 1f;
+    }
   }
 
   public override InstrumentData GetData() {
@@ -78,7 +80,7 @@ public class DCDeviceInterface : deviceInterface {
     //data.isBipolar = isBipolar.switchVal;
     data.dial = attenDial.percent;
 
-    //data.jackInID = input.transform.GetInstanceID();
+    data.jackInID = input.transform.GetInstanceID();
     data.jackOutID = output.transform.GetInstanceID();
 
     return data;
@@ -88,7 +90,7 @@ public class DCDeviceInterface : deviceInterface {
     DCData data = d as DCData;
     base.Load(data);
 
-    //input.ID = data.jackInID;
+    input.ID = data.jackInID;
     output.ID = data.jackOutID;
 
     //isBipolar.setSwitch(data.isBipolar, true);
@@ -102,5 +104,5 @@ public class DCData : InstrumentData {
   public float dial;
 
   public int jackOutID;
-  //public int jackInID;
+  public int jackInID;
 }

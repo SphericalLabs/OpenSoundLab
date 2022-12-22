@@ -70,6 +70,11 @@ public class manipulator : MonoBehaviour
     _touchpad.manip = this;
     activeTip.SetActive(false);
 
+    tipPackage.localPosition = new Vector3(-0.0167f, 0.0123f, 0.0715f);
+    tipPackage.Rotate(Vector3.up, -7f);
+    tipPackage.Rotate(Vector3.forward, 7f);
+    //tipPackage.Rotate(Vector3.up, -10.992f);
+
     //glowMenuTransform.position = viveMenuButtonTransform.position;
     //glowMenuTransform.rotation = viveMenuButtonTransform.rotation;
 
