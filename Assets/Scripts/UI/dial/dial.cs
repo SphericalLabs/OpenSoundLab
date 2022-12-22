@@ -42,9 +42,10 @@ public class dial : manipObject {
 
   public float percent = 0f;
   public float defaultPercent; 
+  
 
-  public enum dialColors {generic, frequency, amplitude};
-  public dialColors dialColor = dialColors.generic; // dropdown, defaulting to white
+  public enum dialColor {generic, frequency, amplitude};
+  public dialColor currentDialColor = dialColor.generic; // dropdown, defaulting to white
 
   GameObject littleDisk;
   glowDisk dialFeedback;
@@ -61,6 +62,7 @@ public class dial : manipObject {
   public float fineMult = 5f;
 
   public bool isNotched = false;
+  public bool isBipolar = false; 
   public int notchSteps = 4;
 
   public override void Awake() {
@@ -72,7 +74,7 @@ public class dial : manipObject {
     littleDisk = transform.Find("littleDisk").gameObject;
     dialFeedback = transform.parent.Find("glowDisk").GetComponent<glowDisk>();
 
-    loadMaterials(dialColor);
+    loadMaterials(currentDialColor);
     setMaterials(glowDiskMat, littleDiskMat);
     //setGlowState(manipState.none); // no glow variant to save draw calls
 
@@ -81,9 +83,9 @@ public class dial : manipObject {
 
   }
 
-  void loadMaterials(dialColors colorVariant){
+  void loadMaterials(dialColor colorVariant){
     
-    string str = Enum.GetName(typeof(dialColors), colorVariant); // gets the string name of the enum
+    string str = Enum.GetName(typeof(dialColor), colorVariant); // gets the string name of the enum
 
     // Please note: setting a material using .material does not immediately instantiate a copy of that material - only if its properties are accessed!
     // Using sharedMaterial here, but the shader has alpha and therefore cannot be fully batched.
@@ -138,6 +140,8 @@ public class dial : manipObject {
     transform.localRotation = Quaternion.Euler(0, realRot, 0);
   }
 
+  dialColor newDialColor;
+
   void updatePercent() {
 
     percent = Utils.map(realRot, -150f, 150f, 0f, 1f);
@@ -145,6 +149,22 @@ public class dial : manipObject {
     // viz
     dialFeedback.percent = percent * 0.85f; // why that multiplier?
     dialFeedback.PercentUpdate();
+
+    if(isBipolar){
+      if(percent == 0.5f){
+        newDialColor = dialColor.generic;
+      } else if(percent > 0.5f){
+        newDialColor = dialColor.frequency;
+      } else {
+        newDialColor = dialColor.amplitude;
+      }
+      if(newDialColor != currentDialColor){
+        currentDialColor = newDialColor;
+        loadMaterials(currentDialColor); 
+        setMaterials(glowDiskMat, littleDiskMat);
+      }
+
+    }
   }
 
   

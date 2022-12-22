@@ -2972,7 +2972,7 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 0
   defaultPercent: 0
-  dialColor: 2
+  currentDialColor: 2
   controllerRot: 0
   lastControllerRot: 0
   rotAtBeginningOfGrab: 0
@@ -2981,6 +2981,7 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   isNotched: 0
+  isBipolar: 0
   notchSteps: 4
 --- !u!1 &1000013495723170
 GameObject:
@@ -3686,7 +3687,7 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 0.5
   defaultPercent: 0
-  dialColor: 1
+  currentDialColor: 1
   controllerRot: 0
   lastControllerRot: 0
   rotAtBeginningOfGrab: 0
@@ -3695,6 +3696,7 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   isNotched: 0
+  isBipolar: 0
   notchSteps: 4
 --- !u!1 &1436940005579262
 GameObject:

@@ -913,6 +913,7 @@ MonoBehaviour:
   fftWin: 5
   width: 1024
   height: 512
+  onlineTexture: {fileID: 0}
   onlineMaterial: {fileID: 2100000, guid: b2ea714ecc13cb54a9f1173f22538e09, type: 2}
   displayRenderer: {fileID: 23000014021579546}
   skip: 1
@@ -1892,7 +1893,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1207776486901562351}
   m_LocalRotation: {x: 0.70710725, y: -0.00000017136337, z: -0.00000004715441, w: -0.70710635}
-  m_LocalPosition: {x: 0.54893494, y: 0.2, z: -0.119}
+  m_LocalPosition: {x: 0.54893494, y: 0.2, z: -0.086}
   m_LocalScale: {x: 3.115859, y: 10.092265, z: 5.0461626}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2025,7 +2026,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2085595129676322682}
   m_LocalRotation: {x: -0.7071071, y: 0.0000008184834, z: -0.00000011714446, w: 0.70710653}
-  m_LocalPosition: {x: 0.166, y: 0.0757, z: -0.0199}
+  m_LocalPosition: {x: 0.166, y: 0.0757, z: -0.0177}
   m_LocalScale: {x: 0.605536, y: 0.60553586, z: 0.605536}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2100,7 +2101,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2334652460636402524}
   m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000078976143}
-  m_LocalPosition: {x: 0.1664, y: -0.0839, z: -0.0107}
+  m_LocalPosition: {x: 0.1664, y: -0.0839, z: -0.0092}
   m_LocalScale: {x: 0.546583, y: 0.4946019, z: 0.39524373}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2196,6 +2197,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 1297771798217013816}
   selectOverlay: {fileID: 4908846910578448480}
   glowHue: 0
@@ -2318,7 +2320,7 @@ Transform:
   m_GameObject: {fileID: 4228450203725475423}
   m_LocalRotation: {x: -0.0000005364413, y: 0.00000013353807, z: -0.0000014156103,
     w: 1}
-  m_LocalPosition: {x: -0.0001, y: -0.0395, z: -0.0124}
+  m_LocalPosition: {x: -0.0001, y: -0.0395, z: -0.017}
   m_LocalScale: {x: 0.10797663, y: 0.119324684, z: 0.14932102}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2419,7 +2421,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4578011886036838061}
   m_LocalRotation: {x: -0, y: 0.00000034272668, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5506, y: -0.0238, z: 0.058}
+  m_LocalPosition: {x: 0.5506, y: -0.0238, z: 0.073}
   m_LocalScale: {x: 1.7314073, y: 2.5373607, z: 4.055263}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2515,6 +2517,7 @@ MonoBehaviour:
   button2DID: 
   glowMatOnToggle: 1
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  highlightMat: {fileID: 0}
   _componentInterface: {fileID: 1297771798217013816}
   selectOverlay: {fileID: 8861244297975707545}
   glowHue: 0.21960784
@@ -2801,7 +2804,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6226832455343379695}
   m_LocalRotation: {x: -0.7071069, y: -0.0000011663946, z: 0.0000007113711, w: -0.7071067}
-  m_LocalPosition: {x: 0.0005, y: -0.0124, z: -0.0216}
+  m_LocalPosition: {x: 0.0005, y: -0.0092, z: -0.0216}
   m_LocalScale: {x: 0.059999995, y: 0.06, z: 0.060000014}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3062,6 +3065,7 @@ MonoBehaviour:
   heightPadding: 10
   sampleStep: 512
   doTriggering: 1
+  active: 0
   offset: 0
 --- !u!1 &8135534423989162767
 GameObject:
@@ -3215,7 +3219,7 @@ MonoBehaviour:
   canBeDeleted: 0
   percent: 1
   defaultPercent: 0
-  dialColor: 0
+  currentDialColor: 0
   controllerRot: 0
   lastControllerRot: 0
   rotAtBeginningOfGrab: 0
@@ -3224,6 +3228,7 @@ MonoBehaviour:
   prevShakeRot: 0
   fineMult: 5
   isNotched: 1
+  isBipolar: 0
   notchSteps: 11
 --- !u!1 &8446214836861030364
 GameObject:
