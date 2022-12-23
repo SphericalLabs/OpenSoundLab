@@ -213,7 +213,7 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(PolarizerData))]
 [XmlInclude(typeof(ArtefactData))]
 [XmlInclude(typeof(CompressorData))]
-[XmlInclude(typeof(StereoVerbData))]
+[XmlInclude(typeof(FreeverbData))]
 [XmlInclude(typeof(DelayData))]
 [XmlInclude(typeof(ScopeData))]
 [XmlInclude(typeof(QuantizerData))]

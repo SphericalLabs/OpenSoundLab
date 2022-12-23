@@ -113,14 +113,9 @@ public class menuManager : MonoBehaviour {
       if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Airhorn) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.Stereo) continue; // remove completely?
-      //if ((menuItem.deviceType)i == menuItem.deviceType.ADSR) continue;
+            
       if ((menuItem.deviceType)i == menuItem.deviceType.Maracas) continue;
-      //if ((menuItem.deviceType)i == menuItem.deviceType.Drum) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Timeline) continue;      
-      if ((menuItem.deviceType)i == menuItem.deviceType.Funktion) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.SARSCov2) continue;
-      //if ((menuItem.deviceType)i == menuItem.deviceType.Looper) continue;
       if ((menuItem.deviceType)i == menuItem.deviceType.Reverb) continue;
 
       // MultiMix and MultiSplit hack, want to have Multiple available for loading, but not in the menu palette

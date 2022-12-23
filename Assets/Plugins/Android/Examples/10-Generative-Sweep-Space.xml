@@ -2705,9 +2705,9 @@
       <jackInID>-432944</jackInID>
       <jackTriggerID>-433000</jackTriggerID>
     </Instruments>
-    <Instruments xsi:type="StereoVerbData">
+    <Instruments xsi:type="FreeverbData">
       <ID>-432352</ID>
-      <deviceType>StereoVerb</deviceType>
+      <deviceType>Freeverb</deviceType>
       <position>
         <x>0.452343673</x>
         <y>1.31515944</y>
@@ -2859,9 +2859,9 @@
       <jackInSyncID>-431360</jackInSyncID>
       <jackInPwmID>-431332</jackInPwmID>
     </Instruments>
-    <Instruments xsi:type="StereoVerbData">
+    <Instruments xsi:type="FreeverbData">
       <ID>-430342</ID>
-      <deviceType>StereoVerb</deviceType>
+      <deviceType>Freeverb</deviceType>
       <position>
         <x>0.150245517</x>
         <y>1.2757858</y>

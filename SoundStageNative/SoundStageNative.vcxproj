@@ -255,7 +255,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="StereoVerb.cpp" />
+    <ClCompile Include="Freeverb.cpp" />
     <ClCompile Include="util.c" />
   </ItemGroup>
   <ItemGroup>
@@ -279,7 +279,7 @@
     <ClInclude Include="resample.h" />
     <ClInclude Include="resample_tables.h" />
     <ClInclude Include="RingBuffer.h" />
-    <ClInclude Include="StereoVerb.h" />
+    <ClInclude Include="Freeverb.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

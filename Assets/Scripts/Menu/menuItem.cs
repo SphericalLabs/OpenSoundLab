@@ -82,7 +82,7 @@ public class menuItem : manipObject {
     Quantizer,
     Recorder,
     Reverb,
-    StereoVerb, // shown as Reverb
+    Freeverb, 
     SampleHold,
     Sampler,
     Scope,
@@ -145,7 +145,7 @@ public class menuItem : manipObject {
     if (item == deviceType.Microphone) label.text = "Mic";
     if (item == deviceType.SampleHold) label.text = "S&H";
     if (item == deviceType.Reverb) label.text = "Reverb";
-    if (item == deviceType.StereoVerb) label.text = "Reverb";
+    //if (item == deviceType.Freeverb) label.text = "Reverb";
     if (item == deviceType.DC) label.text = "DC";
     if (item == deviceType.Polarizer) label.text = "Polarity";
 

@@ -32,13 +32,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "StereoVerb.h"
+#include "Freeverb.h"
 
-SOUNDSTAGE_API freeverb::ReverbModel* StereoVerb_New(int sampleRate) {
+SOUNDSTAGE_API freeverb::ReverbModel* Freeverb_New(int sampleRate) {
     return new freeverb::ReverbModel((double)sampleRate);
 }
-SOUNDSTAGE_API void StereoVerb_Free(freeverb::ReverbModel* x) { delete x; }
-SOUNDSTAGE_API void StereoVerb_SetParam(int param, float value, freeverb::ReverbModel *x)
+SOUNDSTAGE_API void Freeverb_Free(freeverb::ReverbModel* x) { delete x; }
+SOUNDSTAGE_API void Freeverb_SetParam(int param, float value, freeverb::ReverbModel *x)
 {
     switch (param) {
         case 0:
@@ -63,7 +63,7 @@ SOUNDSTAGE_API void StereoVerb_SetParam(int param, float value, freeverb::Reverb
             break;
     }
 }
-SOUNDSTAGE_API float StereoVerb_GetParam(int param, freeverb::ReverbModel *x)
+SOUNDSTAGE_API float Freeverb_GetParam(int param, freeverb::ReverbModel *x)
 {
     switch (param) {
         case 0:
@@ -90,8 +90,8 @@ SOUNDSTAGE_API float StereoVerb_GetParam(int param, freeverb::ReverbModel *x)
     }
     return 0;
 }
-SOUNDSTAGE_API void StereoVerb_Clear(freeverb::ReverbModel *x) { x->clear(); }
-SOUNDSTAGE_API void StereoVerb_Process(float buffer[], int length, int channels, freeverb::ReverbModel *x)
+SOUNDSTAGE_API void Freeverb_Clear(freeverb::ReverbModel *x) { x->clear(); }
+SOUNDSTAGE_API void Freeverb_Process(float buffer[], int length, int channels, freeverb::ReverbModel *x)
 {
     //This calls a modified FreeVerb function that operates on interleaved audio buffers and also considers the modulation buffers:
     x->processInterleaved(buffer, length, channels);

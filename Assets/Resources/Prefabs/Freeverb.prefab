@@ -308,7 +308,7 @@ GameObject:
   - component: {fileID: 8879622703619581521}
   - component: {fileID: 7628936705920694903}
   m_Layer: 0
-  m_Name: StereoVerb
+  m_Name: Freeverb
   m_TagString: instrument
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5168,7 +5168,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 2251
+  m_VersionIndex: 2254
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []

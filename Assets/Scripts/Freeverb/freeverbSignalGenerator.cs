@@ -37,7 +37,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System;
 
-public class stereoVerbSignalGenerator : signalGenerator {
+public class freeverbSignalGenerator : signalGenerator {
 
     public enum Param : int
     {
@@ -71,26 +71,26 @@ public class stereoVerbSignalGenerator : signalGenerator {
     private IntPtr x;
     private float[] p = new float[(int)Param.P_N];
     [DllImport("SoundStageNative")]
-    private static extern void StereoVerb_Process(float[] buffer, int length, int channels, IntPtr x);
+    private static extern void Freeverb_Process(float[] buffer, int length, int channels, IntPtr x);
     [DllImport("SoundStageNative")]
-    private static extern IntPtr StereoVerb_New(int sampleRate);
+    private static extern IntPtr Freeverb_New(int sampleRate);
     [DllImport("SoundStageNative")]
-    private static extern void StereoVerb_Free(IntPtr x);
+    private static extern void Freeverb_Free(IntPtr x);
     [DllImport("SoundStageNative")]
-    private static extern void StereoVerb_SetParam(int param, float value, IntPtr x);
+    private static extern void Freeverb_SetParam(int param, float value, IntPtr x);
     [DllImport("SoundStageNative")]
-    private static extern float StereoVerb_GetParam(int param, IntPtr x);
+    private static extern float Freeverb_GetParam(int param, IntPtr x);
     [DllImport("SoundStageNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void Awake() {
         base.Awake();
-        x = StereoVerb_New(AudioSettings.outputSampleRate);
+        x = Freeverb_New(AudioSettings.outputSampleRate);
     }
 
     private void OnDestroy()
     {
-        StereoVerb_Free(x);
+        Freeverb_Free(x);
     }
 
     void Update() {
@@ -175,13 +175,13 @@ public class stereoVerbSignalGenerator : signalGenerator {
         //Set new parameters
         for (int i = 0; i < (int)Param.P_N; i++)
         {
-            StereoVerb_SetParam(i, p[i], x);
+            Freeverb_SetParam(i, p[i], x);
         }
 
         if (sigIn != null)
             sigIn.processBuffer(buffer, dspTime, channels);
         //We process the reverb even if there is no input available, to make sure reverb tails decay to the end, and to enable spacy freeze pads.
-        StereoVerb_Process(buffer, buffer.Length, channels, x);
+        Freeverb_Process(buffer, buffer.Length, channels, x);
         recursionCheckPost();
     }
 }

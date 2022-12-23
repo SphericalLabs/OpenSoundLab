@@ -35,8 +35,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class stereoVerbDeviceInterface : deviceInterface {
-    stereoVerbSignalGenerator signal;
+public class freeverbDeviceInterface : deviceInterface {
+    freeverbSignalGenerator signal;
     public dial size, damping, width, mix;
     public basicSwitch freeze;
     public omniJack omniJackIn, omniJackOut, omniJackModSize, omniJackModFreeze, omniJackModMix;
@@ -46,7 +46,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
 
     public override void Awake() {
         base.Awake();
-        signal = GetComponent<stereoVerbSignalGenerator>();
+        signal = GetComponent<freeverbSignalGenerator>();
         dials = new dial[3] { size, damping, width };
     }
 
@@ -56,17 +56,17 @@ public class stereoVerbDeviceInterface : deviceInterface {
         if (omniJackModFreeze.signal != signal.sigModFreeze) signal.sigModFreeze = omniJackModFreeze.signal;
         if (omniJackModMix.signal != signal.sigModMix) signal.sigModMix = omniJackModMix.signal;
 
-        signal.SetParam(size.percent, (int)stereoVerbSignalGenerator.Param.P_ROOMSIZE);
-        signal.SetParam(damping.percent, (int)stereoVerbSignalGenerator.Param.P_DAMPING);
-        signal.SetParam(width.percent, (int)stereoVerbSignalGenerator.Param.P_WIDTH);
-        signal.SetParam(freeze.switchVal ? 1 : 0, (int)stereoVerbSignalGenerator.Param.P_FREEZE);
-        signal.SetParam(Utils.equalPowerCrossfadeGain(mix.percent), (int)stereoVerbSignalGenerator.Param.P_WET);
-        signal.SetParam(Utils.equalPowerCrossfadeGain(1 - mix.percent), (int)stereoVerbSignalGenerator.Param.P_DRY);
+        signal.SetParam(size.percent, (int)freeverbSignalGenerator.Param.P_ROOMSIZE);
+        signal.SetParam(damping.percent, (int)freeverbSignalGenerator.Param.P_DAMPING);
+        signal.SetParam(width.percent, (int)freeverbSignalGenerator.Param.P_WIDTH);
+        signal.SetParam(freeze.switchVal ? 1 : 0, (int)freeverbSignalGenerator.Param.P_FREEZE);
+        signal.SetParam(Utils.equalPowerCrossfadeGain(mix.percent), (int)freeverbSignalGenerator.Param.P_WET);
+        signal.SetParam(Utils.equalPowerCrossfadeGain(1 - mix.percent), (int)freeverbSignalGenerator.Param.P_DRY);
     }
 
     public override InstrumentData GetData() {
-        StereoVerbData data = new StereoVerbData();
-        data.deviceType = menuItem.deviceType.StereoVerb;
+        FreeverbData data = new FreeverbData();
+        data.deviceType = menuItem.deviceType.Freeverb;
         GetTransformData(data);
 
         data.jackInID = omniJackIn.transform.GetInstanceID();
@@ -85,7 +85,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
     }
 
     public override void Load(InstrumentData d) {
-        StereoVerbData data = d as StereoVerbData;
+        FreeverbData data = d as FreeverbData;
         base.Load(data);
         omniJackIn.ID = data.jackInID;
         omniJackOut.ID = data.jackOutID;
@@ -101,7 +101,7 @@ public class stereoVerbDeviceInterface : deviceInterface {
     }
 }
 
-public class StereoVerbData : InstrumentData {
+public class FreeverbData : InstrumentData {
     public float size, damping, mix, width;
     public bool freeze;
     public int jackOutID, jackInID;

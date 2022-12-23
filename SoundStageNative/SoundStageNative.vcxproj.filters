@@ -30,9 +30,6 @@
     <ClCompile Include="RingBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StereoVerb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,6 +57,9 @@
     <ClCompile Include="Artefact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Freeverb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -75,9 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RingBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StereoVerb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util.h">
@@ -126,6 +123,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Artefact.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Freeverb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
