@@ -24,6 +24,7 @@ fi
 
 echo ""
 echo "Cleaning up / removing build folders..."  #optional..
+
 rm -rf libs
 rm -rf obj
 
