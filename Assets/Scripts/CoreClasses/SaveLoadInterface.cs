@@ -216,17 +216,15 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(StereoVerbData))]
 [XmlInclude(typeof(DelayData))]
 [XmlInclude(typeof(ScopeData))]
-[XmlInclude(typeof(QuantizerData))] 
+[XmlInclude(typeof(QuantizerData))]
 
 [XmlInclude(typeof(ADData))]
-  [XmlInclude(typeof(SequencerCVData))] // update?
-  [XmlInclude(typeof(SampleHoldData))]
+[XmlInclude(typeof(SequencerCVData))] // update?
+[XmlInclude(typeof(SampleHoldData))]
 
-  
-  [XmlInclude(typeof(GlideData))]
-  [XmlInclude(typeof(GainData))]
 
-  [XmlInclude(typeof(FunktionData))]
+[XmlInclude(typeof(GlideData))]
+[XmlInclude(typeof(GainData))]
 
 [XmlInclude(typeof(OscillatorData))]
 [XmlInclude(typeof(SpeakerData))]
@@ -257,7 +255,7 @@ public class SaveLoadInterface : MonoBehaviour {
 [XmlInclude(typeof(TimelineData))]
 [XmlInclude(typeof(ADSRData))]
 
- 
+
 
 
 public class InstrumentData {

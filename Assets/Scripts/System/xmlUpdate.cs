@@ -75,7 +75,6 @@ public class xmlUpdate {
             case "Quantizers":
               serializer = new XmlSerializer(typeof(QuantizerData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-
             case "ADs":
               serializer = new XmlSerializer(typeof(ADData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -90,9 +89,6 @@ public class xmlUpdate {
               break;
             case "Gains":
               serializer = new XmlSerializer(typeof(GainData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
-            case "Funktion":
-              serializer = new XmlSerializer(typeof(FunktionData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "Oscillator":
               serializer = new XmlSerializer(typeof(OscillatorData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -215,12 +211,6 @@ public class xmlUpdate {
               break;
             case "Gains":
               data[data.Count - 1].deviceType = menuItem.deviceType.Gain;
-              break;
-            case "SARSCov2":
-              data[data.Count - 1].deviceType = menuItem.deviceType.SARSCov2;
-              break;
-            case "Funktion":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Funktion;
               break;
             case "Oscillators":
               data[data.Count - 1].deviceType = menuItem.deviceType.Oscillator;
