@@ -91,9 +91,6 @@ public class xmlUpdate {
             case "Gains":
               serializer = new XmlSerializer(typeof(GainData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "SARSCov2":
-              serializer = new XmlSerializer(typeof(SARSCov2Data), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
             case "Funktion":
               serializer = new XmlSerializer(typeof(FunktionData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
