@@ -32,14 +32,14 @@ Coming later...
 - Reverb: Classic Freeverb stereo reverb with CV modulation
 - Scope: Oscilloscope / spectral analyser with trigger on rise
 - Added 1V/Oct tracking scheme for Oscillator, Keyboard, Sampler, etc.
-- Quantizer: Featuring Sem, Maj, Min, HMaj, HMin, PMaj, PMin, Oct scales and root key, octave
+- Quantizer: Featuring Sem, Maj, Min, HMaj, HMin, PMaj, PMin, Oct scales and root key, octave dials
 - Gain: 36db gain module
 - Polarity: Convert between unipolar and bipolar signals
 - Artefact: Jitter, bit crush, downsample and noise
 - Compressor: Dynamics processor with attack, release, threshold, ratio, bypass, gain and sidechaining
 - DC: Bipolar signal generator
 - Glide: Slope limiter
-- S&H: Sample and hold module
+- S&H: Sample-and-hold module
 - Tutorials: Player console for video tutorials
 - VCA: Added amplifier with modulation and ring modulation
 - Added performance menu to adjust framerate, resolution, foveated rendering and CPU/GPU levels
@@ -47,6 +47,7 @@ Coming later...
 - Added navigation by dragging and scaling the complete patch
 
 #### Improved features
+- Redesigned look-and-feel and new pictograms
 - CVSequencer: Added CV sequencing and both dials and modulation inputs for volume and pitch
 - Filter: tracks at audio rate, allows more extreme resonances and modulations
 - Oscillator: Added linear through-zero FM, reset, PWM and triangle
@@ -62,7 +63,7 @@ Coming later...
 - Disabled Airhorn
 - Disabled Maraca
 - Removed oscillator from ADSR, ControlCube, Keyboard
-- Disabled timeline and MIDI for XyloRoll and Keyboard
+- Disabled timeline and MIDI for XyloRoll and Keyboard until fixed
 
 
 ### Mailing list
