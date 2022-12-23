@@ -175,7 +175,7 @@ public class libraryDeviceInterface : deviceInterface {
     curTape.masterObj = null;
     curTape = (Instantiate(tapePrefab, tapeHolder, false) as GameObject).GetComponent<tape>();
 
-    curTape.transform.localPosition = p;
+    curTape.transform.localPosition = p + tape.correctOffset; // corrects position when grabbing
     curTape.Setup(curSecondary, sampleManager.instance.sampleDictionary[curPrimary][curSecondary]);
   }
 
@@ -184,13 +184,13 @@ public class libraryDeviceInterface : deviceInterface {
     if (sampleManager.instance.sampleDictionary[p][s] != null) g.Setup(s, sampleManager.instance.sampleDictionary[p][s]);
     else g.Setup(curSecondary, sampleManager.instance.sampleDictionary[curPrimary][curSecondary]);
     t.GetComponent<manipulator>().ForceGrab(g);
-    g.transform.localPosition = Vector3.zero;
+    g.transform.localPosition = tape.correctOffset; // corrects position when grabbing
     g.transform.localRotation = Quaternion.Euler(-90, -90, -90);//.zero;
   }
 
   public void forceGroup(Transform t, string p) {
     if (sampleManager.instance.sampleDictionary[p].Keys.Count == 0) return;
-    tapeGroupDeviceInterface g = (Instantiate(tapegroupPrefab, t.position, t.rotation) as GameObject).GetComponent<tapeGroupDeviceInterface>();
+    tapeGroupDeviceInterface g = (Instantiate(tapegroupPrefab, t.position + tape.correctOffset, t.rotation) as GameObject).GetComponent<tapeGroupDeviceInterface>();
     t.GetComponent<manipulator>().ForceGrab(g.GetComponentInChildren<handle>());
     g.Setup(p);
     g.transform.Rotate(0, 180, 0, Space.Self);

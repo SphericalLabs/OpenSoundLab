@@ -53,6 +53,8 @@ public class tape : manipObject {
 
   public bool previewWhenGrabbed = false;
 
+  public static Vector3 correctOffset = Vector3.forward * 0.12f + Vector3.left * 0.02f; // corrects position when grabbing
+
   Material mat, highlightMat, highlightGrabbedMat;
   Color tapeColor;
   float tapeHue;

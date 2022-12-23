@@ -358,7 +358,7 @@ public class menuItem : manipObject {
   void createItem() {
 
     // Get the direction from the object to the camera
-    Vector3 direction = Camera.main.transform.position - transform.position;
+    Vector3 direction = Camera.main.transform.position - transform.position /*+ Vector3.down * 0.10f*/;
 
     // Generate a quaternion that looks towards the camera
     Quaternion lookRotation = Quaternion.LookRotation(direction);

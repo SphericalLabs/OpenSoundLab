@@ -101,13 +101,13 @@ public class libraryPanel : UIpanel {
         secondaryText = IDtext;
         if (ghostTape != null) Destroy(ghostTape);
         ghostTape = Instantiate(ghostTapePrefab, manipulatorObj.transform, false) as GameObject;
-        ghostTape.transform.localPosition = Vector3.zero;
+        ghostTape.transform.localPosition = tape.correctOffset;
         ghostTape.transform.localRotation = Quaternion.Euler(-90, -90, -90);//.zero;
       } else {
         secondaryText = IDtext;
         if (ghostGroup != null) Destroy(ghostGroup);
         ghostGroup = Instantiate(ghostGroupPrefab, manipulatorObj.transform, false) as GameObject;
-        ghostGroup.transform.localPosition = Vector3.zero;
+        ghostGroup.transform.localPosition = tape.correctOffset; 
         ghostGroup.transform.localRotation = Quaternion.identity;
       }
     } else {
@@ -163,7 +163,7 @@ public class libraryPanel : UIpanel {
     AudioClip c = RuntimeAudioClipLoader.Manager.Load(f, false, true, true);
 
     loaderObject = Instantiate(loadingPrefab, transform, false) as GameObject;
-    loaderObject.transform.localPosition = new Vector3(-.03f, -.037f, .01f);
+    loaderObject.transform.localPosition = Vector3.forward * 0.1f;  // new Vector3(-.03f, -.037f, .01f);
     loaderObject.transform.localRotation = Quaternion.Euler(-90, 180, 0);
     loaderObject.transform.localScale = Vector3.one * .1f;
 
