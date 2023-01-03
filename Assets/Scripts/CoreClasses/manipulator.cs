@@ -42,7 +42,7 @@ using OculusSampleFramework;
 
 public class manipulator : MonoBehaviour
 {
-  int controllerIndex = -1;
+  int controllerIndex = -1; // 0 => left, 1 => right
   public GameObject activeTip;
   public Transform tipL, tipR;
   public Transform triggerTrans;
@@ -111,6 +111,10 @@ public class manipulator : MonoBehaviour
       rightQ2Controller.gameObject.SetActive(false);
       leftQ2Controller.gameObject.SetActive(true);
     }
+  }
+
+  public bool isLeftController() {
+    return controllerIndex == 0 ? true : false;
   }
 
   bool grabbing;

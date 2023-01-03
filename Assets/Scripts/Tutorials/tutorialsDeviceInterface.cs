@@ -85,7 +85,8 @@ public class tutorialsDeviceInterface : deviceInterface
       tutorials[i].setVideo(tutorialRecords[i].videoString);
     }
 
-    triggerOpenTutorial(tutorials[0]);
+
+    triggerOpenTutorial(tutorials[0], true);
 
   }
   Vector3 scaleVector = new Vector3(0f, 1f, 1f);
@@ -152,13 +153,13 @@ public class tutorialsDeviceInterface : deviceInterface
 
   }
 
-  public void triggerOpenTutorial(tutorialPanel tut)
+  public void triggerOpenTutorial(tutorialPanel tut, bool startPaused = false)
   {
     playButton.keyHit(false);
-    StartCoroutine(openTutorial(tut));
+    StartCoroutine(openTutorial(tut, startPaused));
   }
 
-  IEnumerator openTutorial(tutorialPanel tut)
+  IEnumerator openTutorial(tutorialPanel tut, bool startPaused = false)
   {
 
     selectedTutorial = tut;
@@ -179,11 +180,11 @@ public class tutorialsDeviceInterface : deviceInterface
     {
       yield return new WaitForSeconds(.1f);
     }
-
+    videoPlayer.skipOnDrop = false;
     videoPlayer.renderMode = VideoRenderMode.MaterialOverride;
     videoPlayer.targetMaterialRenderer = videoPlayer.GetComponentInChildren<Renderer>();
     videoPlayer.targetMaterialProperty = "_MainTex";
-    forcePlay();
+    if(!startPaused) forcePlay();
   }
 
   public void playPauseVideo()

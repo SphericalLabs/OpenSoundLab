@@ -216,12 +216,14 @@ public class dial : manipObject {
     // only raw input worked properly
     //if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
     //|| (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f)) {
-    if (OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f || OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f) {
+    if ( ( OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f && manipulatorObjScript.isLeftController() ) 
+      || ( OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f && !manipulatorObjScript.isLeftController()) ) {
       curRot += (controllerRot - lastControllerRot) / fineMult;
     } else {
       curRot += controllerRot - lastControllerRot;
     }
       
+
     lastControllerRot = controllerRot;
 
     curRot = Mathf.Clamp(curRot, -150f, 150f);

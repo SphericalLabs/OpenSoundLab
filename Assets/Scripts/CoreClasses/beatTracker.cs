@@ -42,7 +42,7 @@ public class beatTracker : ScriptableObject {
   public delegate void ResetEvent();
   public ResetEvent resetEvent;
 
-  int[] beatVals = new int[] { 1, 2, 4, 8, 12, 16, 24, 32, 64 }; //1,2,4,8,16,32,64
+  int[] beatVals = new int[] { 1, 2, 4, 8, 12, 16, 24, 32, 64 }; 
   int curBeat = 0;
   float[] timeValues = new float[] { };
   float lastTime = 0;
