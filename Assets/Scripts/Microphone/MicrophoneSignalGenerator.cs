@@ -64,9 +64,31 @@ public class MicrophoneSignalGenerator : signalGenerator {
   }
 
   void Start() {
-    source = GetComponent<AudioSource>();
+    source = GetComponent<AudioSource>();    
+    OVRManager.TrackingAcquired += trackingAcquired;
+    OVRManager.TrackingAcquired += trackingLost;
     SelectMic(0);
   }
+
+  void OnApplicationFocus(bool hasFocus)
+  {
+    if(hasFocus) SelectMic(0); // restart mic in order to clear its buffer and avoid severe latency
+  }
+
+  void OnApplicationPause(bool isPaused)
+  {
+    if (!isPaused) SelectMic(0); // restart mic in order to clear its buffer and avoid severe latency
+  }
+
+
+  public void trackingAcquired(){
+    SelectMic(0); // restart mic in order to clear its buffer and avoid severe latency
+  }
+
+  public void trackingLost(){
+    SelectMic(0); // restart mic in order to clear its buffer and avoid severe latency
+  }
+  
 
   Coroutine _MicActivateRoutine;
   void SelectMic(int num) {
@@ -83,7 +105,7 @@ public class MicrophoneSignalGenerator : signalGenerator {
     Microphone.End(Microphone.devices[curMicID]);
     curMicID = num;
 
-    micClip = Microphone.Start(Microphone.devices[num], true, 1, AudioSettings.outputSampleRate);
+    micClip = Microphone.Start(Microphone.devices[num], true, 3, AudioSettings.outputSampleRate);
 
     yield return null;
     if (micClip != null) {
