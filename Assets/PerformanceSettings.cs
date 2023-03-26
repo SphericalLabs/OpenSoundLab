@@ -25,8 +25,16 @@ public class PerformanceSettings : MonoBehaviour
         Debug.Log("Display refresh rate: " + fps);
         OVRManager.useDynamicFixedFoveatedRendering = false;
         Unity.XR.Oculus.Utils.EnableDynamicFFR(false);
-        //Unity.XR.Oculus.Utils.SetFoveationLevel(4);
-      }
+        if (OVRManager.eyeTrackedFoveatedRenderingSupported)
+        {
+          OVRManager.eyeTrackedFoveatedRenderingEnabled = true;
+        } 
+        if (OVRManager.eyeTrackedFoveatedRenderingEnabled)
+        {
+          Debug.Log("eyeTrackedFoveatedRenderingEnabled is true");
+        }
+      //Unity.XR.Oculus.Utils.SetFoveationLevel(4);
+    }
 
       urpa = (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
       urpa.renderScale = 1.33f;
@@ -56,7 +64,8 @@ public class PerformanceSettings : MonoBehaviour
       fovDialVal = fovDial.percent;
       //Unity.XR.Oculus.Utils.SetFoveationLevel(Mathf.FloorToInt(fovDialVal * fovDial.notchSteps));
       
-      OVRManager.fixedFoveatedRenderingLevel = (OVRManager.FixedFoveatedRenderingLevel) Enum.ToObject(typeof(OVRManager.FixedFoveatedRenderingLevel), Mathf.RoundToInt(fovDialVal * (fovDial.notchSteps - 1)));
+      OVRManager.foveatedRenderingLevel = (OVRManager.FoveatedRenderingLevel) Enum.ToObject(typeof(OVRManager.FoveatedRenderingLevel), Mathf.RoundToInt(fovDialVal * (fovDial.notchSteps - 1)));
+
       Debug.Log(Mathf.RoundToInt(fovDialVal * (fovDial.notchSteps - 1)));
     }
 
