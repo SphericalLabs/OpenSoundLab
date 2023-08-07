@@ -239,39 +239,25 @@ public class manipulator : MonoBehaviour
   }
 
   public void hapticPulse(ushort hapticPower = 1200) {
-        // if (masterControl.instance.currentPlatform == masterControl.platform.Vive) SteamVR_Controller.Input(controllerIndex).TriggerHapticPulse(hapticPower);
-        //  else if (masterControl.instance.currentPlatform == masterControl.platform.Oculus) bigHaptic(hapticPower, .05f);
-        List<UnityEngine.XR.InputDevice> devices = new List<UnityEngine.XR.InputDevice>();
-
-    if (controllerIndex == 0)
-    {
-      UnityEngine.XR.InputDevices.GetDevicesWithRole(UnityEngine.XR.InputDeviceRole.LeftHanded, devices);
-    }
-    else if (controllerIndex == 1)
-    {
-      UnityEngine.XR.InputDevices.GetDevicesWithRole(UnityEngine.XR.InputDeviceRole.RightHanded, devices);
-    }
-
-    foreach (var device in devices)
-    {
-      UnityEngine.XR.HapticCapabilities capabilities;
-      if (device.TryGetHapticCapabilities(out capabilities))
-      {
-        if (capabilities.supportsImpulse)
-        {
-          uint channel = 0;
-          float amplitude = hapticPower / 3999.0f;
-          float duration = 0.05f;
-          device.SendHapticImpulse(channel, amplitude, duration);
-        }
-      }
-    }
+     
+    doHaptic(hapticPower);
   }
 
   public void bigHaptic(ushort hapticPower = 750, float dur = 0.1f)
   {
-    //   if (_hapticCoroutine != null) StopCoroutine(_hapticCoroutine);
-    //   _hapticCoroutine = StartCoroutine(hapticCoroutine(hapticPower, dur));
+    doHaptic(hapticPower, dur);
+  }
+
+
+  void doHaptic(ushort hapticPower = 750, float dur = 0.1f)
+  {
+    if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Quest_Pro 
+    || Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Link_Quest_Pro)
+    {
+      hapticPower *= (ushort)1.4;
+      dur *= 0.07f;      
+    }
+
     List<UnityEngine.XR.InputDevice> devices = new List<UnityEngine.XR.InputDevice>();
 
     if (controllerIndex == 0)
@@ -297,6 +283,7 @@ public class manipulator : MonoBehaviour
       }
     }
   }
+
 
   void LateUpdate()
   {

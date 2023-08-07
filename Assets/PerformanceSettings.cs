@@ -110,12 +110,12 @@ public class PerformanceSettings : MonoBehaviour
     if (Time.frameCount % fps == 0) 
     {
 
-      if (averageFrameTime >= renderBudget * 1.07f && currentQualityStep != 0) 
+      if (averageFrameTime >= renderBudget * 1.08f && currentQualityStep != 0) 
       {
         currentQualityStep--;
         qualityChanged = true;        
       }
-      else if (averageFrameTime <= renderBudget * 0.99f && currentQualityStep != qualitySteps.Length - 1) 
+      else if (averageFrameTime <= renderBudget * 1f && currentQualityStep != qualitySteps.Length - 1) 
       {
         currentQualityStep++;
         qualityChanged = true;
