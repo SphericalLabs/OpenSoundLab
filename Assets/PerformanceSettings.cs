@@ -7,7 +7,6 @@ using System;
 public class PerformanceSettings : MonoBehaviour
 {
     public dial cpuDial, gpuDial, fovDial, scaleDial, fpsDial;
-    private float cpuDialVal, gpuDialVal, fovDialVal, scaleDialVal, fpsDialVal;
     UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset urpa;
 
     struct QualityStep
@@ -47,7 +46,7 @@ public class PerformanceSettings : MonoBehaviour
         Debug.Log("New cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
         Performance.TryGetDisplayRefreshRate(out f);
         Debug.Log("Display refresh rate: " + f);
-        //OVRManager.useDynamicFoveatedRendering = true;
+
         if (OVRManager.eyeTrackedFoveatedRenderingSupported)
         {
           OVRManager.eyeTrackedFoveatedRenderingEnabled = true;
@@ -55,19 +54,22 @@ public class PerformanceSettings : MonoBehaviour
         if (OVRManager.eyeTrackedFoveatedRenderingEnabled)
         {
           Debug.Log("eyeTrackedFoveatedRenderingEnabled is true");
+          OVRManager.foveatedRenderingLevel = OVRManager.FoveatedRenderingLevel.Off;
         }
-        //Unity.XR.Oculus.Utils.foveatedRenderingLevel = 0;
-        //OVRManager.foveatedRenderingLevel = OVRManager.FoveatedRenderingLevel.Off;
+        
     }
 
-      //urpa = (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
-      //urpa.renderScale = 1.5f;  // this is the max oversampling quality, should not be changed during runtime, just for init
-      // WARNING: do high settings result in warped visuals?!
+    urpa = (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
+    urpa.renderScale = 1.5f;  // this is the max oversampling quality, should not be changed during runtime, just for init
 
-      Performance.TrySetCPULevel(3);
-      Performance.TrySetGPULevel(3);
+    // WARNING: setting this (higher than 1?) causes warped visuals when downscaling later, but only for Quest Pro?
 
-      currentQualityStep = qualitySteps.Length - 1;
+    //UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.5f; // does not work
+
+    Performance.TrySetCPULevel(3);
+    Performance.TrySetGPULevel(3);
+
+    currentQualityStep = qualitySteps.Length - 1;
   }
 
   bool qualityChanged = false;
@@ -132,69 +134,12 @@ public class PerformanceSettings : MonoBehaviour
         OVRManager.foveatedRenderingLevel = qualitySteps[currentQualityStep].fovLevel;
       if (UnityEngine.XR.XRSettings.renderViewportScale != qualitySteps[currentQualityStep].renderScale)
         UnityEngine.XR.XRSettings.renderViewportScale = qualitySteps[currentQualityStep].renderScale;
+        
       qualityChanged = false;
       Debug.Log("New step is " + currentQualityStep);
     }
 
     return;
-
-
-
-    
-
-    //if (cpuDialVal != cpuDial.percent)
-    //{
-    //  cpuDialVal = cpuDial.percent;
-    //  Performance.TrySetCPULevel(Mathf.RoundToInt(cpuDialVal * (cpuDial.notchSteps - 1)));
-    //}
-
-    //if (gpuDialVal != gpuDial.percent)
-    //{
-    //  gpuDialVal = gpuDial.percent;
-    //  Performance.TrySetGPULevel(Mathf.RoundToInt(gpuDialVal * (gpuDial.notchSteps - 1)));
-    //}
-
-    //if (fovDialVal != fovDial.percent)
-    //{
-    //  fovDialVal = fovDial.percent;
-    //  //Unity.XR.Oculus.Utils.SetFoveationLevel(Mathf.FloorToInt(fovDialVal * fovDial.notchSteps));
-
-    //  OVRManager.foveatedRenderingLevel = (OVRManager.FoveatedRenderingLevel)Enum.ToObject(typeof(OVRManager.FoveatedRenderingLevel), Mathf.RoundToInt(fovDialVal * (fovDial.notchSteps - 1)));
-
-    //  Debug.Log(Mathf.RoundToInt(fovDialVal * (fovDial.notchSteps - 1)));
-    //} 
-
-    //if (scaleDialVal != scaleDial.percent)
-    //{
-    //  scaleDialVal = scaleDial.percent;
-    //  //urpa.renderScale = scaleDialVal * 2f;
-    //  //ScalableBufferManager.ResizeBuffers(Utils.map(scaleDial.percent, 0f, 1f, 0.25f, 1f), Utils.map(scaleDial.percent, 0f, 1f, 0.25f, 1f));
-    //  UnityEngine.XR.XRSettings.renderViewportScale = Utils.map(scaleDial.percent, 0f, 1f, 0.25f, 1f);
-      
-      
-    //}
-
-
-    //if (fpsDialVal != fpsDial.percent)
-    //{
-    //  fpsDialVal = fpsDial.percent;
-    //  float newFps = 0f;
-    //  int tmpFpsMode = Mathf.RoundToInt(fpsDialVal * (fpsDial.notchSteps - 1));
-    //  if(tmpFpsMode == 0) {
-    //    newFps = 60f;
-    //  } else if (tmpFpsMode == 1){
-    //    newFps = 72f;
-    //  } else if (tmpFpsMode == 2){
-    //    newFps = 80f;
-    //  } else if (tmpFpsMode == 3){
-    //    newFps = 90f;
-    //  } else if (tmpFpsMode == 4){
-    //    newFps = 120f;
-    //  } 
-      
-    //  //OVRPlugin.systemDisplayFrequency = newFps;
-    //  Performance.TrySetDisplayRefreshRate(newFps);
-    //}
 
     
   }
