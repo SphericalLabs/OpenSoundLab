@@ -15,6 +15,9 @@ This repository is work-in-progress. Please always link to this repository if yo
 
 At the moment you have to use [sideloading](https://uploadvr.com/sideloading-quest-how-to/) in order to install the .apk binary. You need to register as a developer with Meta, enable the developer mode on your headset with the mobile companion app and use adb or SideQuest to copy the binary to your headset via USB or WiFi. That way you can also manage samples and download your recordings. Having your headset in developer mode is therefore pretty much a requirement for using OSL. Please note that the .apk includes the video tutorials and is therefore over 1GB in size.
 
+### Requirements
+Unity v2021.3.21f1, Oculus Integration v47, Oculus XR Plugin 3.3.0.
+
 ### Build instructions
 Coming soon...
 
