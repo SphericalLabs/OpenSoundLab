@@ -105,10 +105,17 @@ public class UIpanelCancel : manipObject {
     }
   }
 
-  public override void onTouch(bool on, manipulator m) {
-    if (m != null) {
-      if (m.emptyGrab) {
-        keyHit(on);
+  public override void onTouch(bool enter, manipulator m)
+  {
+    if (enter)
+    {
+      if (m != null)
+      {
+        if (m.emptyGrab)
+        {
+          keyHit(enter);
+          m.hapticPulse(1000);
+        }
       }
     }
   }

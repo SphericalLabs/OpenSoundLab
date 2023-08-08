@@ -433,6 +433,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.0099997
       objectReference: {fileID: 0}
+    - target: {fileID: 4000010257027914, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0022
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000010257027914, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0268
+      objectReference: {fileID: 0}
     - target: {fileID: 4000010337518494, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.104653
@@ -824,6 +832,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Textures0.Array.data[89].x
       value: 0.025196373
+      objectReference: {fileID: 0}
+    - target: {fileID: 135000011243908758, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.027
+      objectReference: {fileID: 0}
+    - target: {fileID: 135000011243908758, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 135000011243908758, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_Center.x
+      value: -0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 135000011243908758, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1189296954540883849, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}

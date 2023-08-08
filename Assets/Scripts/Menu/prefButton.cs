@@ -42,9 +42,9 @@ public class prefButton : manipObject {
     menuManager manager;
 
     Material mat;
-  Color normalColor;
-  Color selectColor;
-  Color grabColor;
+    Color normalColor;
+    Color selectColor;
+    Color grabColor;
 
     bool tipsOn = false;
 
@@ -82,4 +82,23 @@ public class prefButton : manipObject {
             manager.GrabAudio();
         }
     }
+
+  public override void onTouch(bool enter, manipulator m)
+  {
+    if (enter)
+    {
+      if (m != null)
+      {
+        if (m.emptyGrab)
+        {
+          setState(manipState.grabbed);
+          m.hapticPulse(1000);
+        }
+      }
+    }
+    else
+    {
+      setState(manipState.none);
+    }
+  }
 }

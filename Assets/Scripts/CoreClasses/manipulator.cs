@@ -238,32 +238,39 @@ public class manipulator : MonoBehaviour
     }
   }
 
-  public void hapticPulse(ushort hapticPower = 1200) {
+  public void hapticPulse(float hapticPower = 1200f) {
      
     doHaptic(hapticPower);
   }
 
-  public void bigHaptic(ushort hapticPower = 750, float dur = 0.1f)
+  public void bigHaptic(float hapticPower = 750f, float dur = 0.1f)
   {
     doHaptic(hapticPower, dur);
   }
 
 
-  void doHaptic(ushort hapticPower = 750, float dur = 0.1f)
+  void doHaptic(float hapticPower = 750f, float dur = 0.1f)
   {
     if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Quest_Pro 
     || Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Link_Quest_Pro)
     {
-      hapticPower = (ushort) ((float) hapticPower * 1.7f);
+      hapticPower = hapticPower * 2.3f;
       dur *= 0.07f;      
     }
 
-    if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Quest_2
-    || Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Link_Quest_2)
+    if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Quest_2)
     {
-      hapticPower *= (ushort) 3;
+      hapticPower *= 3f;
       dur *= 0.07f;
     }
+
+    if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Link_Quest_2)
+    {
+      hapticPower *= 4f;
+      dur *= 0.07f;
+    }
+
+    
 
     List<UnityEngine.XR.InputDevice> devices = new List<UnityEngine.XR.InputDevice>();
 
@@ -285,6 +292,7 @@ public class manipulator : MonoBehaviour
         {
           uint channel = 0;
           float amplitude = hapticPower / 3999.0f;
+          amplitude = Mathf.Clamp01(amplitude);
           device.SendHapticImpulse(channel, amplitude, dur);
         }
       }

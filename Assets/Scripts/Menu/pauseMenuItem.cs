@@ -117,6 +117,7 @@ public class pauseMenuItem : manipObject {
         textMat.SetFloat("_EmissionGain", .6f);
       }
       mainmenu.itemSelect(itemType, ID);
+      curState = manipState.none;
     }
   }
 
@@ -168,4 +169,24 @@ public class pauseMenuItem : manipObject {
     if (appearCoroutine != null) StopCoroutine(appearCoroutine);
     appearCoroutine = StartCoroutine(appearRoutine(on));
   }
+
+  public override void onTouch(bool enter, manipulator m)
+  {
+    if (enter)
+    {
+      if (m != null)
+      {
+        if (m.emptyGrab)
+        {
+          setState(manipState.grabbed);
+          m.hapticPulse(1000);
+        }
+      }
+    }
+    else
+    {
+      setState(manipState.none);
+    }
+  }
+
 }
