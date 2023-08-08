@@ -1,6 +1,15 @@
 # Licenses of libraries and imported codes used in OpenSoundLab
 
 
+## RuntimeAudioClipLoader
+
+Copyright © 2017 Neitri Industries
+
+http://www.neix.eu/RuntimeAudioClipLoader/documentation/index.html
+
+This library is not available anymore, but the developer granted the inclusion in the open-source repository of OpenSoundLab. This permission does not automatically translate to other projects. The developer should be contacted in case you want to use the library in your project.
+
+
 ## Oculus XR Plugin & Oculus Integration
 
 Copyright © Facebook Technologies, LLC and its affiliates. All rights reserved.

@@ -1,0 +1,254 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NLayer</name>
+    </assembly>
+    <members>
+        <member name="M:NLayer.Decoder.FrameBase.Validate">
+            <summary>
+            Called to validate the frame header
+            </summary>
+            <returns>The length of the frame, or -1 if frame is invalid</returns>
+        </member>
+        <member name="M:NLayer.Decoder.FrameBase.Parse">
+            <summary>
+            Called when the stream is not "seek-able"
+            </summary>
+        </member>
+        <member name="T:NLayer.Decoder.LayerIIIDecoder">
+            <summary>
+            Class Implementing Layer 3 Decoder.
+            </summary>
+        </member>
+        <member name="T:NLayer.Decoder.RiffHeaderFrame">
+            <summary>
+            RIFF header reader
+            </summary>
+        </member>
+        <member name="T:NLayer.IMpegFrame">
+            <summary>
+            Defines a standard way of representing a MPEG frame to the decoder
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.SampleRate">
+            <summary>
+            Sample rate of this frame
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.SampleRateIndex">
+            <summary>
+            The samplerate index (directly from the header)
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.FrameLength">
+            <summary>
+            Frame length in bytes
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.BitRate">
+            <summary>
+            Bit Rate
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.Version">
+            <summary>
+            MPEG Version
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.Layer">
+            <summary>
+            MPEG Layer
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.ChannelMode">
+            <summary>
+            Channel Mode
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.ChannelModeExtension">
+            <summary>
+            The number of samples in this frame
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.SampleCount">
+            <summary>
+            The channel extension bits
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.BitRateIndex">
+            <summary>
+            The bitrate index (directly from the header)
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.IsCopyrighted">
+            <summary>
+            Whether the Copyright bit is set
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.HasCrc">
+            <summary>
+            Whether a CRC is present
+            </summary>
+        </member>
+        <member name="P:NLayer.IMpegFrame.IsCorrupted">
+            <summary>
+            Whether the CRC check failed (use error concealment strategy)
+            </summary>
+        </member>
+        <member name="M:NLayer.IMpegFrame.Reset">
+            <summary>
+            Resets the bit reader so frames can be reused
+            </summary>
+        </member>
+        <member name="M:NLayer.IMpegFrame.ReadBits(System.Int32)">
+            <summary>
+            Provides sequential access to the bitstream in the frame (after the header and optional CRC)
+            </summary>
+            <param name="bitCount">The number of bits to read</param>
+            <returns>-1 if the end of the frame has been encountered, otherwise the bits requested</returns>
+        </member>
+        <member name="M:NLayer.MpegFile.#ctor(System.String)">
+            <summary>
+            Construct Mpeg file representation from filename.
+            </summary>
+            <param name="fileName">The file which contains Mpeg data.</param>
+        </member>
+        <member name="M:NLayer.MpegFile.#ctor(System.IO.Stream)">
+            <summary>
+            Construct Mpeg file representation from stream.
+            </summary>
+            <param name="stream">The input stream which contains Mpeg data.</param>
+        </member>
+        <member name="M:NLayer.MpegFile.Dispose">
+            <summary>
+            Implements IDisposable.Dispose.
+            </summary>
+        </member>
+        <member name="P:NLayer.MpegFile.SampleRate">
+            <summary>
+            Sample rate of source Mpeg, in Hertz.
+            </summary>
+        </member>
+        <member name="P:NLayer.MpegFile.Channels">
+            <summary>
+            Channel count of source Mpeg.
+            </summary>
+        </member>
+        <member name="P:NLayer.MpegFile.CanSeek">
+            <summary>
+            Whether the Mpeg stream supports seek operation.
+            </summary>
+        </member>
+        <member name="P:NLayer.MpegFile.Length">
+            <summary>
+            Data length of decoded data, in PCM.
+            </summary>
+        </member>
+        <member name="P:NLayer.MpegFile.Duration">
+            <summary>
+            Media duration of the Mpeg file.
+            </summary>
+        </member>
+        <member name="P:NLayer.MpegFile.Position">
+            <summary>
+            Current decode position, in number of sample. Calling the setter will result in a seeking operation.
+            </summary>
+        </member>
+        <member name="P:NLayer.MpegFile.Time">
+            <summary>
+            Current decode position, represented by time. Calling the setter will result in a seeking operation.
+            </summary>
+        </member>
+        <member name="M:NLayer.MpegFile.SetEQ(System.Single[])">
+            <summary>
+            Set the equalizer.
+            </summary>
+            <param name="eq">The equalizer, represented by an array of 32 adjustments in dB.</param>
+        </member>
+        <member name="P:NLayer.MpegFile.StereoMode">
+            <summary>
+            Stereo mode used in decoding.
+            </summary>
+        </member>
+        <member name="M:NLayer.MpegFile.ReadSamples(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Read specified samples into provided buffer. Do exactly the same as <see cref="M:NLayer.MpegFile.ReadSamples(System.Single[],System.Int32,System.Int32)"/>
+            except that the data is written in type of byte, while still representing single-precision float (in local endian).
+            </summary>
+            <param name="buffer">Buffer to write. Floating point data will be actually written into this byte array.</param>
+            <param name="index">Writing offset on the destination buffer.</param>
+            <param name="count">Length of samples to be read, in bytes.</param>
+            <returns>Sample size actually reads, in bytes.</returns>
+        </member>
+        <member name="M:NLayer.MpegFile.ReadSamples(System.Single[],System.Int32,System.Int32)">
+            <summary>
+            Read specified samples into provided buffer, as PCM format.
+            Result varies with diffirent <see cref="P:NLayer.MpegFile.StereoMode"/>:
+            <list type="bullet">
+            <item>
+            <description>For <see cref="F:NLayer.StereoMode.Both"/>, sample data on both two channels will occur in turn (left first).</description>
+            </item>
+            <item>
+            <description>For <see cref="F:NLayer.StereoMode.LeftOnly"/> and <see cref="F:NLayer.StereoMode.RightOnly"/>, only data on
+            specified channel will occur.</description>
+            </item>
+            <item>
+            <description>For <see cref="F:NLayer.StereoMode.DownmixToMono"/>, two channels will be down-mixed into single channel.</description>
+            </item>
+            </list>
+            </summary>
+            <param name="buffer">Buffer to write.</param>
+            <param name="index">Writing offset on the destination buffer.</param>
+            <param name="count">Count of samples to be read.</param>
+            <returns>Sample count actually reads.</returns>
+        </member>
+        <member name="M:NLayer.MpegFrameDecoder.SetEQ(System.Single[])">
+            <summary>
+            Set the equalizer.
+            </summary>
+            <param name="eq">The equalizer, represented by an array of 32 adjustments in dB.</param>
+        </member>
+        <member name="P:NLayer.MpegFrameDecoder.StereoMode">
+            <summary>
+            Stereo mode used in decoding.
+            </summary>
+        </member>
+        <member name="M:NLayer.MpegFrameDecoder.DecodeFrame(NLayer.IMpegFrame,System.Byte[],System.Int32)">
+            <summary>
+            Decode the Mpeg frame into provided buffer. Do exactly the same as <see cref="M:NLayer.MpegFrameDecoder.DecodeFrame(NLayer.IMpegFrame,System.Single[],System.Int32)"/>
+            except that the data is written in type as byte array, while still representing single-precision float (in local endian).
+            </summary>
+            <param name="frame">The Mpeg frame to be decoded.</param>
+            <param name="dest">Destination buffer. Decoded PCM (single-precision floating point array) will be written into it.</param>
+            <param name="destOffset">Writing offset on the destination buffer.</param>
+            <returns></returns>
+        </member>
+        <member name="M:NLayer.MpegFrameDecoder.DecodeFrame(NLayer.IMpegFrame,System.Single[],System.Int32)">
+            <summary>
+            Decode the Mpeg frame into provided buffer.
+            Result varies with diffirent <see cref="P:NLayer.MpegFrameDecoder.StereoMode"/>:
+            <list type="bullet">
+            <item>
+            <description>For <see cref="F:NLayer.StereoMode.Both"/>, sample data on both two channels will occur in turn (left first).</description>
+            </item>
+            <item>
+            <description>For <see cref="F:NLayer.StereoMode.LeftOnly"/> and <see cref="F:NLayer.StereoMode.RightOnly"/>, only data on
+            specified channel will occur.</description>
+            </item>
+            <item>
+            <description>For <see cref="F:NLayer.StereoMode.DownmixToMono"/>, two channels will be down-mixed into single channel.</description>
+            </item>
+            </list>
+            </summary>
+            <param name="frame">The Mpeg frame to be decoded.</param>
+            <param name="dest">Destination buffer. Decoded PCM (single-precision floating point array) will be written into it.</param>
+            <param name="destOffset">Writing offset on the destination buffer.</param>
+            <returns></returns>
+        </member>
+        <member name="M:NLayer.MpegFrameDecoder.Reset">
+            <summary>
+            Reset the decoder.
+            </summary>
+        </member>
+    </members>
+</doc>

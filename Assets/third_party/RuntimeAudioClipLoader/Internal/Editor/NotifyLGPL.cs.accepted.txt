@@ -1,0 +1,165 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+
+namespace RuntimeAudioClipLoader.Internal
+{
+	[InitializeOnLoad]
+	public class NotifyLGPL : EditorWindow
+	{
+		static NotifyLGPL()
+		{
+			EditorApplication.update += RunOnce;
+		}
+
+		static bool shown;
+		static int frames;
+		static void RunOnce()
+		{
+			frames++;
+			if (frames < 50) return;
+
+			EditorApplication.update -= RunOnce;
+
+			if (shown) return;
+
+			var window = EditorWindow.GetWindow<NotifyLGPL>();
+			window.position = new Rect(Screen.width / 2, Screen.height / 2, 1000, 400);
+			window.Show();
+		}
+
+		static Rect AddPadding(Rect rect, float padding)
+		{
+			return new Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
+		}
+
+		static void DrawBorder(Rect rect, float border, Color color)
+		{
+			#if UNITY_5_3_OR_NEWER
+			EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, border), color); // top
+			EditorGUI.DrawRect(new Rect(rect.x, rect.y, border, rect.height), color); // left
+			EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - border, rect.width, border), color); // bottom
+			EditorGUI.DrawRect(new Rect(rect.x + rect.width - border, rect.y, border, rect.height), color); // right
+			#endif
+		}
+
+		Vector2 scrollPosition;
+		void OnGUI()
+		{
+			shown = true;
+
+			var rect = new Rect(0, 0, position.width, position.height);
+
+			DrawBorder(rect, 5, Color.black);
+			rect = AddPadding(rect, 5);
+
+			var thisScriptAbsolutePath = Path.GetFullPath(Application.dataPath + "/" + AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(this)).Substring("Assets/".Length));
+			var nLayerAbsolutePasth = Path.GetFullPath(Path.GetDirectoryName(thisScriptAbsolutePath) + "/../Plugins/NLayer.dll");
+
+			GUILayout.BeginArea(rect);
+			scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+			{
+
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(30);
+				GUILayout.BeginVertical();
+				GUILayout.Space(10);
+
+
+
+				GUILayout.Label(@"
+Runtime AudioClip Loader - multiplatform MP3 loading
+", EditorStyles.boldLabel);
+
+				GUILayout.Label(@"
+NLayer (library used for managed MP3 decoding) is licensed under LGPL (GNU Library General Public License).
+
+Making your application LGPL-compliant:
+
+1) The NLayer.dll should be able to be replaced. So your players can replace it with updated (bug fixed) version. You should not intentionally embed or encrypt the dll.
+
+2) In your credits section you ought to have license notice for NLayer library, e.g.: “Uses LGPL licensed NLayer library for MP3 decoding, available from github.com/naudio/NLayer”. So your players are notified of it and can use the library in their own work shall they need.
+
+3) Distribute copy of the LGPL license along with the NLayer library. E.g.: add file “RuntimeAudioClipLoader/Plugins/NLayer_license.txt“ next to your exe. So everyone can read the license even if they are offline.
+
+This summary is provided as a convenience to our customers. It does not constitute a legal opinion or legal advice, and you should not rely on it as such. we advise you to consult your own legal counsel. 
+
+Same text is inside Documentation/Licensing.
+
+", EditorStyles.wordWrappedLabel);
+
+				GUILayout.BeginHorizontal();
+				{
+
+					GUILayout.BeginVertical();
+					{
+						if (GUILayout.Button(@"
+Yes, I will comply with LGPL license
+"))
+						{
+							Close();
+							shown = false;
+
+							File.Move(thisScriptAbsolutePath, thisScriptAbsolutePath + ".accepted.txt");
+							AssetDatabase.Refresh();
+						}
+
+						GUILayout.Label(@"
+Will use NLayer, thus you can decode MP3 everywhere.
+
+Will rename:
+NotifyLGPL.cs -> NotifyLGPL.cs.accepted.txt
+", EditorStyles.wordWrappedLabel);
+
+
+					}
+					GUILayout.EndVertical();
+					DrawBorder(GUILayoutUtility.GetLastRect(), 1, Color.black);
+
+					GUILayout.Space(30);
+
+					GUILayout.BeginVertical();
+					{
+						if (GUILayout.Button(@"
+No, I won't to comply with LGPL license
+"))
+						{
+							Close();
+							shown = false;
+
+							File.Move(thisScriptAbsolutePath, thisScriptAbsolutePath + ".declined.txt");
+							File.Move(nLayerAbsolutePasth, nLayerAbsolutePasth + ".declined.bin");
+							AssetDatabase.Refresh();
+						}
+
+
+						GUILayout.Label(@"
+Will not use NLayer, thus you can decode MP3 only on Windows
+
+Will rename:
+NotifyLGPL.cs -> NotifyLGPL.cs.declined.txt
+NLayer.dll -> NLayer.dll.declined.bin
+", EditorStyles.wordWrappedLabel);
+
+					}
+					GUILayout.EndVertical();
+					DrawBorder(GUILayoutUtility.GetLastRect(), 1, Color.black);
+				}
+				GUILayout.EndHorizontal();
+
+
+				GUILayout.Space(0);
+				GUILayout.EndVertical();
+				GUILayout.Space(30);
+				GUILayout.EndHorizontal();
+
+			}
+			GUILayout.EndScrollView();
+			GUILayout.EndArea();
+		}
+
+
+	}
+}
