@@ -36,6 +36,10 @@ sysinfo.txt
 .vs/
 .vsconfig
 
+# Had to whitelist these binaries
+!/Assets/third_party/RuntimeAudioClipLoader/Plugins/*
+
+
 SoundStage_Data/StreamingAssets/xyloroll.mp4
 SoundStage_Data/StreamingAssets/touchpad.mp4
 SoundStage_Data/StreamingAssets/tapes.mp4
@@ -166,10 +170,7 @@ SoundStage_Data/Managed/System.Core.dll
 SoundStage_Data/Managed/System.Configuration.dll
 SoundStage_Data/Managed/System.ComponentModel.Composition.dll
 SoundStage_Data/Managed/Oculus.VR.dll
-SoundStage_Data/Managed/NVorbis.dll
-SoundStage_Data/Managed/NLayer.dll
 SoundStage_Data/Managed/netstandard.dll
-SoundStage_Data/Managed/NAudio.dll
 SoundStage_Data/Managed/mscorlib.dll
 SoundStage_Data/Managed/Mono.Security.dll
 SoundStage_Data/Managed/Midi.dll
