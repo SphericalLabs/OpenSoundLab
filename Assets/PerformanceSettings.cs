@@ -59,12 +59,13 @@ public class PerformanceSettings : MonoBehaviour
         
     }
 
-    urpa = (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
-    urpa.renderScale = 1.5f;  // this is the max oversampling quality, should not be changed during runtime, just for init
-
-    // WARNING: setting this (higher than 1?) causes warped visuals when downscaling later, but only for Quest Pro?
 
     //UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.5f; // does not work
+
+    // WARNING: setting this higher than 1.33f (tested or 1.5f) causes warped visuals when downscaling later, but apparently only for Quest Pro. 
+    urpa = (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
+    urpa.renderScale = 1.33f;  // this is the max oversampling quality, should not be changed during runtime, just for init
+        
 
     Performance.TrySetCPULevel(3);
     Performance.TrySetGPULevel(3);
@@ -136,7 +137,7 @@ public class PerformanceSettings : MonoBehaviour
         UnityEngine.XR.XRSettings.renderViewportScale = qualitySteps[currentQualityStep].renderScale;
         
       qualityChanged = false;
-      Debug.Log("New step is " + currentQualityStep);
+      //Debug.Log("New step is " + currentQualityStep);
     }
 
     return;
