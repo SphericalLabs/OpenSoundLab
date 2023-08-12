@@ -162,8 +162,7 @@ public class touchpad : MonoBehaviour {
         padTouchFeedback.GetComponent<Renderer>().material.SetFloat("_EmissionGain", on ? .7f : .6f);
         if (halfSelected[0])
         {
-            if(!on || (on && masterControl.instance.tooltipsOn))
-            manip.toggleTips(on);
+
         }
         else if (halfSelected[1])
         {

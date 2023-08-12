@@ -157,7 +157,6 @@ public class airhornUI : manipObject {
       transform.localPosition = Vector3.zero;
       transform.localRotation = Quaternion.identity;
 
-      if (manipulatorObjScript != null) manipulatorObjScript.setVerticalPosition(transform);
       transform.Rotate(45, 0, 0, Space.Self);
     }
   }

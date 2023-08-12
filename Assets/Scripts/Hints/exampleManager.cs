@@ -158,9 +158,7 @@ public class exampleManager : MonoBehaviour {
     }
   }
 
-  void killManipHints() {
-    manipulator[] manips = FindObjectsOfType<manipulator>();
-    for (int i = 0; i < manips.Length; i++) manips[i].toggleTips(false);
+  void killManipHints() {    
   }
 
   public void LoadExample(string s) {

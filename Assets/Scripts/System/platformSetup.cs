@@ -84,7 +84,7 @@ public class platformSetup : MonoBehaviour {
   }
 
   void Start() {
-    manips[0].toggleTips(false);
-    }
+    
+  }
 
 }

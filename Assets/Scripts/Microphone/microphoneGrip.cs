@@ -119,7 +119,6 @@ public class microphoneGrip : manipObject {
       transform.localPosition = Vector3.zero;
       transform.localRotation = Quaternion.identity;
 
-      if (manipulatorObjScript != null) manipulatorObjScript.setVerticalPosition(transform);
       transform.Translate(0, 0, -.035f, Space.Self);
       transform.Rotate(90, 0, 0, Space.Self);
     }

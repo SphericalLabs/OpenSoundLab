@@ -226,8 +226,6 @@ public class drumstick : manipObject {
       transform.localPosition = Vector3.zero;
       transform.localRotation = Quaternion.identity;
 
-      if (manipulatorObjScript != null) manipulatorObjScript.setVerticalPosition(transform);
-
       pads.Clear();
       lastStickPos.Clear();
       pads = FindObjectsOfType<drumpad>().ToList();

@@ -305,33 +305,13 @@ public class manipulator : MonoBehaviour
   void toggleCopy(bool on)
   {
     copyEnabled = on;
-    if (!usingOculus){ }
-    else if (!copying)
-    {
-      //oculusSprites[0].gameObject.SetActive(!on);
-      //oculusSprites[1].gameObject.SetActive(on);
-      //oculusSprites[2].gameObject.SetActive(false);
-      //oculusSprites[3].gameObject.SetActive(false);
-
-    }
-
   }
 
   bool deleteEnabled = false;
   void toggleDelete(bool on)
   {
     if (multiselecting) return;
-
     deleteEnabled = on;
-    if (!usingOculus) { }
-    else
-    {
-      //oculusSprites[0].gameObject.SetActive(!on);
-      //oculusSprites[1].gameObject.SetActive(false);
-      //oculusSprites[2].gameObject.SetActive(on);
-      //oculusSprites[3].gameObject.SetActive(false);
-    }
-
   }
 
   timelineGridUI multiselectGrid;
@@ -412,7 +392,7 @@ public class manipulator : MonoBehaviour
   void updateProngs()
   {
     float val = 0;
-    //    if (masterControl.instance.currentPlatform == masterControl.platform.Vive) val = SteamVR_Controller.Input(controllerIndex).GetAxis(EVRButtonId.k_EButton_Axis1).x;
+    
     if (controllerIndex == 0)
     {
       val = Input.GetAxis("triggerR");
@@ -430,17 +410,6 @@ public class manipulator : MonoBehaviour
     tipR.localPosition = new Vector3(Mathf.Lerp(.004f, -.001f, val), -.005f, -.018f);
   }
 
-  bool showingTips = false;
-  public void toggleTips(bool on)
-  {
-
-    //showingTips = on;
-    //for (int i = 0; i < tipTexts.Length; i++) {
-    //  tipTexts[i].SetActive(showingTips);
-    //}
-    //if (!usingOculus) _touchpad.setQuestionMark(showingTips);
-  }
-
 
   public void changeHW(string s)
   {
@@ -450,83 +419,8 @@ public class manipulator : MonoBehaviour
     }
   }
 
-  public void setVerticalPosition(Transform t)
-  {
-
-
-  }
 
   bool touchpadActive = false;
-  public void viveTouchpadUpdate()
-  {
-
-    bool tOn; // = SteamVR_Controller.Input(controllerIndex).GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad);
-    bool tOff; // = SteamVR_Controller.Input(controllerIndex).GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad);
-
-    bool pOn; // = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Touchpad);
-    bool pOff; // = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Touchpad);
-
-    if (controllerIndex == 0)
-    {
-      tOn = Input.GetButtonDown("touchR");
-      tOff = Input.GetButtonUp("touchR");
-      pOn = Input.GetButtonDown("pressR");
-      pOff = Input.GetButtonUp("pressR");
-    }
-    else if (controllerIndex == 1)
-    {
-      tOn = Input.GetButtonDown("touchL");
-      tOff = Input.GetButtonUp("touchL");
-      pOn = Input.GetButtonDown("pressL");
-      pOff = Input.GetButtonUp("pressL");
-    }
-    else
-    {
-      tOn = tOff = pOn = pOff = false;
-    }
-    bool activeManipObj = (grabbing && selectedObject != null);
-
-    if (tOn)
-    {
-      touchpadActive = true;
-
-      if (activeManipObj) selectedObject.setTouch(true);
-    }
-    if (tOff)
-    {
-      touchpadActive = false;
-      if (activeManipObj) selectedObject.setTouch(false);
-    }
-
-    if (!touchpadActive) return;
-
-    Vector2 pos; // = SteamVR_Controller.Input(controllerIndex).GetAxis();
-    if (controllerIndex == 0)
-    {
-      pos = new Vector2(Input.GetAxis("touchAxisXR"), Input.GetAxis("touchAxisYR"));
-    }
-    else if (controllerIndex == 1)
-    {
-      pos = new Vector2(Input.GetAxis("touchAxisXL"), Input.GetAxis("touchAxisYL"));
-    }
-    else
-    {
-      pos = new Vector2(0.5f, 0.5f);
-    }
-
-    if (activeManipObj) selectedObject.updateTouchPos(pos);
-
-    if (pOn)
-    {
-
-      if (activeManipObj) selectedObject.setPress(true);
-    }
-
-    if (pOff)
-    {
-      if (activeManipObj) selectedObject.setPress(false);
-    }
-  }
 
   void secondaryOculusButtonUpdate()
   {
@@ -569,17 +463,13 @@ public class manipulator : MonoBehaviour
       {
         if (copyEnabled) SetCopy(true);
         else if (deleteEnabled) DeleteSelection(true);
-        else if (multiselectEnabled) MultiselectSelection(true);
-        else toggleTips(true);
-        //oculusContextButtonGlow.SetActive(true);
+        else if (multiselectEnabled) MultiselectSelection(true);        
       }
       else if (secondaryUp)
       {
-        toggleTips(false);
         if (copying) SetCopy(false);
         else if (deleting) DeleteSelection(false);
         else if (multiselectEnabled) MultiselectSelection(false);
-        //oculusContextButtonGlow.SetActive(false);
       }
     }
     else if (grabbing && selectedObject != null)
@@ -594,18 +484,30 @@ public class manipulator : MonoBehaviour
   static OVRPlugin.Controller lastControl = OVRPlugin.Controller.None;
   public bool isTrackingWorking;
 
-  void Update()
-  {
-    OVRPlugin.Controller currentControl = OVRPlugin.GetActiveController(); //get current controller scheme
+  Renderer[] renderers;
+  SkinnedMeshRenderer[] skinnedRenderers;
 
-    
-    OVRInput.Controller currentInput = OVRInput.Controller.None;
-    if (controllerIndex == 0) {
+  void Start()
+  {
+    renderers = gameObject.transform.parent.parent.parent.GetComponentsInChildren<Renderer>();
+    skinnedRenderers = gameObject.transform.parent.parent.parent.GetComponentsInChildren<SkinnedMeshRenderer>();
+
+    if (controllerIndex == 0)
+    {
       currentInput = OVRInput.Controller.LTouch; // check if correct
-    } else if (controllerIndex == 1) {
+    }
+    else if (controllerIndex == 1)
+    {
       currentInput = OVRInput.Controller.RTouch;
     }
+  }
 
+  OVRPlugin.Controller currentControl = OVRPlugin.GetActiveController(); //get current controller scheme
+  OVRInput.Controller currentInput = OVRInput.Controller.None;
+
+  void Update()
+  {
+   
     //Debug.Log("");
     //Debug.Log(OVRInput.GetControllerOrientationTracked(currentInput));
     //Debug.Log(OVRInput.GetControllerPositionTracked(currentInput));
@@ -618,20 +520,18 @@ public class manipulator : MonoBehaviour
       OVRInput.GetControllerPositionTracked(currentInput) &&
       OVRInput.GetControllerOrientationValid(currentInput) &&
       OVRInput.GetControllerPositionValid(currentInput);
-          
-      // bruteforce!!!
-      foreach (Renderer childRenderer in gameObject.transform.parent.parent.parent.GetComponentsInChildren<Renderer>())
+         
+      
+      foreach (Renderer childRenderer in renderers)
       {
         childRenderer.enabled = isTrackingWorking;
       }
 
-      foreach (SkinnedMeshRenderer childRenderer in gameObject.transform.parent.parent.parent.GetComponentsInChildren<SkinnedMeshRenderer>()){
+      foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers){
         childRenderer.enabled = isTrackingWorking;
       }
       
-      if(!isTrackingWorking) return;
-            
-
+    if(!isTrackingWorking) return;
 
     if (controllerIndex == 0)
     {
@@ -648,17 +548,11 @@ public class manipulator : MonoBehaviour
     bool triggerButtonDown, triggerButtonUp, menuButtonDown;
 
     
-
     bool currentControlHands = false;
     bool currentControlChanged = false;
     float pinchIndexStrength = 0;
     float pinchPinkyStrength = 0;
-    //if ((OVRPlugin.Controller.Hands == currentControl) || (OVRPlugin.Controller.LHand == currentControl) || (OVRPlugin.Controller.RHand == currentControl))
-    //{
-    //  currentControlHands = true;
-    //  //pinchIndexStrength = Hands.Instance.RightHand.PinchStrength(OVRPlugin.HandFinger.Index);
-    //  //pinchPinkyStrength = Hands.Instance.RightHand.PinchStrength(OVRPlugin.HandFinger.Pinky);
-    //}
+    
     if (currentControl != lastControl)
     {
       currentControlChanged = true;
@@ -666,8 +560,7 @@ public class manipulator : MonoBehaviour
     }
     if (masterControl.instance.currentPlatform == masterControl.platform.Oculus)
     {
-      //      triggerButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger);
-      //      triggerButtonUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Trigger);
+      
       if (!triggerDown)
       {
         if (currentControlHands)
@@ -726,7 +619,7 @@ public class manipulator : MonoBehaviour
         triggerButtonUp = false;
       }
 
-      viveTouchpadUpdate();
+      
       if (!usingOculus)
       {
         //        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
