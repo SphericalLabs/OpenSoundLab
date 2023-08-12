@@ -423,6 +423,10 @@ extern "C" {
     float ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
         , int sampleBounds[2], float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active, int windowLength = 0)
     {
+        // clip not yet or not available anymore, but wouldn't check for segmentation fault due to outdated pointer
+        if (!clip) {          
+          return floatingBufferCount;
+        }
 
         float* clipdata = reinterpret_cast<float*>(clip);
         float sampleBoundsCenter = (sampleBounds[0] + sampleBounds[1]) * 0.5f;
