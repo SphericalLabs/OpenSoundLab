@@ -477,6 +477,7 @@ MonoBehaviour:
   emptyGrab: 0
   triggerDown: 0
   pinchPinkyDown: 0
+  isTrackingWorking: 0
 --- !u!54 &54000012962591160
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4269,6 +4270,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: OculusTouchForQuest2_Left
       objectReference: {fileID: 0}
+    - target: {fileID: 100016, guid: 8b83018900d13bb4f8e0ad895cb004e5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 400016, guid: 8b83018900d13bb4f8e0ad895cb004e5, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -4321,7 +4326,8 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 13700002, guid: 8b83018900d13bb4f8e0ad895cb004e5, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 8b83018900d13bb4f8e0ad895cb004e5, type: 3}
 --- !u!4 &2775868352029093498 stripped
 Transform:
@@ -4392,7 +4398,8 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 13700002, guid: 25b5eb0761edb6346b0b3444af76b55e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 25b5eb0761edb6346b0b3444af76b55e, type: 3}
 --- !u!4 &4555410719252976815 stripped
 Transform:

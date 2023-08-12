@@ -676,8 +676,47 @@ public class manipulator : MonoBehaviour
   public bool triggerDown = false;
   public bool pinchPinkyDown = false;
   static OVRPlugin.Controller lastControl = OVRPlugin.Controller.None;
+  public bool isTrackingWorking;
+
   void Update()
   {
+    OVRPlugin.Controller currentControl = OVRPlugin.GetActiveController(); //get current controller scheme
+
+    
+    OVRInput.Controller currentInput = OVRInput.Controller.None;
+    if (controllerIndex == 0) {
+      currentInput = OVRInput.Controller.LTouch; // check if correct
+    } else if (controllerIndex == 1) {
+      currentInput = OVRInput.Controller.RTouch;
+    }
+
+    //Debug.Log("");
+    //Debug.Log(OVRInput.GetControllerOrientationTracked(currentInput));
+    //Debug.Log(OVRInput.GetControllerPositionTracked(currentInput));
+    //Debug.Log(OVRInput.GetControllerOrientationValid(currentInput));
+    //Debug.Log(OVRInput.GetControllerPositionValid(currentInput));
+    //Debug.Log("");
+
+
+    isTrackingWorking = OVRInput.GetControllerOrientationTracked(currentInput) &&
+      OVRInput.GetControllerPositionTracked(currentInput) &&
+      OVRInput.GetControllerOrientationValid(currentInput) &&
+      OVRInput.GetControllerPositionValid(currentInput);
+          
+      // bruteforce!!!
+      foreach (Renderer childRenderer in gameObject.transform.parent.parent.parent.GetComponentsInChildren<Renderer>())
+      {
+        childRenderer.enabled = isTrackingWorking;
+      }
+
+      foreach (SkinnedMeshRenderer childRenderer in gameObject.transform.parent.parent.parent.GetComponentsInChildren<SkinnedMeshRenderer>()){
+        childRenderer.enabled = isTrackingWorking;
+      }
+      
+      if(!isTrackingWorking) return;
+            
+
+
     if (controllerIndex == 0)
     {
       transform.position = OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch);
@@ -692,7 +731,7 @@ public class manipulator : MonoBehaviour
     updateProngs();
     bool triggerButtonDown, triggerButtonUp, menuButtonDown;
 
-    OVRPlugin.Controller currentControl = OVRPlugin.GetActiveController(); //get current controller scheme
+    
 
     bool currentControlHands = false;
     bool currentControlChanged = false;
