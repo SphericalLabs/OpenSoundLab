@@ -19,8 +19,8 @@ public class PerformanceSettings : MonoBehaviour
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.1f },
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.2f },
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.3f },
-      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.4f },
-      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.5f },
+      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.4f },
+      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.5f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.6f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.7f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.8f },
@@ -62,9 +62,9 @@ public class PerformanceSettings : MonoBehaviour
 
     //UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.5f; // does not work
 
-    // WARNING: setting this higher than 1.33f (tested or 1.5f) causes warped visuals when downscaling later, but apparently only for Quest Pro. 
+    // WARNING: setting this higher than 1.33f (tested on 1.5f) causes warped visuals when downscaling, but apparently only for Quest Pro. 
     urpa = (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
-    urpa.renderScale = 1.33f;  // this is the max oversampling quality, should not be changed during runtime, just for init
+    urpa.renderScale = 1.40f;  // this is the max oversampling quality, should not be changed during runtime, just for init
         
 
     Performance.TrySetCPULevel(3);
@@ -83,6 +83,7 @@ public class PerformanceSettings : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
+
     if (Application.platform != RuntimePlatform.Android) return;
 
     if (Time.frameCount % 72 == 0)
