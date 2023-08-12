@@ -45,72 +45,32 @@ public class manipulator : MonoBehaviour
   int controllerIndex = -1; // 0 => left, 1 => right
   public GameObject activeTip;
   public Transform tipL, tipR;
-  public Transform triggerTrans;
+  
   List<Transform> hitTransforms = new List<Transform>();
   Transform selectedTransform;
   manipObject selectedObject;
 
-  public Renderer[] oculusSprites;
-  public GameObject oculusContextButtonGlow;
 
   menuspawn _menuspawn;
-  public touchpad _touchpad;
-  public GameObject[] tipTexts;
-  public GameObject oculusObjects, viveObjects, oculusMenuButton, oculusTrigger;
-  public Transform tipPackage, glowMenuTransform, oculusManipTarget, oculusParentTarget, viveMenuButtonTransform;
-  public GameObject controllerRep;
-  public Transform leftQ2Controller, rightQ2Controller;
+  
   bool usingOculus = false;
   public Color onColor = Color.HSVToRGB(208 / 359f, 234 / 255f, 93 / 255f);
 
   void Awake()
   {
-    _menuspawn = GetComponent<menuspawn>();
-
-    _touchpad.manip = this;
+    _menuspawn = GetComponent<menuspawn>(); 
     activeTip.SetActive(false);
-
-    tipPackage.localPosition = new Vector3(-0.0167f, 0.0123f, 0.0715f);
-    tipPackage.Rotate(Vector3.up, -7f);
-    tipPackage.Rotate(Vector3.forward, 7f);
-    //tipPackage.Rotate(Vector3.up, -10.992f);
-
-    //glowMenuTransform.position = viveMenuButtonTransform.position;
-    //glowMenuTransform.rotation = viveMenuButtonTransform.rotation;
-
-    //oculusSprites[0].material.SetColor("_TintColor", onColor);
-    //oculusSprites[0].material.SetFloat("_EmissionGain", .5f);
-    //oculusSprites[0].gameObject.SetActive(true);
-    //for (int i = 1; i < oculusSprites.Length; i++) {
-    //  oculusSprites[i].material.SetColor("_TintColor", onColor);
-    //  oculusSprites[i].material.SetFloat("_EmissionGain", .5f);
-    //  oculusSprites[i].gameObject.SetActive(false);
-    //}
-
-    //oculusContextButtonGlow.GetComponent<Renderer>().material.SetColor("_TintColor", onColor);
-    //oculusContextButtonGlow.SetActive(false);
   }
 
   bool controllerVisible = true;
   public void toggleController(bool on)
   {
     controllerVisible = on;
-    //controllerRep.SetActive(on); // comment out so that oculus assets stay disabled
   }
 
   public void SetDeviceIndex(int index)
   {
-    controllerIndex = index;
-    if (controllerIndex == 1)
-    {
-      rightQ2Controller.gameObject.SetActive(true);
-      leftQ2Controller.gameObject.SetActive(false);
-    }
-    else if (controllerIndex == 0)
-    {
-      rightQ2Controller.gameObject.SetActive(false);
-      leftQ2Controller.gameObject.SetActive(true);
-    }
+    controllerIndex = index;    
   }
 
   public bool isLeftController() {
@@ -127,23 +87,13 @@ public class manipulator : MonoBehaviour
 
   public void showTip()
   {
-    if (!tipPackage.gameObject.activeSelf) tipPackage.gameObject.SetActive(true);
+    
   }
 
   public void invertScale()
   {
     transform.parent.localScale = new Vector3(-1, 1, 1);
-    Vector3 s = oculusSprites[0].gameObject.transform.localScale;
-    s.x *= -1;
-    oculusSprites[0].gameObject.transform.localScale = s;
 
-
-    for (int i = 0; i < tipTexts.Length; i++)
-    {
-      s = tipTexts[i].gameObject.transform.localScale;
-      s.x *= -1;
-      tipTexts[i].gameObject.transform.localScale = s;
-    }
   }
 
   void Grab(bool on)
@@ -355,7 +305,7 @@ public class manipulator : MonoBehaviour
   void toggleCopy(bool on)
   {
     copyEnabled = on;
-    if (!usingOculus) _touchpad.toggleCopy(on);
+    if (!usingOculus){ }
     else if (!copying)
     {
       //oculusSprites[0].gameObject.SetActive(!on);
@@ -373,7 +323,7 @@ public class manipulator : MonoBehaviour
     if (multiselecting) return;
 
     deleteEnabled = on;
-    if (!usingOculus) _touchpad.toggleDelete(on);
+    if (!usingOculus) { }
     else
     {
       //oculusSprites[0].gameObject.SetActive(!on);
@@ -392,15 +342,7 @@ public class manipulator : MonoBehaviour
     if (!on && multiselecting) return;
 
     multiselectGrid = on ? _grid : null;
-    multiselectEnabled = on;
-    if (!usingOculus) _touchpad.toggleMultiselect(on);
-    else
-    {
-      if (!deleteEnabled) oculusSprites[0].gameObject.SetActive(!on);
-      oculusSprites[1].gameObject.SetActive(false);
-      if (!deleteEnabled) oculusSprites[2].gameObject.SetActive(false);
-      oculusSprites[3].gameObject.SetActive(on);
-    }
+    multiselectEnabled = on;    
   }
 
   public void SetTrigger(bool on)
@@ -484,14 +426,6 @@ public class manipulator : MonoBehaviour
       val = 0;
     }
 
-    if (!usingOculus)
-    {
-      triggerTrans.localRotation = Quaternion.Euler(Mathf.Lerp(0, 45, val), 180, 0);
-    }
-    else
-    {
-      triggerTrans.localRotation = Quaternion.Euler(Mathf.Lerp(0, -20, val), 0, 0);
-    }
     tipL.localPosition = new Vector3(Mathf.Lerp(-.005f, 0, val), -.005f, -.018f);
     tipR.localPosition = new Vector3(Mathf.Lerp(.004f, -.001f, val), -.005f, -.018f);
   }
@@ -513,33 +447,18 @@ public class manipulator : MonoBehaviour
     if (s == "oculus")
     {
       usingOculus = true;
-      oculusObjects.SetActive(true);
-      viveObjects.SetActive(false);
-      //glowMenuTransform.position = oculusMenuButton.transform.position;
-
-      //glowMenuTransform.rotation = oculusMenuButton.transform.rotation;
-      //glowMenuTransform.Translate(Vector3.up * .01f, Space.Self);
-      //tipPackage.localPosition = oculusManipTarget.localPosition;
-      //tipPackage.localRotation = oculusManipTarget.localRotation;
-      triggerTrans = oculusTrigger.transform;
     }
   }
 
   public void setVerticalPosition(Transform t)
   {
-    tipPackage.gameObject.SetActive(false);
-    if (!usingOculus) return;
-    else
-    {
-      t.localPosition = oculusParentTarget.localPosition;
-      t.localRotation = oculusParentTarget.localRotation;
-    }
+
+
   }
 
   bool touchpadActive = false;
   public void viveTouchpadUpdate()
   {
-
 
     bool tOn; // = SteamVR_Controller.Input(controllerIndex).GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad);
     bool tOff; // = SteamVR_Controller.Input(controllerIndex).GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad);
@@ -570,13 +489,12 @@ public class manipulator : MonoBehaviour
     if (tOn)
     {
       touchpadActive = true;
-      if (controllerVisible) _touchpad.setTouch(true);
+
       if (activeManipObj) selectedObject.setTouch(true);
     }
     if (tOff)
     {
       touchpadActive = false;
-      if (controllerVisible) _touchpad.setTouch(false);
       if (activeManipObj) selectedObject.setTouch(false);
     }
 
@@ -595,19 +513,17 @@ public class manipulator : MonoBehaviour
     {
       pos = new Vector2(0.5f, 0.5f);
     }
-    if (controllerVisible) _touchpad.updateTouchPos(pos);
+
     if (activeManipObj) selectedObject.updateTouchPos(pos);
 
     if (pOn)
     {
 
-      if (controllerVisible) _touchpad.setPress(true);
       if (activeManipObj) selectedObject.setPress(true);
     }
 
     if (pOff)
     {
-      if (controllerVisible) _touchpad.setPress(false);
       if (activeManipObj) selectedObject.setPress(false);
     }
   }

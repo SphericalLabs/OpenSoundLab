@@ -38,53 +38,19 @@ using System.Collections;
 public class menuspawn : MonoBehaviour {
   int controllerIndex = -1;
   bool active = false;
-
-  public GameObject glowNode;
-  Material glowRender;
-
+    
   public menuManager menu;
 
   public void SetDeviceIndex(int index) {
     controllerIndex = index;
   }
 
-  void Start() {
-    glowRender = glowNode.GetComponent<Renderer>().material;
-    glowNode.SetActive(false);
+  void Start() {    
     menu = menuManager.instance;
   }
 
-  Coroutine toggleCoroutine;
   public void togglePad() {
-    bool on = menu.buttonEvent(controllerIndex, transform);
-    if (toggleCoroutine != null) StopCoroutine(toggleCoroutine);
-    toggleCoroutine = StartCoroutine(toggleRoutine(on));
+    bool on = menu.buttonEvent(controllerIndex, transform);        
   }
 
-  IEnumerator toggleRoutine(bool on) {
-    glowNode.SetActive(true);
-    Vector3 big = Vector3.one * 2.16f;
-    Vector3 small = new Vector3(.01f, 2.16f, .01f);
-    float timer = 0;
-
-    if (on) {
-      glowNode.transform.localScale = small;
-      while (timer < 1) {
-        timer = Mathf.Clamp01(timer + Time.deltaTime * 3);
-        glowNode.transform.localScale = Vector3.Lerp(small, big, timer);
-        glowRender.SetFloat("_EmissionGain", Mathf.Lerp(.3f, .7f, timer));
-        yield return null;
-      }
-      glowNode.SetActive(false);
-    } else {
-      glowNode.transform.localScale = small;
-      while (timer < 1) {
-        timer = Mathf.Clamp01(timer + Time.deltaTime * 3);
-        glowNode.transform.localScale = Vector3.Lerp(small, big, 1 - timer);
-        glowRender.SetFloat("_EmissionGain", Mathf.Lerp(.3f, .7f, 1 - timer));
-        yield return null;
-      }
-      glowNode.SetActive(false);
-    }
-  }
 }
