@@ -1554,6 +1554,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1516804423}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1149821011 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec,
+    type: 3}
+  m_PrefabInstance: {fileID: 16882453}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1244697027
 GameObject:
   m_ObjectHideFlags: 0
@@ -1600,6 +1606,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   overloadIndicator: {fileID: 774769632}
+--- !u!1 &1448205329 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec,
+    type: 3}
+  m_PrefabInstance: {fileID: 1024677436}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1474746739 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114000012117563708, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
@@ -2010,6 +2022,21 @@ PrefabInstance:
       objectReference: {fileID: 1697095944}
     - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
+      propertyPath: OVRControllerPrefabL
+      value: 
+      objectReference: {fileID: 1448205329}
+    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: OVRControllerPrefabR
+      value: 
+      objectReference: {fileID: 1149821011}
+    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: usePersonalizedHands
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
       propertyPath: controllerLTargetVive
       value: 
       objectReference: {fileID: 1516804427}
@@ -2028,6 +2055,11 @@ PrefabInstance:
       propertyPath: controllerRTargetOculus
       value: 
       objectReference: {fileID: 1516804426}
+    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: personalizedHandsPrefabStr
+      value: rubber-med-gloves/rubber-med-gloves
+      objectReference: {fileID: 0}
     - target: {fileID: 114000013435907624, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
       propertyPath: nome

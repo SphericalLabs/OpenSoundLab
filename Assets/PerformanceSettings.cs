@@ -119,7 +119,7 @@ public class PerformanceSettings : MonoBehaviour
         currentQualityStep--;
         qualityChanged = true;        
       }
-      else if (averageFrameTime <= renderBudget * 1f && currentQualityStep != qualitySteps.Length - 1) 
+      else if (averageFrameTime <= renderBudget * 1.02f && currentQualityStep != qualitySteps.Length - 1) 
       {
         currentQualityStep++;
         qualityChanged = true;

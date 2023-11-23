@@ -39,6 +39,7 @@ sysinfo.txt
 # Had to whitelist these binaries
 !/Assets/third_party/RuntimeAudioClipLoader/Plugins/*
 
+/Assets/Resources/Personalization/*
 
 SoundStage_Data/StreamingAssets/xyloroll.mp4
 SoundStage_Data/StreamingAssets/touchpad.mp4

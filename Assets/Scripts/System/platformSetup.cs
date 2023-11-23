@@ -38,9 +38,11 @@ using System.Collections;
 public class platformSetup : MonoBehaviour {
   public GameObject hmdPrefab, controllerPrefab;
 
-  public Transform hmdTargetVive, controllerLTargetVive, controllerRTargetVive;
   public Transform hmdTargetOculus, controllerLTargetOculus, controllerRTargetOculus;
   public GameObject hiresCamSelect;
+
+  public bool usePersonalizedHands = false;
+  public string personalizedHandsPrefabStr;
 
   manipulator[] manips = new manipulator[2];
   void Awake() {
@@ -48,9 +50,9 @@ public class platformSetup : MonoBehaviour {
 
     if (MC.currentPlatform == masterControl.platform.Oculus) {
 
-      Instantiate(hmdPrefab, hmdTargetVive, false);
-      manips[0] = (Instantiate(controllerPrefab, controllerLTargetVive, false) as GameObject).GetComponentInChildren<manipulator>();
-      manips[1] = (Instantiate(controllerPrefab, controllerRTargetVive, false) as GameObject).GetComponentInChildren<manipulator>();
+      Instantiate(hmdPrefab, hmdTargetOculus, false);
+      manips[0] = (Instantiate(controllerPrefab, controllerLTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
+      manips[1] = (Instantiate(controllerPrefab, controllerRTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
 
       manips[0].transform.parent.localPosition = Vector3.zero;
       manips[1].transform.parent.localPosition = Vector3.zero;
@@ -83,8 +85,38 @@ public class platformSetup : MonoBehaviour {
     manips[1].changeHW("oculus");
   }
 
-  void Start() {
-    
+
+  //public GameObject targetGameObject; // GameObject to attach the loaded prefab to.
+  public GameObject OVRControllerPrefabL; // GameObject to be disabled.
+  public GameObject OVRControllerPrefabR; // GameObject to be disabled.
+
+  void Start()
+  {
+
+    if (usePersonalizedHands)
+    {
+      // Attempt to load the resource
+      GameObject loadedPrefab = Resources.Load("Personalization/" + personalizedHandsPrefabStr) as GameObject;
+
+      // Check if the resource is present
+      if (loadedPrefab != null)
+      {
+        Debug.Log("Personalized hands found.");
+
+        // Instantiate and attach it to the target GameObject
+        Instantiate(loadedPrefab, manips[0].transform);
+        Instantiate(loadedPrefab, manips[1].transform);
+
+        if (OVRControllerPrefabL != null)
+          OVRControllerPrefabL.SetActive(false);
+        if (OVRControllerPrefabR != null)
+          OVRControllerPrefabR.SetActive(false);
+      }
+      else
+      {
+        Debug.LogWarning("Personalized hands requested but not found. Add your hands prefab to Resources or disable this feature by setting usePersonalizedHands to false.");
+      }
+    }
   }
 
 }
