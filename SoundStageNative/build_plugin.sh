@@ -14,7 +14,7 @@ then
 	mv libs/arm64-v8a/libSoundStageNative.so ../Assets/SoundStageNative/arm64/Release/libSoundStageNative.so
 else
 
-	NDK_PATH="/c/Users/Ludwig/android-ndk-r21e-windows-x86_64/android-ndk-r21e/build/ndk-build.cmd"
+	NDK_PATH="/c/Users/turbo/android-ndk-r26b/build/ndk-build.cmd"
 	echo ""
 	echo "Compiling native code..."
 
