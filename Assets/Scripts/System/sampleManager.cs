@@ -162,7 +162,7 @@ public class sampleManager : MonoBehaviour {
 #endif
                 sampleDictionary[s] = new Dictionary<string, string>();
 
-        for (int i2 = 0; i2 < 3; i2++) {
+        for (int i2 = 0; i2 < fileEndings.Length; i2++) {
           string[] subdirFiles = Directory.GetFiles(subdirs[i], fileEndings[i2]);
           foreach (string d in subdirFiles) {
             sampleDictionary[s][Path.GetFileNameWithoutExtension(d)] = pathtype + Path.DirectorySeparatorChar + s + Path.DirectorySeparatorChar + Path.GetFileName(d);
@@ -175,7 +175,7 @@ public class sampleManager : MonoBehaviour {
     }
   }
 
-    string[] fileEndings = new string[] { "*.wav", "*.ogg", "*.mp3" };
+    string[] fileEndings = new string[] { "*.wav"/*, "*.ogg", "*.mp3" */}; // disabled ogg and mp3, since NVorbis and NAudio are not supporting Android / ARM64 and NLayer somehow is also not working as a fallback and it actually would only have supported 44.1khz mp3 files.
 
   public void Init() {
 
