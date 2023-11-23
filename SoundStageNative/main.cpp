@@ -420,97 +420,101 @@ extern "C" {
         }
     }
 
-    float ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
-        , int sampleBounds[2], float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active, int windowLength = 0)
+    double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount
+      , int sampleBounds[2], float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active, int windowLength = 0)
     {
-        // clip not yet or not available anymore, but wouldn't check for segmentation fault due to outdated pointer
-        if (!clip) {          
-          return floatingBufferCount;
-        }
-
-        float* clipdata = reinterpret_cast<float*>(clip);
-        float sampleBoundsCenter = (sampleBounds[0] + sampleBounds[1]) * 0.5f;
-
-        for (int i = 0; i < length; i += channels)
-        {
-            
-            float endAmplitude = amplitude;
-            if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i / length); // slope limiting
-            if (ampGen) endAmplitude = endAmplitude * ampBuffer[i]; // -1,1, allows for ring modulation
-
-            float endPlaybackSpeed = playbackSpeed;
-            if (lastPlayBackSpeed != playbackSpeed) endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float)i / length); // slope limiting
-
-            if(active){
-                if (freqExpGen) floatingBufferCount += endPlaybackSpeed * powf(2, _clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
-                else floatingBufferCount += endPlaybackSpeed;
-                if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 20.f; // lin fm 
-            }
-
-            bool endOfSample = false;
-            if (floatingBufferCount > sampleBounds[1]) 
-            {
-                endOfSample = true;
-                floatingBufferCount = fmod((double) floatingBufferCount - sampleBounds[0], (double) sampleBounds[1] - sampleBounds[0]) + sampleBounds[0] + 1; // wrap over playhead offset
-            } else if (floatingBufferCount < sampleBounds[0] + 1) 
-            {
-                endOfSample = true;
-                floatingBufferCount = sampleBounds[1] - fmod((double) floatingBufferCount - sampleBounds[0], (double)sampleBounds[1] - sampleBounds[0]); // wrap over playhead offset
-            }
-
-            if (endOfSample)
-            {
-                if (!looping) active = false;
-            }
-
-            if (seqGen)
-            {
-              if (seqBuffer[i] > 0.f && lastSeqGen[0] <= 0.f)
-              {
-                if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1;
-                else floatingBufferCount = bufferCount = sampleBounds[1];
-                active = true;
-              }
-              lastSeqGen[0] = seqBuffer[i];
-            }
-
-            float windowing = 1.f; 
-            if(windowLength != 0){
-              if (floatingBufferCount < sampleBounds[0] + windowLength && floatingBufferCount <= sampleBoundsCenter) { 
-                  windowing = _map(floatingBufferCount, sampleBounds[0], sampleBounds[0] + windowLength, 0.f, 1.f, 0.5f);
-              } else if (floatingBufferCount > sampleBounds[1] - windowLength) {
-                  windowing = _map(floatingBufferCount, sampleBounds[1] - windowLength, sampleBounds[1], 1.f, 0.f, 0.5f);
-              } else {
-                windowing = 1.f;
-              }
-            }
-            
-            if (active)
-            {
-                // linear interpolation
-                buffer[i] =
-                  lerp(
-                    clipdata[(int)floorf(floatingBufferCount) * clipChannels],
-                    clipdata[(int)ceilf(floatingBufferCount) * clipChannels],
-                    fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
-                  * endAmplitude * windowing;                  ;
-
-                if (clipChannels == 2) {
-                  buffer[i + 1] =
-                    lerp(
-                      clipdata[(int)floorf(floatingBufferCount) * clipChannels + 1],
-                      clipdata[(int)ceilf(floatingBufferCount) * clipChannels + 1],
-                      fmod(floatingBufferCount, (int)floorf(floatingBufferCount)))
-                    * endAmplitude * windowing;
-                }
-                else {
-                  buffer[i + 1] = buffer[i];
-                }
-
-            }
-        }
+      // clip not yet or not available anymore, but wouldn't check for segmentation fault due to outdated pointer
+      if (!clip) {
         return floatingBufferCount;
+      }
+
+      float* clipdata = reinterpret_cast<float*>(clip);
+      float sampleBoundsCenter = (sampleBounds[0] + sampleBounds[1]) * 0.5f;
+
+      for (int i = 0; i < length; i += channels)
+      {
+
+        float endAmplitude = amplitude;
+        if (lastAmplitude != amplitude) endAmplitude = lerp(lastAmplitude, amplitude, (float)i / length); // slope limiting
+        if (ampGen) endAmplitude = endAmplitude * ampBuffer[i]; // -1,1, allows for ring modulation
+
+        float endPlaybackSpeed = playbackSpeed;
+        if (lastPlayBackSpeed != playbackSpeed) endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float)i / length); // slope limiting
+
+        if (active) {
+          if (freqExpGen) floatingBufferCount += endPlaybackSpeed * pow(2, _clamp(freqExpBuffer[i], -1.f, 1.f) * 10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
+          else floatingBufferCount += endPlaybackSpeed;
+          if (freqLinGen) floatingBufferCount += freqLinBuffer[i] * 20.f; // lin fm 
+        }
+
+        bool endOfSample = false;
+        if (floatingBufferCount > sampleBounds[1])
+        {
+          endOfSample = true;
+          floatingBufferCount = fmod(floatingBufferCount - sampleBounds[0], sampleBounds[1] - sampleBounds[0]) + sampleBounds[0] + 1; // wrap over playhead offset
+        }
+        else if (floatingBufferCount < sampleBounds[0] + 1)
+        {
+          endOfSample = true;
+          floatingBufferCount = sampleBounds[1] - fmod(floatingBufferCount - sampleBounds[0], sampleBounds[1] - sampleBounds[0]); // wrap over playhead offset
+        }
+
+        if (endOfSample)
+        {
+          if (!looping) active = false;
+        }
+
+        if (seqGen)
+        {
+          if (seqBuffer[i] > 0.f && lastSeqGen[0] <= 0.f)
+          {
+            if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1;
+            else floatingBufferCount = bufferCount = sampleBounds[1];
+            active = true;
+          }
+          lastSeqGen[0] = seqBuffer[i];
+        }
+
+        float windowing = 1.f;
+        if (windowLength != 0) {
+          if (floatingBufferCount < sampleBounds[0] + windowLength && floatingBufferCount <= sampleBoundsCenter) {
+            windowing = _map(floatingBufferCount, sampleBounds[0], sampleBounds[0] + windowLength, 0.f, 1.f, 0.5f);
+          }
+          else if (floatingBufferCount > sampleBounds[1] - windowLength) {
+            windowing = _map(floatingBufferCount, sampleBounds[1] - windowLength, sampleBounds[1], 1.f, 0.f, 0.5f);
+          }
+          else {
+            windowing = 1.f;
+          }
+        }
+
+        if (active)
+        {
+          // linear interpolation
+          buffer[i] =
+            lerp(
+              clipdata[(int)floor(floatingBufferCount) * clipChannels],
+              clipdata[(int)ceil(floatingBufferCount) * clipChannels],
+              fmod(floatingBufferCount, floor(floatingBufferCount)))
+            * endAmplitude * windowing; ;
+
+          if (clipChannels == 2) {
+            buffer[i + 1] =
+              lerp(
+                clipdata[(int)floor(floatingBufferCount) * clipChannels + 1],
+                clipdata[(int)ceil(floatingBufferCount) * clipChannels + 1],
+                fmod(floatingBufferCount, floor(floatingBufferCount)))
+              * endAmplitude * windowing;
+          }
+          else {
+            buffer[i + 1] = buffer[i];
+          }
+
+        }
+      }
+      return floatingBufferCount;
     }
+
 
     void XylorollMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[])
     {

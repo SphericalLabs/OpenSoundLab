@@ -58,7 +58,7 @@ public class clipPlayerComplex : clipPlayer {
 
   public bool active = true;
 
-  float _lastBuffer = 0;
+  double _lastBuffer = 0;
   float[] lastSeqGen;
 
   Texture2D tex;
@@ -80,7 +80,7 @@ public class clipPlayerComplex : clipPlayer {
   float lastAmplitude = 0f;
 
   [DllImport("SoundStageNative")]
-  public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
+  public static extern double ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount
 , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
 
   [DllImport("SoundStageNative")]
@@ -365,10 +365,10 @@ public class clipPlayerComplex : clipPlayer {
       lp_filter[1] = buffer[buffer.Length - 1];
     } else if (scrubGrabbed) // keeping scrub non-native because such an edge-case and maxes out at 2 instances
       {
-      float amount = (scrubTarg - _lastBuffer) / (buffer.Length / channels);
+      double amount = (scrubTarg - _lastBuffer) / (buffer.Length / channels);
 
       for (int i = 0; i < buffer.Length; i += channels) {
-        bufferCount = Mathf.RoundToInt(floatingBufferCount);
+        bufferCount = (int)System.Math.Round(floatingBufferCount);
         floatingBufferCount += amount;
 
         float endAmplitude = amplitude;
@@ -382,7 +382,7 @@ public class clipPlayerComplex : clipPlayer {
     } else {
       float amount = turntableDelta * (float)_sampleRate * channels / buffer.Length;
       for (int i = 0; i < buffer.Length; i += channels) {
-        bufferCount = Mathf.RoundToInt(floatingBufferCount);
+        bufferCount = (int)System.Math.Round(floatingBufferCount);
         floatingBufferCount += amount;
 
         if (bufferCount > sampleBounds[1]) floatingBufferCount = bufferCount = sampleBounds[0];

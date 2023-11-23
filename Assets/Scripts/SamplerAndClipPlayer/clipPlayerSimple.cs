@@ -50,14 +50,14 @@ public class clipPlayerSimple : clipPlayer
 
     bool active = false;
     
-    float _lastBuffer = 0;
+    double _lastBuffer = 0;
     float[] lastSeqGen;
 
     float lastPlaybackSpeed = 0f;
     float lastAmplitude = 0f;
 
   [DllImport("SoundStageNative")]
-    public static extern float ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, float floatingBufferCount
+    public static extern double ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount
 , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
 
 
