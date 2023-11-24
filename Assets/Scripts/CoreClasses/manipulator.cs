@@ -299,6 +299,74 @@ public class manipulator : MonoBehaviour
         selectedObject = null;
       }
     }
+
+
+    // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
+    if (gazeSelectedObj != null && gazeSelectedObj != gazedObjectTracker.Instance.gazedAtManipObject)
+    {
+      gazeSelectedObj.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      gazeSelectedObj = null;
+    }
+
+    if (gazeSelectedObj != null && !isTriggerPressed())
+    {
+      gazeSelectedObj.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      gazeSelectedObj = null;
+    }
+
+
+    // gaze interaction at the end, if not touched something for real
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject != null){
+
+      if (isTriggerHalfPressed())
+      {
+        gazeSelectedObj = gazedObjectTracker.Instance.gazedAtManipObject;
+        gazeSelectedObj.setSelect(true, transform);
+      } else if(isTriggerFullPressed()) {
+        
+      }
+    }
+
+
+  }
+
+  manipObject gazeSelectedObj;
+
+  bool isTriggerHalfPressed(){
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerR") >= 0.1 && Input.GetAxis("triggerR") < 0.7;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerL") >= 0.1 && Input.GetAxis("triggerL") < 0.7;
+    }
+    return false;
+  }
+
+  bool isTriggerFullPressed()
+  {
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerR") > 0.7;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerL") > 0.7;
+    }
+    return false;
+  }
+
+  bool isTriggerPressed(){
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerR") >= 0.1;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerL") >= 0.1;
+    }
+    return false;
   }
 
   bool copyEnabled = false;
