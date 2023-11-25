@@ -6,6 +6,7 @@ public class gazedObjectTracker : MonoBehaviour
 
     private static gazedObjectTracker instance;
     public manipObject gazedAtManipObject;
+    public Vector3 correction;
 
     void Awake()
     {
@@ -43,6 +44,8 @@ public class gazedObjectTracker : MonoBehaviour
     {
         // reset every frame
         gazedAtManipObject = null;
+
+        transform.Translate(correction); // shift 2cm 
 
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit hit;

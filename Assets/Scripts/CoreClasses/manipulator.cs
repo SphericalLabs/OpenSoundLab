@@ -252,7 +252,22 @@ public class manipulator : MonoBehaviour
 
   void LateUpdate()
   {
-    if (grabbing) return;
+
+    if (grabbing) return; // should this moved back to the first line?
+
+    // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
+    if (selectedObject != null && selectedObject != gazedObjectTracker.Instance.gazedAtManipObject)
+    {
+      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject = null;
+    }
+
+    if (selectedObject != null && !isTriggerPressed())
+    {
+      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject = null;
+    }
+
     Transform candidate = null;
 
     if (selectedObject != null)
@@ -300,46 +315,43 @@ public class manipulator : MonoBehaviour
       }
     }
 
+    
+    // gaze interaction at the end 
+    if (gazedObjectTracker.Instance.gazedAtManipObject != null){
 
-    // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
-    if (gazeSelectedObj != null && gazeSelectedObj != gazedObjectTracker.Instance.gazedAtManipObject)
-    {
-      gazeSelectedObj.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
-      gazeSelectedObj = null;
-    }
-
-    if (gazeSelectedObj != null && !isTriggerPressed())
-    {
-      gazeSelectedObj.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
-      gazeSelectedObj = null;
-    }
-
-
-    // gaze interaction at the end, if not touched something for real
-    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject != null){
-
-      if (isTriggerHalfPressed())
+      if (selectedObject == null && isTriggerHalfPressed()) // if not touched something for real
       {
-        gazeSelectedObj = gazedObjectTracker.Instance.gazedAtManipObject;
-        gazeSelectedObj.setSelect(true, transform);
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        selectedObject.setSelect(true, transform);
+        //selectedObject = gazeSelectedObj;
+
       } else if(isTriggerFullPressed()) {
-        
+
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        //selectedObject = gazeSelectedObj;
+        selectedTransform = selectedObject.transform;
+        SetTrigger(true);
+
+        // do we need this?
+        activeTip.SetActive(false);
+        tipL.gameObject.SetActive(true);
+        tipR.gameObject.SetActive(true);
       }
     }
 
 
   }
 
-  manipObject gazeSelectedObj;
+  //manipObject gazeSelectedObj; // the object selected by gaze by this manipulator
 
   bool isTriggerHalfPressed(){
     if (controllerIndex == 0)
     {
-      return Input.GetAxis("triggerR") >= 0.1 && Input.GetAxis("triggerR") < 0.7;
+      return Input.GetAxis("triggerL") >= 0.02 && Input.GetAxis("triggerL") <= 0.7;
     }
     else if (controllerIndex == 1)
     {
-      return Input.GetAxis("triggerL") >= 0.1 && Input.GetAxis("triggerL") < 0.7;
+      return Input.GetAxis("triggerR") >= 0.02 && Input.GetAxis("triggerR") <= 0.7;
     }
     return false;
   }
@@ -348,11 +360,11 @@ public class manipulator : MonoBehaviour
   {
     if (controllerIndex == 0)
     {
-      return Input.GetAxis("triggerR") > 0.7;
+      return Input.GetAxis("triggerL") > 0.7;
     }
     else if (controllerIndex == 1)
     {
-      return Input.GetAxis("triggerL") > 0.7;
+      return Input.GetAxis("triggerR") > 0.7;
     }
     return false;
   }
@@ -360,11 +372,11 @@ public class manipulator : MonoBehaviour
   bool isTriggerPressed(){
     if (controllerIndex == 0)
     {
-      return Input.GetAxis("triggerR") >= 0.1;
+      return Input.GetAxis("triggerL") >= 0.02;
     }
     else if (controllerIndex == 1)
     {
-      return Input.GetAxis("triggerL") >= 0.1;
+      return Input.GetAxis("triggerR") >= 0.02;
     }
     return false;
   }
@@ -463,11 +475,11 @@ public class manipulator : MonoBehaviour
     
     if (controllerIndex == 0)
     {
-      val = Input.GetAxis("triggerR");
+      val = Input.GetAxis("triggerL");
     }
     else if (controllerIndex == 1)
     {
-      val = Input.GetAxis("triggerL");
+      val = Input.GetAxis("triggerR");
     }
     else
     {
@@ -639,11 +651,11 @@ public class manipulator : MonoBehaviour
         {
           if (controllerIndex == 0)
           {
-            triggerButtonDown = Input.GetAxis("triggerR") > 0.75;
+            triggerButtonDown = Input.GetAxis("triggerL") > 0.75;
           }
           else if (controllerIndex == 1)
           {
-            triggerButtonDown = Input.GetAxis("triggerL") > 0.75;
+            triggerButtonDown = Input.GetAxis("triggerR") > 0.75;
           }
           else
           {
@@ -670,11 +682,11 @@ public class manipulator : MonoBehaviour
         {
           if (controllerIndex == 0)
           {
-            triggerButtonUp = Input.GetAxis("triggerR") < 0.25;
+            triggerButtonUp = Input.GetAxis("triggerL") < 0.25;
           }
           else if (controllerIndex == 1)
           {
-            triggerButtonUp = Input.GetAxis("triggerL") < 0.25;
+            triggerButtonUp = Input.GetAxis("triggerR") < 0.25;
           }
           else
           {
