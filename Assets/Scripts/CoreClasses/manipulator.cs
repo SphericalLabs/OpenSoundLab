@@ -250,137 +250,6 @@ public class manipulator : MonoBehaviour
   }
 
 
-  void LateUpdate()
-  {
-
-    if (grabbing) return; // should this moved back to the first line?
-
-    // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
-    if (selectedObject != null && selectedObject != gazedObjectTracker.Instance.gazedAtManipObject)
-    {
-      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
-      selectedObject = null;
-    }
-
-    if (selectedObject != null && !isTriggerPressed())
-    {
-      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
-      selectedObject = null;
-    }
-
-    Transform candidate = null;
-
-    if (selectedObject != null)
-    {
-      if (hitTransforms.Contains(selectedTransform)) candidate = selectedTransform;
-    }
-    else
-    {
-      foreach (Transform t in hitTransforms)
-      {
-        if (t != null)
-        {
-          manipObject o = t.GetComponent<manipObject>();
-          if (o != null)
-          {
-            if (o.curState != manipObject.manipState.grabbed && o.curState != manipObject.manipState.selected)
-            {
-              candidate = t;
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    if (candidate != selectedTransform)
-    {
-      if (selectedObject != null) selectedObject.GetComponent<manipObject>().setSelect(false, transform);
-
-      if (candidate != null)
-      {
-        candidate.GetComponent<manipObject>().setSelect(true, transform);
-        if (candidate.GetComponent<handle>() != null) toggleCopy(true);
-        else if (candidate.GetComponent<manipObject>().canBeDeleted) toggleDelete(true);
-        hapticPulse();
-        selectedTransform = candidate;
-        selectedObject = candidate.GetComponent<manipObject>();
-      }
-      else
-      {
-        toggleCopy(false);
-        toggleDelete(false);
-        selectedTransform = null;
-        selectedObject = null;
-      }
-    }
-
-    
-    // gaze interaction at the end 
-    if (gazedObjectTracker.Instance.gazedAtManipObject != null){
-
-      if (selectedObject == null && isTriggerHalfPressed()) // if not touched something for real
-      {
-        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
-        selectedObject.setSelect(true, transform);
-        //selectedObject = gazeSelectedObj;
-
-      } else if(isTriggerFullPressed()) {
-
-        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
-        //selectedObject = gazeSelectedObj;
-        selectedTransform = selectedObject.transform;
-        SetTrigger(true);
-
-        // do we need this?
-        activeTip.SetActive(false);
-        tipL.gameObject.SetActive(true);
-        tipR.gameObject.SetActive(true);
-      }
-    }
-
-
-  }
-
-  //manipObject gazeSelectedObj; // the object selected by gaze by this manipulator
-
-  bool isTriggerHalfPressed(){
-    if (controllerIndex == 0)
-    {
-      return Input.GetAxis("triggerL") >= 0.02 && Input.GetAxis("triggerL") <= 0.7;
-    }
-    else if (controllerIndex == 1)
-    {
-      return Input.GetAxis("triggerR") >= 0.02 && Input.GetAxis("triggerR") <= 0.7;
-    }
-    return false;
-  }
-
-  bool isTriggerFullPressed()
-  {
-    if (controllerIndex == 0)
-    {
-      return Input.GetAxis("triggerL") > 0.7;
-    }
-    else if (controllerIndex == 1)
-    {
-      return Input.GetAxis("triggerR") > 0.7;
-    }
-    return false;
-  }
-
-  bool isTriggerPressed(){
-    if (controllerIndex == 0)
-    {
-      return Input.GetAxis("triggerL") >= 0.02;
-    }
-    else if (controllerIndex == 1)
-    {
-      return Input.GetAxis("triggerR") >= 0.02;
-    }
-    return false;
-  }
-
   bool copyEnabled = false;
   void toggleCopy(bool on)
   {
@@ -405,9 +274,16 @@ public class manipulator : MonoBehaviour
     multiselectEnabled = on;    
   }
 
+  // this starts grabbing, etc.
   public void SetTrigger(bool on)
   {
     triggerDown = on;
+
+    // late injection of gazed at object, in the case that the trigger was pulled so fast that there was not intermediate select stage and thus selectedObject has not been populated properly
+    if(selectedObject == null) {
+      selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+      wasGazeBased = true;
+    }
 
     if (selectedObject != null)
     {
@@ -828,6 +704,148 @@ public class manipulator : MonoBehaviour
 
     if (grabbing && selectedObject != null) selectedObject.grabUpdate(transform);
     else if (selectedObject != null) selectedObject.selectUpdate(transform);
+  }
+
+  // true when select or grab was gaze-based
+  bool wasGazeBased = false; 
+
+  void LateUpdate()
+  {
+
+    if (grabbing) return; 
+
+    // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
+    if (selectedObject != null && selectedObject != gazedObjectTracker.Instance.gazedAtManipObject && wasGazeBased)
+    {
+      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject = null;
+      wasGazeBased = false;
+    }
+
+    if (selectedObject != null && !isTriggerPressed() && wasGazeBased)
+    {
+      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject = null;
+      wasGazeBased = false;
+    }
+
+    Transform candidate = null;
+
+    if (selectedObject != null)
+    {
+      if (hitTransforms.Contains(selectedTransform)) candidate = selectedTransform;
+    }
+    else
+    {
+      foreach (Transform t in hitTransforms)
+      {
+        if (t != null)
+        {
+          manipObject o = t.GetComponent<manipObject>();
+          if (o != null)
+          {
+            if (o.curState != manipObject.manipState.grabbed && o.curState != manipObject.manipState.selected)
+            {
+              candidate = t;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if (candidate != selectedTransform)
+    {
+      if (selectedObject != null) selectedObject.GetComponent<manipObject>().setSelect(false, transform);
+
+      if (candidate != null)
+      {
+        candidate.GetComponent<manipObject>().setSelect(true, transform);
+        if (candidate.GetComponent<handle>() != null) toggleCopy(true);
+        else if (candidate.GetComponent<manipObject>().canBeDeleted) toggleDelete(true);
+        hapticPulse();
+        selectedTransform = candidate;
+        selectedObject = candidate.GetComponent<manipObject>();
+      }
+      else
+      {
+        toggleCopy(false);
+        toggleDelete(false);
+        selectedTransform = null;
+        selectedObject = null;
+      }
+    }
+
+
+    // gaze interaction at the end 
+    if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
+    {
+
+      if (selectedObject == null && isTriggerHalfPressed()) 
+      {
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        selectedObject.setSelect(true, transform);
+        wasGazeBased = true;
+        //selectedObject = gazeSelectedObj;
+
+      }
+      else if (isTriggerFullPressed())
+      {
+
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        //selectedObject = gazeSelectedObj;
+        selectedTransform = selectedObject.transform;
+        SetTrigger(true);
+        wasGazeBased = true;
+
+        // do we need this?
+        activeTip.SetActive(false);
+        tipL.gameObject.SetActive(true);
+        tipR.gameObject.SetActive(true);
+      }
+    }
+
+
+  }
+
+
+  bool isTriggerHalfPressed()
+  {
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerL") >= 0.02 && Input.GetAxis("triggerL") <= 0.7;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerR") >= 0.02 && Input.GetAxis("triggerR") <= 0.7;
+    }
+    return false;
+  }
+
+  bool isTriggerFullPressed()
+  {
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerL") > 0.7;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerR") > 0.7;
+    }
+    return false;
+  }
+
+  bool isTriggerPressed()
+  {
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerL") >= 0.02;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerR") >= 0.02;
+    }
+    return false;
   }
 }
 
