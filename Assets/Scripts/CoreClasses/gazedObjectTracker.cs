@@ -53,6 +53,7 @@ public class gazedObjectTracker : MonoBehaviour
     RaycastHit hit;
     int layerMask = 1 << 9; // layerMask 9 = manipOnly
 
+    // Calib cast from here
     if (Physics.Raycast(ray, out hit, 2f, layerMask)){ 
 
       // if looking at calib plane and one trigger is pressed
@@ -60,7 +61,7 @@ public class gazedObjectTracker : MonoBehaviour
       {
         
         gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(isHalfPressed());
+        gazeIndicator.SetActive(true);
 
         if (Time.frameCount % 30 == 0 && isFullPressed())
         {
@@ -74,6 +75,7 @@ public class gazedObjectTracker : MonoBehaviour
       }
     }
 
+    // UI cast from here
     transform.Translate(correction); 
 
     ray = new Ray(transform.position, transform.forward);
@@ -81,14 +83,14 @@ public class gazedObjectTracker : MonoBehaviour
 
     gazeIndicator.SetActive(false);
 
-    if (Physics.Raycast(ray, out hit, 2f, layerMask))
+    if (Physics.SphereCast(ray, 0.015f, out hit, 2f, layerMask))
     {
       manipObject targetObject = hit.collider.GetComponent<manipObject>();
       if (targetObject != null)
       {
         gazedAtManipObject = targetObject;
         gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(isHalfPressed());
+        gazeIndicator.SetActive(true);
       }
 
     }
