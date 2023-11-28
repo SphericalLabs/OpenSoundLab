@@ -388,10 +388,13 @@ public class menuItem : manipObject {
       g.transform.Rotate(90, 0, 0, Space.Self);
 
 
-
     //else if (item != deviceType.Filter && item != deviceType.Scope && item != deviceType.Airhorn && item != deviceType.ADSR) /*g.transform.Rotate(0, 180, 0, Space.Self);*/
 
-    manipulatorObj.GetComponent<manipulator>().ForceGrab(g.GetComponentInChildren<handle>());
+    manipulator manip = manipulatorObj.GetComponent<manipulator>();
+    if (manip == null) return;
+    if (manip.wasGazeBased) g.transform.parent = GameObject.Find("PatchAnchor").transform;  // Directly inject PatchAnchor as parent, since the normal grab and then place back routine is skipped when spawn by gaze
+    manip.ForceGrab(g.GetComponentInChildren<handle>());
+
   }
 
   public override void setState(manipState state) {
