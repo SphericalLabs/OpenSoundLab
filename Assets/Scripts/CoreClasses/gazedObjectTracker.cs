@@ -39,69 +39,80 @@ public class gazedObjectTracker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
-    }
-
-  // Update is called once per frame
-  void Update()
-  {
-    // reset every frame
-    gazedAtManipObject = null;
-    gazeIndicator.SetActive(false);
-
-    Ray ray = new Ray(transform.position, transform.forward);
-    RaycastHit hit;
-    int layerMask = 1 << 9; // layerMask 9 = manipOnly
-
-    // Calib cast from here
-    if (Physics.Raycast(ray, out hit, 2f, layerMask)){ 
-
-      // if looking at calib plane and one trigger is pressed
-      if (hit.collider.gameObject == calibrationPlane)
-      {
-        
-        gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(true);
-
-        if (Time.frameCount % 30 == 0 && isFullPressed())
+        if (PlayerPrefs.HasKey("CorrectionX"))
         {
-          Vector3 localizedHitPoint = transform.InverseTransformPoint(hit.point);
-          Vector3 localizedPlaneCenter = transform.InverseTransformPoint(calibrationPlaneCenter.transform.position);
-          correction.x = localizedPlaneCenter.x - localizedHitPoint.x;
-          correction.y = localizedPlaneCenter.y - localizedHitPoint.y;
+          correction.x = PlayerPrefs.GetFloat("CorrectionX");
         }
 
-        return;
-      }
+        if (PlayerPrefs.HasKey("CorrectionY"))
+        {
+          correction.y = PlayerPrefs.GetFloat("CorrectionY");
+        }
     }
 
-    // UI cast from here
-    transform.Translate(correction); 
-
-    ray = new Ray(transform.position, transform.forward);
-    layerMask = 1 << 9; // layerMask 9 = manipOnly
-
-    gazeIndicator.SetActive(false);
-
-    if (Physics.SphereCast(ray, 0.015f, out hit, 2f, layerMask))
+    // Update is called once per frame
+    void Update()
     {
-      manipObject targetObject = hit.collider.GetComponent<manipObject>();
-      if (targetObject != null)
-      {
-        gazedAtManipObject = targetObject;
-        gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(true);
+      // reset every frame
+      gazedAtManipObject = null;
+      gazeIndicator.SetActive(false);
+
+      Ray ray = new Ray(transform.position, transform.forward);
+      RaycastHit hit;
+      int layerMask = 1 << 9; // layerMask 9 = manipOnly
+
+      // Calib cast from here
+      if (Physics.Raycast(ray, out hit, 2f, layerMask)){ 
+
+        // if looking at calib plane and one trigger is pressed
+        if (hit.collider.gameObject == calibrationPlane)
+        {
+        
+          gazeIndicator.transform.position = hit.point;
+          gazeIndicator.SetActive(true);
+
+          if (Time.frameCount % 30 == 0 && isFullPressed())
+          {
+            Vector3 localizedHitPoint = transform.InverseTransformPoint(hit.point);
+            Vector3 localizedPlaneCenter = transform.InverseTransformPoint(calibrationPlaneCenter.transform.position);
+            correction.x = localizedPlaneCenter.x - localizedHitPoint.x;
+            correction.y = localizedPlaneCenter.y - localizedHitPoint.y;
+            PlayerPrefs.SetFloat("CorrectionX", correction.x);
+            PlayerPrefs.SetFloat("CorrectionY", correction.y);
+            PlayerPrefs.Save();
+          }
+
+          return;
+        }
       }
 
+      // UI cast from here
+      transform.Translate(correction); 
+
+      ray = new Ray(transform.position, transform.forward);
+      layerMask = 1 << 9; // layerMask 9 = manipOnly
+
+      gazeIndicator.SetActive(false);
+
+      if (Physics.SphereCast(ray, 0.015f, out hit, 2f, layerMask))
+      {
+        manipObject targetObject = hit.collider.GetComponent<manipObject>();
+        if (targetObject != null)
+        {
+          gazedAtManipObject = targetObject;
+          gazeIndicator.transform.position = hit.point;
+          gazeIndicator.SetActive(true);
+        }
+
+      }
     }
-  }
 
-  bool isHalfPressed(){
-    return (Input.GetAxis("triggerL") > 0.05 || Input.GetAxis("triggerR") > 0.05);
-  }
+    bool isHalfPressed(){
+      return (Input.GetAxis("triggerL") > 0.05 || Input.GetAxis("triggerR") > 0.05);
+    }
 
-  bool isFullPressed(){
-    return (Input.GetAxis("triggerL") > 0.7 || Input.GetAxis("triggerR") > 0.7);
-  }
+    bool isFullPressed(){
+      return (Input.GetAxis("triggerL") > 0.7 || Input.GetAxis("triggerR") > 0.7);
+    }
 }
 
