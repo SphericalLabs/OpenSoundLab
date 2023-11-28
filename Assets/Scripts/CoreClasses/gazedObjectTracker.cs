@@ -60,9 +60,9 @@ public class gazedObjectTracker : MonoBehaviour
       {
         
         gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(true);
+        gazeIndicator.SetActive(isHalfPressed());
 
-        if (Time.frameCount % 30 == 0 && (Input.GetAxis("triggerL") > 0.7 || Input.GetAxis("triggerR") > 0.7))
+        if (Time.frameCount % 30 == 0 && isFullPressed())
         {
           Vector3 localizedHitPoint = transform.InverseTransformPoint(hit.point);
           Vector3 localizedPlaneCenter = transform.InverseTransformPoint(calibrationPlaneCenter.transform.position);
@@ -88,10 +88,18 @@ public class gazedObjectTracker : MonoBehaviour
       {
         gazedAtManipObject = targetObject;
         gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(true);
+        gazeIndicator.SetActive(isHalfPressed());
       }
 
     }
+  }
+
+  bool isHalfPressed(){
+    return (Input.GetAxis("triggerL") > 0.05 || Input.GetAxis("triggerR") > 0.05);
+  }
+
+  bool isFullPressed(){
+    return (Input.GetAxis("triggerL") > 0.7 || Input.GetAxis("triggerR") > 0.7);
   }
 }
 
