@@ -707,7 +707,7 @@ public class manipulator : MonoBehaviour
   }
 
   // true when select or grab was gaze-based
-  bool wasGazeBased = false; 
+  public bool wasGazeBased = false; 
 
   void LateUpdate()
   {

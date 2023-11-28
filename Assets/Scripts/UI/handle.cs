@@ -73,7 +73,13 @@ public class handle : manipObject {
 
   bool scaling = false;
   public override void grabUpdate(Transform t) {
-    
+
+    if (manipulatorObjScript.wasGazeBased)
+    {
+      gazeBasedPosRotUpdate();            
+      return;
+    }
+
     if (otherHandle.curState == manipState.grabbed) {
       if (ID == 1) {
         scaleUpdate();
@@ -86,6 +92,38 @@ public class handle : manipObject {
       doublePosRot = false;
     }
   }
+
+  Vector3 initialOffset;
+  Quaternion initialRotationOffset;
+
+  void gazedBasedPosRotStart()
+  {
+    Transform go1 = manipulatorObj.transform;
+    Transform go2 = this.transform.parent;
+
+    initialOffset = go2.position - go1.position;
+    initialRotationOffset = Quaternion.Inverse(go1.rotation) * go2.rotation;
+  }
+
+  void gazeBasedPosRotUpdate()
+  {
+
+    Transform go1 = manipulatorObj.transform;
+    Transform go2 = this.transform.parent;
+
+    // Calculate the desired position in world space for go2 based on the changes you want
+    Vector3 desiredPosition = go1.position + initialOffset;
+
+    // Apply changes to the local position of go2 based on the desired position
+    go2.localPosition = go2.parent.InverseTransformPoint(desiredPosition);
+
+    // Calculate the desired rotation for go2 relative to go1
+    Quaternion desiredRotation = go1.rotation * initialRotationOffset;
+
+    // Apply changes to the local rotation of go2 relative to go1
+    go2.localRotation = Quaternion.Inverse(go1.localRotation) * desiredRotation;
+  }
+
 
   bool doublePosRot = false;
   Vector3 initOtherManipPos = Vector3.zero;
@@ -207,9 +245,13 @@ public class handle : manipObject {
         otherHandle.GetComponent<Renderer>().sharedMaterial = highlightGrabbedMat;
       }
     }
-    if (curState == manipState.grabbed) {
+    if (curState == manipState.grabbed && !manipulatorObjScript.wasGazeBased) {
       masterObj.parent = manipulatorObj.parent;
       doublePosRot = false;
+    }
+
+    if(curState == manipState.grabbed && manipulatorObjScript.wasGazeBased) {
+      gazedBasedPosRotStart();
     }
   }
 }
