@@ -37,6 +37,7 @@ using UnityEngine.XR;
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 public class dial : manipObject {
 
@@ -109,10 +110,10 @@ public class dial : manipObject {
 
   void Update() {
 
-    if(manipulatorObjScript != null) // hand is on this - should check which hand button 
+    if(manipulatorObjScript != null) // hand is on this 
     {
       resetDial();
-    } else if (gazedObjectTracker.Instance.gazedAtManipObject == this) // this is being gazed at    
+    } else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
     {
       resetDial();
     }
@@ -120,19 +121,22 @@ public class dial : manipObject {
     updatePercent();
   }
 
+  // look and touch, no reset
+  // touchDown actually not so good, just touch
+
   void resetDial(){
     if (percent == defaultPercent) return;
 
     if (manipulatorObjScript != null) // has contact with a controller, therefore should only reset from that controller
     {
-      if (manipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonR") // these are wrongly labeled, rename or use other system
-      || (!manipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonL")))
+      if (manipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonL") // these are wrongly labeled, rename or use other system
+      || (!manipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonR")))
       {
         setPercent(defaultPercent);
       }
     } else {
-      if (Input.GetButtonDown("secondaryButtonL")
-      || (Input.GetButtonDown("secondaryButtonR")))
+      if (Input.GetButton("secondaryButtonL")
+      || (Input.GetButton("secondaryButtonR")))
       {
         setPercent(defaultPercent);
       }

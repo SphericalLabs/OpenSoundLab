@@ -37,11 +37,15 @@ using System.Collections;
 using System.Collections.Generic;
 using static OVRHand;
 using OculusSampleFramework;
+using UnityEngine.UIElements;
 //using System.Linq;
 //using Valve.VR;
 
 public class manipulator : MonoBehaviour
 {
+  
+  private static List<manipulator> instances = new List<manipulator>();
+
   int controllerIndex = -1; // 0 => left, 1 => right
   public GameObject activeTip;
   public Transform tipL, tipR;
@@ -60,6 +64,29 @@ public class manipulator : MonoBehaviour
   {
     _menuspawn = GetComponent<menuspawn>(); 
     activeTip.SetActive(false);
+    instances.Add(this);
+  }
+
+  private void OnDestroy()
+  {
+    instances.Remove(this);
+  }
+
+  public static List<manipulator> GetInstances()
+  {
+    return instances;
+  }
+
+  public static bool NoneTouched()
+  {
+    foreach (manipulator manip in instances)
+    {
+      if (manip.selectedObject != null)
+      {
+        return false; // At least one instance has touched something
+      }
+    }
+    return true; // None of the instances have touched something
   }
 
   bool controllerVisible = true;
@@ -389,11 +416,11 @@ public class manipulator : MonoBehaviour
       //      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
       if (controllerIndex == 0)
       {
-        secondaryDown = Input.GetButtonDown("secondaryButtonR");
+        secondaryDown = Input.GetButtonDown("secondaryButtonL");
       }
       else if (controllerIndex == 1)
       {
-        secondaryDown = Input.GetButtonDown("secondaryButtonL");
+        secondaryDown = Input.GetButtonDown("secondaryButtonR");
       }
       else
       {
@@ -402,11 +429,11 @@ public class manipulator : MonoBehaviour
 
       if (controllerIndex == 0)
       {
-        secondaryUp = Input.GetButtonUp("secondaryButtonR");
+        secondaryUp = Input.GetButtonUp("secondaryButtonL");
       }
       else if (controllerIndex == 1)
       {
-        secondaryUp = Input.GetButtonUp("secondaryButtonL");
+        secondaryUp = Input.GetButtonUp("secondaryButtonR");
       }
       else
       {
