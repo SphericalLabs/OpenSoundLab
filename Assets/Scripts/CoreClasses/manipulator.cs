@@ -809,7 +809,7 @@ public class manipulator : MonoBehaviour
   }
 
 
-  bool isTriggerHalfPressed()
+  public bool isTriggerHalfPressed()
   {
     if (controllerIndex == 0)
     {
@@ -822,7 +822,7 @@ public class manipulator : MonoBehaviour
     return false;
   }
 
-  bool isTriggerFullPressed()
+  public bool isTriggerFullPressed()
   {
     if (controllerIndex == 0)
     {
@@ -835,7 +835,7 @@ public class manipulator : MonoBehaviour
     return false;
   }
 
-  bool isTriggerPressed()
+  public bool isTriggerPressed()
   {
     if (controllerIndex == 0)
     {

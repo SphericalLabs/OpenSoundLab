@@ -109,19 +109,35 @@ public class dial : manipObject {
 
   void Update() {
 
-    if (curState == manipState.selected || curState == manipState.grabbed)
+    if(manipulatorObjScript != null) // hand is on this - should check which hand button 
     {
-      // reset dial to default
-      //if ((selectObj.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawButton.Y)
-      //|| (selectObj.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawButton.B))))
-      if (OVRInput.Get(OVRInput.RawButton.Y) || OVRInput.Get(OVRInput.RawButton.B))
-      {
-        setPercent(defaultPercent);
-        rotAtBeginningOfGrab = controllerRot - curRot;
-      }
+      resetDial();
+    } else if (gazedObjectTracker.Instance.gazedAtManipObject == this) // this is being gazed at    
+    {
+      resetDial();
     }
 
     updatePercent();
+  }
+
+  void resetDial(){
+    if (percent == defaultPercent) return;
+
+    if (manipulatorObjScript != null) // has contact with a controller, therefore should only reset from that controller
+    {
+      if (manipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonR") // these are wrongly labeled, rename or use other system
+      || (!manipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonL")))
+      {
+        setPercent(defaultPercent);
+      }
+    } else {
+      if (Input.GetButtonDown("secondaryButtonL")
+      || (Input.GetButtonDown("secondaryButtonR")))
+      {
+        setPercent(defaultPercent);
+      }
+    }
+
   }
 
   public void setPercent(float p) {
