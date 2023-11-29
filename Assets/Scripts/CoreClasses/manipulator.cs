@@ -362,6 +362,9 @@ public class manipulator : MonoBehaviour
 
     copying = on;
 
+    // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject is handle) selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+
     if (selectedObject != null)
     {
       if (on)
@@ -444,6 +447,8 @@ public class manipulator : MonoBehaviour
     {
       if (secondaryDown)
       {
+        // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
+        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle) copyEnabled = true;
         if (copyEnabled) SetCopy(true);
         else if (deleteEnabled) DeleteSelection(true);
         else if (multiselectEnabled) MultiselectSelection(true);        
@@ -744,14 +749,14 @@ public class manipulator : MonoBehaviour
     // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
     if (selectedObject != null && selectedObject != gazedObjectTracker.Instance.gazedAtManipObject && wasGazeBased)
     {
-      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject.setSelect(false, transform); 
       selectedObject = null;
       wasGazeBased = false;
     }
 
     if (selectedObject != null && !isTriggerPressed() && wasGazeBased)
     {
-      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject.setSelect(false, transform); 
       selectedObject = null;
       wasGazeBased = false;
     }

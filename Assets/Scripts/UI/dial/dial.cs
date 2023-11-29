@@ -112,10 +112,10 @@ public class dial : manipObject {
 
     if(manipulatorObjScript != null) // hand is on this 
     {
-      resetDial();
+      checkForResetDial();
     } else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
     {
-      resetDial();
+      checkForResetDial();
     }
 
     updatePercent();
@@ -124,7 +124,7 @@ public class dial : manipObject {
   // look and touch, no reset
   // touchDown actually not so good, just touch
 
-  void resetDial(){
+  void checkForResetDial(){
     if (percent == defaultPercent) return;
 
     if (manipulatorObjScript != null) // has contact with a controller, therefore should only reset from that controller
@@ -135,8 +135,7 @@ public class dial : manipObject {
         setPercent(defaultPercent);
       }
     } else {
-      if (Input.GetButton("secondaryButtonL")
-      || (Input.GetButton("secondaryButtonR")))
+      if (Input.GetButton("secondaryButtonL") || Input.GetButton("secondaryButtonR"))
       {
         setPercent(defaultPercent);
       }
