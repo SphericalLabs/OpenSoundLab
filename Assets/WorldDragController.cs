@@ -10,12 +10,27 @@ public class WorldDragController : MonoBehaviour
   Vector3 currentControllerMiddle, lastControllerMiddle;
   float currentControllerAngle, lastControllerAngle, currentControllerDistance, lastControllerDistance;
   bool isDragging = false;
+  bool isVertical = false;
+  bool isHorizontal = false;
   Transform[] transArray;
+
+  Quaternion lastRightHandRotation, lastLeftHandRotation;
+
 
   void Awake()
   {
     
   }
+
+  // dragging around the y axis
+  public static bool worldDraggedHorizontally(){
+    return OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
+  }
+
+  // tilting the world up and down
+  public static bool worldDraggedVertically(){
+    return OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.1f;    
+    }
 
   void Update()
   {
@@ -27,18 +42,21 @@ public class WorldDragController : MonoBehaviour
     if (!isDragging && (leftManip.isGrabbing() || rightManip.isGrabbing())) return; 
 
     // begin drag, save start values
-    if (!isDragging && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.5f && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.5f)
+    if (!isDragging && worldDraggedHorizontally())
     {
       isDragging = true;
 
       lastControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
       lastControllerAngle = getAngleBetweenControllers();
       lastControllerDistance = getDistanceBetweenControllers();
-      
+
+      lastLeftHandRotation = leftHandAnchor.rotation;
+      lastRightHandRotation = rightHandAnchor.rotation;
+
     }
     
     // end of drag
-    if (isDragging && (OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) < 0.3f || OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) < 0.3f) )
+    if (isDragging && !worldDraggedHorizontally() )
     {
       isDragging = false;
 
@@ -80,24 +98,81 @@ public class WorldDragController : MonoBehaviour
       //Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * currentControllerAngle), 0f, Mathf.Cos(Mathf.Deg2Rad * currentControllerAngle)), new Color(1f, 0f, 1f));
       //Debug.DrawLine(Vector3.zero, getMiddle(leftHandAnchor, rightHandAnchor), new Color(0f, 1f, 1f));
 
-      currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
+      if (worldDraggedVertically())
+      {
+        if (!isVertical)
+        {
+          isVertical = true;
+          isHorizontal = false;
+          // Update last hand rotations
+          lastLeftHandRotation = leftHandAnchor.rotation;
+          lastRightHandRotation = rightHandAnchor.rotation;
+        }
+        if (isVertical)
+        {
+          // Calculate the rotation deltas for both hands
+          Quaternion deltaLeftRotation = Quaternion.Inverse(lastLeftHandRotation) * leftHandAnchor.rotation;
+          Quaternion deltaRightRotation = Quaternion.Inverse(lastRightHandRotation) * rightHandAnchor.rotation;
 
-      // scale
-      currentControllerDistance = getDistanceBetweenControllers();
-      scaleAround(transform, currentControllerMiddle, transform.localScale * (1f + currentControllerDistance - lastControllerDistance));
+          // Average the rotations and project onto the axis between the hands
+          Quaternion averagedRotation = Quaternion.Slerp(deltaLeftRotation, deltaRightRotation, 0.5f);
+          Vector3 handAxis = leftHandAnchor.position - rightHandAnchor.position;
+          Quaternion actualRot = ProjectQuaternion(averagedRotation, handAxis);
 
-      // rotation
-      currentControllerAngle = getAngleBetweenControllers();
-      transform.RotateAround(currentControllerMiddle, Vector3.up, lastControllerAngle - currentControllerAngle);
+          // Apply the rotation
+          actualRot.ToAngleAxis(out float angle, out Vector3 axis);
+          transform.RotateAround(currentControllerMiddle, axis, angle);
 
-      // translation
-      transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
+          // Update last hand rotations
+          lastLeftHandRotation = leftHandAnchor.rotation;
+          lastRightHandRotation = rightHandAnchor.rotation;
+        }
+      } else {
+        currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
 
-      // for next frame
-      lastControllerMiddle = currentControllerMiddle;
-      lastControllerAngle = currentControllerAngle;
-      lastControllerDistance = currentControllerDistance;
+        // scale
+        currentControllerDistance = getDistanceBetweenControllers();
+        scaleAround(transform, currentControllerMiddle, transform.localScale * (1f + currentControllerDistance - lastControllerDistance));
+
+        // rotation
+        if (!isHorizontal)
+        {
+          isHorizontal = true;
+          isVertical = false;
+        }
+        if (isHorizontal)
+        {
+          currentControllerAngle = getAngleBetweenControllers();
+          transform.RotateAround(currentControllerMiddle, Vector3.up, lastControllerAngle - currentControllerAngle);
+        }
+
+        // translation
+        transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
+
+        // for next frame
+        lastControllerMiddle = currentControllerMiddle;
+        lastControllerAngle = currentControllerAngle;
+        lastControllerDistance = currentControllerDistance;
+      }
+
     }
+  }
+
+  public Quaternion ProjectQuaternion(Quaternion q1, Vector3 axis)
+  {
+    // Normalize the axis to ensure it's a unit vector
+    axis.Normalize();
+
+    // Decompose the input quaternion into an axis and an angle
+    q1.ToAngleAxis(out float angle, out Vector3 rotationAxis);
+
+    // Project the rotation axis onto the given axis
+    Vector3 projectedAxis = Vector3.Project(rotationAxis, axis);
+
+    // Recompose the quaternion with the projected axis and original angle
+    Quaternion projectedQuaternion = Quaternion.AngleAxis(angle, projectedAxis);
+
+    return projectedQuaternion;
   }
 
   Vector3 getPatchCenter(){

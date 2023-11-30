@@ -37,11 +37,15 @@ using System.Collections;
 using System.Collections.Generic;
 using static OVRHand;
 using OculusSampleFramework;
+using UnityEngine.UIElements;
 //using System.Linq;
 //using Valve.VR;
 
 public class manipulator : MonoBehaviour
 {
+  
+  private static List<manipulator> instances = new List<manipulator>();
+
   int controllerIndex = -1; // 0 => left, 1 => right
   public GameObject activeTip;
   public Transform tipL, tipR;
@@ -60,6 +64,29 @@ public class manipulator : MonoBehaviour
   {
     _menuspawn = GetComponent<menuspawn>(); 
     activeTip.SetActive(false);
+    instances.Add(this);
+  }
+
+  private void OnDestroy()
+  {
+    instances.Remove(this);
+  }
+
+  public static List<manipulator> GetInstances()
+  {
+    return instances;
+  }
+
+  public static bool NoneTouched()
+  {
+    foreach (manipulator manip in instances)
+    {
+      if (manip.selectedObject != null)
+      {
+        return false; // At least one instance has touched something
+      }
+    }
+    return true; // None of the instances have touched something
   }
 
   bool controllerVisible = true;
@@ -280,7 +307,7 @@ public class manipulator : MonoBehaviour
     triggerDown = on;
 
     // late injection of gazed at object, in the case that the trigger was pulled so fast that there was not intermediate select stage and thus selectedObject has not been populated properly
-    if(selectedObject == null) {
+    if(selectedObject == null && !WorldDragController.worldDraggedHorizontally()) {
       selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
       wasGazeBased = true;
     }
@@ -334,6 +361,9 @@ public class manipulator : MonoBehaviour
     if (menuManager.instance.simple) return;
 
     copying = on;
+
+    // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.worldDraggedHorizontally()) selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
 
     if (selectedObject != null)
     {
@@ -389,11 +419,11 @@ public class manipulator : MonoBehaviour
       //      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
       if (controllerIndex == 0)
       {
-        secondaryDown = Input.GetButtonDown("secondaryButtonR");
+        secondaryDown = Input.GetButtonDown("secondaryButtonL");
       }
       else if (controllerIndex == 1)
       {
-        secondaryDown = Input.GetButtonDown("secondaryButtonL");
+        secondaryDown = Input.GetButtonDown("secondaryButtonR");
       }
       else
       {
@@ -402,11 +432,11 @@ public class manipulator : MonoBehaviour
 
       if (controllerIndex == 0)
       {
-        secondaryUp = Input.GetButtonUp("secondaryButtonR");
+        secondaryUp = Input.GetButtonUp("secondaryButtonL");
       }
       else if (controllerIndex == 1)
       {
-        secondaryUp = Input.GetButtonUp("secondaryButtonL");
+        secondaryUp = Input.GetButtonUp("secondaryButtonR");
       }
       else
       {
@@ -417,6 +447,8 @@ public class manipulator : MonoBehaviour
     {
       if (secondaryDown)
       {
+        // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
+        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.worldDraggedHorizontally()) copyEnabled = true;
         if (copyEnabled) SetCopy(true);
         else if (deleteEnabled) DeleteSelection(true);
         else if (multiselectEnabled) MultiselectSelection(true);        
@@ -717,14 +749,14 @@ public class manipulator : MonoBehaviour
     // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
     if (selectedObject != null && selectedObject != gazedObjectTracker.Instance.gazedAtManipObject && wasGazeBased)
     {
-      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject.setSelect(false, transform); 
       selectedObject = null;
       wasGazeBased = false;
     }
 
     if (selectedObject != null && !isTriggerPressed() && wasGazeBased)
     {
-      selectedObject.setSelect(false, transform); // this might cause trouble, might have had a physical touch...
+      selectedObject.setSelect(false, transform); 
       selectedObject = null;
       wasGazeBased = false;
     }
@@ -777,10 +809,10 @@ public class manipulator : MonoBehaviour
     }
 
 
-    // gaze interaction at the end 
     if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
     {
-
+      if (WorldDragController.worldDraggedHorizontally()) return; // no gaze interaction when dragging the world
+      
       if (selectedObject == null && isTriggerHalfPressed()) 
       {
         selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
