@@ -363,7 +363,11 @@ public class manipulator : MonoBehaviour
     copying = on;
 
     // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.worldDraggedHorizontally()) selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.worldDraggedHorizontally())
+    {
+      selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+      wasGazeBased = true;      
+    }
 
     if (selectedObject != null)
     {
