@@ -469,18 +469,38 @@ public class omniPlug : manipObject {
       collCandidates.Clear();
       if (connected != null) collCandidates.Add(connected.transform);
 
-      // this fixes the grab position of the omniPlug, when the controller is compensated for passthrough overlay
+
       transform.parent = manipulatorObj.parent;
-      Vector3 tmp = transform.localPosition;
-      tmp.z = 0.06f;
-      tmp.x = 0f;
-      tmp.y = 0f;
-      transform.localPosition = tmp;
+
+      if (manipulatorObjScript != null)
+      {
+        Vector3 posDiff = Vector3.zero;
+
+        if (manipulatorObjScript.wasGazeBased)
+        {
+          // grabbing a freshly spawned far plug or a plug that was already connected
+          Transform grabReference = connected == null ? gazedObjectTracker.Instance.gazedAtManipObject.transform : connected.transform;
+
+          // translate based on reference, in this case for gaze-based remote patching
+          posDiff = manipulatorObjScript.transform.InverseTransformPoint(grabReference.transform.position 
+          + grabReference.transform.up * -0.075f);
+
+        }
+        else
+        {
+          // fix position at hand
+          posDiff = new Vector3(0f, 0f, 0.06f);
+        }
+
+        transform.localPosition = posDiff;
+
+      }
 
       updateJackList();
       foreach (omniJack j in targetJackList) j.flash(cordColor);
       setCableHighlighted(true);
       if (otherPlug != null) otherPlug.setCableHighlighted(true);
+
     }
   }
 

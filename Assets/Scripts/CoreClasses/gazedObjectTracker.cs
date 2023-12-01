@@ -90,7 +90,9 @@ public class gazedObjectTracker : MonoBehaviour
       transform.Translate(correction); 
 
       ray = new Ray(transform.position, transform.forward);
-      layerMask = 1 << 9; // layerMask 9 = manipOnly
+      //layerMask = 1 << 9; // layerMask 9 = manipOnly
+      //layerMask |= 1 << 0;
+      layerMask = ~0;
 
       gazeIndicator.SetActive(false);
 
