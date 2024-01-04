@@ -38,6 +38,7 @@ using System.Collections.Generic;
 using static OVRHand;
 using OculusSampleFramework;
 using UnityEngine.UIElements;
+using static manipObject;
 //using System.Linq;
 //using Valve.VR;
 
@@ -175,6 +176,20 @@ public class manipulator : MonoBehaviour
   {
     manipObject o = coll.transform.GetComponent<manipObject>();
     if (o != null) o.onTouch(true, this);
+
+    // allow for remote deletion by dragging the controller into the trashbin instead of the module itself
+    if (wasGazeBased)
+    {
+      if (coll.transform.name == "trashMenu" && (selectedObject != null) && selectedObject.curState == manipState.grabbed && selectedObject is handle)
+      {
+        handle selectedHandle = (handle)selectedObject;
+        selectedHandle.curTrash = coll.transform.GetComponent<trashcan>();
+        selectedHandle.curTrash.setReady(true);
+        hapticPulse(1000);
+        selectedHandle.trashReady = true;        
+      }
+    }
+
   }
 
   void OnCollisionExit(Collision coll)
