@@ -470,29 +470,30 @@ public class omniPlug : manipObject {
       if (connected != null) collCandidates.Add(connected.transform);
 
 
-      transform.parent = manipulatorObj.parent;
+      
 
       if (manipulatorObjScript != null)
       {
         Vector3 posDiff = Vector3.zero;
 
-        if (manipulatorObjScript.wasGazeBased)
+        if (manipulatorObjScript.wasGazeBased) // remote patching
         {
           // grabbing a freshly spawned far plug or a plug that was already connected
           Transform grabReference = connected == null ? gazedObjectTracker.Instance.gazedAtManipObject.transform : connected.transform;
 
-          // translate based on reference, in this case for gaze-based remote patching
-          posDiff = manipulatorObjScript.transform.InverseTransformPoint(grabReference.transform.position 
-          + grabReference.transform.up * -0.075f);
+          // translate based on reference, in this case for gaze-based remote patching          
+          transform.position = grabReference.transform.position + grabReference.transform.up * -0.075f; 
+          gazeBasedPosRotStart();          
 
         }
-        else
+        else // manual patching
         {
+          transform.parent = manipulatorObj.parent;
           // fix position at hand
           posDiff = new Vector3(0f, 0f, 0.06f);
+          transform.localPosition = posDiff;
         }
 
-        transform.localPosition = posDiff;
 
       }
 
@@ -503,6 +504,44 @@ public class omniPlug : manipObject {
 
     }
   }
+
+  public override void grabUpdate(Transform t)
+  {
+
+    if (manipulatorObjScript.wasGazeBased)
+    {
+      gazeBasedPosRotUpdate();
+      return;
+    }
+
+  }
+
+  // copied from handle.cs, consider unifying refactoring
+
+  Vector3 initialOffset;
+
+  void gazeBasedPosRotStart()
+  {
+    Transform go1 = manipulatorObj.transform;
+    Transform go2 = this.transform;
+
+    initialOffset = go2.position - go1.position;
+  }
+
+  void gazeBasedPosRotUpdate()
+  {
+
+    Transform go1 = manipulatorObj.transform;
+    Transform go2 = this.transform;
+
+    // Calculate the desired position in world space for go2 based on the changes you want
+    Vector3 desiredPosition = go1.position + initialOffset;
+
+    // Apply changes to the local position of go2 based on the desired position
+    go2.position = desiredPosition;
+
+  }
+
 
   public void setCableHighlighted(bool on){
     lr.sharedMaterial = on ? omniCableSelectedMat : omniCableMat;

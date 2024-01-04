@@ -96,7 +96,7 @@ public class handle : manipObject {
   Vector3 initialOffset;
   Quaternion initialRotationOffset;
 
-  void gazedBasedPosRotStart()
+  void gazeBasedPosRotStart()
   {
     Transform go1 = manipulatorObj.transform;
     Transform go2 = this.transform.parent;
@@ -251,7 +251,7 @@ public class handle : manipObject {
     }
 
     if(curState == manipState.grabbed && manipulatorObjScript.wasGazeBased) {
-      gazedBasedPosRotStart();
+      gazeBasedPosRotStart();
     }
   }
 }
