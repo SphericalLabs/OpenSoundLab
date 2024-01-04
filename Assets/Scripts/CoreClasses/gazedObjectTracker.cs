@@ -1,4 +1,4 @@
-
+using Unity.XR.Oculus;
 using UnityEngine;
 
 public class gazedObjectTracker : MonoBehaviour
@@ -8,9 +8,20 @@ public class gazedObjectTracker : MonoBehaviour
   public manipObject gazedAtManipObject;
   public Vector3 correction;
   public GameObject gazeIndicator;
+  public GameObject calibIndicator;
   public GameObject calibrationPlane;
   public GameObject calibrationPlaneCenter;
   public GameObject leftGazeAnchor, rightGazeAnchor;
+  public GameObject centerEyeAnchor;
+  public Vector3 centerEyeCompensation;
+
+  public GazeMode currentMode;
+  public enum GazeMode
+  {
+    Off,
+    FixedGaze,
+    TrackedGaze
+  }
 
   void Awake()
   {
@@ -23,6 +34,17 @@ public class gazedObjectTracker : MonoBehaviour
     {
       // Destroy this instance because it is a duplicate
       Destroy(gameObject);
+    }
+
+    currentMode = GazeMode.FixedGaze;
+
+    if (
+    (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == SystemHeadset.Meta_Quest_Pro
+    || Unity.XR.Oculus.Utils.GetSystemHeadsetType() == SystemHeadset.Meta_Link_Quest_Pro)
+    && Unity.XR.Oculus.Utils.IsEyeTrackingPermissionGranted()
+    )
+    {
+      currentMode = GazeMode.TrackedGaze;
     }
 
     calibrationPlane = GameObject.Find("GazeCalibPlane");
@@ -40,38 +62,81 @@ public class gazedObjectTracker : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    if (PlayerPrefs.HasKey("CorrectionX"))
+    if (currentMode != GazeMode.Off)
     {
-      correction.x = PlayerPrefs.GetFloat("CorrectionX");
-    }
+      if (PlayerPrefs.HasKey("CorrectionX"))
+      {
+        correction.x = PlayerPrefs.GetFloat("CorrectionX");
+      }
 
-    if (PlayerPrefs.HasKey("CorrectionY"))
-    {
-      correction.y = PlayerPrefs.GetFloat("CorrectionY");
+      if (PlayerPrefs.HasKey("CorrectionY"))
+      {
+        correction.y = PlayerPrefs.GetFloat("CorrectionY");
+      }
     }
   }
 
+  Ray gazeRay;
+  RaycastHit hit;
+  int layerMask;
+
   void Update()
   {
+    if (currentMode == GazeMode.Off) return;
+
     // Reset every frame
     gazedAtManipObject = null;
     gazeIndicator.SetActive(false);
+    layerMask = 1 << 9; // LayerMask 9 for manipOnly
+    
+    if (currentMode == GazeMode.FixedGaze)
+    {
+      
+      gazeRay = new Ray(centerEyeAnchor.transform.position, centerEyeAnchor.transform.forward);
 
-    // Calculate average gaze data from both eyes
-    Vector3 avgPosition = (leftGazeAnchor.transform.position + rightGazeAnchor.transform.position) / 2;
-    Vector3 avgDirection = (leftGazeAnchor.transform.forward + rightGazeAnchor.transform.forward).normalized;
-    Ray avgRay = new Ray(avgPosition, avgDirection);
+      runCalibration();
 
-    RaycastHit hit;
-    int layerMask = 1 << 9; // LayerMask 9 for manipOnly
+      gazeRay = new Ray(centerEyeAnchor.transform.position + correction, centerEyeAnchor.transform.forward);
 
-    // Calibration cast
-    if (Physics.Raycast(avgRay, out hit, 2f, layerMask))
+    } else if(currentMode == GazeMode.TrackedGaze) { 
+
+      // Calculate average gaze data from both eyes
+      Vector3 avgPosition = (leftGazeAnchor.transform.position + rightGazeAnchor.transform.position) / 2;
+      Vector3 avgDirection = (leftGazeAnchor.transform.forward + rightGazeAnchor.transform.forward).normalized;
+      gazeRay = new Ray(avgPosition, avgDirection);
+
+      runCalibration();
+
+      gazeRay = new Ray(avgPosition + correction, avgDirection);
+
+    }
+
+    gazeIndicator.SetActive(false);
+
+    layerMask = ~0; // not 0, i.e. all layers
+    if (Physics.SphereCast(gazeRay, 0.015f, out hit, Mathf.Infinity, layerMask))
+    {
+      gazeIndicator.transform.position = hit.point;
+      gazeIndicator.SetActive(true);
+
+      manipObject targetObject = hit.collider.GetComponent<manipObject>();
+      if (targetObject != null)
+      {
+        gazedAtManipObject = targetObject;
+      }
+    }
+  }
+
+  private void runCalibration(){
+
+    calibIndicator.SetActive(false);
+
+    if (Physics.Raycast(gazeRay, out hit, Mathf.Infinity, layerMask))
     {
       if (hit.collider.gameObject == calibrationPlane)
       {
-        gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(true);
+        calibIndicator.transform.position = hit.point;
+        calibIndicator.SetActive(true);
 
         if (Time.frameCount % 30 == 0 && isFullPressed())
         {
@@ -86,26 +151,7 @@ public class gazedObjectTracker : MonoBehaviour
         return;
       }
     }
-
-    // Apply correction and do a SphereCast
-    transform.Translate(correction);
-    avgRay = new Ray(avgPosition, avgDirection);
-
-    layerMask = ~0; // Adjust the layer mask as needed
-    gazeIndicator.SetActive(false);
-
-    if (Physics.SphereCast(avgRay, 0.015f, out hit, 2f, layerMask))
-    {
-      manipObject targetObject = hit.collider.GetComponent<manipObject>();
-      if (targetObject != null)
-      {
-        gazedAtManipObject = targetObject;
-        gazeIndicator.transform.position = hit.point;
-        gazeIndicator.SetActive(true);
-      }
-    }
   }
-
 
   bool isHalfPressed()
   {
