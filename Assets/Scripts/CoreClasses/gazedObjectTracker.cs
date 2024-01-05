@@ -13,7 +13,7 @@ public class gazedObjectTracker : MonoBehaviour
   public GameObject calibrationPlaneCenter;
   public GameObject leftGazeAnchor, rightGazeAnchor;
   public GameObject centerEyeAnchor;
-  public Vector3 centerEyeCompensation;
+  //public Vector3 centerEyeCompensation;
 
   public GazeMode currentMode;
   public enum GazeMode
@@ -79,6 +79,8 @@ public class gazedObjectTracker : MonoBehaviour
   Ray gazeRay;
   RaycastHit hit;
   int layerMask;
+  Vector3 worldOrientedOffset;
+  Vector3 avgPosition, avgDirection;
 
   void Update()
   {
@@ -95,19 +97,25 @@ public class gazedObjectTracker : MonoBehaviour
       gazeRay = new Ray(centerEyeAnchor.transform.position, centerEyeAnchor.transform.forward);
 
       runCalibration();
+      
+      // turn localPosition offset to current worldRotation
+      worldOrientedOffset = centerEyeAnchor.transform.rotation * correction;
 
-      gazeRay = new Ray(centerEyeAnchor.transform.position + correction, centerEyeAnchor.transform.forward);
-
+      gazeRay = new Ray(centerEyeAnchor.transform.position + worldOrientedOffset, centerEyeAnchor.transform.forward);
+      
     } else if(currentMode == GazeMode.TrackedGaze) { 
 
       // Calculate average gaze data from both eyes
-      Vector3 avgPosition = (leftGazeAnchor.transform.position + rightGazeAnchor.transform.position) / 2;
-      Vector3 avgDirection = (leftGazeAnchor.transform.forward + rightGazeAnchor.transform.forward).normalized;
+      avgPosition = (leftGazeAnchor.transform.position + rightGazeAnchor.transform.position) / 2;
+      avgDirection = (leftGazeAnchor.transform.forward + rightGazeAnchor.transform.forward).normalized;
       gazeRay = new Ray(avgPosition, avgDirection);
 
       runCalibration();
 
-      gazeRay = new Ray(avgPosition + correction, avgDirection);
+      // turn localPosition offset to current worldRotation
+      worldOrientedOffset = centerEyeAnchor.transform.rotation * correction;
+      // note: maybe using the rotation of centerEyeAnchor here is not optimal, maybe construct a Quaternion from left and right gaze?
+      gazeRay = new Ray(avgPosition + worldOrientedOffset, avgDirection);
 
     }
 
@@ -138,10 +146,10 @@ public class gazedObjectTracker : MonoBehaviour
         calibIndicator.transform.position = hit.point;
         calibIndicator.SetActive(true);
 
-        if (Time.frameCount % 30 == 0 && isFullPressed())
+        if (Time.frameCount % 15 == 0 && isFullPressed())
         {
-          Vector3 localizedHitPoint = transform.InverseTransformPoint(hit.point);
-          Vector3 localizedPlaneCenter = transform.InverseTransformPoint(calibrationPlaneCenter.transform.position);
+          Vector3 localizedHitPoint = centerEyeAnchor.transform.InverseTransformPoint(hit.point);
+          Vector3 localizedPlaneCenter = centerEyeAnchor.transform.InverseTransformPoint(calibrationPlaneCenter.transform.position);
           correction.x = localizedPlaneCenter.x - localizedHitPoint.x;
           correction.y = localizedPlaneCenter.y - localizedHitPoint.y;
           PlayerPrefs.SetFloat("CorrectionX", correction.x);
