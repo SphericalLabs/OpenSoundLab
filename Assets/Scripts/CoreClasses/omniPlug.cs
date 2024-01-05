@@ -519,6 +519,13 @@ public class omniPlug : manipObject {
   // copied from handle.cs, consider unifying refactoring
 
   Vector3 initialOffset;
+  bool wasPrecisionGazeGrabbed = false; // at last frame
+
+  // whether the side buttons of the controllerare pushed and a fine
+  bool isPrecisionGazeGrabbed()
+  {
+    return manipulatorObjScript.isLeftController() ? OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f : OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
+  }
 
   void gazeBasedPosRotStart()
   {
@@ -531,14 +538,33 @@ public class omniPlug : manipObject {
   void gazeBasedPosRotUpdate()
   {
 
-    Transform go1 = manipulatorObj.transform;
-    Transform go2 = this.transform;
+    if (isPrecisionGazeGrabbed()) // precision
+    {
+      transform.parent = plugTrans.parent;
 
-    // Calculate the desired position in world space for go2 based on the changes you want
-    Vector3 desiredPosition = go1.position + initialOffset;
+      if (!wasPrecisionGazeGrabbed)
+      {
+        gazeBasedPosRotStart();
+      }
 
-    // Apply changes to the local position of go2 based on the desired position
-    go2.position = desiredPosition;
+      Transform go1 = manipulatorObj.transform;
+      Transform go2 = this.transform;
+
+      // Calculate the desired position in world space for go2 based on the changes you want
+      Vector3 desiredPosition = go1.position + initialOffset;
+
+      // Apply changes to the local position of go2 based on the desired position
+      go2.position = desiredPosition;
+
+      wasPrecisionGazeGrabbed = true;
+    }
+    else // classic coarse
+    {
+      transform.parent = manipulatorObj.parent;
+      wasPrecisionGazeGrabbed = false;
+    }
+
+   
 
   }
 
