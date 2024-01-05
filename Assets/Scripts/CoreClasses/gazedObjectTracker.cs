@@ -1,5 +1,6 @@
 using Unity.XR.Oculus;
 using UnityEngine;
+using static manipObject;
 
 public class gazedObjectTracker : MonoBehaviour
 {
@@ -127,13 +128,12 @@ public class gazedObjectTracker : MonoBehaviour
       gazeIndicator.transform.position = hit.point;
       gazeIndicator.SetActive(true);
 
-      manipObject targetObject = hit.collider.GetComponent<manipObject>();
-      if (targetObject != null)
-      {
-        gazedAtManipObject = targetObject;
-      }
+      gazedAtManipObject = hit.collider.GetComponent<manipObject>();
+      gazedAtTrashcan = hit.collider.GetComponent<trashcan>();
     }
   }
+
+  public trashcan gazedAtTrashcan;
 
   private void runCalibration(){
 

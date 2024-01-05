@@ -745,6 +745,19 @@ public class manipulator : MonoBehaviour
     }
     if (triggerButtonUp)
     {
+      // manage deletion via gaze'n'drop
+      if (gazedObjectTracker.Instance.gazedAtTrashcan != null)
+      {
+        if (selectedObject != null && selectedObject is handle)
+        {
+          handle selectedHandle = (handle)selectedObject;
+          selectedHandle.curTrash = gazedObjectTracker.Instance.gazedAtTrashcan;
+          selectedHandle.curTrash.setReady(true);
+          hapticPulse(1000);
+          selectedHandle.trashReady = true;
+        }
+      }
+
       activeTip.SetActive(false);
       tipL.gameObject.SetActive(true);
       tipR.gameObject.SetActive(true);
