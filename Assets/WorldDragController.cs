@@ -6,6 +6,7 @@ public class WorldDragController : MonoBehaviour
 {
   public manipulator leftManip, rightManip;
   public Transform leftHandAnchor, rightHandAnchor;
+  public Transform centerEyeAnchor;
 
   Vector3 currentControllerMiddle, lastControllerMiddle;
   float currentControllerAngle, lastControllerAngle, currentControllerDistance, lastControllerDistance;
@@ -47,7 +48,7 @@ public class WorldDragController : MonoBehaviour
       isDragging = true;
 
       lastControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
-      lastControllerAngle = getAngleBetweenControllers();
+      lastControllerAngle = getAngleBetweenControllersXZ();
       lastControllerDistance = getDistanceBetweenControllers();
 
       lastLeftHandRotation = leftHandAnchor.rotation;
@@ -100,34 +101,27 @@ public class WorldDragController : MonoBehaviour
 
       if (worldDraggedVertically())
       {
+        
+        currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
+
         if (!isVertical)
         {
           isVertical = true;
           isHorizontal = false;
-          // Update last hand rotations
-          lastLeftHandRotation = leftHandAnchor.rotation;
-          lastRightHandRotation = rightHandAnchor.rotation;
         }
+
         if (isVertical)
         {
-          // Calculate the rotation deltas for both hands
-          Quaternion deltaLeftRotation = Quaternion.Inverse(lastLeftHandRotation) * leftHandAnchor.rotation;
-          Quaternion deltaRightRotation = Quaternion.Inverse(lastRightHandRotation) * rightHandAnchor.rotation;
-
-          // Average the rotations and project onto the axis between the hands
-          Quaternion averagedRotation = Quaternion.Slerp(deltaLeftRotation, deltaRightRotation, 0.5f);
-          Vector3 handAxis = leftHandAnchor.position - rightHandAnchor.position;
-          Quaternion actualRot = ProjectQuaternion(averagedRotation, handAxis);
-
-          // Apply the rotation
-          actualRot.ToAngleAxis(out float angle, out Vector3 axis);
-          transform.RotateAround(currentControllerMiddle, axis, angle);
-
-          // Update last hand rotations
-          lastLeftHandRotation = leftHandAnchor.rotation;
-          lastRightHandRotation = rightHandAnchor.rotation;
+          currentControllerAngle = getAngleBetweenControllersZY();
+          transform.RotateAround(currentControllerMiddle, centerEyeAnchor.right, currentControllerAngle - lastControllerAngle);
         }
-      } else {
+
+        // for next frame
+        lastControllerMiddle = currentControllerMiddle;
+        lastControllerAngle = currentControllerAngle;
+        lastControllerDistance = currentControllerDistance;
+
+      } else { // horizontal
         currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
 
         // scale
@@ -142,7 +136,7 @@ public class WorldDragController : MonoBehaviour
         }
         if (isHorizontal)
         {
-          currentControllerAngle = getAngleBetweenControllers();
+          currentControllerAngle = getAngleBetweenControllersXZ();
           transform.RotateAround(currentControllerMiddle, Vector3.up, lastControllerAngle - currentControllerAngle);
         }
 
@@ -188,9 +182,18 @@ public class WorldDragController : MonoBehaviour
     return Vector3.Lerp(a.position, b.position, 0.5f);
   }
 
-  float getAngleBetweenControllers(){
+  float getAngleBetweenControllersXZ(){
     // on x,z plane
     return Mathf.Rad2Deg * Mathf.Atan2(leftHandAnchor.transform.position.z - rightHandAnchor.transform.position.z, leftHandAnchor.transform.position.x - rightHandAnchor.transform.position.x);
+  }
+
+  float getAngleBetweenControllersZY()
+  {
+    Vector3 localizedLeft = centerEyeAnchor.InverseTransformPoint(leftHandAnchor.position);
+    Vector3 localizedRight = centerEyeAnchor.InverseTransformPoint(rightHandAnchor.position);
+
+    // on local z,y plane from camera view point of centerEyeAnchor
+    return Mathf.Rad2Deg * Mathf.Atan2(localizedLeft.z - localizedRight.z, localizedLeft.y - localizedRight.y);
   }
 
   float getDistanceBetweenControllers(){
