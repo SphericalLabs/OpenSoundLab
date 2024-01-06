@@ -8,14 +8,13 @@ public class gazedObjectTracker : MonoBehaviour
   private static gazedObjectTracker instance;
   public manipObject gazedAtManipObject;
   public Vector3 correction;
-  public GameObject gazeIndicator;
-  public GameObject calibIndicator;
+  public GameObject centerIndicator, calibIndicator, leftIndicator;
   public GameObject calibrationPlane;
   public GameObject calibrationPlaneCenter;
   public GameObject leftGazeAnchor, rightGazeAnchor;
   public GameObject centerEyeAnchor;
 
-  public Vector3Averager averagedCenter, averagedDirection;
+  public Vector3Averager averagedCenterPos, averagedCenterDir, averagedLeftPos, averagedLeftDir;
 
 
   public GazeMode currentMode;
@@ -53,8 +52,10 @@ public class gazedObjectTracker : MonoBehaviour
     calibrationPlane = GameObject.Find("GazeCalibPlane");
     calibrationPlaneCenter = GameObject.Find("GazeCalibCenter");
 
-    averagedCenter = new Vector3Averager(4);
-    averagedDirection = new Vector3Averager(4);
+    averagedCenterPos = new Vector3Averager(4);
+    averagedCenterDir = new Vector3Averager(4);
+    averagedLeftPos = new Vector3Averager(4);
+    averagedLeftDir = new Vector3Averager(4);
     
   }
 
@@ -95,9 +96,10 @@ public class gazedObjectTracker : MonoBehaviour
 
     // Reset every frame
     gazedAtManipObject = null;
-    gazeIndicator.SetActive(false);
-    layerMask = 1 << 9; // LayerMask 9 for manipOnly
-    
+    centerIndicator.SetActive(false);
+    //layerMask = 1 << 9; // LayerMask 9 for manipOnly
+    layerMask = ~(1 << 16); // all besides layer 16
+
     if (currentMode == GazeMode.FixedGaze)
     {
       
@@ -108,6 +110,7 @@ public class gazedObjectTracker : MonoBehaviour
       // turn localPosition offset to current worldRotation
       worldOrientedOffset = centerEyeAnchor.transform.rotation * correction;
 
+      // prepare ray for actual gaze tracking
       gazeRay = new Ray(centerEyeAnchor.transform.position + worldOrientedOffset, centerEyeAnchor.transform.forward);
       
     } else if(currentMode == GazeMode.TrackedGaze) { 
@@ -115,31 +118,49 @@ public class gazedObjectTracker : MonoBehaviour
       // Calculate average gaze data from both eyes
       centerPosition = (leftGazeAnchor.transform.position + rightGazeAnchor.transform.position) / 2;
       centerDirection = (leftGazeAnchor.transform.forward + rightGazeAnchor.transform.forward).normalized;
-      averagedCenter.Add(centerPosition);
-      averagedDirection.Add(centerDirection);
-      gazeRay = new Ray(averagedCenter.GetAverage(), averagedDirection.GetAverage());
+      averagedCenterPos.Add(centerPosition);
+      averagedCenterDir.Add(centerDirection);
+      gazeRay = new Ray(averagedCenterPos.GetAverage(), averagedCenterDir.GetAverage());
 
       runCalibration();
 
       // turn localPosition offset to current worldRotation
       worldOrientedOffset = centerEyeAnchor.transform.rotation * correction;
       // note: maybe using the rotation of centerEyeAnchor here is not optimal, maybe construct a Quaternion from left and right gaze?
+      
 
-      gazeRay = new Ray(averagedCenter.GetAverage() + worldOrientedOffset, averagedDirection.GetAverage());
+      // left eye only viz
+      if(false){          
+        averagedLeftPos.Add(leftGazeAnchor.transform.position);
+        averagedLeftDir.Add(leftGazeAnchor.transform.forward);
 
+        leftIndicator.SetActive(false);
+
+        gazeRay = new Ray(averagedLeftPos.GetAverage() /*+ worldOrientedOffset*/, averagedLeftDir.GetAverage());
+
+        if (Physics.SphereCast(gazeRay, 0.01f, out hit, 10f, layerMask))
+        {
+          leftIndicator.transform.position = hit.point;
+          leftIndicator.SetActive(true);        
+        }
+      }
+
+      // prepare ray for actual gaze tracking
+      gazeRay = new Ray(averagedCenterPos.GetAverage() + worldOrientedOffset, averagedCenterDir.GetAverage());
     }
 
-    gazeIndicator.SetActive(false);
+    centerIndicator.SetActive(false);
 
-    layerMask = ~0; // not 0, i.e. all layers
-    if (Physics.SphereCast(gazeRay, 0.01f, out hit, Mathf.Infinity, layerMask))
+    if (Physics.SphereCast(gazeRay, 0.01f, out hit, 10f, layerMask))
     {
-      gazeIndicator.transform.position = hit.point;
-      gazeIndicator.SetActive(true);
+      centerIndicator.transform.position = hit.point;
+      centerIndicator.SetActive(true);
 
       gazedAtManipObject = hit.collider.GetComponent<manipObject>();
       gazedAtTrashcan = hit.collider.GetComponent<trashcan>();
     }
+
+
   }
 
   public trashcan gazedAtTrashcan;
@@ -148,7 +169,7 @@ public class gazedObjectTracker : MonoBehaviour
 
     calibIndicator.SetActive(false);
 
-    if (Physics.Raycast(gazeRay, out hit, Mathf.Infinity, layerMask))
+    if (Physics.Raycast(gazeRay, out hit, 5f, layerMask))
     {
       if (hit.collider.gameObject == calibrationPlane)
       {
