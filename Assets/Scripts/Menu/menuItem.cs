@@ -366,7 +366,7 @@ public class menuItem : manipObject {
 
     // spawn directly into the hand if selecting by gaze
     if (manip != null && manip.wasGazeBased){
-      g.transform.position = manip.transform.position + manip.transform.forward * 0.09f;
+      g.transform.position = manip.transform.position + manip.transform.forward * 0.12f;
       manip.wasGazeBased = false; // treat that interaction as a physical one from now on, otherwise it would be handled in fine mode by default
     }
 

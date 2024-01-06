@@ -322,7 +322,7 @@ public class manipulator : MonoBehaviour
     triggerDown = on;
 
     // late injection of gazed at object, in the case that the trigger was pulled so fast that there was not intermediate select stage and thus selectedObject has not been populated properly
-    if(selectedObject == null && !WorldDragController.worldDraggedHorizontally()) {
+    if(selectedObject == null && !WorldDragController.bothSidesDown()) {
       selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
       wasGazeBased = true;
     }
@@ -378,7 +378,7 @@ public class manipulator : MonoBehaviour
     copying = on;
 
     // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.worldDraggedHorizontally())
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown())
     {
       selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
       wasGazeBased = true;      
@@ -467,7 +467,7 @@ public class manipulator : MonoBehaviour
       if (secondaryDown)
       {
         // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.worldDraggedHorizontally()) copyEnabled = true;
+        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown()) copyEnabled = true;
         if (copyEnabled) SetCopy(true);
         else if (deleteEnabled) DeleteSelection(true);
         else if (multiselectEnabled) MultiselectSelection(true);        
@@ -843,7 +843,7 @@ public class manipulator : MonoBehaviour
 
     if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
     {
-      if (WorldDragController.worldDraggedHorizontally()) return; // no gaze interaction when dragging the world
+      if (WorldDragController.bothSidesDown()) return; // no gaze interaction when dragging the world
       
       if (selectedObject == null && isTriggerHalfPressed()) 
       {

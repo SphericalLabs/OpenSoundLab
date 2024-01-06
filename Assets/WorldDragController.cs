@@ -15,23 +15,7 @@ public class WorldDragController : MonoBehaviour
   bool isHorizontal = false;
   Transform[] transArray;
 
-  Quaternion lastRightHandRotation, lastLeftHandRotation;
 
-
-  void Awake()
-  {
-    
-  }
-
-  // dragging around the y axis
-  public static bool worldDraggedHorizontally(){
-    return OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
-  }
-
-  // tilting the world up and down
-  public static bool worldDraggedVertically(){
-    return OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.1f;    
-    }
 
   void Update()
   {
@@ -43,130 +27,155 @@ public class WorldDragController : MonoBehaviour
     if (!isDragging && (leftManip.isGrabbing() || rightManip.isGrabbing())) return; 
 
     // begin drag, save start values
-    if (!isDragging && worldDraggedHorizontally())
+    if (!isDragging && bothSidesDown())
     {
       isDragging = true;
 
-      lastControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
-      lastControllerAngle = getAngleBetweenControllersXZ();
-      lastControllerDistance = getDistanceBetweenControllers();
-
-      lastLeftHandRotation = leftHandAnchor.rotation;
-      lastRightHandRotation = rightHandAnchor.rotation;
-
+      getCurrentValuesHorizontal();
+      storeCurrentValues();
     }
     
     // end of drag
-    if (isDragging && !worldDraggedHorizontally() )
+    if (isDragging && !bothSidesDown() )
     {
       isDragging = false;
-
-      // move all children transform to parent, save list of transforms
-      transArray = new Transform[transform.childCount];
-      
-      // foreach(Transform child in transform){ // not working!
-      // populate array first, otherwise weird index/list bugs when moving transforms while iterating on them
-      for (int i = 0; i < transform.childCount; i++)
-      {
-        transArray[i] = transform.GetChild(i);
-      }
-
-      // move them up
-      for (int n = 0; n < transArray.Length; n++)
-      {
-        transArray[n].parent = transform.parent;
-      }
-
-      // fully reset parent transform
-      transform.position = Vector3.zero;
-      transform.rotation = Quaternion.identity;
-      transform.localScale = Vector3.one;
-
-      // move them back down again, burning the global drag transform into them
-      for(int n = 0; n < transArray.Length; n++){ 
-        transArray[n].parent = transform;
-      }
-
+      isVertical = false;
+      isHorizontal = false;
+      bakeTransforms();
     }
 
     // do the drag
     if(isDragging){
 
-      //Debug.DrawLine(Vector3.zero, patchPositionAtBeginDrag, new Color(1f, 0f, 0f));
-      //Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * patchAngleAtBeginDrag), 0f, Mathf.Cos(Mathf.Deg2Rad * patchAngleAtBeginDrag)), new Color(0f, 1f, 0f));
-      //Debug.DrawLine(Vector3.zero, controllerMiddleAtBeginDrag, new Color(0f, 0f, 1f));
-      //Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * controllerAngleAtBeginDrag), 0f, Mathf.Cos(Mathf.Deg2Rad * controllerAngleAtBeginDrag)), new Color(1f, 1f, 0f));
-      //Debug.DrawLine(Vector3.zero, new Vector3(Mathf.Sin(Mathf.Deg2Rad * currentControllerAngle), 0f, Mathf.Cos(Mathf.Deg2Rad * currentControllerAngle)), new Color(1f, 0f, 1f));
-      //Debug.DrawLine(Vector3.zero, getMiddle(leftHandAnchor, rightHandAnchor), new Color(0f, 1f, 1f));
+      getCurrentValuesHorizontal(); // run twice when starting...
 
-      if (worldDraggedVertically())
+      if (bothSidesDown() && !bothTriggersDown())
       {
         
-        currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
-
-        if (!isVertical)
-        {
-          isVertical = true;
-          isHorizontal = false;
-        }
-
-        if (isVertical)
-        {
-          currentControllerAngle = getAngleBetweenControllersZY();
-          transform.RotateAround(currentControllerMiddle, centerEyeAnchor.right, currentControllerAngle - lastControllerAngle);
-        }
-
-        // for next frame
-        lastControllerMiddle = currentControllerMiddle;
-        lastControllerAngle = currentControllerAngle;
-        lastControllerDistance = currentControllerDistance;
-
-      } else { // horizontal
-        currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
-
-        // scale
-        currentControllerDistance = getDistanceBetweenControllers();
-        scaleAround(transform, currentControllerMiddle, transform.localScale * (1f + currentControllerDistance - lastControllerDistance));
-
-        // rotation
-        if (!isHorizontal)
+        if (!isHorizontal) // init horizontal
         {
           isHorizontal = true;
           isVertical = false;
+
+          getCurrentValuesHorizontal();
+          storeCurrentValues();
         }
-        if (isHorizontal)
+
+        
+        if (isHorizontal) // run horizontal
         {
+          // rotate
           currentControllerAngle = getAngleBetweenControllersXZ();
           transform.RotateAround(currentControllerMiddle, Vector3.up, lastControllerAngle - currentControllerAngle);
+
+          currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
+
+          // scale
+          currentControllerDistance = getDistanceBetweenControllers();
+          scaleAround(transform, currentControllerMiddle, transform.localScale * (1f + currentControllerDistance - lastControllerDistance));
+
+          // translation
+          transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
+
+          // for next frame
+          storeCurrentValues();
         }
+        
+      } else if (bothSidesDown() && bothTriggersDown()) {
 
-        // translation
-        transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
+          if (!isVertical) // init vertical
+          {
+            isHorizontal = false;
+            isVertical = true;
 
-        // for next frame
-        lastControllerMiddle = currentControllerMiddle;
-        lastControllerAngle = currentControllerAngle;
-        lastControllerDistance = currentControllerDistance;
-      }
+            getCurrentValuesVertical();
+            storeCurrentValues();
 
+            rotationAxis = centerEyeAnchor.right; // take snapshot of head position at beginning
+          }
+
+          if (isVertical) // running vertical
+          {
+
+            currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
+
+            // rotation
+            currentControllerAngle = getAngleBetweenControllersZY();
+            transform.RotateAround(currentControllerMiddle, rotationAxis, currentControllerAngle - lastControllerAngle);
+
+            // translation
+            transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
+
+            // for next frame
+            storeCurrentValues();
+          }
+
+        }
+    }
+  }
+  
+  Vector3 rotationAxis;
+
+  void getCurrentValuesHorizontal(){
+    currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
+    currentControllerAngle = getAngleBetweenControllersXZ();
+    currentControllerDistance = getDistanceBetweenControllers();
+  }
+  
+  void getCurrentValuesVertical(){
+    currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
+    currentControllerAngle = getAngleBetweenControllersZY();
+    currentControllerDistance = getDistanceBetweenControllers();
+  }
+
+  void storeCurrentValues(){
+    lastControllerMiddle = currentControllerMiddle;
+    lastControllerAngle = currentControllerAngle;
+    lastControllerDistance = currentControllerDistance;
+  }
+
+  
+
+
+  void bakeTransforms(){
+    // move all children transform to parent, save list of transforms
+    transArray = new Transform[transform.childCount];
+
+    // foreach(Transform child in transform){ // not working!
+    // populate array first, otherwise weird index/list bugs when moving transforms while iterating on them
+    for (int i = 0; i < transform.childCount; i++)
+    {
+      transArray[i] = transform.GetChild(i);
+    }
+
+    // move them up
+    for (int n = 0; n < transArray.Length; n++)
+    {
+      transArray[n].parent = transform.parent;
+    }
+
+    // fully reset parent transform
+    transform.position = Vector3.zero;
+    transform.rotation = Quaternion.identity;
+    transform.localScale = Vector3.one;
+
+    // move them back down again, baking the global drag transform into them
+    for (int n = 0; n < transArray.Length; n++)
+    {
+      transArray[n].parent = transform;
     }
   }
 
-  public Quaternion ProjectQuaternion(Quaternion q1, Vector3 axis)
+  // dragging around the y axis
+  public static bool bothSidesDown() // similar code is in manipulator.cs
   {
-    // Normalize the axis to ensure it's a unit vector
-    axis.Normalize();
+    return OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
+  }
 
-    // Decompose the input quaternion into an axis and an angle
-    q1.ToAngleAxis(out float angle, out Vector3 rotationAxis);
-
-    // Project the rotation axis onto the given axis
-    Vector3 projectedAxis = Vector3.Project(rotationAxis, axis);
-
-    // Recompose the quaternion with the projected axis and original angle
-    Quaternion projectedQuaternion = Quaternion.AngleAxis(angle, projectedAxis);
-
-    return projectedQuaternion;
+  // tilting the world up and down
+  public static bool bothTriggersDown()
+  {
+    return OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.1f;
   }
 
   Vector3 getPatchCenter(){
