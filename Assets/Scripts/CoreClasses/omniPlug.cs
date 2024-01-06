@@ -521,11 +521,6 @@ public class omniPlug : manipObject {
   Vector3 initialOffset;
   bool wasPrecisionGazeGrabbed = false; // at last frame
 
-  // whether the side buttons of the controllerare pushed and a fine
-  bool isPrecisionGazeGrabbed()
-  {
-    return manipulatorObjScript.isLeftController() ? OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f : OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
-  }
 
   void gazeBasedPosRotStart()
   {
@@ -538,7 +533,7 @@ public class omniPlug : manipObject {
   void gazeBasedPosRotUpdate()
   {
 
-    if (isPrecisionGazeGrabbed()) // precision
+    if (manipulatorObjScript.isSidePressed() == false) // fine by default
     {
       transform.parent = plugTrans.parent;
 
@@ -558,13 +553,12 @@ public class omniPlug : manipObject {
 
       wasPrecisionGazeGrabbed = true;
     }
-    else // classic coarse
+    else // coarse
     {
       transform.parent = manipulatorObj.parent;
       wasPrecisionGazeGrabbed = false;
     }
-
-   
+     
 
   }
 

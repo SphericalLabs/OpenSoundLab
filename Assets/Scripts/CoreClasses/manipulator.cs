@@ -911,6 +911,11 @@ public class manipulator : MonoBehaviour
     }
     return false;
   }
+
+  public bool isSidePressed()
+  {
+    return isLeftController() ? OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f : OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
+  }
 }
 
 
