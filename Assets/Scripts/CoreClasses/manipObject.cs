@@ -96,7 +96,7 @@ public class manipObject : MonoBehaviour {
     }
   }
 
-  public void setGrab(bool on, Transform t) {
+  public virtual void setGrab(bool on, Transform t) {
     grabbed = on;
     if (on) {
 
