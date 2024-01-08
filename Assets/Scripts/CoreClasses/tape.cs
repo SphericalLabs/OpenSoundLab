@@ -116,7 +116,6 @@ public class tape : manipObject {
   public override void setGrab(bool on, Transform t)
   {
     base.setGrab(on, t);
-    //masterObj = transform.parent;
   }
 
   public override void grabUpdate(Transform t)
@@ -141,8 +140,8 @@ public class tape : manipObject {
     Transform go2 = this.transform;
 
     initialOffset = go2.position - go1.position;
-    //initialRotationOffset = Quaternion.Inverse(go1.rotation) * go2.rotation;
-    
+    initialRotationOffset = Quaternion.Inverse(go1.rotation) * go2.rotation;
+
   }
 
 
@@ -151,7 +150,7 @@ public class tape : manipObject {
     if (manipulatorObjScript.isSidePressed() == false) // fine by default
     {
 
-      //transform.parent = masterObj;
+      transform.parent = deck; 
 
       if (!wasPrecisionGazeGrabbed)
       {
@@ -168,16 +167,16 @@ public class tape : manipObject {
       go2.position = desiredPosition;
 
       //// Calculate the desired rotation for go2 relative to go1
-      //Quaternion desiredRotation = go1.rotation * initialRotationOffset;
+      Quaternion desiredRotation = go1.rotation * initialRotationOffset;
 
       //// Apply changes to the local rotation of go2 relative to go1
-      //go2.localRotation = Quaternion.Inverse(go1.localRotation) * desiredRotation;
+      go2.localRotation = Quaternion.Inverse(go1.localRotation) * desiredRotation;
 
       wasPrecisionGazeGrabbed = true;
     }
     else // coarse
     {
-      //transform.parent = manipulatorObj.parent;
+      transform.parent = manipulatorObj.parent;
       wasPrecisionGazeGrabbed = false;
     }
 
