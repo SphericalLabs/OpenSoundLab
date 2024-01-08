@@ -43,9 +43,6 @@ public class libraryDeviceInterface : deviceInterface {
   public GameObject sprocketRing, panelRing, sprocketRingB, panelRingB, ghostTape;
   public TextMesh note;
 
-  public Transform tapeHolder;
-
-  public tape curTape;
   panelRingComponentInterface _panelRingPrimary, _panelRingSecondary;
 
   public bool[] spinLocks = new bool[2];
@@ -104,13 +101,6 @@ public class libraryDeviceInterface : deviceInterface {
   void Update() {
     manageRotation(panelRing.transform, sprocketRing.transform, 0);
     manageRotation(panelRingB.transform, sprocketRingB.transform, 1);
-    if (curTape != null) {
-      if (curTape.inDeck()) {
-        createNewTape();
-      }
-    }
-
-    //tapeHolder.Rotate(0, Time.deltaTime * 15, 0);
   }
 
   void manageRotation(Transform a, Transform b, int i) {
@@ -135,7 +125,7 @@ public class libraryDeviceInterface : deviceInterface {
   public void updateSecondaryPanels(string s) {
     curPrimary = s;
     curSecondary = "";
-    if (curTape != null) Destroy(curTape.gameObject);
+    //if (curTape != null) Destroy(curTape.gameObject);
     _panelRingSecondary.updatePanels(sampleManager.instance.sampleDictionary[s].Keys.ToList());
     if (sampleManager.instance.sampleDictionary[s].Keys.ToList().Count == 0) {
       note.gameObject.SetActive(true);
@@ -157,11 +147,6 @@ public class libraryDeviceInterface : deviceInterface {
 
   void updateTape(string s, Transform t) {
     curSecondary = s;
-    if (curTape != null) Destroy(curTape.gameObject);
-    curTape = (Instantiate(tapePrefab, tapeHolder, false) as GameObject).GetComponent<tape>();
-    curTape.transform.localRotation = Quaternion.Euler(270, 180, 0);
-    curTape.Setup(s, sampleManager.instance.sampleDictionary[curPrimary][s]);
-    
   }
 
 
@@ -172,14 +157,7 @@ public class libraryDeviceInterface : deviceInterface {
 
   void createNewTape() {
     Vector3 p;
-    Quaternion q;
-    curTape.getOrigTrans(out p, out q);
-    curTape.masterObj = null;
-    curTape = (Instantiate(tapePrefab, tapeHolder, false) as GameObject).GetComponent<tape>();
-    curTape.transform.localRotation = Quaternion.Euler(270, 180, 0);
-    curTape.transform.localPosition = p + tape.correctOffset; // corrects position when grabbing
-    curTape.Setup(curSecondary, sampleManager.instance.sampleDictionary[curPrimary][curSecondary]);
-    
+    Quaternion q;  
   }
 
   public void forceTape(Transform t, string p, string s) {
