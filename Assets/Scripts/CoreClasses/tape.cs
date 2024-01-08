@@ -113,10 +113,11 @@ public class tape : manipObject {
   }
 
 
-  //public override void setGrab(bool on, Transform t)
-  //{
-  //  base.setGrab(on, t);
-  //}
+  public override void setGrab(bool on, Transform t)
+  {
+    base.setGrab(on, t);
+    //masterObj = transform.parent;
+  }
 
   public override void grabUpdate(Transform t)
   {
@@ -140,7 +141,8 @@ public class tape : manipObject {
     Transform go2 = this.transform;
 
     initialOffset = go2.position - go1.position;
-    initialRotationOffset = Quaternion.Inverse(go1.rotation) * go2.rotation;
+    //initialRotationOffset = Quaternion.Inverse(go1.rotation) * go2.rotation;
+    
   }
 
 
@@ -148,8 +150,8 @@ public class tape : manipObject {
   {
     if (manipulatorObjScript.isSidePressed() == false) // fine by default
     {
-      //masterObj.parent = masterObjParent;
-      //transform.SetParent(null);
+
+      //transform.parent = masterObj;
 
       if (!wasPrecisionGazeGrabbed)
       {
@@ -163,19 +165,19 @@ public class tape : manipObject {
       Vector3 desiredPosition = go1.position + initialOffset;
 
       // Apply changes to the local position of go2 based on the desired position
-      go2.localPosition = go2.parent.InverseTransformPoint(desiredPosition);
+      go2.position = desiredPosition;
 
-      // Calculate the desired rotation for go2 relative to go1
-      Quaternion desiredRotation = go1.rotation * initialRotationOffset;
+      //// Calculate the desired rotation for go2 relative to go1
+      //Quaternion desiredRotation = go1.rotation * initialRotationOffset;
 
-      // Apply changes to the local rotation of go2 relative to go1
-      go2.localRotation = Quaternion.Inverse(go1.localRotation) * desiredRotation;
+      //// Apply changes to the local rotation of go2 relative to go1
+      //go2.localRotation = Quaternion.Inverse(go1.localRotation) * desiredRotation;
 
       wasPrecisionGazeGrabbed = true;
     }
     else // coarse
     {
-      //masterObj.parent = manipulatorObj.parent;
+      //transform.parent = manipulatorObj.parent;
       wasPrecisionGazeGrabbed = false;
     }
 
@@ -337,7 +339,7 @@ public class tape : manipObject {
       yield return null;
     }
     if (loaderObject != null) Destroy(loaderObject);
-    masterObj.parent.GetComponent<AudioSource>().PlayOneShot(c, .25f);
+    if(masterObj.parent.GetComponent<AudioSource>() != null) masterObj.parent.GetComponent<AudioSource>().PlayOneShot(c, .25f);
   }
 
   Coroutine _StreamRoutine;
@@ -359,7 +361,7 @@ public class tape : manipObject {
       if (loaderObject != null) Destroy(loaderObject);
       if (_StreamRoutine != null) StopCoroutine(_StreamRoutine);
       if (masterObj != null) {
-        if (masterObj.parent != null) masterObj.parent.GetComponent<AudioSource>().Stop();
+        if (masterObj.parent.GetComponent<AudioSource>() != null) masterObj.parent.GetComponent<AudioSource>().Stop();
       }
     }
   }
