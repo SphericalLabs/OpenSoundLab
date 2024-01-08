@@ -110,7 +110,7 @@ public class libraryDeviceInterface : deviceInterface {
       }
     }
 
-    tapeHolder.Rotate(0, Time.deltaTime * 15, 0);
+    //tapeHolder.Rotate(0, Time.deltaTime * 15, 0);
   }
 
   void manageRotation(Transform a, Transform b, int i) {
@@ -159,7 +159,9 @@ public class libraryDeviceInterface : deviceInterface {
     curSecondary = s;
     if (curTape != null) Destroy(curTape.gameObject);
     curTape = (Instantiate(tapePrefab, tapeHolder, false) as GameObject).GetComponent<tape>();
+    curTape.transform.localRotation = Quaternion.Euler(270, 180, 0);
     curTape.Setup(s, sampleManager.instance.sampleDictionary[curPrimary][s]);
+    
   }
 
 
@@ -174,9 +176,10 @@ public class libraryDeviceInterface : deviceInterface {
     curTape.getOrigTrans(out p, out q);
     curTape.masterObj = null;
     curTape = (Instantiate(tapePrefab, tapeHolder, false) as GameObject).GetComponent<tape>();
-
+    curTape.transform.localRotation = Quaternion.Euler(270, 180, 0);
     curTape.transform.localPosition = p + tape.correctOffset; // corrects position when grabbing
     curTape.Setup(curSecondary, sampleManager.instance.sampleDictionary[curPrimary][curSecondary]);
+    
   }
 
   public void forceTape(Transform t, string p, string s) {
@@ -185,7 +188,7 @@ public class libraryDeviceInterface : deviceInterface {
     else g.Setup(curSecondary, sampleManager.instance.sampleDictionary[curPrimary][curSecondary]);
     t.GetComponent<manipulator>().ForceGrab(g);
     g.transform.localPosition = tape.correctOffset; // corrects position when grabbing
-    g.transform.localRotation = Quaternion.Euler(-90, -90, -90);//.zero;
+    g.transform.localRotation = Quaternion.Euler(-90, -90, -90);
   }
 
   public void forceGroup(Transform t, string p) {
