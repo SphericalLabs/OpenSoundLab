@@ -16,7 +16,6 @@ public class WorldDragController : MonoBehaviour
   Transform[] transArray;
 
 
-
   void Update()
   {
     
@@ -32,7 +31,7 @@ public class WorldDragController : MonoBehaviour
       isDragging = true;
 
       getCurrentValuesHorizontal();
-      storeCurrentValues();
+      storeCurrentValuesHorizontal();
     }
     
     // end of drag
@@ -58,7 +57,7 @@ public class WorldDragController : MonoBehaviour
           isVertical = false;
 
           getCurrentValuesHorizontal();
-          storeCurrentValues();
+          storeCurrentValuesHorizontal();
         }
 
         
@@ -78,7 +77,7 @@ public class WorldDragController : MonoBehaviour
           transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
 
           // for next frame
-          storeCurrentValues();
+          storeCurrentValuesHorizontal();
         }
         
       } else if (bothSidesDown() && bothTriggersDown()) {
@@ -88,35 +87,40 @@ public class WorldDragController : MonoBehaviour
             isHorizontal = false;
             isVertical = true;
 
+            // take a snapshots at beginning so that turning the head while dragging is not yielding weird results
+            tiltAxis = centerEyeAnchor.right; 
+            rollAxis = centerEyeAnchor.forward;
+            centerEyeAnchorSnapshot = new TransformSnapshot(centerEyeAnchor); // this is offering world to local projection
+            //rotationPoint = getMiddle(leftHandAnchor, rightHandAnchor); // in world space
+            rotationPoint = centerEyeAnchor.position;
+                        
             getCurrentValuesVertical();
-            storeCurrentValues();
-
-            rotationAxis = centerEyeAnchor.right; // take snapshot of head position at beginning
-            chest = centerEyeAnchor.position - centerEyeAnchor.up * 0.3f;
-        }
+            storeCurrentValuesVertical();            
+          }
 
           if (isVertical) // running vertical
           {
-
-            currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
+            currentControllerMiddle = centerEyeAnchorSnapshot.WorldToLocal(getMiddle(leftHandAnchor, rightHandAnchor));
 
             // rotation
-            currentControllerAngle = getAngleBetweenControllersCenterEye();
-            transform.RotateAround(centerEyeAnchor.position, rotationAxis, currentControllerAngle - lastControllerAngle);
+            float rollAngle = Utils.map((currentControllerMiddle - lastControllerMiddle).x, -1f, 1f, 90f, -90f);
+            float tiltAngle = Utils.map((currentControllerMiddle - lastControllerMiddle).y, -0.3f, 0.3f, 90f, -90f);
 
-            // translation
-            //transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
+            transform.RotateAround(rotationPoint, rollAxis, rollAngle);
+            transform.RotateAround(rotationPoint, tiltAxis, tiltAngle);
 
             // for next frame
-            storeCurrentValues();
+            storeCurrentValuesVertical();
           }
 
         }
     }
   }
   
-  Vector3 rotationAxis;
-  Vector3 chest;
+  Vector3 tiltAxis;
+  Vector3 rollAxis;
+  TransformSnapshot centerEyeAnchorSnapshot;
+  Vector3 rotationPoint;
 
   void getCurrentValuesHorizontal(){
     currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
@@ -124,17 +128,18 @@ public class WorldDragController : MonoBehaviour
     currentControllerDistance = getDistanceBetweenControllers();
   }
   
-  void getCurrentValuesVertical(){
-    currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
-    //currentControllerAngle = getAngleBetweenControllersZY();
-    currentControllerAngle = getAngleBetweenControllersCenterEye();
-    currentControllerDistance = getDistanceBetweenControllers();
-  }
-
-  void storeCurrentValues(){
+  void storeCurrentValuesHorizontal(){
     lastControllerMiddle = currentControllerMiddle;
     lastControllerAngle = currentControllerAngle;
     lastControllerDistance = currentControllerDistance;
+  }
+
+  void getCurrentValuesVertical(){
+    currentControllerMiddle = centerEyeAnchorSnapshot.WorldToLocal(getMiddle(leftHandAnchor, rightHandAnchor)); // in local space 
+  }
+
+  void storeCurrentValuesVertical(){
+    lastControllerMiddle = currentControllerMiddle;
   }
 
   float getAngleBetweenControllersXZ()
@@ -142,32 +147,11 @@ public class WorldDragController : MonoBehaviour
     // on x,z plane
     return Mathf.Rad2Deg * Mathf.Atan2(leftHandAnchor.transform.position.z - rightHandAnchor.transform.position.z, leftHandAnchor.transform.position.x - rightHandAnchor.transform.position.x);
   }
-
-  float getAngleBetweenControllersZY()
-  {
-    Vector3 localizedLeft = centerEyeAnchor.InverseTransformPoint(leftHandAnchor.position);
-    Vector3 localizedRight = centerEyeAnchor.InverseTransformPoint(rightHandAnchor.position);
-
-    // on local z,y plane from camera view point of centerEyeAnchor
-    return Mathf.Rad2Deg * Mathf.Atan2(localizedLeft.z - localizedRight.z, localizedLeft.y - localizedRight.y);
-  }
-
-  float getAngleBetweenControllersCenterEye()
-  {
-    Vector3 point1 = centerEyeAnchor.InverseTransformPoint(currentControllerMiddle);
-    //Vector3 point2 = centerEyeAnchor.InverseTransformPoint(centerEyeAnchor);
-    Vector3 point2 = Vector3.zero;
-
-    // on local z,y plane from camera view point of centerEyeAnchor
-    return Mathf.Rad2Deg * Mathf.Atan2(point1.z - point2.z, point1.y - point2.y);
-  }
-
-
+  
   void bakeTransforms(){
     // move all children transform to parent, save list of transforms
     transArray = new Transform[transform.childCount];
 
-    // foreach(Transform child in transform){ // not working!
     // populate array first, otherwise weird index/list bugs when moving transforms while iterating on them
     for (int i = 0; i < transform.childCount; i++)
     {
@@ -204,21 +188,10 @@ public class WorldDragController : MonoBehaviour
     return OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.1f;
   }
 
-  Vector3 getPatchCenter(){
-    Vector3 sumVector = new Vector3(0f, 0f, 0f);
-    foreach (Transform child in transform)
-    {
-      sumVector += child.position;
-    }
-    return sumVector / transform.childCount;
-  }
-
   Vector3 getMiddle(Transform a, Transform b){
     return Vector3.Lerp(a.position, b.position, 0.5f);
   }
-
-  
- 
+   
 
   float getDistanceBetweenControllers(){
     return Vector3.Distance(leftHandAnchor.transform.position, rightHandAnchor.transform.position);
@@ -240,5 +213,42 @@ public class WorldDragController : MonoBehaviour
     // finally, actually perform the scale/translation
     target.localScale = newScale;
     target.localPosition = FP;
+  }
+}
+
+
+public class TransformSnapshot
+{
+  private Vector3 position;
+  private Quaternion rotation;
+  private Vector3 scale;
+
+  public TransformSnapshot(Transform transform)
+  {
+    position = transform.position;
+    rotation = transform.rotation;
+    scale = transform.localScale;
+  }
+
+  public Vector3 WorldToLocal(Vector3 worldPoint)
+  {
+    Matrix4x4 matrix = Matrix4x4.TRS(position, rotation, scale).inverse;
+    return matrix.MultiplyPoint3x4(worldPoint);
+  }
+
+  public Vector3 LocalToWorld(Vector3 localPoint)
+  {
+    Matrix4x4 matrix = Matrix4x4.TRS(position, rotation, scale);
+    return matrix.MultiplyPoint3x4(localPoint);
+  }
+
+  public Vector3 TransformDirection(Vector3 localDirection)
+  {
+    return rotation * localDirection;
+  }
+
+  public Quaternion TransformRotation(Quaternion localRotation)
+  {
+    return rotation * localRotation;
   }
 }
