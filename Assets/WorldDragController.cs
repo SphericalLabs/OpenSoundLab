@@ -92,7 +92,8 @@ public class WorldDragController : MonoBehaviour
             storeCurrentValues();
 
             rotationAxis = centerEyeAnchor.right; // take snapshot of head position at beginning
-          }
+            chest = centerEyeAnchor.position - centerEyeAnchor.up * 0.3f;
+        }
 
           if (isVertical) // running vertical
           {
@@ -100,11 +101,11 @@ public class WorldDragController : MonoBehaviour
             currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
 
             // rotation
-            currentControllerAngle = getAngleBetweenControllersZY();
-            transform.RotateAround(currentControllerMiddle, rotationAxis, currentControllerAngle - lastControllerAngle);
+            currentControllerAngle = getAngleBetweenControllersCenterEye();
+            transform.RotateAround(centerEyeAnchor.position, rotationAxis, currentControllerAngle - lastControllerAngle);
 
             // translation
-            transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
+            //transform.Translate(currentControllerMiddle - lastControllerMiddle, Space.World);
 
             // for next frame
             storeCurrentValues();
@@ -115,6 +116,7 @@ public class WorldDragController : MonoBehaviour
   }
   
   Vector3 rotationAxis;
+  Vector3 chest;
 
   void getCurrentValuesHorizontal(){
     currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
@@ -124,7 +126,8 @@ public class WorldDragController : MonoBehaviour
   
   void getCurrentValuesVertical(){
     currentControllerMiddle = getMiddle(leftHandAnchor, rightHandAnchor);
-    currentControllerAngle = getAngleBetweenControllersZY();
+    //currentControllerAngle = getAngleBetweenControllersZY();
+    currentControllerAngle = getAngleBetweenControllersCenterEye();
     currentControllerDistance = getDistanceBetweenControllers();
   }
 
@@ -134,7 +137,30 @@ public class WorldDragController : MonoBehaviour
     lastControllerDistance = currentControllerDistance;
   }
 
-  
+  float getAngleBetweenControllersXZ()
+  {
+    // on x,z plane
+    return Mathf.Rad2Deg * Mathf.Atan2(leftHandAnchor.transform.position.z - rightHandAnchor.transform.position.z, leftHandAnchor.transform.position.x - rightHandAnchor.transform.position.x);
+  }
+
+  float getAngleBetweenControllersZY()
+  {
+    Vector3 localizedLeft = centerEyeAnchor.InverseTransformPoint(leftHandAnchor.position);
+    Vector3 localizedRight = centerEyeAnchor.InverseTransformPoint(rightHandAnchor.position);
+
+    // on local z,y plane from camera view point of centerEyeAnchor
+    return Mathf.Rad2Deg * Mathf.Atan2(localizedLeft.z - localizedRight.z, localizedLeft.y - localizedRight.y);
+  }
+
+  float getAngleBetweenControllersCenterEye()
+  {
+    Vector3 point1 = centerEyeAnchor.InverseTransformPoint(currentControllerMiddle);
+    //Vector3 point2 = centerEyeAnchor.InverseTransformPoint(centerEyeAnchor);
+    Vector3 point2 = Vector3.zero;
+
+    // on local z,y plane from camera view point of centerEyeAnchor
+    return Mathf.Rad2Deg * Mathf.Atan2(point1.z - point2.z, point1.y - point2.y);
+  }
 
 
   void bakeTransforms(){
@@ -191,19 +217,8 @@ public class WorldDragController : MonoBehaviour
     return Vector3.Lerp(a.position, b.position, 0.5f);
   }
 
-  float getAngleBetweenControllersXZ(){
-    // on x,z plane
-    return Mathf.Rad2Deg * Mathf.Atan2(leftHandAnchor.transform.position.z - rightHandAnchor.transform.position.z, leftHandAnchor.transform.position.x - rightHandAnchor.transform.position.x);
-  }
-
-  float getAngleBetweenControllersZY()
-  {
-    Vector3 localizedLeft = centerEyeAnchor.InverseTransformPoint(leftHandAnchor.position);
-    Vector3 localizedRight = centerEyeAnchor.InverseTransformPoint(rightHandAnchor.position);
-
-    // on local z,y plane from camera view point of centerEyeAnchor
-    return Mathf.Rad2Deg * Mathf.Atan2(localizedLeft.z - localizedRight.z, localizedLeft.y - localizedRight.y);
-  }
+  
+ 
 
   float getDistanceBetweenControllers(){
     return Vector3.Distance(leftHandAnchor.transform.position, rightHandAnchor.transform.position);
