@@ -16,8 +16,8 @@ public class gazedObjectTracker : MonoBehaviour
 
   public Vector3Averager averagedCenterPos, averagedCenterDir, averagedLeftPos, averagedLeftDir;
 
+  public GazeMode currentMode = GazeMode.Off; // will be overriden in Unity Editor, should be set there for now, later it will be set in the settings menu
 
-  public GazeMode currentMode;
   public enum GazeMode
   {
     Off,
@@ -38,25 +38,27 @@ public class gazedObjectTracker : MonoBehaviour
       Destroy(gameObject);
     }
 
-    currentMode = GazeMode.FixedGaze;
-
-    if (
-    (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == SystemHeadset.Meta_Quest_Pro
-    || Unity.XR.Oculus.Utils.GetSystemHeadsetType() == SystemHeadset.Meta_Link_Quest_Pro)
-    && Unity.XR.Oculus.Utils.IsEyeTrackingPermissionGranted()
-    )
+    if (currentMode == GazeMode.TrackedGaze)
     {
-      currentMode = GazeMode.TrackedGaze;
+      if(!isEyeTrackingCapable()) currentMode = GazeMode.FixedGaze; // fallback to fixedGaze      
     }
 
     calibrationPlane = GameObject.Find("GazeCalibPlane");
     calibrationPlaneCenter = GameObject.Find("GazeCalibCenter");
+
+    if(currentMode == GazeMode.Off) calibrationPlane.SetActive(false);  // hide the calibration plane
 
     averagedCenterPos = new Vector3Averager(4);
     averagedCenterDir = new Vector3Averager(4);
     averagedLeftPos = new Vector3Averager(4);
     averagedLeftDir = new Vector3Averager(4);
     
+  }
+
+  public bool isEyeTrackingCapable(){
+    return (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == SystemHeadset.Meta_Quest_Pro
+      || Unity.XR.Oculus.Utils.GetSystemHeadsetType() == SystemHeadset.Meta_Link_Quest_Pro)
+      && Unity.XR.Oculus.Utils.IsEyeTrackingPermissionGranted();
   }
 
   public static gazedObjectTracker Instance

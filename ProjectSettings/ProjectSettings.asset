@@ -821,6 +821,7 @@ PlayerSettings:
   metroSplashScreenUseBackgroundColor: 1
   platformCapabilities:
     WindowsStoreApps:
+      EnterpriseAuthentication: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -831,7 +832,6 @@ PlayerSettings:
       LowLevelDevices: False
       PrivateNetworkClientServer: False
       InternetClientServer: False
-      Proximity: False
       Objects3D: False
       RemoteSystem: False
       BlockedChatMessages: False
@@ -853,10 +853,10 @@ PlayerSettings:
       PointOfService: False
       RecordedCallsFolder: False
       Contacts: False
-      InternetClient: False
+      Proximity: False
       CodeGeneration: False
       BackgroundMediaPlayback: False
-      EnterpriseAuthentication: False
+      InternetClient: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
