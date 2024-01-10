@@ -119,8 +119,8 @@ public class dial : manipObject {
         selectManipulatorObjScript = selectObj.GetComponent<manipulator>();
         if (curState == manipState.selected || curState == manipState.grabbed) // these checks might be redundant at this time
         {
-          if (selectManipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonL")
-          || (!selectManipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonR")))
+          if (selectManipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonL")
+          || (!selectManipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonR")))
           {
             setPercent(defaultPercent);
           }
