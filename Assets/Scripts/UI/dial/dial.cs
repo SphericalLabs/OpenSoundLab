@@ -108,39 +108,35 @@ public class dial : manipObject {
     setPercent(percent);
   }
 
+  manipulator selectManipulatorObjScript; // this should actually be made available from manipObject.cs
+
   void Update() {
 
-    if(manipulatorObjScript != null) // hand is on this 
+    if (percent != defaultPercent)
     {
-      checkForResetDial();
-    } else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
-    {
-      checkForResetDial();
+      if (selectObj != null && selectObj.GetComponent<manipulator>() != null)
+      {
+        selectManipulatorObjScript = selectObj.GetComponent<manipulator>();
+        if (curState == manipState.selected || curState == manipState.grabbed) // these checks might be redundant at this time
+        {
+          if (selectManipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonL")
+          || (!selectManipulatorObjScript.isLeftController() && Input.GetButtonDown("secondaryButtonR")))
+          {
+            setPercent(defaultPercent);
+          }
+        }
+      }
+
+      else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
+      {
+        if (Input.GetButton("secondaryButtonL") || Input.GetButton("secondaryButtonR"))
+        {
+          setPercent(defaultPercent);
+        }
+      }
     }
 
     updatePercent();
-  }
-
-  // look and touch, no reset
-  // touchDown actually not so good, just touch
-
-  void checkForResetDial(){
-    if (percent == defaultPercent) return;
-
-    if (manipulatorObjScript != null) // has contact with a controller, therefore should only reset from that controller
-    {
-      if (manipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonL") // these are wrongly labeled, rename or use other system
-      || (!manipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonR")))
-      {
-        setPercent(defaultPercent);
-      }
-    } else {
-      if (Input.GetButton("secondaryButtonL") || Input.GetButton("secondaryButtonR"))
-      {
-        setPercent(defaultPercent);
-      }
-    }
-
   }
 
   public void setPercent(float p) {

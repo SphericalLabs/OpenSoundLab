@@ -323,8 +323,11 @@ public class manipulator : MonoBehaviour
 
     // late injection of gazed at object, in the case that the trigger was pulled so fast that there was not intermediate select stage and thus selectedObject has not been populated properly
     if(selectedObject == null && !WorldDragController.bothSidesDown()) {
-      selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
-      wasGazeBased = true;
+      if (gazedObjectTracker.Instance.gazedAtManipObject != null)
+      {
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        wasGazeBased = true;
+      }
     }
 
     if (selectedObject != null)
@@ -378,7 +381,7 @@ public class manipulator : MonoBehaviour
     copying = on;
 
     // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown())
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown())
     {
       selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
       wasGazeBased = true;      
@@ -851,7 +854,6 @@ public class manipulator : MonoBehaviour
         selectedObject.setSelect(true, transform);
         wasGazeBased = true;
         //selectedObject = gazeSelectedObj;
-
       }
       else if (isTriggerFullPressed())
       {
