@@ -45,7 +45,8 @@ public class ADSignalGenerator : signalGenerator
     int releaseLength = 0;
     int attackLengthFinal = 0;
     int releaseLengthFinal = 0;
-    float linearity = 1f;
+    float linearityA = 1f;
+    float linearityD = 1f;
 
     int length = 48000 * 5; // 5 seconds
 
@@ -76,17 +77,20 @@ public class ADSignalGenerator : signalGenerator
         releaseLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, 0.01f, 1f) * length) + 1;
     }
 
+    // c.f. https://www.reddit.com/r/modular/comments/ovh1b2/log_lin_exp_envelopes_and_which_is_correct/
     public void setLinearity(float val)
-    {
-        if (val >= 0.5)
-        {
-            linearity = Utils.map(val, 0.5f, 1f, 1f, 0.05f);
-        }
-        else
-        {
-            linearity = Utils.map(val, 0f, 0.5f, 20f, 1f);
-        }
-    }
+      {
+          if (val >= 0.5)
+          {
+              linearityA = Utils.map(val, 0.5f, 1f, 1f, 20f);
+              linearityD = Utils.map(val, 0.5f, 1f, 1f, 0.05f);
+      }
+          else
+          {
+              linearityD = Utils.map(val, 0f, 0.5f, 20f, 1f); 
+              linearityA = Utils.map(val, 0f, 0.5f, 0.05f, 1f);
+          }
+      }
 
     [DllImport("SoundStageNative")]
     public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
@@ -96,6 +100,11 @@ public class ADSignalGenerator : signalGenerator
 
     [DllImport("SoundStageNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+    float prevLinearityA = 1f;
+    float prevLinearityD = 1f;
+    int prevAttackLengthFinal = 0; 
+    int prevReleaseLengthFinal = 0; 
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
@@ -142,8 +151,8 @@ public class ADSignalGenerator : signalGenerator
         for (int n = 0; n < buffer.Length; n += 2)
         {
 
-            // NATIVE
-            if(incoming != null){
+            // SHOULD BE NATIVE
+            if (incoming != null){
                 // this trigger implementation is good practice, carry over to other modules
                 if (pulseBuffer[n] > 0f && lastPulseFloat <= 0f){ // left only
                     counter = 0;
@@ -153,15 +162,16 @@ public class ADSignalGenerator : signalGenerator
                 lastPulseFloat = pulseBuffer[n];
             } 
 
-            // NATIVE
+            // SHOULD BE NATIVE
             if (isRunning)
             {
 
                 if (stage == 0)
                 {
                     // need speed up with pre-calculated lookups at some point?
-
-                    buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / (float)attackLengthFinal, linearity);
+                    // PLEASE NOTE: this lerp interpolation here is also smoothing A and D changes that come via the CV inputs. Additionally, these inputs are only sampled on the first sample of the buffer, see above. But then again, audio rate modulation probably doesn't make much sense here anyways.
+                    buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / ( prevAttackLengthFinal == attackLengthFinal ? (float)attackLengthFinal : Mathf.Lerp(prevAttackLengthFinal, attackLengthFinal, (float)n / buffer.Length) ), 
+                    prevLinearityA == linearityA ? linearityA : Mathf.Lerp(prevLinearityA, linearityA, (float) n / buffer.Length));
                     
                     counter++;
                     if (counter > attackLengthFinal)
@@ -172,7 +182,8 @@ public class ADSignalGenerator : signalGenerator
                 }
                 else if (stage == 1)
                 {
-                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / (float) releaseLengthFinal, linearity);
+                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / ( prevReleaseLengthFinal == releaseLengthFinal ? (float)releaseLengthFinal : Mathf.Lerp(prevReleaseLengthFinal, releaseLengthFinal, (float)n / buffer.Length) ), 
+                    prevLinearityD == linearityD ? linearityD : Mathf.Lerp(prevLinearityD, linearityD, (float) n / buffer.Length));
                     counter++;
                     if (counter > releaseLengthFinal)
                     {
@@ -202,6 +213,11 @@ public class ADSignalGenerator : signalGenerator
 
             glidedVal += (buffer[n] - glidedVal) * 1f; // seems to smooth via float rounding error
             buffer[n] = buffer[n + 1] = glidedVal;
+
+            prevLinearityA = linearityA;
+            prevLinearityD = linearityD;
+            prevAttackLengthFinal = attackLengthFinal;
+            prevReleaseLengthFinal = releaseLengthFinal;
 
         }
         recursionCheckPost();
