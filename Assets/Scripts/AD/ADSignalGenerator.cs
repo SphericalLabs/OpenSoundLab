@@ -48,7 +48,10 @@ public class ADSignalGenerator : signalGenerator
     float linearityA = 1f;
     float linearityD = 1f;
 
-    int length = 48000 * 5; // 5 seconds
+    int minAttack; // in samples
+    int maxAttack;
+    int minRelease;
+    int maxRelease;
 
     int stage = 0;
     int counter = 0;
@@ -65,17 +68,21 @@ public class ADSignalGenerator : signalGenerator
 
     public void Awake()
     {
-    }
+        minAttack = 1; // in samples
+        maxAttack = Mathf.RoundToInt(5.000f * AudioSettings.outputSampleRate);
+        minRelease = Mathf.RoundToInt(0.020f * AudioSettings.outputSampleRate);
+        maxRelease = Mathf.RoundToInt(5.000f * AudioSettings.outputSampleRate);
+  }
 
     public void setAttack(float val)
     {
-        attackLength = Mathf.RoundToInt(val * length) + 1;
+        attackLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, minAttack, maxAttack));
     }
 
     public void setRelease(float val)
     {
-        releaseLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, 0.01f, 1f) * length) + 1;
-    }
+        releaseLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, minRelease, maxRelease));
+  }
 
     // c.f. https://www.reddit.com/r/modular/comments/ovh1b2/log_lin_exp_envelopes_and_which_is_correct/
     public void setLinearity(float val)
@@ -88,7 +95,7 @@ public class ADSignalGenerator : signalGenerator
           else
           {
               linearityD = Utils.map(val, 0f, 0.5f, 20f, 1f); 
-              linearityA = Utils.map(val, 0f, 0.5f, 0.05f, 1f);
+              linearityA = Utils.map(val, 0f, 0.5f, 0.05f, 1f); 
           }
       }
 
@@ -126,7 +133,7 @@ public class ADSignalGenerator : signalGenerator
 
             SetArrayToSingleValue(attackBuffer, attackBuffer.Length, 0f);
             attackInput.processBuffer(attackBuffer, dspTime, channels);
-            attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + attackBuffer[0] * length, 0, length)); // left only
+            attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + attackBuffer[0] * maxAttack, minAttack, maxAttack)); // left only
         }
         else
         {
@@ -140,7 +147,7 @@ public class ADSignalGenerator : signalGenerator
 
             SetArrayToSingleValue(releaseBuffer, releaseBuffer.Length, 0f); 
             releaseInput.processBuffer(releaseBuffer, dspTime, channels);
-            releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + releaseBuffer[0] * length, 0, length)); // left only
+            releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + releaseBuffer[0] * maxRelease, minRelease, maxRelease)); // left only
         }
         else
         {
