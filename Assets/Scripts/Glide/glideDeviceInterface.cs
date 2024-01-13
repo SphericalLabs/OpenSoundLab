@@ -48,10 +48,9 @@ public class glideDeviceInterface : deviceInterface {
   }
 
   void Update() {
-    
-    signal.time = valueDial.percent; // 0 to 1?
-    
-//    signal.active = activeSwitch.switchVal;
+        
+    signal.setTimeFactor(valueDial.percent);
+
     if (signal.incoming != input.signal) signal.incoming = input.signal;
   }
 

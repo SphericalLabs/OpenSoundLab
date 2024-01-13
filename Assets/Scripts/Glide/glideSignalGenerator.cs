@@ -35,19 +35,29 @@
 using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Data;
 
 public class glideSignalGenerator : signalGenerator {
 
   public signalGenerator incoming;
   public bool active = true;
-  public float time = 1f;
+  public float timeFactor = 1f;
   private float glidedVal = 0f;
-  float lastTime= 0f;
 
-  [Range(0.01f, 10)]
-  public float power = 0.05f;
-  [Range(1, 1000)]
-  public float div = 150f;
+  public void setTimeFactor(float t){
+    if(t <= 0.1f){
+      timeFactor = Utils.map(t, 0f, 0.1f, 1f, 0.01f); 
+
+    } else if (t > 0.1f && t <= 0.4f) {
+      timeFactor = Utils.map(t, 0.1f, 0.4f, 0.01f, 0.001f);
+
+    } else if (t > 0.4f && t <= 0.7f){
+      timeFactor = Utils.map(t, 0.4f, 0.7f, 0.001f, 0.0001f);
+
+    } else {
+      timeFactor = Utils.map(t, 0.7f, 1f, 0.0001f, 0.00001f); 
+    }
+  }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
     
@@ -59,12 +69,11 @@ public class glideSignalGenerator : signalGenerator {
 
       for (int n = 0; n < buffer.Length; n += 2)
       {
-        glidedVal += (buffer[n] - glidedVal) * (1.001f - Mathf.Pow(time, power) ) / div;
+        glidedVal += (buffer[n] - glidedVal) * timeFactor;
         buffer[n] = buffer[n + 1] = glidedVal;
       }
     }
-    lastTime = time;
-
+    
     recursionCheckPost();
   }
 }

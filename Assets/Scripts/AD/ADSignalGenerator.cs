@@ -70,7 +70,7 @@ public class ADSignalGenerator : signalGenerator
     {
         minAttack = 1; // in samples
         maxAttack = Mathf.RoundToInt(5.000f * AudioSettings.outputSampleRate);
-        minRelease = Mathf.RoundToInt(0.020f * AudioSettings.outputSampleRate);
+        minRelease = Mathf.RoundToInt(0.010f * AudioSettings.outputSampleRate);
         maxRelease = Mathf.RoundToInt(5.000f * AudioSettings.outputSampleRate);
   }
 
