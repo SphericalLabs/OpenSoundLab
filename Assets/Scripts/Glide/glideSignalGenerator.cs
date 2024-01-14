@@ -45,18 +45,12 @@ public class glideSignalGenerator : signalGenerator {
   private float glidedVal = 0f;
 
   public void setTimeFactor(float t){
-    if(t <= 0.1f){
-      timeFactor = Utils.map(t, 0f, 0.1f, 1f, 0.01f); 
+    
+    t = Mathf.Clamp01(t);
 
-    } else if (t > 0.1f && t <= 0.4f) {
-      timeFactor = Utils.map(t, 0.1f, 0.4f, 0.01f, 0.001f);
+    float logScale = Utils.map(t, 0f, 1f, 0f, -6f);
 
-    } else if (t > 0.4f && t <= 0.7f){
-      timeFactor = Utils.map(t, 0.4f, 0.7f, 0.001f, 0.0001f);
-
-    } else {
-      timeFactor = Utils.map(t, 0.7f, 1f, 0.0001f, 0.00001f); 
-    }
+    timeFactor = Mathf.Pow(10, logScale);
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
