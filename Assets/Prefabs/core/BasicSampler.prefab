@@ -2739,6 +2739,7 @@ MonoBehaviour:
     RefIds:
     - rid: 4337661840611082242
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
+      data: 
 --- !u!23 &2305645656453490579
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3084,7 +3085,7 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
-  percent: 0.5
+  percent: 0
   defaultPercent: 0
   currentDialColor: 2
   controllerRot: 0
