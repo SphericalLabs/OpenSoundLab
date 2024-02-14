@@ -122,8 +122,13 @@ extern "C" {
     /* Multiplies all elements of src1 with the corresponding elements of src2 and writes the results to dest */
     void _fMultiply(float *src1, float *src2, float *dest, int n);
 
+    /* Applies pow to all elements of src and writes to dest */ 
+    void _fPow(float* src, float* dest, float power, int n);
+
     /* Adds corresponding elements of src1 and src2 and writes the result to dest */
     void _fAdd(float *src1, float *src2, float *dest, int n);
+
+    void _fAddSingle(float* src1, float val, float* dest, int n);
 
     /* Multiplies elements of src1 and src2 and adds the results to dest */
     void _fMultiplyAdd(float *src1, float *src2, float *dest, int n);

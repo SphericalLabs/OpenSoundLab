@@ -49,6 +49,8 @@ enum DelayParams
     P_DRY,
     P_CLEAR,
     P_INTERPOLATION,
+    P_MODE_MIN_TIME,
+    P_MODE_MAX_TIME,
     P_N
 };
 
@@ -225,16 +227,29 @@ void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeB
     _fLerp(x->cTime, x->cTime, prevTime, time, nPerChannel);
     if(timeBuffer != NULL)
     {
-        //Crude way for timeBuffer = timeBuffer^3:
-        _fMultiply(timeBuffer, timeBuffer, timeBuffer, nPerChannel);
-        _fMultiply(timeBuffer, timeBuffer, timeBuffer, nPerChannel);
-        
-        _fScale(timeBuffer, timeBuffer, (float)x->maxTime, nPerChannel); //convert PCM float range [-1...1] to [-maxtime...maxtime]
-        //alternatively we could scale to [0...maxtime:]
-        //_fAdd(x->cTime, timeBuffer, timeBuffer, nPerChannel); //assuming x->cTime is padded with 1's at this moment
-        //_fScale(timeBuffer, timeBuffer, (float)x->maxTime/2, nPerChannel);
+        //for (int i = 0; i < nPerChannel; i++) {
+        //    timeBuffer[i] = _clamp(timeBuffer[i], -1.0f, 1.0f);
+        //    timeBuffer[i] = timeBuffer[i] * 0.5f + 0.5f; // normalize to 0-1
+        //    timeBuffer[i] = powf(timeBuffer[i], 3.0f);
+        //    timeBuffer[i] = timeBuffer[i] * 2.0f - 1.0f;
+        //    timeBuffer[i] = timeBuffer[i] * (x->modeMaxTime - x->modeMinTime);
+        //    x->cTime[i] += timeBuffer[i];
+        //    x->cTime[i] = _clamp(x->cTime[i], x->modeMinTime, x->modeMaxTime);
+        //}
+
+        _fClamp(timeBuffer, -1, 1, nPerChannel);
+        //_fScale(timeBuffer, timeBuffer, 0.5f, nPerChannel);
+        //_fAddSingle(timeBuffer, 0.5f, timeBuffer, nPerChannel);
+        _fPow(timeBuffer, timeBuffer, 3, nPerChannel); // it's a bit unusual to apply pow to a cv input buffer at this stage
+        //_fScale(timeBuffer, timeBuffer, 2.0f, nPerChannel);
+        //_fAddSingle(timeBuffer, -1.0f, timeBuffer, nPerChannel);
+        _fScale(timeBuffer, timeBuffer, x->modeMaxTime - x->modeMinTime, nPerChannel); // -1,1 to actual mode range +/-
         _fAdd(timeBuffer, x->cTime, x->cTime, nPerChannel);
-        _fClamp(x->cTime, 1, x->maxTime, nPerChannel);
+        _fClamp(x->cTime, x->modeMinTime, x->modeMaxTime, nPerChannel);
+        
+        // low ranges are broken, is clamping broken? 
+        // consider making it respond in 1v/oct, pow(2, n) with modeMaxTime as reference
+
     }
     float oversampling = x->maxTime / _fAverageSumOfMags(x->cTime, nPerChannel); //this is the "average" oversampling over the whole input buffer. For writing, we use this to avoid many small frames in the ringbuffer, as this affects read performance negatively.
         
@@ -335,6 +350,13 @@ SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x)
             break;
         case P_INTERPOLATION:
             x->interpolation = intval;
+            break;
+        case P_MODE_MIN_TIME:
+            x->modeMinTime = intval;
+            break;
+        case P_MODE_MAX_TIME:
+            x->modeMaxTime = intval;
+            break;
         default:
             break;
     }

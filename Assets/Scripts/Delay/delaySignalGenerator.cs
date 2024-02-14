@@ -50,6 +50,8 @@ public class delaySignalGenerator : signalGenerator
         P_DRY,
         P_CLEAR,
         P_INTERPOLATION,
+        P_MODE_MIN_TIME,
+        P_MODE_MAX_TIME,
         P_N
     };
 
@@ -69,8 +71,8 @@ public class delaySignalGenerator : signalGenerator
     public const float MAX_DRY = 0; //dB
 
     //currently selected min/max range in samples.
-    public int minTime = 1;
-    public int maxTime = 1; //cannot be larger than const MAX_TIME.
+    public int modeMinTime = 1;
+    public int modeMaxTime = 1; //cannot be larger than const MAX_TIME.
 
     int sampleRate;
 
@@ -123,6 +125,7 @@ public class delaySignalGenerator : signalGenerator
                 if (value != 0)
                     shouldClear = true;
                 break;
+            
         }
     }
 
@@ -132,22 +135,24 @@ public class delaySignalGenerator : signalGenerator
         switch (mode)
         {
             case 0:
-                minTime = (int)(0.001f * sampleRate);
-                maxTime = (int)(12.5f * sampleRate);
+                modeMinTime = (int)( 0.01f * sampleRate);
+                modeMaxTime = (int)(12.5f * sampleRate);
                 break;
             case 1:
-                minTime = (int)(0.001f * sampleRate);
-                maxTime = (int)(0.05f * sampleRate);
+                modeMinTime = (int)(0.01f * sampleRate);
+                modeMaxTime = (int)(0.10f * sampleRate);
                 break;
             case 2:
-                minTime = (int)(0.05f * sampleRate);
-                maxTime = (int)(2.5f * sampleRate);
+                modeMinTime = (int)(0.10f * sampleRate);
+                modeMaxTime = (int)(3.00f * sampleRate);
                 break;
             case 3:
-                minTime = (int)(0.25f * sampleRate);
-                maxTime = (int)(12.5f * sampleRate);
+                modeMinTime = (int)( 3.00f * sampleRate);
+                modeMaxTime = (int)(30.00f * sampleRate);
                 break;
         }
+        Delay_SetParam(modeMinTime, (int)Param.P_MODE_MIN_TIME, x);
+        Delay_SetParam(modeMaxTime, (int)Param.P_MODE_MAX_TIME, x);
     }
 
     [DllImport("SoundStageNative")]
@@ -259,7 +264,7 @@ public class delaySignalGenerator : signalGenerator
         }
 
         //Set all delay params:
-        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME]), 3), 0, 1, minTime, maxTime), (int)Param.P_TIME, x);
+        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME]), 3), 0, 1, modeMinTime, modeMaxTime), (int)Param.P_TIME, x);
         Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + modFeedbackVal), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
         Delay_SetParam(wet, (int)Param.P_WET, x);
         Delay_SetParam(dry, (int)Param.P_DRY, x);

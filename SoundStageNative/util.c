@@ -276,6 +276,12 @@ extern "C" {
 #endif
     }
 
+    void _fPow(float* src, float* dest, float power, int n) {
+      for (int i = 0; i < n; i++) {
+        dest[i] = pow(src[i], power); 
+      }
+    }
+
     void _fAdd(float *src1, float *src2, float *dest, int n)
     {
 #if __APPLE_VDSP_DONTUSE
@@ -306,6 +312,13 @@ extern "C" {
             dest[i] = src1[i] + src2[i];
         }
 #endif
+    }
+
+    void _fAddSingle(float* src1, float val, float* dest, int n) {
+        for (int i = 0; i < n; i++)
+        {
+          dest[i] = src1[i] + val;
+        }
     }
     
     void _fMultiplyAdd(float *src1, float *src2, float *dest, int n)
@@ -657,9 +670,21 @@ extern "C" {
     
     void _fClamp(float *src, float min, float max, int n)
     {
-        for(int i = 0; i < n; i++)
+        //for(int i = 0; i < n; i++)
+        //{
+        //    src[i] = _min(max, _max(min, src[i]));
+        //}
+        for (int i = 0; i < n; ++i)
         {
-            src[i] = _min(max, _max(min, src[i]));
+          if (src[i] < min)
+          {
+            src[i] = min;
+          }
+          else if (src[i] > max)
+          {
+            src[i] = max;
+          }
+          // If src[i] is between min and max, it remains unchanged
         }
     }
     
@@ -754,11 +779,11 @@ extern "C" {
     }
     
     float _map(float x, float start1, float stop1, float start2, float stop2, float slope)
-        {
-            float a = (x - start1) / (stop1 - start1); //percentage of x in old range, linear
-            a = _expCurve(a, slope); //percentage of x in old range with slope applied
-            return start2 + a * (stop2 - start2); //value mapped to new range
-        }
+    {
+        float a = (x - start1) / (stop1 - start1); //percentage of x in old range, linear
+        a = _expCurve(a, slope); //percentage of x in old range with slope applied
+        return start2 + a * (stop2 - start2); //value mapped to new range
+    }
 
 #if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
     double _wallTime(void){
