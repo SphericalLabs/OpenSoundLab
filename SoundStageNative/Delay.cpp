@@ -49,8 +49,8 @@ enum DelayParams
     P_DRY,
     P_CLEAR,
     P_INTERPOLATION,
-    P_MODE_MIN_TIME,
-    P_MODE_MAX_TIME,
+    P_MIN_SAMPLES,
+    P_MAX_SAMPLES,
     P_N
 };
 
@@ -227,25 +227,20 @@ void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeB
     _fLerp(x->cTime, x->cTime, prevTime, time, nPerChannel);
     if(timeBuffer != NULL)
     {
-        //for (int i = 0; i < nPerChannel; i++) {
-        //    timeBuffer[i] = _clamp(timeBuffer[i], -1.0f, 1.0f);
-        //    timeBuffer[i] = timeBuffer[i] * 0.5f + 0.5f; // normalize to 0-1
-        //    timeBuffer[i] = powf(timeBuffer[i], 3.0f);
-        //    timeBuffer[i] = timeBuffer[i] * 2.0f - 1.0f;
-        //    timeBuffer[i] = timeBuffer[i] * (x->modeMaxTime - x->modeMinTime);
-        //    x->cTime[i] += timeBuffer[i];
-        //    x->cTime[i] = _clamp(x->cTime[i], x->modeMinTime, x->modeMaxTime);
-        //}
 
         _fClamp(timeBuffer, -1, 1, nPerChannel);
         //_fScale(timeBuffer, timeBuffer, 0.5f, nPerChannel);
         //_fAddSingle(timeBuffer, 0.5f, timeBuffer, nPerChannel);
-        _fPow(timeBuffer, timeBuffer, 3, nPerChannel); // it's a bit unusual to apply pow to a cv input buffer at this stage
+        for (int i = 0; i < nPerChannel; i++) {
+          x->cTime[i] *= powf(2, timeBuffer[i] * 9.0f);
+        }        
+        //_fPow(timeBuffer, timeBuffer, 3, nPerChannel); // it's a bit unusual to apply pow to a cv input buffer at this stage
         //_fScale(timeBuffer, timeBuffer, 2.0f, nPerChannel);
         //_fAddSingle(timeBuffer, -1.0f, timeBuffer, nPerChannel);
-        _fScale(timeBuffer, timeBuffer, x->modeMaxTime - x->modeMinTime, nPerChannel); // -1,1 to actual mode range +/-
-        _fAdd(timeBuffer, x->cTime, x->cTime, nPerChannel);
-        _fClamp(x->cTime, x->modeMinTime, x->modeMaxTime, nPerChannel);
+        //_fScale(timeBuffer, timeBuffer, x->modeMaxTime - x->modeMinTime, nPerChannel); // -1,1 to actual mode range +/-
+        //_fAdd(timeBuffer, x->cTime, x->cTime, nPerChannel);
+        _fClamp(x->cTime, x->minSamples, x->maxSamples, nPerChannel);
+        //_fClamp(x->cTime, 5, 30 * 48000, nPerChannel); // sync 
         
         // low ranges are broken, is clamping broken? 
         // consider making it respond in 1v/oct, pow(2, n) with modeMaxTime as reference
@@ -351,11 +346,11 @@ SOUNDSTAGE_API void Delay_SetParam(float value, int param, struct DelayData *x)
         case P_INTERPOLATION:
             x->interpolation = intval;
             break;
-        case P_MODE_MIN_TIME:
-            x->modeMinTime = intval;
+        case P_MIN_SAMPLES:
+            x->minSamples = intval;
             break;
-        case P_MODE_MAX_TIME:
-            x->modeMaxTime = intval;
+        case P_MAX_SAMPLES:
+            x->maxSamples = intval;
             break;
         default:
             break;

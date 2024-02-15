@@ -39,6 +39,13 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System;
+using UnityEngine.Rendering;
+using static ONSPPropagationMaterial;
+using static UnityEditor.Experimental.GraphView.GraphView;
+using static UnityEngine.Rendering.DebugUI.Table;
+using TMPro;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.SocialPlatforms;
 
 public class delaySignalGenerator : signalGenerator
 {
@@ -50,8 +57,8 @@ public class delaySignalGenerator : signalGenerator
         P_DRY,
         P_CLEAR,
         P_INTERPOLATION,
-        P_MODE_MIN_TIME,
-        P_MODE_MAX_TIME,
+        P_MIN_SAMPLES,
+        P_MAX_SAMPLES,
         P_N
     };
 
@@ -62,17 +69,14 @@ public class delaySignalGenerator : signalGenerator
     const int DELAYMODE_OVERSAMPLED = 1;
     const int DELAYMODE_EFFICIENT = 2;
 
-    public const float MAX_TIME = 12.5f; // * 1000 ms.
+    public float MIN_TIME; // in seconds
+    public float MAX_TIME; // in seconds
     public const float MIN_FEEDBACK = 0;
     public const float MAX_FEEDBACK = 1f;
     public const float MIN_WET = -96; //dB
     public const float MAX_WET = 0; //dB
     public const float MIN_DRY = -96; //dB
     public const float MAX_DRY = 0; //dB
-
-    //currently selected min/max range in samples.
-    public int modeMinTime = 1;
-    public int modeMaxTime = 1; //cannot be larger than const MAX_TIME.
 
     int sampleRate;
 
@@ -94,6 +98,8 @@ public class delaySignalGenerator : signalGenerator
     public override void Awake()
     {
         sampleRate = AudioSettings.outputSampleRate;
+        MIN_TIME = Mathf.Pow(2f, minPower) / sampleRate; // in seconds
+        MAX_TIME = Mathf.Pow(2f, maxPower) / sampleRate; // in seconds
         int maxDelaySamples = (int)(MAX_TIME * sampleRate);
         x = Delay_New(maxDelaySamples);
         Delay_SetParam(INTERPOLATION_LINEAR, (int)Param.P_INTERPOLATION, x);
@@ -129,33 +135,58 @@ public class delaySignalGenerator : signalGenerator
         }
     }
 
+    float timeCenter;
+    float timeRange;
 
-    public void SetTimeRange(int mode)
+    // absolute minimum 2^8 samples
+    // absolute maximum 2^21 samples
+    const int minPower = 8;
+    const int maxPower = 21;
+
+    //For mode 0 (full range):
+    //minVal_seconds = 0.0053 seconds
+    //maxVal_seconds = 43.69 seconds
+
+    //For mode 1 (low third range):
+    //minVal_seconds = 0.0053 seconds
+    //maxVal_seconds = 0.1075 seconds
+
+    //For mode 2 (mid third range):
+    //minVal_seconds = 0.1075 seconds
+    //maxVal_seconds = 2.1673 seconds
+
+    //For mode 3 (high third range):
+    //minVal_seconds = 2.1673 seconds
+    //maxVal_seconds = 43.69 seconds
+
+  public void SetTimeRange(int mode)
     {
         switch (mode)
         {
-            case 0:
-                modeMinTime = (int)( 0.01f * sampleRate);
-                modeMaxTime = (int)(12.5f * sampleRate);
+            case 0: // full range
+                timeCenter = Mathf.Pow(2f, minPower + (maxPower - minPower) / 2); 
+                timeRange = (maxPower - minPower) / 2;
                 break;
-            case 1:
-                modeMinTime = (int)(0.01f * sampleRate);
-                modeMaxTime = (int)(0.10f * sampleRate);
+            case 1: // low third range
+                timeCenter = Mathf.Pow(2f, minPower + (maxPower - minPower) / 6 * 1);
+                timeRange = (maxPower - minPower) / 6;
                 break;
-            case 2:
-                modeMinTime = (int)(0.10f * sampleRate);
-                modeMaxTime = (int)(3.00f * sampleRate);
+            case 2: // mid third range
+                timeCenter = Mathf.Pow(2f, minPower + (maxPower - minPower) / 6 * 3);
+                timeRange = (maxPower - minPower) / 6;
                 break;
-            case 3:
-                modeMinTime = (int)( 3.00f * sampleRate);
-                modeMaxTime = (int)(30.00f * sampleRate);
+            case 3: // high third range
+                timeCenter = Mathf.Pow(2f, minPower + (maxPower - minPower) / 6 * 5);
+                timeRange = (maxPower - minPower) / 6;
                 break;
         }
-        Delay_SetParam(modeMinTime, (int)Param.P_MODE_MIN_TIME, x);
-        Delay_SetParam(modeMaxTime, (int)Param.P_MODE_MAX_TIME, x);
-    }
+        
+        Delay_SetParam(Mathf.Pow(2f, minPower), (int)Param.P_MIN_SAMPLES, x);
+        Delay_SetParam(Mathf.Pow(2f, maxPower), (int)Param.P_MAX_SAMPLES, x);
 
-    [DllImport("SoundStageNative")]
+  }
+
+  [DllImport("SoundStageNative")]
     //private static extern void Delay_Process(float[] buffer, int length, int channels, IntPtr x);
     private static extern void Delay_Process(float[] buffer, float[] timeBuffer, float[] feedbackBuffer, float[] mixBuffer, int n, int channels, IntPtr x);
 
@@ -263,8 +294,9 @@ public class delaySignalGenerator : signalGenerator
             sigIn.processBuffer(buffer, dspTime, channels);
         }
 
-        //Set all delay params:
-        Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME]), 3), 0, 1, modeMinTime, modeMaxTime), (int)Param.P_TIME, x);
+    //Set all delay params:
+        Delay_SetParam(timeCenter * Mathf.Pow(2, Utils.map(Mathf.Clamp01(p[(int)Param.P_TIME]), 0f, 1f, -timeRange, timeRange)), (int)Param.P_TIME, x); 
+        //Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME]), 3), 0, 1, modeMinTime, modeMaxTime), (int)Param.P_TIME, x);
         Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + modFeedbackVal), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
         Delay_SetParam(wet, (int)Param.P_WET, x);
         Delay_SetParam(dry, (int)Param.P_DRY, x);

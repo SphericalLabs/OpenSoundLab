@@ -670,22 +670,21 @@ extern "C" {
     
     void _fClamp(float *src, float min, float max, int n)
     {
-        //for(int i = 0; i < n; i++)
-        //{
-        //    src[i] = _min(max, _max(min, src[i]));
-        //}
-        for (int i = 0; i < n; ++i)
+        for(int i = 0; i < n; i++)
         {
-          if (src[i] < min)
-          {
-            src[i] = min;
-          }
-          else if (src[i] > max)
-          {
-            src[i] = max;
-          }
-          // If src[i] is between min and max, it remains unchanged
+            src[i] = _min(max, _max(min, src[i]));
         }
+        //for (int i = 0; i < n; ++i)
+        //{
+        //  if (src[i] < min)
+        //  {
+        //    src[i] = min;
+        //  }
+        //  else if (src[i] > max)
+        //  {
+        //    src[i] = max;
+        //  }
+        //}
     }
     
     void _fNoise(float *buf, float amplitude, int n)

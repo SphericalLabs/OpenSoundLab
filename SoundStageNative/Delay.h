@@ -66,8 +66,8 @@ struct DelayData
     
     //internal
     int maxTime;
-    int modeMinTime;
-    int modeMaxTime; // relative to current mode, need to stay in this range
+    int minSamples;
+    int maxSamples; 
     int prevTime; //for time interpolation
     float prevFeedback;
     float prevDry;
