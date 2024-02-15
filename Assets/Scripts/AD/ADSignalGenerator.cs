@@ -99,13 +99,13 @@ public class ADSignalGenerator : signalGenerator
           }
       }
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern bool IsPulse(float[] buffer, int length);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     float prevLinearityA = 1f;

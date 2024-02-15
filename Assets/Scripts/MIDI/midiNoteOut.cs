@@ -52,7 +52,7 @@ public class midiNoteOut : signalGenerator {
 
   public bool noteOn = false;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
 
   public override void Awake() {

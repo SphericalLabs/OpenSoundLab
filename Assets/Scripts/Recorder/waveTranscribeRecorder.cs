@@ -76,7 +76,7 @@ public class waveTranscribeRecorder : signalGenerator {
 
   float[] lastRecSig, lastPlaySig, lastBackSig;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
 

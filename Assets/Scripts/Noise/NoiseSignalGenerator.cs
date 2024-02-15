@@ -46,7 +46,7 @@ public class NoiseSignalGenerator : signalGenerator {
 
   float curSample = -1.0f;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern int NoiseProcessBuffer(float[] buffer, ref float sample, int length, int channels, float frequency, int counter, int speedFrames, ref bool updated);
 
   public bool updated = false;

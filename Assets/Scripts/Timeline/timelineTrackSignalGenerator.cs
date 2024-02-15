@@ -45,13 +45,13 @@ public class timelineTrackSignalGenerator : signalGenerator {
   timelineTrackComponentInterface _interface;
   public signalGenerator incoming;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern bool IsPulse(float[] buffer, int length);
 
   public override void Awake() {

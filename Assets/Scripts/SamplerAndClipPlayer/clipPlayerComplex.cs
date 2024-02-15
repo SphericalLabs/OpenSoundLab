@@ -79,11 +79,11 @@ public class clipPlayerComplex : clipPlayer {
   float lastPlaybackSpeed = 0f;
   float lastAmplitude = 0f;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern double ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount
 , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void Awake() {

@@ -49,11 +49,11 @@ public class multipleSignalGenerator : signalGenerator {
   const int MAX_COUNT = 16;
   float[][] mergeBuffers;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void CopyArray(float[] a, float[] b, int length);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void AddArrays(float[] a, float[] b, int length);
 
   public override void Awake() {

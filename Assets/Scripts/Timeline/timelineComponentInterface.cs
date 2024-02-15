@@ -40,7 +40,7 @@ using System.Runtime.InteropServices;
 
 public class timelineComponentInterface : componentInterface {
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern int CountPulses(float[] buffer, int length, int channels, float[] lastSig);
 
   public deviceInterface _targetDeviceInterface;

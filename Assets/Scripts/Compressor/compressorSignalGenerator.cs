@@ -85,28 +85,28 @@ public class compressorSignalGenerator : signalGenerator
         }
     }
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Compressor_Process(float[] buffer, float[] sidechain, int length, int channels, IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern IntPtr Compressor_New(float sampleRate);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Compressor_Free(IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Compressor_SetParam(float value, int param, IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern float Compressor_GetAttenuation(IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern bool Compressor_IsRamping(IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern bool Compressor_IsClipping(IntPtr x);
     
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
    public override void processBuffer(float[] buffer, double dspTime, int channels)

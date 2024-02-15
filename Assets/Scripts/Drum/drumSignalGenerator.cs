@@ -46,7 +46,7 @@ public class drumSignalGenerator : signalGenerator
     int hitdur = 100;
     int counter = 0;
 
-    [DllImport("SoundStageNative", EntryPoint = "DrumSignalGenerator")]
+    [DllImport("OSLNative", EntryPoint = "DrumSignalGenerator")]
     public static extern int DrumSignalGenerator(float[] buffer, int length, int channels, bool signalOn, int counter);
 
     void Start()

@@ -40,8 +40,8 @@ using System.Runtime.InteropServices;
 public class mixer : signalGenerator {
   public List<signalGenerator> incoming = new List<signalGenerator>();
 
-  [DllImport("SoundStageNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")] public static extern void AddArrays(float[] a, float[] b, int length);
+  [DllImport("OSLNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+  [DllImport("OSLNative")] public static extern void AddArrays(float[] a, float[] b, int length);
 
   float[] tempBuff;
 

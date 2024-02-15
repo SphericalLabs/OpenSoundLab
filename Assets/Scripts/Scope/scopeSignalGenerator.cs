@@ -45,9 +45,9 @@ public class scopeSignalGenerator : signalGenerator
   spectrumDisplay displayFft;
   public bool isMuted = false;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void CopyArray(float[] a, float[] b, int length);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
 

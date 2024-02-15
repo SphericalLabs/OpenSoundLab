@@ -50,7 +50,7 @@ public class midiNote : signalGenerator {
 
   public bool noteOn = false;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void Awake() {

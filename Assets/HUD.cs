@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 public class HUD : MonoBehaviour
 {
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern float MasterBusRecorder_GetLevel_Lin();
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern float MasterBusRecorder_GetLevel_dB();
 
   public GameObject overloadIndicator;

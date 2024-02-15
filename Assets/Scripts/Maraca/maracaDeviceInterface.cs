@@ -42,7 +42,7 @@ public class maracaDeviceInterface : deviceInterface {
   omniJack jackOut;
   double _sampleDuration;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void MaracaProcessAudioBuffer(float[] buffer, float[] controlBuffer, int length, int channels, ref double _phase, double _sampleDuration);
 
   public override void Awake() {

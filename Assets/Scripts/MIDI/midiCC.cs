@@ -48,7 +48,7 @@ public class midiCC : signalGenerator {
   omniJack jackOut;
   public float curValue = .5f;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void Awake() {

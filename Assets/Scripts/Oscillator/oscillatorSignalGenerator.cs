@@ -62,11 +62,11 @@ public class oscillatorSignalGenerator : signalGenerator
   float prevAmplitude;
   float prevFrequency;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
                               float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer, bool bFreqExpGen, bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, ref double dspTime);
   
-  [DllImport("SoundStageNative")] 
+  [DllImport("OSLNative")] 
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
 

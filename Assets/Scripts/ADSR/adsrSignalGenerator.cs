@@ -91,14 +91,14 @@ public class adsrSignalGenerator : signalGenerator {
   public signalGenerator incoming;
   public adsrDeviceInterface _devinterface;
 
-  [DllImport("SoundStageNative", EntryPoint = "ADSRSignalGenerator")]
+  [DllImport("OSLNative", EntryPoint = "ADSRSignalGenerator")]
   public static extern void ADSRSignalGenerator(float[] buffer, int length, int channels, int[] frames, ref int frameCount, bool active, ref float ADSRvolume,
   float[] volumes, float startVal, ref int curFrame, bool sustaining);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void Awake() {

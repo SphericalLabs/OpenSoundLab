@@ -39,10 +39,10 @@ using System.Runtime.InteropServices;
 public class reverbSignalGenerator : signalGenerator {
   public signalGenerator incoming;
 
-  [DllImport("SoundStageNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")] public static extern void DuplicateArrayAndReset(float[] from, float[] to, int length, float val);
-  [DllImport("SoundStageNative")] public static extern void lowpassSignal(float[] buffer, int length, ref float lowpassL, ref float lowpassR);
-  [DllImport("SoundStageNative")] public static extern void combineArrays(float[] buffer, float[] bufferB, int length, float levelA, float levelB);
+  [DllImport("OSLNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+  [DllImport("OSLNative")] public static extern void DuplicateArrayAndReset(float[] from, float[] to, int length, float val);
+  [DllImport("OSLNative")] public static extern void lowpassSignal(float[] buffer, int length, ref float lowpassL, ref float lowpassR);
+  [DllImport("OSLNative")] public static extern void combineArrays(float[] buffer, float[] bufferB, int length, float levelA, float levelB);
 
   public float decayTime = 1.0f;
 
@@ -115,9 +115,9 @@ public class CombFilter {
   int inPoint;
   int outPoint;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void addCombFilterSignal(float[] inputbuffer, float[] addbuffer, int length, float[] delayBufferL, float[] delayBufferR, int delaylength, float gain, ref int inPoint, ref int outPoint);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void processCombFilterSignal(float[] buffer, int length, float[] delayBufferL, float[] delayBufferR, int delaylength, float gain, ref int inPoint, ref int outPoint);
 
   public void updateGain(float g) {

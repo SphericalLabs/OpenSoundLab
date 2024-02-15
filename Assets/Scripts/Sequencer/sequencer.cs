@@ -43,7 +43,7 @@ public class sequencer : signalGenerator
     bool newSignal = false;
     bool signalOn = false;
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public void setSignal(bool on)

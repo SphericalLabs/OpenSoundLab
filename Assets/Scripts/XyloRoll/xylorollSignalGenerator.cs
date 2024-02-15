@@ -45,10 +45,10 @@ public class xylorollSignalGenerator : signalGenerator {
 
   List<monophone> voices;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void XylorollMergeSignalsWithoutOsc(float[] buf, int length, float[] buf1, float[] buf2);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void XylorollMergeSignalsWithOsc(float[] buf, int length, float[] buf1, float[] buf2);
 
   public void spawnVoices(int n, float[] adsrVol, float[] adsrDur) {

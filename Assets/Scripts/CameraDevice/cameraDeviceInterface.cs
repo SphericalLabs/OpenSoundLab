@@ -50,7 +50,7 @@ public class cameraDeviceInterface : deviceInterface {
 
   bool activated = false;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern int CountPulses(float[] buffer, int length, int channels, float[] lastSig);
 
   public override void Awake() {

@@ -70,14 +70,14 @@ public class filterSignalGenerator : signalGenerator
 
   public filterType curType = filterType.LP;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void CopyArray(float[] a, float[] b, int length);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void AddArrays(float[] a, float[] b, int length);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float[] frequencyBuffer, float resonance/*, IntPtr logger*/);
    
     // create structs for passing to native code

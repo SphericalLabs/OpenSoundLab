@@ -41,7 +41,7 @@ public class keyGateSignalGenerator : signalGenerator {
   public bool isHigh = false;
   public bool newKeyWasPressed = false;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
     
   public override void processBuffer(float[] buffer, double dspTime, int channels) {

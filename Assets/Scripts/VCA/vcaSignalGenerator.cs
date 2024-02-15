@@ -46,7 +46,7 @@ public class vcaSignalGenerator : signalGenerator {
   float[] controlBuffer = new float[1];
 
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {

@@ -7,21 +7,21 @@ using UnityEngine;
 
 public class masterBusRecorder : MonoBehaviour
 {
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern IntPtr MasterBusRecorder_GetRecorderInstance();
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern void MasterBusRecorder_StartRecording();
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern void MasterBusRecorder_StopRecording();
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern bool MasterBusRecorder_ReadRecordedSample(ref float sample);
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern float MasterBusRecorder_GetLevel_Lin();
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern float MasterBusRecorder_GetLevel_dB();
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern int MasterBusRecorder_GetBufferPointer(IntPtr buffer, ref int offset);
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     static extern void MasterBusRecorder_Clear();
 
     //types

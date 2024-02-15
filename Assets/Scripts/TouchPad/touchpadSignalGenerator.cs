@@ -39,7 +39,7 @@ using System.Runtime.InteropServices;
 public class touchpadSignalGenerator : signalGenerator {
   public bool signalOn = false;
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {

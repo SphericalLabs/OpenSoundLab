@@ -39,13 +39,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System;
-using UnityEngine.Rendering;
-using static ONSPPropagationMaterial;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEngine.Rendering.DebugUI.Table;
-using TMPro;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.SocialPlatforms;
+
 
 public class delaySignalGenerator : signalGenerator
 {
@@ -186,26 +180,26 @@ public class delaySignalGenerator : signalGenerator
 
   }
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
     //private static extern void Delay_Process(float[] buffer, int length, int channels, IntPtr x);
     private static extern void Delay_Process(float[] buffer, float[] timeBuffer, float[] feedbackBuffer, float[] mixBuffer, int n, int channels, IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern IntPtr Delay_New(int maxDelayTimeSamples);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Delay_Free(IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Delay_SetParam(float value, int param, IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Delay_Clear(IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Delay_SetMode(int mode, IntPtr x);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     private bool containsTrigger(float[] buffer){

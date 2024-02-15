@@ -70,17 +70,17 @@ public class freeverbSignalGenerator : signalGenerator {
 
     private IntPtr x;
     private float[] p = new float[(int)Param.P_N];
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Freeverb_Process(float[] buffer, int length, int channels, IntPtr x);
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern IntPtr Freeverb_New(int sampleRate);
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Freeverb_Free(IntPtr x);
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern void Freeverb_SetParam(int param, float value, IntPtr x);
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     private static extern float Freeverb_GetParam(int param, IntPtr x);
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void Awake() {

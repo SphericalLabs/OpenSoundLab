@@ -44,7 +44,7 @@ public class keyFrequencySignalGenerator : signalGenerator {
   int curKey = -1;
   int semitone = 0; // as key number, not in hertz
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void KeyFrequencySignalGenerator(float[] buffer, int length, int channels, int semitone, float keyMultConst, ref float filteredVal);
 
   public void UpdateKey(int k) {

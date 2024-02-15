@@ -50,8 +50,8 @@ public class fader : signalGenerator {
 
   float[] bufferB;
 
-  [DllImport("SoundStageNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")] public static extern void processFader(float[] buffer, int length, int channels, float[] bufferB, int lengthB, bool aSig, bool bSig, bool samePercent, float lastpercent, float sliderPercent);
+  [DllImport("OSLNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+  [DllImport("OSLNative")] public static extern void processFader(float[] buffer, int length, int channels, float[] bufferB, int lengthB, bool aSig, bool bSig, bool samePercent, float lastpercent, float sliderPercent);
 
   public override void Awake() {
     fadeSlider = GetComponentInChildren<slider>();

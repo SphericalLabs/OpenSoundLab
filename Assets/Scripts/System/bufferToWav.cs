@@ -44,7 +44,7 @@ public class bufferToWav : MonoBehaviour {
     public static bufferToWav instance; // singleton
     public bool applyNormalization = false;
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void NormalizeClip(float[] clip, int length);
 
     void Awake()

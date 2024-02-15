@@ -39,11 +39,11 @@ using System.Runtime.InteropServices;
 
 public class MicrophoneSignalGenerator : signalGenerator {
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void CopyArray(float[] a, float[] b, int length);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   public static extern void MicFunction(float[] a, float[] b, int length, float val);
 
   AudioClip micClip;

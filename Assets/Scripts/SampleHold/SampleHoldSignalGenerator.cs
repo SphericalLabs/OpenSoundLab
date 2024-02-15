@@ -46,10 +46,10 @@ public class SampleHoldSignalGenerator : signalGenerator
     float lastTrig = -1f;
     float holdVal = 0f;
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void CopyArray(float[] from, float[] to, int length);
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)

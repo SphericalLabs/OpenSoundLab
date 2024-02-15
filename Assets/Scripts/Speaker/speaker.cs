@@ -44,7 +44,7 @@ public class speaker : MonoBehaviour
     public bool monoMode = false;
     public bool leftOn = true;
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void MultiplyArrayBySingleValue(float[] buffer, int length, float val);
 
     private void OnAudioFilterRead(float[] buffer, int channels)

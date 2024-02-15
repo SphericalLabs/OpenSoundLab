@@ -65,19 +65,19 @@ public class waveViz : MonoBehaviour
   IntPtr ringBufferPtr;
 
   ///Writes n samples to the ring buffer.
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern void RingBuffer_Write(float[] src, int n, IntPtr x);
 
   ///Writes samples to the ringbuffer with a specified stride. If the stride is 1, all samples are written to the ringbuffer. If stride < 1, some samples are skipped. If stride > 1, some samples are written more than once (=padded)f. No interpolation is performed. Returns the difference between old and new writeptr.
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern int RingBuffer_WritePadded(float[] src, int n, float stride, IntPtr x);
 
   ///Reads n samples from the ring buffer
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern void RingBuffer_Read(float[] dest, int n, int offset, IntPtr x);
 
   //Reads n samples with a specific stride
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern void RingBuffer_ReadPadded(float[] dest, int n, int offset, float stride, IntPtr x);
 
   ///Reads n samples from the ring buffer and adds the values to the dest array.
@@ -85,17 +85,17 @@ public class waveViz : MonoBehaviour
 
   ///Resizes the buffer. This includes a memory re-allocation, so use with caution!
   //static extern void RingBuffer_Resize(int n, struct RingBuffer *x);
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern IntPtr RingBuffer_New(int n);
 
   ///Frees all resources.
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern void RingBuffer_Free(IntPtr x);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern void _fDeinterleave(float[] src, float[] dest, int n, int channels);
 
-  [DllImport("SoundStageNative")]
+  [DllImport("OSLNative")]
   static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
   float[] renderBuffer;

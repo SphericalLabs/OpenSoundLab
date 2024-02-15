@@ -47,7 +47,7 @@ public class sequencerCV : signalGenerator
     float outVal = 0f;
     float rangeMultiplier = lowRange;
 
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public void setRange(float f)

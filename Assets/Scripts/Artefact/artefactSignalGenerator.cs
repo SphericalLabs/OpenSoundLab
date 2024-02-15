@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class artefactSignalGenerator : signalGenerator
 {
-    [DllImport("SoundStageNative")]
+    [DllImport("OSLNative")]
     public static extern void Artefact_Process(float[] buffer, float noiseAmount, int downsampleFactor, float jitterAmount, int bitReduction, int channels, int n);
 
     public float noiseAmount = 0;
