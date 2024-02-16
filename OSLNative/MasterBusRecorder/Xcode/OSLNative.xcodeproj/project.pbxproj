@@ -60,7 +60,7 @@
 		3D199B5F1858F3E60063EC53 /* AudioPluginUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginUtil.h; path = ../AudioPluginUtil.h; sourceTree = "<group>"; };
 		3D199B6D1858F3E60063EC53 /* PluginList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PluginList.h; path = ../PluginList.h; sourceTree = "<group>"; };
 		3DA35E0E175F7CA000FA3842 /* AudioPluginInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginInterface.h; path = ../AudioPluginInterface.h; sourceTree = "<group>"; };
-		8D576316048677EA00EA77CD /* SoundStageNative.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoundStageNative.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D576316048677EA00EA77CD /* OSLNative.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OSLNative.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		972153AC27B42F3B006DDB29 /* SoundStageTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SoundStageTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		972153B327B42F65006DDB29 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -195,7 +195,7 @@
 		19C28FB6FE9D52B211CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D576316048677EA00EA77CD /* SoundStageNative.bundle */,
+				8D576316048677EA00EA77CD /* OSLNative.bundle */,
 				972153AC27B42F3B006DDB29 /* SoundStageTest */,
 			);
 			name = Products;
@@ -262,9 +262,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8D57630D048677EA00EA77CD /* SoundStageNative */ = {
+		8D57630D048677EA00EA77CD /* OSLNative */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1DEB911A08733D790010E9CD /* Build configuration list for PBXNativeTarget "SoundStageNative" */;
+			buildConfigurationList = 1DEB911A08733D790010E9CD /* Build configuration list for PBXNativeTarget "OSLNative" */;
 			buildPhases = (
 				974D48A527B158B80087EC11 /* ShellScript */,
 				8D57630F048677EA00EA77CD /* Resources */,
@@ -275,10 +275,10 @@
 			);
 			dependencies = (
 			);
-			name = SoundStageNative;
+			name = OSLNative;
 			productInstallPath = "$(HOME)/Library/Bundles";
 			productName = AudioPluginDemo;
-			productReference = 8D576316048677EA00EA77CD /* SoundStageNative.bundle */;
+			productReference = 8D576316048677EA00EA77CD /* OSLNative.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
 		972153AB27B42F3B006DDB29 /* SoundStageTest */ = {
@@ -310,7 +310,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "SoundStageNative" */;
+			buildConfigurationList = 1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "OSLNative" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -325,7 +325,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8D57630D048677EA00EA77CD /* SoundStageNative */,
+				8D57630D048677EA00EA77CD /* OSLNative */,
 				972153AB27B42F3B006DDB29 /* SoundStageTest */,
 			);
 		};
@@ -357,7 +357,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Unity places .meta files inside the bundle, which Xcode doesn't like at all:\ncd \"$BUILD_DIR/Debug/SoundStageNative.bundle\"\nfind . -name \"*.meta\" -type f -delete\ncd \"$BUILD_DIR/Release/SoundStageNative.bundle\"\nfind . -name \"*.meta\" -type f -delete\n\n";
+			shellScript = "# Unity places .meta files inside the bundle, which Xcode doesn't like at all:\ncd \"$BUILD_DIR/Debug/OSLNative.bundle\"\nfind . -name \"*.meta\" -type f -delete\ncd \"$BUILD_DIR/Release/OSLNative.bundle\"\nfind . -name \"*.meta\" -type f -delete\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -429,11 +429,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = fast;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = /SoundStageNative/macos;
+				INSTALL_PATH = /OSLNative/macos;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.FHNW.MasterBusRecorder;
-				PRODUCT_NAME = SoundStageNative;
+				PRODUCT_NAME = OSLNative;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -459,10 +459,10 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = fast;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = /SoundStageNative/macos;
+				INSTALL_PATH = /OSLNative/macos;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.FHNW.MasterBusRecorder;
-				PRODUCT_NAME = SoundStageNative;
+				PRODUCT_NAME = OSLNative;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -618,7 +618,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1DEB911A08733D790010E9CD /* Build configuration list for PBXNativeTarget "SoundStageNative" */ = {
+		1DEB911A08733D790010E9CD /* Build configuration list for PBXNativeTarget "OSLNative" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB911B08733D790010E9CD /* Debug */,
@@ -627,7 +627,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "SoundStageNative" */ = {
+		1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "OSLNative" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB911F08733D790010E9CD /* Debug */,

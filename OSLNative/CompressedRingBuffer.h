@@ -1,6 +1,6 @@
 //
 //  CompressedRingBuffer.hpp
-//  SoundStageNative
+//  OSLNative
 //
 //  Created by hb on 19.01.22.
 //

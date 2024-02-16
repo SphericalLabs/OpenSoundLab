@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8D57630D048677EA00EA77CD"
-               BuildableName = "SoundStageNative.bundle"
-               BlueprintName = "SoundStageNative"
-               ReferencedContainer = "container:SoundStageNative.xcodeproj">
+               BuildableName = "OSLNative.bundle"
+               BlueprintName = "OSLNative"
+               ReferencedContainer = "container:OSLNative.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -51,9 +51,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8D57630D048677EA00EA77CD"
-            BuildableName = "SoundStageNative.bundle"
-            BlueprintName = "SoundStageNative"
-            ReferencedContainer = "container:SoundStageNative.xcodeproj">
+            BuildableName = "OSLNative.bundle"
+            BlueprintName = "OSLNative"
+            ReferencedContainer = "container:OSLNative.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

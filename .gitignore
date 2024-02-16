@@ -78,7 +78,7 @@ SoundStage_Data/Resources/unity default resources
 SoundStage_Data/resources.resource
 SoundStage_Data/resources.assets.resS
 SoundStage_Data/resources.assets
-SoundStage_Data/Plugins/SoundStageNative.dll
+SoundStage_Data/Plugins/OSLNative.dll
 SoundStage_Data/Plugins/OVRPlugin.dll
 SoundStage_Data/Plugins/OVRLipSync.dll
 SoundStage_Data/Plugins/openvr_api.dll
@@ -351,67 +351,68 @@ user.keystore
 /Assets/Editor/Android_Code_Signing.cs
 /Assets/Editor/Android_Code_Signing.cs.meta
 
-#SoundStageNative
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.exp
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.iobj
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.ipdb
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.lib
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.log
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.pdb
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/SoundStageNative.write.1u.tlog
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/link.read.1.tlog
+#OSLNative
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.exp
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.iobj
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.ipdb
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.lib
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.log
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.pdb
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.tlog/OSLNative.write.1u.tlog
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.tlog/link.read.1.tlog
 
 
-/Assets/SoundStageNative/SoundStageNative/x64/Debug/*
-/Assets/SoundStageNative/SoundStageNative/Debug/*
+/Assets/OSLNative/OSLNative/x64/Debug/*
+/Assets/OSLNative/OSLNative/Debug/*
 
 
-/Assets/SoundStageNative/SoundStageNative/x64/Release/vc140.pdb
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/CL.command.1.tlog
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/CL.read.1.tlog
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/CL.write.1.tlog
+/Assets/OSLNative/OSLNative/x64/Release/vc140.pdb
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.tlog/CL.command.1.tlog
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.tlog/CL.read.1.tlog
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.tlog/CL.write.1.tlog
 
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.Build.CppClean.log
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.Build.CppClean.log
  
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*.obj
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*obj.meta
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*recipe.meta
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*exp.meta
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*iobj.meta
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*ipdb.meta
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*lib.meta
-/Assets/SoundStageNative/SoundStageNative/x64/Release/*log.meta
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.tlog/*
-/Assets/SoundStageNative/SoundStageNative/x64/Release/SoundStageNative.vcxproj.FileListAbsolute.txt.meta
+/Assets/OSLNative/OSLNative/x64/Release/*.obj
+/Assets/OSLNative/OSLNative/x64/Release/*obj.meta
+/Assets/OSLNative/OSLNative/x64/Release/*recipe.meta
+/Assets/OSLNative/OSLNative/x64/Release/*exp.meta
+/Assets/OSLNative/OSLNative/x64/Release/*iobj.meta
+/Assets/OSLNative/OSLNative/x64/Release/*ipdb.meta
+/Assets/OSLNative/OSLNative/x64/Release/*lib.meta
+/Assets/OSLNative/OSLNative/x64/Release/*log.meta
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.tlog/
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.tlog/*
+/Assets/OSLNative/OSLNative/x64/Release/OSLNative.vcxproj.FileListAbsolute.txt.meta
 
-/SoundStageNative/x64/Release/*.obj
-/SoundStageNative/x64/Release/*.log
-/SoundStageNative/x64/Release/*.recipe
-/SoundStageNative/x64/Release/*.iobj
-/SoundStageNative/x64/Release/*.ipdb
-/SoundStageNative/x64/Release/*obj.meta
-/SoundStageNative/x64/Release/*recipe.meta
-/SoundStageNative/x64/Release/*exp.meta
-/SoundStageNative/x64/Release/*iobj.meta
-/SoundStageNative/x64/Release/*ipdb.meta
-/SoundStageNative/x64/Release/*lib.meta
-/SoundStageNative/x64/Release/*log.meta
-/SoundStageNative/x64/Release/SoundStageNative.log
-/SoundStageNative/x64/Release/SoundStageNative.tlog/
-/SoundStageNative/x64/Release/SoundStageNative.tlog/*
-/SoundStageNative/x64/Release/SoundStageNative.vcxproj.FileListAbsolute.txt.meta
+/OSLNative/x64/
+/OSLNative/x64/Release/*.obj
+/OSLNative/x64/Release/*.log
+/OSLNative/x64/Release/*.recipe
+/OSLNative/x64/Release/*.iobj
+/OSLNative/x64/Release/*.ipdb
+/OSLNative/x64/Release/*obj.meta
+/OSLNative/x64/Release/*recipe.meta
+/OSLNative/x64/Release/*exp.meta
+/OSLNative/x64/Release/*iobj.meta
+/OSLNative/x64/Release/*ipdb.meta
+/OSLNative/x64/Release/*lib.meta
+/OSLNative/x64/Release/*log.meta
+/OSLNative/x64/Release/OSLNative.log
+/OSLNative/x64/Release/OSLNative.tlog/
+/OSLNative/x64/Release/OSLNative.tlog/*
+/OSLNative/x64/Release/OSLNative.vcxproj.FileListAbsolute.txt.meta
 
 
-/Assets/SoundStageNative/x64/Release/SoundStageNative.exp
-/Assets/SoundStageNative/x64/Release/SoundStageNative.exp.meta
-/Assets/SoundStageNative/x64/Release/SoundStageNative.iobj
-/Assets/SoundStageNative/x64/Release/SoundStageNative.iobj.meta
-/Assets/SoundStageNative/x64/Release/SoundStageNative.ipdb
-/Assets/SoundStageNative/x64/Release/SoundStageNative.ipdb.meta
-/Assets/SoundStageNative/x64/Release/SoundStageNative.lib.meta
+/Assets/OSLNative/x64/Release/OSLNative.exp
+/Assets/OSLNative/x64/Release/OSLNative.exp.meta
+/Assets/OSLNative/x64/Release/OSLNative.iobj
+/Assets/OSLNative/x64/Release/OSLNative.iobj.meta
+/Assets/OSLNative/x64/Release/OSLNative.ipdb
+/Assets/OSLNative/x64/Release/OSLNative.ipdb.meta
+/Assets/OSLNative/x64/Release/OSLNative.lib.meta
 
-/SoundStageNative/x64/Release/SoundStageNative.tlog/*
+/OSLNative/x64/Release/OSLNative.tlog/*
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/xcode
