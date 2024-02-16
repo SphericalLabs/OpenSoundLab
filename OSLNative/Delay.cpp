@@ -179,7 +179,7 @@ OSL_API void Delay_SetMode(int mode, DelayData* x)
             {
                 RingBuffer* tap1 = (RingBuffer*)x->tap;
                 RingBuffer_Free(tap1);
-                x->tap = (void*)FrameRingBuffer_New(12.5f * 48000); //TODO: this is an ugly hack
+                x->tap = (void*)FrameRingBuffer_New(x->maxTime); 
             }
             break;
         }
@@ -229,21 +229,12 @@ void Delay_ProcessInterpolated2(float buffer[], int n, int channels, float timeB
     {
 
         _fClamp(timeBuffer, -1, 1, nPerChannel);
-        //_fScale(timeBuffer, timeBuffer, 0.5f, nPerChannel);
-        //_fAddSingle(timeBuffer, 0.5f, timeBuffer, nPerChannel);
-        for (int i = 0; i < nPerChannel; i++) {
-          x->cTime[i] *= powf(2, timeBuffer[i] * 9.0f);
-        }        
-        //_fPow(timeBuffer, timeBuffer, 3, nPerChannel); // it's a bit unusual to apply pow to a cv input buffer at this stage
-        //_fScale(timeBuffer, timeBuffer, 2.0f, nPerChannel);
-        //_fAddSingle(timeBuffer, -1.0f, timeBuffer, nPerChannel);
-        //_fScale(timeBuffer, timeBuffer, x->modeMaxTime - x->modeMinTime, nPerChannel); // -1,1 to actual mode range +/-
-        //_fAdd(timeBuffer, x->cTime, x->cTime, nPerChannel);
-        _fClamp(x->cTime, x->minSamples, x->maxSamples, nPerChannel);
-        //_fClamp(x->cTime, 5, 30 * 48000, nPerChannel); // sync 
         
-        // low ranges are broken, is clamping broken? 
-        // consider making it respond in 1v/oct, pow(2, n) with modeMaxTime as reference
+        for (int i = 0; i < nPerChannel; i++) {
+          x->cTime[i] *= powf(2, timeBuffer[i] * 13.0f); // 13 octaves in both directions, full range between minPower 2^8 and maxPower 2^18
+        }        
+
+        _fClamp(x->cTime, x->minSamples, x->maxSamples, nPerChannel);
 
     }
     float oversampling = x->maxTime / _fAverageSumOfMags(x->cTime, nPerChannel); //this is the "average" oversampling over the whole input buffer. For writing, we use this to avoid many small frames in the ringbuffer, as this affects read performance negatively.
