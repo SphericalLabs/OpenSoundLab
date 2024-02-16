@@ -6,37 +6,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-using UnityEngine;
-using UnityEngine.UI;
+using System;
 
-namespace Facebook.WitAi.TTS.Samples
+namespace Oculus.Interaction.Deprecated
 {
-    public class TTSErrorText : MonoBehaviour
-    {
-        // Label
-        [SerializeField] private Text _errorLabel;
-        // Current error response
-        private string _error = string.Empty;
-
-        // Add listeners
-        private void Update()
-        {
-            if (TTSService.Instance != null)
-            {
-                string serviceError = TTSService.Instance.IsValid();
-                if (!string.Equals(serviceError, _error))
-                {
-                    _error = serviceError;
-                    if (string.IsNullOrEmpty(_error))
-                    {
-                        _errorLabel.text = string.Empty;
-                    }
-                    else
-                    {
-                        _errorLabel.text = $"TTS Service Error: {_error}";
-                    }
-                }
-            }
-        }
-    }
+    [Obsolete("Sample moved to Samples/TTSVoices")]
+    public class TTSErrorText { }
 }

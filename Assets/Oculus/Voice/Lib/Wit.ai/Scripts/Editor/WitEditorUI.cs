@@ -8,10 +8,11 @@
 
 using System;
 using System.Collections.Generic;
+using Meta.Voice.TelemetryUtilities;
 using UnityEditor;
 using UnityEngine;
 
-namespace Facebook.WitAi
+namespace Meta.WitAi
 {
     public static class WitEditorUI
     {
@@ -69,7 +70,10 @@ namespace Facebook.WitAi
             EditorGUI.indentLevel++;
             foreach (var field in obj.GetType().GetFields())
             {
-                LayoutKeyLabel(field.Name, field.GetValue(obj).ToString());
+                if (field.IsPublic && !field.IsStatic)
+                {
+                    LayoutKeyLabel(field.Name, field.GetValue(obj).ToString());
+                }
             }
             EditorGUI.indentLevel--;
         }
@@ -82,10 +86,34 @@ namespace Facebook.WitAi
             float width = WitStyles.TextButton.CalcSize(content).x + WitStyles.TextButtonPadding * 2f;
             return LayoutButton(content, WitStyles.TextButton, new GUILayoutOption[] { GUILayout.Width(width) });
         }
+
+        public static bool LayoutTextLink(string text)
+        {
+            GUIContent content = new GUIContent(text);
+#if UNITY_2021_3_OR_NEWER
+            var isClicked = EditorGUILayout.LinkButton(content);
+            if (isClicked)
+            {
+                Telemetry.LogInstantEvent(Telemetry.TelemetryEventId.ClickButton, new Dictionary<Telemetry.AnnotationKey, string>
+                {
+                    {Telemetry.AnnotationKey.ControlId, text},
+                    {Telemetry.AnnotationKey.Type, "Link"}
+                });
+            }
+#else
+            var style = GUI.skin.GetStyle("Label");
+            var isClicked = LayoutButton(content, style, new GUILayoutOption[] {});
+#endif
+
+
+            return isClicked;
+        }
+
         public static bool LayoutIconButton(GUIContent icon)
         {
             return LayoutButton(icon, WitStyles.IconButton, null);
         }
+
         public static void LayoutTabButtons(string[] tabTitles, ref int selection)
         {
             if (tabTitles != null)
@@ -109,10 +137,35 @@ namespace Facebook.WitAi
         }
         private static bool LayoutButton(GUIContent content, GUIStyle style, GUILayoutOption[] options)
         {
-            return GUILayout.Button(content, style, options);
+            var isClicked = GUILayout.Button(content, style, options);
+            if (isClicked)
+            {
+                var annotations = new Dictionary<Telemetry.AnnotationKey, string>
+                {
+                    { Telemetry.AnnotationKey.ControlId, content.text }
+                };
+
+                var name = content.text;
+                if (string.IsNullOrEmpty(name) && content.image != null)
+                {
+                    name = content.image.name;
+                    annotations[Telemetry.AnnotationKey.ControlId] = name;
+                    annotations.Add(Telemetry.AnnotationKey.Type, "Image");
+                }
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    // We can't figure out what was just clicked, so skip telemetry.
+                    return true;
+                }
+
+                Telemetry.LogInstantEvent(Telemetry.TelemetryEventId.ClickButton, annotations);
+            }
+
+            return isClicked;
         }
         // Layout header button
-        public static void LayoutHeaderButton(Texture2D headerTexture, string headerURL)
+        public static void LayoutHeaderButton(Texture2D headerTexture, string headerURL, string docsUrl)
         {
             if (headerTexture != null)
             {
@@ -125,13 +178,29 @@ namespace Facebook.WitAi
                 {
                     Application.OpenURL(headerURL);
                 }
-                GUILayout.FlexibleSpace();
-                if (LayoutIconButton(WitStyles.HelpIcon))
+                if (!string.IsNullOrEmpty(docsUrl) && LayoutIconButton(WitStyles.HelpIcon))
                 {
-                    Application.OpenURL(headerURL);
+                    Application.OpenURL(docsUrl);
                 }
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
             }
+        }
+        // Layout header button
+        public static void LayoutHeaderText(string text, string headerURL, string docsUrl)
+        {
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(text, EditorStyles.boldLabel, GUILayout.ExpandWidth(true)) && !string.IsNullOrEmpty(headerURL))
+            {
+                Application.OpenURL(headerURL);
+            }
+            GUILayout.FlexibleSpace();
+            if (!string.IsNullOrEmpty(docsUrl) && LayoutIconButton(WitStyles.HelpIcon))
+            {
+                Application.OpenURL(docsUrl);
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
         }
         #endregion
 
@@ -313,7 +382,7 @@ namespace Facebook.WitAi
         }
         #endregion
 
-        #region MISCELANEOUS
+        #region MISCELLANEOUS
         public static void LayoutToggle(GUIContent key, ref bool toggleValue, ref bool isUpdated)
         {
             // Simple layout
@@ -322,6 +391,11 @@ namespace Facebook.WitAi
             // Update
             if (toggleValue != newToggleValue)
             {
+                Telemetry.LogInstantEvent(Telemetry.TelemetryEventId.ToggleCheckbox, new Dictionary<Telemetry.AnnotationKey, string>
+                {
+                    {Telemetry.AnnotationKey.ControlId, key.text},
+                    {Telemetry.AnnotationKey.Value, newToggleValue.ToString()}
+                });
                 toggleValue = newToggleValue;
                 isUpdated = true;
             }
@@ -329,7 +403,7 @@ namespace Facebook.WitAi
         public static void LayoutPopup(string key, string[] options, ref int selectionValue, ref bool isUpdated)
         {
             // Default
-            int newSelectionValue = selectionValue;
+            int newSelectionValue;
 
             // No options
             if (options == null || options.Length == 0)
@@ -352,6 +426,22 @@ namespace Facebook.WitAi
             // Update
             if (selectionValue != newSelectionValue)
             {
+                string value;
+                if (newSelectionValue > 0 && newSelectionValue < options?.Length)
+                {
+                     value = $"{newSelectionValue}:{options[newSelectionValue]}";
+                }
+                else
+                {
+                    value = $"{newSelectionValue}";
+                }
+                Telemetry.LogInstantEvent(Telemetry.TelemetryEventId.ToggleCheckbox, new Dictionary<Telemetry.AnnotationKey, string>
+                {
+                    {Telemetry.AnnotationKey.ControlId, key},
+                    {Telemetry.AnnotationKey.Type, "Popup"},
+                    {Telemetry.AnnotationKey.Value, value}
+                });
+
                 selectionValue = newSelectionValue;
                 isUpdated = true;
             }
@@ -388,7 +478,7 @@ namespace Facebook.WitAi
         #endregion
 
         #region WINDOW
-        public static void LayoutWindow(string windowTitle, Texture2D windowHeader, string windowHeaderUrl, Action windowContentLayout, ref Vector2 offset, out Vector2 size)
+        public static void LayoutWindow(string windowTitle, Texture2D windowHeader, string windowHeaderUrl, string windowInfoUrl, Action windowContentLayout, ref Vector2 offset, out Vector2 size)
         {
             // Get minimum width
             float minWidth = WitStyles.WindowMinWidth;
@@ -402,7 +492,7 @@ namespace Facebook.WitAi
                         // Layout header image
                         if (windowHeader != null)
                         {
-                            LayoutHeaderButton(windowHeader, windowHeaderUrl);
+                            LayoutHeaderButton(windowHeader, windowHeaderUrl, windowInfoUrl);
                         }
                         // Layout header label
                         if (!string.IsNullOrEmpty(windowTitle))

@@ -1,13 +1,13 @@
 using System;
 using System.Text;
-using Facebook.WitAi.Events;
+using Meta.WitAi.Events;
 using UnityEngine;
 
-namespace Facebook.WitAi.Dictation
+namespace Meta.WitAi.Dictation
 {
     public class MultiRequestTranscription : MonoBehaviour
     {
-        [SerializeField] private WitDictation witDictation;
+        [SerializeField] private DictationService witDictation;
         [SerializeField] private int linesBetweenActivations = 2;
         [Multiline]
         [SerializeField] private string activationSeparator = String.Empty;
@@ -24,7 +24,7 @@ namespace Facebook.WitAi.Dictation
 
         private void Awake()
         {
-            if (!witDictation) witDictation = FindObjectOfType<WitDictation>();
+            if (!witDictation) witDictation = FindObjectOfType<DictationService>();
 
             _text = new StringBuilder();
             _separator = new StringBuilder();
@@ -41,17 +41,17 @@ namespace Facebook.WitAi.Dictation
 
         private void OnEnable()
         {
-            witDictation.VoiceEvents.OnFullTranscription.AddListener(OnFullTranscription);
-            witDictation.VoiceEvents.OnPartialTranscription.AddListener(OnPartialTranscription);
-            witDictation.VoiceEvents.OnAborting.AddListener(OnCancelled);
+            witDictation.DictationEvents.OnFullTranscription.AddListener(OnFullTranscription);
+            witDictation.DictationEvents.OnPartialTranscription.AddListener(OnPartialTranscription);
+            witDictation.DictationEvents.OnAborting.AddListener(OnCancelled);
         }
 
         private void OnDisable()
         {
             _activeText = string.Empty;
-            witDictation.VoiceEvents.OnFullTranscription.RemoveListener(OnFullTranscription);
-            witDictation.VoiceEvents.OnPartialTranscription.RemoveListener(OnPartialTranscription);
-            witDictation.VoiceEvents.OnAborting.RemoveListener(OnCancelled);
+            witDictation.DictationEvents.OnFullTranscription.RemoveListener(OnFullTranscription);
+            witDictation.DictationEvents.OnPartialTranscription.RemoveListener(OnPartialTranscription);
+            witDictation.DictationEvents.OnAborting.RemoveListener(OnCancelled);
         }
 
         private void OnCancelled()

@@ -18,12 +18,18 @@
  * limitations under the License.
  */
 
+using System;
+using Oculus.VoiceSDK;
 using UnityEngine;
 
 namespace Oculus.Voice.Utility
 {
+    /// <summary>
+    /// Obsolete class for editor version info
+    /// </summary>
     public class VoiceSDKVersion : MonoBehaviour
     {
-        public const string VERSION = "46.0.0.244.0";
+        [Obsolete("Use 'VoiceSDKConstants.SdkVersion' directly")]
+        public static string VERSION => VoiceSDKConstants.SdkVersion;
     }
 }

@@ -18,112 +18,40 @@
  * limitations under the License.
  */
 
+using Oculus.Interaction.DebugTree;
 using UnityEngine;
-using TMPro;
-using System.Collections.Generic;
-using UnityEngine.Assertions;
 
 namespace Oculus.Interaction.PoseDetection.Debug
 {
-    public interface IActiveStateNodeUI
+    public class ActiveStateDebugTreeUI : DebugTreeUI<IActiveState>
     {
-        RectTransform ChildArea { get; }
-        void Bind(IActiveStateTreeNode node, bool isRoot, bool isDuplicate);
-    }
-
-    public class ActiveStateDebugTreeUI : MonoBehaviour
-    {
+        [Tooltip("The IActiveState to debug.")]
         [SerializeField, Interface(typeof(IActiveState))]
-        private MonoBehaviour _activeState;
+        private UnityEngine.Object _activeState;
 
-        [SerializeField, Interface(typeof(IActiveStateNodeUI))]
-        private MonoBehaviour _nodePrefab;
+        [Tooltip("The node prefab which will be used to build the visual tree.")]
+        [SerializeField, Interface(typeof(INodeUI<IActiveState>))]
+        private UnityEngine.Component _nodePrefab;
 
-        [SerializeField]
-        private RectTransform _contentArea;
-
-        [SerializeField]
-        private bool _buildTreeOnStart;
-
-        [SerializeField, Optional]
-        private TMP_Text _title;
-
-        private IActiveState ActiveState;
-        private ActiveStateDebugTree _tree;
-
-        private Dictionary<IActiveStateTreeNode, IActiveStateNodeUI> _nodeToUI
-            = new Dictionary<IActiveStateTreeNode, IActiveStateNodeUI>();
-
-        protected virtual void Awake()
+        protected override IActiveState Value
         {
-            ActiveState = _activeState as IActiveState;
-            _tree = new ActiveStateDebugTree(ActiveState);
+            get => _activeState as IActiveState;
         }
 
-        protected virtual void Start()
+        protected override INodeUI<IActiveState> NodePrefab
         {
-            Assert.IsNotNull(ActiveState);
-            Assert.IsNotNull(_nodePrefab);
-            Assert.IsNotNull(_contentArea);
-
-            if (_buildTreeOnStart)
-            {
-                BuildTree();
-            }
+            get => _nodePrefab as INodeUI<IActiveState>;
         }
 
-        public void BuildTree()
+        protected override DebugTree<IActiveState> InstantiateTree(IActiveState value)
         {
-            _nodeToUI.Clear();
-            ClearContentArea();
-            SetTitleText();
-            BuildTreeRecursive(_contentArea, _tree.GetRootNode(), true);
+            return new ActiveStateDebugTree(value);
+        }
+        protected override string TitleForValue(IActiveState value)
+        {
+            Object obj = value as Object;
+            return obj != null ? obj.name : "";
         }
 
-        private void BuildTreeRecursive(
-            RectTransform parent, IActiveStateTreeNode node, bool isRoot)
-        {
-            IActiveStateNodeUI nodeUI = Instantiate(_nodePrefab, parent) as IActiveStateNodeUI;
-
-            bool isDuplicate = _nodeToUI.ContainsKey(node);
-            nodeUI.Bind(node, isRoot, isDuplicate);
-
-            if (!isDuplicate)
-            {
-                _nodeToUI.Add(node, nodeUI);
-                foreach (var child in node.Children)
-                {
-                    BuildTreeRecursive(nodeUI.ChildArea, child, false);
-                }
-            }
-        }
-
-        private void ClearContentArea()
-        {
-            for (int i = 0; i < _contentArea.childCount; ++i)
-            {
-                Transform child = _contentArea.GetChild(i);
-                if (child != null && child.TryGetComponent<IActiveStateNodeUI>(out _))
-                {
-                    Destroy(child.gameObject);
-                }
-            }
-        }
-
-        private void SetTitleText()
-        {
-            if (_title != null)
-            {
-                _title.text = _activeState != null ?
-                    _activeState.gameObject.name : "";
-            }
-        }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            SetTitleText();
-        }
-#endif
     }
 }

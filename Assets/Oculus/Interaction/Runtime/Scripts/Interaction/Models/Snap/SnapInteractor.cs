@@ -18,9 +18,7 @@
  * limitations under the License.
  */
 
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 
 namespace Oculus.Interaction
@@ -34,13 +32,26 @@ namespace Oculus.Interaction
     public class SnapInteractor : Interactor<SnapInteractor, SnapInteractable>,
         IRigidbodyRef
     {
+        /// <summary>
+        /// The object's Grabbable component.
+        /// </summary>
+        [Tooltip("The object's Grabbable component.")]
         [SerializeField]
         private PointableElement _pointableElement;
+        public IPointableElement PointableElement => _pointableElement;
 
+        /// <summary>
+        /// The object's RigidBody component.
+        /// </summary>
+        [Tooltip("The object's RigidBody component.")]
         [SerializeField]
         private Rigidbody _rigidbody;
         public Rigidbody Rigidbody => _rigidbody;
 
+        /// <summary>
+        /// Used to determine which object should snap to your hand when there are multiple to choose from. Objects with a lower threshold have a higher priority.
+        /// </summary>
+        [Tooltip("Used to determine which object should snap to your hand when there are multiple to choose from. Objects with a lower threshold have a higher priority.")]
         [SerializeField]
         private float _distanceThreshold = 0.01f;
 
@@ -50,13 +61,29 @@ namespace Oculus.Interaction
         private Transform _snapPoseTransform;
         public Pose SnapPose => _snapPoseTransform.GetPose();
 
+        /// <summary>
+        /// The default Interactable to snap to until you interact with the object.
+        /// </summary>
+        [Tooltip("The default Interactable to snap to until you interact with the object.")]
         [SerializeField, Optional]
         private SnapInteractable _defaultInteractable = null;
 
+        /// <summary>
+        /// Interactable to automatically snap to
+        /// when the associated Pointable is not being pointed at for Time-Out seconds.
+        /// </summary>
         [SerializeField, Optional]
+        [Tooltip("Interactable to automatically snap to " +
+            "when the associated Pointable is not being pointed at for Time-Out seconds")]
         private SnapInteractable _timeOutInteractable = null;
 
+        /// <summary>
+        /// When the associated Pointable is not being pointed at for Time-Out seconds
+        /// the SnapInteractor will snap to the TimeOutInteractable, unless it is null.
+        /// </summary>
         [SerializeField, Optional]
+        [Tooltip("When the associated Pointable is not being pointed at for Time-Out seconds " +
+            "the SnapInteractor will snap to the TimeOutInteractable, unless it is null.")]
         private float _timeOut = 0f;
 
         private float _idleStarted = -1f;
@@ -92,8 +119,9 @@ namespace Oculus.Interaction
         protected override void Start()
         {
             this.BeginStart(ref _started, () => base.Start());
-            Assert.IsNotNull(_pointableElement);
-            Assert.IsNotNull(Rigidbody);
+            this.AssertField(_pointableElement, nameof(_pointableElement));
+            this.AssertField(Rigidbody, nameof(Rigidbody));
+
             if (_snapPoseTransform == null)
             {
                 _snapPoseTransform = this.transform;
@@ -282,7 +310,8 @@ namespace Oculus.Interaction
 
         private bool TimedOut()
         {
-            return _timeOut >= 0f
+            return _timeOutInteractable != null
+                && _timeOut >= 0f
                 && _idleStarted >= 0f
                 && Time.time - _idleStarted > _timeOut;
         }
@@ -313,7 +342,7 @@ namespace Oculus.Interaction
             float bestPositionDeltaSqr = float.MaxValue;
             float bestAngularDelta = float.MaxValue;
 
-            IEnumerable<SnapInteractable> interactables = SnapInteractable.Registry.List(this);
+            var interactables = SnapInteractable.Registry.List(this);
             foreach (SnapInteractable interactable in interactables)
             {
                 if (!interactable.PoseForInteractor(this, out Pose pose))

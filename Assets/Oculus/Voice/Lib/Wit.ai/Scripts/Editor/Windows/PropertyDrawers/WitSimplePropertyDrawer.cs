@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Facebook.WitAi.Windows
+namespace Meta.WitAi.Windows
 {
     // Handles layout of very simple property drawer
     public abstract class WitSimplePropertyDrawer : PropertyDrawer
@@ -45,14 +45,17 @@ namespace Facebook.WitAi.Windows
         protected virtual string GetFieldStringValue(SerializedProperty subfieldProperty)
         {
             // Supported types
-            switch (subfieldProperty.type)
+            if (subfieldProperty != null)
             {
-                case "string":
-                    return subfieldProperty.stringValue;
-                case "int":
-                    return subfieldProperty.intValue.ToString();
-                case "bool":
-                    return subfieldProperty.boolValue.ToString();
+                switch (subfieldProperty.type)
+                {
+                    case "string":
+                        return subfieldProperty.stringValue;
+                    case "int":
+                        return subfieldProperty.intValue.ToString();
+                    case "bool":
+                        return subfieldProperty.boolValue.ToString();
+                }
             }
             // No others are currently supported
             return string.Empty;

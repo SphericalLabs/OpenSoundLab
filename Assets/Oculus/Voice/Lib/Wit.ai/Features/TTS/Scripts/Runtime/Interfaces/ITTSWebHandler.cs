@@ -6,17 +6,22 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-using Facebook.WitAi.TTS.Data;
-using Facebook.WitAi.TTS.Events;
+using Meta.WitAi.TTS.Data;
+using Meta.WitAi.TTS.Events;
 
-namespace Facebook.WitAi.TTS.Interfaces
+namespace Meta.WitAi.TTS.Interfaces
 {
     public interface ITTSWebHandler
     {
         /// <summary>
+        /// Any web request performs this event
+        /// </summary>
+        TTSWebRequestEvents WebRequestEvents { get; }
+
+        /// <summary>
         /// Streaming events
         /// </summary>
-        TTSStreamEvents WebStreamEvents { get; set; }
+        TTSStreamEvents WebStreamEvents { get; }
 
         /// <summary>
         /// Method for determining if text to speak is valid
@@ -40,7 +45,7 @@ namespace Facebook.WitAi.TTS.Interfaces
         /// <summary>
         /// Download events
         /// </summary>
-        TTSDownloadEvents WebDownloadEvents { get; set; }
+        TTSDownloadEvents WebDownloadEvents { get; }
 
         /// <summary>
         /// Method for performing a web load request

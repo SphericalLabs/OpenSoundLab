@@ -24,6 +24,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
+using UnityEngine.Assertions.Must;
 
 namespace Oculus.Interaction.GrabAPI
 {
@@ -93,6 +94,12 @@ namespace Oculus.Interaction.GrabAPI
         private static extern ReturnValue isdk_FingerPinchGrabAPI_GetFingerIsGrabbing(int handle, int index, out bool grabbing);
 
         [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetFingerPinchPercent(int handle, int index, out float pinchPercent);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetFingerPinchDistance(int handle, int index, out float pinchDistance);
+
+        [DllImport("InteractionSdk")]
         private static extern ReturnValue isdk_FingerPinchGrabAPI_GetFingerIsGrabbingChanged(int handle, int index, bool targetState, out bool grabbing);
 
         [DllImport("InteractionSdk")]
@@ -105,21 +112,55 @@ namespace Oculus.Interaction.GrabAPI
         private static extern int isdk_Common_GetVersion(out IntPtr versionStringPtr);
 
         [DllImport("InteractionSdk")]
-        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetPinchHasGoodVisibility(int handle, out bool isGood);
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_GetPinchGrabParam(int handle, PinchGrabParam paramId, out float outParam);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_SetPinchGrabParam(int handle, PinchGrabParam paramId, float param);
+
+        [DllImport("InteractionSdk")]
+        private static extern ReturnValue isdk_FingerPinchGrabAPI_IsPinchVisibilityGood(int handle, out bool outVal);
         #endregion
 
-        private int _fingerPinchGrabAPIHandle = -1;
+        private int _fingerPinchGrabApiHandle = -1;
         private HandPinchData _pinchData = new HandPinchData();
+
+        private IHmd _hmd = null;
+
+        public FingerPinchGrabAPI(IHmd hmd = null)
+        {
+            _hmd = hmd;
+        }
 
         private int GetHandle()
         {
-            if (_fingerPinchGrabAPIHandle == -1)
+            if (_fingerPinchGrabApiHandle == -1)
             {
-                _fingerPinchGrabAPIHandle = isdk_FingerPinchGrabAPI_Create();
-                Debug.Assert(_fingerPinchGrabAPIHandle != -1, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_Create failed");
+                _fingerPinchGrabApiHandle = isdk_FingerPinchGrabAPI_Create();
+                Debug.Assert(_fingerPinchGrabApiHandle != -1, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_Create failed");
             }
 
-            return _fingerPinchGrabAPIHandle;
+            return _fingerPinchGrabApiHandle;
+        }
+
+        public void SetPinchGrabParam(PinchGrabParam paramId, float paramVal)
+        {
+            ReturnValue rc = isdk_FingerPinchGrabAPI_SetPinchGrabParam(GetHandle(), paramId, paramVal);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_SetPinchGrabParam failed");
+        }
+
+        public float GetPinchGrabParam(PinchGrabParam paramId)
+        {
+            ReturnValue rc = isdk_FingerPinchGrabAPI_GetPinchGrabParam(GetHandle(), paramId, out float paramVal);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetPinchGrabParam failed");
+            return paramVal;
+        }
+
+        public bool GetIsPinchVisibilityGood()
+        {
+            bool b;
+            ReturnValue rc = isdk_FingerPinchGrabAPI_IsPinchVisibilityGood(GetHandle(), out b);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetIsPinchVisibilityGood failed");
+            return b;
         }
 
         public bool GetFingerIsGrabbing(HandFinger finger)
@@ -129,7 +170,21 @@ namespace Oculus.Interaction.GrabAPI
             return grabbing;
         }
 
-        public Vector3 GetCenterOffset()
+        public float GetFingerPinchPercent(HandFinger finger)
+        {
+            ReturnValue rc = isdk_FingerPinchGrabAPI_GetFingerPinchPercent(GetHandle(), (int)finger, out float pinchPercent);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetFingerPinchPercent failed");
+            return pinchPercent;
+        }
+
+        public float GetFingerPinchDistance(HandFinger finger)
+        {
+            ReturnValue rc = isdk_FingerPinchGrabAPI_GetFingerPinchDistance(GetHandle(), (int)finger, out float pinchDistance);
+            Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetFingerPinchDistance failed");
+            return pinchDistance;
+        }
+
+        public Vector3 GetWristOffsetLocal()
         {
             ReturnValue rc = isdk_FingerPinchGrabAPI_GetCenterOffset(GetHandle(), out Vector3 center);
             Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_GetCenterOffset failed");
@@ -157,24 +212,23 @@ namespace Oculus.Interaction.GrabAPI
             if (poses.Count > 0)
             {
                 _pinchData.SetJoints(poses);
+                Vector3 wristForward = Vector3.forward;
+                Vector3 hmdForward = Vector3.forward;
 
-                if (hand.GetJointPose(HandJointId.HandWristRoot, out Pose wristPose) && hand.GetCenterEyePose(out Pose centerEyePose))
+                if (_hmd != null &&
+                    hand.GetJointPose(HandJointId.HandWristRoot, out Pose wristPose) &&
+                    _hmd.TryGetRootPose(out Pose centerEyePose))
                 {
-                    Vector3 wristForward = -1.0f * wristPose.forward;
-                    Vector3 hmdForward = -1.0f * centerEyePose.forward;
+                    wristForward = -1.0f * wristPose.forward;
+                    hmdForward = -1.0f * centerEyePose.forward;
                     if (hand.Handedness == Handedness.Right)
                     {
                         wristForward = -wristForward;
                     }
+                }
 
-                    ReturnValue rc = isdk_FingerPinchGrabAPI_UpdateHandWristHMDData(GetHandle(), _pinchData, wristForward, hmdForward);
-                    Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_UpdateHandData failed");
-                }
-                else
-                {
-                    ReturnValue rc = isdk_FingerPinchGrabAPI_UpdateHandData(GetHandle(), _pinchData);
-                    Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_UpdateHandData failed");
-                }
+                ReturnValue rc = isdk_FingerPinchGrabAPI_UpdateHandWristHMDData(GetHandle(), _pinchData, wristForward, hmdForward);
+                Debug.Assert(rc != ReturnValue.Failure, "FingerPinchGrabAPI: isdk_FingerPinchGrabAPI_UpdateHandWristHMDData failed");
             }
         }
     }

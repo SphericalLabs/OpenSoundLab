@@ -18,25 +18,31 @@
  * limitations under the License.
  */
 
+using System.Collections.Generic;
+using Oculus.Interaction.PoseDetection.Debug;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Oculus.Interaction.PoseDetection
 {
     public class SequenceActiveState : MonoBehaviour, IActiveState
     {
+        [Tooltip("The Sequence that will drive this component.")]
         [SerializeField]
         private Sequence _sequence;
 
+        [Tooltip("If true, this ActiveState will become Active as soon " +
+            "as the first sequence step becomes Active.")]
         [SerializeField]
         private bool _activateIfStepsStarted;
 
+        [Tooltip("If true, this ActiveState will be active when " +
+            "the supplied Sequence is Active.")]
         [SerializeField]
         private bool _activateIfStepsComplete = true;
 
         protected virtual void Start()
         {
-            Assert.IsNotNull(_sequence);
+            this.AssertField(_sequence, nameof(_sequence));
         }
 
         public bool Active
@@ -45,6 +51,19 @@ namespace Oculus.Interaction.PoseDetection
             {
                 return (_activateIfStepsStarted && _sequence.CurrentActivationStep > 0 && !_sequence.Active) ||
                        (_activateIfStepsComplete && _sequence.Active);
+            }
+        }
+
+        static SequenceActiveState()
+        {
+            ActiveStateDebugTree.RegisterModel<SequenceActiveState>(new DebugModel());
+        }
+
+        private class DebugModel : ActiveStateModel<SequenceActiveState>
+        {
+            protected override IEnumerable<IActiveState> GetChildren(SequenceActiveState activeState)
+            {
+                return new[] { activeState._sequence };
             }
         }
 
