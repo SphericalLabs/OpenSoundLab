@@ -454,12 +454,12 @@ public class manipulator : MonoBehaviour
   void Update()
   {
 
-    Debug.Log("");
-    Debug.Log("GetControllerOrientationTracked " + OVRInput.GetControllerOrientationTracked(currentInput));
-    Debug.Log("GetControllerPositionTracked " + OVRInput.GetControllerPositionTracked(currentInput));
-    Debug.Log("GetControllerOrientationValid " + OVRInput.GetControllerOrientationValid(currentInput));
-    Debug.Log("GetControllerPositionValid " + OVRInput.GetControllerPositionValid(currentInput));
-    Debug.Log("");
+    //Debug.Log("");
+    //Debug.Log("GetControllerOrientationTracked " + OVRInput.GetControllerOrientationTracked(currentInput));
+    //Debug.Log("GetControllerPositionTracked " + OVRInput.GetControllerPositionTracked(currentInput));
+    //Debug.Log("GetControllerOrientationValid " + OVRInput.GetControllerOrientationValid(currentInput));
+    //Debug.Log("GetControllerPositionValid " + OVRInput.GetControllerPositionValid(currentInput));
+    //Debug.Log("");
 
 
     isTrackingWorking = OVRInput.GetControllerOrientationTracked(currentInput) &&
