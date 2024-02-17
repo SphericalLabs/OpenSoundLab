@@ -35,11 +35,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using static OVRHand;
-using OculusSampleFramework;
-using UnityEngine.InputSystem;
-//using System.Linq;
-//using Valve.VR;
 
 public class manipulator : MonoBehaviour
 {
@@ -51,32 +46,23 @@ public class manipulator : MonoBehaviour
   Transform selectedTransform;
   manipObject selectedObject;
 
-
   menuspawn _menuspawn;
   
   bool usingOculus = false;
   public Color onColor = Color.HSVToRGB(208 / 359f, 234 / 255f, 93 / 255f);
 
-  public PlayerInput playerInput;
-  private OSLInput oslInput;
+  OSLInput oslInput;
 
   void Awake()
   {
     _menuspawn = GetComponent<menuspawn>(); 
     activeTip.SetActive(false);
 
-    playerInput = GetComponent<PlayerInput>();    
-    playerInput.onActionTriggered += PlayerInput_onActionTriggered;
-
     oslInput = new OSLInput();
     oslInput.Patcher.Enable();
     
   }
-   
-  private void PlayerInput_onActionTriggered(InputAction.CallbackContext obj)
-  {
-    //Debug.Log(obj);
-  }
+
 
   bool controllerVisible = true;
   public void toggleController(bool on)
@@ -467,22 +453,24 @@ public class manipulator : MonoBehaviour
 
   void Update()
   {
-    //if (oslInput.Patcher.Menu.WasPressedThisFrame()) Debug.Log("menu pressed");
-    
 
-    //Debug.Log("");
-    //Debug.Log(OVRInput.GetControllerOrientationTracked(currentInput));
-    //Debug.Log(OVRInput.GetControllerPositionTracked(currentInput));
-    //Debug.Log(OVRInput.GetControllerOrientationValid(currentInput));
-    //Debug.Log(OVRInput.GetControllerPositionValid(currentInput));
-    //Debug.Log("");
+    Debug.Log("");
+    Debug.Log("GetControllerOrientationTracked " + OVRInput.GetControllerOrientationTracked(currentInput));
+    Debug.Log("GetControllerPositionTracked " + OVRInput.GetControllerPositionTracked(currentInput));
+    Debug.Log("GetControllerOrientationValid " + OVRInput.GetControllerOrientationValid(currentInput));
+    Debug.Log("GetControllerPositionValid " + OVRInput.GetControllerPositionValid(currentInput));
+    Debug.Log("");
 
 
     isTrackingWorking = OVRInput.GetControllerOrientationTracked(currentInput) &&
-      OVRInput.GetControllerPositionTracked(currentInput) &&
-      OVRInput.GetControllerOrientationValid(currentInput) &&
-      OVRInput.GetControllerPositionValid(currentInput);
-         
+      OVRInput.GetControllerPositionTracked(currentInput);
+
+
+    //OVRInput.GetControllerOrientationValid(currentInput);
+    //OVRInput.GetControllerPositionValid(currentInput)
+
+
+    isTrackingWorking = true;
       
       foreach (Renderer childRenderer in renderers)
       {
