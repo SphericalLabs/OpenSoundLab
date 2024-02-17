@@ -37,6 +37,7 @@ using System.Collections;
 using System.Collections.Generic;
 using static OVRHand;
 using OculusSampleFramework;
+using UnityEngine.InputSystem;
 //using System.Linq;
 //using Valve.VR;
 
@@ -56,10 +57,25 @@ public class manipulator : MonoBehaviour
   bool usingOculus = false;
   public Color onColor = Color.HSVToRGB(208 / 359f, 234 / 255f, 93 / 255f);
 
+  public PlayerInput playerInput;
+  private OSLInput oslInput;
+
   void Awake()
   {
     _menuspawn = GetComponent<menuspawn>(); 
     activeTip.SetActive(false);
+
+    playerInput = GetComponent<PlayerInput>();    
+    playerInput.onActionTriggered += PlayerInput_onActionTriggered;
+
+    oslInput = new OSLInput();
+    oslInput.Patcher.Enable();
+    
+  }
+   
+  private void PlayerInput_onActionTriggered(InputAction.CallbackContext obj)
+  {
+    //Debug.Log(obj);
   }
 
   bool controllerVisible = true;
@@ -422,62 +438,6 @@ public class manipulator : MonoBehaviour
 
   bool touchpadActive = false;
 
-  void secondaryOculusButtonUpdate()
-  {
-    bool secondaryDown = false;
-    bool secondaryUp = false;
-
-    if (masterControl.instance.currentPlatform == masterControl.platform.Oculus)
-    {
-      //      secondaryDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
-      //      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
-      if (controllerIndex == 0)
-      {
-        secondaryDown = Input.GetButtonDown("secondaryButtonR");
-      }
-      else if (controllerIndex == 1)
-      {
-        secondaryDown = Input.GetButtonDown("secondaryButtonL");
-      }
-      else
-      {
-        secondaryDown = false;
-      }
-
-      if (controllerIndex == 0)
-      {
-        secondaryUp = Input.GetButtonUp("secondaryButtonR");
-      }
-      else if (controllerIndex == 1)
-      {
-        secondaryUp = Input.GetButtonUp("secondaryButtonL");
-      }
-      else
-      {
-        secondaryUp = false;
-      }
-    }
-    if (controllerVisible)
-    {
-      if (secondaryDown)
-      {
-        if (copyEnabled) SetCopy(true);
-        else if (deleteEnabled) DeleteSelection(true);
-        else if (multiselectEnabled) MultiselectSelection(true);        
-      }
-      else if (secondaryUp)
-      {
-        if (copying) SetCopy(false);
-        else if (deleting) DeleteSelection(false);
-        else if (multiselectEnabled) MultiselectSelection(false);
-      }
-    }
-    else if (grabbing && selectedObject != null)
-    {
-      if (secondaryDown) selectedObject.setPress(true);
-      if (secondaryUp) selectedObject.setPress(false);
-    }
-  }
 
   public bool triggerDown = false;
   public bool pinchPinkyDown = false;
@@ -507,7 +467,9 @@ public class manipulator : MonoBehaviour
 
   void Update()
   {
-   
+    //if (oslInput.Patcher.Menu.WasPressedThisFrame()) Debug.Log("menu pressed");
+    
+
     //Debug.Log("");
     //Debug.Log(OVRInput.GetControllerOrientationTracked(currentInput));
     //Debug.Log(OVRInput.GetControllerPositionTracked(currentInput));
@@ -545,198 +507,48 @@ public class manipulator : MonoBehaviour
     }
 
     updateProngs();
-    bool triggerButtonDown, triggerButtonUp, menuButtonDown;
-
     
     bool currentControlHands = false;
     bool currentControlChanged = false;
-    float pinchIndexStrength = 0;
-    float pinchPinkyStrength = 0;
     
     if (currentControl != lastControl)
     {
       currentControlChanged = true;
       lastControl = currentControl;
     }
-    if (masterControl.instance.currentPlatform == masterControl.platform.Oculus)
+
+    // manage copy
+    if (controllerVisible)
     {
-      
-      if (!triggerDown)
+      if (oslInput.wasCopyStartedByController(controllerIndex))
       {
-        if (currentControlHands)
-        {
-          triggerButtonDown = pinchIndexStrength > 0.85;
-        }
-        else
-        {
-          if (controllerIndex == 0)
-          {
-            triggerButtonDown = Input.GetAxis("triggerR") > 0.75;
-          }
-          else if (controllerIndex == 1)
-          {
-            triggerButtonDown = Input.GetAxis("triggerL") > 0.75;
-          }
-          else
-          {
-            triggerButtonDown = false;
-          }
-        }
+        if (copyEnabled) SetCopy(true);
+        else if (deleteEnabled) DeleteSelection(true);
+        else if (multiselectEnabled) MultiselectSelection(true);
       }
-      else
+      else if (oslInput.wasCopyReleasedByController(controllerIndex))
       {
-        triggerButtonDown = false;
-      }
-      if (triggerDown)
-      {
-        if (currentControlHands)
-        {
-          triggerButtonUp = pinchIndexStrength < 0.50;
-        }
-        else if (!currentControlHands && currentControlChanged)
-        {
-          // force an trigger button up when we lose hands
-          triggerButtonUp = true;
-        }
-        else
-        {
-          if (controllerIndex == 0)
-          {
-            triggerButtonUp = Input.GetAxis("triggerR") < 0.25;
-          }
-          else if (controllerIndex == 1)
-          {
-            triggerButtonUp = Input.GetAxis("triggerL") < 0.25;
-          }
-          else
-          {
-            triggerButtonUp = false;
-          }
-        }
-      }
-      else
-      {
-        triggerButtonUp = false;
-      }
-
-      
-      if (!usingOculus)
-      {
-        //        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
-        if (currentControlHands)
-        {
-          if (pinchPinkyStrength > 0.85)
-          {
-            if (pinchPinkyDown)
-            {
-              menuButtonDown = false;
-            }
-            else
-            {
-              menuButtonDown = true;
-              pinchPinkyDown = true;
-            }
-          }
-          else if (pinchPinkyStrength < 0.25)
-          {
-            pinchPinkyDown = false;
-            menuButtonDown = false;
-          }
-          else
-          {
-            menuButtonDown = false;
-          }
-        }
-        else
-        {
-          if (controllerIndex == 0)
-          {
-            menuButtonDown = Input.GetButtonDown("menuButtonR");
-          }
-          else if (controllerIndex == 1)
-          {
-            menuButtonDown = Input.GetButtonDown("menuButtonL");
-          }
-          else
-          {
-            menuButtonDown = false;
-          }
-        }
-      }
-      else
-      {
-        Vector2 pos; // = SteamVR_Controller.Input(controllerIndex).GetAxis();
-        if (controllerIndex == 0)
-        {
-          pos = new Vector2(Input.GetAxis("touchAxisXR"), Input.GetAxis("touchAxisYR"));
-        }
-        else if (controllerIndex == 1)
-        {
-          pos = new Vector2(Input.GetAxis("touchAxisXL"), Input.GetAxis("touchAxisYL"));
-        }
-        else
-        {
-          pos = new Vector2(0.5f, 0.5f);
-        }
-
-        if (grabbing && selectedObject != null) selectedObject.updateTouchPos(pos);
-
-        secondaryOculusButtonUpdate();
-        //        menuButtonDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(EVRButtonId.k_EButton_A);
-        if (currentControlHands)
-        {
-          if (pinchPinkyStrength > 0.85)
-          {
-            if (pinchPinkyDown)
-            {
-              menuButtonDown = false;
-            }
-            else
-            {
-              menuButtonDown = true;
-              pinchPinkyDown = true;
-            }
-          }
-          else if (pinchPinkyStrength < 0.25)
-          {
-            pinchPinkyDown = false;
-            menuButtonDown = false;
-          }
-          else
-          {
-            menuButtonDown = false;
-          }
-        }
-        else
-        {
-          if (controllerIndex == 0)
-          {
-            menuButtonDown = Input.GetButtonDown("menuButtonR");
-          }
-          else if (controllerIndex == 1)
-          {
-            menuButtonDown = Input.GetButtonDown("menuButtonL");
-          }
-          else
-          {
-            menuButtonDown = false;
-          }
-        }
+        if (copying) SetCopy(false);
+        else if (deleting) DeleteSelection(false);
+        else if (multiselectEnabled) MultiselectSelection(false);
       }
     }
-    else
+    else if (grabbing && selectedObject != null)
     {
-      triggerButtonDown = triggerButtonUp = menuButtonDown = false;
+      if (oslInput.wasCopyStartedByController(controllerIndex)) selectedObject.setPress(true);
+      if (oslInput.wasCopyReleasedByController(controllerIndex)) selectedObject.setPress(false);
     }
 
-    if (triggerButtonDown)
+    // manage interaction
+    if (oslInput.wasTriggerStartedByController(controllerIndex))
     {
       activeTip.SetActive(true);
       tipL.gameObject.SetActive(false);
       tipR.gameObject.SetActive(false);
       SetTrigger(true);
     }
-    if (triggerButtonUp)
+
+    if (oslInput.wasTriggerReleasedByController(controllerIndex))
     {
       activeTip.SetActive(false);
       tipL.gameObject.SetActive(true);
@@ -744,11 +556,14 @@ public class manipulator : MonoBehaviour
       SetTrigger(false);
     }
 
-    if (menuButtonDown) _menuspawn.togglePad();
-
+    // manage ongoing grabbing
     if (grabbing && selectedObject != null) selectedObject.grabUpdate(transform);
     else if (selectedObject != null) selectedObject.selectUpdate(transform);
   }
+
+
+
+
 }
 
 

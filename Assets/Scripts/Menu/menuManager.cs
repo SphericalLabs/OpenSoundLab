@@ -249,7 +249,7 @@ public class menuManager : MonoBehaviour {
   public bool buttonEvent(int controller, Transform pad) {
     bool on = true;
 
-    if (controller != lastController) {
+    if (controller != lastController) { // this logic switches between the two controllers
       if (!simple) Activate(true, pad);
       else SimpleActivate(true, pad);
     } else {

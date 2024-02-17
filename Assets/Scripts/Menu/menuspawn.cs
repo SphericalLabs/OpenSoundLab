@@ -34,23 +34,33 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class menuspawn : MonoBehaviour {
-  int controllerIndex = -1;
+  
   bool active = false;
     
   public menuManager menu;
+  private OSLInput oslInput;
 
-  public void SetDeviceIndex(int index) {
-    controllerIndex = index;
+
+  private void Awake()
+  {
+    oslInput = new OSLInput();
+    oslInput.Enable();
+    oslInput.Patcher.PrimaryLeft.started += togglePad;
+    oslInput.Patcher.PrimaryRight.started += togglePad;
+
   }
 
   void Start() {    
     menu = menuManager.instance;
   }
 
-  public void togglePad() {
-    bool on = menu.buttonEvent(controllerIndex, transform);        
+
+  public void togglePad(InputAction.CallbackContext context) {
+      int controllerIndex = GetComponent<manipulator>().isLeftController() ? 0 : 1;
+      if (oslInput.wasMenuStartedByController(controllerIndex)) menu.buttonEvent(controllerIndex, transform);
   }
 
 }
