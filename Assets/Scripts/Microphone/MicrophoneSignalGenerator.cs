@@ -36,6 +36,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System;
 
 public class MicrophoneSignalGenerator : signalGenerator {
 
@@ -46,8 +47,11 @@ public class MicrophoneSignalGenerator : signalGenerator {
   [DllImport("OSLNative")]
   public static extern void MicFunction(float[] a, float[] b, int length, float val);
 
+
+  
+
   AudioClip micClip;
-  AudioSource source;
+  AudioSource audioSource;
   float[] sharedBuffer;
   bool activated = false;
 
@@ -58,16 +62,72 @@ public class MicrophoneSignalGenerator : signalGenerator {
   public bool active = true;
   int curMicID = 0;
 
+  int selectedMic = 0;
+  private float checkInterval = 0.1f; // Time in seconds to wait between checks
+  private float nextCheckTime = 0f;
+  private int lastMicPosition = 0;
+  private float driftThreshold = 1000; // Sample threshold to consider a drift correction
+  int desiredBuffering;
+
   public override void Awake() {
     base.Awake();
     sharedBuffer = new float[MAX_BUFFER_LENGTH];
+
+    AudioSettings.GetDSPBufferSize(out bufferSize, out numBuffers);
+    desiredBuffering = bufferSize * 32;
   }
 
+  int bufferSize, numBuffers;
+
   void Start() {
-    source = GetComponent<AudioSource>();    
+    audioSource = GetComponent<AudioSource>();    
     OVRManager.TrackingAcquired += trackingAcquired;
     OVRManager.TrackingAcquired += trackingLost;
+
     SelectMic(0);
+
+  }
+
+  void Update()
+  {
+    if (Time.time >= nextCheckTime)
+    {
+      CheckAndCompensateDrift();
+      nextCheckTime = Time.time + checkInterval;
+    }
+  }
+
+  void CheckAndCompensateDrift()
+  {
+    
+    int micPosition = Microphone.GetPosition(Microphone.devices[selectedMic]);
+    int playbackPosition = audioSource.timeSamples;
+
+    // Calculate drift
+    int drift = micPosition - desiredBuffering - (playbackPosition + lastMicPosition - micPosition);
+    lastMicPosition = micPosition;
+
+    // Check if drift is significant
+    if (Mathf.Abs(drift) > driftThreshold && Mathf.Abs(micPosition - playbackPosition) < AudioSettings.outputSampleRate * 2) // avoid compensating when recordHead was just looping!
+    {
+      // Compensate for drift by adjusting playback speed slightly
+      // This is a very basic form of compensation and may not be perfect
+      audioSource.pitch = drift < 0 ? 0.99f : 1.01f;
+    }
+    else
+    {
+      // If drift is within acceptable limits, ensure normal playback speed
+      audioSource.pitch = 1.0f;
+    }
+
+    // modulo for looping!
+    // can you count globally somehow?
+    // can you detect looping for reading and writing?
+
+    //if (playbackPosition > micPosition) {
+    //  audioSource.time -= 0.2f;
+    //}
+
   }
 
   void OnApplicationFocus(bool hasFocus)
@@ -101,23 +161,26 @@ public class MicrophoneSignalGenerator : signalGenerator {
   }
 
   IEnumerator MicActivateRoutine(int num) {
-    source.Stop();
+    audioSource.Stop();
     Microphone.End(Microphone.devices[curMicID]);
     curMicID = num;
 
-    micClip = Microphone.Start(Microphone.devices[num], true, 3, AudioSettings.outputSampleRate);
+    micClip = Microphone.Start(Microphone.devices[num], true, 10, AudioSettings.outputSampleRate);
 
     yield return null;
     if (micClip != null) {
-      source.clip = micClip;
-      source.loop = true;
-      while (!(Microphone.GetPosition(null) > 0)) { }
-      source.Play();
+      audioSource.clip = micClip;
+      audioSource.loop = true;
+      while (!(Microphone.GetPosition(Microphone.devices[num]) > desiredBuffering)) { } 
+      // waits until there are n samples in the buffer in order to avoid drop outs
+      audioSource.Play();
     }
 
     yield return null;
 
   }
+
+  
 
   private void OnAudioFilterRead(float[] buffer, int channels) {
     activated = true;
