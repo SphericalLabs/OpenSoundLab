@@ -48,8 +48,6 @@ public class MicrophoneSignalGenerator : signalGenerator {
   public static extern void MicFunction(float[] a, float[] b, int length, float val);
 
 
-  
-
   AudioClip micClip;
   AudioSource audioSource;
   float[] sharedBuffer;
@@ -58,23 +56,33 @@ public class MicrophoneSignalGenerator : signalGenerator {
   public Dictionary<float, float[]> freqBuffers = new Dictionary<float, float[]>();
 
   public float amp = 1;
-  int micChannels = 1;
-  public bool active = true;
-  int curMicID = 0;
 
-  int selectedMic = 0;
+  public bool active = true;
+
+  int micID = 0;
+  string selectedMic;
+
   private float checkInterval = 0.1f; // Time in seconds to wait between checks
   private float nextCheckTime = 0f;
-  private int lastMicPosition = 0;
-  private float driftThreshold = 1000; // Sample threshold to consider a drift correction
-  int desiredBuffering;
+
+  private float driftThreshold = 0; // Sample threshold to consider a drift correction
+  private int lastWritePos = 0;
+  private int lastReadPos = 0;
+  private long totalWriteDistance = 0; // Total distance traveled by the mic recording
+  private long totalReadDistance = 0; // Total distance traveled by the playback
+
+  int targetBuffering;
 
   public override void Awake() {
     base.Awake();
     sharedBuffer = new float[MAX_BUFFER_LENGTH];
 
     AudioSettings.GetDSPBufferSize(out bufferSize, out numBuffers);
-    desiredBuffering = bufferSize * 32;
+    targetBuffering = bufferSize * 8;
+
+    //int minFreq = 0, maxFreq = 0;
+    //Microphone.GetDeviceCaps(Microphone.devices[micID], out minFreq, out maxFreq);
+    //Debug.Log("Microphone: " + micID + ", minFreq: " + minFreq + ", maxFreq: " + maxFreq);
   }
 
   int bufferSize, numBuffers;
@@ -90,45 +98,51 @@ public class MicrophoneSignalGenerator : signalGenerator {
 
   void Update()
   {
-    if (Time.time >= nextCheckTime)
-    {
-      CheckAndCompensateDrift();
-      nextCheckTime = Time.time + checkInterval;
-    }
+    CheckAndCompensateDrift();
   }
 
+  int micClipLength;
+  int readPos, writePos;
+  long correctedPlaybackPosition, correctedMicPosition, drift;
   void CheckAndCompensateDrift()
   {
-    
-    int micPosition = Microphone.GetPosition(Microphone.devices[selectedMic]);
-    int playbackPosition = audioSource.timeSamples;
+    if (selectedMic == null) return;
 
-    // Calculate drift
-    int drift = micPosition - desiredBuffering - (playbackPosition + lastMicPosition - micPosition);
-    lastMicPosition = micPosition;
+    micClipLength = audioSource.clip.samples; // Total samples in the mic clip
+    readPos = audioSource.timeSamples;
+    writePos = Microphone.GetPosition(selectedMic);
 
-    // Check if drift is significant
-    if (Mathf.Abs(drift) > driftThreshold && Mathf.Abs(micPosition - playbackPosition) < AudioSettings.outputSampleRate * 2) // avoid compensating when recordHead was just looping!
+    // Update total distances traveled, accounting for loops
+    if (readPos < lastReadPos)
     {
-      // Compensate for drift by adjusting playback speed slightly
-      // This is a very basic form of compensation and may not be perfect
-      audioSource.pitch = drift < 0 ? 0.99f : 1.01f;
+      totalReadDistance += micClipLength; // Assuming playback clip is the same length as the recording
+    }
+    if (writePos < lastWritePos)
+    {
+      totalWriteDistance += micClipLength;
+    }
+
+    lastReadPos = readPos;
+    lastWritePos = writePos;
+
+    correctedPlaybackPosition = totalReadDistance + readPos;
+    correctedMicPosition = totalWriteDistance + writePos;
+
+    drift = correctedMicPosition - targetBuffering - correctedPlaybackPosition;
+
+    if (Mathf.Abs(drift) > driftThreshold)
+    {
+      //audioSource.pitch = drift < 0 ? 0.98f : 1.02f;
+      audioSource.pitch = Utils.map(drift, -2000, 2000, 0.95f, 1.05f);
     }
     else
     {
-      // If drift is within acceptable limits, ensure normal playback speed
       audioSource.pitch = 1.0f;
     }
 
-    // modulo for looping!
-    // can you count globally somehow?
-    // can you detect looping for reading and writing?
-
-    //if (playbackPosition > micPosition) {
-    //  audioSource.time -= 0.2f;
-    //}
-
+    //Debug.LogFormat("readHead: {0}, writeHead: {1}, distance: {2}, pitch: {3}", correctedPlaybackPosition.ToString("0000000000"), correctedMicPosition.ToString("0000000000"), drift.ToString("0000000000"), audioSource.pitch);
   }
+
 
   void OnApplicationFocus(bool hasFocus)
   {
@@ -162,16 +176,16 @@ public class MicrophoneSignalGenerator : signalGenerator {
 
   IEnumerator MicActivateRoutine(int num) {
     audioSource.Stop();
-    Microphone.End(Microphone.devices[curMicID]);
-    curMicID = num;
-
-    micClip = Microphone.Start(Microphone.devices[num], true, 10, AudioSettings.outputSampleRate);
+    selectedMic = Microphone.devices[micID];
+    Microphone.End(selectedMic);
+    
+    micClip = Microphone.Start(selectedMic, true, 10, AudioSettings.outputSampleRate);
 
     yield return null;
     if (micClip != null) {
       audioSource.clip = micClip;
       audioSource.loop = true;
-      while (!(Microphone.GetPosition(Microphone.devices[num]) > desiredBuffering)) { } 
+      while (!(Microphone.GetPosition(selectedMic) > targetBuffering)) { } 
       // waits until there are n samples in the buffer in order to avoid drop outs
       audioSource.Play();
     }
@@ -183,6 +197,7 @@ public class MicrophoneSignalGenerator : signalGenerator {
   
 
   private void OnAudioFilterRead(float[] buffer, int channels) {
+
     activated = true;
     if (sharedBuffer.Length != buffer.Length)
       System.Array.Resize(ref sharedBuffer, buffer.Length);
