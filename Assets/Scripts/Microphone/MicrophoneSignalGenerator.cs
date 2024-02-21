@@ -36,7 +36,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System;
 
 public class MicrophoneSignalGenerator : signalGenerator {
 
@@ -60,10 +59,7 @@ public class MicrophoneSignalGenerator : signalGenerator {
   public bool active = true;
 
   int micID = 0;
-  string selectedMic;
-
-  private float checkInterval = 0.1f; // Time in seconds to wait between checks
-  private float nextCheckTime = 0f;
+  string activeDeviceString; 
 
   private float driftThreshold = 0; // Sample threshold to consider a drift correction
   private int lastWritePos = 0;
@@ -106,11 +102,11 @@ public class MicrophoneSignalGenerator : signalGenerator {
   long correctedPlaybackPosition, correctedMicPosition, drift;
   void CheckAndCompensateDrift()
   {
-    if (selectedMic == null) return;
+    if (activeDeviceString == null) return;
 
     micClipLength = audioSource.clip.samples; // Total samples in the mic clip
     readPos = audioSource.timeSamples;
-    writePos = Microphone.GetPosition(selectedMic);
+    writePos = Microphone.GetPosition(activeDeviceString);
 
     // Update total distances traveled, accounting for loops
     if (readPos < lastReadPos)
@@ -176,16 +172,16 @@ public class MicrophoneSignalGenerator : signalGenerator {
 
   IEnumerator MicActivateRoutine(int num) {
     audioSource.Stop();
-    selectedMic = Microphone.devices[micID];
-    Microphone.End(selectedMic);
+    activeDeviceString = Microphone.devices[micID];
+    Microphone.End(activeDeviceString);
     
-    micClip = Microphone.Start(selectedMic, true, 10, AudioSettings.outputSampleRate);
+    micClip = Microphone.Start(activeDeviceString, true, 10, AudioSettings.outputSampleRate);
 
     yield return null;
     if (micClip != null) {
       audioSource.clip = micClip;
       audioSource.loop = true;
-      while (!(Microphone.GetPosition(selectedMic) > targetBuffering)) { } 
+      while (!(Microphone.GetPosition(activeDeviceString) > targetBuffering)) { } 
       // waits until there are n samples in the buffer in order to avoid drop outs
       audioSource.Play();
     }
@@ -202,8 +198,8 @@ public class MicrophoneSignalGenerator : signalGenerator {
     if (sharedBuffer.Length != buffer.Length)
       System.Array.Resize(ref sharedBuffer, buffer.Length);
 
-    CopyArray(buffer, sharedBuffer, buffer.Length);
-    SetArrayToSingleValue(buffer, buffer.Length, 0.0f);
+    CopyArray(buffer, sharedBuffer, buffer.Length); // copy over for processBuffer, this is probably thread-safe since both calls are supposed to be in the audio thread
+    SetArrayToSingleValue(buffer, buffer.Length, 0.0f); // this zeroes the buffer that is directly played from the AudioSource, so that only the OSL patch is heard
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
