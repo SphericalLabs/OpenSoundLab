@@ -533,7 +533,7 @@ public class omniPlug : manipObject {
   void gazeBasedPosRotUpdate()
   {
 
-    if (manipulatorObjScript.isSidePressed() == false) // fine by default
+    if (OSLInput.getInstance().isSidePressed(manipulatorObjScript.controllerIndex) == false) // fine by default
     {
       transform.parent = plugTrans.parent;
 

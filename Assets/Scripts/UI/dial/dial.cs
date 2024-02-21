@@ -232,8 +232,7 @@ public class dial : manipObject {
     controllerRot = (Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - rotAtBeginningOfGrab) * speedUp;
 
     
-    if ( ( oslInput.Patcher.TriggerLeft.WasPerformedThisFrame() && manipulatorObjScript.isLeftController() ) 
-      || ( oslInput.Patcher.TriggerRight.WasPerformedThisFrame() && !manipulatorObjScript.isLeftController()) ) {
+    if (OSLInput.getInstance().isSidePressed(manipulatorObjScript.controllerIndex)) {
       curRot += (controllerRot - lastControllerRot) / fineMult;
     } else {
       curRot += controllerRot - lastControllerRot;

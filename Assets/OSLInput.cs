@@ -98,6 +98,24 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TriggerLeftAnalog"",
+                    ""type"": ""Value"",
+                    ""id"": ""733ed998-da93-473b-b390-08ebf6371596"",
+                    ""expectedControlType"": ""Analog"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""TriggerRightAnalog"",
+                    ""type"": ""Value"",
+                    ""id"": ""3d23a1f9-b236-4ce5-af3a-9be8422f3204"",
+                    ""expectedControlType"": ""Analog"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -188,6 +206,28 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
                     ""action"": ""TriggerRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a4dc7aed-fe51-40f6-92d7-49807ed0ac07"",
+                    ""path"": ""<XRController>{LeftHand}/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TriggerLeftAnalog"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""77246433-0ab3-4bc0-ab9b-8d67ffd3a65f"",
+                    ""path"": ""<XRController>{RightHand}/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TriggerRightAnalog"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -204,6 +244,8 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
         m_Patcher_GripRight = m_Patcher.FindAction("GripRight", throwIfNotFound: true);
         m_Patcher_TriggerLeft = m_Patcher.FindAction("TriggerLeft", throwIfNotFound: true);
         m_Patcher_TriggerRight = m_Patcher.FindAction("TriggerRight", throwIfNotFound: true);
+        m_Patcher_TriggerLeftAnalog = m_Patcher.FindAction("TriggerLeftAnalog", throwIfNotFound: true);
+        m_Patcher_TriggerRightAnalog = m_Patcher.FindAction("TriggerRightAnalog", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -273,6 +315,8 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Patcher_GripRight;
     private readonly InputAction m_Patcher_TriggerLeft;
     private readonly InputAction m_Patcher_TriggerRight;
+    private readonly InputAction m_Patcher_TriggerLeftAnalog;
+    private readonly InputAction m_Patcher_TriggerRightAnalog;
     public struct PatcherActions
     {
         private @OSLInput m_Wrapper;
@@ -285,6 +329,8 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
         public InputAction @GripRight => m_Wrapper.m_Patcher_GripRight;
         public InputAction @TriggerLeft => m_Wrapper.m_Patcher_TriggerLeft;
         public InputAction @TriggerRight => m_Wrapper.m_Patcher_TriggerRight;
+        public InputAction @TriggerLeftAnalog => m_Wrapper.m_Patcher_TriggerLeftAnalog;
+        public InputAction @TriggerRightAnalog => m_Wrapper.m_Patcher_TriggerRightAnalog;
         public InputActionMap Get() { return m_Wrapper.m_Patcher; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -318,6 +364,12 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
             @TriggerRight.started += instance.OnTriggerRight;
             @TriggerRight.performed += instance.OnTriggerRight;
             @TriggerRight.canceled += instance.OnTriggerRight;
+            @TriggerLeftAnalog.started += instance.OnTriggerLeftAnalog;
+            @TriggerLeftAnalog.performed += instance.OnTriggerLeftAnalog;
+            @TriggerLeftAnalog.canceled += instance.OnTriggerLeftAnalog;
+            @TriggerRightAnalog.started += instance.OnTriggerRightAnalog;
+            @TriggerRightAnalog.performed += instance.OnTriggerRightAnalog;
+            @TriggerRightAnalog.canceled += instance.OnTriggerRightAnalog;
         }
 
         private void UnregisterCallbacks(IPatcherActions instance)
@@ -346,6 +398,12 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
             @TriggerRight.started -= instance.OnTriggerRight;
             @TriggerRight.performed -= instance.OnTriggerRight;
             @TriggerRight.canceled -= instance.OnTriggerRight;
+            @TriggerLeftAnalog.started -= instance.OnTriggerLeftAnalog;
+            @TriggerLeftAnalog.performed -= instance.OnTriggerLeftAnalog;
+            @TriggerLeftAnalog.canceled -= instance.OnTriggerLeftAnalog;
+            @TriggerRightAnalog.started -= instance.OnTriggerRightAnalog;
+            @TriggerRightAnalog.performed -= instance.OnTriggerRightAnalog;
+            @TriggerRightAnalog.canceled -= instance.OnTriggerRightAnalog;
         }
 
         public void RemoveCallbacks(IPatcherActions instance)
@@ -373,5 +431,7 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
         void OnGripRight(InputAction.CallbackContext context);
         void OnTriggerLeft(InputAction.CallbackContext context);
         void OnTriggerRight(InputAction.CallbackContext context);
+        void OnTriggerLeftAnalog(InputAction.CallbackContext context);
+        void OnTriggerRightAnalog(InputAction.CallbackContext context);
     }
 }

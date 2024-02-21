@@ -147,10 +147,11 @@ public class tape : manipObject {
 
   void gazeBasedPosRotUpdate()
   {
-    if (manipulatorObjScript.isSidePressed() == false) // fine by default
+    
+    if (OSLInput.getInstance().isSidePressed(manipulatorObjScript.controllerIndex) == false) // fine by default
     {
 
-      transform.parent = deck; 
+      transform.parent = deck;  
 
       if (!wasPrecisionGazeGrabbed)
       {

@@ -179,7 +179,7 @@ public class gazedObjectTracker : MonoBehaviour
         calibIndicator.transform.position = hit.point;
         calibIndicator.SetActive(true);
 
-        if (Time.frameCount % 15 == 0 && isFullPressed())
+        if (Time.frameCount % 15 == 0 && OSLInput.getInstance().isTriggerFullPressed())
         {
           Vector3 localizedHitPoint = centerEyeAnchor.transform.InverseTransformPoint(hit.point);
           Vector3 localizedPlaneCenter = centerEyeAnchor.transform.InverseTransformPoint(calibrationPlaneCenter.transform.position);
@@ -194,15 +194,6 @@ public class gazedObjectTracker : MonoBehaviour
     }
   }
 
-  bool isHalfPressed()
-  {
-    return (Input.GetAxis("triggerL") > 0.05 || Input.GetAxis("triggerR") > 0.05);
-  }
-
-  bool isFullPressed()
-  {
-    return (Input.GetAxis("triggerL") > 0.7 || Input.GetAxis("triggerR") > 0.7);
-  }
 }
 
 

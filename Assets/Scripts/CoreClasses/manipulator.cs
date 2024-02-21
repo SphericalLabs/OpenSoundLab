@@ -42,7 +42,7 @@ public class manipulator : MonoBehaviour
   
   private static List<manipulator> instances = new List<manipulator>();
 
-  int controllerIndex = -1; // 0 => left, 1 => right
+  public int controllerIndex = -1; // 0 => left, 1 => right
   public GameObject activeTip;
   public Transform tipL, tipR;
   
@@ -429,67 +429,6 @@ public class manipulator : MonoBehaviour
   }
 
 
-  bool touchpadActive = false;
-
-  void secondaryOculusButtonUpdate()
-  {
-    bool secondaryDown = false;
-    bool secondaryUp = false;
-
-    if (masterControl.instance.currentPlatform == masterControl.platform.Oculus)
-    {
-      //      secondaryDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
-      //      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
-      if (controllerIndex == 0)
-      {
-        secondaryDown = Input.GetButtonDown("secondaryButtonL");
-      }
-      else if (controllerIndex == 1)
-      {
-        secondaryDown = Input.GetButtonDown("secondaryButtonR");
-      }
-      else
-      {
-        secondaryDown = false;
-      }
-
-      if (controllerIndex == 0)
-      {
-        secondaryUp = Input.GetButtonUp("secondaryButtonL");
-      }
-      else if (controllerIndex == 1)
-      {
-        secondaryUp = Input.GetButtonUp("secondaryButtonR");
-      }
-      else
-      {
-        secondaryUp = false;
-      }
-    }
-    if (controllerVisible)
-    {
-      if (secondaryDown)
-      {
-        // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown()) copyEnabled = true;
-        if (copyEnabled) SetCopy(true);
-        else if (deleteEnabled) DeleteSelection(true);
-        else if (multiselectEnabled) MultiselectSelection(true);        
-      }
-      else if (secondaryUp)
-      {
-        if (copying) SetCopy(false);
-        else if (deleting) DeleteSelection(false);
-        else if (multiselectEnabled) MultiselectSelection(false);
-      }
-    }
-    else if (grabbing && selectedObject != null)
-    {
-      if (secondaryDown) selectedObject.setPress(true);
-      if (secondaryUp) selectedObject.setPress(false);
-    }
-  }
-
   public bool triggerDown = false;
   public bool pinchPinkyDown = false;
   static OVRPlugin.Controller lastControl = OVRPlugin.Controller.None;
@@ -526,10 +465,8 @@ public class manipulator : MonoBehaviour
     //Debug.Log("GetControllerPositionValid " + OVRInput.GetControllerPositionValid(currentInput));
     //Debug.Log("");
 
-
     isTrackingWorking = OVRInput.GetControllerOrientationTracked(currentInput) &&
       OVRInput.GetControllerPositionTracked(currentInput);
-
 
     //OVRInput.GetControllerOrientationValid(currentInput);
     //OVRInput.GetControllerPositionValid(currentInput)
@@ -537,14 +474,14 @@ public class manipulator : MonoBehaviour
 
     isTrackingWorking = true;
       
-      foreach (Renderer childRenderer in renderers)
-      {
-        childRenderer.enabled = isTrackingWorking;
-      }
+    foreach (Renderer childRenderer in renderers)
+    {
+      childRenderer.enabled = isTrackingWorking;
+    }
 
-      foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers){
-        childRenderer.enabled = isTrackingWorking;
-      }
+    foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers){
+      childRenderer.enabled = isTrackingWorking;
+    }
       
     if(!isTrackingWorking) return;
 
@@ -570,16 +507,20 @@ public class manipulator : MonoBehaviour
       lastControl = currentControl;
     }
 
+
     // manage copy
     if (controllerVisible)
     {
-      if (oslInput.wasCopyStartedByController(controllerIndex))
+      if (oslInput.isCopyStartedByController(controllerIndex))
       {
+        // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
+        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown()) copyEnabled = true;
+
         if (copyEnabled) SetCopy(true);
         else if (deleteEnabled) DeleteSelection(true);
         else if (multiselectEnabled) MultiselectSelection(true);
       }
-      else if (oslInput.wasCopyReleasedByController(controllerIndex))
+      else if (oslInput.isCopyReleasedByController(controllerIndex))
       {
         if (copying) SetCopy(false);
         else if (deleting) DeleteSelection(false);
@@ -588,12 +529,12 @@ public class manipulator : MonoBehaviour
     }
     else if (grabbing && selectedObject != null)
     {
-      if (oslInput.wasCopyStartedByController(controllerIndex)) selectedObject.setPress(true);
-      if (oslInput.wasCopyReleasedByController(controllerIndex)) selectedObject.setPress(false);
+      if (oslInput.isCopyStartedByController(controllerIndex)) selectedObject.setPress(true);
+      if (oslInput.isCopyReleasedByController(controllerIndex)) selectedObject.setPress(false);
     }
 
     // manage interaction
-    if (oslInput.wasTriggerStartedByController(controllerIndex))
+    if (oslInput.isTriggerStartedByController(controllerIndex))
     {
       activeTip.SetActive(true);
       tipL.gameObject.SetActive(false);
@@ -601,7 +542,7 @@ public class manipulator : MonoBehaviour
       SetTrigger(true);
     }
 
-    if (oslInput.wasTriggerReleasedByController(controllerIndex))
+    if (oslInput.isTriggerReleasedByController(controllerIndex))
     {
       // manage deletion via gaze'n'drop
       if (gazedObjectTracker.Instance.gazedAtTrashcan != null)
@@ -643,7 +584,7 @@ public class manipulator : MonoBehaviour
       wasGazeBased = false;
     }
 
-    if (selectedObject != null && !isTriggerPressed() && wasGazeBased)
+    if (selectedObject != null && !OSLInput.getInstance().isTriggerPressed(controllerIndex) && wasGazeBased)
     {
       selectedObject.setSelect(false, transform); 
       selectedObject = null;
@@ -702,14 +643,14 @@ public class manipulator : MonoBehaviour
     {
       if (WorldDragController.bothSidesDown()) return; // no gaze interaction when dragging the world
       
-      if (selectedObject == null && isTriggerHalfPressed()) 
+      if (selectedObject == null && OSLInput.getInstance().isTriggerHalfPressed(controllerIndex)) 
       {
         selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
         selectedObject.setSelect(true, transform);
         wasGazeBased = true;
         //selectedObject = gazeSelectedObj;
       }
-      else if (isTriggerFullPressed())
+      else if (OSLInput.getInstance().isTriggerFullPressed(controllerIndex))
       {
 
         selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
@@ -725,53 +666,8 @@ public class manipulator : MonoBehaviour
       }
     }
 
-
   }
 
-
-  public bool isTriggerHalfPressed()
-  {
-    if (controllerIndex == 0)
-    {
-      return Input.GetAxis("triggerL") >= 0.02 && Input.GetAxis("triggerL") <= 0.7;
-    }
-    else if (controllerIndex == 1)
-    {
-      return Input.GetAxis("triggerR") >= 0.02 && Input.GetAxis("triggerR") <= 0.7;
-    }
-    return false;
-  }
-
-  public bool isTriggerFullPressed()
-  {
-    if (controllerIndex == 0)
-    {
-      return Input.GetAxis("triggerL") > 0.7;
-    }
-    else if (controllerIndex == 1)
-    {
-      return Input.GetAxis("triggerR") > 0.7;
-    }
-    return false;
-  }
-
-  public bool isTriggerPressed()
-  {
-    if (controllerIndex == 0)
-    {
-      return Input.GetAxis("triggerL") >= 0.02;
-    }
-    else if (controllerIndex == 1)
-    {
-      return Input.GetAxis("triggerR") >= 0.02;
-    }
-    return false;
-  }
-
-  public bool isSidePressed()
-  {
-    return isLeftController() ? OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f : OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
-  }
 }
 
 
