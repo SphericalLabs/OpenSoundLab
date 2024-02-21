@@ -35,12 +35,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using static OVRHand;
-using OculusSampleFramework;
-using UnityEngine.UIElements;
 using static manipObject;
-//using System.Linq;
-//using Valve.VR;
 
 public class manipulator : MonoBehaviour
 {
