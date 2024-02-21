@@ -205,10 +205,9 @@ public class menuManager : MonoBehaviour {
       }
       transform.position = pad.Find("manipCollViz").position;
       transform.Translate(Vector3.left * -0.03f); // somehow this is only applied from the second menu spawn on
-      Vector3 camPos = Camera.main.transform.position;
-      camPos.y -= .2f;
-      camPos.x += 0.04f; // half eye distance, so that it centers of middle of both eyes
-      transform.LookAt(camPos, Vector3.up);
+
+      faceCenterEye();
+
     }
     else {
       trashNode.SetActive(false);
@@ -221,6 +220,25 @@ public class menuManager : MonoBehaviour {
       rootNode.SetActive(false);
     }
     yield return null;
+  }
+
+  GameObject centerEyeAnchor;
+  Vector3 centerEye, lookDirection;
+
+  void faceCenterEye(){
+    if (centerEyeAnchor == null) centerEyeAnchor = GameObject.Find("CenterEyeAnchor");
+    
+    centerEye = centerEyeAnchor.transform.position;
+    centerEye.y -= 0.1f;
+
+    //transform.LookAt(centerEye, Vector3.up);
+
+    // needed Quaternion to avoid gimbal locks when spawning above or below
+    lookDirection = centerEye - transform.position;
+    if (lookDirection != Vector3.zero)
+    {
+      transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+    }
   }
 
   void Activate(bool on, Transform pad) {
@@ -238,9 +256,8 @@ public class menuManager : MonoBehaviour {
     if (!active) return;
 
     transform.position = pad.position;
-    Vector3 camPos = Camera.main.transform.position;
-    camPos.y = transform.position.y;
-    transform.LookAt(camPos);
+    
+    faceCenterEye();
   }
 
   public bool simple = false;

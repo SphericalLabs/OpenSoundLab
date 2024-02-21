@@ -37,6 +37,7 @@ using UnityEngine.XR;
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 public class dial : manipObject {
 
@@ -107,17 +108,31 @@ public class dial : manipObject {
     setPercent(percent);
   }
 
+  manipulator selectManipulatorObjScript; // this should actually be made available from manipObject.cs
+
   void Update() {
 
-    if (curState == manipState.selected || curState == manipState.grabbed)
+    if (percent != defaultPercent)
     {
-      // reset dial to default
-      //if ((selectObj.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawButton.Y)
-      //|| (selectObj.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawButton.B))))
-      if (OVRInput.Get(OVRInput.RawButton.Y) || OVRInput.Get(OVRInput.RawButton.B))
+      if (selectObj != null && selectObj.GetComponent<manipulator>() != null)
       {
-        setPercent(defaultPercent);
-        rotAtBeginningOfGrab = controllerRot - curRot;
+        selectManipulatorObjScript = selectObj.GetComponent<manipulator>();
+        if (curState == manipState.selected || curState == manipState.grabbed) // these checks might be redundant at this time
+        {
+          if (selectManipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonL")
+          || (!selectManipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonR")))
+          {
+            setPercent(defaultPercent);
+          }
+        }
+      }
+
+      else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
+      {
+        if (Input.GetButton("secondaryButtonL") || Input.GetButton("secondaryButtonR"))
+        {
+          setPercent(defaultPercent);
+        }
       }
     }
 

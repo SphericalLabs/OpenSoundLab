@@ -200,7 +200,9 @@ public class SaveLoadInterface : MonoBehaviour {
       Vector3 v = g.transform.localScale;
       if(v.x < 0) v.x *= -1; // needs mirroring if dragged while copyijg, because left controller was always mirrored and this copies down to the duplicate
       g2.transform.localScale = v;
-      
+
+      if (m.wasGazeBased) g2.transform.parent = GameObject.Find("PatchAnchor").transform;
+
       m.ForceGrab(g2.GetComponentInChildren<handle>());
     }
   }

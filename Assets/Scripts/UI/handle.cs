@@ -35,7 +35,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class handle : manipObject {
+public class handle : manipObject
+{
 
   public Transform masterObj;
   Transform masterObjParent;
@@ -47,16 +48,19 @@ public class handle : manipObject {
   Material highlightMat;
   Material highlightGrabbedMat;
 
-  public override void Awake() {
+  public override void Awake()
+  {
     base.Awake();
     if (masterObj == null) masterObj = transform.parent;
     masterObjParent = GameObject.Find("PatchAnchor").transform; // move this to instantiation?
-    if (ID == 0) {
+    if (ID == 0)
+    {
       if (GetComponent<Renderer>() == null) mat = matTarg.GetComponent<Renderer>().material;
       else mat = GetComponent<Renderer>().sharedMaterial;
     }
     handle[] temp = transform.parent.GetComponentsInChildren<handle>();
-    for (int i = 0; i < temp.Length; i++) {
+    for (int i = 0; i < temp.Length; i++)
+    {
       if (temp[i] != this) otherHandle = temp[i];
     }
 
@@ -66,33 +70,100 @@ public class handle : manipObject {
 
   }
 
-  public void setObjectParent(Transform t) {
+  public void setObjectParent(Transform t)
+  {
     masterObjParent = t;
     masterObj.parent = t;
   }
 
   bool scaling = false;
-  public override void grabUpdate(Transform t) {
-    
-    if (otherHandle.curState == manipState.grabbed) {
-      if (ID == 1) {
+  public override void grabUpdate(Transform t)
+  {
+
+    if (manipulatorObjScript.wasGazeBased)
+    {
+      gazeBasedPosRotUpdate();
+      return;
+    }
+
+    if (otherHandle.curState == manipState.grabbed)
+    {
+      if (ID == 1)
+      {
         scaleUpdate();
       }
 
       if (manipulatorObj.parent == masterObj.parent) posRotUpdate();
-    } else {
+    }
+    else
+    {
       masterObj.parent = manipulatorObj.parent;
       scaling = false;
       doublePosRot = false;
     }
   }
 
+  Vector3 initialOffset;
+  Quaternion initialRotationOffset;
+
+  bool wasPrecisionGazeGrabbed = false; // at last frame
+
+  void gazeBasedPosRotStart()
+  {
+
+    Transform go1 = manipulatorObj.transform;
+    Transform go2 = this.transform.parent;
+
+    initialOffset = go2.position - go1.position;
+    initialRotationOffset = Quaternion.Inverse(go1.rotation) * go2.rotation;
+  }
+
+
+  void gazeBasedPosRotUpdate()
+  {
+    if (manipulatorObjScript.isSidePressed() == false) // fine by default
+    {
+      masterObj.parent = masterObjParent;
+
+      if (!wasPrecisionGazeGrabbed)
+      {
+        gazeBasedPosRotStart();
+      }
+
+      Transform go1 = manipulatorObj.transform;
+      Transform go2 = this.transform.parent;
+
+      // Calculate the desired position in world space for go2 based on the changes you want
+      Vector3 desiredPosition = go1.position + initialOffset;
+
+      // Apply changes to the local position of go2 based on the desired position
+      go2.localPosition = go2.parent.InverseTransformPoint(desiredPosition);
+
+      // Calculate the desired rotation for go2 relative to go1
+      Quaternion desiredRotation = go1.rotation * initialRotationOffset;
+
+      // Apply changes to the local rotation of go2 relative to go1
+      go2.localRotation = Quaternion.Inverse(go1.localRotation) * desiredRotation;
+
+      wasPrecisionGazeGrabbed = true;
+    }
+    else // coarse
+    {
+      masterObj.parent = manipulatorObj.parent;
+      wasPrecisionGazeGrabbed = false;
+    }
+
+  }
+
+
   bool doublePosRot = false;
   Vector3 initOtherManipPos = Vector3.zero;
   Quaternion initRot = Quaternion.identity;
   Vector3 doubleManipOffset = Vector3.zero;
-  void posRotUpdate() {
-    if (!doublePosRot) {
+  void posRotUpdate()
+  {
+    if (!doublePosRot)
+    {
       initOtherManipPos = manipulatorObj.InverseTransformPoint(otherHandle.manipulatorObj.position);
       initRot = masterObj.localRotation;
       doubleManipOffset = masterObj.position - Vector3.Lerp(manipulatorObj.position, otherHandle.manipulatorObj.position, .5f);
@@ -107,8 +178,10 @@ public class handle : manipObject {
 
   float initDistance = 0;
   Vector3 initScale = Vector3.one;
-  void scaleUpdate() {
-    if (!scaling) {
+  void scaleUpdate()
+  {
+    if (!scaling)
+    {
       initDistance = Vector3.Distance(otherHandle.manipulatorObj.position, manipulatorObj.position);
       initScale = masterObj.localScale;
     }
@@ -119,8 +192,10 @@ public class handle : manipObject {
 
   public bool trashReady = false;
   public trashcan curTrash;
-  void OnCollisionEnter(Collision coll) {
-    if (coll.transform.name == "trashMenu" && (curState == manipState.grabbed || otherHandle.curState == manipState.grabbed) && ID == 0) {
+  void OnCollisionEnter(Collision coll)
+  {
+    if (coll.transform.name == "trashMenu" && (curState == manipState.grabbed || otherHandle.curState == manipState.grabbed) && ID == 0)
+    {
       curTrash = coll.transform.GetComponent<trashcan>();
       curTrash.setReady(true);
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(1000);
@@ -130,8 +205,10 @@ public class handle : manipObject {
     }
   }
 
-  void OnCollisionExit(Collision coll) {
-    if (coll.transform.name == "trashMenu" && ID == 0) {
+  void OnCollisionExit(Collision coll)
+  {
+    if (coll.transform.name == "trashMenu" && ID == 0)
+    {
       coll.transform.GetComponent<trashcan>().setReady(false);
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(1000);
       else if (otherHandle.manipulatorObjScript != null) otherHandle.manipulatorObjScript.hapticPulse(1000);
@@ -141,44 +218,57 @@ public class handle : manipObject {
     }
   }
 
-  public void toggleHandles(bool on) {
+  public void toggleHandles(bool on)
+  {
     Collider[] colls = GetComponents<Collider>();
     for (int i = 0; i < colls.Length; i++) colls[i].enabled = on;
   }
 
-  public override void setState(manipState state) {
+  public override void setState(manipState state)
+  {
     if (curState == state) return;
 
-    if (curState == manipState.grabbed && state != manipState.grabbed) {
-      if (curTrash != null) {
+    if (curState == manipState.grabbed && state != manipState.grabbed)
+    {
+      if (curTrash != null)
+      {
         if (curTrash.gameObject.activeSelf) curTrash.trashEvent();
-        else {
+        else
+        {
           curTrash.setReady(false);
           curTrash = null;
           trashReady = false;
           soundUtils.SetupMaterialWithBlendMode(mat, soundUtils.BlendMode.Opaque);
         }
-      } else if (otherHandle.curTrash != null) {
+      }
+      else if (otherHandle.curTrash != null)
+      {
         if (otherHandle.curTrash.gameObject.activeSelf) otherHandle.curTrash.trashEvent();
-        else {
+        else
+        {
           otherHandle.curTrash.setReady(false);
           otherHandle.curTrash = null;
           otherHandle.trashReady = false;
           soundUtils.SetupMaterialWithBlendMode(mat, soundUtils.BlendMode.Opaque);
         }
-      } else {
+      }
+      else
+      {
         otherHandle.trashReady = false;
         trashReady = false;
         soundUtils.SetupMaterialWithBlendMode(mat, soundUtils.BlendMode.Opaque);
       }
 
-      if (trashReady || otherHandle.trashReady) {
+      if (trashReady || otherHandle.trashReady)
+      {
         if (masterObj.gameObject.GetComponentInChildren<tape>())
           masterObj.gameObject.GetComponentInChildren<tape>().Eject();
         Destroy(masterObj.gameObject);
-      } else masterObj.parent = masterObjParent;
+      }
+      else masterObj.parent = masterObjParent;
 
-      if (!masterControl.instance.handlesEnabled) {
+      if (!masterControl.instance.handlesEnabled)
+      {
         toggleHandles(false);
         otherHandle.toggleHandles(false);
       }
@@ -186,30 +276,45 @@ public class handle : manipObject {
 
     curState = state;
 
-    if (ID == 0) {
-      if (curState == manipState.none) {
-        if (otherHandle.curState == manipState.none) GetComponent<Renderer>().sharedMaterial = mat; 
+    if (ID == 0)
+    {
+      if (curState == manipState.none)
+      {
+        if (otherHandle.curState == manipState.none) GetComponent<Renderer>().sharedMaterial = mat;
       }
-      if (curState == manipState.selected) {
+      if (curState == manipState.selected)
+      {
         GetComponent<Renderer>().sharedMaterial = highlightMat;
       }
-      if (curState == manipState.grabbed) {
+      if (curState == manipState.grabbed)
+      {
         GetComponent<Renderer>().sharedMaterial = highlightGrabbedMat;
       }
-    } else {
-      if (curState == manipState.none) {
+    }
+    else
+    {
+      if (curState == manipState.none)
+      {
         if (otherHandle.curState == manipState.none) otherHandle.GetComponent<Renderer>().sharedMaterial = mat;
       }
-      if (curState == manipState.selected) {
+      if (curState == manipState.selected)
+      {
         otherHandle.GetComponent<Renderer>().sharedMaterial = highlightMat;
       }
-      if (curState == manipState.grabbed) {
+      if (curState == manipState.grabbed)
+      {
         otherHandle.GetComponent<Renderer>().sharedMaterial = highlightGrabbedMat;
       }
     }
-    if (curState == manipState.grabbed) {
+    if (curState == manipState.grabbed && !manipulatorObjScript.wasGazeBased)
+    {
       masterObj.parent = manipulatorObj.parent;
       doublePosRot = false;
+    }
+
+    if (curState == manipState.grabbed && manipulatorObjScript.wasGazeBased)
+    {
+      gazeBasedPosRotStart();
     }
   }
 }

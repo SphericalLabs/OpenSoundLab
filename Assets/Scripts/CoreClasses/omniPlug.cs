@@ -469,20 +469,99 @@ public class omniPlug : manipObject {
       collCandidates.Clear();
       if (connected != null) collCandidates.Add(connected.transform);
 
-      // this fixes the grab position of the omniPlug, when the controller is compensated for passthrough overlay
-      transform.parent = manipulatorObj.parent;
-      Vector3 tmp = transform.localPosition;
-      tmp.z = 0.06f;
-      tmp.x = 0f;
-      tmp.y = 0f;
-      transform.localPosition = tmp;
+
+      
+
+      if (manipulatorObjScript != null)
+      {
+        Vector3 posDiff = Vector3.zero;
+
+        if (manipulatorObjScript.wasGazeBased) // remote patching
+        {
+          // grabbing a freshly spawned far plug or a plug that was already connected
+          Transform grabReference = connected == null ? gazedObjectTracker.Instance.gazedAtManipObject.transform : connected.transform;
+
+          // translate based on reference, in this case for gaze-based remote patching          
+          transform.position = grabReference.transform.position + grabReference.transform.up * -0.075f; 
+          gazeBasedPosRotStart();          
+
+        }
+        else // manual patching
+        {
+          transform.parent = manipulatorObj.parent;
+          // fix position at hand
+          posDiff = new Vector3(0f, 0f, 0.06f);
+          transform.localPosition = posDiff;
+        }
+
+
+      }
 
       updateJackList();
       foreach (omniJack j in targetJackList) j.flash(cordColor);
       setCableHighlighted(true);
       if (otherPlug != null) otherPlug.setCableHighlighted(true);
+
     }
   }
+
+  public override void grabUpdate(Transform t)
+  {
+
+    if (manipulatorObjScript.wasGazeBased)
+    {
+      gazeBasedPosRotUpdate();
+      return;
+    }
+
+  }
+
+  // copied from handle.cs, consider unifying refactoring
+
+  Vector3 initialOffset;
+  bool wasPrecisionGazeGrabbed = false; // at last frame
+
+
+  void gazeBasedPosRotStart()
+  {
+    Transform go1 = manipulatorObj.transform;
+    Transform go2 = this.transform;
+
+    initialOffset = go2.position - go1.position;
+  }
+
+  void gazeBasedPosRotUpdate()
+  {
+
+    if (manipulatorObjScript.isSidePressed() == false) // fine by default
+    {
+      transform.parent = plugTrans.parent;
+
+      if (!wasPrecisionGazeGrabbed)
+      {
+        gazeBasedPosRotStart();
+      }
+
+      Transform go1 = manipulatorObj.transform;
+      Transform go2 = this.transform;
+
+      // Calculate the desired position in world space for go2 based on the changes you want
+      Vector3 desiredPosition = go1.position + initialOffset;
+
+      // Apply changes to the local position of go2 based on the desired position
+      go2.position = desiredPosition;
+
+      wasPrecisionGazeGrabbed = true;
+    }
+    else // coarse
+    {
+      transform.parent = manipulatorObj.parent;
+      wasPrecisionGazeGrabbed = false;
+    }
+     
+
+  }
+
 
   public void setCableHighlighted(bool on){
     lr.sharedMaterial = on ? omniCableSelectedMat : omniCableMat;

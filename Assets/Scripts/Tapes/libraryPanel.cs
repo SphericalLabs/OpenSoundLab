@@ -100,15 +100,17 @@ public class libraryPanel : UIpanel {
         primaryText = _panelRing._deviceInterface.curPrimary;
         secondaryText = IDtext;
         if (ghostTape != null) Destroy(ghostTape);
+        manipulatorObjScript.wasGazeBased = false;  
         ghostTape = Instantiate(ghostTapePrefab, manipulatorObj.transform, false) as GameObject;
         ghostTape.transform.localPosition = tape.correctOffset;
-        ghostTape.transform.localRotation = Quaternion.Euler(-90, -90, -90);//.zero;
-      } else {
+        //ghostTape.transform.localRotation = Quaternion.Euler(-90, -90, -90);//.zero;
+        ghostTape.transform.localRotation = Quaternion.Euler(270, 180, 0);
+      } else if(!manipulatorObjScript.wasGazeBased) {
         secondaryText = IDtext;
         if (ghostGroup != null) Destroy(ghostGroup);
         ghostGroup = Instantiate(ghostGroupPrefab, manipulatorObj.transform, false) as GameObject;
         ghostGroup.transform.localPosition = tape.correctOffset; 
-        ghostGroup.transform.localRotation = Quaternion.identity;
+        ghostGroup.transform.localRotation = Quaternion.identity;        
       }
     } else {
       if (secondary) {
@@ -236,7 +238,7 @@ public class libraryPanel : UIpanel {
 
     if (transform.InverseTransformPoint(t.position).magnitude > 10) {
       if (secondary) _panelRing._deviceInterface.forceTape(t, primaryText, secondaryText);
-      else _panelRing._deviceInterface.forceGroup(t, secondaryText);
+      else if(!manipulatorObjScript.wasGazeBased) _panelRing._deviceInterface.forceGroup(t, secondaryText);
     }
   }
 }

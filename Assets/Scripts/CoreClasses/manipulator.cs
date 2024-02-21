@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,9 +35,18 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using static OVRHand;
+using OculusSampleFramework;
+using UnityEngine.UIElements;
+using static manipObject;
+//using System.Linq;
+//using Valve.VR;
 
 public class manipulator : MonoBehaviour
 {
+  
+  private static List<manipulator> instances = new List<manipulator>();
+
   int controllerIndex = -1; // 0 => left, 1 => right
   public GameObject activeTip;
   public Transform tipL, tipR;
@@ -61,6 +70,29 @@ public class manipulator : MonoBehaviour
     oslInput = new OSLInput();
     oslInput.Patcher.Enable();
     
+    instances.Add(this);
+  }
+
+  private void OnDestroy()
+  {
+    instances.Remove(this);
+  }
+
+  public static List<manipulator> GetInstances()
+  {
+    return instances;
+  }
+
+  public static bool NoneTouched()
+  {
+    foreach (manipulator manip in instances)
+    {
+      if (manip.selectedObject != null)
+      {
+        return false; // At least one instance has touched something
+      }
+    }
+    return true; // None of the instances have touched something
   }
 
 
@@ -150,6 +182,20 @@ public class manipulator : MonoBehaviour
   {
     manipObject o = coll.transform.GetComponent<manipObject>();
     if (o != null) o.onTouch(true, this);
+
+    // allow for remote deletion by dragging the controller into the trashbin instead of the module itself
+    if (wasGazeBased)
+    {
+      if (coll.transform.name == "trashMenu" && (selectedObject != null) && selectedObject.curState == manipState.grabbed && selectedObject is handle)
+      {
+        handle selectedHandle = (handle)selectedObject;
+        selectedHandle.curTrash = coll.transform.GetComponent<trashcan>();
+        selectedHandle.curTrash.setReady(true);
+        hapticPulse(1000);
+        selectedHandle.trashReady = true;        
+      }
+    }
+
   }
 
   void OnCollisionExit(Collision coll)
@@ -252,57 +298,6 @@ public class manipulator : MonoBehaviour
   }
 
 
-  void LateUpdate()
-  {
-    if (grabbing) return;
-    Transform candidate = null;
-
-    if (selectedObject != null)
-    {
-      if (hitTransforms.Contains(selectedTransform)) candidate = selectedTransform;
-    }
-    else
-    {
-      foreach (Transform t in hitTransforms)
-      {
-        if (t != null)
-        {
-          manipObject o = t.GetComponent<manipObject>();
-          if (o != null)
-          {
-            if (o.curState != manipObject.manipState.grabbed && o.curState != manipObject.manipState.selected)
-            {
-              candidate = t;
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    if (candidate != selectedTransform)
-    {
-      if (selectedObject != null) selectedObject.GetComponent<manipObject>().setSelect(false, transform);
-
-      if (candidate != null)
-      {
-        candidate.GetComponent<manipObject>().setSelect(true, transform);
-        if (candidate.GetComponent<handle>() != null) toggleCopy(true);
-        else if (candidate.GetComponent<manipObject>().canBeDeleted) toggleDelete(true);
-        hapticPulse();
-        selectedTransform = candidate;
-        selectedObject = candidate.GetComponent<manipObject>();
-      }
-      else
-      {
-        toggleCopy(false);
-        toggleDelete(false);
-        selectedTransform = null;
-        selectedObject = null;
-      }
-    }
-  }
-
   bool copyEnabled = false;
   void toggleCopy(bool on)
   {
@@ -327,9 +322,19 @@ public class manipulator : MonoBehaviour
     multiselectEnabled = on;    
   }
 
+  // this starts grabbing, etc.
   public void SetTrigger(bool on)
   {
     triggerDown = on;
+
+    // late injection of gazed at object, in the case that the trigger was pulled so fast that there was not intermediate select stage and thus selectedObject has not been populated properly
+    if(selectedObject == null && !WorldDragController.bothSidesDown()) {
+      if (gazedObjectTracker.Instance.gazedAtManipObject != null)
+      {
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        wasGazeBased = true;
+      }
+    }
 
     if (selectedObject != null)
     {
@@ -381,6 +386,13 @@ public class manipulator : MonoBehaviour
 
     copying = on;
 
+    // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown())
+    {
+      selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+      wasGazeBased = true;      
+    }
+
     if (selectedObject != null)
     {
       if (on)
@@ -397,11 +409,11 @@ public class manipulator : MonoBehaviour
     
     if (controllerIndex == 0)
     {
-      val = Input.GetAxis("triggerR");
+      val = Input.GetAxis("triggerL");
     }
     else if (controllerIndex == 1)
     {
-      val = Input.GetAxis("triggerL");
+      val = Input.GetAxis("triggerR");
     }
     else
     {
@@ -424,6 +436,64 @@ public class manipulator : MonoBehaviour
 
   bool touchpadActive = false;
 
+  void secondaryOculusButtonUpdate()
+  {
+    bool secondaryDown = false;
+    bool secondaryUp = false;
+
+    if (masterControl.instance.currentPlatform == masterControl.platform.Oculus)
+    {
+      //      secondaryDown = SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu);
+      //      secondaryUp = SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu);
+      if (controllerIndex == 0)
+      {
+        secondaryDown = Input.GetButtonDown("secondaryButtonL");
+      }
+      else if (controllerIndex == 1)
+      {
+        secondaryDown = Input.GetButtonDown("secondaryButtonR");
+      }
+      else
+      {
+        secondaryDown = false;
+      }
+
+      if (controllerIndex == 0)
+      {
+        secondaryUp = Input.GetButtonUp("secondaryButtonL");
+      }
+      else if (controllerIndex == 1)
+      {
+        secondaryUp = Input.GetButtonUp("secondaryButtonR");
+      }
+      else
+      {
+        secondaryUp = false;
+      }
+    }
+    if (controllerVisible)
+    {
+      if (secondaryDown)
+      {
+        // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
+        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown()) copyEnabled = true;
+        if (copyEnabled) SetCopy(true);
+        else if (deleteEnabled) DeleteSelection(true);
+        else if (multiselectEnabled) MultiselectSelection(true);        
+      }
+      else if (secondaryUp)
+      {
+        if (copying) SetCopy(false);
+        else if (deleting) DeleteSelection(false);
+        else if (multiselectEnabled) MultiselectSelection(false);
+      }
+    }
+    else if (grabbing && selectedObject != null)
+    {
+      if (secondaryDown) selectedObject.setPress(true);
+      if (secondaryUp) selectedObject.setPress(false);
+    }
+  }
 
   public bool triggerDown = false;
   public bool pinchPinkyDown = false;
@@ -538,6 +608,19 @@ public class manipulator : MonoBehaviour
 
     if (oslInput.wasTriggerReleasedByController(controllerIndex))
     {
+      // manage deletion via gaze'n'drop
+      if (gazedObjectTracker.Instance.gazedAtTrashcan != null)
+      {
+        if (selectedObject != null && selectedObject is handle)
+        {
+          handle selectedHandle = (handle)selectedObject;
+          selectedHandle.curTrash = gazedObjectTracker.Instance.gazedAtTrashcan;
+          selectedHandle.curTrash.setReady(true);
+          hapticPulse(1000);
+          selectedHandle.trashReady = true;
+        }
+      }
+
       activeTip.SetActive(false);
       tipL.gameObject.SetActive(true);
       tipR.gameObject.SetActive(true);
@@ -549,9 +632,151 @@ public class manipulator : MonoBehaviour
     else if (selectedObject != null) selectedObject.selectUpdate(transform);
   }
 
+  // true when select or grab was gaze-based
+  public bool wasGazeBased = false; 
+
+  void LateUpdate()
+  {
+
+    if (grabbing) return; 
+
+    // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
+    if (selectedObject != null && selectedObject != gazedObjectTracker.Instance.gazedAtManipObject && wasGazeBased)
+    {
+      selectedObject.setSelect(false, transform); 
+      selectedObject = null;
+      wasGazeBased = false;
+    }
+
+    if (selectedObject != null && !isTriggerPressed() && wasGazeBased)
+    {
+      selectedObject.setSelect(false, transform); 
+      selectedObject = null;
+      wasGazeBased = false;
+    }
+
+    Transform candidate = null;
+
+    if (selectedObject != null)
+    {
+      if (hitTransforms.Contains(selectedTransform)) candidate = selectedTransform;
+    }
+    else
+    {
+      foreach (Transform t in hitTransforms)
+      {
+        if (t != null)
+        {
+          manipObject o = t.GetComponent<manipObject>();
+          if (o != null)
+          {
+            if (o.curState != manipObject.manipState.grabbed && o.curState != manipObject.manipState.selected)
+            {
+              candidate = t;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if (candidate != selectedTransform)
+    {
+      if (selectedObject != null) selectedObject.GetComponent<manipObject>().setSelect(false, transform);
+
+      if (candidate != null)
+      {
+        candidate.GetComponent<manipObject>().setSelect(true, transform);
+        if (candidate.GetComponent<handle>() != null) toggleCopy(true);
+        else if (candidate.GetComponent<manipObject>().canBeDeleted) toggleDelete(true);
+        hapticPulse();
+        selectedTransform = candidate;
+        selectedObject = candidate.GetComponent<manipObject>();
+      }
+      else
+      {
+        toggleCopy(false);
+        toggleDelete(false);
+        selectedTransform = null;
+        selectedObject = null;
+      }
+    }
 
 
+    if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
+    {
+      if (WorldDragController.bothSidesDown()) return; // no gaze interaction when dragging the world
+      
+      if (selectedObject == null && isTriggerHalfPressed()) 
+      {
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        selectedObject.setSelect(true, transform);
+        wasGazeBased = true;
+        //selectedObject = gazeSelectedObj;
+      }
+      else if (isTriggerFullPressed())
+      {
 
+        selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+        //selectedObject = gazeSelectedObj;
+        selectedTransform = selectedObject.transform;
+        SetTrigger(true);
+        wasGazeBased = true;
+
+        // do we need this?
+        activeTip.SetActive(false);
+        tipL.gameObject.SetActive(true);
+        tipR.gameObject.SetActive(true);
+      }
+    }
+
+
+  }
+
+
+  public bool isTriggerHalfPressed()
+  {
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerL") >= 0.02 && Input.GetAxis("triggerL") <= 0.7;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerR") >= 0.02 && Input.GetAxis("triggerR") <= 0.7;
+    }
+    return false;
+  }
+
+  public bool isTriggerFullPressed()
+  {
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerL") > 0.7;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerR") > 0.7;
+    }
+    return false;
+  }
+
+  public bool isTriggerPressed()
+  {
+    if (controllerIndex == 0)
+    {
+      return Input.GetAxis("triggerL") >= 0.02;
+    }
+    else if (controllerIndex == 1)
+    {
+      return Input.GetAxis("triggerR") >= 0.02;
+    }
+    return false;
+  }
+
+  public bool isSidePressed()
+  {
+    return isLeftController() ? OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f : OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
+  }
 }
 
 

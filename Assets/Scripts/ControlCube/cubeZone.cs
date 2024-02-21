@@ -48,31 +48,48 @@ public class cubeZone : manipObject {
     base.Awake();
     mat = GetComponent<Renderer>().material;
     _deviceInterface = GetComponentInParent<ControlCubeDeviceInterface>();
-  }
-
-  Vector3 p;
-  public override void grabUpdate(Transform t) {
-    Transform tip = t.Find("manipCollViz").transform; 
-    p = transform.InverseTransformPoint(tip.position);
     updatePercent(p);
-    manipulatorObjScript.hapticPulse((ushort)(750f * (_deviceInterface.percent.x + _deviceInterface.percent.y + _deviceInterface.percent.z) / 3));
+
+    if (lines[0] != null) lineWidth = lines[0].localScale.x;
   }
 
-  Vector3 percent = Vector3.one;
-  void updatePercent(Vector3 p) {
-    p.x = Mathf.Clamp01(-p.x + .5f);
-    p.y = Mathf.Clamp01(p.y + .5f);
-    p.z = Mathf.Clamp01(-p.z + .5f);
-    _deviceInterface.updatePercent(p);
-
-    updateLines(p);
+  Vector3 controllerPosAtBeginDragging;
+  Transform tip;
+  public override void setGrab(bool on, Transform t){
+    base.setGrab(on, t);
+    tip = t.Find("manipCollViz").transform;
+    controllerPosAtBeginDragging = tip.position;
+    pAtBeginDragging = p;
   }
 
+  Vector3 p, pAtBeginDragging = Vector3.zero;
+  float lineWidth = 0f;
+
+  public override void grabUpdate(Transform t) {
+    p = pAtBeginDragging + transform.InverseTransformPoint(tip.position) - transform.InverseTransformPoint(controllerPosAtBeginDragging);
+    p.x = Mathf.Clamp(p.x, -0.5f, 0.5f);
+    p.y = Mathf.Clamp(p.y, -0.5f, 0.5f);
+    p.z = Mathf.Clamp(p.z, -0.5f, 0.5f);
+    updatePercent(p);
+
+    if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse((ushort)(700f * (_deviceInterface.percent.x + _deviceInterface.percent.y + _deviceInterface.percent.z) / 3 + 50f));
+  }
+
+  void updatePercent(Vector3 tmp) {
+    tmp.x = Mathf.Clamp01(-tmp.x + .5f);
+    tmp.y = Mathf.Clamp01(tmp.y + .5f);
+    tmp.z = Mathf.Clamp01(-tmp.z + .5f);
+
+    _deviceInterface.updatePercent(tmp);
+    updateLines(tmp);
+  }
+
+  float lineMargin = 0.0015f;
   public void updateLines(Vector3 p) {
-    p = p * .3f;
-    lines[0].localPosition = new Vector3(-p.x + .15f, p.y, 0);
-    lines[1].localPosition = new Vector3(-p.x + .15f, .15f, -p.z + .15f);
-    lines[2].localPosition = new Vector3(0, p.y, -p.z + .15f);
+    p = p * (.3f - lineMargin * 2) + Vector3.one * lineMargin; // margin to align with inside borders
+    lines[0].localPosition = new Vector3(-p.x + .15f,   p.y,   0);
+    lines[1].localPosition = new Vector3(-p.x + .15f,   .15f,  -p.z + .15f);
+    lines[2].localPosition = new Vector3(0,             p.y,   -p.z + .15f);
   }
 
   void colorChange(bool on) {

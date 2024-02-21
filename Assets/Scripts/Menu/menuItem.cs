@@ -362,6 +362,13 @@ public class menuItem : manipObject {
 
     GameObject g = Instantiate(itemPrefab, transform.position /*+ new Vector3(-0f, 0f, -0.04f)*/, lookRotation) as GameObject;
 
+    manipulator manip = manipulatorObj.GetComponent<manipulator>();
+
+    // spawn directly into the hand if selecting by gaze
+    if (manip != null && manip.wasGazeBased){
+      g.transform.position = manip.transform.position + manip.transform.forward * 0.12f;
+      manip.wasGazeBased = false; // treat that interaction as a physical one from now on, otherwise it would be handled in fine mode by default
+    }
 
     if (item == deviceType.Tapes)
     {
@@ -388,10 +395,12 @@ public class menuItem : manipObject {
       g.transform.Rotate(90, 0, 0, Space.Self);
 
 
-
     //else if (item != deviceType.Filter && item != deviceType.Scope && item != deviceType.Airhorn && item != deviceType.ADSR) /*g.transform.Rotate(0, 180, 0, Space.Self);*/
 
-    manipulatorObj.GetComponent<manipulator>().ForceGrab(g.GetComponentInChildren<handle>());
+    
+    if (manip != null && manip.wasGazeBased) g.transform.parent = GameObject.Find("PatchAnchor").transform;  // Directly inject PatchAnchor as parent, since the normal grab and then place back routine is skipped when spawn by gaze
+    manip.ForceGrab(g.GetComponentInChildren<handle>());
+
   }
 
   public override void setState(manipState state) {
