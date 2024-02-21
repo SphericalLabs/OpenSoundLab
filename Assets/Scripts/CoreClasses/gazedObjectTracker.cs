@@ -45,6 +45,7 @@ public class gazedObjectTracker : MonoBehaviour
 
     calibrationPlane = GameObject.Find("GazeCalibPlane");
     calibrationPlaneCenter = GameObject.Find("GazeCalibCenter");
+    centerEyeAnchor = GameObject.Find("CenterEyeAnchor");
 
     if(currentMode == GazeMode.Off) calibrationPlane.SetActive(false);  // hide the calibration plane
 

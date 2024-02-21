@@ -60,7 +60,9 @@ public class platformSetup : MonoBehaviour {
       /*if (UnityEngine.XR.XRSettings.loadedDeviceName == "Oculus")*/  oculusSwitch();
 
       manips[0].SetDeviceIndex(0);
+      manips[0].transform.parent.GetComponentInChildren<OVRControllerHelper>().m_controller = OVRInput.Controller.LTouch;      
       manips[1].SetDeviceIndex(1);
+      manips[1].transform.parent.GetComponentInChildren<OVRControllerHelper>().m_controller = OVRInput.Controller.RTouch;      
     }
   }
 
@@ -80,7 +82,7 @@ public class platformSetup : MonoBehaviour {
     }
 
     void oculusSwitch() {
-    manips[0].invertScale(); // this actually makes the controller model L and R handed.
+    //manips[0].invertScale(); // this actually makes the controller model L and R handed.
     manips[0].changeHW("oculus");
     manips[1].changeHW("oculus");
   }
@@ -108,15 +110,17 @@ public class platformSetup : MonoBehaviour {
         Instantiate(loadedPrefab, manips[1].transform);
 
         if (OVRControllerPrefabL != null)
-          OVRControllerPrefabL.SetActive(false);
+          OVRControllerPrefabL.SetActive(false);          
         if (OVRControllerPrefabR != null)
           OVRControllerPrefabR.SetActive(false);
+          
       }
       else
       {
         Debug.LogWarning("Personalized hands requested but not found. Add your hands prefab to Resources or disable this feature by setting usePersonalizedHands to false.");
       }
     }
+
   }
 
 }

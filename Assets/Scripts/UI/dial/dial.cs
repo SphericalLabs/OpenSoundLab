@@ -66,9 +66,14 @@ public class dial : manipObject {
   public bool isBipolar = false; 
   public int notchSteps = 4;
 
+  private OSLInput oslInput;
+
   public override void Awake() {
-    base.Awake();    
-    
+    base.Awake();
+
+    oslInput = new OSLInput();
+    oslInput.Patcher.Enable();
+
     // store the first value on Awake and keep it as default
     defaultPercent = percent;
 
@@ -119,8 +124,8 @@ public class dial : manipObject {
         selectManipulatorObjScript = selectObj.GetComponent<manipulator>();
         if (curState == manipState.selected || curState == manipState.grabbed) // these checks might be redundant at this time
         {
-          if (selectManipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonL")
-          || (!selectManipulatorObjScript.isLeftController() && Input.GetButton("secondaryButtonR")))
+          if (selectManipulatorObjScript.isLeftController() && oslInput.Patcher.SecondaryLeft.WasPerformedThisFrame()
+          || (!selectManipulatorObjScript.isLeftController() && oslInput.Patcher.SecondaryRight.WasPerformedThisFrame()))
           {
             setPercent(defaultPercent);
           }
@@ -129,7 +134,7 @@ public class dial : manipObject {
 
       else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
       {
-        if (Input.GetButton("secondaryButtonL") || Input.GetButton("secondaryButtonR"))
+        if (oslInput.Patcher.SecondaryLeft.WasPerformedThisFrame() || oslInput.Patcher.SecondaryRight.WasPerformedThisFrame())
         {
           setPercent(defaultPercent);
         }
@@ -225,14 +230,10 @@ public class dial : manipObject {
   {
     Vector2 temp = dialCoordinates(manipulatorObj.up);
     controllerRot = (Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - rotAtBeginningOfGrab) * speedUp;
+
     
-    // fine tune modifier
-    // https://developer.oculus.com/documentation/unity/unity-ovrinput
-    // only raw input worked properly
-    //if ((t.parent.parent.name == "ControllerLeft" && OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f)
-    //|| (t.parent.parent.name == "ControllerRight" && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f)) {
-    if ( ( OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f && manipulatorObjScript.isLeftController() ) 
-      || ( OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f && !manipulatorObjScript.isLeftController()) ) {
+    if ( ( oslInput.Patcher.TriggerLeft.WasPerformedThisFrame() && manipulatorObjScript.isLeftController() ) 
+      || ( oslInput.Patcher.TriggerRight.WasPerformedThisFrame() && !manipulatorObjScript.isLeftController()) ) {
       curRot += (controllerRot - lastControllerRot) / fineMult;
     } else {
       curRot += controllerRot - lastControllerRot;
