@@ -179,7 +179,7 @@ public class gazedObjectTracker : MonoBehaviour
         calibIndicator.transform.position = hit.point;
         calibIndicator.SetActive(true);
 
-        if (Time.frameCount % 15 == 0 && OSLInput.getInstance().isTriggerFullPressed())
+        if (Time.frameCount % 15 == 0 && OSLInput.getInstance().isAnyTriggerFullPressed())
         {
           Vector3 localizedHitPoint = centerEyeAnchor.transform.InverseTransformPoint(hit.point);
           Vector3 localizedPlaneCenter = centerEyeAnchor.transform.InverseTransformPoint(calibrationPlaneCenter.transform.position);

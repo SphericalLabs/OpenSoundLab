@@ -44,7 +44,6 @@ public class dial : manipObject {
   public float percent = 0f;
   public float defaultPercent; 
   
-
   public enum dialColor {generic, frequency, amplitude};
   public dialColor currentDialColor = dialColor.generic; // dropdown, defaulting to white
 
@@ -199,14 +198,15 @@ public class dial : manipObject {
       
       turnCount = 0;
       
-      // trigger beginners guidance
-      if (!masterControl.instance.dialUsed) { 
-        if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
-        _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
-      }
+      //// trigger beginners guidance
+      //if (!masterControl.instance.dialUsed) { 
+      //  if (_dialCheckRoutine != null) StopCoroutine(_dialCheckRoutine);
+      //  _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
+      //}
       
       Vector2 temp = dialCoordinates(manipulatorObj.up);
       controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x); 
+
       rotAtBeginningOfGrab = controllerRot - curRot;
       lastControllerRot = (controllerRot - rotAtBeginningOfGrab) * speedUp; // update relative values here so that it doesnt jump on first grab
       
@@ -218,13 +218,6 @@ public class dial : manipObject {
   }
 
 
-  Vector2 dialCoordinates(Vector3 vec)
-  {
-    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
-    return new Vector2(flat.x, flat.z);
-  }
-
-  float speedUp = 1.4f;
 
   public override void grabUpdate(Transform t)
   {
@@ -266,39 +259,47 @@ public class dial : manipObject {
       turnCount++;
     }
 
+
   }
 
 
-
-
-  // code for first steps guidance below, currently not enabled
-  int turnCount = 0;
-  Coroutine _dialCheckRoutine;
-  IEnumerator dialCheckRoutine()
+  Vector2 dialCoordinates(Vector3 vec)
   {
-    Vector3 lastPos = Vector3.zero;
-    float cumulative = 0;
-    if (manipulatorObj != null)
-    {
-      lastPos = manipulatorObj.position;
-    }
-
-    while (curState == manipState.grabbed && manipulatorObj != null && !masterControl.instance.dialUsed)
-    {
-      cumulative += Vector3.Magnitude(manipulatorObj.position - lastPos);
-      lastPos = manipulatorObj.position;
-
-      if (turnCount > 3) masterControl.instance.dialUsed = true;
-      else if (cumulative > .2f)
-      {
-        masterControl.instance.dialUsed = true;
-        Instantiate(Resources.Load("Hints/TurnVignette", typeof(GameObject)), transform.parent, false);
-      }
-
-      yield return null;
-    }
-    yield return null;
+    Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
+    return new Vector2(flat.x, flat.z);
   }
+
+  float speedUp = 1.4f;
+  int turnCount = 0;
+
+
+  //// code for first steps guidance below, currently not enabled
+  //Coroutine _dialCheckRoutine;
+  //IEnumerator dialCheckRoutine()
+  //{
+  //  Vector3 lastPos = Vector3.zero;
+  //  float cumulative = 0;
+  //  if (manipulatorObj != null)
+  //  {
+  //    lastPos = manipulatorObj.position;
+  //  }
+
+  //  while (curState == manipState.grabbed && manipulatorObj != null && !masterControl.instance.dialUsed)
+  //  {
+  //    cumulative += Vector3.Magnitude(manipulatorObj.position - lastPos);
+  //    lastPos = manipulatorObj.position;
+
+  //    if (turnCount > 3) masterControl.instance.dialUsed = true;
+  //    else if (cumulative > .2f)
+  //    {
+  //      masterControl.instance.dialUsed = true;
+  //      Instantiate(Resources.Load("Hints/TurnVignette", typeof(GameObject)), transform.parent, false);
+  //    }
+
+  //    yield return null;
+  //  }
+  //  yield return null;
+  //}
 }
 
 

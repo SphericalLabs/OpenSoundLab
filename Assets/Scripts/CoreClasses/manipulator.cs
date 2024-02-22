@@ -323,7 +323,7 @@ public class manipulator : MonoBehaviour
     triggerDown = on;
 
     // late injection of gazed at object, in the case that the trigger was pulled so fast that there was not intermediate select stage and thus selectedObject has not been populated properly
-    if(selectedObject == null && !WorldDragController.bothSidesDown()) {
+    if(selectedObject == null && !OSLInput.getInstance().areBothSidesPressed()) {
       if (gazedObjectTracker.Instance.gazedAtManipObject != null)
       {
         selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
@@ -382,7 +382,7 @@ public class manipulator : MonoBehaviour
     copying = on;
 
     // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown())
+    if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !OSLInput.getInstance().areBothSidesPressed())
     {
       selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
       wasGazeBased = true;      
@@ -511,16 +511,16 @@ public class manipulator : MonoBehaviour
     // manage copy
     if (controllerVisible)
     {
-      if (oslInput.isCopyStartedByController(controllerIndex))
+      if (oslInput.isCopyStarted(controllerIndex))
       {
         // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !WorldDragController.bothSidesDown()) copyEnabled = true;
+        if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !OSLInput.getInstance().areBothSidesPressed()) copyEnabled = true;
 
         if (copyEnabled) SetCopy(true);
         else if (deleteEnabled) DeleteSelection(true);
         else if (multiselectEnabled) MultiselectSelection(true);
       }
-      else if (oslInput.isCopyReleasedByController(controllerIndex))
+      else if (oslInput.isCopyReleased(controllerIndex))
       {
         if (copying) SetCopy(false);
         else if (deleting) DeleteSelection(false);
@@ -529,12 +529,12 @@ public class manipulator : MonoBehaviour
     }
     else if (grabbing && selectedObject != null)
     {
-      if (oslInput.isCopyStartedByController(controllerIndex)) selectedObject.setPress(true);
-      if (oslInput.isCopyReleasedByController(controllerIndex)) selectedObject.setPress(false);
+      if (oslInput.isCopyStarted(controllerIndex)) selectedObject.setPress(true);
+      if (oslInput.isCopyReleased(controllerIndex)) selectedObject.setPress(false);
     }
 
     // manage interaction
-    if (oslInput.isTriggerStartedByController(controllerIndex))
+    if (oslInput.isTriggerStarted(controllerIndex))
     {
       activeTip.SetActive(true);
       tipL.gameObject.SetActive(false);
@@ -542,7 +542,7 @@ public class manipulator : MonoBehaviour
       SetTrigger(true);
     }
 
-    if (oslInput.isTriggerReleasedByController(controllerIndex))
+    if (oslInput.isTriggerReleased(controllerIndex))
     {
       // manage deletion via gaze'n'drop
       if (gazedObjectTracker.Instance.gazedAtTrashcan != null)
@@ -641,7 +641,7 @@ public class manipulator : MonoBehaviour
 
     if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
     {
-      if (WorldDragController.bothSidesDown()) return; // no gaze interaction when dragging the world
+      if (OSLInput.getInstance().areBothSidesPressed()) return; // no gaze interaction when dragging the world
       
       if (selectedObject == null && OSLInput.getInstance().isTriggerHalfPressed(controllerIndex)) 
       {

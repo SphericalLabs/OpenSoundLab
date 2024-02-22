@@ -26,7 +26,7 @@ public class WorldDragController : MonoBehaviour
     if (!isDragging && (leftManip.isGrabbing() || rightManip.isGrabbing())) return; 
 
     // begin drag, save start values
-    if (!isDragging && bothSidesDown())
+    if (!isDragging && OSLInput.getInstance().areBothSidesPressed())
     {
       isDragging = true;
 
@@ -35,7 +35,7 @@ public class WorldDragController : MonoBehaviour
     }
     
     // end of drag
-    if (isDragging && !bothSidesDown() )
+    if (isDragging && !OSLInput.getInstance().areBothSidesPressed())
     {
       isDragging = false;
       isVertical = false;
@@ -48,7 +48,7 @@ public class WorldDragController : MonoBehaviour
 
       getCurrentValuesHorizontal(); // run twice when starting...
 
-      if (bothSidesDown() && !bothTriggersDown())
+      if (OSLInput.getInstance().areBothSidesPressed() && !OSLInput.getInstance().areBothTriggersFullPressed())
       {
         
         if (!isHorizontal) // init horizontal
@@ -80,14 +80,14 @@ public class WorldDragController : MonoBehaviour
           storeCurrentValuesHorizontal();
         }
         
-      } else if (bothSidesDown() && bothTriggersDown()) {
+      } else if (OSLInput.getInstance().areBothSidesPressed() && OSLInput.getInstance().areBothTriggersFullPressed()) {
 
           if (!isVertical) // init vertical
           {
             isHorizontal = false;
             isVertical = true;
 
-            // take a snapshots at beginning so that turning the head while dragging is not yielding weird results
+            // take snapshots at beginning so that turning the head while dragging is not yielding weird results
             tiltAxis = centerEyeAnchor.right; 
             rollAxis = centerEyeAnchor.forward;
             centerEyeAnchorSnapshot = new TransformSnapshot(centerEyeAnchor); // this is offering world to local projection
@@ -176,17 +176,6 @@ public class WorldDragController : MonoBehaviour
     }
   }
 
-  // dragging around the y axis
-  public static bool bothSidesDown() // similar code is in manipulator.cs
-  {
-    return OVRInput.Get(OVRInput.RawAxis1D.LHandTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.1f;
-  }
-
-  // tilting the world up and down
-  public static bool bothTriggersDown()
-  {
-    return OVRInput.Get(OVRInput.RawAxis1D.LIndexTrigger) > 0.1f && OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger) > 0.1f;
-  }
 
   Vector3 getMiddle(Transform a, Transform b){
     return Vector3.Lerp(a.position, b.position, 0.5f);

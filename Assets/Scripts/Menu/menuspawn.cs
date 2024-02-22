@@ -60,7 +60,7 @@ public class menuspawn : MonoBehaviour {
 
   public void togglePad(InputAction.CallbackContext context) {
       int controllerIndex = GetComponent<manipulator>().isLeftController() ? 0 : 1;
-      if (oslInput.isMenuStartedByController(controllerIndex)) menu.buttonEvent(controllerIndex, transform);
+      if (oslInput.isMenuStarted(controllerIndex)) menu.buttonEvent(controllerIndex, transform);
   }
 
 }
