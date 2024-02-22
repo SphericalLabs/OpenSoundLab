@@ -94,6 +94,7 @@ public class MicrophoneSignalGenerator : signalGenerator {
 
   void Update()
   {
+    if (!activated) return;
     CheckAndCompensateDrift();
   }
 
