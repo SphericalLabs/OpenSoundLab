@@ -208,9 +208,9 @@ public class WorldDragController : MonoBehaviour
 
 public class TransformSnapshot
 {
-  private Vector3 position;
-  private Quaternion rotation;
-  private Vector3 scale;
+  public Vector3 position;
+  public Quaternion rotation;
+  public Vector3 scale;
 
   public TransformSnapshot(Transform transform)
   {
