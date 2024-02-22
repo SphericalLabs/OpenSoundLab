@@ -145,10 +145,8 @@ OSL_API void Compressor_Process(float buffer[], float sc[], int length, int chan
             xL = xG - yG;
             y1 = _max(xL, x->aR * x->y1_prev[k] + (1 - x->aR) * xL);
             yL = x->aA * x->yL_prev[k] + (1 - x->aA) * y1;
-            ///If compressor is in bypass state, we still apply the makeup gain.
-            ///People should not get the impression that a compressor "makes things louder"
-            ///bc it is just wrong...
-            cdb = x->params[P_BYPASS] ? makeup : -yL + makeup;
+            ///If compressor is in bypass state, we do not apply the makeup gain, and the output is simply the input signal.            
+            cdb = x->params[P_BYPASS] ? 0 : -yL + makeup;
             attenuation += -yL;
             c = _dbtoa(cdb);
             
