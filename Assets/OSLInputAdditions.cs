@@ -108,5 +108,23 @@ public partial class OSLInput
       return Patcher.GripLeft.ReadValue<float>() >= 0.1f && Patcher.GripRight.ReadValue<float>() >= 0.1f;
     }
 
+    public bool isSecondaryPressed(int controllerIndex)
+    {
+      if (controllerIndex == 0)
+      {
+        return Patcher.SecondaryLeft.IsPressed();
+      }
+      else if (controllerIndex == 1)
+      {
+        return Patcher.SecondaryRight.IsPressed();
+      }
+      return false;
+    }
+
+    public bool isAnySecondaryPressed()
+    {
+      return Patcher.SecondaryLeft.IsPressed() || Patcher.SecondaryRight.IsPressed();
+    }
+
 
 }

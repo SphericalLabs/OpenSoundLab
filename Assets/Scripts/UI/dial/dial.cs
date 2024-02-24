@@ -70,9 +70,6 @@ public class dial : manipObject {
   public override void Awake() {
     base.Awake();
 
-    oslInput = new OSLInput();
-    oslInput.Patcher.Enable();
-
     // store the first value on Awake and keep it as default
     defaultPercent = percent;
 
@@ -123,8 +120,7 @@ public class dial : manipObject {
         selectManipulatorObjScript = selectObj.GetComponent<manipulator>();
         if (curState == manipState.selected || curState == manipState.grabbed) // these checks might be redundant at this time
         {
-          if (selectManipulatorObjScript.isLeftController() && oslInput.Patcher.SecondaryLeft.WasPerformedThisFrame()
-          || (!selectManipulatorObjScript.isLeftController() && oslInput.Patcher.SecondaryRight.WasPerformedThisFrame()))
+          if (OSLInput.getInstance().isSecondaryPressed(selectManipulatorObjScript.controllerIndex))
           {
             setPercent(defaultPercent);
           }
@@ -133,7 +129,7 @@ public class dial : manipObject {
 
       else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
       {
-        if (oslInput.Patcher.SecondaryLeft.WasPerformedThisFrame() || oslInput.Patcher.SecondaryRight.WasPerformedThisFrame())
+        if (OSLInput.getInstance().isAnySecondaryPressed())
         {
           setPercent(defaultPercent);
         }
