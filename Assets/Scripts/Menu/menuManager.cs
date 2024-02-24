@@ -36,6 +36,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Analytics;
+using System;
+using System.Linq;
 
 public class menuManager : MonoBehaviour {
   public GameObject item;
@@ -97,82 +99,94 @@ public class menuManager : MonoBehaviour {
     active = on;
   }
 
-  int rowLength = 8;
+  
 
   // this populates the menu on program start
   void loadMenu() { 
     menuItems = new List<GameObject>();
     menuItemScripts = new List<menuItem>();
 
-    foreach(var devType in DeviceType.GetAllByCategory(DeviceCategory.Synthesizer)){
-      // skip incompatible devices
-      if (Application.platform == RuntimePlatform.Android)
-      {
-        if (devType == DeviceType.Camera) continue;
-      }
-      
-      if (devType == DeviceType.Sequencer) continue; 
-      if (devType == DeviceType.MIDIIN) continue;
-      if (devType == DeviceType.MIDIOUT) continue;
-      if (devType == DeviceType.Airhorn) continue;
-            
-      if (devType == DeviceType.Maracas) continue;
-      if (devType == DeviceType.Timeline) continue;      
-      if (devType == DeviceType.Reverb) continue;
+    int hElements = 8;
+    float arc = -8.4f * hElements;
+    float arcSegment = arc / hElements;
 
-      // MultiMix and MultiSplit hack, want to have Multiple available for loading, but not in the menu palette
-      if (devType == DeviceType.Multiple) 
-      {
-        GameObject tmpObj2 = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
-        tmpObj2.transform.parent = rootNode.transform;
-        //menuItems.Add(tmpObj2);
-        menuItem m2 = tmpObj2.GetComponent<menuItem>();
-        refObjects[devType] = m2.Setup(devType);
-        //menuItemScripts.Add(m); 
-        tmpObj2.SetActive(false);
-        continue; 
-      }
-
-
-      if (devType == DeviceType.Camera) continue; // skip for windows, too, throws error otherwise
-      if (devType == DeviceType.Pano) continue;
-      if (devType == DeviceType.TapeGroup) continue;
-
-      GameObject tmpObj = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
-      tmpObj.transform.parent = rootNode.transform;
-      menuItems.Add(tmpObj);
-      menuItem m = tmpObj.GetComponent<menuItem>();
-      refObjects[devType] = m.Setup(devType);
-      menuItemScripts.Add(m);
-    }
-
+    float y;
+    int x = 0;
     int tempCount = 0;
-    float h = 0;
-    float arc = -37.5f * rowLength / 5; // depending on rowLength?
 
-    //Debug.Log(menuItems.Length);
-    while (tempCount < menuItems.Count) {
-      for (int i = 0; i < rowLength; i++) {
-        if (tempCount < menuItems.Count) {
-          menuItems[tempCount].transform.localPosition = Quaternion.Euler(0, (arc / rowLength) * (i - rowLength / 2f) + (arc / rowLength) / 2f, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f) + Vector3.up * h;
-          menuItems[tempCount].transform.rotation = Quaternion.Euler(0, (arc / rowLength) * (i - rowLength / 2f) + (arc / rowLength) / 2f, 0);
+    IEnumerable<DeviceCategory> categories = Enum.GetValues(typeof(DeviceCategory)).OfType<DeviceCategory>();
+    foreach (DeviceCategory category in categories)
+    {
+
+      y = 0;
+
+      foreach (DeviceType devType in DeviceType.GetAllByCategory(category))
+      {
+        // skip incompatible devices
+        if (Application.platform == RuntimePlatform.Android)
+        {
+          if (devType == DeviceType.Camera) continue;
         }
+
+        if (devType == DeviceType.Sequencer) continue;
+        if (devType == DeviceType.MIDIIN) continue;
+        if (devType == DeviceType.MIDIOUT) continue;
+        if (devType == DeviceType.Airhorn) continue;
+
+        if (devType == DeviceType.Maracas) continue;
+        if (devType == DeviceType.Timeline) continue;
+        if (devType == DeviceType.Reverb) continue;
+
+        // MultiMix and MultiSplit hack, want to have Multiple available for loading, but not in the menu palette
+        if (devType == DeviceType.Multiple)
+        {
+          GameObject tmpObj2 = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
+          tmpObj2.transform.parent = rootNode.transform;
+          //menuItems.Add(tmpObj2);
+          menuItem m2 = tmpObj2.GetComponent<menuItem>();
+          refObjects[devType] = m2.Setup(devType);
+          //menuItemScripts.Add(m); 
+          tmpObj2.SetActive(false);
+          continue;
+        }
+
+
+        if (devType == DeviceType.Camera) continue; // skip for windows, too, throws error otherwise
+        if (devType == DeviceType.Pano) continue;
+        if (devType == DeviceType.TapeGroup) continue;
+
+        GameObject tmpObj = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
+        tmpObj.transform.parent = rootNode.transform;
+        menuItems.Add(tmpObj);
+        menuItem m = tmpObj.GetComponent<menuItem>();
+        refObjects[devType] = m.Setup(devType);
+        menuItemScripts.Add(m);
+
+
+
+        float angle = arcSegment * (x - hElements / 2) + arcSegment / 2f;
+        Quaternion rotation = Quaternion.Euler(0, angle, 0);
+        Vector3 positionOffset = rotation * Vector3.forward * -0.5f - Vector3.forward * -0.5f;
+        menuItems[tempCount].transform.localPosition = positionOffset + Vector3.up * y * 0.07f;
+        menuItems[tempCount].transform.rotation = rotation;
+
         tempCount++;
+        y++;
+
       }
-      h += 0.07f;
+
+      x++;
+
     }
 
-    //metronomeNode.transform.localPosition = Quaternion.Euler(0, -arc / 2 - 10, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f) + Vector3.up * .014f;
-    //metronomeNode.transform.rotation = Quaternion.Euler(0, -arc / 2 - 10, 0);
-    //settingsNode.transform.localPosition = Quaternion.Euler(0, arc / 2 + 10, 0) * (Vector3.forward * -.5f) - (Vector3.forward * -.5f);
-    //settingsNode.transform.rotation = Quaternion.Euler(0, arc / 2 + 10, 0);
 
-    metronomeNode.transform.localPosition = new Vector3(0.329f, 0.012f + 0.10f, 0.107f);
-    metronomeNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);    
+    metronomeNode.transform.localPosition = new Vector3(0.345f, 0.012f + 0.10f, 0.107f);
+    metronomeNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);   
+    
     performanceNode.transform.localPosition = new Vector3(0.329f, 0.012f - 0.12f + 0.10f, 0.107f);
     performanceNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);
 
-    settingsNode.transform.localPosition = new Vector3(-0.341f, 0.023f, 0.125f);
+    settingsNode.transform.localPosition = new Vector3(-0.344f, -0.001f, 0.171f);
     settingsNode.transform.rotation = Quaternion.Euler(-0.422f, 40.013f, 0.576f);
 
   }

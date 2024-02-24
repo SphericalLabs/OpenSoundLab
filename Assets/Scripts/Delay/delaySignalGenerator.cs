@@ -132,26 +132,11 @@ public class delaySignalGenerator : signalGenerator
     float timeCenter;
     float timeRange;
 
-    // absolute minimum 2^8 samples
+    // absolute minimum 2^9 samples
     // absolute maximum 2^21 samples
-    const int minPower = 8;
+    const int minPower = 9;
     const int maxPower = 21;
 
-    //For mode 0 (full range):
-    //minVal_seconds = 0.0053 seconds
-    //maxVal_seconds = 43.69 seconds
-
-    //For mode 1 (low third range):
-    //minVal_seconds = 0.0053 seconds
-    //maxVal_seconds = 0.1075 seconds
-
-    //For mode 2 (mid third range):
-    //minVal_seconds = 0.1075 seconds
-    //maxVal_seconds = 2.1673 seconds
-
-    //For mode 3 (high third range):
-    //minVal_seconds = 2.1673 seconds
-    //maxVal_seconds = 43.69 seconds
 
   public void SetTimeRange(int mode)
     {
