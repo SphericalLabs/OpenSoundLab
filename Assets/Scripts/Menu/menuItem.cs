@@ -452,14 +452,16 @@ public class menuItem : manipObject {
 
 public enum DeviceCategory
 {
-  Synthesizer,
-  Effect,
-  InputOutput,
-  Controller,
-  Utility,
-  Sequencer
+  Various,
+  Interface,
+  Mixing,
+  ModulationProcessor,
+  ModulationGenerator,
+  SoundProcessor,
+  SampleGenerator,
+  WaveGenerator,
+  // this order defines the order in the menu
 }
-
 
 public class DeviceType
 {
@@ -469,61 +471,74 @@ public class DeviceType
   public DeviceCategory Category { get; private set; }
   public int Order { get; private set; }
 
-  private DeviceType(string name, DeviceCategory category, int order)
+  private DeviceType(string name, DeviceCategory category, int orderWithinCategory)
   {
     Name = name;
     Category = category;
-    Order = order;
+    Order = orderWithinCategory;
     instances.Add(this);
   }
 
-  // DeviceType instances as per your list, with categories attributed based on my best judgment
-  public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.Synthesizer, 1);
-  public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.Synthesizer, 2);
-  public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.Effect, 3);
-  public static readonly DeviceType Artefact = new DeviceType("Artefact", DeviceCategory.Utility, 4);
-  public static readonly DeviceType DC = new DeviceType("DC", DeviceCategory.Utility, 5);
-  public static readonly DeviceType Camera = new DeviceType("Camera", DeviceCategory.InputOutput, 6);
-  public static readonly DeviceType Compressor = new DeviceType("Compressor", DeviceCategory.Effect, 7);
-  public static readonly DeviceType ControlCube = new DeviceType("ControlCube", DeviceCategory.Controller, 8);
-  public static readonly DeviceType Delay = new DeviceType("Delay", DeviceCategory.Effect, 9);
-  public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Synthesizer, 10);
-  public static readonly DeviceType Filter = new DeviceType("Filter", DeviceCategory.Effect, 11);
-  public static readonly DeviceType Freeverb = new DeviceType("Freeverb", DeviceCategory.Effect, 12);
-  public static readonly DeviceType Gain = new DeviceType("Gain", DeviceCategory.Utility, 13);
-  public static readonly DeviceType Glide = new DeviceType("Glide", DeviceCategory.Utility, 14);
-  public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Controller, 15);
-  public static readonly DeviceType Looper = new DeviceType("Looper", DeviceCategory.Effect, 16);
-  public static readonly DeviceType Maracas = new DeviceType("Maracas", DeviceCategory.Synthesizer, 17);
-  public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.InputOutput, 18);
-  public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.InputOutput, 19);
-  public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.InputOutput, 20);
-  public static readonly DeviceType Mixer = new DeviceType("Mixer", DeviceCategory.Utility, 21);
-  public static readonly DeviceType Multiple = new DeviceType("Multiple", DeviceCategory.Utility, 22);
-  public static readonly DeviceType MultiMix = new DeviceType("MultiMix", DeviceCategory.Utility, 23);
-  public static readonly DeviceType MultiSplit = new DeviceType("MultiSplit", DeviceCategory.Utility, 24);
-  public static readonly DeviceType Noise = new DeviceType("Noise", DeviceCategory.Synthesizer, 25);
-  public static readonly DeviceType Oscillator = new DeviceType("Oscillator", DeviceCategory.Synthesizer, 26);
-  public static readonly DeviceType Polarizer = new DeviceType("Polarizer", DeviceCategory.Utility, 27);
-  public static readonly DeviceType Quantizer = new DeviceType("Quantizer", DeviceCategory.Utility, 28);
-  public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.InputOutput, 29);
-  public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.Effect, 30);
-  public static readonly DeviceType SampleHold = new DeviceType("SampleHold", DeviceCategory.Utility, 31);
-  public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.Synthesizer, 32);
-  public static readonly DeviceType Scope = new DeviceType("Scope", DeviceCategory.Utility, 33);
-  public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.Sequencer, 34);
-  public static readonly DeviceType SequencerCV = new DeviceType("SequencerCV", DeviceCategory.Sequencer, 35);
-  public static readonly DeviceType Speaker = new DeviceType("Speaker", DeviceCategory.InputOutput, 36);
-  public static readonly DeviceType Tapes = new DeviceType("Tapes", DeviceCategory.Utility, 37);
-  public static readonly DeviceType Timeline = new DeviceType("Timeline", DeviceCategory.Utility, 38);
-  public static readonly DeviceType TouchPad = new DeviceType("TouchPad", DeviceCategory.Controller, 39);
-  public static readonly DeviceType Tutorials = new DeviceType("Tutorials", DeviceCategory.Utility, 40);
-  public static readonly DeviceType VCA = new DeviceType("VCA", DeviceCategory.Utility, 41);
-  public static readonly DeviceType XyloRoll = new DeviceType("XyloRoll", DeviceCategory.Controller, 42);
-  public static readonly DeviceType TapeGroup = new DeviceType("TapeGroup", DeviceCategory.Utility, 43);
-  public static readonly DeviceType Pano = new DeviceType("Pano", DeviceCategory.Utility, 44);
-  
-  // Method to get all instances, optionally sorted
+  // WaveGenerator
+  public static readonly DeviceType Maracas = new DeviceType("Maracas", DeviceCategory.WaveGenerator, 3);
+  public static readonly DeviceType Noise = new DeviceType("Noise", DeviceCategory.WaveGenerator, 2);
+  public static readonly DeviceType Oscillator = new DeviceType("Oscillator", DeviceCategory.WaveGenerator, 1);
+
+  // SampleGenerator
+  public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 5);
+  public static readonly DeviceType Looper = new DeviceType("Looper", DeviceCategory.SampleGenerator, 4);
+  public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 3);
+  public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 2);
+  public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.SampleGenerator, 1);
+
+  // ModulationGenerator
+  public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 6);
+  public static readonly DeviceType Timeline = new DeviceType("Timeline", DeviceCategory.ModulationGenerator, 5);
+  public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 4);
+  public static readonly DeviceType SequencerCV = new DeviceType("SequencerCV", DeviceCategory.ModulationGenerator, 3);
+  public static readonly DeviceType DC = new DeviceType("DC", DeviceCategory.ModulationGenerator, 2);
+  public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 1);
+
+  // SoundProcessor
+  public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 6);
+  public static readonly DeviceType Artefact = new DeviceType("Artefact", DeviceCategory.SoundProcessor, 5);
+  public static readonly DeviceType Compressor = new DeviceType("Compressor", DeviceCategory.SoundProcessor, 4);
+  public static readonly DeviceType Filter = new DeviceType("Filter", DeviceCategory.SoundProcessor, 3);
+  public static readonly DeviceType Delay = new DeviceType("Delay", DeviceCategory.SoundProcessor, 2);
+  public static readonly DeviceType Freeverb = new DeviceType("Freeverb", DeviceCategory.SoundProcessor, 1);
+
+  // ModulationProcessor
+  public static readonly DeviceType Polarizer = new DeviceType("Polarizer", DeviceCategory.ModulationProcessor, 5);
+  public static readonly DeviceType Glide = new DeviceType("Glide", DeviceCategory.ModulationProcessor, 4);
+  public static readonly DeviceType SampleHold = new DeviceType("SampleHold", DeviceCategory.ModulationProcessor, 3);
+  public static readonly DeviceType Quantizer = new DeviceType("Quantizer", DeviceCategory.ModulationProcessor, 2);
+  public static readonly DeviceType VCA = new DeviceType("VCA", DeviceCategory.ModulationProcessor, 1);
+
+  // Mixing
+  public static readonly DeviceType Multiple = new DeviceType("Multiple", DeviceCategory.Mixing, 5);
+  public static readonly DeviceType Mixer = new DeviceType("Mixer", DeviceCategory.Mixing, 4);
+  public static readonly DeviceType Gain = new DeviceType("Gain", DeviceCategory.Mixing, 3);
+  public static readonly DeviceType MultiMix = new DeviceType("MultiMix", DeviceCategory.Mixing, 2);
+  public static readonly DeviceType MultiSplit = new DeviceType("MultiSplit", DeviceCategory.Mixing, 1);
+
+  // Interface
+  public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.Interface, 7);
+  public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.Interface, 6);
+  public static readonly DeviceType XyloRoll = new DeviceType("XyloRoll", DeviceCategory.Interface, 5);
+  public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 4);
+  public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 3);
+  public static readonly DeviceType ControlCube = new DeviceType("ControlCube", DeviceCategory.Interface, 2);
+  public static readonly DeviceType TouchPad = new DeviceType("TouchPad", DeviceCategory.Interface, 1);
+
+  // Various
+  public static readonly DeviceType Pano = new DeviceType("Pano", DeviceCategory.Various, 7);
+  public static readonly DeviceType Tapes = new DeviceType("Tapes", DeviceCategory.Various, 6);
+  public static readonly DeviceType Camera = new DeviceType("Camera", DeviceCategory.Various, 5);
+  public static readonly DeviceType Tutorials = new DeviceType("Tutorials", DeviceCategory.Various, 4);
+  public static readonly DeviceType Speaker = new DeviceType("Speaker", DeviceCategory.Various, 3);
+  public static readonly DeviceType TapeGroup = new DeviceType("TapeGroup", DeviceCategory.Various, 2);
+  public static readonly DeviceType Scope = new DeviceType("Scope", DeviceCategory.Various, 1);
+
   public static IEnumerable<DeviceType> GetAll(bool sortAlphabetically = false)
   {
     if (sortAlphabetically)
@@ -532,11 +547,10 @@ public class DeviceType
     }
     else
     {
-      return instances.OrderBy(d => d.Order).ToList();
+      return instances.OrderBy(d => d.Category).ThenBy(d => d.Order).ToList();
     }
   }
 
-  // Method to get all instances of a specific category, optionally sorted
   public static IEnumerable<DeviceType> GetAllByCategory(DeviceCategory category, bool sortAlphabetically = false)
   {
     var filteredDevices = instances.Where(d => d.Category == category);
@@ -551,7 +565,6 @@ public class DeviceType
     }
   }
 
-  // Implicit conversion to string for compatibility
   public static implicit operator string(DeviceType deviceType) => deviceType.Name;
 
   public override string ToString() => Name;
