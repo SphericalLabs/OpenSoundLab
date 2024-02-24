@@ -170,7 +170,7 @@ public class looperDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     LooperData data = new LooperData();
-    data.deviceType = menuItem.deviceType.Looper;
+    data.deviceType = DeviceType.Looper;
     GetTransformData(data);
 
     data.jackInID = input.transform.GetInstanceID();

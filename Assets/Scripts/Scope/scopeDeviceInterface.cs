@@ -107,7 +107,7 @@ public class scopeDeviceInterface : deviceInterface {
     
   public override InstrumentData GetData() {
     ScopeData data = new ScopeData();
-    data.deviceType = menuItem.deviceType.Scope;
+    data.deviceType = DeviceType.Scope;
     GetTransformData(data);
 
     data.jackInID = input.transform.GetInstanceID();

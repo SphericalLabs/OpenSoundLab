@@ -101,10 +101,6 @@ public class clipPlayerComplex : clipPlayer {
     if (!loaded) toggleWaveDisplay(false);
   }
 
-  public override menuItem.deviceType queryDeviceType() {
-    return menuItem.deviceType.Sampler;
-  }
-
   public override void toggleWaveDisplay(bool on) {
     if (_waveDisplayAnimation != null) StopCoroutine(_waveDisplayAnimation);
     _waveDisplayAnimation = StartCoroutine(waveDisplayAnimation(on));

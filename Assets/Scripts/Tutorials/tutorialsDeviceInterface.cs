@@ -215,7 +215,7 @@ public class tutorialsDeviceInterface : deviceInterface
   public override InstrumentData GetData()
   {
     TutorialsData data = new TutorialsData();
-    data.deviceType = menuItem.deviceType.Tutorials;
+    data.deviceType = DeviceType.Tutorials;
     GetTransformData(data);
     return data;
   }

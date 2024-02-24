@@ -130,7 +130,7 @@ public class oscillatorDeviceInterface : deviceInterface
   public override InstrumentData GetData()
   {
     OscillatorData data = new OscillatorData();
-    data.deviceType = menuItem.deviceType.Oscillator;
+    data.deviceType = DeviceType.Oscillator;
     GetTransformData(data);
 
     data.lfo = lfo;

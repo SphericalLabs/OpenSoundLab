@@ -360,7 +360,7 @@ public class xylorollDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     XyloRollData data = new XyloRollData();
-    data.deviceType = menuItem.deviceType.XyloRoll;
+    data.deviceType = DeviceType.XyloRoll;
     GetTransformData(data);
 
     data.ADSRdata = new Vector2[3];

@@ -75,7 +75,7 @@ public class speakerDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     SpeakerData data = new SpeakerData();
-    data.deviceType = menuItem.deviceType.Speaker;
+    data.deviceType = DeviceType.Speaker;
     GetTransformData(data);
     data.jackInID = input.transform.GetInstanceID();
     data.channelState = channelSwitcher.switchVal;

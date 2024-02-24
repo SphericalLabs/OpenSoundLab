@@ -56,7 +56,7 @@ public class glideDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     GlideData data = new GlideData();
-    data.deviceType = menuItem.deviceType.Glide;
+    data.deviceType = DeviceType.Glide;
     GetTransformData(data);
 
     data.dialState = valueDial.percent;

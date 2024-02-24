@@ -72,7 +72,7 @@ public class drumDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     DrumData data = new DrumData();
-    data.deviceType = menuItem.deviceType.Drum;
+    data.deviceType = DeviceType.Drum;
     GetTransformData(data);
     data.jackOutSampID = sampOut.transform.GetInstanceID();
     data.jackOutSigID = sigOut.transform.GetInstanceID();

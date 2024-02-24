@@ -73,7 +73,7 @@ public class delayDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         DelayData data = new DelayData();
-        data.deviceType = menuItem.deviceType.Delay;
+        data.deviceType = DeviceType.Delay;
         GetTransformData(data);
 
         data.timeState = timeDial.percent;

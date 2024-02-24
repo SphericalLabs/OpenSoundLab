@@ -52,7 +52,7 @@ public class polarizerDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     PolarizerData data = new PolarizerData();
-    data.deviceType = menuItem.deviceType.Polarizer;
+    data.deviceType = DeviceType.Polarizer;
     GetTransformData(data);
 
     data.switchState = uni2biSelector.switchVal;

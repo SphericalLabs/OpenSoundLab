@@ -94,7 +94,7 @@ public class adsrDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     ADSRData data = new ADSRData();
-    data.deviceType = menuItem.deviceType.ADSR;
+    data.deviceType = DeviceType.ADSR;
     GetTransformData(data);
 
     data.ADSRdata = new Vector2[3];

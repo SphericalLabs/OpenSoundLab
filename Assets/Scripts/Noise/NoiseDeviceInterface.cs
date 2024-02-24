@@ -93,7 +93,7 @@ public class NoiseDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     NoiseData data = new NoiseData();
-    data.deviceType = menuItem.deviceType.Noise;
+    data.deviceType = DeviceType.Noise;
 
     GetTransformData(data);
 

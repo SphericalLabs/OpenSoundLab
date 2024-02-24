@@ -58,11 +58,11 @@ public class exampleManager : MonoBehaviour {
       items.Add(g.GetComponent<exampleItem>());
     }
 
-    items[0].Setup(this, menuItem.deviceType.Drum, "basicDrumExample", "Basic\nDrums");
-    items[1].Setup(this, menuItem.deviceType.Tapes, "basicSamplerExample", "Basic\nSampler");
-    items[2].Setup(this, menuItem.deviceType.Sequencer, "basicDrumMachineExample", "Drum\nMachine");
-    items[3].Setup(this, menuItem.deviceType.Oscillator, "basicOscillatorExample", "Basic\nSynthesizer");
-    items[4].Setup(this, menuItem.deviceType.Timeline, "basicSequencerExample", "Basic\nSequencer");
+    items[0].Setup(this, DeviceType.Drum, "basicDrumExample", "Basic\nDrums");
+    items[1].Setup(this, DeviceType.Tapes, "basicSamplerExample", "Basic\nSampler");
+    items[2].Setup(this, DeviceType.Sequencer, "basicDrumMachineExample", "Drum\nMachine");
+    items[3].Setup(this, DeviceType.Oscillator, "basicOscillatorExample", "Basic\nSynthesizer");
+    items[4].Setup(this, DeviceType.Timeline, "basicSequencerExample", "Basic\nSequencer");
 
     for (int i = 0; i < 7; i++) {
       GameObject g = Instantiate(exampleItemPrefab, transform, false) as GameObject;
@@ -72,13 +72,13 @@ public class exampleManager : MonoBehaviour {
       items.Add(g.GetComponent<exampleItem>());
     }
 
-    items[5].Setup(this, menuItem.deviceType.Mixer, "mixerExample", "Mixer");
-    items[6].Setup(this, menuItem.deviceType.ControlCube, "cubeExample", "Cube");
-    items[7].Setup(this, menuItem.deviceType.Maracas, "maracaExample", "Maraca");
-    items[8].Setup(this, menuItem.deviceType.Filter, "filterExample", "Filter");
-    items[9].Setup(this, menuItem.deviceType.Drum, "complexDrumExample", "Drumkit");
-    items[10].Setup(this, menuItem.deviceType.Sequencer, "complexSequencerExample", "Drum\nMachines");
-    items[11].Setup(this, menuItem.deviceType.Camera, "camAndMicExample", "Camera\n+ Mic");
+    items[5].Setup(this, DeviceType.Mixer, "mixerExample", "Mixer");
+    items[6].Setup(this, DeviceType.ControlCube, "cubeExample", "Cube");
+    items[7].Setup(this, DeviceType.Maracas, "maracaExample", "Maraca");
+    items[8].Setup(this, DeviceType.Filter, "filterExample", "Filter");
+    items[9].Setup(this, DeviceType.Drum, "complexDrumExample", "Drumkit");
+    items[10].Setup(this, DeviceType.Sequencer, "complexSequencerExample", "Drum\nMachines");
+    items[11].Setup(this, DeviceType.Camera, "camAndMicExample", "Camera\n+ Mic");
   }
 
   void Start() {

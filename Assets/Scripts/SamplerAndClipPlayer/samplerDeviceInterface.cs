@@ -126,7 +126,7 @@ public class samplerDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     SamplerData data = new SamplerData();
-    data.deviceType = menuItem.deviceType.Sampler;
+    data.deviceType = DeviceType.Sampler;
     GetTransformData(data);
     data.speedDial = speedDial.percent;
     data.ampDial = volumeDial.percent;

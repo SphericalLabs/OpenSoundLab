@@ -173,115 +173,115 @@ public class xmlUpdate {
 
           switch (xmlNode.Name) {
             case "DCs":
-              data[data.Count - 1].deviceType = menuItem.deviceType.DC;
+              data[data.Count - 1].deviceType = DeviceType.DC;
               break;
             case "Tutorialss":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Tutorials;
+              data[data.Count - 1].deviceType = DeviceType.Tutorials;
               break;
             case "Polarizers":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Polarizer;
+              data[data.Count - 1].deviceType = DeviceType.Polarizer;
               break;
             case "Compressors":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Compressor;
+              data[data.Count - 1].deviceType = DeviceType.Compressor;
               break;
             case "Freeverbs":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Freeverb;
+              data[data.Count - 1].deviceType = DeviceType.Freeverb;
               break;
             case "Delays":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Delay;
+              data[data.Count - 1].deviceType = DeviceType.Delay;
               break;
             case "Scopes":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Scope;
+              data[data.Count - 1].deviceType = DeviceType.Scope;
               break;
             case "Quantizers":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Quantizer;
+              data[data.Count - 1].deviceType = DeviceType.Quantizer;
               break;
 
             case "ADs":
-              data[data.Count - 1].deviceType = menuItem.deviceType.AD;
+              data[data.Count - 1].deviceType = DeviceType.AD;
               break;
             case "SequencerCVs":
-              data[data.Count - 1].deviceType = menuItem.deviceType.SequencerCV;
+              data[data.Count - 1].deviceType = DeviceType.SequencerCV;
               break;
             case "SampleHolds":
-              data[data.Count - 1].deviceType = menuItem.deviceType.SampleHold;
+              data[data.Count - 1].deviceType = DeviceType.SampleHold;
               break;
             case "Glides":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Glide;
+              data[data.Count - 1].deviceType = DeviceType.Glide;
               break;
             case "Gains":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Gain;
+              data[data.Count - 1].deviceType = DeviceType.Gain;
               break;
             case "Oscillators":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Oscillator;
+              data[data.Count - 1].deviceType = DeviceType.Oscillator;
               break;
             case "TapeGroups":
-              data[data.Count - 1].deviceType = menuItem.deviceType.TapeGroup;
+              data[data.Count - 1].deviceType = DeviceType.TapeGroup;
               data[data.Count - 1].scale = Vector3.one;
               break;
             case "Speaker":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Speaker;
+              data[data.Count - 1].deviceType = DeviceType.Speaker;
               break;
             case "Drums":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Drum;
+              data[data.Count - 1].deviceType = DeviceType.Drum;
               break;
             case "Multiples":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Multiple;
+              data[data.Count - 1].deviceType = DeviceType.Multiple;
               break;
             case "Recorders":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Recorder;
+              data[data.Count - 1].deviceType = DeviceType.Recorder;
               break;
             case "Loopers":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Looper;
+              data[data.Count - 1].deviceType = DeviceType.Looper;
               break;
             case "Mixers":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Mixer;
+              data[data.Count - 1].deviceType = DeviceType.Mixer;
               break;
             case "Maracas":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Maracas;
+              data[data.Count - 1].deviceType = DeviceType.Maracas;
               break;
             case "XyloRolls":
-              data[data.Count - 1].deviceType = menuItem.deviceType.XyloRoll;
+              data[data.Count - 1].deviceType = DeviceType.XyloRoll;
               break;
             case "TouchPads":
-              data[data.Count - 1].deviceType = menuItem.deviceType.TouchPad;
+              data[data.Count - 1].deviceType = DeviceType.TouchPad;
               break;
             case "Microphones":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Microphone;
+              data[data.Count - 1].deviceType = DeviceType.Microphone;
               break;
             case "Cameras":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Camera;
+              data[data.Count - 1].deviceType = DeviceType.Camera;
               break;
             case "ControlCubes":
-              data[data.Count - 1].deviceType = menuItem.deviceType.ControlCube;
+              data[data.Count - 1].deviceType = DeviceType.ControlCube;
               break;
             case "VCAs":
-              data[data.Count - 1].deviceType = menuItem.deviceType.VCA;
+              data[data.Count - 1].deviceType = DeviceType.VCA;
               break;
             case "Reverbs":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Reverb;
+              data[data.Count - 1].deviceType = DeviceType.Reverb;
               break;
             case "Samplers":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Sampler;
+              data[data.Count - 1].deviceType = DeviceType.Sampler;
               break;
             case "Sequencers":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Sequencer;
+              data[data.Count - 1].deviceType = DeviceType.Sequencer;
               break;
             case "Keyboards":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Keyboard;
+              data[data.Count - 1].deviceType = DeviceType.Keyboard;
               break;
             case "Tapes":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Tapes;
+              data[data.Count - 1].deviceType = DeviceType.Tapes;
               data[data.Count - 1].scale = Vector3.one;
               break;
             case "Noise":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Noise;
+              data[data.Count - 1].deviceType = DeviceType.Noise;
               break;
             case "Filters":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Filter;
+              data[data.Count - 1].deviceType = DeviceType.Filter;
               break;
             case "Artefacts":
-              data[data.Count - 1].deviceType = menuItem.deviceType.Artefact;
+              data[data.Count - 1].deviceType = DeviceType.Artefact;
               break;
             default:
               break;
@@ -293,11 +293,11 @@ public class xmlUpdate {
 
   }
 
-  menuItem.deviceType getDeviceType(string s) {
-    if (s == "Drums") return menuItem.deviceType.Drum;
-    if (s == "TapeGroups") return menuItem.deviceType.TapeGroup;
+  DeviceType getDeviceType(string s) {
+    if (s == "Drums") return DeviceType.Drum;
+    if (s == "TapeGroups") return DeviceType.TapeGroup;
 
-    return menuItem.deviceType.Oscillator;
+    return DeviceType.Oscillator;
   }
 }
 

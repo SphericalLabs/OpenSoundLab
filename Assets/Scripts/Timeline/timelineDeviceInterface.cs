@@ -111,7 +111,7 @@ public class timelineDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     TimelineData data = new TimelineData();
-    data.deviceType = menuItem.deviceType.Timeline;
+    data.deviceType = DeviceType.Timeline;
     GetTransformData(data);
 
     data.timelineData = _timeline.GetTimelineData();

@@ -62,7 +62,7 @@ public class tapeGroupDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     TapeGroupData data = new TapeGroupData();
-    data.deviceType = menuItem.deviceType.TapeGroup;
+    data.deviceType = DeviceType.TapeGroup;
     GetTransformData(data);
 
     data.samplegroup = samplegroup;

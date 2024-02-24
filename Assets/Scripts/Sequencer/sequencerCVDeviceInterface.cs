@@ -626,7 +626,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     {
         // TODO implement serialization for knobs, etc
         SequencerCVData data = new SequencerCVData();
-        data.deviceType = menuItem.deviceType.SequencerCV;
+        data.deviceType = DeviceType.SequencerCV;
         GetTransformData(data);
         data.sliderSpeed = beatSlider.switchVal;
 

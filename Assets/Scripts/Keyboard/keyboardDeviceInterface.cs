@@ -206,7 +206,7 @@ public class keyboardDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     KeyboardData data = new KeyboardData();
-    data.deviceType = menuItem.deviceType.Keyboard;
+    data.deviceType = DeviceType.Keyboard;
     GetTransformData(data);
 
     

@@ -73,7 +73,7 @@ public class ControlCubeDeviceInterface : deviceInterface {
   public override InstrumentData GetData() {
     ControlCubeData data = new ControlCubeData();
 
-    data.deviceType = menuItem.deviceType.ControlCube;
+    data.deviceType = DeviceType.ControlCube;
     GetTransformData(data);
 
     data.jackOutID = new int[4];

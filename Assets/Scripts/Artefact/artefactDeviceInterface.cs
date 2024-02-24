@@ -28,7 +28,7 @@ public class artefactDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         ArtefactData data = new ArtefactData();
-        data.deviceType = menuItem.deviceType.Artefact;
+        data.deviceType = DeviceType.Artefact;
         GetTransformData(data);
 
         data.noiseAmount = noiseDial.percent;

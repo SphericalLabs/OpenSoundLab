@@ -43,18 +43,18 @@ public class SaveLoadInterface : MonoBehaviour {
   public GameObject plugPrefab;
   public static SaveLoadInterface instance;
   public metronome nome;
-  Dictionary<menuItem.deviceType, GameObject> instrumentPrefabs;
+  Dictionary<DeviceType, GameObject> instrumentPrefabs;
 
   void Awake() {
     instance = this;
-    instrumentPrefabs = new Dictionary<menuItem.deviceType, GameObject>();
+    instrumentPrefabs = new Dictionary<DeviceType, GameObject>();
 
-    for (int i = 0; i < (int)menuItem.deviceType.Max; i++) {
-      instrumentPrefabs[(menuItem.deviceType)i] = Resources.Load("Prefabs/" + ((menuItem.deviceType)i).ToString()) as GameObject;
+    foreach (var devType in DeviceType.GetAll()){ 
+      instrumentPrefabs[devType] = Resources.Load("Prefabs/" + devType) as GameObject;
     }
 
-    instrumentPrefabs[menuItem.deviceType.TapeGroup] = Resources.Load("Prefabs/" + (menuItem.deviceType.TapeGroup).ToString()) as GameObject;
-    instrumentPrefabs[menuItem.deviceType.Pano] = Resources.Load("Prefabs/" + (menuItem.deviceType.Pano).ToString()) as GameObject;
+    instrumentPrefabs[DeviceType.TapeGroup] = Resources.Load("Prefabs/" + DeviceType.TapeGroup) as GameObject;
+    //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
   }
 
   public void Load(string filename, bool tutorial = false) {
@@ -262,7 +262,7 @@ public class SaveLoadInterface : MonoBehaviour {
 
 public class InstrumentData {
   public int ID;
-  public menuItem.deviceType deviceType;
+  public DeviceType deviceType;
   public Vector3 position;
   public Vector3 scale = Vector3.one;
   public Quaternion rotation;

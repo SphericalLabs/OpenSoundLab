@@ -78,7 +78,7 @@ public class recorderDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     RecorderData data = new RecorderData();
-    data.deviceType = menuItem.deviceType.Recorder;
+    data.deviceType = DeviceType.Recorder;
     GetTransformData(data);
 
     data.jackInID = input.transform.GetInstanceID();

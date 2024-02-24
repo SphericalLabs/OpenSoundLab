@@ -35,6 +35,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Analytics;
 
 public class menuManager : MonoBehaviour {
   public GameObject item;
@@ -46,7 +47,7 @@ public class menuManager : MonoBehaviour {
 
   public List<GameObject> menuItems;
 
-  public Dictionary<menuItem.deviceType, GameObject> refObjects;
+  public Dictionary<DeviceType, GameObject> refObjects;
 
   public AudioSource _audioSource;
   public AudioClip openClip;
@@ -65,7 +66,7 @@ public class menuManager : MonoBehaviour {
 
   void Awake() {
     instance = this;
-    refObjects = new Dictionary<menuItem.deviceType, GameObject>();
+    refObjects = new Dictionary<DeviceType, GameObject>();
     _audioSource = GetComponent<AudioSource>();
     loadMenu();
     loadNonMenuItems();
@@ -82,14 +83,14 @@ public class menuManager : MonoBehaviour {
     GameObject temp = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
     temp.transform.parent = rootNode.transform;
     menuItem m = temp.GetComponent<menuItem>();
-    refObjects[menuItem.deviceType.TapeGroup] = m.Setup(menuItem.deviceType.TapeGroup);
+    refObjects[DeviceType.TapeGroup] = m.Setup(DeviceType.TapeGroup);
     temp.SetActive(false);
 
-    temp = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
-    temp.transform.parent = rootNode.transform;
-    m = temp.GetComponent<menuItem>();
-    refObjects[menuItem.deviceType.Pano] = m.Setup(menuItem.deviceType.Pano);
-    temp.SetActive(false);
+    //temp = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
+    //temp.transform.parent = rootNode.transform;
+    //m = temp.GetComponent<menuItem>();
+    //refObjects[deviceType.Pano] = m.Setup(deviceType.Pano);
+    //temp.SetActive(false);
   }
 
   public void SetMenuActive(bool on) {
@@ -102,43 +103,46 @@ public class menuManager : MonoBehaviour {
   void loadMenu() { 
     menuItems = new List<GameObject>();
     menuItemScripts = new List<menuItem>();
-    for (int i = (int)menuItem.deviceType.Max - 1; i >= 0; i--) {
+
+    foreach(var devType in DeviceType.GetAllByCategory(DeviceCategory.Synthesizer)){
       // skip incompatible devices
       if (Application.platform == RuntimePlatform.Android)
       {
-        if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue;
+        if (devType == DeviceType.Camera) continue;
       }
       
-      if ((menuItem.deviceType)i == menuItem.deviceType.Sequencer) continue; 
-      if ((menuItem.deviceType)i == menuItem.deviceType.MIDIIN) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.MIDIOUT) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.Airhorn) continue;
+      if (devType == DeviceType.Sequencer) continue; 
+      if (devType == DeviceType.MIDIIN) continue;
+      if (devType == DeviceType.MIDIOUT) continue;
+      if (devType == DeviceType.Airhorn) continue;
             
-      if ((menuItem.deviceType)i == menuItem.deviceType.Maracas) continue;
-      if ((menuItem.deviceType)i == menuItem.deviceType.Timeline) continue;      
-      if ((menuItem.deviceType)i == menuItem.deviceType.Reverb) continue;
+      if (devType == DeviceType.Maracas) continue;
+      if (devType == DeviceType.Timeline) continue;      
+      if (devType == DeviceType.Reverb) continue;
 
       // MultiMix and MultiSplit hack, want to have Multiple available for loading, but not in the menu palette
-      if ((menuItem.deviceType)i == menuItem.deviceType.Multiple) 
+      if (devType == DeviceType.Multiple) 
       {
         GameObject tmpObj2 = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
         tmpObj2.transform.parent = rootNode.transform;
         //menuItems.Add(tmpObj2);
         menuItem m2 = tmpObj2.GetComponent<menuItem>();
-        refObjects[(menuItem.deviceType)i] = m2.Setup((menuItem.deviceType)i);
+        refObjects[devType] = m2.Setup(devType);
         //menuItemScripts.Add(m); 
         tmpObj2.SetActive(false);
         continue; 
       }
 
 
-      if ((menuItem.deviceType)i == menuItem.deviceType.Camera) continue; // skip for windows, too, throws error otherwise
+      if (devType == DeviceType.Camera) continue; // skip for windows, too, throws error otherwise
+      if (devType == DeviceType.Pano) continue;
+      if (devType == DeviceType.TapeGroup) continue;
 
       GameObject tmpObj = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
       tmpObj.transform.parent = rootNode.transform;
       menuItems.Add(tmpObj);
       menuItem m = tmpObj.GetComponent<menuItem>();
-      refObjects[(menuItem.deviceType)i] = m.Setup((menuItem.deviceType)i);
+      refObjects[devType] = m.Setup(devType);
       menuItemScripts.Add(m);
     }
 

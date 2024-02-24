@@ -160,7 +160,7 @@ public class cameraDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     CameraData data = new CameraData();
-    data.deviceType = menuItem.deviceType.Camera;
+    data.deviceType = DeviceType.Camera;
     GetTransformData(data);
 
     data.inputID = input.transform.GetInstanceID();

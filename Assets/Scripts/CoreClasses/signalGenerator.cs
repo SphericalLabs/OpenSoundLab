@@ -58,11 +58,6 @@ public class signalGenerator : MonoBehaviour
         _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
     }
 
-    public virtual menuItem.deviceType queryDeviceType()
-    {
-        return menuItem.deviceType.Max;
-    }
-
     public virtual void updateTape(string s)
     {
         

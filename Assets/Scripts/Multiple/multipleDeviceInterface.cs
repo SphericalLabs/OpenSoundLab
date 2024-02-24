@@ -151,7 +151,7 @@ public class multipleDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     MultipleData data = new MultipleData();
-    data.deviceType = menuItem.deviceType.Multiple;
+    data.deviceType = DeviceType.Multiple;
     GetTransformData(data);
 
     data.isSplitter = isSplitter;

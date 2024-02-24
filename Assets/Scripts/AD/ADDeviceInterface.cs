@@ -61,7 +61,7 @@ public class ADDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         ADData data = new ADData();
-        data.deviceType = menuItem.deviceType.AD;
+        data.deviceType = DeviceType.AD;
         GetTransformData(data);
 
         data.attackState = attackDial.percent;

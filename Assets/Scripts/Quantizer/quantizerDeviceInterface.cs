@@ -59,7 +59,7 @@ public class quantizerDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     QuantizerData data = new QuantizerData();
-    data.deviceType = menuItem.deviceType.Quantizer;
+    data.deviceType = DeviceType.Quantizer;
     GetTransformData(data);
 
     data.transposeState = transposeDial.percent;

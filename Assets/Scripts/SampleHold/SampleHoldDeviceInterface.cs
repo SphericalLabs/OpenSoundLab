@@ -52,7 +52,7 @@ public class SampleHoldDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     SampleHoldData data = new SampleHoldData();
-    data.deviceType = menuItem.deviceType.SampleHold;
+    data.deviceType = DeviceType.SampleHold;
     GetTransformData(data);
 
     data.jackInID = input.transform.GetInstanceID();

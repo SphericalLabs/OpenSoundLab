@@ -109,7 +109,7 @@ public class mixerDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     MixerData data = new MixerData();
-    data.deviceType = menuItem.deviceType.Mixer;
+    data.deviceType = DeviceType.Mixer;
     data.jackOutID = output.GetInstanceID();
 
     GetTransformData(data);

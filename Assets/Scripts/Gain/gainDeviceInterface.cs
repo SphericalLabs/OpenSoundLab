@@ -63,7 +63,7 @@ public class gainDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     GainData data = new GainData();
-    data.deviceType = menuItem.deviceType.Gain;
+    data.deviceType = DeviceType.Gain;
     GetTransformData(data);
 
     data.dialState = ampDial.percent;

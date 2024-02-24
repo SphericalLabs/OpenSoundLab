@@ -56,7 +56,7 @@ public class vcaDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     vcaData data = new vcaData();
-    data.deviceType = menuItem.deviceType.VCA;
+    data.deviceType = DeviceType.VCA;
     GetTransformData(data);
 
     data.dialState = ampDial.percent;

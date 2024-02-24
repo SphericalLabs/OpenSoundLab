@@ -453,7 +453,7 @@ public class sequencerDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     SequencerData data = new SequencerData();
-    data.deviceType = menuItem.deviceType.Sequencer;
+    data.deviceType = DeviceType.Sequencer;
     GetTransformData(data);
     data.speedMult = beatSlider.switchVal;
 

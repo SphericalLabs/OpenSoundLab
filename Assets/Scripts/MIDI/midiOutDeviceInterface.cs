@@ -141,7 +141,7 @@ public class midiOutDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     MIDIoutData data = new MIDIoutData();
-    data.deviceType = menuItem.deviceType.MIDIOUT;
+    data.deviceType = DeviceType.MIDIOUT;
     GetTransformData(data);
 
     data.connection = _midiComponentInterface.connectedDevice;

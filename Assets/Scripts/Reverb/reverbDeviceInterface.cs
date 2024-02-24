@@ -58,7 +58,7 @@ public class reverbDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     ReverbData data = new ReverbData();
-    data.deviceType = menuItem.deviceType.Reverb;
+    data.deviceType = DeviceType.Reverb;
     GetTransformData(data);
 
     data.dialState = level.percent;

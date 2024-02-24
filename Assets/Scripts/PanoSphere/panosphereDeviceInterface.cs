@@ -98,7 +98,7 @@ public class panosphereDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     PanoData data = new PanoData();
-    data.deviceType = menuItem.deviceType.Pano;
+    data.deviceType = DeviceType.Pano;
     GetTransformData(data);
     data.filename = filename;
     data.active = sphereActive;

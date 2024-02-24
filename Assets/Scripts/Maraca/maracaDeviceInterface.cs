@@ -74,7 +74,7 @@ public class maracaDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     MaracaData data = new MaracaData();
-    data.deviceType = menuItem.deviceType.Maracas;
+    data.deviceType = DeviceType.Maracas;
     GetTransformData(data);
     data.jackOutID = jackOut.transform.GetInstanceID();
     return data;

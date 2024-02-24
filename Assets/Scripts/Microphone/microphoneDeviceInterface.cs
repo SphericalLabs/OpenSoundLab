@@ -77,7 +77,7 @@ public class microphoneDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     MicrophoneData data = new MicrophoneData();
-    data.deviceType = menuItem.deviceType.Microphone;
+    data.deviceType = DeviceType.Microphone;
     GetTransformData(data);
     data.jackOutID = output.transform.GetInstanceID();
     data.amp = amp;

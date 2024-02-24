@@ -76,7 +76,7 @@ public class airhornDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     AirhornData data = new AirhornData();
-    data.deviceType = menuItem.deviceType.Airhorn;
+    data.deviceType = DeviceType.Airhorn;
     GetTransformData(data);
     data.jackOutID = jackOut.transform.GetInstanceID();
 

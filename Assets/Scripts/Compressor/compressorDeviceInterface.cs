@@ -78,7 +78,7 @@ public class compressorDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         CompressorData data = new CompressorData();
-        data.deviceType = menuItem.deviceType.Compressor;
+        data.deviceType = DeviceType.Compressor;
         GetTransformData(data);
 
         data.attackState = attackDial.percent;

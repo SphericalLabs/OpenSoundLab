@@ -74,7 +74,7 @@ public class DCDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     DCData data = new DCData();
-    data.deviceType = menuItem.deviceType.DC;
+    data.deviceType = DeviceType.DC;
     GetTransformData(data);
 
     //data.isBipolar = isBipolar.switchVal;

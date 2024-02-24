@@ -184,7 +184,7 @@ public class libraryDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     InstrumentData data = new InstrumentData();
-    data.deviceType = menuItem.deviceType.Tapes;
+    data.deviceType = DeviceType.Tapes;
     GetTransformData(data);
     return data;
   }

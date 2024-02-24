@@ -72,7 +72,7 @@ public class touchpadDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     TouchPadData data = new TouchPadData();
-    data.deviceType = menuItem.deviceType.TouchPad;
+    data.deviceType = DeviceType.TouchPad;
     GetTransformData(data);
 
     data.jackOutID = output.transform.GetInstanceID();

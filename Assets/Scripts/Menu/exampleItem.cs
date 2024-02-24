@@ -42,7 +42,7 @@ public class exampleItem : manipObject {
   public Renderer label;
   public bool toggleState = false;
 
-  menuItem.deviceType DeviceRep;
+  DeviceType DeviceRep;
   public Material menuMat;
 
   float rotateSpeed = 5f;
@@ -57,7 +57,7 @@ public class exampleItem : manipObject {
     label.material.SetFloat("_EmissionGain", .15f);
   }
 
-  public void Setup(exampleManager mgr, menuItem.deviceType rep, string filestring, string labelcopy) {
+  public void Setup(exampleManager mgr, DeviceType rep, string filestring, string labelcopy) {
     manager = mgr;
     filename = filestring;
     DeviceRep = rep;

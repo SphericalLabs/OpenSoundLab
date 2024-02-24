@@ -106,7 +106,7 @@ public class filterDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     FilterData data = new FilterData();
-    data.deviceType = menuItem.deviceType.Filter;
+    data.deviceType = DeviceType.Filter;
     GetTransformData(data);
 
     data.jackInID = input.transform.GetInstanceID();

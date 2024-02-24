@@ -66,7 +66,7 @@ public class freeverbDeviceInterface : deviceInterface {
 
     public override InstrumentData GetData() {
         FreeverbData data = new FreeverbData();
-        data.deviceType = menuItem.deviceType.Freeverb;
+        data.deviceType = DeviceType.Freeverb;
         GetTransformData(data);
 
         data.jackInID = omniJackIn.transform.GetInstanceID();
