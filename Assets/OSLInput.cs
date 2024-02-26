@@ -67,7 +67,7 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
                     ""name"": ""GripLeft"",
                     ""type"": ""Value"",
                     ""id"": ""8c80dbb2-e4df-4247-a62f-a9443cb1a57a"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": ""Analog"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -76,7 +76,7 @@ public partial class @OSLInput: IInputActionCollection2, IDisposable
                     ""name"": ""GripRight"",
                     ""type"": ""Value"",
                     ""id"": ""95bc30e0-54ac-4b4e-97e9-af5ac3958eef"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": ""Analog"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
