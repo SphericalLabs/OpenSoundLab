@@ -88,6 +88,7 @@ public class recorderDeviceInterface : deviceInterface {
     data.backTriggerID = backTrigger.transform.GetInstanceID();
     data.dur = durSlider.switchVal;
     data.normalize = normalizeSwitch.switchVal;
+    data.mutedState = buttons[5].isHit;
     return data;
   }
 
@@ -101,6 +102,7 @@ public class recorderDeviceInterface : deviceInterface {
     backTrigger.ID = data.backTriggerID;
     durSlider.setVal(data.dur);
     normalizeSwitch.setSwitch(data.normalize, true);
+    buttons[5].setOnAtStart(data.mutedState);
   }
 }
 
@@ -112,5 +114,6 @@ public class RecorderData : InstrumentData {
   public int backTriggerID;
   public int dur;
   public bool normalize;
+  public bool mutedState;
   public string audioFilename;
 }

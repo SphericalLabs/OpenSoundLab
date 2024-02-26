@@ -42,6 +42,7 @@ public class microphoneDeviceInterface : deviceInterface {
   omniJack output;
   omniPlug outputplug;
   dial ampDial;
+  button active;
 
   float amp = -1f;
 
@@ -50,6 +51,7 @@ public class microphoneDeviceInterface : deviceInterface {
     signal = GetComponent<MicrophoneSignalGenerator>();
     output = GetComponentInChildren<omniJack>();
     ampDial = GetComponentInChildren<dial>();
+    active = GetComponentInChildren<button>();
     microphoneDeviceInterface[] otherMics = FindObjectsOfType<microphoneDeviceInterface>();
     for (int i = 0; i < otherMics.Length; i++) {
       if (otherMics[i] != this) Destroy(otherMics[i].gameObject);
@@ -81,6 +83,7 @@ public class microphoneDeviceInterface : deviceInterface {
     GetTransformData(data);
     data.jackOutID = output.transform.GetInstanceID();
     data.amp = amp;
+    data.activeState = active.isHit;
     return data;
   }
 
@@ -89,10 +92,12 @@ public class microphoneDeviceInterface : deviceInterface {
     base.Load(data);
     output.ID = data.jackOutID;
     ampDial.setPercent(data.amp);
+    active.setOnAtStart(data.activeState);
   }
 }
 
 public class MicrophoneData : InstrumentData {
   public int jackOutID;
   public float amp;
+  public bool activeState;
 }
