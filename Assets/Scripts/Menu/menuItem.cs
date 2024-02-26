@@ -467,9 +467,11 @@ public class DeviceType
 {
   private static readonly List<DeviceType> instances = new List<DeviceType>();
 
-  public string Name { get; private set; }
-  public DeviceCategory Category { get; private set; }
-  public int Order { get; private set; }
+  public string Name { get; set; }
+  public DeviceCategory Category { get; set; }
+  public int Order { get; set; }
+
+  public DeviceType() { }
 
   private DeviceType(string name, DeviceCategory category, int orderWithinCategory)
   {

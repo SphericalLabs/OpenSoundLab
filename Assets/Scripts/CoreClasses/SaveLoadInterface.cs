@@ -43,11 +43,11 @@ public class SaveLoadInterface : MonoBehaviour {
   public GameObject plugPrefab;
   public static SaveLoadInterface instance;
   public metronome nome;
-  Dictionary<DeviceType, GameObject> instrumentPrefabs;
+  Dictionary<string, GameObject> instrumentPrefabs;
 
   void Awake() {
     instance = this;
-    instrumentPrefabs = new Dictionary<DeviceType, GameObject>();
+    instrumentPrefabs = new Dictionary<string, GameObject>();
 
     foreach (var devType in DeviceType.GetAll()){ 
       instrumentPrefabs[devType] = Resources.Load("Prefabs/" + devType) as GameObject;
@@ -262,7 +262,7 @@ public class SaveLoadInterface : MonoBehaviour {
 
 public class InstrumentData {
   public int ID;
-  public DeviceType deviceType;
+  public string deviceType;
   public Vector3 position;
   public Vector3 scale = Vector3.one;
   public Quaternion rotation;

@@ -49,7 +49,7 @@ public class menuManager : MonoBehaviour {
 
   public List<GameObject> menuItems;
 
-  public Dictionary<DeviceType, GameObject> refObjects;
+  public Dictionary<string, GameObject> refObjects;
 
   public AudioSource _audioSource;
   public AudioClip openClip;
@@ -68,7 +68,7 @@ public class menuManager : MonoBehaviour {
 
   void Awake() {
     instance = this;
-    refObjects = new Dictionary<DeviceType, GameObject>();
+    refObjects = new Dictionary<string, GameObject>();
     _audioSource = GetComponent<AudioSource>();
     loadMenu();
     loadNonMenuItems();
