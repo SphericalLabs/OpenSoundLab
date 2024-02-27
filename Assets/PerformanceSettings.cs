@@ -20,7 +20,7 @@ public class PerformanceSettings : MonoBehaviour
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.2f },
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.3f },
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.4f },
-      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.5f },
+      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.5f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.6f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.7f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.8f },
@@ -32,94 +32,124 @@ public class PerformanceSettings : MonoBehaviour
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.Off, renderScale = 1f },
     };
 
+    float baseRenderScale = 1.40f;
     int currentQualityStep;
 
   // Start is called before the first frame update
   void Start()
+  {
+    if (Application.platform == RuntimePlatform.Android) // remove this init?
     {
-      if (Application.platform == RuntimePlatform.Android) // remove this init?
-      {
-        Debug.Log("Current cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
-        Debug.Log("Trying to set levels to 4");
-        Debug.Log("TrySetCPULevel returned " + Performance.TrySetCPULevel(3)); // from 0-3
-        Debug.Log("TrySetGPULevel returned " + Performance.TrySetGPULevel(3)); // from 0-3
-        Debug.Log("New cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
-        Performance.TryGetDisplayRefreshRate(out f);
-        Debug.Log("Display refresh rate: " + f);
 
-        if (OVRManager.eyeTrackedFoveatedRenderingSupported)
-        {
-          OVRManager.eyeTrackedFoveatedRenderingEnabled = true;
-        }
-        if (OVRManager.eyeTrackedFoveatedRenderingEnabled)
-        {
-          Debug.Log("eyeTrackedFoveatedRenderingEnabled is true");
-          OVRManager.foveatedRenderingLevel = OVRManager.FoveatedRenderingLevel.Off;
-        }
-        
+      boostProcessors();
+
+      if (OVRManager.eyeTrackedFoveatedRenderingSupported)
+      {
+        OVRManager.eyeTrackedFoveatedRenderingEnabled = true;
+      }
+      if (OVRManager.eyeTrackedFoveatedRenderingEnabled)
+      {
+        Debug.Log("eyeTrackedFoveatedRenderingEnabled is true");
+        OVRManager.foveatedRenderingLevel = OVRManager.FoveatedRenderingLevel.Off;
+      }
+      //OVRManager.useDynamicFoveatedRendering = true;
+      //OVRManager.SetDynamicFoveatedRenderingEnabled(true);  
+
     }
 
 
     //UnityEngine.XR.XRSettings.eyeTextureResolutionScale = 1.5f; // does not work
 
-    // WARNING: setting this higher than 1.33f (tested on 1.5f) causes warped visuals when downscaling, but apparently only for Quest Pro. 
     urpa = (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
-    urpa.renderScale = 1.40f;  // this is the max oversampling quality, should not be changed during runtime, just for init
-        
+    urpa.renderScale = baseRenderScale;  // this is the max oversampling quality, should not be changed during runtime, just for init
 
-    Performance.TrySetCPULevel(3);
-    Performance.TrySetGPULevel(3);
+    //OVRManager.suggestedGpuPerfLevel = OVRManager.ProcessorPerformanceLevel.Boost;
+    //OVRManager.gpuLevel = 2;
+    //OVRManager.cpuLevel = 2;
+
+    //if (Performance.TrySetCPULevel(3)) 
+    //  Debug.Log("TrySetCPULevel(3) successful");
+    //else 
+    //  Debug.Log("TrySetCPULevel(3) not successful");
+
+    //if (Performance.TrySetGPULevel(3))
+    //  Debug.Log("TrySetGPULevel(3) successful");
+    //else
+    //  Debug.Log("TrySetGPULevel(3) not successful");
 
     currentQualityStep = qualitySteps.Length - 1;
   }
 
   bool qualityChanged = false;
   float averageFrameTime = 0f;
-  int fps;
+  int targetFps = 72;
   float renderBudget;
   float f;
+  float lastKickDownTime;
 
+  void boostProcessors()
+  {
+  
+    Debug.Log("Current cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
+    Debug.Log("Trying to set levels to 4");
+    Debug.Log("TrySetCPULevel returned " + Performance.TrySetCPULevel(4)); // from 0-4
+    Debug.Log("TrySetGPULevel returned " + Performance.TrySetGPULevel(4)); // from 0-4
+    Debug.Log("New cpuLevel: " + Stats.AdaptivePerformance.CPULevel + ", gpuLevel: " + Stats.AdaptivePerformance.GPULevel);
+    Performance.TryGetDisplayRefreshRate(out f);
+    Debug.Log("Display refresh rate: " + f);
+
+    OVRPlugin.suggestedCpuPerfLevel = OVRPlugin.ProcessorPerformanceLevel.SustainedLow;
+    OVRPlugin.suggestedGpuPerfLevel = OVRPlugin.ProcessorPerformanceLevel.Boost;
+  } 
 
   // Update is called once per frame
   void Update()
   {
+    //return;
 
     if (Application.platform != RuntimePlatform.Android) return;
 
-    if (Time.frameCount % 72 == 0)
+    if(Time.frameCount % 100 == 0) boostProcessors(); // keep spamming the metal
+
+    if (Time.frameCount % (int)targetFps == 0)
     {
       Performance.TryGetDisplayRefreshRate(out f); // Application.targetFrameRate would not capture fps changes from adb or SideQuest
-      fps = (int) f;
-      renderBudget = 1.0f / fps; // 1 : 72 = 13.8 ms    
-      //Debug.Log(fps);
+      targetFps = (int) f;
+      renderBudget = 1.0f / targetFps; // 1 : 72 = 13.8 ms    
+      //Debug.Log(targetFps);
     }
 
     
+
     // always run averaging
     averageFrameTime += (Time.deltaTime - averageFrameTime) * 0.07f;
 
     // often run spike detection
-    if (Time.frameCount % fps / 2 == 0)
+    if (Time.frameCount % targetFps == 0 && lastKickDownTime + 1 < Time.time )
     {
-      if (Time.deltaTime >= renderBudget * 2.5f) 
+      if (Time.deltaTime >= renderBudget * 1f) 
       {
-        currentQualityStep -= 2;
-        Debug.Log("KICK DOWN");
-        qualityChanged = true;
+        currentQualityStep -= 1;
+        qualityChanged = true;        
+        lastKickDownTime = Time.time;
+        //Debug.Log("KICK DOWN");
       }
     }
 
+    //if(Time.frameCount % 10 == 0)Debug.Log(averageFrameTime + "    " + currentQualityStep);
+
     // rarely run general rate detection
     // longer time step to let kick down settle in
-    if (Time.frameCount % fps == 0) 
+    if (Time.frameCount % targetFps == 0) 
     {
 
-      if (averageFrameTime >= renderBudget * 1.08f && currentQualityStep != 0) 
-      {
-        currentQualityStep--;
-        qualityChanged = true;        
-      }
-      else if (averageFrameTime <= renderBudget * 1.02f && currentQualityStep != qualitySteps.Length - 1) 
+      //if (averageFrameTime >= renderBudget * 1.04f && currentQualityStep != 0) 
+      //{
+      //  currentQualityStep--;
+      //  qualityChanged = true;        
+      //}
+      //else 
+      if (averageFrameTime <= renderBudget * 1.05f && currentQualityStep != qualitySteps.Length - 1) 
       {
         currentQualityStep++;
         qualityChanged = true;
