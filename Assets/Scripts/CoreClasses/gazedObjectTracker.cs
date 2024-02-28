@@ -91,6 +91,18 @@ public class gazedObjectTracker : MonoBehaviour
     else
     {
       currentMode = GazeMode.Off;
+
+      // clear off all currently ongoing gaze-based interations
+      gazedAtManipObject = null;
+      foreach( manipulator mani in FindObjectsByType<manipulator>(FindObjectsSortMode.None) ){
+        mani.SetTrigger(false);
+        mani.ForceRelease();
+        //mani.wasGazeBased = false;
+        //mani.selectedObject.setGrab(false, null);
+        //mani.selectedObject.setSelect(false, null);
+        //mani.selectedObject = null;
+        //mani.selectedTransform = null;
+      }
     }
 
     // Determine the active state of components based on whether the gaze mode is Off.

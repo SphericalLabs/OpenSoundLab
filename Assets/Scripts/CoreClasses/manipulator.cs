@@ -47,8 +47,8 @@ public class manipulator : MonoBehaviour
   public Transform tipL, tipR;
   
   List<Transform> hitTransforms = new List<Transform>();
-  Transform selectedTransform;
-  manipObject selectedObject;
+  public Transform selectedTransform;
+  public manipObject selectedObject;
 
   menuspawn _menuspawn;
   

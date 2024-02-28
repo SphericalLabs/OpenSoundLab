@@ -84,6 +84,7 @@ public class basicSwitch : manipObject {
   }
 
   public override void grabUpdate(Transform t) {
+    if (manipulatorObj == null) return; // sometimes is null, since implemented eye-control
     float curY = transform.InverseTransformPoint(manipulatorObj.position).z - offset;
     if (Mathf.Abs(curY) > 0.01f) setSwitch(curY > 0);
   }

@@ -217,6 +217,8 @@ public class dial : manipObject {
 
   public override void grabUpdate(Transform t)
   {
+    if (manipulatorObj == null) return; // sometimes is null, since implemented eye-control
+
     Vector2 temp = dialCoordinates(manipulatorObj.up);
     controllerRot = (Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - rotAtBeginningOfGrab) * speedUp;
 
