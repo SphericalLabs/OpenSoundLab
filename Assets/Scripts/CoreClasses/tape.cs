@@ -308,7 +308,8 @@ public class tape : manipObject {
       tapeTrans.parent = transform;
       deck.parent.GetComponent<samplerLoad>().LoadTape(this);
       if (insertCoroutine != null) StopCoroutine(insertCoroutine);
-      insertCoroutine = StartCoroutine(insertRoutine());
+      transform.localScale = Vector3.one;
+      insertCoroutine = StartCoroutine(insertRoutine());      
     }
   }
 
@@ -325,6 +326,8 @@ public class tape : manipObject {
     tapeTrans.parent = transform;
     transform.localPosition = new Vector3(0, 0, -.0225f);
     deck.parent.GetComponent<samplerLoad>().LoadTape(this);
+
+    transform.localScale = Vector3.one;
   }
 
   IEnumerator streamRoutine(string f) {
