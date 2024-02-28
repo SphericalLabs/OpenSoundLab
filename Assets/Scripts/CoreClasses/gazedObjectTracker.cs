@@ -23,6 +23,7 @@ public class gazedObjectTracker : MonoBehaviour
     Off,
     FixedGaze,
     TrackedGaze
+    // changing the sequence of these will break the PlayerPrefs
   }
 
   void Awake()
@@ -38,9 +39,19 @@ public class gazedObjectTracker : MonoBehaviour
       Destroy(gameObject);
     }
 
+    // read the gaze prefs
+    if (PlayerPrefs.HasKey("GazeMode")) 
+    {
+      currentMode = (GazeMode)PlayerPrefs.GetInt("GazeMode");      
+    }
+    else if(isEyeTrackingCapable()) {
+      // default to trackedGaze if eye tracking is available
+      currentMode = GazeMode.TrackedGaze;
+    }
+
     if (currentMode == GazeMode.TrackedGaze)
     {
-      if(!isEyeTrackingCapable()) currentMode = GazeMode.FixedGaze; // fallback to fixedGaze      
+      if(!isEyeTrackingCapable()) currentMode = GazeMode.FixedGaze; // fallback to fixedGaze
     }
 
     calibrationPlane = GameObject.Find("GazeCalibPlane");
@@ -69,6 +80,32 @@ public class gazedObjectTracker : MonoBehaviour
       return instance;
     }
   }
+
+  public void toggleGaze()
+  {
+    // Determine the new mode based on the current mode and whether eye tracking is available.
+    if (currentMode == GazeMode.Off)
+    {
+      currentMode = isEyeTrackingCapable() ? GazeMode.TrackedGaze : GazeMode.FixedGaze;
+    }
+    else
+    {
+      currentMode = GazeMode.Off;
+    }
+
+    // Determine the active state of components based on whether the gaze mode is Off.
+    bool isActive = currentMode != GazeMode.Off;
+
+    // Apply the active state to calibrationPlane and calibIndicator.
+    calibrationPlane.SetActive(isActive);
+    calibIndicator.SetActive(isActive);
+    centerIndicator.SetActive(isActive);
+    
+
+    // Save the current mode to PlayerPrefs.
+    PlayerPrefs.SetInt("GazeMode", (int)currentMode);
+  }
+
 
   // Start is called before the first frame update
   void Start()

@@ -52,8 +52,10 @@ public class pauseMenu : MonoBehaviour {
     cancelItem,
     wireSettingsItem,
     tooltipItem,
-    exampleItem
+    exampleItem,
+    gazeItem
   };
+  // note for adding more menu items: add to the end of itemType enum, duplicate an existing gameobject in itemRoot, set type in pauseMenuItem, add your code to itemSelect switch
 
   public GameObject[] items;
   bool active = true;
@@ -62,13 +64,16 @@ public class pauseMenu : MonoBehaviour {
 
   List<pauseMenuItem> menuItems;
 
-  const int optionCount = 3; // one before confirmCancel, has to be avoided, otherwise always visible
+  int optionCount; 
+
   void Awake() {
     menuItems = new List<pauseMenuItem>();
     for (int i = 0; i < items.Length; i++) {
       pauseMenuItem temp = items[i].GetComponent<pauseMenuItem>();
       if (temp != null) menuItems.Add(temp);
     }
+
+    optionCount = items.Length - 1;
 
     menuObject.SetActive(false);
     savePanel.SetActive(false);
@@ -188,6 +193,12 @@ public class pauseMenu : MonoBehaviour {
         masterControl.instance.currentScene = "";
         clearInstruments();
       }
+    }
+    if(t == itemType.gazeItem){
+       gazedObjectTracker tracker = gazedObjectTracker.Instance;
+       if(tracker != null) {
+          tracker.toggleGaze();
+        }
     }
     return;
   }
