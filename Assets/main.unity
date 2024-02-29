@@ -433,12 +433,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
---- !u!1 &359157204 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1000012983180942, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-    type: 3}
-  m_PrefabInstance: {fileID: 1609445184}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &562025346
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -648,29 +642,12 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1609445184}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 359157204}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adf9e13cb425cb44d82a7bb9ea69f17d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1126673611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 359157204}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 908267b565c2f6f4984fb75f0966bf36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cpuDial: {fileID: 2049868786}
-  gpuDial: {fileID: 1620398568}
-  fovDial: {fileID: 1930855367}
-  scaleDial: {fileID: 1955920398}
-  fpsDial: {fileID: 255986233}
 --- !u!1001 &1128621395
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1315,10 +1292,6 @@ PrefabInstance:
       value: MasterControl
       objectReference: {fileID: 0}
     - target: {fileID: 4000014106015952, guid: 083403f7558b3c14ea83c5b29d4e4f01, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4000014106015952, guid: 083403f7558b3c14ea83c5b29d4e4f01, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1373,26 +1346,6 @@ PrefabInstance:
       propertyPath: muteEnvToggle
       value: 
       objectReference: {fileID: 1128621396}
-    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: currentPlatform
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: tutorialsPrefab
-      value: 
-      objectReference: {fileID: 191382, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: hmdTargetVive
-      value: 
-      objectReference: {fileID: 1697095944}
     - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
       propertyPath: hiresCamSelect
@@ -1405,31 +1358,6 @@ PrefabInstance:
       objectReference: {fileID: 1697095944}
     - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
-      propertyPath: OVRControllerPrefabL
-      value: 
-      objectReference: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: OVRControllerPrefabR
-      value: 
-      objectReference: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: usePersonalizedHands
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: controllerLTargetVive
-      value: 
-      objectReference: {fileID: 1516804427}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: controllerRTargetVive
-      value: 
-      objectReference: {fileID: 1516804426}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
       propertyPath: controllerLTargetOculus
       value: 
       objectReference: {fileID: 1516804427}
@@ -1438,24 +1366,40 @@ PrefabInstance:
       propertyPath: controllerRTargetOculus
       value: 
       objectReference: {fileID: 1516804426}
-    - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: personalizedHandsPrefabStr
-      value: rubber-med-gloves/rubber-med-gloves
-      objectReference: {fileID: 0}
     - target: {fileID: 114000013435907624, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
       propertyPath: nome
       value: 
       objectReference: {fileID: 1474746739}
+    - target: {fileID: 9110256219709051021, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: cpuDial
+      value: 
+      objectReference: {fileID: 2049868786}
+    - target: {fileID: 9110256219709051021, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: fovDial
+      value: 
+      objectReference: {fileID: 1930855367}
+    - target: {fileID: 9110256219709051021, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: fpsDial
+      value: 
+      objectReference: {fileID: 255986233}
+    - target: {fileID: 9110256219709051021, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: gpuDial
+      value: 
+      objectReference: {fileID: 1620398568}
+    - target: {fileID: 9110256219709051021, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: scaleDial
+      value: 
+      objectReference: {fileID: 1955920398}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1000012983180942, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1126673611}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 083403f7558b3c14ea83c5b29d4e4f01, type: 3}
 --- !u!114 &1620398568 stripped
 MonoBehaviour:
