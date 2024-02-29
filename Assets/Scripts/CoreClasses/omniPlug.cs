@@ -36,12 +36,15 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+using static UnityEngine.GraphicsBuffer;
 
 public class omniPlug : manipObject {
   public GameObject mouseoverFeedback;
   public int ID = -1;
   public bool outputPlug = false;
   public omniJack connected;
+  bool justPreviewConnected = true; 
 
   Color cordColor;
   LineRenderer lr;
@@ -68,7 +71,7 @@ public class omniPlug : manipObject {
     //mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
     lr = GetComponent<LineRenderer>();
 
-    cordColor = new Color(Random.value, Random.value, Random.value);
+    cordColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
     //lr.material.SetColor("_TintColor", cordColor);
     //mat.SetColor("_TintColor", cordColor);
     //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
@@ -225,8 +228,45 @@ public class omniPlug : manipObject {
 
       updateLineVerts();
       if (noChange) calmLine();
+
+      if(Time.frameCount % 36 == 0) UpdateLineRendererWidth();
     }
   }
+
+  void UpdateLineRendererWidth()
+  {
+    if (!justPreviewConnected && connected != null && otherPlug != null && otherPlug.connected != null)
+    {
+      try
+      {
+        lr.startWidth = getPlugLength(otherPlug) * 0.13f;
+        lr.endWidth = getPlugLength(this) * 0.13f;
+      }
+      catch (InvalidOperationException ex)
+      {
+        // this is the case when an already connected plug is temporarily connected to a jack but still grabbed
+        // in this case the plug and the MeshRenderer are at different points in the scene graph
+        // the plug is with the manipulator, the MeshRenderer is with the jack
+      }
+    }
+  }
+
+
+  float getPlugLength(omniPlug plug)
+  {
+    Renderer actualPlugRenderer = plug.GetComponentInChildren<MeshRenderer>(true); // true to search including inactive children
+
+    if (actualPlugRenderer != null)
+    {
+      Bounds bounds = actualPlugRenderer.bounds;
+      return bounds.size.magnitude;
+    }
+    else
+    {
+      throw new InvalidOperationException($"MeshRenderer not found on omniPlug '{plug.name}' or its children.");
+    }
+  }
+
 
   float flowVal = 0;
   void lrFlowEffect() {
@@ -375,6 +415,9 @@ public class omniPlug : manipObject {
       calmTime = 0;
     }
 
+    
+
+    justPreviewConnected = false;
     collCandidates.Clear();
   }
 
@@ -388,6 +431,8 @@ public class omniPlug : manipObject {
     if (j.signal != null || j.near != null) return;
 
     collCandidates.Add(j.transform);
+
+    justPreviewConnected = true;
   }
 
   void updateConnection(omniJack j) {
@@ -468,8 +513,6 @@ public class omniPlug : manipObject {
       updateForceWireShow(true);
       collCandidates.Clear();
       if (connected != null) collCandidates.Add(connected.transform);
-
-
       
 
       if (manipulatorObjScript != null)
@@ -507,7 +550,7 @@ public class omniPlug : manipObject {
 
   public override void grabUpdate(Transform t)
   {
-
+    
     if (manipulatorObjScript.wasGazeBased)
     {
       gazeBasedPosRotUpdate();
