@@ -162,6 +162,9 @@ public class omniPlug : manipObject {
   }
 
   void Update() {
+    
+  if (Time.frameCount % 12 == 0) UpdateLineRendererWidth();
+
     if (otherPlug == null) {
       if (lr) lr.positionCount = 0;
       Destroy(gameObject);
@@ -229,32 +232,29 @@ public class omniPlug : manipObject {
       updateLineVerts();
       if (noChange) calmLine();
 
-      if(Time.frameCount % 36 == 0) UpdateLineRendererWidth();
     }
   }
 
   void UpdateLineRendererWidth()
-  {
-    if (!justPreviewConnected && connected != null && otherPlug != null && otherPlug.connected != null)
+  { 
+    try
     {
-      try
-      {
-        lr.startWidth = getPlugLength(otherPlug) * 0.13f;
-        lr.endWidth = getPlugLength(this) * 0.13f;
-      }
-      catch (InvalidOperationException ex)
-      {
-        // this is the case when an already connected plug is temporarily connected to a jack but still grabbed
-        // in this case the plug and the MeshRenderer are at different points in the scene graph
-        // the plug is with the manipulator, the MeshRenderer is with the jack
-      }
+      if (otherPlug != null) lr.startWidth = getPlugLength(otherPlug) * 0.13f;
+      lr.endWidth = getPlugLength(this) * 0.13f;
+    }
+    catch (InvalidOperationException ex)
+    {
+      // this is the case when an already connected plug is temporarily connected to a jack but still grabbed
+      // in this case the plug and the MeshRenderer are at different points in the scene graph
+      // the plug is with the manipulator, the MeshRenderer is with the jack
     }
   }
 
-
+  Renderer actualPlugRenderer;
   float getPlugLength(omniPlug plug)
   {
-    Renderer actualPlugRenderer = plug.GetComponentInChildren<MeshRenderer>(true); // true to search including inactive children
+    
+    actualPlugRenderer = plug.GetComponentInChildren<MeshRenderer>(); 
 
     if (actualPlugRenderer != null)
     {
@@ -400,13 +400,15 @@ public class omniPlug : manipObject {
       otherPlug.Destruct();
       Destroy(gameObject);
     } else {
-      if (plugTrans.parent != connected.transform) {
+      if (plugTrans.parent != connected.transform) { // i.e. if it is attached to the manipulator?
         plugTrans.position = connected.transform.position;
         plugTrans.rotation = connected.transform.rotation;
         plugTrans.parent = connected.transform;
         plugTrans.Rotate(-90, 0, 0);
-        plugTrans.Translate(0, 0, -.02f);
+        plugTrans.Translate(0, 0, -0.03f);
       }
+
+      plugTrans.Translate(0, 0, 0.014f);
 
       transform.parent = plugTrans.parent;
       transform.position = plugTrans.position;
@@ -415,10 +417,39 @@ public class omniPlug : manipObject {
       calmTime = 0;
     }
 
+    matchPlugtoJackScale();
+    otherPlug.matchPlugtoJackScale();
     
-
     justPreviewConnected = false;
     collCandidates.Clear();
+  }
+
+  public void matchPlugtoJackScale(){
+    matchPlugtoJackScale(connected);
+  }
+
+  // this matches the scale of the plug to the scale of the jack, regardless of their orientation
+  public void matchPlugtoJackScale(omniJack jackReference)
+  {
+    if (jackReference != null)
+    {
+      MeshFilter targetMeshFilter = jackReference.GetComponentInChildren<MeshFilter>();
+      MeshFilter resizeMeshFilter = this.GetComponentInChildren<MeshFilter>();
+
+      if (targetMeshFilter != null && resizeMeshFilter != null)
+      {
+        Vector3 targetLocalSize = targetMeshFilter.mesh.bounds.size;
+        Vector3 resizeLocalSize = resizeMeshFilter.mesh.bounds.size;
+
+        float targetWidth = targetLocalSize.x * jackReference.transform.localScale.x;
+        float resizeWidth = resizeLocalSize.x * this.transform.localScale.x;
+
+        // Calculate scale factor
+        float scaleFactor = targetWidth / resizeWidth;
+
+        this.transform.localScale *= scaleFactor * 0.9f;
+      }
+    }
   }
 
   void OnCollisionEnter(Collision coll) {
@@ -448,7 +479,10 @@ public class omniPlug : manipObject {
     plugTrans.rotation = connected.transform.rotation;
     plugTrans.parent = connected.transform;
     plugTrans.Rotate(-90, 0, 0);
-    plugTrans.Translate(0, 0, -.02f);
+    plugTrans.Translate(0, 0, -.03f);
+
+    matchPlugtoJackScale();
+    if (otherPlug != null) otherPlug.matchPlugtoJackScale();
   }
 
   void OnCollisionExit(Collision coll) {

@@ -95,11 +95,22 @@ public class omniJack : manipObject {
         near.connected = this;
         near.signal = homesignal;
 
+        near.matchPlugtoJackScale();
+        
+
         j = Instantiate(plugPrefab, manipulatorObj.position, manipulatorObj.rotation) as GameObject;
         far = j.GetComponent<omniPlug>();
         far.Setup(jackTargetHue, outgoing, near);
         near.Setup(jackTargetHue, !outgoing, far);
         manipulatorObj.GetComponent<manipulator>().ForceGrab(far);
+
+        // bubble up to get the scale of the device this will be attached to and apply it to the far plug 
+        deviceInterface device = gameObject.FindComponentInParentAndAbove<deviceInterface>();
+        if(device != null)
+          far.transform.localScale = device.transform.localScale;
+
+        //far.matchPlugtoJackScale(this); // match the plug at the other side of the cable to the size of this jack here
+        //far.transform.localScale = near.transform.localScale; // not working because localScale is 1, actual scale is set far above in the device
 
         plugRep.SetActive(false);
       }
@@ -191,5 +202,27 @@ public class omniJack : manipObject {
       //mat.SetColor("_EmissionColor", Color.Lerp(Color.black, targColor, Mathf.Abs(Mathf.Sin(t))));
       yield return null;
     }
+  }
+
+}
+
+
+public static class ComponentSearchExtensions
+{
+  public static T FindComponentInParentAndAbove<T>(this GameObject gameObject) where T : Component
+  {
+    Transform currentTransform = gameObject.transform.parent; // Start with the parent
+
+    while (currentTransform != null)
+    {
+      T component = currentTransform.GetComponent<T>();
+      if (component != null)
+      {
+        return component; // Found the component, return it
+      }
+      currentTransform = currentTransform.parent; // Move up to the next parent
+    }
+
+    return null; // Component not found in the hierarchy
   }
 }

@@ -80,7 +80,7 @@ public class handle : manipObject
   public override void grabUpdate(Transform t)
   {
 
-    if (manipulatorObjScript.wasGazeBased)
+    if (manipulatorObjScript != null && manipulatorObjScript.wasGazeBased)
     {
       gazeBasedPosRotUpdate();
       return;
