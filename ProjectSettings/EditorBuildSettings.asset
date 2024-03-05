@@ -5,13 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/main.unity
     guid: 98ca84121eec7424d9669ae097f8c52e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/KCPNetworkScene.unity
     guid: cb57b32b57c1b4e368e1c85e3cad4623
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/RelayNetworkScene.unity
     guid: d41a9f33ef16c422795a0e94f4f45ac2
   m_configObjects:

@@ -77,6 +77,8 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
 
         #endregion Callbacks
 
+        public bool allwaysCapsLook = false;
+
         /// <summary>
         /// The InputField that the keyboard uses to show the currently edited text.
         /// If you are using the Keyboard prefab you can ignore this field as it will
@@ -273,7 +275,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
 
             // Setting the keyboardType to an undefined TouchScreenKeyboardType,
             // which prevents the MRTK keyboard from triggering the system keyboard itself.
-            InputField.keyboardType = (TouchScreenKeyboardType)(int.MaxValue);
+            //InputField.keyboardType = (TouchScreenKeyboardType)(int.MaxValue);
 
             // Keep keyboard deactivated until needed
             gameObject.SetActive(false);
@@ -327,6 +329,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         }
 
         private void UpdateCaretPosition(int newPos) => InputField.caretPosition = newPos;
+
 
         /// <summary>
         /// Called whenever the keyboard is disabled or deactivated.
@@ -426,6 +429,11 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             PresentKeyboard();
             Clear();
             InputField.text = startText;
+
+            if (allwaysCapsLook)
+            {
+                CapsLock(true);
+            }
         }
 
         /// <summary>
@@ -835,6 +843,10 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// <param name="newCapsLockState">Caps lock state the method is switching to</param>
         public void CapsLock(bool newCapsLockState)
         {
+            if (!newCapsLockState && allwaysCapsLook)
+            {
+                return;
+            }
             m_IsCapslocked = newCapsLockState;
             Shift(newCapsLockState);
         }
@@ -958,7 +970,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// <returns>Returns true if default subkeys were activated, false if alphanumeric keyboard isn't active</returns>
         private bool TryToShowAlphaSubkeys()
         {
-            if (AlphaKeyboard.IsActive())
+            if (AlphaSubKeys != null && AlphaKeyboard.IsActive())
             {
                 AlphaSubKeys.gameObject.SetActive(true);
                 return true;
@@ -1019,11 +1031,11 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         private void DisableAllKeyboards()
         {
             AlphaKeyboard.gameObject.SetActive(false);
-            SymbolKeyboard.gameObject.SetActive(false);
+            SymbolKeyboard?.gameObject.SetActive(false);
 
-            AlphaWebKeys.gameObject.SetActive(false);
-            AlphaMailKeys.gameObject.SetActive(false);
-            AlphaSubKeys.gameObject.SetActive(false);
+            AlphaWebKeys?.gameObject.SetActive(false);
+            AlphaMailKeys?.gameObject.SetActive(false);
+            AlphaSubKeys?.gameObject.SetActive(false);
         }
 
         /// <summary>

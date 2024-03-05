@@ -54,6 +54,11 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             m_Button.onClick.AddListener(FireAppendValue);
 
             NonNativeKeyboard.Instance.OnKeyboardShifted += Shift;
+
+            if (NonNativeKeyboard.Instance.allwaysCapsLook)
+            {
+                Shift(true);
+            }
         }
 
         /// <summary>
