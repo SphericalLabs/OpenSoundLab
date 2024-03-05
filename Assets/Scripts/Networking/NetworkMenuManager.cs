@@ -1,0 +1,413 @@
+using System.Collections;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Mirror;
+using Mirror.Discovery;
+using Network;
+using TMPro;
+using UnityEngine.UI;
+using System.Net;
+using UnityEngine.SceneManagement;
+
+public class NetworkMenuManager : MonoBehaviour
+{
+    public static NetworkMenuManager Instance;
+
+    [SerializeField] private bool createHostOnStart = true;
+    [SerializeField] private bool isRelayScene = true;
+    [SerializeField] private NetworkManager networkManager;
+    [SerializeField] private NetworkDiscovery networkDiscovery;
+    private bool clientGotStopped = false;
+
+    public static string relayCode = "";
+
+    readonly Dictionary<long, ServerResponse> discoveredServers = new Dictionary<long, ServerResponse>();
+
+    [Header("UI")]
+    [Header("Host Menu")]
+    [SerializeField] private Transform hostMenuParent;
+    [SerializeField] private Transform discoveryButtonParent;
+    [SerializeField] private GameObject discoveryButtonPrefab;
+    [SerializeField] private TMP_InputField relayCodeInputField;
+    [SerializeField] private TMP_Text ipAdressText;
+
+    [Header("Relay Host Menu")]
+    [SerializeField] private Transform relayHostMenuParent;
+    [SerializeField] private TMP_Text relayJoinCodeText;
+
+    [Header("Client Menu")]
+    [SerializeField] private Transform clientMenuParent;
+
+    public string RelayJoinCode { get => relayCodeInputField.text; }
+
+    public VRNetworkPlayer localPlayer;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    // Start is called before the first frame update
+    IEnumerator Start()
+    {
+        if (createHostOnStart)
+        {
+            yield return new WaitForSeconds(0.5f);
+            if (isRelayScene)
+            {
+                if (networkManager is MyNetworkManager)
+                {
+                    if (relayCode.Length > 0)
+                    {
+                        StartCoroutine(JoinRelayHostWaitTime(relayCode));
+                    }
+                    else
+                    {
+                        StartCoroutine(StartRelayHostWaitTime());
+                    }
+                }
+                else
+                {
+                    SceneManager.LoadScene(0);
+                }
+            }
+            else
+            {
+                networkManager.StartHost();
+                ActivateHostUI();
+                yield return new WaitForSeconds(0.5f);
+                networkDiscovery.AdvertiseServer();
+            }
+        }
+    }
+
+    public void RestartHost()
+    {
+        networkManager.StopHost();
+        StartCoroutine(RestartHostWaitTime());
+    }
+
+    private IEnumerator RestartHostWaitTime()
+    {
+        while (networkManager.isNetworkActive)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForEndOfFrame();
+        clientGotStopped = false;
+        if (networkManager is MyNetworkManager)
+        {
+            ((MyNetworkManager)networkManager).StartStandardHost();
+        }
+        else
+        {
+            networkManager.StartHost();
+        }
+        yield return new WaitForSeconds(0.5f);
+        networkDiscovery.AdvertiseServer();
+    }
+
+
+    public void StopClient()
+    {
+        networkManager.StopClient();
+        StartCoroutine(RestartHostWaitTime());
+    }
+
+    public void CheckIfClientGetKickedOut()
+    {
+        /*
+        clientGotStopped = true;
+        Debug.Log("Player got kicked out true");
+        StartCoroutine(RestartHostWhenKickedOutWaitTime());*/
+    }
+
+    private IEnumerator RestartHostWhenKickedOutWaitTime()
+    {
+        yield return new WaitForSeconds(2f);
+        if (clientGotStopped && !networkManager.isNetworkActive)
+        {
+            if (isRelayScene)
+            {
+                StopRelayClient();
+            }
+            else
+            {
+                StartCoroutine(RestartHostWaitTime());
+            }
+            Debug.Log("Player got kicked out, restart");
+        }
+    }
+
+
+    #region localNetwork
+
+    public void DiscorverServer()
+    {
+        discoveredServers.Clear();
+        networkDiscovery.StartDiscovery();
+    }
+
+
+    public void OnDiscoveredServer(ServerResponse info)
+    {
+        Debug.Log("On discover servers");
+        discoveredServers[info.serverId] = info;
+
+        DeleteAllServerDiscoveryButtons();
+
+        //create a UI button if a server get discoverd
+        foreach (ServerResponse newinfo in discoveredServers.Values)
+            CreateServerDiscoveryButton(newinfo);
+    }
+
+    public void FindServer()
+    {
+        discoveredServers.Clear();
+        networkDiscovery.StartDiscovery();
+    }
+
+
+    public void JoinLocalHost(ServerResponse info)
+    {
+        networkManager.StopHost();
+        StartCoroutine(JoinLocalHostWaitTime(info));
+    }
+
+    private IEnumerator JoinLocalHostWaitTime(ServerResponse info)
+    {
+        while (networkManager.isNetworkActive)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForSeconds(1f);
+        clientGotStopped = false;
+        networkDiscovery.StopDiscovery();
+        networkManager.StartClient(info.uri);
+    }
+
+    #endregion
+
+    #region Relay
+
+    public void StartRelayHost()
+    {
+        networkManager.StopHost();
+        relayCode = "";
+        StartCoroutine(LoadRelaySceneWaitingTime());
+    }
+
+
+    private IEnumerator LoadRelaySceneWaitingTime()
+    {
+        while (networkManager.isNetworkActive)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForSeconds(0.1f);
+        SceneManager.LoadScene(1);
+    }
+
+    private IEnumerator StartRelayHostWaitTime()
+    {
+        if (networkManager is MyNetworkManager)
+        {
+            var myNetworkManager = ((MyNetworkManager)networkManager);
+            if (!myNetworkManager.isLoggedIn)
+            {
+                //check if loggin works
+                myNetworkManager.UnityLogin();
+                while (!myNetworkManager.isLoggedIn)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                //todo if not start normal host and show error
+            }
+
+            while (myNetworkManager.isNetworkActive)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            yield return new WaitForEndOfFrame();
+            clientGotStopped = false;
+            int maxPlayers = myNetworkManager.maxConnections;
+            myNetworkManager.StartRelayHost(maxPlayers);
+            //todo if not working, start normal host and show error
+        }
+    }
+
+    public void JoinRelayHost()
+    {
+        networkManager.StopHost();
+
+        relayCode = RelayJoinCode;
+        StartCoroutine(LoadRelaySceneWaitingTime());
+    }
+
+    private IEnumerator JoinRelayHostWaitTime(string joinCode)
+    {
+        if (networkManager is MyNetworkManager)
+        {
+            var myNetworkManager = ((MyNetworkManager)networkManager);
+
+
+            while (myNetworkManager.isNetworkActive)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            yield return new WaitForEndOfFrame();
+            clientGotStopped = false;
+
+            if (!myNetworkManager.isLoggedIn)
+            {
+                myNetworkManager.UnityLogin();
+                while (!myNetworkManager.isLoggedIn)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+            myNetworkManager.relayJoinCode = joinCode;
+            myNetworkManager.JoinRelayServer();
+
+            //todo if no correct code, back to menu
+        }
+
+    }
+
+    public void StopRelayClient()
+    {
+        networkManager.StopClient();
+        SceneManager.LoadScene(0);
+    }
+
+    public void StopRelayHost()
+    {
+        networkManager.StopHost();
+        SceneManager.LoadScene(0);
+    }
+    #endregion
+
+
+    #region UI
+    public void ActivateHostUI()
+    {
+        if (networkManager is MyNetworkManager && ((MyNetworkManager)networkManager).IsRelayEnabled())
+        {
+            hostMenuParent.gameObject.SetActive(false);
+            relayHostMenuParent.gameObject.SetActive(true);
+            clientMenuParent.gameObject.SetActive(false);
+
+            relayJoinCodeText.text = $"Room Code: {((MyNetworkManager)networkManager).relayJoinCode}";
+        }
+        else
+        {
+            hostMenuParent.gameObject.SetActive(true);
+            relayHostMenuParent.gameObject.SetActive(false);
+            clientMenuParent.gameObject.SetActive(false);
+
+            ipAdressText.text = $"Adress: {IPManager.GetLocalIPAddress()}";
+        }
+    }
+
+    public void ActivateClientUI()
+    {
+        hostMenuParent.gameObject.SetActive(false);
+        relayHostMenuParent.gameObject.SetActive(false);
+        clientMenuParent.gameObject.SetActive(true);
+        //Check if relay host
+        /*if (networkManager.IsRelayEnabled())
+        {
+            //show relay code
+        }*/
+        //else show ip adress
+    }
+
+    public void DeactivateUI()
+    {
+        hostMenuParent.gameObject.SetActive(false);
+        relayHostMenuParent.gameObject.SetActive(false);
+        clientMenuParent.gameObject.SetActive(false);
+    }
+
+    /*
+    void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(10, 10, 300, 500));
+
+        GUILayout.Label($"Discovered Servers [{discoveredServers.Count}]:");
+
+        StatusLabels();
+
+        GUILayout.EndArea();
+    }
+
+    void StatusLabels()
+    {
+        // server / client status message
+        if (NetworkServer.active)
+        {
+            GUILayout.Label("Server: active. Transport: " + Transport.activeTransport);
+            if (networkManager.IsRelayEnabled())
+            {
+                GUILayout.Label("Relay enabled. Join code: " + networkManager.relayJoinCode);
+            }
+        }
+        if (NetworkClient.isConnected)
+        {
+            GUILayout.Label("Client: address = " + IPManager.GetLocalIPAddress());
+        }
+    }*/
+
+    public void DeleteAllServerDiscoveryButtons()
+    {
+        for (int i = discoveryButtonParent.childCount; i > 0; i--)
+        {
+            Destroy(discoveryButtonParent.GetChild(i - 1).gameObject);
+        }
+    }
+
+    //create running server button
+    public void CreateServerDiscoveryButton(ServerResponse info)
+    {
+        GameObject obj = GameObject.Instantiate(discoveryButtonPrefab, discoveryButtonParent);
+        TMP_Text objText = obj.GetComponentInChildren<TMP_Text>();
+        objText.text = info.EndPoint.Address.ToString();
+
+        obj.GetComponent<Button>().onClick.AddListener(delegate { NetworkMenuManager.Instance.JoinLocalHost(info); });
+    }
+    #endregion
+
+    #region Player
+
+    public void PlayPlayerAudio()
+    {
+        if (localPlayer != null)
+        {
+            localPlayer.GetComponent<SimpleClientAudioTrigger>().TryPlayAudio();
+        }
+    }
+    #endregion
+
+    public void SetTickRate(int value)
+    {
+        Application.targetFrameRate = value;
+    }
+}
+
+public static class IPManager
+{
+    public static string GetLocalIPAddress()
+    {
+        var host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            {
+                return ip.ToString();
+            }
+        }
+
+        throw new System.Exception("No network adapters with an IPv4 address in the system!");
+    }
+}
