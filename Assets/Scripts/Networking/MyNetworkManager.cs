@@ -22,7 +22,7 @@ namespace Network
         /// <summary>
         /// Flag to determine if the user is logged into the backend.
         /// </summary>
-        public bool isLoggedIn = false;
+        public static bool isLoggedIn = false;
 
         /// <summary>
         /// List of players currently connected to the server.
@@ -50,11 +50,16 @@ namespace Network
 			{
                 isLoggedIn = false;
                 Debug.Log(e);
+                if (NetworkMenuManager.Instance != null)
+                {
+                    NetworkMenuManager.Instance.GoBackToLocalScene();
+                }
 			}
 		}
 
-        private void Update()
+        public override void Update()
         {
+            base.Update();
             if (NetworkManager.singleton.isNetworkActive)
             {
                 if (localPlayer == null)

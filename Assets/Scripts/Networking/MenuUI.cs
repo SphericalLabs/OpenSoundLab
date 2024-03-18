@@ -100,7 +100,7 @@ namespace UI
 					if (GUILayout.Button("Server Only")) m_Manager.StartStandardServer();
 				}
 
-				if (m_Manager.isLoggedIn)
+				if (MyNetworkManager.isLoggedIn)
 				{
 					// Server + Client
 					if (Application.platform != RuntimePlatform.WebGLPlayer)

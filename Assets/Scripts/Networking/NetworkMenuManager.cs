@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -9,6 +8,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Net;
 using UnityEngine.SceneManagement;
+using Utp;
 
 public class NetworkMenuManager : MonoBehaviour
 {
@@ -35,6 +35,7 @@ public class NetworkMenuManager : MonoBehaviour
     [Header("Relay Host Menu")]
     [SerializeField] private Transform relayHostMenuParent;
     [SerializeField] private TMP_Text relayJoinCodeText;
+    [SerializeField] private GameObject backButtonObject;
 
     [Header("Client Menu")]
     [SerializeField] private Transform clientMenuParent;
@@ -51,6 +52,10 @@ public class NetworkMenuManager : MonoBehaviour
     // Start is called before the first frame update
     IEnumerator Start()
     {
+        if (relayCodeInputField != null && relayCode.Length > 0)
+        {
+            relayCodeInputField.SetTextWithoutNotify(relayCode);
+        }
         if (createHostOnStart)
         {
             yield return new WaitForSeconds(0.5f);
@@ -58,6 +63,8 @@ public class NetworkMenuManager : MonoBehaviour
             {
                 if (networkManager is MyNetworkManager)
                 {
+                    ((RelayNetworkManager)networkManager).onFailedStartHostEvent.AddListener(GoBackToLocalScene);
+                    ((RelayNetworkManager)networkManager).onFailedConnectToServerEvent.AddListener(GoBackToLocalScene);
                     if (relayCode.Length > 0)
                     {
                         StartCoroutine(JoinRelayHostWaitTime(relayCode));
@@ -78,6 +85,15 @@ public class NetworkMenuManager : MonoBehaviour
                 ActivateHostUI();
                 yield return new WaitForSeconds(0.5f);
                 networkDiscovery.AdvertiseServer();
+            }
+        }
+
+        if (backButtonObject != null)
+        {
+            yield return new WaitForSeconds(6f);
+            if (!networkManager.isNetworkActive)
+            {
+                backButtonObject.SetActive(true);
             }
         }
     }
@@ -117,10 +133,16 @@ public class NetworkMenuManager : MonoBehaviour
 
     public void CheckIfClientGetKickedOut()
     {
-        /*
-        clientGotStopped = true;
-        Debug.Log("Player got kicked out true");
-        StartCoroutine(RestartHostWhenKickedOutWaitTime());*/
+        if (isRelayScene)
+        {
+            GoBackToLocalScene();
+        }
+        else
+        {
+            clientGotStopped = true;
+            Debug.Log("Player got kicked out true");
+            StartCoroutine(RestartHostWhenKickedOutWaitTime());
+        }
     }
 
     private IEnumerator RestartHostWhenKickedOutWaitTime()
@@ -128,14 +150,8 @@ public class NetworkMenuManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
         if (clientGotStopped && !networkManager.isNetworkActive)
         {
-            if (isRelayScene)
-            {
-                StopRelayClient();
-            }
-            else
-            {
-                StartCoroutine(RestartHostWaitTime());
-            }
+            StartCoroutine(RestartHostWaitTime());
+
             Debug.Log("Player got kicked out, restart");
         }
     }
@@ -214,11 +230,11 @@ public class NetworkMenuManager : MonoBehaviour
         if (networkManager is MyNetworkManager)
         {
             var myNetworkManager = ((MyNetworkManager)networkManager);
-            if (!myNetworkManager.isLoggedIn)
+            if (!MyNetworkManager.isLoggedIn)
             {
                 //check if loggin works
                 myNetworkManager.UnityLogin();
-                while (!myNetworkManager.isLoggedIn)
+                while (!MyNetworkManager.isLoggedIn)
                 {
                     yield return new WaitForEndOfFrame();
                 }
@@ -239,10 +255,13 @@ public class NetworkMenuManager : MonoBehaviour
 
     public void JoinRelayHost()
     {
-        networkManager.StopHost();
+        if (relayCode.Length > 0)
+        {
+            networkManager.StopHost();
 
-        relayCode = RelayJoinCode;
-        StartCoroutine(LoadRelaySceneWaitingTime());
+            relayCode = RelayJoinCode;
+            StartCoroutine(LoadRelaySceneWaitingTime());
+        }
     }
 
     private IEnumerator JoinRelayHostWaitTime(string joinCode)
@@ -259,10 +278,10 @@ public class NetworkMenuManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
             clientGotStopped = false;
 
-            if (!myNetworkManager.isLoggedIn)
+            if (!MyNetworkManager.isLoggedIn)
             {
                 myNetworkManager.UnityLogin();
-                while (!myNetworkManager.isLoggedIn)
+                while (!MyNetworkManager.isLoggedIn)
                 {
                     yield return new WaitForEndOfFrame();
                 }
@@ -284,6 +303,11 @@ public class NetworkMenuManager : MonoBehaviour
     public void StopRelayHost()
     {
         networkManager.StopHost();
+        SceneManager.LoadScene(0);
+    }
+
+    public void GoBackToLocalScene()
+    {
         SceneManager.LoadScene(0);
     }
     #endregion

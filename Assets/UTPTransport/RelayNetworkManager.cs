@@ -5,6 +5,7 @@ using Mirror;
 
 using UnityEngine;
 using Unity.Services.Relay.Models;
+using UnityEngine.Events;
 //using OSL;
 
 namespace Utp
@@ -17,6 +18,9 @@ namespace Utp
 		/// Server's join code if using Relay.
 		/// </summary>
 		public string relayJoinCode = "";
+
+		public UnityEvent onFailedStartHostEvent;
+        public UnityEvent onFailedConnectToServerEvent;
 
 
         public override void Awake()
@@ -108,6 +112,7 @@ namespace Utp
 			() =>
 			{
 				UtpLog.Error($"Failed to start a Relay host.");
+				onFailedStartHostEvent?.Invoke();
 			});
 		}
 
@@ -134,11 +139,8 @@ namespace Utp
 			() =>
 			{
 				UtpLog.Error($"Failed to join Relay server.");
-				/*if (NetworkMenuManager.Instance != null)
-				{
-					
-				}*/
-			});
+				onFailedConnectToServerEvent?.Invoke();
+            });
 		}
 	}
 }
