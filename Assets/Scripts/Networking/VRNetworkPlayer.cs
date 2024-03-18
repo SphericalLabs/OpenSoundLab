@@ -28,6 +28,20 @@ public class VRNetworkPlayer : NetworkBehaviour
         {
             NetworkMenuManager.Instance.localPlayer = this;
         }
+
+        //deactivate meshrenderers
+        if (networkHead.TryGetComponent<MeshRenderer>(out MeshRenderer headMR))
+        {
+            headMR.enabled = false;
+        }
+        if (networkLeftHand.TryGetComponent<MeshRenderer>(out MeshRenderer leftHandMR))
+        {
+            leftHandMR.enabled = false;
+        }
+        if (networkRightHand.TryGetComponent<MeshRenderer>(out MeshRenderer rightHandMR))
+        {
+            rightHandMR.enabled = false;
+        }
     }
 
     // Update is called once per frame

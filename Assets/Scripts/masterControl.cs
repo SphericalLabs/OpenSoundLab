@@ -297,7 +297,7 @@ public class masterControl : MonoBehaviour {
       PlayerPrefs.Save();
     }
 
-    if(PlayerPrefs.GetInt("showTutorialsOnStartup") == 1){
+    if(PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null){
 
       GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
 

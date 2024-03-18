@@ -1263,6 +1263,7 @@ MonoBehaviour:
   ipAdressText: {fileID: 2075408523}
   relayHostMenuParent: {fileID: 195110620}
   relayJoinCodeText: {fileID: 81230159}
+  backButtonObject: {fileID: 0}
   clientMenuParent: {fileID: 120674276}
   localPlayer: {fileID: 0}
 --- !u!114 &207291390
@@ -5085,7 +5086,7 @@ MonoBehaviour:
   m_SendPointerHoverToParent: 1
   rayTransform: {fileID: 109561403}
   m_Cursor: {fileID: 917266318}
-  joyPadClickButton: 1
+  joyPadClickButton: 2105344
   gazeClickKey: 32
   performSphereCastForGazepointer: 0
   useRightStickScroll: 1

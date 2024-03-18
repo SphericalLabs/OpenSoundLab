@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/main.unity
     guid: 98ca84121eec7424d9669ae097f8c52e
   - enabled: 1
+    path: Assets/Scenes/oslLocalNetworking.unity
+    guid: 70a55efe19ab2224bb9eb09638a2128e
+  - enabled: 0
     path: Assets/Scenes/KCPNetworkScene.unity
     guid: cb57b32b57c1b4e368e1c85e3cad4623
   - enabled: 1
