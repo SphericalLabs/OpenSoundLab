@@ -255,7 +255,7 @@ public class NetworkMenuManager : MonoBehaviour
 
     public void JoinRelayHost()
     {
-        if (relayCode.Length > 0)
+        if (RelayJoinCode.Length > 0)
         {
             networkManager.StopHost();
 
