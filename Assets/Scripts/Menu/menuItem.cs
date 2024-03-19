@@ -139,6 +139,221 @@ public class menuItem : manipObject
         if (tex != null) tex.mipMapBias = -1f; // shift mipmap by one level, improves clarity of menu symbols
         symbol.material.SetTexture("_BaseMap", tex);
         itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
+        GameObject menuPrefab = Resources.Load("MenuPrefabs/" + item.ToString() + "_Menu") as GameObject;
+        label.text = item.ToString();
+        // Please use the first letter of the original enum name for proper sorting in the menu!
+        if (item == DeviceType.VCA) label.text = "VCA";
+        else if (item == DeviceType.Glide) label.text = "Glide";
+        else if (item == DeviceType.Gain) label.text = "Gain / Mute";
+        else if (item == DeviceType.MIDIIN) label.text = "MIDI In";
+        else if (item == DeviceType.MIDIOUT) label.text = "MIDI Out";
+        else if (item == DeviceType.Sequencer) label.text = "Sequencer (Old)";
+        else if (item == DeviceType.SequencerCV) label.text = "Sequencer";
+        else if (item == DeviceType.Timeline) label.text = "Sequencer III";
+        else if (item == DeviceType.ControlCube) label.text = "ControlCube";
+        else if (item == DeviceType.Microphone) label.text = "Mic";
+        else if (item == DeviceType.SampleHold) label.text = "S&H";
+        else if (item == DeviceType.Reverb) label.text = "Reverb";
+        //if (item == deviceType.Freeverb) label.text = "Reverb";
+        else if (item == DeviceType.DC) label.text = "DC";
+        else if (item == DeviceType.Polarizer) label.text = "Polarity";
+
+
+        label.gameObject.SetActive(true);
+        symbol.gameObject.SetActive(true);
+        g = Instantiate(menuPrefab, transform.position, transform.rotation) as GameObject;
+        g.transform.parent = transform;
+
+
+        manager = transform.parent.parent.GetComponent<menuManager>();
+
+        Vector3 size = Vector3.zero;
+        Vector3 center = Vector3.zero;
+        /*
+        if (item == DeviceType.Sequencer)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                for (int i2 = 0; i2 < 4; i2++)
+                {
+                    GameObject cube = Instantiate(g.GetComponent<sequencerDeviceInterface>().touchCubePrefab, transform.position, transform.rotation) as GameObject;
+                    cube.transform.parent = g.transform;
+                    cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
+                    cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+                }
+
+                GameObject seq = Instantiate(g.GetComponent<sequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
+                seq.transform.parent = g.transform;
+                seq.transform.Translate(Vector3.right * .081f, Space.Self);
+                seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+            }
+            //Destroy(g.transform.Find("stretchNode").gameObject);
+        }
+
+        else if (item == DeviceType.SequencerCV)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                for (int i2 = 0; i2 < 4; i2++)
+                {
+                    GameObject cube = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().touchDialPrefab, transform.position, transform.rotation) as GameObject;
+                    cube.transform.parent = g.transform;
+                    cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
+                    cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+                }
+
+                GameObject seq = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
+                seq.transform.parent = g.transform;
+                seq.transform.Translate(Vector3.right * .081f, Space.Self);
+                seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
+            }
+            Destroy(g.transform.Find("stretchNode").gameObject);
+        }
+        else if (item == DeviceType.Tapes)
+        {
+            GameObject tape = Instantiate(g.GetComponent<libraryDeviceInterface>().tapePrefab, transform, false) as GameObject;
+            Destroy(g);
+            g = tape;
+        }
+
+        else if (item == DeviceType.Timeline)
+        {
+            GameObject tl = Instantiate(Resources.Load("MenuPrefabs/timelineRep_Menu") as GameObject, transform, false) as GameObject;
+            Destroy(g);
+            g = tl;
+        }
+
+        
+        MonoBehaviour[] m = g.GetComponentsInChildren<MonoBehaviour>();
+        for (int i = 0; i < m.Length; i++) Destroy(m[i]);
+
+        AudioSource[] audios = g.GetComponentsInChildren<AudioSource>();
+        for (int i = 0; i < audios.Length; i++) Destroy(audios[i]);
+
+        Rigidbody[] rig = g.GetComponentsInChildren<Rigidbody>();
+        for (int i = 0; i < rig.Length; i++) Destroy(rig[i]);
+        */
+        Renderer[] r = g.GetComponentsInChildren<Renderer>();
+        for (int i = 0; i < r.Length; i++)
+        {
+            //r[i].material = menuMat;
+            if (r[i].bounds.size.sqrMagnitude > size.sqrMagnitude)
+            {
+                size = r[i].bounds.size;
+                center = r[i].bounds.center;
+            }
+        }
+
+
+        g.tag = "Untagged";
+        g.transform.localScale = g.transform.localScale / (size.magnitude * 20);
+        g.transform.localPosition = g.transform.localPosition + Vector3.forward * .02f;
+
+        if (item == DeviceType.Maracas) g.transform.localPosition = new Vector3(0, -.02f, .02f);
+
+        else if (item == DeviceType.Camera)
+        {
+            g.transform.localRotation = Quaternion.Euler(90, 0, 0);
+            /*
+            Camera[] cams = g.GetComponentsInChildren<Camera>();
+            for (int i = 0; i < cams.Length; i++) Destroy(cams[i].gameObject);
+            Destroy(g.transform.Find("screenFrame").gameObject);*/
+        }
+
+        else if (item == DeviceType.Keyboard)
+        {
+            g.transform.localPosition = new Vector3(0.013f, 0, .026f);
+            g.transform.localScale = Vector3.one * .08f;
+            //Destroy(g.transform.Find("KeyboardTimeline").gameObject);
+        }
+
+        else if (item == DeviceType.XyloRoll)
+        {
+            g.transform.localPosition = new Vector3(.0239f, 0, .02f);
+            g.transform.localScale = Vector3.one * .087f;
+            g.transform.localRotation = Quaternion.Euler(34, 0, 0);
+            //Destroy(g.transform.Find("KeyboardTimeline").gameObject);
+            //Destroy(g.transform.Find("OscillatorBank").gameObject);
+            //Destroy(g.transform.Find("ADSR").gameObject);
+        }
+        /*
+        if (item == DeviceType.MIDIOUT)
+        {
+            Destroy(g.transform.Find("CChandle").gameObject);
+            Destroy(g.transform.Find("NOTEhandle").gameObject);
+        }*/
+
+        else if (item == DeviceType.Airhorn)
+        {
+            g.transform.localPosition = new Vector3(-0.005f, -.018f, 0.02f);
+            g.transform.localRotation = Quaternion.Euler(0, 90, 0);
+            g.transform.localScale = Vector3.one * .14f;
+        }
+
+        else if (item == DeviceType.Tapes)
+        {
+            g.transform.localPosition = new Vector3(0, 0, 0.02f);
+            g.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        }
+        else if (item == DeviceType.Timeline)
+        {
+            g.transform.localPosition = new Vector3(0, 0, 0.02f);
+            g.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        }
+        /*
+        if (item == DeviceType.Filter)
+        {
+            //g.transform.localPosition = new Vector3(.015f, 0, .02f);
+            //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
+        }
+        if (item == DeviceType.Scope)
+        {
+            //g.transform.localPosition = new Vector3(.015f, 0, .02f);
+            //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
+        }*/
+        else if (item == DeviceType.Multiple)
+        {
+            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+        }
+        else if (item == DeviceType.MultiMix)
+        {
+            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+        }
+        else if (item == DeviceType.MultiSplit)
+        {
+            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+        }
+        else if (item == DeviceType.Sequencer)
+        {
+            g.transform.localScale = Vector3.one * .166f;
+        }
+        else if (item == DeviceType.ControlCube) g.transform.localPosition = new Vector3(0, -.01f, .024f);
+        else if (item == DeviceType.Reverb) g.transform.localPosition = new Vector3(0, -0.0175f, .02f);
+        else if (item == DeviceType.Drum)
+        {
+            g.transform.localPosition = new Vector3(0, 0, .026f);
+            g.transform.localRotation = Quaternion.Euler(40, 0, 0);
+        }
+        else if (item == DeviceType.Mixer)
+        {
+            g.transform.localPosition = new Vector3(0.014f, 0, .02f);
+            g.transform.localRotation = Quaternion.Euler(60, 0, 0);
+        }
+
+        g.SetActive(false);
+
+        return g;
+    }
+
+
+    /*backup 
+     * public GameObject Setup(DeviceType d)
+    {
+        item = d;
+        tex = Resources.Load("Textures/" + item.ToString() + "Symbol") as Texture;
+        if (tex != null) tex.mipMapBias = -1f; // shift mipmap by one level, improves clarity of menu symbols
+        symbol.material.SetTexture("_BaseMap", tex);
+        itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
         label.text = item.ToString();
         // Please use the first letter of the original enum name for proper sorting in the menu!
         if (item == DeviceType.VCA) label.text = "VCA";
@@ -344,7 +559,7 @@ public class menuItem : manipObject
         g.SetActive(false);
 
         return g;
-    }
+    }*/
 
     IEnumerator appearRoutine(bool on)
     {

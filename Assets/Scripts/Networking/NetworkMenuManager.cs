@@ -332,6 +332,11 @@ public class NetworkMenuManager : MonoBehaviour
 
             ipAdressText.text = $"Adress: {IPManager.GetLocalIPAddress()}";
         }
+
+        if (backButtonObject != null)
+        {
+            backButtonObject.SetActive(false);
+        }
     }
 
     public void ActivateClientUI()
@@ -339,6 +344,11 @@ public class NetworkMenuManager : MonoBehaviour
         hostMenuParent.gameObject.SetActive(false);
         relayHostMenuParent.gameObject.SetActive(false);
         clientMenuParent.gameObject.SetActive(true);
+
+        if (backButtonObject != null)
+        {
+            backButtonObject.SetActive(false);
+        }
         //Check if relay host
         /*if (networkManager.IsRelayEnabled())
         {
