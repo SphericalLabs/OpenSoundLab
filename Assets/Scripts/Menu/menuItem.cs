@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -601,54 +601,78 @@ public class menuItem : manipObject
 
     void createItem()
     {
-
         // Get the direction from the object to the camera
         Vector3 direction = Camera.main.transform.position - transform.position /*+ Vector3.down * 0.10f*/;
 
         // Generate a quaternion that looks towards the camera
         Quaternion lookRotation = Quaternion.LookRotation(direction);
 
-        GameObject g = Instantiate(itemPrefab, transform.position /*+ new Vector3(-0f, 0f, -0.04f)*/, lookRotation) as GameObject;
-
-        manipulator manip = manipulatorObj.GetComponent<manipulator>();
-
-        // spawn directly into the hand if selecting by gaze
-        if (manip != null && manip.wasGazeBased)
+        //spawn on network
+        if (NetworkSpawnManager.Instance != null)
         {
-            g.transform.position = manip.transform.position + manip.transform.forward * 0.12f;
-            manip.wasGazeBased = false; // treat that interaction as a physical one from now on, otherwise it would be handled in fine mode by default
+            Vector3 localPositionOffset = Vector3.zero;
+            Vector3 localRotationOffset = Vector3.zero;
+
+
+            if (item == DeviceType.Tapes)
+            {
+                localPositionOffset = new Vector3(.1f, .02f, .15f);
+                localRotationOffset = new Vector3(0, 180, 0);
+            }
+            else if (item == DeviceType.ControlCube)
+            {
+                localPositionOffset = new Vector3(0f, 0f, -0.15f);
+            }
+            else if (item == DeviceType.XyloRoll)
+            {
+                localRotationOffset = new Vector3(90, 0, 0);
+                localPositionOffset = new Vector3(0.15f, 0f, -0.05f);
+            }
+            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.Mixer)
+            {
+                localRotationOffset = new Vector3(90, 0, 0);
+            }
+            //todo send local player id with it
+
+            NetworkSpawnManager.Instance.CmdCreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity);
         }
+        else {
+            GameObject g = Instantiate(itemPrefab, transform.position /*+ new Vector3(-0f, 0f, -0.04f)*/, lookRotation) as GameObject;
 
-        if (item == DeviceType.Tapes)
-        {
-            g.transform.Translate(.1f, .02f, .15f, Space.Self);
-            g.transform.Rotate(0, 180, 0, Space.Self);
+            manipulator manip = manipulatorObj.GetComponent<manipulator>();
+
+            // spawn directly into the hand if selecting by gaze
+            if (manip != null && manip.wasGazeBased)
+            {
+                g.transform.position = manip.transform.position + manip.transform.forward * 0.12f;
+                manip.wasGazeBased = false; // treat that interaction as a physical one from now on, otherwise it would be handled in fine mode by default
+            }
+
+            if (item == DeviceType.Tapes)
+            {
+                g.transform.Translate(.1f, .02f, .15f, Space.Self);
+                g.transform.Rotate(0, 180, 0, Space.Self);
+            }
+
+            else if (item == DeviceType.ControlCube)
+                g.transform.Translate(0f, 0f, -0.15f, Space.Self);
+
+            else if (item == DeviceType.XyloRoll)
+            {
+                g.transform.Rotate(90, 0, 0, Space.Self);
+                g.transform.Translate(0.15f, 0f, -0.05f, Space.Self);
+            }
+
+            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.Mixer)
+                g.transform.Rotate(90, 0, 0, Space.Self);
+
+
+            //else if (item != deviceType.Filter && item != deviceType.Scope && item != deviceType.Airhorn && item != deviceType.ADSR) /*g.transform.Rotate(0, 180, 0, Space.Self);*/
+
+
+            if (manip != null && manip.wasGazeBased) g.transform.parent = GameObject.Find("PatchAnchor").transform;  // Directly inject PatchAnchor as parent, since the normal grab and then place back routine is skipped when spawn by gaze
+            manip.ForceGrab(g.GetComponentInChildren<handle>());
         }
-
-        if (item == DeviceType.ControlCube)
-            g.transform.Translate(0f, 0f, -0.15f, Space.Self);
-
-        if (item == DeviceType.XyloRoll)
-        {
-            g.transform.Rotate(90, 0, 0, Space.Self);
-            g.transform.Translate(0.15f, 0f, -0.05f, Space.Self);
-        }
-
-        if (item == DeviceType.Drum)
-            g.transform.Rotate(90, 0, 0, Space.Self);
-
-        if (item == DeviceType.Keyboard)
-            g.transform.Rotate(90, 0, 0, Space.Self);
-
-        if (item == DeviceType.Mixer)
-            g.transform.Rotate(90, 0, 0, Space.Self);
-
-
-        //else if (item != deviceType.Filter && item != deviceType.Scope && item != deviceType.Airhorn && item != deviceType.ADSR) /*g.transform.Rotate(0, 180, 0, Space.Self);*/
-
-
-        if (manip != null && manip.wasGazeBased) g.transform.parent = GameObject.Find("PatchAnchor").transform;  // Directly inject PatchAnchor as parent, since the normal grab and then place back routine is skipped when spawn by gaze
-        manip.ForceGrab(g.GetComponentInChildren<handle>());
 
     }
 

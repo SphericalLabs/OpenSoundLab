@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18025829, g: 0.22567949, b: 0.30687967, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1297,7 +1297,51 @@ MonoBehaviour:
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 161644, guid: e7ba6a1cf941e4a419ad234e3a0cff3c, type: 3}
+  - {fileID: 1529033898387040, guid: c1d692fad89d64e4eb909587e17fb503, type: 3}
+  - {fileID: 1627441985901624, guid: f1a581e5cb96fda40b89d54e0834704f, type: 3}
+  - {fileID: 161644, guid: fac39bed66a084092966964e26b829be, type: 3}
+  - {fileID: 1000012466838072, guid: 5cbd4beb1617f2f42842cb4c148ddb06, type: 3}
+  - {fileID: 161644, guid: 25501a09ebf58425ca453e9889ad2ab7, type: 3}
+  - {fileID: 129626, guid: 18cf3d2689374974b9759fb81f9d23e8, type: 3}
+  - {fileID: 161644, guid: bb062ec846e822947a9da2b3a45d8127, type: 3}
+  - {fileID: 161644, guid: 71caf287092b145d6a1eb6314b72e02d, type: 3}
+  - {fileID: 123834, guid: 84988cdc5f6ae0a47ad7dc44a118e733, type: 3}
+  - {fileID: 1000010636603940, guid: 11497bfa83404514ab18c74a47322441, type: 3}
+  - {fileID: 161644, guid: b05ad22051b8a4bef9fa4cdbf9e79e75, type: 3}
+  - {fileID: 161644, guid: 010fb6440f76d5b45ab5166315671a84, type: 3}
+  - {fileID: 161644, guid: d8308a3d92b43ed44af7f499125b2d12, type: 3}
+  - {fileID: 1000013258226742, guid: b9f24ef3edc1377488b4b73214b56d78, type: 3}
+  - {fileID: 1000013544788900, guid: f583096498794bc4abced23245a8207b, type: 3}
+  - {fileID: 164900, guid: 76ff91b891dfa0b4c8730d87c1e11677, type: 3}
+  - {fileID: 1000011508732560, guid: c23125852e70c554183aec982bba9190, type: 3}
+  - {fileID: 1872141894946328, guid: 3634b68603bdd6540b368d8cf79997df, type: 3}
+  - {fileID: 1199539764712922, guid: 006a877f79040094ebefbacb02d54097, type: 3}
+  - {fileID: 1000012803914034, guid: efe171d82e84ec64bb8b37787514c016, type: 3}
+  - {fileID: 1984383435952320, guid: e5c2e999de77b124eb3fff0b837098d7, type: 3}
+  - {fileID: 1984383435952320, guid: 04f118cfdaebe0b419722efc3593fffb, type: 3}
+  - {fileID: 1984383435952320, guid: fcdae6c38662ac84482f83782f5e59e7, type: 3}
+  - {fileID: 1000012179911288, guid: c2f11553e7c7ad940b59a31e1c507d5a, type: 3}
+  - {fileID: 1000014108096392, guid: 5ff645c60ba11f646a506769f8c67627, type: 3}
+  - {fileID: 1109546034012396, guid: d47927aa7fef3cb43a6b73ba7b944525, type: 3}
+  - {fileID: 161644, guid: 9e3002f8fd598a14d8b26cbf0c2dd4e2, type: 3}
+  - {fileID: 161644, guid: 4084062e06e78174eb00ad8de3c041fc, type: 3}
+  - {fileID: 1000010799953068, guid: 4e0bec5084b0ba94cac462d0d3fc2a18, type: 3}
+  - {fileID: 1000011720101380, guid: f2b0adff4d098ce4fb13767b4fccf66d, type: 3}
+  - {fileID: 161644, guid: 5e34956dc17cabc4fbdc0e014d8f9ad2, type: 3}
+  - {fileID: 191382, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
+  - {fileID: 1000010636603940, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
+  - {fileID: 1000012113822842, guid: c46773833548a8b48a4f77fe74866d4d, type: 3}
+  - {fileID: 1000012113822842, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
+  - {fileID: 139084, guid: c7593c6b75ee52e47a7e40f855fcd140, type: 3}
+  - {fileID: 1000010012498744, guid: 845728fb51fed694fb9a1b77875724a6, type: 3}
+  - {fileID: 1000014101487022, guid: 236b3d62afbfdc14da5afdc9dd957355, type: 3}
+  - {fileID: 1334158620380744, guid: 5096ca2b466e4dd4d91f229729a43af4, type: 3}
+  - {fileID: 1327524652071292, guid: c696757858bcd2e4ebfc375301d4bd53, type: 3}
+  - {fileID: 1000014214864386, guid: ce7c0e70b11c6714ba4790139f93fe9d, type: 3}
+  - {fileID: 161644, guid: 3711d8030be5241469cf044c77b9e4f3, type: 3}
+  - {fileID: 1687681188691744, guid: e7529c2cf9fb00c4d9bd37c1c56e8e09, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
