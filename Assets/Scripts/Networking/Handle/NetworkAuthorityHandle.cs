@@ -5,7 +5,7 @@ using Mirror;
 
 public class NetworkAuthorityHandle : NetworkBehaviour
 {
-    private handle _handle;
+    private handle[] _handles;
     public TMPro.TMP_Text debugtextMesh;
 
     private NetworkTransformBase _netTransform;
@@ -14,24 +14,27 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         UpdateDebugText();
         _netTransform = GetComponent<NetworkTransformBase>();
-        _handle = GetComponentInChildren<handle>();
-        if (_handle != null)
+        _handles = GetComponentsInChildren<handle>();
+        if (_handles != null && _handles.Length > 0)
         {
-            if (_handle.onTrashEvents == null)
+            foreach (handle handle in _handles)
             {
-                _handle.onTrashEvents = new UnityEngine.Events.UnityEvent();
+                if (handle.onTrashEvents == null)
+                {
+                    handle.onTrashEvents = new UnityEngine.Events.UnityEvent();
+                }
+                if (handle.onStartGrabEvents == null)
+                {
+                    handle.onStartGrabEvents = new UnityEngine.Events.UnityEvent();
+                }
+                if (handle.onEndGrabEvents == null)
+                {
+                    handle.onEndGrabEvents = new UnityEngine.Events.UnityEvent();
+                }
+                handle.onTrashEvents.AddListener(NetworkDestroy);
+                handle.onStartGrabEvents.AddListener(StartAuthorityGrabing);
+                handle.onEndGrabEvents.AddListener(EndGrabing);
             }
-            if (_handle.onStartGrabEvents == null)
-            {
-                _handle.onStartGrabEvents = new UnityEngine.Events.UnityEvent();
-            }
-            if (_handle.onEndGrabEvents == null)
-            {
-                _handle.onEndGrabEvents = new UnityEngine.Events.UnityEvent();
-            }
-            _handle.onTrashEvents.AddListener(NetworkDestroy);
-            _handle.onStartGrabEvents.AddListener(StartAuthorityGrabing);
-            _handle.onEndGrabEvents.AddListener(EndGrabing);
         }
     }
 
