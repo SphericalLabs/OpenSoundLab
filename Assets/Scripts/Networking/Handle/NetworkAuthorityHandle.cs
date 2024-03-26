@@ -9,6 +9,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     public TMPro.TMP_Text debugtextMesh;
 
     private NetworkTransformBase _netTransform;
+    private bool _destroyIsTriggerd;
 
     public virtual void Start()
     {
@@ -104,6 +105,11 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     #region Destroy
     public void NetworkDestroy()
     {
+        if (_destroyIsTriggerd)
+        {
+            return;
+        }
+        _destroyIsTriggerd = true;
         Debug.Log($"Trigger Destroy");
         if (isServer)
         {
@@ -111,7 +117,15 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         }
         else
         {
-            CmdNetworkDestroy();
+            if (isOwned)
+            {
+                Debug.Log($"Network Destroy on client {gameObject.name}");
+                NetworkServer.Destroy(gameObject);
+            }
+            else
+            {
+                CmdNetworkDestroy();
+            }
         }
     }
 
