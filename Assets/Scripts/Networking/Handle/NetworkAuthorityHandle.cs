@@ -24,7 +24,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         if (debugtextMesh != null)
         {
-            debugtextMesh.text = (isServer ? "Server: client connection" + connectionToClient : "Client: ") + "\nhas authority: " + authority;
+            debugtextMesh.text = (isServer ? "Server: client connection" + connectionToClient : "Client: ") + "\nhas authority: " + isOwned;
         }
     }
 
@@ -70,7 +70,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         this.UpdateDebugText();
 
         Debug.Log($"End Grab of {gameObject.name}");
-        if (!isServer && authority)
+        if (!isServer)
             CmdRemoveObjectAuthority();
     }
 
@@ -80,6 +80,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     #region Destroy
     public void NetworkDestroy()
     {
+        Debug.Log($"Trigger Destroy");
         if (isServer)
         {
             ServerNetworkDestroy();
@@ -93,15 +94,17 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdNetworkDestroy()
     {
-        NetworkServer.Destroy(gameObject);
         Debug.Log($"Network Destroy {gameObject.name}");
+        NetworkServer.Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     [Server]
     public void ServerNetworkDestroy()
     {
-        NetworkServer.Destroy(gameObject);
         Debug.Log($"Network Destroy {gameObject.name}");
+        NetworkServer.Destroy(gameObject);
+        Destroy(gameObject);
     }
     #endregion
 }
