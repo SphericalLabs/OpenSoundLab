@@ -8,12 +8,24 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     private handle _handle;
     public TMPro.TMP_Text debugtextMesh;
 
-    public virtual void Awake()
+    public virtual void Start()
     {
         UpdateDebugText();
         _handle = GetComponentInChildren<handle>();
         if (_handle != null)
         {
+            if (_handle.onTrashEvents == null)
+            {
+                _handle.onTrashEvents = new UnityEngine.Events.UnityEvent();
+            }
+            if (_handle.onStartGrabEvents == null)
+            {
+                _handle.onStartGrabEvents = new UnityEngine.Events.UnityEvent();
+            }
+            if (_handle.onEndGrabEvents == null)
+            {
+                _handle.onEndGrabEvents = new UnityEngine.Events.UnityEvent();
+            }
             _handle.onTrashEvents.AddListener(NetworkDestroy);
             _handle.onStartGrabEvents.AddListener(StartAuthorityGrabing);
             _handle.onEndGrabEvents.AddListener(EndGrabing);
@@ -24,6 +36,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         if (debugtextMesh != null)
         {
+            Debug.Log($"Update Text {isServer}");
             debugtextMesh.text = (isServer ? "Server: client connection" + connectionToClient : "Client: ") + "\nhas authority: " + isOwned;
         }
     }
@@ -67,11 +80,10 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void EndGrabing()
     {
-        this.UpdateDebugText();
-
         Debug.Log($"End Grab of {gameObject.name}");
         if (!isServer)
             CmdRemoveObjectAuthority();
+        this.UpdateDebugText();
     }
 
     #endregion

@@ -37,9 +37,11 @@ using System.Collections;
 using UnityEngine.Events;
 using Mirror;
 
+public enum FollowType { Follow, Parenting};
+
 public class handle : manipObject
 {
-
+    public FollowType followType = FollowType.Follow;
     public Transform masterObj;
     Transform masterObjParent;
     public handle otherHandle;
@@ -101,7 +103,21 @@ public class handle : manipObject
         }
         else
         {
-            masterObj.parent = manipulatorObj.parent;
+            switch (followType)
+            {
+                case FollowType.Follow:
+                    Debug.Log("update grab by follow");
+                    masterObj.transform.position = manipulatorObjScript.GrabedFollowPointTransform.position;
+                    masterObj.transform.rotation = manipulatorObjScript.GrabedFollowPointTransform.rotation;
+                    break;
+                case FollowType.Parenting:
+                    Debug.Log("update grab by parenting");
+                    if (masterObj.parent != manipulatorObj.parent)
+                    {
+                        masterObj.parent = manipulatorObj.parent;
+                    }
+                    break;
+            }
             scaling = false;
             doublePosRot = false;
         }
@@ -321,7 +337,17 @@ public class handle : manipObject
         }
         if (curState == manipState.grabbed && !manipulatorObjScript.wasGazeBased)
         {
-            masterObj.parent = manipulatorObj.parent;
+            switch (followType)
+            {
+                case FollowType.Follow:
+                    Debug.Log("update grab by follow");
+                    manipulatorObjScript.GrabedFollowPointTransform.position = masterObj.transform.position;
+                    manipulatorObjScript.GrabedFollowPointTransform.rotation = masterObj.transform.rotation;
+                    break;
+                case FollowType.Parenting:
+                    masterObj.parent = manipulatorObj.parent;
+                    break;
+            }
             doublePosRot = false;
         }
 
