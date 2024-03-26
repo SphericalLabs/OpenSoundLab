@@ -90,7 +90,7 @@ public class NetworkSpawnManager : NetworkBehaviour
 
 
     //general networking actions
-    [Command]
+    [Command (requiresAuthority = false)]
     public void CmdGetObjectAuthority(NetworkIdentity item)
     {
         if (item.connectionToClient != null)
@@ -98,15 +98,9 @@ public class NetworkSpawnManager : NetworkBehaviour
         item.AssignClientAuthority(connectionToClient);
     }
 
-    [Command]
+    [Command (requiresAuthority = false)]
     public void CmdRemoveObjectAuthority(NetworkIdentity item)
     {
         item.RemoveClientAuthority();
-    }
-
-    [Command]
-    public void CmdDestroyObjectOnServer(GameObject target)
-    {
-        NetworkServer.Destroy(target);
     }
 }
