@@ -87,20 +87,4 @@ public class NetworkSpawnManager : NetworkBehaviour
             Debug.Log($"Spawned {prefabName}");
         }
     }
-
-
-    //general networking actions
-    [Command (requiresAuthority = false)]
-    public void CmdGetObjectAuthority(NetworkIdentity item)
-    {
-        if (item.connectionToClient != null)
-            item.RemoveClientAuthority();
-        item.AssignClientAuthority(connectionToClient);
-    }
-
-    [Command (requiresAuthority = false)]
-    public void CmdRemoveObjectAuthority(NetworkIdentity item)
-    {
-        item.RemoveClientAuthority();
-    }
 }

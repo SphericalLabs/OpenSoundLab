@@ -40,6 +40,11 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         UpdateDebugText();
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdRemoveObjectAuthority()
+    {
+        netIdentity.RemoveClientAuthority();
+    }
 
     #region IGrabable
 
@@ -48,7 +53,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         Debug.Log($"Get Authority of {gameObject.name}");
         if (!isServer && !authority)
-            NetworkSpawnManager.Instance.CmdGetObjectAuthority(netIdentity);
+            NetworkMenuManager.Instance.localPlayer.CmdGetObjectAuthority(netIdentity);
         else if (isServer)
         {
             netIdentity.RemoveClientAuthority();
@@ -64,7 +69,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
 
         Debug.Log($"Remove Authority of {gameObject.name}");
         if (authority)
-            NetworkSpawnManager.Instance.CmdRemoveObjectAuthority(netIdentity);
+            CmdRemoveObjectAuthority();
     }
 
     #endregion

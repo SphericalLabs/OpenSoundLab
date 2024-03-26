@@ -59,4 +59,13 @@ public class VRNetworkPlayer : NetworkBehaviour
             networkRightHand.rotation = localPlayerRightHand.rotation;
         }
     }
+
+    //general networking actions
+    [Command(requiresAuthority = false)]
+    public void CmdGetObjectAuthority(NetworkIdentity item)
+    {
+        if (item.connectionToClient != null)
+            item.RemoveClientAuthority();
+        item.AssignClientAuthority(connectionToClient);
+    }
 }
