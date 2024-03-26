@@ -142,6 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 477d1f84783131541b1cdda57008a248, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controllerIndex: -1
   activeTip: {fileID: 1000010129621912}
   tipL: {fileID: 4000013276849122}
   tipR: {fileID: 4000010632361918}
@@ -669,6 +670,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 488160, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11479374, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
+      propertyPath: m_controller
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

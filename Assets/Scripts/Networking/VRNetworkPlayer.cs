@@ -13,6 +13,9 @@ public class VRNetworkPlayer : NetworkBehaviour
     private Transform localPlayerRightHand;
     private Transform localPlayerLeftHand;
 
+    private manipulator lefHandManipulator;
+    private manipulator rightHandManipulator;
+
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
@@ -42,6 +45,13 @@ public class VRNetworkPlayer : NetworkBehaviour
         {
             rightHandMR.enabled = false;
         }
+
+        var worldDragController = GameObject.FindObjectOfType<WorldDragController>();
+        if (worldDragController != null)
+        {
+            lefHandManipulator = worldDragController.leftManip;
+            rightHandManipulator = worldDragController.rightManip;
+        }
     }
 
     // Update is called once per frame
@@ -70,17 +80,23 @@ public class VRNetworkPlayer : NetworkBehaviour
     }
 
     [Server]
-    public void GrabNewObjectByHand(GameObject obj)
+    public void GrabNewObjectByHand(GameObject obj, bool isLeftHand)
     {
         if (obj.TryGetComponent<NetworkIdentity>(out NetworkIdentity item))
         {
-            RpcGrabNewObjectByHand(connectionToClient, item);
+            RpcGrabNewObjectByHand(connectionToClient, item, isLeftHand);
         }
     }
 
     [TargetRpc]
-    public void RpcGrabNewObjectByHand(NetworkConnectionToClient target, NetworkIdentity item)
+    public void RpcGrabNewObjectByHand(NetworkConnectionToClient target, NetworkIdentity item, bool isLeftHand)
     {
-        Debug.Log($"Spawned item with name {item.gameObject} to this player");
+        Debug.Log($"Spawned item with name {item.gameObject} to this player, by lefthand {isLeftHand}");
+        TargetManipulator(isLeftHand).ForceGrab(item.GetComponentInChildren<handle>());
+    }
+
+    private manipulator TargetManipulator(bool isLeftHand)
+    {
+        return isLeftHand ? lefHandManipulator : rightHandManipulator;
     }
 }

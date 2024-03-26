@@ -35,36 +35,40 @@
 using UnityEngine;
 using System.Collections;
 
-public class platformSetup : MonoBehaviour {
-  public GameObject hmdPrefab, controllerPrefab;
+public class platformSetup : MonoBehaviour
+{
+    public GameObject hmdPrefab, controllerPrefab;
 
-  public Transform hmdTargetOculus, controllerLTargetOculus, controllerRTargetOculus;
-  public GameObject hiresCamSelect;
+    public Transform hmdTargetOculus, controllerLTargetOculus, controllerRTargetOculus;
+    public GameObject hiresCamSelect;
 
-  public bool usePersonalizedHands = false;
-  public string personalizedHandsPrefabStr;
+    public bool usePersonalizedHands = false;
+    public string personalizedHandsPrefabStr;
 
-  manipulator[] manips = new manipulator[2];
-  void Awake() {
-    masterControl MC = GetComponent<masterControl>();
+    manipulator[] manips = new manipulator[2];
+    void Awake()
+    {
+        masterControl MC = GetComponent<masterControl>();
 
-    if (MC.currentPlatform == masterControl.platform.Oculus) {
+        if (MC.currentPlatform == masterControl.platform.Oculus)
+        {
 
-      Instantiate(hmdPrefab, hmdTargetOculus, false);
-      manips[0] = (Instantiate(controllerPrefab, controllerLTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
-      manips[1] = (Instantiate(controllerPrefab, controllerRTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
+            Instantiate(hmdPrefab, hmdTargetOculus, false);
+            manips[0] = (Instantiate(controllerPrefab, controllerLTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
+            manips[1] = (Instantiate(controllerPrefab, controllerRTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
 
-      manips[0].transform.parent.localPosition = Vector3.zero;
-      manips[1].transform.parent.localPosition = Vector3.zero;
+            manips[0].transform.parent.localPosition = Vector3.zero;
+            manips[1].transform.parent.localPosition = Vector3.zero;
 
-      /*if (UnityEngine.XR.XRSettings.loadedDeviceName == "Oculus")*/  oculusSwitch();
+            /*if (UnityEngine.XR.XRSettings.loadedDeviceName == "Oculus")*/
+            oculusSwitch();
 
-      manips[0].SetDeviceIndex(0);
-      manips[0].transform.parent.GetComponentInChildren<OVRControllerHelper>().m_controller = OVRInput.Controller.LTouch;      
-      manips[1].SetDeviceIndex(1);
-      manips[1].transform.parent.GetComponentInChildren<OVRControllerHelper>().m_controller = OVRInput.Controller.RTouch;      
+            manips[0].SetDeviceIndex(0);
+            manips[0].transform.parent.GetComponentInChildren<OVRControllerHelper>().m_controller = OVRInput.Controller.LTouch;
+            manips[1].SetDeviceIndex(1);
+            manips[1].transform.parent.GetComponentInChildren<OVRControllerHelper>().m_controller = OVRInput.Controller.RTouch;
+        }
     }
-  }
 
     void Update()
     {
@@ -81,46 +85,47 @@ public class platformSetup : MonoBehaviour {
         }
     }
 
-    void oculusSwitch() {
-    //manips[0].invertScale(); // this actually makes the controller model L and R handed.
-    manips[0].changeHW("oculus");
-    manips[1].changeHW("oculus");
-  }
-
-
-  //public GameObject targetGameObject; // GameObject to attach the loaded prefab to.
-  public GameObject OVRControllerPrefabL; // GameObject to be disabled.
-  public GameObject OVRControllerPrefabR; // GameObject to be disabled.
-
-  void Start()
-  {
-
-    if (usePersonalizedHands)
+    void oculusSwitch()
     {
-      // Attempt to load the resource
-      GameObject loadedPrefab = Resources.Load("Personalization/" + personalizedHandsPrefabStr) as GameObject;
-
-      // Check if the resource is present
-      if (loadedPrefab != null)
-      {
-        Debug.Log("Personalized hands found.");
-
-        // Instantiate and attach it to the target GameObject
-        Instantiate(loadedPrefab, manips[0].transform);
-        Instantiate(loadedPrefab, manips[1].transform);
-
-        if (OVRControllerPrefabL != null)
-          OVRControllerPrefabL.SetActive(false);          
-        if (OVRControllerPrefabR != null)
-          OVRControllerPrefabR.SetActive(false);
-          
-      }
-      else
-      {
-        Debug.LogWarning("Personalized hands requested but not found. Add your hands prefab to Resources or disable this feature by setting usePersonalizedHands to false.");
-      }
+        //manips[0].invertScale(); // this actually makes the controller model L and R handed.
+        manips[0].changeHW("oculus");
+        manips[1].changeHW("oculus");
     }
 
-  }
+
+    //public GameObject targetGameObject; // GameObject to attach the loaded prefab to.
+    public GameObject OVRControllerPrefabL; // GameObject to be disabled.
+    public GameObject OVRControllerPrefabR; // GameObject to be disabled.
+
+    void Start()
+    {
+
+        if (usePersonalizedHands)
+        {
+            // Attempt to load the resource
+            GameObject loadedPrefab = Resources.Load("Personalization/" + personalizedHandsPrefabStr) as GameObject;
+
+            // Check if the resource is present
+            if (loadedPrefab != null)
+            {
+                Debug.Log("Personalized hands found.");
+
+                // Instantiate and attach it to the target GameObject
+                Instantiate(loadedPrefab, manips[0].transform);
+                Instantiate(loadedPrefab, manips[1].transform);
+
+                if (OVRControllerPrefabL != null)
+                    OVRControllerPrefabL.SetActive(false);
+                if (OVRControllerPrefabR != null)
+                    OVRControllerPrefabR.SetActive(false);
+
+            }
+            else
+            {
+                Debug.LogWarning("Personalized hands requested but not found. Add your hands prefab to Resources or disable this feature by setting usePersonalizedHands to false.");
+            }
+        }
+
+    }
 
 }

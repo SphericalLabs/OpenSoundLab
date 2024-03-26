@@ -58,7 +58,7 @@ public class NetworkSpawnManager : NetworkBehaviour
     }
 
     [Command (requiresAuthority = false)]
-    public void CmdCreatItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, NetworkIdentity player)
+    public void CmdCreatItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, NetworkIdentity player, bool isLeftHand)
     {
         var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
         if (prefab != null)
@@ -72,7 +72,7 @@ public class NetworkSpawnManager : NetworkBehaviour
             Debug.Log($"{player.gameObject} spawned {prefabName}");
             if (player.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
             {
-                networkPlayer.GrabNewObjectByHand(g);
+                networkPlayer.GrabNewObjectByHand(g, isLeftHand);
             }
         }
     }

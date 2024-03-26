@@ -1400,6 +1400,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 82000010023805524, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: spreadCustomCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 82000010023805524, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: panLevelCustomCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 82000010023805524, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: reverbZoneMixCustomCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 114000013472979670, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: items.Array.data[3]
@@ -5898,6 +5913,21 @@ PrefabInstance:
     - target: {fileID: 4000014106015952, guid: 083403f7558b3c14ea83c5b29d4e4f01, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 82000010201573614, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: spreadCustomCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 82000010201573614, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: panLevelCustomCurve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 82000010201573614, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: reverbZoneMixCustomCurve.m_RotationOrder
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}

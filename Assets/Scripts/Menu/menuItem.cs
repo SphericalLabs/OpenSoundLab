@@ -643,7 +643,8 @@ public class menuItem : manipObject
             else
             {
                 Debug.Log("Spawn on client");
-                NetworkSpawnManager.Instance.CmdCreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity);
+                manipulator manip = manipulatorObj.GetComponent<manipulator>();
+                NetworkSpawnManager.Instance.CmdCreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity, manip.isLeftController());
             }
 
         }
