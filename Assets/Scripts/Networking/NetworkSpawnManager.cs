@@ -66,7 +66,7 @@ public class NetworkSpawnManager : NetworkBehaviour
             var g = Instantiate(prefab, position, rotation);
             g.transform.Translate(localPositionOffset, Space.Self);
             g.transform.Rotate(localRotationOffset, Space.Self);
-            NetworkServer.Spawn(g);
+            NetworkServer.Spawn(g, player.connectionToClient);
 
             //todo send local player the info of the prefab and set grabed
             Debug.Log($"{player.gameObject} spawned {prefabName}");

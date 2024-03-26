@@ -125,7 +125,8 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         }
         else
         {
-            if (isOwned)
+            CmdNetworkDestroy();
+            /*if (isOwned)
             {
                 Debug.Log($"Network Destroy on client {gameObject.name}");
                 NetworkServer.Destroy(gameObject);
@@ -133,7 +134,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
             else
             {
                 CmdNetworkDestroy();
-            }
+            }*/
         }
     }
 
@@ -141,8 +142,15 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     public void CmdNetworkDestroy()
     {
         Debug.Log($"Network Destroy {gameObject.name}");
-        NetworkServer.Destroy(gameObject);
+        netIdentity.RemoveClientAuthority();
+        StartCoroutine(WaitDestroyTime());
         //Destroy(gameObject);
+    }
+    IEnumerator WaitDestroyTime()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        NetworkServer.Destroy(gameObject);
     }
 
     [Server]
