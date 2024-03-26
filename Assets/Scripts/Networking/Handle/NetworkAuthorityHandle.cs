@@ -6,7 +6,7 @@ using Mirror;
 public class NetworkAuthorityHandle : NetworkBehaviour
 {
     private handle _handle;
-    public TextMesh debugtextMesh;
+    public TMPro.TMP_Text debugtextMesh;
 
     public virtual void Awake()
     {
@@ -32,12 +32,14 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         base.OnStartAuthority();
         UpdateDebugText();
+        Debug.Log($"Start Authority of {gameObject.name}");
     }
 
     public override void OnStopAuthority()
     {
         base.OnStopAuthority();
         UpdateDebugText();
+        Debug.Log($"Stop Authority of {gameObject.name}");
     }
 
     [Command(requiresAuthority = false)]
@@ -51,7 +53,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void StartAuthorityGrabing()
     {
-        Debug.Log($"Get Authority of {gameObject.name}");
+        Debug.Log($"Start Grab of {gameObject.name}");
         if (!isServer && !authority)
             NetworkMenuManager.Instance.localPlayer.CmdGetObjectAuthority(netIdentity);
         else if (isServer)
@@ -67,8 +69,8 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         this.UpdateDebugText();
 
-        Debug.Log($"Remove Authority of {gameObject.name}");
-        if (authority)
+        Debug.Log($"End Grab of {gameObject.name}");
+        if (!isServer && authority)
             CmdRemoveObjectAuthority();
     }
 

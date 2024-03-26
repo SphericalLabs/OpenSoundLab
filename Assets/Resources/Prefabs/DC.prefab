@@ -438,7 +438,7 @@ MonoBehaviour:
   interpolatePosition: 1
   interpolateRotation: 1
   interpolateScale: 0
-  coordinateSpace: 0
+  coordinateSpace: 1
   sendIntervalMultiplier: 1
   timelineOffset: 0
   showGizmos: 0
@@ -464,7 +464,6 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   debugtextMesh: {fileID: 0}
-  isMovingByClient: 0
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0
