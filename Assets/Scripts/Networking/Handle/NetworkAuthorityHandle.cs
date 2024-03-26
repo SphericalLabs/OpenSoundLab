@@ -8,9 +8,12 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     private handle _handle;
     public TMPro.TMP_Text debugtextMesh;
 
+    private NetworkTransformBase _netTransform;
+
     public virtual void Start()
     {
         UpdateDebugText();
+        _netTransform = GetComponent<NetworkTransformBase>();
         _handle = GetComponentInChildren<handle>();
         if (_handle != null)
         {
@@ -81,8 +84,14 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     public virtual void EndGrabing()
     {
         Debug.Log($"End Grab of {gameObject.name}");
-        if (!isServer)
+        if (!isServer && isOwned)
+        {
+            if (_netTransform != null)
+            {
+                _netTransform.CmdTeleport(transform.position, transform.rotation);
+            }
             CmdRemoveObjectAuthority();
+        }
         this.UpdateDebugText();
     }
 
