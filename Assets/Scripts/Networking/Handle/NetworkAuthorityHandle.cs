@@ -120,7 +120,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         Debug.Log($"Network Destroy {gameObject.name}");
         NetworkServer.Destroy(gameObject);
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 
     [Server]
@@ -128,7 +128,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         Debug.Log($"Network Destroy {gameObject.name}");
         NetworkServer.Destroy(gameObject);
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
     #endregion
 }
