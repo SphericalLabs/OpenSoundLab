@@ -124,10 +124,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  onTrashEvents:
+    m_PersistentCalls:
+      m_Calls: []
   trashReady: 0
   curTrash: {fileID: 0}
 --- !u!1 &1000010702751328
@@ -368,10 +377,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  onTrashEvents:
+    m_PersistentCalls:
+      m_Calls: []
   trashReady: 0
   curTrash: {fileID: 0}
 --- !u!1 &1000011245692720
@@ -547,6 +565,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 1
   defaultPercent: 0
   currentDialColor: 0
@@ -573,6 +597,7 @@ GameObject:
   - component: {fileID: 114000013364750988}
   - component: {fileID: 6948287103393080654}
   - component: {fileID: -7795006367016938658}
+  - component: {fileID: -3973643090797363748}
   m_Layer: 0
   m_Name: Noise
   m_TagString: instrument
@@ -684,6 +709,23 @@ MonoBehaviour:
   rotationSensitivity: 0.01
   positionPrecision: 0.01
   scalePrecision: 0.01
+--- !u!114 &-3973643090797363748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012179911288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f07a6fd47d334f19b03365e6f7df057, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  debugtextMesh: {fileID: 0}
+  isMovingByClient: 0
 --- !u!1 &1000013671002302
 GameObject:
   m_ObjectHideFlags: 0
@@ -1204,6 +1246,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   outgoing: 1
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
@@ -1317,6 +1365,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   vidPlayerPrefab: {fileID: 1964164916261308, guid: 575f0788e444b434ebc8609190335e28,
     type: 3}
   vidContainer: {fileID: 1605634760400874}

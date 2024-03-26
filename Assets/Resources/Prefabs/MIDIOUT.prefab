@@ -387,6 +387,7 @@ GameObject:
   - component: {fileID: 114897832371887926}
   - component: {fileID: -3181408644286012090}
   - component: {fileID: -6892049878142041983}
+  - component: {fileID: 5256678613496522767}
   m_Layer: 9
   m_Name: MIDIOUT
   m_TagString: instrument
@@ -582,6 +583,23 @@ MonoBehaviour:
   rotationSensitivity: 0.01
   positionPrecision: 0.01
   scalePrecision: 0.01
+--- !u!114 &5256678613496522767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199539764712922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f07a6fd47d334f19b03365e6f7df057, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  debugtextMesh: {fileID: 0}
+  isMovingByClient: 0
 --- !u!1 &1202215096489592
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,6 +800,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   targetTransform: {fileID: 0}
   xBounds: {x: -Infinity, y: -0.05}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
@@ -909,6 +933,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 0.5
   xBound: 0.08
   switchVal: 0
@@ -1124,10 +1154,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  onTrashEvents:
+    m_PersistentCalls:
+      m_Calls: []
   trashReady: 0
   curTrash: {fileID: 0}
 --- !u!1 &1283380365270148
@@ -2040,6 +2079,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   targetTransform: {fileID: 0}
   xBounds: {x: -Infinity, y: -0.05}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
@@ -2319,6 +2364,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   vidPlayerPrefab: {fileID: 1964164916261308, guid: 575f0788e444b434ebc8609190335e28,
     type: 3}
   vidContainer: {fileID: 1283380365270148}
@@ -2744,10 +2795,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  onTrashEvents:
+    m_PersistentCalls:
+      m_Calls: []
   trashReady: 0
   curTrash: {fileID: 0}
 --- !u!1 &1976502194521922

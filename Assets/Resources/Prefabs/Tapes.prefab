@@ -126,10 +126,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  onTrashEvents:
+    m_PersistentCalls:
+      m_Calls: []
   trashReady: 0
   curTrash: {fileID: 0}
 --- !u!1 &1000010305206494
@@ -390,10 +399,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  onTrashEvents:
+    m_PersistentCalls:
+      m_Calls: []
   trashReady: 0
   curTrash: {fileID: 0}
 --- !u!1 &1000013426884842
@@ -440,6 +458,7 @@ GameObject:
   - component: {fileID: 82000013040753416}
   - component: {fileID: 826705276682413372}
   - component: {fileID: -2261303870425227436}
+  - component: {fileID: 5396033948670992827}
   m_Layer: 0
   m_Name: Tapes
   m_TagString: instrument
@@ -646,6 +665,23 @@ MonoBehaviour:
   rotationSensitivity: 0.01
   positionPrecision: 0.01
   scalePrecision: 0.01
+--- !u!114 &5396033948670992827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000014101487022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f07a6fd47d334f19b03365e6f7df057, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  debugtextMesh: {fileID: 0}
+  isMovingByClient: 0
 --- !u!1 &1000014119419114
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,6 +995,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   vidPlayerPrefab: {fileID: 1964164916261308, guid: 575f0788e444b434ebc8609190335e28,
     type: 3}
   vidContainer: {fileID: 1126760263637666}
