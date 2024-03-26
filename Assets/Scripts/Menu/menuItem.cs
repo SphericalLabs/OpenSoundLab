@@ -32,6 +32,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -633,8 +634,18 @@ public class menuItem : manipObject
                 localRotationOffset = new Vector3(90, 0, 0);
             }
             //todo send local player id with it
+            if (NetworkManager.singleton.mode == NetworkManagerMode.Host)
+            {
+                Debug.Log("Spawn on host");
+                manipulator manip = manipulatorObj.GetComponent<manipulator>();
+                NetworkSpawnManager.Instance.CreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, manip);
+            }
+            else
+            {
+                Debug.Log("Spawn on client");
+                NetworkSpawnManager.Instance.CmdCreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity);
+            }
 
-            NetworkSpawnManager.Instance.CmdCreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity);
         }
         else {
             GameObject g = Instantiate(itemPrefab, transform.position /*+ new Vector3(-0f, 0f, -0.04f)*/, lookRotation) as GameObject;
