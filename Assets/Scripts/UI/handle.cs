@@ -123,6 +123,29 @@ public class handle : manipObject
         }
     }
 
+    public override void setGrab(bool on, Transform t)
+    {
+        //base.setGrab(on, t);grabbed = on;
+        if (on)
+        {
+            manipulatorObj = t;
+            manipulatorObjScript = t.GetComponent<manipulator>();
+            setState(manipState.grabbed);
+            onStartGrabEvents.Invoke();
+        }
+        else
+        {
+            manipulatorObj = null;
+            manipulatorObjScript = null;
+            if (selected) setState(manipState.selected);
+            else setState(manipState.none);
+            if (!trashReady && !otherHandle.trashReady)
+            {
+                onEndGrabEvents.Invoke();
+            }
+        }
+    }
+
     Vector3 initialOffset;
     Quaternion initialRotationOffset;
 

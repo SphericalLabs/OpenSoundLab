@@ -70,6 +70,10 @@ public class NetworkSpawnManager : NetworkBehaviour
 
             //todo send local player the info of the prefab and set grabed
             Debug.Log($"{player.gameObject} spawned {prefabName}");
+            if (player.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
+            {
+                networkPlayer.GrabNewObjectByHand(g);
+            }
         }
     }
 

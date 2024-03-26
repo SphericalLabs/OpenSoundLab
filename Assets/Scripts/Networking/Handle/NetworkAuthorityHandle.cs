@@ -60,6 +60,14 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         base.OnStopAuthority();
         UpdateDebugText();
         Debug.Log($"Stop Authority of {gameObject.name}");
+        //force release on manipulatorObject
+        foreach (var handle in _handles)
+        {
+            if (handle.curState == manipObject.manipState.grabbed && handle.manipulatorObjScript != null)
+            {
+                handle.manipulatorObjScript.ForceRelease();
+            }
+        }
     }
 
     [Command(requiresAuthority = false)]

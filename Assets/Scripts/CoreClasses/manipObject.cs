@@ -45,8 +45,8 @@ public class manipObject : MonoBehaviour
     public bool stickyGrip = false;
     public bool canBeDeleted = false;
 
-    bool selected = false;
-    bool grabbed = false;
+    protected bool selected = false;
+    protected bool grabbed = false;
 
     public UnityEvent onStartGrabEvents;
     public UnityEvent onEndGrabEvents;

@@ -68,4 +68,19 @@ public class VRNetworkPlayer : NetworkBehaviour
             item.RemoveClientAuthority();
         item.AssignClientAuthority(connectionToClient);
     }
+
+    [Server]
+    public void GrabNewObjectByHand(GameObject obj)
+    {
+        if (obj.TryGetComponent<NetworkIdentity>(out NetworkIdentity item))
+        {
+            RpcGrabNewObjectByHand(connectionToClient, item);
+        }
+    }
+
+    [TargetRpc]
+    public void RpcGrabNewObjectByHand(NetworkConnectionToClient target, NetworkIdentity item)
+    {
+        Debug.Log($"Spawned item with name {item.gameObject} to this player");
+    }
 }
