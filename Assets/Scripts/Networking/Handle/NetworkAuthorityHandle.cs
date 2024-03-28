@@ -56,7 +56,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
 
     public void UpdateDebugText()
     {
-        if (debugtextMesh != null)
+        if (debugtextMesh != null && _netTransform != null)
         {
             Debug.Log($"Update Text {isServer}");
             debugtextMesh.text = (isServer ? "Server: client connection" + connectionToClient : "Client: ") + "\nhas authority: " + isOwned + "\nSync Direction: " + _netTransform.syncDirection;
