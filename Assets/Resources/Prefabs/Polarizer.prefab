@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 1
+  syncDirection: 0
   syncMode: 0
   syncInterval: 0
   target: {fileID: 421762}
@@ -143,6 +143,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   debugtextMesh: {fileID: 0}
+  controlledByClient: 0
 --- !u!1 &1000010291414624
 GameObject:
   m_ObjectHideFlags: 0

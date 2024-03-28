@@ -11,9 +11,11 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     private NetworkTransformBase _netTransform;
     private bool _destroyIsTriggerd;
 
+    [SyncVar(hook = nameof(OnControlledByClient))]
+    public bool controlledByClient = false;
+
     public virtual void Start()
     {
-        UpdateDebugText();
         _netTransform = GetComponent<NetworkTransformBase>();
         _handles = GetComponentsInChildren<handle>();
         if (_handles != null && _handles.Length > 0)
@@ -37,6 +39,19 @@ public class NetworkAuthorityHandle : NetworkBehaviour
                 handle.onEndGrabEvents.AddListener(EndGrabing);
             }
         }
+        UpdateDebugText();
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdOnControlledByClient(bool b)
+    {
+        controlledByClient = b;
+        UpdateDebugText();
+    }
+
+    public void OnControlledByClient(bool old, bool newBool)
+    {
+        _netTransform.syncDirection = controlledByClient ? SyncDirection.ClientToServer : SyncDirection.ServerToClient;
     }
 
     public void UpdateDebugText()
@@ -44,7 +59,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         if (debugtextMesh != null)
         {
             Debug.Log($"Update Text {isServer}");
-            debugtextMesh.text = (isServer ? "Server: client connection" + connectionToClient : "Client: ") + "\nhas authority: " + isOwned;
+            debugtextMesh.text = (isServer ? "Server: client connection" + connectionToClient : "Client: ") + "\nhas authority: " + isOwned + "\nSync Direction: " + _netTransform.syncDirection;
         }
     }
 
@@ -53,6 +68,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         base.OnStartAuthority();
         UpdateDebugText();
         Debug.Log($"Start Authority of {gameObject.name}");
+        CmdOnControlledByClient(true);
     }
 
     public override void OnStopAuthority()
@@ -87,6 +103,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         else if (isServer)
         {
             netIdentity.RemoveClientAuthority();
+            controlledByClient = false;
         }
 
         UpdateDebugText();
@@ -102,9 +119,10 @@ public class NetworkAuthorityHandle : NetworkBehaviour
             {
                 _netTransform.CmdTeleport(transform.position, transform.rotation);
             }
+            CmdOnControlledByClient(false);
             CmdRemoveObjectAuthority();
         }
-        this.UpdateDebugText();
+        UpdateDebugText();
     }
 
     #endregion
