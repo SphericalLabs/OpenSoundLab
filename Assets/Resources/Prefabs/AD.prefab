@@ -201,6 +201,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,6 +336,7 @@ GameObject:
   - component: {fileID: 2784505346093719039}
   - component: {fileID: -8377651455752395044}
   - component: {fileID: 1434073801687785722}
+  - component: {fileID: 3393416618359231669}
   m_Layer: 0
   m_Name: AD
   m_TagString: instrument
@@ -471,6 +475,26 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   debugtextMesh: {fileID: 2867650565897827143}
+  controlledByClient: 0
+--- !u!114 &3393416618359231669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d53d1a4367f6a94dbb5478e2d0981f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  dials:
+  - {fileID: 11493542}
+  - {fileID: 3606635105746897460}
+  - {fileID: 8577778889699378278}
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0
@@ -1575,6 +1599,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1598251524818806355
 GameObject:
   m_ObjectHideFlags: 0
@@ -1952,6 +1979,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3583066697814510832
 GameObject:
   m_ObjectHideFlags: 0

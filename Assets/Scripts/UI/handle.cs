@@ -106,12 +106,10 @@ public class handle : manipObject
             switch (followType)
             {
                 case FollowType.Follow:
-                    Debug.Log("update grab by follow");
                     masterObj.transform.position = manipulatorObjScript.GrabedFollowPointTransform.position;
                     masterObj.transform.rotation = manipulatorObjScript.GrabedFollowPointTransform.rotation;
                     break;
                 case FollowType.Parenting:
-                    Debug.Log("update grab by parenting");
                     if (masterObj.parent != manipulatorObj.parent)
                     {
                         masterObj.parent = manipulatorObj.parent;

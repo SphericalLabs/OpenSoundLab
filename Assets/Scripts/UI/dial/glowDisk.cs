@@ -43,7 +43,7 @@ public class glowDisk : MonoBehaviour {
 
   bool initialized = false;
 
-  void Start() {
+  void Awake() {
     mesh = GetComponent<MeshFilter>().mesh;
     originalUVs = mesh.uv;
     newUVs = new Vector2[originalUVs.Length];
