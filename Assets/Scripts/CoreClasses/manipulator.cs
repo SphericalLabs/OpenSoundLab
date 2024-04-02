@@ -496,6 +496,7 @@ public class manipulator : MonoBehaviour
 
         if (!isTrackingWorking) return;
 
+        /*
         if (controllerIndex == 0)
         {
             transform.position = OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch);
@@ -506,7 +507,7 @@ public class manipulator : MonoBehaviour
         {
             transform.position = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
             transform.rotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch);
-        }
+        }*/
 
         updateProngs();
 

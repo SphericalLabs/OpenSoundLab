@@ -8,6 +8,7 @@ public class TextFieldKeyboard : MonoBehaviour
 {
     private TMP_InputField inputField;
 
+    public bool repositionKeyboard = false;
     public Transform positonTarget;
     public float distance = 1f;
     public float verticalOffset = -1f;
@@ -24,7 +25,7 @@ public class TextFieldKeyboard : MonoBehaviour
         NonNativeKeyboard.Instance.InputField = inputField;
         NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
 
-        if (positonTarget != null)
+        if (repositionKeyboard && positonTarget != null)
         {
             var offset = positonTarget.forward;
             offset.y = 0f;
