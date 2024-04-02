@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: -8377651455752395044}
   - component: {fileID: 1434073801687785722}
   - component: {fileID: 3393416618359231669}
+  - component: {fileID: 4892668014370762092}
   m_Layer: 0
   m_Name: AD
   m_TagString: instrument
@@ -495,6 +496,26 @@ MonoBehaviour:
   - {fileID: 11493542}
   - {fileID: 3606635105746897460}
   - {fileID: 8577778889699378278}
+--- !u!114 &4892668014370762092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 4489780998428833203}
+  - {fileID: 1023038474674153049}
+  - {fileID: 114000012859573534}
+  - {fileID: 114000012040633690}
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0

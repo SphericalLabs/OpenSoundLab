@@ -7,6 +7,8 @@ public class NetworkSpawnManager : NetworkBehaviour
 {
     public static NetworkSpawnManager Instance;
 
+    public List<omniJack> networkedJacks;
+
     private void Start()
     {
         if (Instance != null)
@@ -16,10 +18,11 @@ public class NetworkSpawnManager : NetworkBehaviour
         else
         {
             Instance = this;
+            networkedJacks = new List<omniJack>();
         }
     }
 
-
+    #region Create Item
     public void CreatItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset)
     {
         var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
@@ -91,4 +94,33 @@ public class NetworkSpawnManager : NetworkBehaviour
             Debug.Log($"Spawned {prefabName}");
         }
     }
+
+    #endregion
+
+    #region Networked Jacks
+    public void AddJack(omniJack omniJack)
+    {
+        if (!networkedJacks.Contains(omniJack))
+        {
+            networkedJacks.Add(omniJack);
+        }
+    }
+    public void RemoveJack(omniJack omniJack)
+    {
+        if (networkedJacks.Contains(omniJack))
+        {
+            networkedJacks.Remove(omniJack);
+        }
+    }
+
+    public omniJack GetJackById(int id)
+    {
+        var target = networkedJacks.Find((x) => x.ID == id);
+        if (target != null)
+        {
+            return target;
+        }
+        return null;
+    }
+    #endregion
 }

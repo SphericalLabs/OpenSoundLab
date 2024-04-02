@@ -7315,6 +7315,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  networkedJacks: []
 --- !u!114 &1995894248
 MonoBehaviour:
   m_ObjectHideFlags: 0
