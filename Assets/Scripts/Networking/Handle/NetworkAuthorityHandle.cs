@@ -97,7 +97,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void StartAuthorityGrabing()
     {
-        Debug.Log($"Start Grab of {gameObject.name}");
+        //Debug.Log($"Start Grab of {gameObject.name}");
         if (!isServer && !authority)
             NetworkMenuManager.Instance.localPlayer.CmdGetObjectAuthority(netIdentity);
         else if (isServer)
@@ -112,7 +112,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void EndGrabing()
     {
-        Debug.Log($"End Grab of {gameObject.name}");
+        //Debug.Log($"End Grab of {gameObject.name}");
         if (!isServer && isOwned)
         {
             if (_netTransform != null)

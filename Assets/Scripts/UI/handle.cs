@@ -361,7 +361,6 @@ public class handle : manipObject
             switch (followType)
             {
                 case FollowType.Follow:
-                    Debug.Log("update grab by follow");
                     manipulatorObjScript.GrabedFollowPointTransform.position = masterObj.transform.position;
                     manipulatorObjScript.GrabedFollowPointTransform.rotation = masterObj.transform.rotation;
                     break;
