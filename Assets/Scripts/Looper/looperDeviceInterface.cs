@@ -161,7 +161,7 @@ public class looperDeviceInterface : deviceInterface {
       if (on) PlayCountdown();
       else {
         playCountdown = false;
-        buttons[0].keyHit(false);
+        buttons[0].keyHit(false, false);
         transcriber.Back();
         transcriber.playing = false;
       }

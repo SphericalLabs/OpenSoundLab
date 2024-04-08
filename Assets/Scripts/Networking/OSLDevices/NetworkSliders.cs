@@ -1,30 +1,30 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 
-public class NetworkDials : NetworkBehaviour
+public class NetworkSliders : NetworkBehaviour
 {
-    public dial[] dials;
+    public sliderNotched[] sliders;
 
-    public readonly SyncList<float> dialValues = new SyncList<float>();
+    public readonly SyncList<float> sliderValues = new SyncList<float>();
 
     public override void OnStartServer()
     {
         base.OnStartServer();
-        foreach (var dial in dials)
+        foreach (var slider in sliders)
         {
-            dialValues.Add(dial.percent);
+            sliderValues.Add(slider.percent);
         }
     }
 
     private void Start()
     {
         //add dials on change callback event
-        for (int i = 0; i < dials.Length; i++)
+        for (int i = 0; i < sliders.Length; i++)
         {
             int index = i;
-            dials[i].onPercentChangedEvent.AddListener(delegate { UpdateDialValue(index); });
+            sliders[i].onPercentChangedEvent.AddListener(delegate { UpdateSliderValue(index); });
         }
     }
 
@@ -32,12 +32,12 @@ public class NetworkDials : NetworkBehaviour
     {
         if (!isServer)
         {
-            dialValues.Callback += OnDialsUpdated;
+            sliderValues.Callback += OnDialsUpdated;
 
             // Process initial SyncList payload
-            for (int i = 0; i < dialValues.Count; i++)
+            for (int i = 0; i < sliderValues.Count; i++)
             {
-                OnDialsUpdated(SyncList<float>.Operation.OP_ADD, i, dials[i].percent, dialValues[i]);
+                OnDialsUpdated(SyncList<float>.Operation.OP_ADD, i, sliders[i].percent, sliderValues[i]);
             }
         }
     }
@@ -47,37 +47,37 @@ public class NetworkDials : NetworkBehaviour
         switch (op)
         {
             case SyncList<float>.Operation.OP_ADD:
-                dials[index].setPercent(newValue);
+                //sliders[index].setPercent(newValue);
                 break;
             case SyncList<float>.Operation.OP_INSERT:
                 break;
             case SyncList<float>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<float>.Operation.OP_SET:
-                dials[index].setPercent(newValue);
+                //sliders[index].setPercent(newValue);
                 break;
             case SyncList<float>.Operation.OP_CLEAR:
                 break;
         }
     }
 
-    public void UpdateDialValue(int index)
+    public void UpdateSliderValue(int index)
     {
-        Debug.Log($"Update dial value of index: {index} to value: {dials[index].percent}");
+        Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
         if (isServer)
         {
-            dialValues[index] = dials[index].percent;
+            sliderValues[index] = sliders[index].percent;
         }
         else
         {
-            CmdUpdateDialValue(index, dials[index].percent);
+            CmdUpdateSliderValue(index, sliders[index].percent);
         }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdUpdateDialValue(int index, float value)
+    public void CmdUpdateSliderValue(int index, float value)
     {
-        dialValues[index] = value;
-        dials[index].setPercent(value);
+        sliderValues[index] = value;
+        //sliders[index].setPercent(value);
     }
 }

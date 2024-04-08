@@ -150,17 +150,7 @@ public class dial : manipObject
         }
     }
 
-
-    public void setPercent(float p, bool sendUpdate)
-    {
-        setPercent(p);
-        if (sendUpdate)
-        {
-            onPercentChangedEvent.Invoke();
-        }
-    }
-
-    public void setPercent(float p)
+    public void setPercent(float p, bool invokeEvent = false)
     {
 
         if (float.IsNaN(p)) return; // this is used for skipping missing data fields in old save xmls
@@ -181,6 +171,11 @@ public class dial : manipObject
         // viz
         dialFeedback.percent = percent * 0.85f; // why that multiplier?
         dialFeedback.PercentUpdate();
+
+        if (invokeEvent)
+        {
+            onPercentChangedEvent.Invoke();
+        }
     }
 
     dialColor newDialColor;

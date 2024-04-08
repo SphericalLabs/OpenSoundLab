@@ -1115,6 +1115,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012869793228
 GameObject:
   m_ObjectHideFlags: 0
@@ -1257,6 +1263,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013101032572
 GameObject:
   m_ObjectHideFlags: 0
@@ -2145,6 +2157,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3974444902285636297
 GameObject:
   m_ObjectHideFlags: 0
@@ -2502,6 +2520,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5091795263407212133
 GameObject:
   m_ObjectHideFlags: 0

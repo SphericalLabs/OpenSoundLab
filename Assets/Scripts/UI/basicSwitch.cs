@@ -34,70 +34,89 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
-public class basicSwitch : manipObject {
-  public Transform onLabel, offLabel;
-  Material[] labelMats;
-  public bool switchVal = false;
-  public Transform switchObject;
-  float rotationIncrement = 45f;
-  public Transform glowTrans;
-  Material mat;
+public class basicSwitch : manipObject
+{
+    public Transform onLabel, offLabel;
+    Material[] labelMats;
+    public bool switchVal = false;
+    public Transform switchObject;
+    float rotationIncrement = 45f;
+    public Transform glowTrans;
+    Material mat;
 
-  public bool redOption = true;
+    public bool redOption = true;
 
-  public override void Awake() {
-    base.Awake();
-    glowTrans.gameObject.SetActive(false);
-    //mat = glowTrans.GetComponent<Renderer>().sharedmaterial;    
-    //mat.SetColor("_TintColor", Color.black);
+    public UnityEvent onSwitchChangedEvent;
 
-    if (onLabel != null && offLabel != null) {
-      labelMats = new Material[2];
-      labelMats[0] = onLabel.GetComponent<Renderer>().material;
-      labelMats[1] = offLabel.GetComponent<Renderer>().material;
+    public override void Awake()
+    {
+        base.Awake();
+        glowTrans.gameObject.SetActive(false);
+        //mat = glowTrans.GetComponent<Renderer>().sharedmaterial;    
+        //mat.SetColor("_TintColor", Color.black);
 
-      labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, 0f, 1f));
-      labelMats[0].SetFloat("_EmissionGain", .0f);
+        if (onLabel != null && offLabel != null)
+        {
+            labelMats = new Material[2];
+            labelMats[0] = onLabel.GetComponent<Renderer>().material;
+            labelMats[1] = offLabel.GetComponent<Renderer>().material;
 
-      labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, 0f, 1f));
-      labelMats[1].SetFloat("_EmissionGain", .0f);
+            labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, 0f, 1f));
+            labelMats[0].SetFloat("_EmissionGain", .0f);
+
+            labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, 0f, 1f));
+            labelMats[1].SetFloat("_EmissionGain", .0f);
+        }
+
+        setSwitch(switchVal, true);
     }
 
-    setSwitch(switchVal, true);
-  }
+    public void setSwitch(bool on, bool forced = false, bool invokeEvent = false)
+    {
+        if (switchVal == on && !forced) return;
+        if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(1000);
+        switchVal = on;
+        float rot = rotationIncrement * (switchVal ? 1 : -1);
+        switchObject.localRotation = Quaternion.Euler(rot, 0, 0);
 
-  public void setSwitch(bool on, bool forced = false) {
-    if (switchVal == on && !forced) return;
-    if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(1000);
-    switchVal = on;
-    float rot = rotationIncrement * (switchVal ? 1 : -1);
-    switchObject.localRotation = Quaternion.Euler(rot, 0, 0);
-    
-    //if (onLabel != null && offLabel != null) {
-    //  labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, on ? .9f : .1f));
-    //  labelMats[0].SetFloat("_EmissionGain", on ? .0f : .0f);
+        //if (onLabel != null && offLabel != null) {
+        //  labelMats[0].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, on ? .9f : .1f));
+        //  labelMats[0].SetFloat("_EmissionGain", on ? .0f : .0f);
 
-    //  labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, .7f, !on ? .9f : .1f));
-    //  labelMats[1].SetFloat("_EmissionGain", !on ? .0f : .0f);
-    //}
-  }
+        //  labelMats[1].SetColor("_TintColor", Color.HSVToRGB(redOption ? 0 : .4f, .7f, !on ? .9f : .1f));
+        //  labelMats[1].SetFloat("_EmissionGain", !on ? .0f : .0f);
+        //}
 
-  public override void grabUpdate(Transform t) {
-    float curY = transform.InverseTransformPoint(manipulatorObj.position).z - offset;
-    if (Mathf.Abs(curY) > 0.01f) setSwitch(curY > 0);
-  }
-
-  float offset;
-  public override void setState(manipState state) {
-    curState = state;
-    if (curState == manipState.none) {
-      glowTrans.gameObject.SetActive(false);
-    } else if (curState == manipState.selected) {
-      glowTrans.gameObject.SetActive(true);
-    } else if (curState == manipState.grabbed) {
-      glowTrans.gameObject.SetActive(true);
-      offset = transform.InverseTransformPoint(manipulatorObj.position).z;
+        if (invokeEvent)
+        {
+            onSwitchChangedEvent.Invoke();
+        }
     }
-  }
+
+    public override void grabUpdate(Transform t)
+    {
+        float curY = transform.InverseTransformPoint(manipulatorObj.position).z - offset;
+        if (Mathf.Abs(curY) > 0.01f) setSwitch(curY > 0, false, true);
+    }
+
+    float offset;
+    public override void setState(manipState state)
+    {
+        curState = state;
+        if (curState == manipState.none)
+        {
+            glowTrans.gameObject.SetActive(false);
+        }
+        else if (curState == manipState.selected)
+        {
+            glowTrans.gameObject.SetActive(true);
+        }
+        else if (curState == manipState.grabbed)
+        {
+            glowTrans.gameObject.SetActive(true);
+            offset = transform.InverseTransformPoint(manipulatorObj.position).z;
+        }
+    }
 }

@@ -153,12 +153,13 @@ public class NetworkJacks : NetworkBehaviour
     {
         if (otherId == 0)
         {
-            if (omniJacks[index].near != null)
+            if (omniJacks[index].near != null && omniJacks[index].far != null)
             {
+                if (omniJacks[index].near.curState == manipObject.manipState.grabbed || omniJacks[index].far.curState == manipObject.manipState.grabbed)
+                {
+                    return;
+                }
                 Destroy(omniJacks[index].near.gameObject);
-            }
-            if (omniJacks[index].far != null)
-            {
                 Destroy(omniJacks[index].far.gameObject);
             }
             omniJacks[index].endConnection(false);

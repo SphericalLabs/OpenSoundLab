@@ -616,6 +616,9 @@ MonoBehaviour:
   switchObject: {fileID: 4000010521766414}
   glowTrans: {fileID: 4000013445980962}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135000010814957214
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1328,6 +1331,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000011388037958
 GameObject:
   m_ObjectHideFlags: 0
@@ -1577,6 +1586,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000011815553810
 GameObject:
   m_ObjectHideFlags: 0
@@ -2075,6 +2090,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012272548330
 GameObject:
   m_ObjectHideFlags: 0
@@ -2477,6 +2498,9 @@ MonoBehaviour:
   labelsPresent: 1
   labelObjects: []
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012805973394
 GameObject:
   m_ObjectHideFlags: 0
@@ -3144,6 +3168,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013495723170
 GameObject:
   m_ObjectHideFlags: 0
@@ -3589,6 +3616,10 @@ GameObject:
   - component: {fileID: -7835924945731690378}
   - component: {fileID: 6075808030107566551}
   - component: {fileID: -3747631031286742675}
+  - component: {fileID: 8247759790419016157}
+  - component: {fileID: 3268999890355147956}
+  - component: {fileID: 3441120879253779692}
+  - component: {fileID: 7092770143146360708}
   m_Layer: 9
   m_Name: Oscillator
   m_TagString: instrument
@@ -3769,6 +3800,80 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 3169653997698570821}
   controlledByClient: 0
+--- !u!114 &8247759790419016157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000014108096392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114000013994899878}
+  - {fileID: 114000011640955404}
+  - {fileID: 911366409592356726}
+  - {fileID: 114000012454262826}
+  - {fileID: 6296272824242415757}
+  - {fileID: 2055977446810749061}
+--- !u!114 &3268999890355147956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000014108096392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d53d1a4367f6a94dbb5478e2d0981f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  dials:
+  - {fileID: 114000013827922008}
+  - {fileID: 114000013240102536}
+--- !u!114 &3441120879253779692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000014108096392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2652fb293a2d2b546a2bf994e25007a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  sliders:
+  - {fileID: 5864582847930563685}
+--- !u!114 &7092770143146360708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000014108096392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38783740befed9b4ead5b3b54a968b09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  switchs:
+  - {fileID: 114000011071982876}
 --- !u!1 &1000014130592554
 GameObject:
   m_ObjectHideFlags: 0
@@ -3947,6 +4052,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1436940005579262
 GameObject:
   m_ObjectHideFlags: 0
@@ -4541,6 +4649,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3947334849638787039
 GameObject:
   m_ObjectHideFlags: 0
@@ -5324,6 +5438,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &6920482911414255422
 GameObject:
   m_ObjectHideFlags: 0
@@ -5501,6 +5621,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8806253264645821974
 GameObject:
   m_ObjectHideFlags: 0

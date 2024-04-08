@@ -201,6 +201,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,6 +336,9 @@ GameObject:
   - component: {fileID: -5285906837041996311}
   - component: {fileID: 5548897254976487421}
   - component: {fileID: 4989059878197584975}
+  - component: {fileID: 6779117078275724614}
+  - component: {fileID: 8797831437359523207}
+  - component: {fileID: 6446156164780786039}
   m_Layer: 0
   m_Name: Delay
   m_TagString: instrument
@@ -485,6 +491,65 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 4664659549217751971}
   controlledByClient: 0
+--- !u!114 &6779117078275724614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114000012859573534}
+  - {fileID: 114000012040633690}
+  - {fileID: 7382565002978976597}
+  - {fileID: 2810740477773686349}
+  - {fileID: 6518975777099845550}
+  - {fileID: 6030985900164152747}
+--- !u!114 &8797831437359523207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d53d1a4367f6a94dbb5478e2d0981f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  dials:
+  - {fileID: 11493542}
+  - {fileID: 4452449050945597988}
+  - {fileID: 3606635105746897460}
+  - {fileID: 7521646718397647436}
+--- !u!114 &6446156164780786039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 6636227210291650402}
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,6 +1149,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012869793228
 GameObject:
   m_ObjectHideFlags: 0
@@ -1226,6 +1297,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013101032572
 GameObject:
   m_ObjectHideFlags: 0
@@ -1501,6 +1578,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &454934336691462055
 GameObject:
   m_ObjectHideFlags: 0
@@ -2057,6 +2137,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2416762181299732101
 GameObject:
   m_ObjectHideFlags: 0
@@ -3305,6 +3388,9 @@ MonoBehaviour:
   isNotched: 1
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2777184327606219814
 GameObject:
   m_ObjectHideFlags: 0
@@ -3696,6 +3782,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3606959721698394622
 GameObject:
   m_ObjectHideFlags: 0
@@ -4462,6 +4554,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4613558777773001520
 GameObject:
   m_ObjectHideFlags: 0
@@ -5096,6 +5194,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &5742712347249619496
 GameObject:
@@ -5442,6 +5543,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7217309753971637426
 GameObject:
   m_ObjectHideFlags: 0
@@ -6387,6 +6494,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8775240965028762475
 GameObject:
   m_ObjectHideFlags: 0
