@@ -69,6 +69,14 @@ public class NetworkJacks : NetworkBehaviour
         switch (op)
         {
             case SyncList<int>.Operation.OP_ADD:
+                if (omniJacks[index].far != null && omniJacks[index].far.connected != null && omniJacks[index].far.connected.ID == newValue)
+                {
+                    Debug.Log($"Jack of id {omniJacks[index].ID} is already connected with jack of id {newValue} on this client");
+                }
+                else
+                {
+                    ManagePlugConnection(index, newValue);
+                }
                 break;
             case SyncList<int>.Operation.OP_INSERT:
                 break;
@@ -81,7 +89,6 @@ public class NetworkJacks : NetworkBehaviour
                 }
                 else if (oldValue != newValue)
                 {
-                    //create plug connection
                     ManagePlugConnection(index, newValue);
                 }
                 break;

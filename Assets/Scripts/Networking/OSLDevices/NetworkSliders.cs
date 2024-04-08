@@ -47,14 +47,14 @@ public class NetworkSliders : NetworkBehaviour
         switch (op)
         {
             case SyncList<float>.Operation.OP_ADD:
-                //sliders[index].setPercent(newValue);
+                sliders[index].setValByPercent(newValue);
                 break;
             case SyncList<float>.Operation.OP_INSERT:
                 break;
             case SyncList<float>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<float>.Operation.OP_SET:
-                //sliders[index].setPercent(newValue);
+                sliders[index].setValByPercent(newValue);
                 break;
             case SyncList<float>.Operation.OP_CLEAR:
                 break;
@@ -78,6 +78,6 @@ public class NetworkSliders : NetworkBehaviour
     public void CmdUpdateSliderValue(int index, float value)
     {
         sliderValues[index] = value;
-        //sliders[index].setPercent(value);
+        sliders[index].setValByPercent(value);
     }
 }
