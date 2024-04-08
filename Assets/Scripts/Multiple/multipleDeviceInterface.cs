@@ -72,7 +72,7 @@ public class multipleDeviceInterface : deviceInterface
         symbolB.sharedMaterial = mixerMaterial;
 
         CreateInactiveNodes();
-        stretchSlider.onPosSetEvent.AddListener(delegate { updateSplitterCount(false); });
+        stretchSlider.onPosSetEvent.AddListener(CalculateSpliterCount);
 
         float xVal = stretchSlider.transform.localPosition.x;
 
@@ -113,7 +113,15 @@ public class multipleDeviceInterface : deviceInterface
         }
     }
 
-    public void updateSplitterCount(bool updateByGrab = false)
+    public void CalculateSpliterCount()
+    {
+        float xVal = stretchSlider.transform.localPosition.x;
+
+        count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
+        updateSplitterCount();
+    }
+
+    void updateSplitterCount(bool updateByGrab = false)
     {
         /*
         int cur = signal.nodes.Count;
