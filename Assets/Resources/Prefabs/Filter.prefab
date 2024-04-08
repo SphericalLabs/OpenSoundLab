@@ -225,6 +225,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000010636603940
 GameObject:
   m_ObjectHideFlags: 0
@@ -239,6 +245,8 @@ GameObject:
   - component: {fileID: 8313248359537249113}
   - component: {fileID: -6710731021320180726}
   - component: {fileID: -1486002584682292150}
+  - component: {fileID: 1405451700906028734}
+  - component: {fileID: 5712696232713983370}
   m_Layer: 0
   m_Name: Filter
   m_TagString: instrument
@@ -383,6 +391,45 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &1405451700906028734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000010636603940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114997626691167684}
+  - {fileID: 114000014136486758}
+  - {fileID: 114000011130701930}
+--- !u!114 &5712696232713983370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000010636603940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d53d1a4367f6a94dbb5478e2d0981f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  dials:
+  - {fileID: 3603450660231366613}
+  - {fileID: 9151993444879296290}
+  - {fileID: 7225363069823110471}
+  - {fileID: 7947673056770506069}
 --- !u!1 &1000010757114696
 GameObject:
   m_ObjectHideFlags: 0
@@ -1222,6 +1269,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1101021866177444
 GameObject:
   m_ObjectHideFlags: 0
@@ -1710,6 +1763,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &11150229186375478
 GameObject:
   m_ObjectHideFlags: 0
@@ -1888,6 +1947,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &646129951174984302
 GameObject:
   m_ObjectHideFlags: 0
@@ -2066,6 +2128,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2251638775376113915
 GameObject:
   m_ObjectHideFlags: 0
@@ -2544,6 +2609,9 @@ MonoBehaviour:
   isNotched: 1
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3254699730181108768
 GameObject:
   m_ObjectHideFlags: 0
@@ -2639,6 +2707,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3601203309325798146
 GameObject:
   m_ObjectHideFlags: 0

@@ -152,6 +152,26 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 5712696232713983370, guid: 11497bfa83404514ab18c74a47322441,
+        type: 3}
+      propertyPath: dials.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712696232713983370, guid: 11497bfa83404514ab18c74a47322441,
+        type: 3}
+      propertyPath: dials.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712696232713983370, guid: 11497bfa83404514ab18c74a47322441,
+        type: 3}
+      propertyPath: dials.Array.data[2]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712696232713983370, guid: 11497bfa83404514ab18c74a47322441,
+        type: 3}
+      propertyPath: dials.Array.data[3]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6679453104658626120, guid: 11497bfa83404514ab18c74a47322441,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -215,6 +235,8 @@ PrefabInstance:
     - {fileID: 7310926286175460580, guid: 11497bfa83404514ab18c74a47322441, type: 3}
     - {fileID: 5022745102061342910, guid: 11497bfa83404514ab18c74a47322441, type: 3}
     - {fileID: -1486002584682292150, guid: 11497bfa83404514ab18c74a47322441, type: 3}
+    - {fileID: 1405451700906028734, guid: 11497bfa83404514ab18c74a47322441, type: 3}
+    - {fileID: 5712696232713983370, guid: 11497bfa83404514ab18c74a47322441, type: 3}
     m_RemovedGameObjects:
     - {fileID: 6824388151668508129, guid: 11497bfa83404514ab18c74a47322441, type: 3}
     - {fileID: 3093534547005628417, guid: 11497bfa83404514ab18c74a47322441, type: 3}

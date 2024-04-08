@@ -54,7 +54,10 @@ public class NetworkSliders : NetworkBehaviour
             case SyncList<float>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<float>.Operation.OP_SET:
-                sliders[index].setValByPercent(newValue);
+                if (sliders[index].curState != manipObject.manipState.grabbed)
+                {
+                    sliders[index].setValByPercent(newValue);
+                }
                 break;
             case SyncList<float>.Operation.OP_CLEAR:
                 break;

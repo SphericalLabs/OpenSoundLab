@@ -2,9 +2,6 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Rendering.CameraUI;
-using UnityEngine.Windows;
-using Unity.Collections.LowLevel.Unsafe;
 
 
 public class NetworkJacks : NetworkBehaviour

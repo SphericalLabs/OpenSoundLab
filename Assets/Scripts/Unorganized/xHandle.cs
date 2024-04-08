@@ -34,69 +34,88 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
-public class xHandle : manipObject {
+public class xHandle : manipObject
+{
 
-  Material mat;
-  public Vector2 xBounds = new Vector2(-Mathf.Infinity, Mathf.Infinity);
+    Material mat;
+    public Vector2 xBounds = new Vector2(-Mathf.Infinity, Mathf.Infinity);
 
-  public Material onMat;
-  public Renderer rend;
-  Material offMat;
-  Material glowMat;
+    public Material onMat;
+    public Renderer rend;
+    Material offMat;
+    Material glowMat;
 
-  public bool invisibleMesh = false;
+    public bool invisibleMesh = false;
 
-  Color glowColor = Color.HSVToRGB(.55f, .8f, .3f);
+    Color glowColor = Color.HSVToRGB(.55f, .8f, .3f);
 
-  public override void Awake() {
-    base.Awake();
-    if (rend == null) rend = GetComponent<Renderer>();
-    offMat = rend.material;
-    glowMat = new Material(onMat);
-    glowMat.SetFloat("_EmissionGain", .5f);
-    glowMat.SetColor("_TintColor", glowColor);
+    public UnityEvent onHandleChangedEvent;
+    public UnityEvent onPosSetEvent;
 
-    if (invisibleMesh) rend.enabled = false;
-  }
+    public override void Awake()
+    {
+        base.Awake();
+        if (rend == null) rend = GetComponent<Renderer>();
+        offMat = rend.material;
+        glowMat = new Material(onMat);
+        glowMat.SetFloat("_EmissionGain", .5f);
+        glowMat.SetColor("_TintColor", glowColor);
 
-  public void pulse() {
-    if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(750);
-  }
-
-  public override void grabUpdate(Transform t) {
-    Vector3 p = transform.localPosition;
-    p.x = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset, xBounds.x, xBounds.y);
-    transform.localPosition = p;
-  }
-
-  public void updatePos(float pos) {
-    Vector3 p = transform.localPosition;
-    p.x = Mathf.Clamp(pos, xBounds.x, xBounds.y);
-
-    transform.localPosition = p;
-  }
-
-  public void recalcOffset() {
-    offset = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
-  }
-
-  float offset = 0;
-
-  public override void setState(manipState state) {
-    curState = state;
-    if (curState == manipState.none) {
-      if (!invisibleMesh) rend.material = offMat;
-      else rend.enabled = false;
-    } else if (curState == manipState.selected) {
-      rend.material = glowMat;
-      glowMat.SetFloat("_EmissionGain", .4f);
-      if (invisibleMesh) rend.enabled = true;
-    } else if (curState == manipState.grabbed) {
-      rend.material = glowMat;
-      glowMat.SetFloat("_EmissionGain", .6f);
-      offset = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
-      if (invisibleMesh) rend.enabled = true;
+        if (invisibleMesh) rend.enabled = false;
     }
-  }
+
+    public void pulse()
+    {
+        if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(750);
+    }
+
+    public override void grabUpdate(Transform t)
+    {
+        Vector3 p = transform.localPosition;
+        p.x = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset, xBounds.x, xBounds.y);
+        transform.localPosition = p;
+
+        onHandleChangedEvent.Invoke();
+    }
+
+    public void updatePos(float pos)
+    {
+        Vector3 p = transform.localPosition;
+        p.x = Mathf.Clamp(pos, xBounds.x, xBounds.y);
+
+        transform.localPosition = p;
+        onPosSetEvent.Invoke();
+    }
+
+    public void recalcOffset()
+    {
+        offset = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
+    }
+
+    float offset = 0;
+
+    public override void setState(manipState state)
+    {
+        curState = state;
+        if (curState == manipState.none)
+        {
+            if (!invisibleMesh) rend.material = offMat;
+            else rend.enabled = false;
+        }
+        else if (curState == manipState.selected)
+        {
+            rend.material = glowMat;
+            glowMat.SetFloat("_EmissionGain", .4f);
+            if (invisibleMesh) rend.enabled = true;
+        }
+        else if (curState == manipState.grabbed)
+        {
+            rend.material = glowMat;
+            glowMat.SetFloat("_EmissionGain", .6f);
+            offset = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
+            if (invisibleMesh) rend.enabled = true;
+        }
+    }
 }

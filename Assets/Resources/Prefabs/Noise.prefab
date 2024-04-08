@@ -586,6 +586,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012179911288
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,6 +603,8 @@ GameObject:
   - component: {fileID: 6948287103393080654}
   - component: {fileID: -7795006367016938658}
   - component: {fileID: -3973643090797363748}
+  - component: {fileID: 4168567202581597113}
+  - component: {fileID: 5589605367902422806}
   m_Layer: 0
   m_Name: Noise
   m_TagString: instrument
@@ -729,6 +734,40 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &4168567202581597113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012179911288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d53d1a4367f6a94dbb5478e2d0981f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  dials:
+  - {fileID: 114000010708388580}
+--- !u!114 &5589605367902422806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012179911288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114000011938180816}
 --- !u!1 &1000013671002302
 GameObject:
   m_ObjectHideFlags: 0
@@ -1265,6 +1304,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1285130709973182
 GameObject:
   m_ObjectHideFlags: 0

@@ -280,11 +280,7 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4735041571944196227}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1000012113822842, guid: a6a4b533b4e8ef844832896a3c1eac5c,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6357920332695727026}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
 --- !u!4 &145933019782995678 stripped
 Transform:
@@ -292,27 +288,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 146438128800475126}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &147437030646309772 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1000012113822842, guid: a6a4b533b4e8ef844832896a3c1eac5c,
-    type: 3}
-  m_PrefabInstance: {fileID: 146438128800475126}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6357920332695727026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 147437030646309772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe79d4638693f4147b324edb596c8231, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targets:
-  - {fileID: 7698057034794219674}
-  newMaterial: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
 --- !u!1001 &2764878919742276439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1249,12 +1224,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee63b3cfcbc5e8d44b6318ca7ecd09b8, type: 3}
---- !u!1 &7698057034794219674 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1000013574761334, guid: ee63b3cfcbc5e8d44b6318ca7ecd09b8,
-    type: 3}
-  m_PrefabInstance: {fileID: 7698749182646932460}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7699262465090795740 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4000010119408432, guid: ee63b3cfcbc5e8d44b6318ca7ecd09b8,

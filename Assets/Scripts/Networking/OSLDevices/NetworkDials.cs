@@ -54,7 +54,10 @@ public class NetworkDials : NetworkBehaviour
             case SyncList<float>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<float>.Operation.OP_SET:
-                dials[index].setPercent(newValue);
+                if (dials[index].curState != manipObject.manipState.grabbed)
+                {
+                    dials[index].setPercent(newValue);
+                }
                 break;
             case SyncList<float>.Operation.OP_CLEAR:
                 break;

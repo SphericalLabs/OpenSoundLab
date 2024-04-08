@@ -172,6 +172,10 @@ public class omniPlug : manipObject
         if (otherPlug == null)
         {
             if (lr) lr.positionCount = 0;
+            if (connected != null)
+            {
+                endConnection();
+            }
             Destroy(gameObject);
             return;
         }
