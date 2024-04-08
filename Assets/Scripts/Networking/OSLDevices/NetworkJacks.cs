@@ -171,9 +171,9 @@ public class NetworkJacks : NetworkBehaviour
             {
                 //create plugs
                 omniPlug o1 = (Instantiate(omniJack.plugPrefab, omniJack.transform.position, omniJack.transform.rotation) as GameObject).GetComponent<omniPlug>();
-                o1.outputPlug = false;
+                o1.outputPlug = !omniJack.outgoing;
                 omniPlug o2 = (Instantiate(otherJack.plugPrefab, otherJack.transform.position, otherJack.transform.rotation) as GameObject).GetComponent<omniPlug>();
-                o2.outputPlug = true;
+                o2.outputPlug = !otherJack.outgoing;
                 Vector3[] tempPath = new Vector3[] {
                     omniJack.transform.position,
                     otherJack.transform.position
