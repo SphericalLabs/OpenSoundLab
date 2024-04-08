@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static UnityEditor.Rendering.CameraUI;
 using UnityEngine.Windows;
+using Unity.Collections.LowLevel.Unsafe;
 
 
 public class NetworkJacks : NetworkBehaviour
@@ -129,10 +130,22 @@ public class NetworkJacks : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdUpdateJackConnection(int index, int otherId)
     {
-        connectedJackIds[index] = otherId;
-        Debug.Log($"On server update jack connection of id {omniJacks[index].ID} to {otherId}");
-        
-        ManagePlugConnection(index, otherId);
+        if (connectedJackIds[index] != otherId)
+        {
+            connectedJackIds[index] = otherId;
+            Debug.Log($"On server update jack connection of id {omniJacks[index].ID} to {otherId}");
+            //ManagePlugConnection(index, otherId);
+
+            if (omniJacks[index].far != null && omniJacks[index].far.connected != null && omniJacks[index].far.connected.ID == otherId)
+            {
+                Debug.Log($"Jack of id {omniJacks[index].ID} is already connected with jack of id {otherId} on this client");
+            }
+            else
+            {
+                //create plug connection
+                ManagePlugConnection(index, otherId);
+            }
+        }
     }
 
     //create jack plugs
