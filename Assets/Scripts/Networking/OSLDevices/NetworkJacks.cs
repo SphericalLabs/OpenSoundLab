@@ -153,6 +153,14 @@ public class NetworkJacks : NetworkBehaviour
     {
         if (otherId == 0)
         {
+            if (omniJacks[index].near != null)
+            {
+                Destroy(omniJacks[index].near.gameObject);
+            }
+            if (omniJacks[index].far != null)
+            {
+                Destroy(omniJacks[index].far.gameObject);
+            }
             omniJacks[index].endConnection(false);
         }
         else
@@ -161,30 +169,7 @@ public class NetworkJacks : NetworkBehaviour
             var otherJack = NetworkSpawnManager.Instance.GetJackById(otherId);
             if (otherJack != null)
             {
-                //instantiate two plugs
-                /*
-                GameObject firstPlugObj = Instantiate(omniJack.plugPrefab, omniJack.transform.position, omniJack.transform.rotation) as GameObject;
-                var firstPlug = firstPlugObj.GetComponent<omniPlug>();
-                omniJack.near = firstPlug;
-                otherJack.near = firstPlug;
-                firstPlug.transform.localScale = transform.localScale;
-                firstPlug.transform.parent = omniJack.transform;
-                firstPlug.transform.localPosition = new Vector3(0, -.0175f, 0);
-                firstPlug.transform.localRotation = Quaternion.Euler(-90, 0, 0);
-                firstPlug.connected = omniJack;
-                firstPlug.signal = omniJack.signal;
-
-
-                GameObject secondPlugObj = Instantiate(otherJack.plugPrefab, otherJack.transform.position, otherJack.transform.rotation) as GameObject;
-                var secondPlug = otherJack.GetComponent<omniPlug>();
-                omniJack.far = secondPlug;
-                otherJack.near = secondPlug;
-
-                secondPlug.Activate(firstPlug, otherJack, new Vector3[], Color.white);
-                */
-                //far.Setup(jackTargetHue, outgoing, near);
-                //near.Setup(jackTargetHue, !outgoing, far);
-
+                //create plugs
                 omniPlug o1 = (Instantiate(omniJack.plugPrefab, omniJack.transform.position, omniJack.transform.rotation) as GameObject).GetComponent<omniPlug>();
                 o1.outputPlug = false;
                 omniPlug o2 = (Instantiate(otherJack.plugPrefab, otherJack.transform.position, otherJack.transform.rotation) as GameObject).GetComponent<omniPlug>();
