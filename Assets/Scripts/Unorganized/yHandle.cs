@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class yHandle : manipObject {
 
@@ -49,7 +50,11 @@ public class yHandle : manipObject {
 
   Color glowColor = Color.HSVToRGB(.55f, .8f, .3f);
 
-  public override void Awake() {
+
+    public UnityEvent onHandleChangedEvent;
+    public UnityEvent onPosSetEvent;
+
+    public override void Awake() {
     base.Awake();
     if (targetTransform == null) targetTransform = transform;
     rend = GetComponent<Renderer>();
@@ -67,15 +72,19 @@ public class yHandle : manipObject {
     Vector3 p = targetTransform.localPosition;
     p.y = Mathf.Clamp(targetTransform.parent.InverseTransformPoint(manipulatorObj.position).y + offset, xBounds.x, xBounds.y);
     targetTransform.localPosition = p;
-  }
 
-  public void updatePos(float pos) {
-    Vector3 p = targetTransform.localPosition;
-    p.y = Mathf.Clamp(pos, xBounds.x, xBounds.y);
-    targetTransform.localPosition = p;
-  }
+        onHandleChangedEvent.Invoke();
+    }
 
-  float offset = 0;
+    public void updatePos(float pos) {
+        Vector3 p = targetTransform.localPosition;
+        p.y = Mathf.Clamp(pos, xBounds.x, xBounds.y);
+        targetTransform.localPosition = p;
+
+        onPosSetEvent.Invoke();
+    }
+
+    float offset = 0;
 
   public override void setState(manipState state) {
     curState = state;

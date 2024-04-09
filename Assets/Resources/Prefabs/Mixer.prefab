@@ -114,11 +114,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!65 &65000013412099636
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -419,11 +419,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!65 &65000013834355196
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -459,6 +459,8 @@ GameObject:
   - component: {fileID: -676961171566042570}
   - component: {fileID: -8358209413635134523}
   - component: {fileID: -4318158881619070310}
+  - component: {fileID: 1244200740706594178}
+  - component: {fileID: 37741646473603999}
   m_Layer: 0
   m_Name: Mixer
   m_TagString: instrument
@@ -594,6 +596,41 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &1244200740706594178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012803914034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114000013490094934}
+--- !u!114 &37741646473603999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012803914034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12927abaed8c3294b97dac9508297db5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  xHandles:
+  - {fileID: 114224196866840162}
+  - {fileID: 114000014187606012}
 --- !u!1 &1000013633280040
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,6 +855,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000014226122104
 GameObject:
   m_ObjectHideFlags: 0
@@ -1161,6 +1204,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65848476478658480
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1400,6 +1449,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 23494190631701188}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1774123997022070
 GameObject:
   m_ObjectHideFlags: 0

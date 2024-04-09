@@ -772,6 +772,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1034902458334150
 GameObject:
@@ -1116,6 +1119,9 @@ MonoBehaviour:
   switchObject: {fileID: 4947689973235666}
   glowTrans: {fileID: 4783148915981826}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135261576754002730
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1296,6 +1302,9 @@ MonoBehaviour:
   - {fileID: 1391079361543108}
   - {fileID: 1183952916379102}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65092538229648458
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1454,6 +1463,12 @@ MonoBehaviour:
   onMat: {fileID: 0}
   usePercent: 1
   _interface: {fileID: 0}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1072399284318054
 GameObject:
   m_ObjectHideFlags: 0
@@ -2927,6 +2942,9 @@ MonoBehaviour:
   - {fileID: 1003363106491904}
   - {fileID: 1838388767867208}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65047887196196704
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3779,6 +3797,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1162785656747682
 GameObject:
@@ -4201,6 +4222,12 @@ MonoBehaviour:
   onMat: {fileID: 0}
   usePercent: 1
   _interface: {fileID: 0}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1179241835741120
 GameObject:
   m_ObjectHideFlags: 0
@@ -4995,6 +5022,12 @@ MonoBehaviour:
   targetTransform: {fileID: 0}
   xBounds: {x: 0.2, y: Infinity}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65133555118204922
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5597,6 +5630,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1239797936843978
 GameObject:
   m_ObjectHideFlags: 0
@@ -5663,6 +5702,9 @@ MonoBehaviour:
   switchObject: {fileID: 4107828690141356}
   glowTrans: {fileID: 4196321262085358}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135207590348778532
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -6391,6 +6433,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1293097651559686
 GameObject:
   m_ObjectHideFlags: 0
@@ -7164,11 +7212,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1311679187137592
 GameObject:
   m_ObjectHideFlags: 0
@@ -8164,6 +8212,9 @@ MonoBehaviour:
   - {fileID: 1437377896686274}
   - {fileID: 1314265426447700}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65940084533736728
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9038,6 +9089,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1418883701491334
 GameObject:
   m_ObjectHideFlags: 0
@@ -9155,6 +9209,9 @@ MonoBehaviour:
   rend: {fileID: 0}
   labelsPresent: 1
   labelColor: {r: 0, g: 0.65, b: 0.15, a: 1}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65718089779489926
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10311,6 +10368,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1466271801848666
 GameObject:
@@ -10446,6 +10506,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1474269168931514
 GameObject:
   m_ObjectHideFlags: 0
@@ -11228,6 +11294,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1504594766511276
 GameObject:
   m_ObjectHideFlags: 0
@@ -11805,6 +11877,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1524885029008472
 GameObject:
   m_ObjectHideFlags: 0
@@ -11928,6 +12006,9 @@ MonoBehaviour:
   - {fileID: 1542332973464910}
   - {fileID: 1250769921720006}
   titleLabel: {fileID: 1551727093358014}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65428122735791260
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12084,6 +12165,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1538571337702912
 GameObject:
   m_ObjectHideFlags: 0
@@ -12947,6 +13034,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1562188261907970
 GameObject:
   m_ObjectHideFlags: 0
@@ -13081,6 +13171,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1566677176281552
 GameObject:
   m_ObjectHideFlags: 0
@@ -13771,6 +13867,12 @@ MonoBehaviour:
   onMat: {fileID: 0}
   usePercent: 1
   _interface: {fileID: 0}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1597762501635612
 GameObject:
   m_ObjectHideFlags: 0
@@ -14068,6 +14170,9 @@ MonoBehaviour:
   rend: {fileID: 0}
   labelsPresent: 1
   labelColor: {r: 0, g: 0.65, b: 0.15, a: 1}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65540048349394272
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14795,6 +14900,9 @@ MonoBehaviour:
   switchObject: {fileID: 4913386832200898}
   glowTrans: {fileID: 4827973909795420}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135504521894269940
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -15285,6 +15393,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1677829043522374
 GameObject:
@@ -15481,6 +15592,13 @@ GameObject:
   - component: {fileID: -543654773718035683}
   - component: {fileID: 7017222406094786027}
   - component: {fileID: 5890015463364658410}
+  - component: {fileID: 758851066305749668}
+  - component: {fileID: 7589011272204600356}
+  - component: {fileID: 133514173983901042}
+  - component: {fileID: 8489979283902667863}
+  - component: {fileID: 4157207791445655935}
+  - component: {fileID: 2383484716006547019}
+  - component: {fileID: 2473946159105737952}
   m_Layer: 0
   m_Name: XyloRoll
   m_TagString: instrument
@@ -15647,6 +15765,147 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &758851066305749668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114507869557182512}
+  - {fileID: 114239155252282360}
+  - {fileID: 114629658862271602}
+--- !u!114 &7589011272204600356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d53d1a4367f6a94dbb5478e2d0981f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  dials:
+  - {fileID: 114677821411231214}
+  - {fileID: 114437872781420720}
+  - {fileID: 114032869348442842}
+  - {fileID: 114398104627189848}
+--- !u!114 &133514173983901042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 114812795426627834}
+  - {fileID: 114976315080689000}
+  - {fileID: 114988926450385236}
+  - {fileID: 114559761366850050}
+  - {fileID: 114075077610980074}
+--- !u!114 &8489979283902667863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38783740befed9b4ead5b3b54a968b09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  switchs:
+  - {fileID: 114981548670136632}
+  - {fileID: 114703821436627878}
+  - {fileID: 114703309951808876}
+  - {fileID: 114225829411299078}
+  - {fileID: 114129434373101610}
+--- !u!114 &4157207791445655935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12927abaed8c3294b97dac9508297db5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  xHandles:
+  - {fileID: 114657122072926584}
+  - {fileID: 114779264712445156}
+  - {fileID: 114990332658577720}
+  - {fileID: 114316982286666388}
+  - {fileID: 114929172540102000}
+  - {fileID: 114509487151349834}
+  - {fileID: 114373514987051144}
+  - {fileID: 114936710135213920}
+--- !u!114 &2383484716006547019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c09e2f6eaff94b5699436dc38bddaa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  yHandles:
+  - {fileID: 114762695170117000}
+--- !u!114 &2473946159105737952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1acbde0d59a64460ebccfecf6f2a62aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  xyHandles:
+  - {fileID: 114644762317458382}
+  - {fileID: 114818255910520690}
+  - {fileID: 114248368636140424}
 --- !u!1 &1694541082181486
 GameObject:
   m_ObjectHideFlags: 0
@@ -15796,6 +16055,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1698575251054552
 GameObject:
@@ -16064,11 +16326,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1705329907587088
 GameObject:
   m_ObjectHideFlags: 0
@@ -16135,6 +16397,9 @@ MonoBehaviour:
   switchObject: {fileID: 4804417355386932}
   glowTrans: {fileID: 4133934221247434}
   redOption: 0
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135715516605077912
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -16561,6 +16826,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1740319729883320
 GameObject:
   m_ObjectHideFlags: 0
@@ -17967,6 +18238,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1798243796303882
 GameObject:
@@ -18867,6 +19141,9 @@ MonoBehaviour:
   - {fileID: 1461942202627272}
   - {fileID: 1356047691224094}
   titleLabel: {fileID: 1740319729883320}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65350321685515998
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -19119,6 +19396,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1842854434841286
 GameObject:
   m_ObjectHideFlags: 0
@@ -19950,6 +20233,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1874690567598494
 GameObject:
   m_ObjectHideFlags: 0
@@ -20164,6 +20450,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1887341488726168
 GameObject:
   m_ObjectHideFlags: 0
@@ -20313,6 +20602,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1894338502826336
 GameObject:
@@ -20642,6 +20934,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1903158924174476
 GameObject:
   m_ObjectHideFlags: 0
@@ -21194,6 +21492,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1960764750448678
 GameObject:
   m_ObjectHideFlags: 0
@@ -21718,6 +22022,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1973415619537174
 GameObject:
@@ -21924,6 +22231,9 @@ MonoBehaviour:
   switchObject: {fileID: 4050615165919618}
   glowTrans: {fileID: 4061673583185594}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135769155157391194
 SphereCollider:
   m_ObjectHideFlags: 0

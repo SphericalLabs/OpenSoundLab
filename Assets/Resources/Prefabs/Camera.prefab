@@ -548,6 +548,9 @@ MonoBehaviour:
   startToggled: 1
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1000011948541518
 GameObject:
@@ -966,6 +969,7 @@ GameObject:
   - component: {fileID: -4345341056553258834}
   - component: {fileID: -3338619576241457552}
   - component: {fileID: 4432709060549026038}
+  - component: {fileID: 990340407546437350}
   m_Layer: 9
   m_Name: Camera
   m_TagString: instrument
@@ -1187,6 +1191,24 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &990340407546437350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012466838072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 114118948572162560}
+  - {fileID: 114000013218703250}
 --- !u!1 &1000012626884876
 GameObject:
   m_ObjectHideFlags: 0
@@ -1713,6 +1735,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013957134064
 GameObject:
   m_ObjectHideFlags: 0
@@ -2495,4 +2523,7 @@ MonoBehaviour:
   startToggled: 1
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0

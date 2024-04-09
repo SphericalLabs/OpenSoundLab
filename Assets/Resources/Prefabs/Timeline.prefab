@@ -642,6 +642,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1074610199735862
 GameObject:
   m_ObjectHideFlags: 0
@@ -708,6 +714,9 @@ MonoBehaviour:
   switchObject: {fileID: 4538272841046864}
   glowTrans: {fileID: 4033564865815432}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135722459465614208
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -954,6 +963,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1134529008346218
 GameObject:
   m_ObjectHideFlags: 0
@@ -1255,6 +1270,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1153640098788380
 GameObject:
   m_ObjectHideFlags: 0
@@ -1802,11 +1823,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1221281579595266
 GameObject:
   m_ObjectHideFlags: 0
@@ -2339,6 +2360,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1316786259217078
 GameObject:
@@ -2586,6 +2610,9 @@ MonoBehaviour:
   switchObject: {fileID: 4657795141140840}
   glowTrans: {fileID: 4670519156288404}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135409894370875046
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2748,6 +2775,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1334158620380744
 GameObject:
   m_ObjectHideFlags: 0
@@ -2764,6 +2797,10 @@ GameObject:
   - component: {fileID: 1403328986264280435}
   - component: {fileID: -8863409768827368370}
   - component: {fileID: -6806473655122705796}
+  - component: {fileID: 7164655824383995748}
+  - component: {fileID: 1286637820371056042}
+  - component: {fileID: 4856642843806423646}
+  - component: {fileID: 7055154641685278347}
   m_Layer: 0
   m_Name: Timeline
   m_TagString: instrument
@@ -3050,6 +3087,84 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &7164655824383995748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334158620380744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 114753799378281918}
+  - {fileID: 114413427617217402}
+  - {fileID: 114001379815979886}
+  - {fileID: 114549597154092274}
+--- !u!114 &1286637820371056042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334158620380744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2652fb293a2d2b546a2bf994e25007a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  sliders:
+  - {fileID: 114599634479497324}
+--- !u!114 &4856642843806423646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334158620380744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12927abaed8c3294b97dac9508297db5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  xHandles:
+  - {fileID: 114799412011284422}
+  - {fileID: 114863722114395326}
+  - {fileID: 114600414178552954}
+  - {fileID: 114894831009637408}
+  - {fileID: 114500678660787914}
+  - {fileID: 114967405411203328}
+  - {fileID: 114375960191779760}
+  - {fileID: 114169158810456014}
+--- !u!114 &7055154641685278347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334158620380744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c09e2f6eaff94b5699436dc38bddaa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  yHandles:
+  - {fileID: 114210789747883166}
 --- !u!1 &1342898617859112
 GameObject:
   m_ObjectHideFlags: 0
@@ -3281,6 +3396,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1388536045205336
 GameObject:
   m_ObjectHideFlags: 0
@@ -3380,6 +3501,9 @@ MonoBehaviour:
   switchObject: {fileID: 4947589505239272}
   glowTrans: {fileID: 4261252667631952}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135543582666823896
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3672,6 +3796,9 @@ MonoBehaviour:
   switchObject: {fileID: 4924386283127960}
   glowTrans: {fileID: 4591314971483440}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135751524185721420
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4190,6 +4317,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1572803965492194
 GameObject:
@@ -4603,6 +4733,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1634637900716002
 GameObject:
@@ -4822,6 +4955,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1646065661066234
 GameObject:
   m_ObjectHideFlags: 0
@@ -4905,11 +5044,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1651963641978810
 GameObject:
   m_ObjectHideFlags: 0
@@ -5059,6 +5198,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1657785347420792
 GameObject:
@@ -5661,6 +5803,9 @@ MonoBehaviour:
   - {fileID: 1893678934304218}
   - {fileID: 1319510500991748}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65828888681718062
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5816,6 +5961,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1708893994810364
 GameObject:
   m_ObjectHideFlags: 0
@@ -6155,6 +6306,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1746725860942978
 GameObject:
   m_ObjectHideFlags: 0
@@ -6407,6 +6564,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1801585346757326
 GameObject:
   m_ObjectHideFlags: 0
@@ -6603,6 +6766,12 @@ MonoBehaviour:
   targetTransform: {fileID: 0}
   xBounds: {x: 0.112, y: Infinity}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65235482096911750
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6842,6 +7011,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1867245198710554
 GameObject:
   m_ObjectHideFlags: 0

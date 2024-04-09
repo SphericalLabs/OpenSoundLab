@@ -388,6 +388,8 @@ GameObject:
   - component: {fileID: -3181408644286012090}
   - component: {fileID: -6892049878142041983}
   - component: {fileID: 5256678613496522767}
+  - component: {fileID: 4762902612624269646}
+  - component: {fileID: 459814533418913928}
   m_Layer: 9
   m_Name: MIDIOUT
   m_TagString: instrument
@@ -601,6 +603,41 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &4762902612624269646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199539764712922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2652fb293a2d2b546a2bf994e25007a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  sliders:
+  - {fileID: 114485527542186696}
+--- !u!114 &459814533418913928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199539764712922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c09e2f6eaff94b5699436dc38bddaa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  yHandles:
+  - {fileID: 114230785283199152}
+  - {fileID: 114722002975914322}
 --- !u!1 &1202215096489592
 GameObject:
   m_ObjectHideFlags: 0
@@ -810,6 +847,12 @@ MonoBehaviour:
   targetTransform: {fileID: 0}
   xBounds: {x: -Infinity, y: -0.05}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65243240090399790
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -965,6 +1008,9 @@ MonoBehaviour:
   - {fileID: 1561368391561952}
   - {fileID: 1202215096489592}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65320761775780004
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1166,11 +1212,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1283380365270148
 GameObject:
   m_ObjectHideFlags: 0
@@ -2090,6 +2136,12 @@ MonoBehaviour:
   targetTransform: {fileID: 0}
   xBounds: {x: -Infinity, y: -0.05}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65739497609308004
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2808,11 +2860,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1976502194521922
 GameObject:
   m_ObjectHideFlags: 0

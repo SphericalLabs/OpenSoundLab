@@ -168,6 +168,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: 89681c510a2d4144f82986df469f44a1, type: 2}
   usePercent: 1
   _interface: {fileID: 0}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1066598448987964
 GameObject:
   m_ObjectHideFlags: 0
@@ -490,6 +496,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1256886302706904
 GameObject:
   m_ObjectHideFlags: 0
@@ -627,6 +639,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: 89681c510a2d4144f82986df469f44a1, type: 2}
   usePercent: 1
   _interface: {fileID: 0}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1259489118296080
 GameObject:
   m_ObjectHideFlags: 0
@@ -1138,11 +1156,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1394457116529444
 GameObject:
   m_ObjectHideFlags: 0
@@ -1452,6 +1470,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1529033898387040
 GameObject:
   m_ObjectHideFlags: 0
@@ -1466,6 +1490,8 @@ GameObject:
   - component: {fileID: -6355797048093882804}
   - component: {fileID: -863377895464667259}
   - component: {fileID: 2970660514806616978}
+  - component: {fileID: 3621067829631529308}
+  - component: {fileID: 7689269477480123029}
   m_Layer: 0
   m_Name: ADSR
   m_TagString: instrument
@@ -1607,6 +1633,43 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &3621067829631529308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529033898387040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114762981863947428}
+  - {fileID: 114828334721014738}
+--- !u!114 &7689269477480123029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529033898387040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1acbde0d59a64460ebccfecf6f2a62aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  xyHandles:
+  - {fileID: 114678488685329124}
+  - {fileID: 114629786817738494}
+  - {fileID: 114835999939529082}
 --- !u!1 &1657017015403770
 GameObject:
   m_ObjectHideFlags: 0
@@ -1808,11 +1871,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1740135425574956
 GameObject:
   m_ObjectHideFlags: 0
@@ -1950,6 +2013,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: 89681c510a2d4144f82986df469f44a1, type: 2}
   usePercent: 1
   _interface: {fileID: 0}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1779401905998466
 GameObject:
   m_ObjectHideFlags: 0

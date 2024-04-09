@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
+using UnityEngine.XR.OpenXR.Input;
 
 public class xyHandle : manipObject {
   public int ID = 0;
@@ -52,9 +54,11 @@ public class xyHandle : manipObject {
 
   public componentInterface _interface;
 
-  //Color glowColor = Color.HSVToRGB(0, .5f, .1f);
+    public UnityEvent onHandleChangedEvent;
+    public UnityEvent onPosSetEvent;
+    //Color glowColor = Color.HSVToRGB(0, .5f, .1f);
 
-  public override void Awake() {
+    public override void Awake() {
     base.Awake();
     rend = GetComponent<Renderer>();
     offMat = rend.sharedMaterial;
@@ -90,9 +94,21 @@ public class xyHandle : manipObject {
     p.y = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).y + offset.y, yBounds.x, yBounds.y);
     transform.localPosition = p;
     updatePercent();
-  }
+        onHandleChangedEvent.Invoke();
+    }
 
-  void updatePercent() {
+    public void updatePos(Vector2 pos)
+    {
+        Vector3 p = transform.localPosition;
+        p.x = Mathf.Clamp(pos.x, xBounds.x, xBounds.y);
+        p.y = Mathf.Clamp(pos.y, yBounds.x, yBounds.y);
+        transform.localPosition = p;
+        updatePercent();
+
+        onPosSetEvent.Invoke();
+    }
+
+    void updatePercent() {
     if (!usePercent) return;
     percent.x = Mathf.InverseLerp(xBounds.x, xBounds.y, transform.localPosition.x);
     percent.y = Mathf.InverseLerp(yBounds.x, yBounds.y, transform.localPosition.y);

@@ -264,6 +264,7 @@ GameObject:
   - component: {fileID: 3666400540360301204}
   - component: {fileID: 2591338105249821339}
   - component: {fileID: -1642124330640775617}
+  - component: {fileID: 3457113228603339848}
   m_Layer: 9
   m_Name: Drum
   m_TagString: instrument
@@ -394,6 +395,24 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &3457113228603339848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114000014014702960}
+  - {fileID: 114000010119618080}
 --- !u!1 &130724
 GameObject:
   m_ObjectHideFlags: 0
@@ -555,11 +574,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 138656}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!64 &7993465822302899633
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1484,6 +1503,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000011556914824
 GameObject:
   m_ObjectHideFlags: 0
@@ -1651,11 +1676,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 138656}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000012658974454
 GameObject:
   m_ObjectHideFlags: 0
@@ -1978,6 +2003,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013482807498
 GameObject:
   m_ObjectHideFlags: 0

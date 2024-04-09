@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,6 +52,22 @@ public class handle : manipObject
     Material highlightMat;
     Material highlightGrabbedMat;
 
+
+    Vector3 initialOffset;
+    Quaternion initialRotationOffset;
+
+    bool wasPrecisionGazeGrabbed = false; // at last frame
+
+    bool doublePosRot = false;
+    Vector3 initOtherManipPos = Vector3.zero;
+    Quaternion initRot = Quaternion.identity;
+    Vector3 doubleManipOffset = Vector3.zero;
+
+    float initDistance = 0;
+    Vector3 initScale = Vector3.one;
+
+    public bool trashReady = false;
+    public trashcan curTrash;
     public UnityEvent onTrashEvents;
 
     public override void Awake()
@@ -144,11 +160,6 @@ public class handle : manipObject
         }
     }
 
-    Vector3 initialOffset;
-    Quaternion initialRotationOffset;
-
-    bool wasPrecisionGazeGrabbed = false; // at last frame
-
     void gazeBasedPosRotStart()
     {
 
@@ -198,10 +209,6 @@ public class handle : manipObject
     }
 
 
-    bool doublePosRot = false;
-    Vector3 initOtherManipPos = Vector3.zero;
-    Quaternion initRot = Quaternion.identity;
-    Vector3 doubleManipOffset = Vector3.zero;
     void posRotUpdate()
     {
         if (!doublePosRot)
@@ -218,8 +225,6 @@ public class handle : manipObject
         masterObj.position = Vector3.Lerp(manipulatorObj.position, otherHandle.manipulatorObj.position, .5f) + doubleManipOffset;
     }
 
-    float initDistance = 0;
-    Vector3 initScale = Vector3.one;
     void scaleUpdate()
     {
         if (!scaling)
@@ -232,8 +237,6 @@ public class handle : manipObject
         masterObj.localScale = initScale * (dist / initDistance);
     }
 
-    public bool trashReady = false;
-    public trashcan curTrash;
     void OnCollisionEnter(Collision coll)
     {
         if (coll.transform.name == "trashMenu" && (curState == manipState.grabbed || otherHandle.curState == manipState.grabbed) && ID == 0)

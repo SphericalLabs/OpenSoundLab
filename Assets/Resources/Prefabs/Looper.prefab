@@ -462,6 +462,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000010479101084
 GameObject:
   m_ObjectHideFlags: 0
@@ -781,6 +787,9 @@ MonoBehaviour:
   labelsPresent: 1
   labelObjects: []
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000010993760902
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,6 +932,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000011140922288
 GameObject:
   m_ObjectHideFlags: 0
@@ -1449,11 +1464,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 1000011258606448}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!64 &5379196005243902824
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1867,6 +1882,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &135000013396039688
 SphereCollider:
@@ -3522,6 +3540,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &135000010641097752
 SphereCollider:
@@ -3988,6 +4009,8 @@ GameObject:
   - component: {fileID: -8227052865212658269}
   - component: {fileID: 8627000911791570966}
   - component: {fileID: 4712335480945451021}
+  - component: {fileID: 3528175050044112988}
+  - component: {fileID: 56695713983146947}
   m_Layer: 9
   m_Name: Looper
   m_TagString: instrument
@@ -4261,6 +4284,46 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &3528175050044112988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013544788900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114000013046492202}
+  - {fileID: 114000012648955806}
+  - {fileID: 114000011460934530}
+  - {fileID: 114000012134443884}
+--- !u!114 &56695713983146947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013544788900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 114000012319421372}
+  - {fileID: 114000010904982118}
+  - {fileID: 114000014199353358}
+  - {fileID: 114000013208792698}
 --- !u!1 &1000013600084584
 GameObject:
   m_ObjectHideFlags: 0
@@ -4403,6 +4466,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013676071954
 GameObject:
   m_ObjectHideFlags: 0
@@ -4487,11 +4556,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 1000011258606448}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000013761114762
 GameObject:
   m_ObjectHideFlags: 0
@@ -4703,6 +4772,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &135000013949754372
 SphereCollider:
@@ -4867,6 +4939,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013905123602
 GameObject:
   m_ObjectHideFlags: 0
@@ -5028,6 +5106,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &135000013511100590
 SphereCollider:

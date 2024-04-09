@@ -1841,6 +1841,7 @@ GameObject:
   - component: {fileID: 5845568253433134333}
   - component: {fileID: -6535472952307190098}
   - component: {fileID: 3321349599150712715}
+  - component: {fileID: 2791231447916030145}
   m_Layer: 9
   m_Name: Airhorn
   m_TagString: instrument
@@ -1980,6 +1981,23 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &2791231447916030145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1627441985901624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114377911255260466}
 --- !u!1 &1650273641140610
 GameObject:
   m_ObjectHideFlags: 0
@@ -2662,6 +2680,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1903514792861606
 GameObject:
   m_ObjectHideFlags: 0

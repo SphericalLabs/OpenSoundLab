@@ -523,11 +523,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1226598738502048
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,11 +611,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1227500278695446
 GameObject:
   m_ObjectHideFlags: 0
@@ -1633,6 +1633,9 @@ MonoBehaviour:
   - {fileID: 1545092364512312}
   - {fileID: 1083838959937814}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65632416613224612
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2321,6 +2324,7 @@ GameObject:
   - component: {fileID: 3242684105646322414}
   - component: {fileID: -752586630800425736}
   - component: {fileID: 5981690001780154390}
+  - component: {fileID: 7851518583680344058}
   m_Layer: 9
   m_Name: MIDIIN
   m_TagString: instrument
@@ -2434,6 +2438,23 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &7851518583680344058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872141894946328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2652fb293a2d2b546a2bf994e25007a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  sliders:
+  - {fileID: 114638369842905050}
 --- !u!1 &1880308129820994
 GameObject:
   m_ObjectHideFlags: 0

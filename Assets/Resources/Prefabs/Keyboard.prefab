@@ -142,6 +142,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000010192138558
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,11 +283,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000010355461178
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,11 +477,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000010804004402
 GameObject:
   m_ObjectHideFlags: 0
@@ -1117,6 +1123,9 @@ MonoBehaviour:
   switchObject: {fileID: 4000011407889020}
   glowTrans: {fileID: 4000013543717864}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135000011277823308
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1153,6 +1162,8 @@ GameObject:
   - component: {fileID: -6617596432156421487}
   - component: {fileID: -6646226464376814747}
   - component: {fileID: -6637350997551632690}
+  - component: {fileID: 1919951316198919205}
+  - component: {fileID: 4963454062666474859}
   m_Layer: 9
   m_Name: Keyboard
   m_TagString: instrument
@@ -1317,6 +1328,49 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &1919951316198919205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013258226742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db17bfa2dfb5d8459d86ec0ba4b2d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  omniJacks:
+  - {fileID: 114099797032259354}
+  - {fileID: 114000010025628728}
+  - {fileID: 114262216147165432}
+  - {fileID: 114716173396128874}
+--- !u!114 &4963454062666474859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013258226742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 114436795501083008}
+  - {fileID: 114158096237176802}
+  - {fileID: 114226809004411724}
+  - {fileID: 114876497856047590}
+  - {fileID: 114733017891774490}
+  - {fileID: 114944424809332850}
+  - {fileID: 114354287083071102}
 --- !u!1 &1000013439328772
 GameObject:
   m_ObjectHideFlags: 0
@@ -1840,6 +1894,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1023612566743556
 GameObject:
@@ -2389,6 +2446,9 @@ MonoBehaviour:
   switchObject: {fileID: 4730765566666340}
   glowTrans: {fileID: 4532587950573270}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135118446252345832
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2544,6 +2604,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1057025681748170
 GameObject:
   m_ObjectHideFlags: 0
@@ -2678,6 +2744,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1061761968199884
 GameObject:
   m_ObjectHideFlags: 0
@@ -3301,6 +3373,9 @@ MonoBehaviour:
   switchObject: {fileID: 4570709542160604}
   glowTrans: {fileID: 4509276897989408}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135083227042691578
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3905,6 +3980,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1180892128392378
 GameObject:
   m_ObjectHideFlags: 0
@@ -4219,6 +4300,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1198049712517788
 GameObject:
   m_ObjectHideFlags: 0
@@ -4451,6 +4538,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1205497775616500
 GameObject:
@@ -4708,6 +4798,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1209730395277534
 GameObject:
@@ -5738,6 +5831,9 @@ MonoBehaviour:
   switchObject: {fileID: 4783849741274358}
   glowTrans: {fileID: 4169213927626740}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135059172954936542
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -6074,6 +6170,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1284365325955694
 GameObject:
@@ -7459,6 +7558,9 @@ MonoBehaviour:
   - {fileID: 1439101825947960}
   - {fileID: 1248022622343234}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65879060584551968
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8310,6 +8412,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1486004930301180
 GameObject:
@@ -8589,6 +8694,12 @@ MonoBehaviour:
   targetTransform: {fileID: 0}
   xBounds: {x: 0.2, y: Infinity}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65101205681258196
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8744,6 +8855,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 1
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1503050598399364
 GameObject:
   m_ObjectHideFlags: 0
@@ -9340,6 +9457,9 @@ MonoBehaviour:
   switchObject: {fileID: 4028789140794684}
   glowTrans: {fileID: 4451734986113148}
   redOption: 1
+  onSwitchChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!135 &135161944434500092
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -10140,6 +10260,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1659926271364662
 GameObject:
@@ -10981,6 +11104,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1764213340581032
 GameObject:
   m_ObjectHideFlags: 0
@@ -11328,6 +11457,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1808622560021320
 GameObject:
   m_ObjectHideFlags: 0
@@ -12156,6 +12291,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1868536768755774
 GameObject:
   m_ObjectHideFlags: 0
@@ -12574,6 +12715,12 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1907359056030146
 GameObject:
   m_ObjectHideFlags: 0
@@ -12708,6 +12855,12 @@ MonoBehaviour:
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0
+  onHandleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPosSetEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1943195379452756
 GameObject:
   m_ObjectHideFlags: 0
@@ -13037,6 +13190,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1953208697885448
 GameObject:
@@ -13497,6 +13653,9 @@ MonoBehaviour:
   - {fileID: 1076586721972896}
   - {fileID: 1349497179065566}
   titleLabel: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &65765339032425284
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13841,3 +14000,9 @@ MonoBehaviour:
   far: {fileID: 0}
   near: {fileID: 0}
   jackHue: 0
+  onBeginnConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
