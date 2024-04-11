@@ -41,6 +41,9 @@ public class xyHandle : manipObject
 {
     public int ID = 0;
 
+    private bool hasStartPercent = false;
+    public bool HasStartPercent {  get { return hasStartPercent; } }
+
     public Vector2 xBounds = new Vector2(-Mathf.Infinity, -.05f);
     public Vector2 yBounds = new Vector2(-Mathf.Infinity, 0);
     public Vector2 percent = Vector2.zero;
@@ -69,7 +72,7 @@ public class xyHandle : manipObject
 
     void Start()
     {
-        if (usePercent) setPercent(percent);
+        if (usePercent && !hasStartPercent) setPercent(percent);
     }
 
     public void pulse()
@@ -107,6 +110,7 @@ public class xyHandle : manipObject
 
     public void updatePos(Vector2 pos)
     {
+        hasStartPercent = true;
         Vector3 p = transform.localPosition;
         p.x = Mathf.Clamp(pos.x, xBounds.x, xBounds.y);
         p.y = Mathf.Clamp(pos.y, yBounds.x, yBounds.y);
@@ -124,13 +128,17 @@ public class xyHandle : manipObject
         Debug.Log($"{gameObject.name} set precent {percent.x}, {percent.y}");
     }
 
-    public void forceChange(float value, bool Xaxis)
+    public void forceChange(float value, bool Xaxis, bool invokeChange = false)
     {
         setPercent(new Vector2(value, value), Xaxis, !Xaxis);
         if (curState == manipState.grabbed)
         {
             offset.x = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
             offset.y = transform.localPosition.y - transform.parent.InverseTransformPoint(manipulatorObj.position).y;
+        }
+        if (invokeChange)
+        {
+            onHandleChangedEvent.Invoke();
         }
         updatePercent();
     }

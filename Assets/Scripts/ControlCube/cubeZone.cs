@@ -80,7 +80,7 @@ public class cubeZone : manipObject {
     tmp.y = Mathf.Clamp01(tmp.y + .5f);
     tmp.z = Mathf.Clamp01(-tmp.z + .5f);
 
-    _deviceInterface.updatePercent(tmp);
+    _deviceInterface.updatePercent(tmp, true);
     updateLines(tmp);
   }
 

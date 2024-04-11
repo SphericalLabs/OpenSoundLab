@@ -32,17 +32,17 @@ public class NetworkYHandles : NetworkBehaviour
     {
         if (!isServer)
         {
-            yValues.Callback += OnDialsUpdated;
+            yValues.Callback += OnHandleUpdated;
 
             // Process initial SyncList payload
             for (int i = 0; i < yValues.Count; i++)
             {
-                OnDialsUpdated(SyncList<float>.Operation.OP_ADD, i, yHandles[i].transform.localPosition.x, yValues[i]);
+                OnHandleUpdated(SyncList<float>.Operation.OP_ADD, i, yHandles[i].transform.localPosition.x, yValues[i]);
             }
         }
     }
 
-    void OnDialsUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
+    void OnHandleUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
     {
         switch (op)
         {

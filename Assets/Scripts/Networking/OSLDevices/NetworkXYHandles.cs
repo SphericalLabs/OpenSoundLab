@@ -32,18 +32,18 @@ public class NetworkXYHandles : NetworkBehaviour
     {
         if (!isServer)
         {
-            xyValues.Callback += OnDialsUpdated;
+            xyValues.Callback += OnHandleUpdated;
 
             // Process initial SyncList payload
             for (int i = 0; i < xyValues.Count; i++)
             {
                 Vector2 vector = new Vector2(xyHandles[i].transform.localPosition.x, xyHandles[i].transform.localPosition.y);
-                OnDialsUpdated(SyncList<Vector2>.Operation.OP_ADD, i, vector, xyValues[i]);
+                OnHandleUpdated(SyncList<Vector2>.Operation.OP_ADD, i, vector, xyValues[i]);
             }
         }
     }
 
-    void OnDialsUpdated(SyncList<Vector2>.Operation op, int index, Vector2 oldValue, Vector2 newValue)
+    void OnHandleUpdated(SyncList<Vector2>.Operation op, int index, Vector2 oldValue, Vector2 newValue)
     {
         switch (op)
         {

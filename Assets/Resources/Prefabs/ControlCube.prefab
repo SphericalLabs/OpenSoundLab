@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -6331033606204837409}
   - component: {fileID: -344303346754867950}
   - component: {fileID: 70460906363162930}
+  - component: {fileID: 2391052980936220948}
   m_Layer: 9
   m_Name: ControlCube
   m_TagString: instrument
@@ -71,6 +72,9 @@ MonoBehaviour:
   - {fileID: 114000013152400090}
   - {fileID: 114000011262798026}
   cubeManip: {fileID: 11415606}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &114000013536308368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,6 +180,23 @@ MonoBehaviour:
   - {fileID: 114000012573904644}
   - {fileID: 114000013152400090}
   - {fileID: 114000011262798026}
+--- !u!114 &2391052980936220948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 129626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5eb9f2b34c92e8e4c999e9ed9540b476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  controlCube: {fileID: 114000011525452526}
+  syncPercent: {x: 0, y: 0, z: 0}
 --- !u!1 &130384
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,11 +363,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &148308
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,11 +503,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &149680
 GameObject:
   m_ObjectHideFlags: 0

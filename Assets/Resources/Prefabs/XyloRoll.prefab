@@ -2921,7 +2921,7 @@ MonoBehaviour:
   switchVal: 0
   notchCount: 17
   labelHolder: {fileID: 4595958427884446}
-  glowMat: {fileID: 0}
+  glowMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1772154838658544}
@@ -8201,7 +8201,7 @@ MonoBehaviour:
   switchVal: 3
   notchCount: 7
   labelHolder: {fileID: 4082404674105882}
-  glowMat: {fileID: 0}
+  glowMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1101944793732344}
@@ -19173,7 +19173,7 @@ MonoBehaviour:
   switchVal: 0
   notchCount: 5
   labelHolder: {fileID: 4421707739096700}
-  glowMat: {fileID: 0}
+  glowMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   labelsPresent: 1
   labelObjects:
   - {fileID: 1485182228625182}
