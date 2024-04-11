@@ -98,6 +98,7 @@ public class adsrInterface : MonoBehaviour
             {
                 xyHandles[i].percent = defaultPercents[i];
                 xyHandles[i].setPercent(defaultPercents[i]);
+                xyHandles[i].onHandleChangedEvent.Invoke();
             }
         }
     }

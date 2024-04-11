@@ -36,6 +36,7 @@ public class NetworkControlCubeManager : NetworkBehaviour
 
     public void OnUpdateCubePercent(Vector3 oldValue, Vector3 newValue)
     {
+        Debug.Log($"Update control cube percent by sync value: {newValue}");
         controlCube.updatePercent(newValue);
     }
 
@@ -58,5 +59,6 @@ public class NetworkControlCubeManager : NetworkBehaviour
     {
         syncPercent = value;
         controlCube.updatePercent(value);
+        Debug.Log($"Update control cube percent on server value: {value}");
     }
 }
