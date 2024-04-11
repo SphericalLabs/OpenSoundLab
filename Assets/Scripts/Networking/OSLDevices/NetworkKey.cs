@@ -47,14 +47,14 @@ public class NetworkKey : NetworkBehaviour
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
-                //keys[index].phantomHit(newValue, false);
+                keys[index].phantomHit(newValue);
                 break;
             case SyncList<bool>.Operation.OP_INSERT:
                 break;
             case SyncList<bool>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<bool>.Operation.OP_SET:
-                //keys[index].phantomHit(newValue, false);
+                keys[index].phantomHit(newValue);
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
                 break;
@@ -78,7 +78,7 @@ public class NetworkKey : NetworkBehaviour
     public void CmdKeyButtonIsHit(int index, bool value)
     {
         keyValues[index] = value;
-        //keys[index].phantomHit(value, false);
+        keys[index].phantomHit(value);
     }
 }
 

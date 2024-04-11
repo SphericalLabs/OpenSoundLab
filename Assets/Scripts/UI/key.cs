@@ -88,6 +88,7 @@ public class key : manipObject
         {
             isHit = on;
             _deviceInterface.hit(on, keyValue);
+            onKeyChangedEvent.Invoke();
         }
     }
 

@@ -1164,6 +1164,7 @@ GameObject:
   - component: {fileID: -6637350997551632690}
   - component: {fileID: 1919951316198919205}
   - component: {fileID: 4963454062666474859}
+  - component: {fileID: 1835384502225817390}
   m_Layer: 9
   m_Name: Keyboard
   m_TagString: instrument
@@ -1371,6 +1372,22 @@ MonoBehaviour:
   - {fileID: 114733017891774490}
   - {fileID: 114944424809332850}
   - {fileID: 114354287083071102}
+--- !u!114 &1835384502225817390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013258226742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38409838c4b60664fab214c77e15a1a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  keys: []
 --- !u!1 &1000013439328772
 GameObject:
   m_ObjectHideFlags: 0

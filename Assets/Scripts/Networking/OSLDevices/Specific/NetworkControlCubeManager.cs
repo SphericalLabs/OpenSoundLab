@@ -21,7 +21,7 @@ public class NetworkControlCubeManager : NetworkBehaviour
         syncPercent = controlCube.percent;
     }
 
-    private void Start()
+    private void Awake()
     {
         controlCube.onPercentChangedEvent.AddListener(UpdateHandleValue);
     }
