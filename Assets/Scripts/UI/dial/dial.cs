@@ -169,8 +169,11 @@ public class dial : manipObject
         transform.localRotation = Quaternion.Euler(0, realRot, 0);
 
         // viz
-        dialFeedback.percent = percent * 0.85f; // why that multiplier?
-        dialFeedback.PercentUpdate();
+        if (dialFeedback != null)
+        {
+            dialFeedback.percent = percent * 0.85f; // why that multiplier?
+            dialFeedback.PercentUpdate();
+        }
 
         if (invokeEvent)
         {

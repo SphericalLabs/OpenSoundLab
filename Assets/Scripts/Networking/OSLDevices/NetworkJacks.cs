@@ -101,7 +101,7 @@ public class NetworkJacks : NetworkBehaviour
             if (omniJacks[index].far.connected != null)
             {
                 var otherJack = omniJacks[index].far.connected;
-                Debug.Log($"Jack of id {omniJacks[index].ID} is connected with other jack {otherJack.ID}");
+                //Debug.Log($"Jack of id {omniJacks[index].ID} is connected with other jack {otherJack.ID}");
                 if (isServer)
                 {
                     connectedJackIds[index] = otherJack.ID;
@@ -118,7 +118,7 @@ public class NetworkJacks : NetworkBehaviour
     {
         if (index >= 0 && index < omniJacks.Length)
         {
-            Debug.Log($"Jack of id {omniJacks[index].ID} get disconnected with jack of id {connectedJackIds[index]}");
+            //Debug.Log($"Jack of id {omniJacks[index].ID} get disconnected with jack of id {connectedJackIds[index]}");
             if (isServer)
             {
                 connectedJackIds[index] = 0;
@@ -137,7 +137,7 @@ public class NetworkJacks : NetworkBehaviour
         if (connectedJackIds[index] != otherId)
         {
             connectedJackIds[index] = otherId;
-            Debug.Log($"On server update jack connection of id {omniJacks[index].ID} to {otherId}");
+            //Debug.Log($"On server update jack connection of id {omniJacks[index].ID} to {otherId}");
             //ManagePlugConnection(index, otherId);
 
             if (omniJacks[index].far != null && omniJacks[index].far.connected != null && omniJacks[index].far.connected.ID == otherId)
@@ -187,7 +187,7 @@ public class NetworkJacks : NetworkBehaviour
                 Color tempColor = Color.HSVToRGB(0, .8f, .5f);
                 o1.Activate(o2, omniJack, tempPath, tempColor);
                 o2.Activate(o1, otherJack, tempPath, tempColor);
-                Debug.Log($"Create new plug connection of {omniJack.ID} and {otherJack.ID}");
+                //Debug.Log($"Create new plug connection of {omniJack.ID} and {otherJack.ID}");
             }
         }
     }

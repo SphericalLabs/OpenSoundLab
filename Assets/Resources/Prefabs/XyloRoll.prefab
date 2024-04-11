@@ -15599,6 +15599,8 @@ GameObject:
   - component: {fileID: 4157207791445655935}
   - component: {fileID: 2383484716006547019}
   - component: {fileID: 2473946159105737952}
+  - component: {fileID: 8014196460515775066}
+  - component: {fileID: 5727283650442714912}
   m_Layer: 0
   m_Name: XyloRoll
   m_TagString: instrument
@@ -15906,6 +15908,45 @@ MonoBehaviour:
   - {fileID: 114644762317458382}
   - {fileID: 114818255910520690}
   - {fileID: 114248368636140424}
+--- !u!114 &8014196460515775066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2652fb293a2d2b546a2bf994e25007a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  sliders:
+  - {fileID: 114033402943034260}
+  - {fileID: 114587694839831884}
+  - {fileID: 114442041411066682}
+  - {fileID: 114171947125841474}
+  - {fileID: 114040480551306718}
+--- !u!114 &5727283650442714912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7343ffcdc90d341d4ab404fb3d04f864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.05
+  sliders:
+  - {fileID: 114996028422630234}
+  - {fileID: 114424294817523856}
 --- !u!1 &1694541082181486
 GameObject:
   m_ObjectHideFlags: 0

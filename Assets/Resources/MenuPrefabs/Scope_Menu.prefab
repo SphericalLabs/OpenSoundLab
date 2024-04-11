@@ -97,11 +97,31 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 735508415820795447, guid: 0f702086fdede9c41b9c9ac7acba8d4f,
+        type: 3}
+      propertyPath: switchs.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 835585855120203881, guid: 0f702086fdede9c41b9c9ac7acba8d4f,
+        type: 3}
+      propertyPath: dials.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 970149082705724297, guid: 0f702086fdede9c41b9c9ac7acba8d4f,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 1457482764233190265, guid: 0f702086fdede9c41b9c9ac7acba8d4f,
+        type: 3}
+      propertyPath: omniJacks.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1457482764233190265, guid: 0f702086fdede9c41b9c9ac7acba8d4f,
+        type: 3}
+      propertyPath: omniJacks.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1673321937914262512, guid: 0f702086fdede9c41b9c9ac7acba8d4f,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -212,6 +232,10 @@ PrefabInstance:
     - {fileID: 2077884202077326615, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
     - {fileID: 3087120435656170967, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
     - {fileID: 4455072699406581, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
+    - {fileID: 1074699967548780815, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
+    - {fileID: 835585855120203881, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
+    - {fileID: 735508415820795447, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
+    - {fileID: 1457482764233190265, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
     m_RemovedGameObjects:
     - {fileID: 8446214836861030364, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}
     - {fileID: 1101021866177444, guid: 0f702086fdede9c41b9c9ac7acba8d4f, type: 3}

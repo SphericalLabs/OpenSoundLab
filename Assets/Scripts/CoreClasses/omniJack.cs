@@ -160,7 +160,7 @@ public class omniJack : manipObject
     {
         if (invokeEvents)
         {
-            if (far.connected != null)
+            if (far != null && far.connected != null)
             {
                 far.connected.onEndConnectionEvent.Invoke();
             }

@@ -67,7 +67,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         base.OnStartAuthority();
         UpdateDebugText();
-        Debug.Log($"Start Authority of {gameObject.name}");
+        //Debug.Log($"Start Authority of {gameObject.name}");
         CmdOnControlledByClient(true);
     }
 
@@ -75,7 +75,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         base.OnStopAuthority();
         UpdateDebugText();
-        Debug.Log($"Stop Authority of {gameObject.name}");
+        //Debug.Log($"Stop Authority of {gameObject.name}");
         //force release on manipulatorObject
         foreach (var handle in _handles)
         {

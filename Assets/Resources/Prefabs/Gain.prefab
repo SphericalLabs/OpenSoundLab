@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: 7332285868487019471}
   - component: {fileID: 6519842961699977452}
   - component: {fileID: 1278217486317122554}
+  - component: {fileID: 4968837079443941710}
   m_Layer: 0
   m_Name: Gain
   m_TagString: instrument
@@ -504,6 +505,23 @@ MonoBehaviour:
   syncInterval: 0.05
   dials:
   - {fileID: 11493542}
+--- !u!114 &4968837079443941710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38783740befed9b4ead5b3b54a968b09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  switchs:
+  - {fileID: 114200851306455052}
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0
