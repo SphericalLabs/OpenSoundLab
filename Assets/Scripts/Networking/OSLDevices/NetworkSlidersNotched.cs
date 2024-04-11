@@ -66,7 +66,6 @@ public class NetworkSlidersNotched : NetworkBehaviour
 
     public void UpdateSliderValue(int index)
     {
-        Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
         if (isServer)
         {
             sliderValues[index] = sliders[index].percent;

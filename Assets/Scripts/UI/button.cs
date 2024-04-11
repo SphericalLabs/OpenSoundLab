@@ -211,6 +211,7 @@ public class button : manipObject
         {
             onToggleChangedEvent.Invoke();
         }
+        disregardStartToggled = true;
     }
 
     bool toggled = false;

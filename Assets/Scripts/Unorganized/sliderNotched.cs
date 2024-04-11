@@ -88,8 +88,6 @@ public class sliderNotched : manipObject
             titleLabel.GetComponent<Renderer>().material.SetColor("_TintColor", labelColor);
         }
         setVal(switchVal);
-
-
     }
 
     float targetX = 0;
@@ -117,13 +115,13 @@ public class sliderNotched : manipObject
         Vector3 p = transform.localPosition;
         p.x = goalX;
         transform.localPosition = p;
-        updateLabels();
         lastSwitchVal = switchVal;
 
         if (invokeEvent)
         {
             onPercentChangedEvent.Invoke();
         }
+        updateLabels();
     }
 
     public void setValByPercent(float p)
@@ -138,7 +136,10 @@ public class sliderNotched : manipObject
         Vector3 pos = transform.localPosition;
         pos.x = Mathf.Lerp(-xBound, xBound, percent);
         transform.localPosition = pos;
-        updateLabels();
+        if (labels != null)
+        {
+            updateLabels();
+        }
     }
 
     void updateLabels()
