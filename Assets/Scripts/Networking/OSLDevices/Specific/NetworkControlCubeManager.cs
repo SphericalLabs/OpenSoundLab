@@ -61,7 +61,5 @@ public class NetworkControlCubeManager : NetworkBehaviour
     public void CmdUpdateHandleValue(Vector3 value)
     {
         syncPercent = value;
-        controlCube.Setup(value);
-        Debug.Log($"Update control cube percent on server value: {value}");
     }
 }
