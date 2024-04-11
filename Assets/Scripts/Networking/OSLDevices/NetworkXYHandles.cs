@@ -20,6 +20,7 @@ public class NetworkXYHandles : NetworkBehaviour
 
     private void Start()
     {
+        Debug.Log("initail network xyhandles");
         //add dials on change callback event
         for (int i = 0; i < xyHandles.Length; i++)
         {

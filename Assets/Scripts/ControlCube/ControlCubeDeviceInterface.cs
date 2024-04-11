@@ -52,7 +52,7 @@ public class ControlCubeDeviceInterface : deviceInterface
         Setup(percent);
     }
 
-    void Setup(Vector3 p)
+    public void Setup(Vector3 p)
     {
         percent = p;
         cubeManip.updateLines(percent);

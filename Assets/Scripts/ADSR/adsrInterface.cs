@@ -91,7 +91,7 @@ public class adsrInterface : MonoBehaviour
     void Start()
     {
         if (!setDefaults) return;
-
+        Debug.Log("initail adsr interface");
         for (int i = 0; i < 3; i++)
         {
             if (!xyHandles[i].HasStartPercent)

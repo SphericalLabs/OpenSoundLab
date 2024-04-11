@@ -30,14 +30,17 @@ public class NetworkControlCubeManager : NetworkBehaviour
     {
         if (!isServer)
         {
-            controlCube.updatePercent(syncPercent);
+            controlCube.Setup(syncPercent);
         }
     }
 
     public void OnUpdateCubePercent(Vector3 oldValue, Vector3 newValue)
     {
-        Debug.Log($"Update control cube percent by sync value: {newValue}");
-        controlCube.updatePercent(newValue);
+        if (controlCube.cubeManip.curState != manipObject.manipState.grabbed)
+        {
+            Debug.Log($"Update control cube percent by sync value: {newValue}");
+            controlCube.Setup(newValue);
+        }
     }
 
 
@@ -58,7 +61,7 @@ public class NetworkControlCubeManager : NetworkBehaviour
     public void CmdUpdateHandleValue(Vector3 value)
     {
         syncPercent = value;
-        controlCube.updatePercent(value);
+        controlCube.Setup(value);
         Debug.Log($"Update control cube percent on server value: {value}");
     }
 }
