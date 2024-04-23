@@ -3,9 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+[System.Serializable]
+public class ManipulatorVisual
+{
+    public GameObject activeObject;
+    public GameObject inactiveObject;
+
+    public void Toggle(bool b)
+    {
+        activeObject.gameObject.SetActive(b);
+        inactiveObject.gameObject.SetActive(!b);
+    }
+}
+
 public class VRNetworkPlayer : NetworkBehaviour
 {
-    [SerializeField]private Transform networkHead;
+    [SerializeField] private Transform networkHead;
     [SerializeField] private Transform networkLeftHand;
     [SerializeField] private Transform networkRightHand;
 
@@ -13,8 +26,26 @@ public class VRNetworkPlayer : NetworkBehaviour
     private Transform localPlayerRightHand;
     private Transform localPlayerLeftHand;
 
-    private manipulator lefHandManipulator;
+
+    private manipulator leftHandManipulator;
     private manipulator rightHandManipulator;
+
+    [Header("Manipulators")]
+    [SyncVar (hook = nameof(OnLeftHandManipulatorTriggerd))]
+    public bool leftHandManipulatorTriggerd;
+    [SyncVar (hook = nameof(OnRightHandManipulatorTriggerd))]
+    public bool rightHandManipulatorTriggerd;
+
+    public ManipulatorVisual leftManipulatorVisual;
+    public ManipulatorVisual rightManipulatorVisual;
+
+    [Header("Voice Chat")]
+    public bool hasVoiceChat = false;
+    [SyncVar (hook = nameof(OnVoiceChatIDChanged))]
+    public int voiceChatAgentID;
+    private NetworkAudioManager networkAudioManager;
+    private Transform voiceOverTransform;
+
 
     public override void OnStartLocalPlayer()
     {
@@ -33,25 +64,36 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
 
         //deactivate meshrenderers
-        if (networkHead.TryGetComponent<MeshRenderer>(out MeshRenderer headMR))
+        if (networkHead != null)
         {
-            headMR.enabled = false;
+            for(int i = networkHead.childCount - 1; i >= 0; i--)
+            {
+                Destroy(networkHead.GetChild(i).gameObject);
+            }
         }
-        if (networkLeftHand.TryGetComponent<MeshRenderer>(out MeshRenderer leftHandMR))
+        if (networkLeftHand != null)
         {
-            leftHandMR.enabled = false;
+            for (int i = networkLeftHand.childCount - 1; i >= 0; i--)
+            {
+                Destroy(networkLeftHand.GetChild(i).gameObject);
+            }
         }
-        if (networkRightHand.TryGetComponent<MeshRenderer>(out MeshRenderer rightHandMR))
+        if (networkRightHand != null)
         {
-            rightHandMR.enabled = false;
+            for (int i = networkRightHand.childCount - 1; i >= 0; i--)
+            {
+                Destroy(networkRightHand.GetChild(i).gameObject);
+            }
         }
 
         var worldDragController = GameObject.FindObjectOfType<WorldDragController>();
         if (worldDragController != null)
         {
-            lefHandManipulator = worldDragController.leftManip;
+            leftHandManipulator = worldDragController.leftManip;
             rightHandManipulator = worldDragController.rightManip;
         }
+
+        ConnectToVoiceChatAgent();
     }
 
     // Update is called once per frame
@@ -67,6 +109,10 @@ public class VRNetworkPlayer : NetworkBehaviour
 
             networkRightHand.position = localPlayerRightHand.position;
             networkRightHand.rotation = localPlayerRightHand.rotation;
+        }
+        else if (hasVoiceChat && voiceOverTransform != null)
+        {
+            voiceOverTransform.position = networkHead.position;
         }
     }
 
@@ -97,6 +143,120 @@ public class VRNetworkPlayer : NetworkBehaviour
 
     private manipulator TargetManipulator(bool isLeftHand)
     {
-        return isLeftHand ? lefHandManipulator : rightHandManipulator;
+        return isLeftHand ? leftHandManipulator : rightHandManipulator;
     }
+
+    #region Manipulator Object Triggerd
+
+    public void InitializeManipulatorEvents()
+    {
+        leftHandManipulator.onInputTriggerdEvent.AddListener(LeftHandTriggerStarted);
+        leftHandManipulator.onInputReleasedEvent.AddListener(LeftHandTriggerReleased);
+
+        rightHandManipulator.onInputTriggerdEvent.AddListener(RightHandTriggerStarted);
+        rightHandManipulator.onInputReleasedEvent.AddListener(RightHandTriggerReleased);
+    }
+
+    //left Hand
+    public void LeftHandTriggerStarted()
+    {
+        leftHandManipulatorTriggerd = true;
+        if (!isServer)
+        {
+            CmdSetLeftHandManipulatorTriggerd(leftHandManipulatorTriggerd);
+        }
+    }
+    public void LeftHandTriggerReleased()
+    {
+        leftHandManipulatorTriggerd = true;
+        if (!isServer)
+        {
+            CmdSetLeftHandManipulatorTriggerd(leftHandManipulatorTriggerd);
+        }
+    }
+
+    [Command]
+    public void CmdSetLeftHandManipulatorTriggerd(bool b)
+    {
+        leftHandManipulatorTriggerd = b;
+    }
+
+    public void OnLeftHandManipulatorTriggerd(bool old, bool newValue)
+    {
+        leftHandManipulatorTriggerd = newValue;
+        //update visual
+        leftManipulatorVisual.Toggle(leftHandManipulatorTriggerd);
+    }
+
+    //right Hand
+    public void RightHandTriggerStarted()
+    {
+        rightHandManipulatorTriggerd = true;
+        if (!isServer)
+        {
+            CmdSetRightHandManipulatorTriggerd(rightHandManipulatorTriggerd);
+        }
+    }
+    public void RightHandTriggerReleased()
+    {
+        leftHandManipulatorTriggerd = true;
+        if (!isServer)
+        {
+            CmdSetRightHandManipulatorTriggerd(rightHandManipulatorTriggerd);
+        }
+    }
+
+    [Command]
+    public void CmdSetRightHandManipulatorTriggerd(bool b)
+    {
+        rightHandManipulatorTriggerd = b;
+    }
+
+    public void OnRightHandManipulatorTriggerd(bool old, bool newValue)
+    {
+        rightHandManipulatorTriggerd = newValue;
+        //update visual
+        rightManipulatorVisual.Toggle(rightHandManipulatorTriggerd);
+    }
+    #endregion
+
+
+    #region Voice Chat
+    private void ConnectToVoiceChatAgent()
+    {
+        networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
+        if (networkAudioManager != null)
+        {
+            hasVoiceChat = true;
+
+            if (isServer)
+            {
+                voiceChatAgentID = networkAudioManager.GetAgentID();
+            }
+            else
+            {
+                CmdSetVoiceChatID(networkAudioManager.GetAgentID());
+            }
+        }
+    }
+
+    [Command]
+    public void CmdSetVoiceChatID(int id)
+    {
+        voiceChatAgentID = id;
+    }
+
+    public void OnVoiceChatIDChanged(int old, int newValue)
+    {
+        voiceChatAgentID = newValue;
+        //Search audio source object
+        var audioOutput = networkAudioManager.GetSourceOutput((short)voiceChatAgentID);
+        if (audioOutput != null)
+        {
+            voiceOverTransform = audioOutput.transform;
+            audioOutput.AudioSource.spatialBlend = 1f;
+        }
+    }
+
+    #endregion
 }

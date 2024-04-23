@@ -117,10 +117,17 @@ public class NetworkAudioManager : MonoBehaviour
             agent.MuteOthers = value);
     }
 
+    public short GetAgentID()
+    {
+        if (agent != null)
+            return agent.Network.OwnID;
+        return -1;
+    }
+
     void Update()
     {
         if (agent == null || agent.PeerOutputs == null) return;
-
+        
         foreach (var output in agent.PeerOutputs)
         {
             if (peerViews.ContainsKey(output.Key))
@@ -165,5 +172,14 @@ public class NetworkAudioManager : MonoBehaviour
     {
         Debug.Log("<color=blue>" + obj + "</color>");
         menuMessage.text = obj.ToString();
+    }
+
+    public UniVoiceAudioSourceOutput GetSourceOutput(short id)
+    {
+        if (agent.PeerOutputs.ContainsKey(id) && agent.PeerOutputs.TryGetValue(id, out IAudioOutput audioOutput) && audioOutput is UniVoiceAudioSourceOutput)
+        {
+            return audioOutput as UniVoiceAudioSourceOutput;
+        }
+        return null;
     }
 }

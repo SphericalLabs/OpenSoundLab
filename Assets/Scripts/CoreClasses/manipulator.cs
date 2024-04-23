@@ -36,6 +36,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using static manipObject;
+using UnityEngine.Events;
 
 public class manipulator : MonoBehaviour
 {
@@ -59,6 +60,9 @@ public class manipulator : MonoBehaviour
 
     private Transform grabedFollowPointTransform;
     public Transform GrabedFollowPointTransform { get { return grabedFollowPointTransform; } }
+
+    public UnityEvent onInputTriggerdEvent;
+    public UnityEvent onInputReleasedEvent;
 
     void Awake()
     {
@@ -553,6 +557,7 @@ public class manipulator : MonoBehaviour
             tipL.gameObject.SetActive(false);
             tipR.gameObject.SetActive(false);
             SetTrigger(true);
+            onInputTriggerdEvent.Invoke();
         }
 
         if (oslInput.isTriggerReleased(controllerIndex))
@@ -574,6 +579,7 @@ public class manipulator : MonoBehaviour
             tipL.gameObject.SetActive(true);
             tipR.gameObject.SetActive(true);
             SetTrigger(false);
+            onInputReleasedEvent.Invoke();
         }
 
         // manage ongoing grabbing
