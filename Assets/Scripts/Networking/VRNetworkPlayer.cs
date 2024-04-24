@@ -96,6 +96,15 @@ public class VRNetworkPlayer : NetworkBehaviour
         StartCoroutine(ConnectToVoiceChatAgent());
     }
 
+    private IEnumerator Start()
+    {
+        if (!isLocalPlayer && !moveVoiceChatObject)
+        {
+            yield return new WaitForSeconds(1f);
+            OnVoiceChatIDChanged(voiceChatAgentID, voiceChatAgentID);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {

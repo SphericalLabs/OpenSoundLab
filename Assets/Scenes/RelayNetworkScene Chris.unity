@@ -4668,6 +4668,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: GazeTracker
       objectReference: {fileID: 0}
+    - target: {fileID: 4554846243567720952, guid: 00e7b904331c07c41aa83f775e0f00f3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5456440671379796895, guid: 00e7b904331c07c41aa83f775e0f00f3,
         type: 3}
       propertyPath: m_LocalPosition.x
