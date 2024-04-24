@@ -682,6 +682,7 @@ public class manipulator : MonoBehaviour
                 activeTip.SetActive(false);
                 tipL.gameObject.SetActive(true);
                 tipR.gameObject.SetActive(true);
+                onInputReleasedEvent.Invoke();
             }
         }
 

@@ -46,6 +46,10 @@ public class VRNetworkPlayer : NetworkBehaviour
     private NetworkAudioManager networkAudioManager;
     private Transform voiceOverTransform;
 
+    public void Start()
+    {
+        InitializeManipulatorEvents();
+    }
 
     public override void OnStartLocalPlayer()
     {
@@ -168,7 +172,7 @@ public class VRNetworkPlayer : NetworkBehaviour
     }
     public void LeftHandTriggerReleased()
     {
-        leftHandManipulatorTriggerd = true;
+        leftHandManipulatorTriggerd = false;
         if (!isServer)
         {
             CmdSetLeftHandManipulatorTriggerd(leftHandManipulatorTriggerd);
@@ -185,7 +189,10 @@ public class VRNetworkPlayer : NetworkBehaviour
     {
         leftHandManipulatorTriggerd = newValue;
         //update visual
-        leftManipulatorVisual.Toggle(leftHandManipulatorTriggerd);
+        if (!isLocalPlayer)
+        {
+            leftManipulatorVisual.Toggle(leftHandManipulatorTriggerd);
+        }
     }
 
     //right Hand
@@ -199,7 +206,7 @@ public class VRNetworkPlayer : NetworkBehaviour
     }
     public void RightHandTriggerReleased()
     {
-        leftHandManipulatorTriggerd = true;
+        rightHandManipulatorTriggerd = false;
         if (!isServer)
         {
             CmdSetRightHandManipulatorTriggerd(rightHandManipulatorTriggerd);
@@ -216,7 +223,10 @@ public class VRNetworkPlayer : NetworkBehaviour
     {
         rightHandManipulatorTriggerd = newValue;
         //update visual
-        rightManipulatorVisual.Toggle(rightHandManipulatorTriggerd);
+        if (!isLocalPlayer)
+        {
+            rightManipulatorVisual.Toggle(rightHandManipulatorTriggerd);
+        }
     }
     #endregion
 
