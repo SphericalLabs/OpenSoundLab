@@ -93,7 +93,7 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
 
         InitializeManipulatorEvents();
-        ConnectToVoiceChatAgent();
+        StartCoroutine(ConnectToVoiceChatAgent());
     }
 
     // Update is called once per frame
@@ -233,7 +233,7 @@ public class VRNetworkPlayer : NetworkBehaviour
 
 
     #region Voice Chat
-    private void ConnectToVoiceChatAgent()
+    private IEnumerator ConnectToVoiceChatAgent()
     {
         Debug.Log("Try connect to VoiceChatAgent by local Player");
         if (networkAudioManager == null)
@@ -242,6 +242,14 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
         if (networkAudioManager != null)
         {
+            while (networkAudioManager.GetAgentID() < 0)
+            {
+                yield return new WaitForSeconds(1f);
+
+                Debug.Log("Wait for Agent ID over -1");
+            }
+
+            Debug.Log($"set agent id {networkAudioManager.GetAgentID()}");
             if (isServer)
             {
                 voiceChatAgentID = networkAudioManager.GetAgentID();
@@ -258,6 +266,7 @@ public class VRNetworkPlayer : NetworkBehaviour
     {
         voiceChatAgentID = id;
         Debug.Log($"Cmd voiceChatId of {gameObject.name} = {id}");
+        /*
         //we have to do this because the ID of the first player only is set correctly when the first peer joins (see UniVoiceMirrorNetwork.cs line 161)
         if (!isLocalPlayer && NetworkMenuManager.Instance != null)
         {
@@ -266,7 +275,7 @@ public class VRNetworkPlayer : NetworkBehaviour
                 NetworkMenuManager.Instance.localPlayer.voiceChatAgentID = 0;
                 Debug.Log($"Set first player id to 0");
             }
-        }
+        }*/
     }
 
     public void OnVoiceChatIDChanged(int old, int newValue)
