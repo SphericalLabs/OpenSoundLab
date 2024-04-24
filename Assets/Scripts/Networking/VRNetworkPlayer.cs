@@ -46,11 +46,6 @@ public class VRNetworkPlayer : NetworkBehaviour
     private NetworkAudioManager networkAudioManager;
     private Transform voiceOverTransform;
 
-    public void Start()
-    {
-        InitializeManipulatorEvents();
-    }
-
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
@@ -97,6 +92,7 @@ public class VRNetworkPlayer : NetworkBehaviour
             rightHandManipulator = worldDragController.rightManip;
         }
 
+        InitializeManipulatorEvents();
         ConnectToVoiceChatAgent();
     }
 
