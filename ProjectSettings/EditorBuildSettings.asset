@@ -8,12 +8,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/main.unity
     guid: 98ca84121eec7424d9669ae097f8c52e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/oslLocalNetworking.unity
     guid: 70a55efe19ab2224bb9eb09638a2128e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/oslRelayNetworkScene.unity
     guid: ae40a2ed7b0a66e438215baad514d99a
+  - enabled: 1
+    path: Assets/Scenes/KCPNetworkScene.unity
+    guid: cb57b32b57c1b4e368e1c85e3cad4623
+  - enabled: 1
+    path: Assets/Scenes/RelayNetworkScene Chris.unity
+    guid: 0c5474430b9140c4f8aad31533487c3c
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 4111133830c7bbe45a449ccd73094916,
       type: 2}

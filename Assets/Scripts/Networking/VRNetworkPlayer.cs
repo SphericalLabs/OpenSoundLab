@@ -40,9 +40,9 @@ public class VRNetworkPlayer : NetworkBehaviour
     public ManipulatorVisual rightManipulatorVisual;
 
     [Header("Voice Chat")]
-    public bool hasVoiceChat = false;
     [SyncVar (hook = nameof(OnVoiceChatIDChanged))]
     public int voiceChatAgentID;
+    private bool moveVoiceChatObject = false;
     private NetworkAudioManager networkAudioManager;
     private Transform voiceOverTransform;
 
@@ -110,7 +110,7 @@ public class VRNetworkPlayer : NetworkBehaviour
             networkRightHand.position = localPlayerRightHand.position;
             networkRightHand.rotation = localPlayerRightHand.rotation;
         }
-        else if (hasVoiceChat && voiceOverTransform != null)
+        else if (moveVoiceChatObject)
         {
             voiceOverTransform.position = networkHead.position;
         }
@@ -150,11 +150,16 @@ public class VRNetworkPlayer : NetworkBehaviour
 
     public void InitializeManipulatorEvents()
     {
-        leftHandManipulator.onInputTriggerdEvent.AddListener(LeftHandTriggerStarted);
-        leftHandManipulator.onInputReleasedEvent.AddListener(LeftHandTriggerReleased);
-
-        rightHandManipulator.onInputTriggerdEvent.AddListener(RightHandTriggerStarted);
-        rightHandManipulator.onInputReleasedEvent.AddListener(RightHandTriggerReleased);
+        if (leftHandManipulator != null)
+        {
+            leftHandManipulator.onInputTriggerdEvent.AddListener(LeftHandTriggerStarted);
+            leftHandManipulator.onInputReleasedEvent.AddListener(LeftHandTriggerReleased);
+        }
+        if (rightHandManipulator != null)
+        {
+            rightHandManipulator.onInputTriggerdEvent.AddListener(RightHandTriggerStarted);
+            rightHandManipulator.onInputReleasedEvent.AddListener(RightHandTriggerReleased);
+        }
     }
 
     //left Hand
@@ -230,14 +235,13 @@ public class VRNetworkPlayer : NetworkBehaviour
     #region Voice Chat
     private void ConnectToVoiceChatAgent()
     {
+        Debug.Log("Try connect to VoiceChatAgent by local Player");
         if (networkAudioManager == null)
         {
             networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
         }
         if (networkAudioManager != null)
         {
-            hasVoiceChat = true;
-
             if (isServer)
             {
                 voiceChatAgentID = networkAudioManager.GetAgentID();
@@ -253,11 +257,18 @@ public class VRNetworkPlayer : NetworkBehaviour
     public void CmdSetVoiceChatID(int id)
     {
         voiceChatAgentID = id;
+        Debug.Log($"Cmd voiceChatId of {gameObject.name} = {id}");
     }
 
     public void OnVoiceChatIDChanged(int old, int newValue)
     {
         voiceChatAgentID = newValue;
+        Debug.Log($"OnVoiceChatIDChanged {gameObject.name} = {voiceChatAgentID}");
+
+        if (isLocalPlayer)
+        {
+            return;
+        }
         //Search audio source object
         if (networkAudioManager == null)
         {
@@ -268,8 +279,10 @@ public class VRNetworkPlayer : NetworkBehaviour
             var audioOutput = networkAudioManager.GetSourceOutput((short)voiceChatAgentID);
             if (audioOutput != null)
             {
+                moveVoiceChatObject = true;
                 voiceOverTransform = audioOutput.transform;
                 audioOutput.AudioSource.spatialBlend = 1f;
+                Debug.Log($"found voicechat output object {gameObject.name}");
             }
         }
     }
