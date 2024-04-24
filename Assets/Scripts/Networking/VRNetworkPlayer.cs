@@ -230,7 +230,10 @@ public class VRNetworkPlayer : NetworkBehaviour
     #region Voice Chat
     private void ConnectToVoiceChatAgent()
     {
-        networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
+        if (networkAudioManager == null)
+        {
+            networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
+        }
         if (networkAudioManager != null)
         {
             hasVoiceChat = true;
@@ -256,11 +259,18 @@ public class VRNetworkPlayer : NetworkBehaviour
     {
         voiceChatAgentID = newValue;
         //Search audio source object
-        var audioOutput = networkAudioManager.GetSourceOutput((short)voiceChatAgentID);
-        if (audioOutput != null)
+        if (networkAudioManager == null)
         {
-            voiceOverTransform = audioOutput.transform;
-            audioOutput.AudioSource.spatialBlend = 1f;
+            networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
+        }
+        if (networkAudioManager != null)
+        {
+            var audioOutput = networkAudioManager.GetSourceOutput((short)voiceChatAgentID);
+            if (audioOutput != null)
+            {
+                voiceOverTransform = audioOutput.transform;
+                audioOutput.AudioSource.spatialBlend = 1f;
+            }
         }
     }
 
