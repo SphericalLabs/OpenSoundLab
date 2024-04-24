@@ -98,10 +98,13 @@ public class VRNetworkPlayer : NetworkBehaviour
 
     private IEnumerator Start()
     {
-        if (!isLocalPlayer && !moveVoiceChatObject)
+        if (!isLocalPlayer)
         {
             yield return new WaitForSeconds(1f);
-            OnVoiceChatIDChanged(voiceChatAgentID, voiceChatAgentID);
+            if (!moveVoiceChatObject)
+            {
+                OnVoiceChatIDChanged(voiceChatAgentID, voiceChatAgentID);
+            }
         }
     }
 
@@ -244,7 +247,7 @@ public class VRNetworkPlayer : NetworkBehaviour
     #region Voice Chat
     private IEnumerator ConnectToVoiceChatAgent()
     {
-        Debug.Log("Try connect to VoiceChatAgent by local Player");
+        //Debug.Log("Try connect to VoiceChatAgent by local Player");
         if (networkAudioManager == null)
         {
             networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
@@ -254,11 +257,10 @@ public class VRNetworkPlayer : NetworkBehaviour
             while (networkAudioManager.GetAgentID() < 0)
             {
                 yield return new WaitForSeconds(1f);
-
-                Debug.Log("Wait for Agent ID over -1");
+                //Debug.Log("Wait for Agent ID over -1");
             }
 
-            Debug.Log($"set agent id {networkAudioManager.GetAgentID()}");
+            //Debug.Log($"set agent id {networkAudioManager.GetAgentID()}");
             if (isServer)
             {
                 voiceChatAgentID = networkAudioManager.GetAgentID();
@@ -274,23 +276,13 @@ public class VRNetworkPlayer : NetworkBehaviour
     public void CmdSetVoiceChatID(int id)
     {
         voiceChatAgentID = id;
-        Debug.Log($"Cmd voiceChatId of {gameObject.name} = {id}");
-        /*
-        //we have to do this because the ID of the first player only is set correctly when the first peer joins (see UniVoiceMirrorNetwork.cs line 161)
-        if (!isLocalPlayer && NetworkMenuManager.Instance != null)
-        {
-            if (NetworkMenuManager.Instance.localPlayer.voiceChatAgentID != 0)
-            {
-                NetworkMenuManager.Instance.localPlayer.voiceChatAgentID = 0;
-                Debug.Log($"Set first player id to 0");
-            }
-        }*/
+        //Debug.Log($"Cmd voiceChatId of {gameObject.name} = {id}");
     }
 
     public void OnVoiceChatIDChanged(int old, int newValue)
     {
         voiceChatAgentID = newValue;
-        Debug.Log($"OnVoiceChatIDChanged {gameObject.name} = {voiceChatAgentID}");
+        //Debug.Log($"OnVoiceChatIDChanged {gameObject.name} = {voiceChatAgentID}");
 
         if (isLocalPlayer)
         {
@@ -309,7 +301,7 @@ public class VRNetworkPlayer : NetworkBehaviour
                 moveVoiceChatObject = true;
                 voiceOverTransform = audioOutput.transform;
                 audioOutput.AudioSource.spatialBlend = 1f;
-                Debug.Log($"found voicechat output object {gameObject.name}");
+                //Debug.Log($"found voicechat output object {gameObject.name}");
             }
         }
     }
