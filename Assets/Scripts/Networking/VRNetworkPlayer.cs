@@ -258,6 +258,15 @@ public class VRNetworkPlayer : NetworkBehaviour
     {
         voiceChatAgentID = id;
         Debug.Log($"Cmd voiceChatId of {gameObject.name} = {id}");
+        //we have to do this because the ID of the first player only is set correctly when the first peer joins (see UniVoiceMirrorNetwork.cs line 161)
+        if (!isLocalPlayer && NetworkMenuManager.Instance != null)
+        {
+            if (NetworkMenuManager.Instance.localPlayer.voiceChatAgentID != 0)
+            {
+                NetworkMenuManager.Instance.localPlayer.voiceChatAgentID = 0;
+                Debug.Log($"Set first player id to 0");
+            }
+        }
     }
 
     public void OnVoiceChatIDChanged(int old, int newValue)
