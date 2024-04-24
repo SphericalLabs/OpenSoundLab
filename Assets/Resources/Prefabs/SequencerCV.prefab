@@ -3218,8 +3218,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   ID: 0
-  xBounds: {x: -Infinity, y: -0.05}
-  yBounds: {x: -Infinity, y: 0}
+  xBounds: {x: -64, y: -0.05}
+  yBounds: {x: -16, y: 0}
   percent: {x: 0, y: 0}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   usePercent: 0
