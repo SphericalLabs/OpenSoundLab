@@ -26,6 +26,11 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
     public event Action<int, float[]> OnSampleReady;
 
+    private int loops = 0;
+    private int readAbsPos = 0;
+    private int prevPos = 0;
+    private float[] temp;
+
     #region METHODS
 
     static UniVoiceBusRecorder m_Instance;
@@ -50,9 +55,10 @@ public class UniVoiceBusRecorder : MonoBehaviour
         SampleDurationMS = sampleDurationMS;
 
         //AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
-        Sample = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
+        Sample = new float[Frequency / 1000 * SampleDurationMS * 2];
 
-        StartCoroutine(ReadRawAudio());
+        temp = new float[Sample.Length];
+        //StartCoroutine(ReadRawAudio());
     }
 
     public void StopRecording()
@@ -67,25 +73,43 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
     void OnAudioFilterRead(float[] data, int channels)
     {
-        m_SampleCount++;
-        OnSampleReady?.Invoke(m_SampleCount, data);
-        //if (!running)
-        //    return;
+        while (IsRecording)
+        {
+            bool isNewDataAvailable = true;
 
-        //double samplesPerTick = sampleRate * 60.0F / bpm * 4.0F / signatureLo;
-        //double sample = AudioSettings.dspTime * sampleRate;
-        //int dataLen = data.Length / channels;
+            while (isNewDataAvailable)
+            {
+                int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
+                if (currPos < prevPos)
+                    loops++;
+                prevPos = currPos;
 
+                var currAbsPos = loops * data.Length + currPos;
+                var nextReadAbsPos = readAbsPos + temp.Length;
+
+                if (nextReadAbsPos < currAbsPos)
+                {
+                    temp[readAbsPos] = data[currPos];
+                    AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
+
+                    Sample = temp;
+                    m_SampleCount++;
+                    OnSampleReady?.Invoke(m_SampleCount, Sample);
+
+                    readAbsPos = nextReadAbsPos;
+                    isNewDataAvailable = true;
+                }
+                else
+                {
+                    isNewDataAvailable = false;
+                }
+            }
+        }
     }
 
     IEnumerator ReadRawAudio()
     {
-        int loops = 0;
-        int readAbsPos = 0;
-        int prevPos = 0;
-        float[] temp = new float[Sample.Length];
-
-        while (AudioClip != null/* && Microphone.IsRecording(CurrentDeviceName)*/)
+        while (IsRecording)
         {
             bool isNewDataAvailable = true;
 
