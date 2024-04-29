@@ -18,7 +18,7 @@ public class UniVoiceBusAudioInput : IAudioInput
     public UniVoiceBusAudioInput(int deviceIndex = 0, int frequency = 16000, int sampleLen = 100)
     {
         UniVoiceBusRecorder.Instance.StartRecording(frequency, sampleLen);
-        Debug.unityLogger.Log("UniVoiceUniMicInput start playing");
+        Debug.unityLogger.Log("UniVoiceBusAudioInput start recording");
         UniVoiceBusRecorder.Instance.OnSampleReady += Bus_OnSampleReady;
     }
 

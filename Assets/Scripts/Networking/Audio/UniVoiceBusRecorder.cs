@@ -30,6 +30,7 @@ public class UniVoiceBusRecorder : MonoBehaviour
     private int readAbsPos = 0;
     private int prevPos = 0;
     private float[] temp;
+    private int currPos = 0;
 
     #region METHODS
 
@@ -45,12 +46,41 @@ public class UniVoiceBusRecorder : MonoBehaviour
             return m_Instance;
         }
     }
+    /*  I'm yet to try out the OnAudioFilterRead approach, but pretty much the only requirement here is to implement the IAudioInput interface properly.
+     *  Make sure that each interface property returns the right values: Frequency, ChannelCount and SegmentRate
+     *  Ensure that you're firing the OnSegmentReady event with the correct values. 
+     *  The length of the float array you provide in the OnSegmentReady event should align with the values of the property.
+     *  The formula is Length = Frequency * ChannelCount / SegmentRate
+     *  So if you're capturing at 48000Hz with one audio channel 10 times every second, it would be 48000 * 1 / 10 = 4800. 
+     *  UniVoice then expects the float array in the OnSegmentReady event to have a length of 4800
+     *  The int is basically a count of how many times you've fired the event. You need to keep track of it internally. 
+     *  Univoice uses it for caching audio during playback as well as reordering them if they arrive in the wrong order.
+     *  OnAudioFilterRead need not be called with data being the length you need. 
+     *  So you need to maintain an array internally and fire it when it reaches 4800. Some reference on how UniMic does it is here
+     *  Refer to this line: https://github.com/adrenak/univoice-sample/blob/0fea95dd2d747886afd89bc1682f8957c9b51784/Assets/Scripts/GroupVoiceCallSample.cs#L76
+     *  Here:
+     *  - 0 is the device index (the sample app assumes there is atleast one mic available on the device)
+     *  - 16000 is the frequency of the mic input audio stream
+     *  - 100 is the time (in milliseconds) that determines how often the audio is gathered and sent
+     *  
+     *  This means assuming there is one channel, every 100 milliseconds we expect a float of length 1600 to be prepared for UniVoice to send. 
+     *  If there were 2 channels, that would be 3200
+     *  
+     *  So, UniVoiceUniMicInput is able to call the OnSegmentReady event every 100ms with a float array that is of consistent length.
+     *  One more thing to consider when it comes to this is the length of the array itself. 
+     *  If you're capturing at 48KHz every 100ms with a single channel, you'll end up with 4800 floats going out in every packet, which is 19200 bytes. 
+     *  That's usually very large for a single packet especially on UDP, which is the recommended protocol. 
+     *  I mention this because in Unity settings the frequency is usually set at 48000 or 44100 which is what you'll receive in OnAudioFilterReady
+     *  Instead 16KHz single channel every 10ms would be 640 bytes which is much more suitable size wise. 
+     *  For example using KcpTransport in Mirror networking has a limit of around 1500 bytes for a single packet.
+     */
+
 
     public void StartRecording(int frequency = 16000, int sampleDurationMS = 10)
     {
         StopRecording();
         IsRecording = true;
-
+        currPos = 0;
         Frequency = frequency;
         SampleDurationMS = sampleDurationMS;
 
@@ -73,15 +103,20 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
     void OnAudioFilterRead(float[] data, int channels)
     {
-        while (IsRecording)
+        if(!IsRecording)
+        {
+            return;
+        }
+        else
         {
             bool isNewDataAvailable = true;
 
             while (isNewDataAvailable)
             {
-                int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
                 if (currPos < prevPos)
+                {
                     loops++;
+                }
                 prevPos = currPos;
 
                 var currAbsPos = loops * data.Length + currPos;
