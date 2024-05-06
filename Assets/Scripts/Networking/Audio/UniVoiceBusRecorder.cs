@@ -8,6 +8,7 @@ using Adrenak.UniVoice;
 [RequireComponent(typeof(AudioSource))]
 public class UniVoiceBusRecorder : MonoBehaviour
 {
+    public AudioSource audioSource;
     public bool IsRecording { get; private set; }
 
     public int Frequency { get; private set; }
@@ -75,19 +76,26 @@ public class UniVoiceBusRecorder : MonoBehaviour
      *  For example using KcpTransport in Mirror networking has a limit of around 1500 bytes for a single packet.
      */
 
+    public void PlayAudio()
+    {
+        audioSource.PlayOneShot(audioSource.clip);
+    }
 
     public void StartRecording(int frequency = 16000, int sampleDurationMS = 10)
     {
+        Debug.Log("Start Recording Bus");
         StopRecording();
         IsRecording = true;
         currPos = 0;
+        readAbsPos = 0;
         Frequency = frequency;
         SampleDurationMS = sampleDurationMS;
 
         //AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
         Sample = new float[Frequency / 1000 * SampleDurationMS * 2];
-
         temp = new float[Sample.Length];
+        Debug.Log("<color=green>Sample Lenght = " + Sample.Length + "</color>");
+        currPos = 0;
         //StartCoroutine(ReadRawAudio());
     }
 
@@ -103,30 +111,54 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
     void OnAudioFilterRead(float[] data, int channels)
     {
-        if(!IsRecording)
+        if (!IsRecording)
         {
             return;
         }
         else
         {
+            Debug.Log("<color=red>Data Lenght: " + data.Length + "</color>");
+            temp[currPos] = data[readAbsPos];
+            Debug.Log("Current Position = " + currPos + " / Current Data Pos: " + readAbsPos);
+            readAbsPos++;
+            if (currPos == Sample.Length -1)
+            {
+                Debug.Log("<color=red>OnSegmentReady</color>");
+                Sample = temp;
+                m_SampleCount++;
+                currPos = 0;
+                OnSampleReady?.Invoke(m_SampleCount, Sample);
+                return;
+            }
+            currPos++;
+        }
+    }
+
+    private IEnumerator ReadAudioData(float[] data)
+    {
+        while (IsRecording)
+        {
             bool isNewDataAvailable = true;
 
             while (isNewDataAvailable)
             {
+                //Get current position of microphone
+                int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
+
+                //If current Position is smaller than Previouse Position it looped
                 if (currPos < prevPos)
-                {
                     loops++;
-                }
+                //Set previouse To current position
                 prevPos = currPos;
 
+                //abstract position? position if data was glued together?
                 var currAbsPos = loops * data.Length + currPos;
                 var nextReadAbsPos = readAbsPos + temp.Length;
 
                 if (nextReadAbsPos < currAbsPos)
                 {
-                    temp[readAbsPos] = data[currPos];
+                    temp = data[readAbsPos..(data.Length-1)];
                     AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
-
                     Sample = temp;
                     m_SampleCount++;
                     OnSampleReady?.Invoke(m_SampleCount, Sample);
@@ -135,14 +167,13 @@ public class UniVoiceBusRecorder : MonoBehaviour
                     isNewDataAvailable = true;
                 }
                 else
-                {
                     isNewDataAvailable = false;
-                }
             }
+            yield return null;
         }
     }
 
-    IEnumerator ReadRawAudio()
+        IEnumerator ReadRawAudio()
     {
         while (IsRecording)
         {
@@ -150,11 +181,16 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
             while (isNewDataAvailable)
             {
+                //Get current position of microphone
                 int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
+
+                //If current Position is smaller than Previouse Position it looped
                 if (currPos < prevPos)
                     loops++;
+                //Set previouse To current position
                 prevPos = currPos;
 
+                //abstract position? position if data was glued together?
                 var currAbsPos = loops * AudioClip.samples + currPos;
                 var nextReadAbsPos = readAbsPos + temp.Length;
 
