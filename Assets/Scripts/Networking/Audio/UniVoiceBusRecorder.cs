@@ -99,13 +99,11 @@ public class UniVoiceBusRecorder : MonoBehaviour
         Frequency = frequency;
         SampleDurationMS = sampleDurationMS;
 
-        m_SampleCount = Frequency / 1000 * SampleDurationMS * 2;
-
         AudioClip = GetComponent<AudioSource>().clip;
         Debug.Log("Audioclip present = " + (AudioClip != null));
 
         //AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
-        Sample = new float[m_SampleCount];
+        Sample = new float[Frequency / 1000 * SampleDurationMS * 2];
         //temp = new float[Sample.Length];
         //Debug.Log("<color=green>Sample Lenght = " + Sample.Length + "</color>");
         //currPos = 0;
@@ -154,8 +152,9 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
             while (filterReadPos < data.Length)
             {
-                if (globalSampleReadPos > m_SampleCount - 1)
+                if (globalSampleReadPos > Sample.Length - 1)
                 {
+                    m_SampleCount++;
                     globalSampleReadPos = 0;
                     Debug.Log("<color=red>OnSegmentReady</color>");
                     OnSampleReady?.Invoke(m_SampleCount, Sample);
