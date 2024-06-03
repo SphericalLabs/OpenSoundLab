@@ -103,7 +103,7 @@ public class UniVoiceBusRecorder : MonoBehaviour
         Debug.Log("Audioclip present = " + (AudioClip != null));
 
         //AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
-        Sample = new float[Frequency / 1000 * SampleDurationMS * 2];
+        Sample = new float[Frequency / 1000 * SampleDurationMS * 1];
         //temp = new float[Sample.Length];
         //Debug.Log("<color=green>Sample Lenght = " + Sample.Length + "</color>");
         //currPos = 0;
