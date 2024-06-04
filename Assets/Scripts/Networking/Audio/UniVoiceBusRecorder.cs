@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,6 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Collections.Concurrent;
 using Adrenak.UniVoice;
+using Newtonsoft.Json.Linq;
+using UnityEngine.InputSystem;
+using Unity.Mathematics;
 
 [RequireComponent(typeof(AudioSource))]
 public class UniVoiceBusRecorder : MonoBehaviour
@@ -16,7 +19,7 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
     public int Frequency { get; private set; }
 
-    public float[] Sample { get; private set; }
+    public float[] SegmentData { get; private set; }
 
     public int SampleDurationMS { get; private set; }
 
@@ -30,9 +33,9 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
     public event Action<int, float[]> OnSampleReady;
 
-    private int globalSampleReadPos = 0;
+    private int BridgingSegmentPointer = 0;
     private long lockedSamplePos;
-    private int filterReadPos = 0;
+    private int bufferPointer = 0;
     private static ConcurrentQueue<Action> mainThreadActions = new ConcurrentQueue<Action>();
     //private int loops = 0;
     //private int readAbsPos = 0;
@@ -103,7 +106,7 @@ public class UniVoiceBusRecorder : MonoBehaviour
         Debug.Log("Audioclip present = " + (AudioClip != null));
 
         //AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
-        Sample = new float[Frequency / 1000 * SampleDurationMS * 2];
+        SegmentData = new float[Frequency / 1000 * SampleDurationMS * 2];
         //temp = new float[Sample.Length];
         //Debug.Log("<color=green>Sample Lenght = " + Sample.Length + "</color>");
         //currPos = 0;
@@ -137,167 +140,212 @@ public class UniVoiceBusRecorder : MonoBehaviour
         }
     }
 
+    int bufferSamplesdue = 0;
+
+    public float frequency = 440f; // Frequency of the sine wave (in Hz)
+    public float amplitude = 0.1f; // Amplitude of the sine wave
+
+    private double sampleRate;     // Sample rate of the audio
+    private double increment;      // Amount to increment the phase
+    private double phase;          // Current phase of the sine wave
+
+    void Start()
+    {
+      // Get the sample rate of the audio
+      sampleRate = AudioSettings.outputSampleRate;
+      increment = 2.0 * Mathf.PI * frequency / sampleRate;
+    }
+
+    private readonly object lockObject = new object(); // Lock object for thread safety
+
     private void Update()
     {
-        ExecuteMainThreadActions();
+        if (!IsRecording)
+          return;
+        bufferPointer = 0;
+
+
+        int localBufferSamplesDue;
+        lock (lockObject)
+        {
+          localBufferSamplesDue = bufferSamplesdue;
+          bufferSamplesdue = 0; // Reset samplesDue within the lock
+        }
+
+        while (bufferPointer < localBufferSamplesDue)
+        {
+        if (BridgingSegmentPointer > SegmentData.Length - 1)
+        {
+          m_SampleCount++;
+          BridgingSegmentPointer = 0;
+          //Debug.Log("<color=red>OnSegmentReady</color>"); // try not to use debug.log in the audio thread!
+          OnSampleReady?.Invoke(m_SampleCount, SegmentData);
+        }
+
+        // sine wave
+        SegmentData[BridgingSegmentPointer] = amplitude * Mathf.Sin((float)phase);
+        SegmentData[BridgingSegmentPointer + 1] = SegmentData[BridgingSegmentPointer];
+
+        // noise
+        //SegmentData[BridgingSegmentPointer] = UnityEngine.Random.Range(-1f, 1f);
+        //SegmentData[BridgingSegmentPointer + 1] = UnityEngine.Random.Range(-1f, 1f);
+
+        // Increment the phase
+        phase += increment;
+
+        // Keep the phase in the range [0, 2π]
+        if (phase > 2.0 * Mathf.PI)
+        {
+          phase -= 2.0 * Mathf.PI;
+        }
+
+        BridgingSegmentPointer += 2;
+        bufferPointer += 2;
+      }
+
     }
 
     void OnAudioFilterRead(float[] data, int channels)
     {
-        EnqueueMainThreadAction(() =>
-        {
-            if (!IsRecording)
-                return;
-            filterReadPos = 0;
-
-            while (filterReadPos < data.Length)
-            {
-                if (globalSampleReadPos > Sample.Length - 1)
-                {
-                    m_SampleCount++;
-                    globalSampleReadPos = 0;
-                    Debug.Log("<color=red>OnSegmentReady</color>");
-                    OnSampleReady?.Invoke(m_SampleCount, Sample);
-                }
-
-                Sample[globalSampleReadPos] = data[filterReadPos];
-                globalSampleReadPos++;
-                filterReadPos++;
-            }
-        });
-
-        /*
-        Debug.Log("<color=red>Data Lenght: " + data.Length + "</color>");
-        temp[currPos] = data[readAbsPos];
-        Debug.Log("Current Position = " + currPos + " / Current Data Pos: " + readAbsPos);
-        readAbsPos++;
-        if (currPos == Sample.Length -1)
-        {
-            Debug.Log("<color=red>OnSegmentReady</color>");
-            Sample = temp;
-            m_SampleCount++;
-            currPos = 0;
-            OnSampleReady?.Invoke(m_SampleCount, Sample);
-            return;
-        }
-        currPos++;
-        */
+         lock (lockObject)
+          {
+            bufferSamplesdue += data.Length;
+          }
+          /*
+          Debug.Log("<color=red>Data Lenght: " + data.Length + "</color>");
+          temp[currPos] = data[readAbsPos];
+          Debug.Log("Current Position = " + currPos + " / Current Data Pos: " + readAbsPos);
+          readAbsPos++;
+          if (currPos == Sample.Length -1)
+          {
+              Debug.Log("<color=red>OnSegmentReady</color>");
+              Sample = temp;
+              m_SampleCount++;
+              currPos = 0;
+              OnSampleReady?.Invoke(m_SampleCount, Sample);
+              return;
+          }
+          currPos++;
+          */
 
     }
 
     //private IEnumerator ReadAudioData(float[] data)
     //{
-    //    while (IsRecording)
+    //  while (IsRecording)
+    //  {
+    //    bool isNewDataAvailable = true;
+
+    //    while (isNewDataAvailable)
     //    {
-    //        bool isNewDataAvailable = true;
+    //      //Get current position of microphone
+    //      int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
 
-    //        while (isNewDataAvailable)
-    //        {
-    //            //Get current position of microphone
-    //            int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
+    //      //If current Position is smaller than Previouse Position it looped
+    //      if (currPos < prevPos)
+    //        loops++;
+    //      //Set previouse To current position
+    //      prevPos = currPos;
 
-    //            //If current Position is smaller than Previouse Position it looped
-    //            if (currPos < prevPos)
-    //                loops++;
-    //            //Set previouse To current position
-    //            prevPos = currPos;
+    //      //abstract position? position if data was glued together?
+    //      var currAbsPos = loops * data.Length + currPos;
+    //      var nextReadAbsPos = readAbsPos + temp.Length;
 
-    //            //abstract position? position if data was glued together?
-    //            var currAbsPos = loops * data.Length + currPos;
-    //            var nextReadAbsPos = readAbsPos + temp.Length;
+    //      if (nextReadAbsPos < currAbsPos)
+    //      {
+    //        temp = data[readAbsPos..(data.Length - 1)];
+    //        AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
+    //        Sample = temp;
+    //        m_SampleCount++;
+    //        OnSampleReady?.Invoke(m_SampleCount, Sample);
 
-    //            if (nextReadAbsPos < currAbsPos)
-    //            {
-    //                temp = data[readAbsPos..(data.Length - 1)];
-    //                AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
-    //                Sample = temp;
-    //                m_SampleCount++;
-    //                OnSampleReady?.Invoke(m_SampleCount, Sample);
-
-    //                readAbsPos = nextReadAbsPos;
-    //                isNewDataAvailable = true;
-    //            }
-    //            else
-    //                isNewDataAvailable = false;
-    //        }
-    //        yield return null;
+    //        readAbsPos = nextReadAbsPos;
+    //        isNewDataAvailable = true;
+    //      }
+    //      else
+    //        isNewDataAvailable = false;
     //    }
+    //    yield return null;
+    //  }
     //}
 
     //IEnumerator ReadRawAudio()
     //{
-    //    while (IsRecording)
+    //  while (IsRecording)
+    //  {
+    //    bool isNewDataAvailable = true;
+
+    //    while (isNewDataAvailable)
     //    {
-    //        bool isNewDataAvailable = true;
+    //      //Get current position of microphone
+    //      int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
 
-    //        while (isNewDataAvailable)
-    //        {
-    //            //Get current position of microphone
-    //            int currPos /*= Microphone.GetPosition(CurrentDeviceName);*/ = 0; //= 0; so no errors are thrown. it does nothing
+    //      //If current Position is smaller than Previouse Position it looped
+    //      if (currPos < prevPos)
+    //        loops++;
+    //      //Set previouse To current position
+    //      prevPos = currPos;
 
-    //            //If current Position is smaller than Previouse Position it looped
-    //            if (currPos < prevPos)
-    //                loops++;
-    //            //Set previouse To current position
-    //            prevPos = currPos;
+    //      //abstract position? position if data was glued together?
+    //      var currAbsPos = loops * AudioClip.samples + currPos;
+    //      var nextReadAbsPos = readAbsPos + temp.Length;
 
-    //            //abstract position? position if data was glued together?
-    //            var currAbsPos = loops * AudioClip.samples + currPos;
-    //            var nextReadAbsPos = readAbsPos + temp.Length;
+    //      if (nextReadAbsPos < currAbsPos)
+    //      {
+    //        AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
 
-    //            if (nextReadAbsPos < currAbsPos)
-    //            {
-    //                AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
+    //        Sample = temp;
+    //        m_SampleCount++;
+    //        OnSampleReady?.Invoke(m_SampleCount, Sample);
 
-    //                Sample = temp;
-    //                m_SampleCount++;
-    //                OnSampleReady?.Invoke(m_SampleCount, Sample);
-
-    //                readAbsPos = nextReadAbsPos;
-    //                isNewDataAvailable = true;
-    //            }
-    //            else
-    //                isNewDataAvailable = false;
-    //        }
-    //        yield return null;
+    //        readAbsPos = nextReadAbsPos;
+    //        isNewDataAvailable = true;
+    //      }
+    //      else
+    //        isNewDataAvailable = false;
     //    }
-        //this was from chris' UniVoiceAudioSampler.cs file
-        //--------------------------------------------------------
-        //int loops = 0;
-        //int readAbsPos = 0;
-        //int prevPos = 0;
-        //float[] temp = new float[Sample.Length];
+    //    yield return null;
+    //  }
 
-        //while (AudioClip != null)
-        //{
-        //    bool isNewDataAvailable = true;
+    //  //this was from chris' UniVoiceAudioSampler.cs file
+    //  --------------------------------------------------------
+    //  int loops = 0;
+    //  int readAbsPos = 0;
+    //  int prevPos = 0;
+    //  float[] temp = new float[Sample.Length];
 
-        //    while (isNewDataAvailable)
-        //    {
-        //        int currPos = 0; //Microphone.GetPosition(CurrentDeviceName);
-        //        if (currPos < prevPos)
-        //            loops++;
-        //        prevPos = currPos;
+    //  while (AudioClip != null)
+    //  {
+    //    bool isNewDataAvailable = true;
 
-        //        var currAbsPos = loops * AudioClip.samples + currPos;
-        //        var nextReadAbsPos = readAbsPos + temp.Length;
+    //    while (isNewDataAvailable)
+    //    {
+    //      int currPos = 0; //Microphone.GetPosition(CurrentDeviceName);
+    //      if (currPos < prevPos)
+    //        loops++;
+    //      prevPos = currPos;
 
-        //        if (nextReadAbsPos < currAbsPos)
-        //        {
-        //            AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
+    //      var currAbsPos = loops * AudioClip.samples + currPos;
+    //      var nextReadAbsPos = readAbsPos + temp.Length;
 
-        //            Sample = temp;
-        //            m_SampleCount++;
-        //            OnSampleReady?.Invoke(m_SampleCount, Sample);
+    //      if (nextReadAbsPos < currAbsPos)
+    //      {
+    //        AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
 
-        //            readAbsPos = nextReadAbsPos;
-        //            isNewDataAvailable = true;
-        //        }
-        //        else
-        //            isNewDataAvailable = false;
-        //    }
-        //    yield return null;
-        //}
+    //        Sample = temp;
+    //        m_SampleCount++;
+    //        OnSampleReady?.Invoke(m_SampleCount, Sample);
+
+    //        readAbsPos = nextReadAbsPos;
+    //        isNewDataAvailable = true;
+    //      }
+    //      else
+    //        isNewDataAvailable = false;
+    //    }
+    //    yield return null;
+    //  }
     //}
-    #endregion
+
+
+  #endregion
 }
