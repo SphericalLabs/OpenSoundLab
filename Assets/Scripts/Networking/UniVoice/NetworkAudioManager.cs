@@ -52,8 +52,8 @@ public class NetworkAudioManager : MonoBehaviour
     {
         agent = new ChatroomAgent(
             new UniVoiceMirrorNetwork(),
-            //new UniVoiceBusAudioInput(0, 6000, 10),
-            new SinusAudioInput(0, 4000, 25),
+            new UniVoiceBusAudioInput(0, 6000, 10),
+            //new SinusAudioInput(0, 4000, 25),
             //new UniVoiceUniMicInput(0, 8000, 25),
             new UniVoiceAudioSourceOutput.Factory()
         );

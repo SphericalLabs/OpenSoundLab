@@ -2097,7 +2097,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &488759228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2111,7 +2111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 488759229}
-  frequency: 440
+  frequency: 1000
   amplitude: 0.1
 --- !u!82 &488759229
 AudioSource:
@@ -4097,7 +4097,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &858067529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4706,8 +4706,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 858067529}
-        m_TargetAssemblyTypeName: SinusAudioSender, Assembly-CSharp
+      - m_Target: {fileID: 488759228}
+        m_TargetAssemblyTypeName: UniVoiceBusRecorder, Assembly-CSharp
         m_MethodName: PlayAudio
         m_Mode: 1
         m_Arguments:
