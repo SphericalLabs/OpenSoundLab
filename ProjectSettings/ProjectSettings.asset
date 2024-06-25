@@ -143,6 +143,10 @@ PlayerSettings:
   preloadedAssets:
   - {fileID: 0}
   - {fileID: 11400000, guid: c363b5179947cbb40899ebae53ad2c59, type: 2}
+  - {fileID: 11400000, guid: 3099c588a3391ca4a8bb43f81f2d3b89, type: 2}
+  - {fileID: 2480031238747604474, guid: 93c4f4428c8e3814dbf9d469c39e85d4, type: 2}
+  - {fileID: 11400000, guid: 4111133830c7bbe45a449ccd73094916, type: 2}
+  - {fileID: 7014611058148087182, guid: 888fd814a99cacd4091ef31088347959, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -843,6 +847,7 @@ PlayerSettings:
   metroSplashScreenUseBackgroundColor: 1
   platformCapabilities:
     WindowsStoreApps:
+      EnterpriseAuthentication: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -853,7 +858,6 @@ PlayerSettings:
       LowLevelDevices: False
       PrivateNetworkClientServer: False
       InternetClientServer: False
-      BackgroundMediaPlayback: False
       Objects3D: False
       RemoteSystem: False
       BlockedChatMessages: False
@@ -876,9 +880,9 @@ PlayerSettings:
       RecordedCallsFolder: False
       Contacts: False
       Proximity: False
-      InternetClient: False
       CodeGeneration: False
-      EnterpriseAuthentication: False
+      BackgroundMediaPlayback: False
+      InternetClient: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
@@ -948,11 +952,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: c7ac4139-8a11-4c49-86cd-042c2343f554
+  cloudProjectId: 4f7e68e3-9b92-4f5b-850b-af3c33580bb8
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: OpenSoundLab
-  organizationId: archlevel
+  organizationId: ludzeller
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 1
   hmiLoadingImage: {fileID: 0}

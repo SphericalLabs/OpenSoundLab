@@ -8,27 +8,29 @@ public class UniVoiceBusAudioInput : IAudioInput
 {
     public event Action<int, float[]> OnSegmentReady;
 
-    public int Frequency => UniVoiceBusRecorder.Instance.Frequency;
+    public int Frequency => UniVoiceMasterBusRecorder.Instance.Frequency;
 
-    public int ChannelCount =>
-        UniVoiceBusRecorder.Instance.AudioClip == null ? 0 : UniVoiceBusRecorder.Instance.AudioClip.channels;
+    public int ChannelCount => 2;
 
-    public int SegmentRate => 1000 / UniVoiceBusRecorder.Instance.SampleDurationMS;
+    public int SegmentRate { get; private set; }
 
-    public UniVoiceBusAudioInput(int deviceIndex = 0, int frequency = 16000, int sampleLen = 100)
+    public UniVoiceBusAudioInput(int segmentRate = 10)
     {
-        UniVoiceBusRecorder.Instance.StartRecording(frequency, sampleLen);
-        Debug.unityLogger.Log("UniVoiceBusAudioInput start recording");
-        UniVoiceBusRecorder.Instance.OnSampleReady += Bus_OnSampleReady;
+        SegmentRate = segmentRate;
+        UniVoiceMasterBusRecorder.Instance.StartRec(SegmentRate);
+        Debug.unityLogger.Log("UniVoiceBusAudioInput started recording");
+        UniVoiceMasterBusRecorder.Instance.OnSegmentReady += MasterBus_OnSegmentReady;
     }
 
-    void Bus_OnSampleReady(int segmentIndex, float[] samples)
+    void MasterBus_OnSegmentReady(int segmentIndex, float[] samples)
     {
         OnSegmentReady?.Invoke(segmentIndex, samples);
     }
 
     public void Dispose()
     {
-        UniVoiceBusRecorder.Instance.OnSampleReady -= Bus_OnSampleReady;
+        UniVoiceMasterBusRecorder.Instance.StopRec();
+        Debug.unityLogger.Log("UniVoiceBusAudioInput stopped recording");
+        UniVoiceMasterBusRecorder.Instance.OnSegmentReady -= MasterBus_OnSegmentReady;
     }
 }
