@@ -218,7 +218,7 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
                 segIndex++;
                 if (segIndex == segmentBuffer.Length)
                 {
-                    Debug.Log("OnSegmentReady");
+                    //Debug.Log("OnSegmentReady");
                     OnSegmentReady?.Invoke(segCounter, segmentBuffer);
                     segIndex = 0;
                     segCounter++;
@@ -233,7 +233,7 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
         {
             onEnded();
         }
-        else // 2) We consumed all samples that are currently available, but new samples may be available in the future bc we are still recording: 
+        else // 2) We consumed all samples that are currently available, but new samples may be available in the future bc we are still streaming: 
         {
             yield return null;
         }
