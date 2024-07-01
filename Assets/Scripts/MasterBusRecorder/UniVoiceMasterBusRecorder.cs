@@ -105,12 +105,35 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
 
     public int Frequency => AudioSettings.outputSampleRate;
 
-    public int ChannelCount => 2;
+    public int ChannelCount => GetNumberOfAudioChannels();
 
 
     public float[] segmentBuffer { get; private set; }
 
-
+    // this is doubled!
+    int GetNumberOfAudioChannels()
+    {
+        AudioSpeakerMode speakerMode = AudioSettings.speakerMode;
+        switch (speakerMode)
+        {
+            case AudioSpeakerMode.Mono:
+                return 1;
+            case AudioSpeakerMode.Stereo:
+                return 2;
+            case AudioSpeakerMode.Quad:
+                return 4;
+            case AudioSpeakerMode.Surround:
+                return 5;
+            case AudioSpeakerMode.Mode5point1:
+                return 6;
+            case AudioSpeakerMode.Mode7point1:
+                return 8;
+            case AudioSpeakerMode.Prologic:
+                return 2; // Prologic usually indicates stereo but encoded with surround information
+            default:
+                return 2; // Default to stereo if unknown
+        }
+    }
 
     private void OnDestroy()
     {
