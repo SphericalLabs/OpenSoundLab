@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02E0A84A2C33E8FC00807471"
-               BuildableName = "OSLNative-MacOS-Universal.dylib"
-               BlueprintName = "OSLNative-MacOS-Universal"
+               BlueprintIdentifier = "02D44CBB2C33F9ED006D8C29"
+               BuildableName = "libOSLNative.dylib"
+               BlueprintName = "OSLNative"
                ReferencedContainer = "container:OSLNative.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -49,9 +49,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "02E0A84A2C33E8FC00807471"
-            BuildableName = "OSLNative-MacOS-Universal.dylib"
-            BlueprintName = "OSLNative-MacOS-Universal"
+            BlueprintIdentifier = "02D44CBB2C33F9ED006D8C29"
+            BuildableName = "libOSLNative.dylib"
+            BlueprintName = "OSLNative"
             ReferencedContainer = "container:OSLNative.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

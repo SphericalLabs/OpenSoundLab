@@ -7,14 +7,50 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		02E0A8602C33E8FC00807471 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 974D48A027B158430087EC11 /* Accelerate.framework */; };
-		02E0A8612C33E8FC00807471 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
-		02E0A8912C33ED6700807471 /* FreeVerb in Resources */ = {isa = PBXBuildFile; fileRef = 02E0A88E2C33ED5100807471 /* FreeVerb */; };
-		02E0A8932C33ED6C00807471 /* MasterBusRecorder in Resources */ = {isa = PBXBuildFile; fileRef = 02E0A88C2C33ED3900807471 /* MasterBusRecorder */; };
+		02F52C4F2C340C09009F8DBA /* CompressedRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A87A2C33ED0D00807471 /* CompressedRingBuffer.h */; };
+		02F52C502C340C09009F8DBA /* resample.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8732C33ED0D00807471 /* resample.h */; };
+		02F52C512C340C09009F8DBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A86E2C33ED0D00807471 /* main.cpp */; };
+		02F52C522C340C09009F8DBA /* RingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A86D2C33ED0D00807471 /* RingBuffer.cpp */; };
+		02F52C532C340C09009F8DBA /* Filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8762C33ED0D00807471 /* Filter.h */; };
+		02F52C542C340C09009F8DBA /* CompressedRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A87E2C33ED0E00807471 /* CompressedRingBuffer.cpp */; };
+		02F52C552C340C09009F8DBA /* PluginList.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C452C340BCA009F8DBA /* PluginList.h */; };
+		02F52C562C340C09009F8DBA /* dfxsmoothedvalue.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C402C340BB6009F8DBA /* dfxsmoothedvalue.h */; };
+		02F52C572C340C09009F8DBA /* Artefact.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86A2C33ED0D00807471 /* Artefact.h */; };
+		02F52C582C340C09009F8DBA /* Freeverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8722C33ED0D00807471 /* Freeverb.cpp */; };
+		02F52C592C340C09009F8DBA /* AudioPluginInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C472C340BCA009F8DBA /* AudioPluginInterface.h */; };
+		02F52C5A2C340C09009F8DBA /* revmodel.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C352C340B9F009F8DBA /* revmodel.hpp */; };
+		02F52C5B2C340C09009F8DBA /* Artefact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8712C33ED0D00807471 /* Artefact.cpp */; };
+		02F52C5C2C340C09009F8DBA /* lookup_tables.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A87D2C33ED0E00807471 /* lookup_tables.h */; };
+		02F52C5D2C340C09009F8DBA /* AudioPluginUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C462C340BCA009F8DBA /* AudioPluginUtil.h */; };
+		02F52C5E2C340C09009F8DBA /* allpass.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C322C340B9F009F8DBA /* allpass.hpp */; };
+		02F52C5F2C340C09009F8DBA /* comb.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C362C340B9F009F8DBA /* comb.hpp */; };
+		02F52C602C340C09009F8DBA /* comb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C372C340B9F009F8DBA /* comb.cpp */; };
+		02F52C612C340C09009F8DBA /* resample_tables.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8772C33ED0D00807471 /* resample_tables.h */; };
+		02F52C622C340C09009F8DBA /* CRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A87B2C33ED0D00807471 /* CRingBuffer.cpp */; };
+		02F52C632C340C09009F8DBA /* Biquad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8742C33ED0D00807471 /* Biquad.cpp */; };
+		02F52C642C340C09009F8DBA /* RingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8702C33ED0D00807471 /* RingBuffer.h */; };
+		02F52C652C340C09009F8DBA /* Delay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8672C33ED0D00807471 /* Delay.cpp */; };
+		02F52C662C340C09009F8DBA /* Compressor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86F2C33ED0D00807471 /* Compressor.h */; };
+		02F52C672C340C09009F8DBA /* Compressor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8782C33ED0D00807471 /* Compressor.cpp */; };
+		02F52C682C340C09009F8DBA /* tuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C342C340B9F009F8DBA /* tuning.h */; };
+		02F52C692C340C09009F8DBA /* Filter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8682C33ED0D00807471 /* Filter.cpp */; };
+		02F52C6A2C340C09009F8DBA /* Delay.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8792C33ED0D00807471 /* Delay.h */; };
+		02F52C6B2C340C09009F8DBA /* Freeverb.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86C2C33ED0D00807471 /* Freeverb.h */; };
+		02F52C6C2C340C09009F8DBA /* resample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A87C2C33ED0E00807471 /* resample.cpp */; };
+		02F52C6D2C340C09009F8DBA /* dfxsmoothedvalue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C412C340BB6009F8DBA /* dfxsmoothedvalue.hpp */; };
+		02F52C6E2C340C09009F8DBA /* idfxsmoothedvalue.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C3F2C340BB6009F8DBA /* idfxsmoothedvalue.h */; };
+		02F52C6F2C340C09009F8DBA /* revmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C332C340B9F009F8DBA /* revmodel.cpp */; };
+		02F52C702C340C09009F8DBA /* AudioPluginUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */; };
+		02F52C712C340C09009F8DBA /* MasterBusRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */; };
+		02F52C722C340C09009F8DBA /* CRingBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8752C33ED0D00807471 /* CRingBuffer.hpp */; };
+		02F52C732C340C09009F8DBA /* main.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86B2C33ED0D00807471 /* main.h */; };
+		02F52C742C340C09009F8DBA /* allpass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C312C340B9F009F8DBA /* allpass.cpp */; };
+		02F52C752C340C09009F8DBA /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8692C33ED0D00807471 /* util.h */; };
+		02F52C772C340C9B009F8DBA /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C762C340C9B009F8DBA /* util.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		02E0A8652C33E8FC00807471 /* OSLNative-MacOS-Universal.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OSLNative-MacOS-Universal.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
+		02D44CBC2C33F9ED006D8C29 /* libOSLNative.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libOSLNative.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		02E0A8672C33ED0D00807471 /* Delay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Delay.cpp; path = ../Delay.cpp; sourceTree = "<group>"; };
 		02E0A8682C33ED0D00807471 /* Filter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Filter.cpp; path = ../Filter.cpp; sourceTree = "<group>"; };
 		02E0A8692C33ED0D00807471 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = ../util.h; sourceTree = "<group>"; };
@@ -39,20 +75,32 @@
 		02E0A87C2C33ED0E00807471 /* resample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resample.cpp; path = ../resample.cpp; sourceTree = "<group>"; };
 		02E0A87D2C33ED0E00807471 /* lookup_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lookup_tables.h; path = ../lookup_tables.h; sourceTree = "<group>"; };
 		02E0A87E2C33ED0E00807471 /* CompressedRingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompressedRingBuffer.cpp; path = ../CompressedRingBuffer.cpp; sourceTree = "<group>"; };
-		02E0A88C2C33ED3900807471 /* MasterBusRecorder */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MasterBusRecorder; path = ../MasterBusRecorder; sourceTree = "<group>"; };
-		02E0A88E2C33ED5100807471 /* FreeVerb */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FreeVerb; path = ../FreeVerb; sourceTree = "<group>"; };
+		02F52C312C340B9F009F8DBA /* allpass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = allpass.cpp; path = ../FreeVerb/freeverb/components/allpass.cpp; sourceTree = "<group>"; };
+		02F52C322C340B9F009F8DBA /* allpass.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = allpass.hpp; path = ../FreeVerb/freeverb/components/allpass.hpp; sourceTree = "<group>"; };
+		02F52C332C340B9F009F8DBA /* revmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = revmodel.cpp; path = ../FreeVerb/freeverb/components/revmodel.cpp; sourceTree = "<group>"; };
+		02F52C342C340B9F009F8DBA /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuning.h; path = ../FreeVerb/freeverb/components/tuning.h; sourceTree = "<group>"; };
+		02F52C352C340B9F009F8DBA /* revmodel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = revmodel.hpp; path = ../FreeVerb/freeverb/components/revmodel.hpp; sourceTree = "<group>"; };
+		02F52C362C340B9F009F8DBA /* comb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = comb.hpp; path = ../FreeVerb/freeverb/components/comb.hpp; sourceTree = "<group>"; };
+		02F52C372C340B9F009F8DBA /* comb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = comb.cpp; path = ../FreeVerb/freeverb/components/comb.cpp; sourceTree = "<group>"; };
+		02F52C3F2C340BB6009F8DBA /* idfxsmoothedvalue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = idfxsmoothedvalue.h; path = "../FreeVerb/dfx-library/idfxsmoothedvalue.h"; sourceTree = "<group>"; };
+		02F52C402C340BB6009F8DBA /* dfxsmoothedvalue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dfxsmoothedvalue.h; path = "../FreeVerb/dfx-library/dfxsmoothedvalue.h"; sourceTree = "<group>"; };
+		02F52C412C340BB6009F8DBA /* dfxsmoothedvalue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dfxsmoothedvalue.hpp; path = "../FreeVerb/dfx-library/dfxsmoothedvalue.hpp"; sourceTree = "<group>"; };
+		02F52C452C340BCA009F8DBA /* PluginList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PluginList.h; path = ../MasterBusRecorder/PluginList.h; sourceTree = "<group>"; };
+		02F52C462C340BCA009F8DBA /* AudioPluginUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginUtil.h; path = ../MasterBusRecorder/AudioPluginUtil.h; sourceTree = "<group>"; };
+		02F52C472C340BCA009F8DBA /* AudioPluginInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginInterface.h; path = ../MasterBusRecorder/AudioPluginInterface.h; sourceTree = "<group>"; };
+		02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioPluginUtil.cpp; path = ../MasterBusRecorder/AudioPluginUtil.cpp; sourceTree = "<group>"; };
+		02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MasterBusRecorder.cpp; path = ../MasterBusRecorder/MasterBusRecorder.cpp; sourceTree = "<group>"; };
+		02F52C762C340C9B009F8DBA /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../util.c; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		974D48A027B158430087EC11 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		02E0A85F2C33E8FC00807471 /* Frameworks */ = {
+		02D44CBA2C33F9ED006D8C29 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02E0A8602C33E8FC00807471 /* Accelerate.framework in Frameworks */,
-				02E0A8612C33E8FC00807471 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,12 +138,26 @@
 		08FB77AFFE84173DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				02E0A88E2C33ED5100807471 /* FreeVerb */,
-				02E0A88C2C33ED3900807471 /* MasterBusRecorder */,
 				02E0A8762C33ED0D00807471 /* Filter.h */,
 				02E0A8722C33ED0D00807471 /* Freeverb.cpp */,
+				02F52C762C340C9B009F8DBA /* util.c */,
 				02E0A8712C33ED0D00807471 /* Artefact.cpp */,
+				02F52C402C340BB6009F8DBA /* dfxsmoothedvalue.h */,
+				02F52C472C340BCA009F8DBA /* AudioPluginInterface.h */,
+				02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */,
+				02F52C462C340BCA009F8DBA /* AudioPluginUtil.h */,
+				02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */,
+				02F52C452C340BCA009F8DBA /* PluginList.h */,
+				02F52C412C340BB6009F8DBA /* dfxsmoothedvalue.hpp */,
+				02F52C3F2C340BB6009F8DBA /* idfxsmoothedvalue.h */,
 				02E0A86A2C33ED0D00807471 /* Artefact.h */,
+				02F52C312C340B9F009F8DBA /* allpass.cpp */,
+				02F52C322C340B9F009F8DBA /* allpass.hpp */,
+				02F52C372C340B9F009F8DBA /* comb.cpp */,
+				02F52C362C340B9F009F8DBA /* comb.hpp */,
+				02F52C332C340B9F009F8DBA /* revmodel.cpp */,
+				02F52C352C340B9F009F8DBA /* revmodel.hpp */,
+				02F52C342C340B9F009F8DBA /* tuning.h */,
 				02E0A8742C33ED0D00807471 /* Biquad.cpp */,
 				02E0A87E2C33ED0E00807471 /* CompressedRingBuffer.cpp */,
 				02E0A87A2C33ED0D00807471 /* CompressedRingBuffer.h */,
@@ -123,7 +185,7 @@
 		19C28FB6FE9D52B211CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				02E0A8652C33E8FC00807471 /* OSLNative-MacOS-Universal.bundle */,
+				02D44CBC2C33F9ED006D8C29 /* libOSLNative.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -138,25 +200,56 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		02D44CB82C33F9ED006D8C29 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02F52C6D2C340C09009F8DBA /* dfxsmoothedvalue.hpp in Headers */,
+				02F52C722C340C09009F8DBA /* CRingBuffer.hpp in Headers */,
+				02F52C5D2C340C09009F8DBA /* AudioPluginUtil.h in Headers */,
+				02F52C732C340C09009F8DBA /* main.h in Headers */,
+				02F52C612C340C09009F8DBA /* resample_tables.h in Headers */,
+				02F52C5E2C340C09009F8DBA /* allpass.hpp in Headers */,
+				02F52C752C340C09009F8DBA /* util.h in Headers */,
+				02F52C682C340C09009F8DBA /* tuning.h in Headers */,
+				02F52C6A2C340C09009F8DBA /* Delay.h in Headers */,
+				02F52C5A2C340C09009F8DBA /* revmodel.hpp in Headers */,
+				02F52C5F2C340C09009F8DBA /* comb.hpp in Headers */,
+				02F52C6B2C340C09009F8DBA /* Freeverb.h in Headers */,
+				02F52C532C340C09009F8DBA /* Filter.h in Headers */,
+				02F52C662C340C09009F8DBA /* Compressor.h in Headers */,
+				02F52C552C340C09009F8DBA /* PluginList.h in Headers */,
+				02F52C6E2C340C09009F8DBA /* idfxsmoothedvalue.h in Headers */,
+				02F52C572C340C09009F8DBA /* Artefact.h in Headers */,
+				02F52C562C340C09009F8DBA /* dfxsmoothedvalue.h in Headers */,
+				02F52C4F2C340C09009F8DBA /* CompressedRingBuffer.h in Headers */,
+				02F52C642C340C09009F8DBA /* RingBuffer.h in Headers */,
+				02F52C5C2C340C09009F8DBA /* lookup_tables.h in Headers */,
+				02F52C592C340C09009F8DBA /* AudioPluginInterface.h in Headers */,
+				02F52C502C340C09009F8DBA /* resample.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
-		02E0A84A2C33E8FC00807471 /* OSLNative-MacOS-Universal */ = {
+		02D44CBB2C33F9ED006D8C29 /* OSLNative */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 02E0A8622C33E8FC00807471 /* Build configuration list for PBXNativeTarget "OSLNative-MacOS-Universal" */;
+			buildConfigurationList = 02D44CBD2C33F9ED006D8C29 /* Build configuration list for PBXNativeTarget "OSLNative" */;
 			buildPhases = (
-				02E0A84B2C33E8FC00807471 /* ShellScript */,
-				02E0A84C2C33E8FC00807471 /* Resources */,
-				02E0A84D2C33E8FC00807471 /* Sources */,
-				02E0A85F2C33E8FC00807471 /* Frameworks */,
+				02D44CB82C33F9ED006D8C29 /* Headers */,
+				02D44CB92C33F9ED006D8C29 /* Sources */,
+				02D44CBA2C33F9ED006D8C29 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "OSLNative-MacOS-Universal";
-			productInstallPath = "$(HOME)/Library/Bundles";
-			productName = AudioPluginDemo;
-			productReference = 02E0A8652C33E8FC00807471 /* OSLNative-MacOS-Universal.bundle */;
-			productType = "com.apple.product-type.bundle";
+			name = OSLNative;
+			productName = OSLNative;
+			productReference = 02D44CBC2C33F9ED006D8C29 /* libOSLNative.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
@@ -164,6 +257,11 @@
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				TargetAttributes = {
+					02D44CBB2C33F9ED006D8C29 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+				};
 			};
 			buildConfigurationList = 1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "OSLNative" */;
 			compatibilityVersion = "Xcode 3.1";
@@ -180,121 +278,172 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				02E0A84A2C33E8FC00807471 /* OSLNative-MacOS-Universal */,
+				02D44CBB2C33F9ED006D8C29 /* OSLNative */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		02E0A84C2C33E8FC00807471 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				02E0A8912C33ED6700807471 /* FreeVerb in Resources */,
-				02E0A8932C33ED6C00807471 /* MasterBusRecorder in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		02E0A84B2C33E8FC00807471 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Unity places .meta files inside the bundle, which Xcode doesn't like at all:\ncd \"$BUILD_DIR/Debug/OSLNative.bundle\"\nfind . -name \"*.meta\" -type f -delete\ncd \"$BUILD_DIR/Release/OSLNative.bundle\"\nfind . -name \"*.meta\" -type f -delete\n\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		02E0A84D2C33E8FC00807471 /* Sources */ = {
+		02D44CB92C33F9ED006D8C29 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02F52C512C340C09009F8DBA /* main.cpp in Sources */,
+				02F52C772C340C9B009F8DBA /* util.c in Sources */,
+				02F52C632C340C09009F8DBA /* Biquad.cpp in Sources */,
+				02F52C5B2C340C09009F8DBA /* Artefact.cpp in Sources */,
+				02F52C692C340C09009F8DBA /* Filter.cpp in Sources */,
+				02F52C602C340C09009F8DBA /* comb.cpp in Sources */,
+				02F52C712C340C09009F8DBA /* MasterBusRecorder.cpp in Sources */,
+				02F52C672C340C09009F8DBA /* Compressor.cpp in Sources */,
+				02F52C622C340C09009F8DBA /* CRingBuffer.cpp in Sources */,
+				02F52C652C340C09009F8DBA /* Delay.cpp in Sources */,
+				02F52C522C340C09009F8DBA /* RingBuffer.cpp in Sources */,
+				02F52C702C340C09009F8DBA /* AudioPluginUtil.cpp in Sources */,
+				02F52C6F2C340C09009F8DBA /* revmodel.cpp in Sources */,
+				02F52C742C340C09009F8DBA /* allpass.cpp in Sources */,
+				02F52C582C340C09009F8DBA /* Freeverb.cpp in Sources */,
+				02F52C6C2C340C09009F8DBA /* resample.cpp in Sources */,
+				02F52C542C340C09009F8DBA /* CompressedRingBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		02E0A8632C33E8FC00807471 /* Debug */ = {
+		02D44CBE2C33F9ED006D8C29 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD)";
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Manual;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = "";
-				DSTROOT = "$(PROJECT_DIR)/../../Assets";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DSTROOT = "$(PROJECT_DIR)/build";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				INFOPLIST_FILE = "OSLNative-MacOS-ARM64 copy-Info.plist";
-				INSTALL_PATH = "/OSLNative/macos/$(ARCHS)/";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = io.sphericals.OSLNative;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INSTALL_PATH = "../../../Assets/OSLNative/macos/$(ARCHS)/";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
-				SKIP_INSTALL = NO;
-				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../**";
-				WRAPPER_EXTENSION = bundle;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
-		02E0A8642C33E8FC00807471 /* Release */ = {
+		02D44CBF2C33F9ED006D8C29 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD)";
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Manual;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = "";
-				DSTROOT = "$(PROJECT_DIR)/../../Assets";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				INFOPLIST_FILE = "OSLNative-MacOS-ARM64 copy-Info.plist";
-				INSTALL_PATH = "/OSLNative/macos/$(ARCHS)/";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PRODUCT_BUNDLE_IDENTIFIER = io.sphericals.OSLNative;
+				DSTROOT = "$(PROJECT_DIR)/build";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INSTALL_PATH = "../../../Assets/OSLNative/macos/$(ARCHS)/";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
-				SKIP_INSTALL = NO;
-				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../**";
-				WRAPPER_EXTENSION = bundle;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
 		1DEB911F08733D790010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -310,7 +459,7 @@
 		1DEB912008733D790010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -324,11 +473,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		02E0A8622C33E8FC00807471 /* Build configuration list for PBXNativeTarget "OSLNative-MacOS-Universal" */ = {
+		02D44CBD2C33F9ED006D8C29 /* Build configuration list for PBXNativeTarget "OSLNative" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				02E0A8632C33E8FC00807471 /* Debug */,
-				02E0A8642C33E8FC00807471 /* Release */,
+				02D44CBE2C33F9ED006D8C29 /* Debug */,
+				02D44CBF2C33F9ED006D8C29 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
