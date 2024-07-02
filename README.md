@@ -1,4 +1,6 @@
-# OpenSoundLab
+# OpenMultiLab
+
+In this branch Chris Leisi, Christoph Müller and Ludwig Zeller are currently working on making OpenSoundLab multi-user capable via Mirror, Unity Relay and UniVoice. Until further notice, this branch will yield separate binaries that go under the name of OpenMultiLab. Our commits here might not always behave well or build without errors. Please handle with care! This ongoing work is part of the SNSF Spark research project "Emerging Practices in Modular Synthesis: Towards a Virtual Ethnography for Mixed Realities".
 
 [[Trailer](https://youtu.be/HYn9THRtBvs)] [[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)] [[Download](https://github.com/ludzeller/OpenSoundLab/releases/)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.gg/Jrmg5na3Ru)]
 [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)]
