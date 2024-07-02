@@ -157,7 +157,7 @@ public class sampleManager : MonoBehaviour {
       for (int i = 0; i < subdirs.Length; i++) {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
                 string s = subdirs[i].Replace(dir + "\\", "");
-#elif UNITY_ANDROID || UNITY_EDITOR_OSX
+#elif UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
                 string s = subdirs[i].Replace(dir + "/", "");
 #endif
                 sampleDictionary[s] = new Dictionary<string, string>();
