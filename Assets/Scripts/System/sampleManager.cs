@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ? 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ? 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ? 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ? 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -157,7 +157,7 @@ public class sampleManager : MonoBehaviour {
       for (int i = 0; i < subdirs.Length; i++) {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
                 string s = subdirs[i].Replace(dir + "\\", "");
-#elif UNITY_ANDROID
+#elif UNITY_ANDROID || UNITY_EDITOR_OSX
                 string s = subdirs[i].Replace(dir + "/", "");
 #endif
                 sampleDictionary[s] = new Dictionary<string, string>();
