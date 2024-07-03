@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02D93F202C353FF400F2F319 /* libOSLNative.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 02D44CBC2C33F9ED006D8C29 /* libOSLNative.dylib */; };
 		02F52C4F2C340C09009F8DBA /* CompressedRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A87A2C33ED0D00807471 /* CompressedRingBuffer.h */; };
 		02F52C502C340C09009F8DBA /* resample.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8732C33ED0D00807471 /* resample.h */; };
 		02F52C512C340C09009F8DBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A86E2C33ED0D00807471 /* main.cpp */; };
@@ -48,6 +49,19 @@
 		02F52C752C340C09009F8DBA /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8692C33ED0D00807471 /* util.h */; };
 		02F52C772C340C9B009F8DBA /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C762C340C9B009F8DBA /* util.c */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		02D93F1D2C353F5800F2F319 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(INSTALL_PATH)";
+			dstSubfolderSpec = 0;
+			files = (
+				02D93F202C353FF400F2F319 /* libOSLNative.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		02D44CBC2C33F9ED006D8C29 /* libOSLNative.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libOSLNative.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -241,6 +255,7 @@
 				02D44CB82C33F9ED006D8C29 /* Headers */,
 				02D44CB92C33F9ED006D8C29 /* Sources */,
 				02D44CBA2C33F9ED006D8C29 /* Frameworks */,
+				02D93F1D2C353F5800F2F319 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -348,7 +363,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DSTROOT = "$(PROJECT_DIR)/build";
+				DSTROOT = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -367,14 +382,15 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INSTALL_PATH = "../../../Assets/OSLNative/macos/$(ARCHS)/";
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/$(ARCHS)/";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
+				SYMROOT = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/$(ARCHS)/";
 			};
 			name = Debug;
 		};
@@ -415,7 +431,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DSTROOT = "$(PROJECT_DIR)/build";
+				DSTROOT = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -429,14 +445,15 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INSTALL_PATH = "../../../Assets/OSLNative/macos/$(ARCHS)/";
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/$(ARCHS)/";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
+				SYMROOT = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/$(ARCHS)/";
 			};
 			name = Release;
 		};
@@ -449,6 +466,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/$(ARCHS)/";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
@@ -464,6 +482,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/$(ARCHS)/";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PREBINDING = NO;
 				SDKROOT = macosx14.2;
