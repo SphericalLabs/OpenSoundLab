@@ -111,7 +111,7 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
     public float[] segmentBuffer { get; private set; }
 
     // this is doubled!
-    int GetNumberOfAudioChannels()
+    public int GetNumberOfAudioChannels()
     {
         AudioSpeakerMode speakerMode = AudioSettings.speakerMode;
         switch (speakerMode)
@@ -225,12 +225,11 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
 
     public event Action<int, float[]> OnSegmentReady;
     int segCounter = 0;
+    float sample = 0;
+    int segIndex = 0;
 
     public IEnumerator QuerySamples(UniVoiceMasterBusRecorder recInterface, Action onEnded)
     {
-
-        float sample = 0;
-        int segIndex = 0;
 
         ///Repeatedly query native code for new samples
         while (recInterface.state != State.Idle)
