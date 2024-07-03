@@ -3784,10 +3784,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   label: {fileID: 1665044624}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 11
   ID: -1
+  disabledForMultiuser: 0
 --- !u!1 &1106793264
 GameObject:
   m_ObjectHideFlags: 0

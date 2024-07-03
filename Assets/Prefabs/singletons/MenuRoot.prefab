@@ -309,6 +309,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   isToggle: 0
   toggleKey: 0
   buttonID: 3
@@ -326,6 +332,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &7483247851325266044
 SphereCollider:
@@ -454,6 +463,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   isToggle: 0
   toggleKey: 0
   buttonID: 4
@@ -471,6 +486,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &1924785667356309180
 SphereCollider:
@@ -915,11 +933,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000011737981362}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 1
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000011040354932
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1091,11 +1117,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000011504477722}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 3
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000010516813060
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1434,7 +1468,7 @@ AudioSource:
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -1449,7 +1483,7 @@ AudioSource:
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -1464,7 +1498,7 @@ AudioSource:
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
 --- !u!1 &1000010306020102
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,11 +1552,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000012117968536}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 4
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000012144255174
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1606,6 +1648,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000010497472968}
   outline: {fileID: 775777338748587676}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
@@ -2156,6 +2204,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000010873408160}
   outline: {fileID: 1000013092965312}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
@@ -2301,6 +2355,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 0.5
   defaultPercent: 0
   currentDialColor: 0
@@ -2314,6 +2374,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000010878650878
 GameObject:
   m_ObjectHideFlags: 0
@@ -2450,11 +2513,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000010152283630}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 2
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000013350501224
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2709,11 +2780,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000013515584266}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 5
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000010746938798
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2747,7 +2826,7 @@ GameObject:
   - component: {fileID: 23000011595940570}
   - component: {fileID: 102000012117968536}
   m_Layer: 0
-  m_Name: New Text (2)
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2844,7 +2923,7 @@ GameObject:
   - component: {fileID: 23000013696737982}
   - component: {fileID: 102000011737981362}
   m_Layer: 0
-  m_Name: New Text (3)
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3279,6 +3358,10 @@ MonoBehaviour:
   savePanel: {fileID: 1000013901675166}
   wireSettingsPanel: {fileID: 1000011517248258}
   settingsLabel: {fileID: 1701085991450616}
+  newItem: {fileID: 114000013269375150}
+  loadItem: {fileID: 114000011599850036}
+  saveItem: {fileID: 114000014167325040}
+  disabledMaterial: {fileID: 2100000, guid: afbcc4a0fb7f85748903fef2e6f54fa3, type: 2}
   items:
   - {fileID: 1000010147057914}
   - {fileID: 1000010306020102}
@@ -3892,11 +3975,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000013866017362}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 7
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000011853681814
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4220,6 +4311,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000014234056240}
   outline: {fileID: 1000014264170290}
   textMat: {fileID: 0}
@@ -4360,6 +4457,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000013604903038}
   outline: {fileID: 1000013533404154}
   textMat: {fileID: 0}
@@ -4448,11 +4551,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000012155045274}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 6
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000013524494202
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4631,6 +4742,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   menu: {fileID: 114000013472979670}
   gearRenderer: {fileID: 23000010216605130}
 --- !u!1 &1000012954179604
@@ -4645,7 +4762,7 @@ GameObject:
   - component: {fileID: 23000012366362932}
   - component: {fileID: 102000011504477722}
   m_Layer: 0
-  m_Name: New Text (1)
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5062,6 +5179,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102576945830915048}
   outline: {fileID: 23000010389668562}
   _componentInterface: {fileID: 114000011303056404}
@@ -5294,6 +5417,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000013752562542}
   outline: {fileID: 1000010607730584}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
@@ -6284,6 +6413,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000013812865366}
   outline: {fileID: 1000010489127044}
   panelMat: {fileID: 0}
@@ -6442,11 +6577,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000013203009670}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 9
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000013287818494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7135,11 +7278,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102000013386909054}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 8
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &65000013829114764
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7543,6 +7694,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   isToggle: 0
   toggleKey: 0
   buttonID: 1
@@ -7560,6 +7717,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &3755671258882700754
 SphereCollider:
@@ -7895,6 +8055,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 0
   xBound: 0.065
   sliderHue: 0.44
@@ -7903,6 +8069,9 @@ MonoBehaviour:
   rend: {fileID: 0}
   labelsPresent: 0
   labelColor: {r: 0, g: 0.65, b: 0.15, a: 1}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1114926341177990
 GameObject:
   m_ObjectHideFlags: 0
@@ -8422,6 +8591,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 0
   defaultPercent: 0
   currentDialColor: 0
@@ -8435,6 +8610,9 @@ MonoBehaviour:
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1303048483121190
 GameObject:
   m_ObjectHideFlags: 0
@@ -8540,6 +8718,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   isToggle: 1
   toggleKey: 0
   buttonID: 0
@@ -8557,6 +8741,9 @@ MonoBehaviour:
   startToggled: 1
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &3330669305064121860
 SphereCollider:
@@ -9241,6 +9428,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102602513759140504}
   outline: {fileID: 23186489358333476}
   _componentInterface: {fileID: 114000011303056404}
@@ -9530,6 +9723,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102022779410391708}
   outline: {fileID: 1527955584648820}
   textMat: {fileID: 0}
@@ -10076,6 +10275,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 102289478877226466}
   outline: {fileID: 23990859527927480}
   _componentInterface: {fileID: 114000011303056404}
@@ -10301,6 +10506,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   isToggle: 1
   toggleKey: 0
   buttonID: 5
@@ -10318,6 +10529,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 1
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!135 &8848369812413771563
 SphereCollider:
@@ -10416,6 +10630,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 0.5
   defaultPercent: 0
   currentDialColor: 0
@@ -10429,6 +10649,9 @@ MonoBehaviour:
   isNotched: 1
   isBipolar: 0
   notchSteps: 8
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &775777338748587676
 GameObject:
   m_ObjectHideFlags: 0
@@ -11419,6 +11642,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 0.8
   defaultPercent: 0
   currentDialColor: 0
@@ -11432,6 +11661,9 @@ MonoBehaviour:
   isNotched: 1
   isBipolar: 0
   notchSteps: 5
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3035397866869824105
 GameObject:
   m_ObjectHideFlags: 0
@@ -11605,6 +11837,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 1
   defaultPercent: 0
   currentDialColor: 0
@@ -11618,6 +11856,9 @@ MonoBehaviour:
   isNotched: 1
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3151853537499514499
 GameObject:
   m_ObjectHideFlags: 0
@@ -13383,11 +13624,19 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   label: {fileID: 1274432476903583881}
+  panelRend: {fileID: 0}
   panelMat: {fileID: 2100000, guid: a922c43dad4a2ed4690c22dce774399f, type: 2}
   panelMatSelected: {fileID: 2100000, guid: 84c9f74238ea4c34a964a59b8247bf1e, type: 2}
   itemType: 3
   ID: -1
+  disabledForMultiuser: 0
 --- !u!65 &1020171246727760075
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14194,7 +14443,7 @@ GameObject:
   - component: {fileID: 7776870973648302687}
   - component: {fileID: 1274432476903583881}
   m_Layer: 0
-  m_Name: New Text (1)
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14570,6 +14819,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 1
   defaultPercent: 0
   currentDialColor: 0
@@ -14583,6 +14838,9 @@ MonoBehaviour:
   isNotched: 1
   isBipolar: 0
   notchSteps: 4
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8472863758491401039
 GameObject:
   m_ObjectHideFlags: 0
@@ -15051,6 +15309,12 @@ MonoBehaviour:
   manipulatorObjScript: {fileID: 0}
   stickyGrip: 0
   canBeDeleted: 0
+  onStartGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndGrabEvents:
+    m_PersistentCalls:
+      m_Calls: []
   percent: 0.2
   defaultPercent: 0
   currentDialColor: 0
@@ -15064,6 +15328,9 @@ MonoBehaviour:
   isNotched: 1
   isBipolar: 0
   notchSteps: 5
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &9215941584575005156
 GameObject:
   m_ObjectHideFlags: 0

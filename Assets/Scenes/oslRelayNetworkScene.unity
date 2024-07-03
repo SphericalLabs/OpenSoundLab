@@ -5659,6 +5659,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23000013696737982, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6cccb3fa713c5504481e6a7cfd607402, type: 2}
     - target: {fileID: 82000010023805524, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: spreadCustomCurve.m_RotationOrder
@@ -5699,12 +5704,18 @@ PrefabInstance:
       propertyPath: itemType
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 2530460891964872692, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: sceneId
+      value: 3961805318
+      objectReference: {fileID: 0}
     - target: {fileID: 7657181334817952640, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 79575265}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2155345172820807172, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4000012630833762, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,

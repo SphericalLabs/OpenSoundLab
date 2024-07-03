@@ -39,12 +39,14 @@ public class pauseMenuItem : manipObject
 {
     public TextMesh label;
     //public Texture2D tex;
-    Renderer panelRend;
+    public Renderer panelRend;
     public Material panelMat, panelMatSelected;
     Material textMat;
     pauseMenu mainmenu;
     public pauseMenu.itemType itemType;
     public int ID = -1;
+
+    public bool disabledForMultiuser = false;
 
     Color normalColor;
     public override void Awake()
@@ -111,6 +113,8 @@ public class pauseMenuItem : manipObject
 
     public override void setState(manipState state)
     {
+        if (disabledForMultiuser) return;
+
         curState = state;
         if (curState == manipState.none)
         {
@@ -208,6 +212,7 @@ public class pauseMenuItem : manipObject
 
     public override void onTouch(bool enter, manipulator m)
     {
+                
         if (enter)
         {
             if (m != null)

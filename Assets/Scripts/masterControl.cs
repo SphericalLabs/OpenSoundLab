@@ -165,7 +165,7 @@ public class masterControl : MonoBehaviour {
 
     GetComponent<sampleManager>().Init();
 
-   recorder = GetComponentInChildren<masterBusRecorder>();
+    recorder = GetComponentInChildren<masterBusRecorder>();
 
   }
 

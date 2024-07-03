@@ -38,10 +38,16 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System;
+using Mirror;
+
+using System.Linq;
 
 public class pauseMenu : MonoBehaviour
 {
     public GameObject savePanel, wireSettingsPanel, settingsLabel;
+
+    public pauseMenuItem newItem, loadItem, saveItem;
+    public Material disabledMaterial;
 
     public enum itemType
     {
@@ -88,6 +94,42 @@ public class pauseMenu : MonoBehaviour
     void Start()
     {
         toggleMenu(false);
+    }
+
+    bool networkInitialized = false;
+
+    void Update()
+    {
+        if (!networkInitialized)
+        {
+            if (NetworkClient.isConnected && !NetworkServer.active) // Client
+            {
+                invalidatePauseMenuItem(newItem);
+                invalidatePauseMenuItem(saveItem);
+                networkInitialized = true;
+            }
+
+            if (NetworkClient.isConnected && NetworkServer.active) // Server
+            {
+                invalidatePauseMenuItem(loadItem);
+                networkInitialized = true;
+            }
+        }
+    }
+
+    void invalidatePauseMenuItem(pauseMenuItem mItem){
+        if (mItem == null) return;
+
+        // Change the material of the item's panel renderer
+        if (mItem.panelRend != null) mItem.transform.Find("Label").GetComponent<Renderer>().sharedMaterial = disabledMaterial;
+
+        // Remove the item from the menuItems list
+        if (menuItems.Contains(mItem)) menuItems.Remove(mItem);
+
+        // Remove the item from the items array
+        items = items.Where(item => item != mItem.gameObject).ToArray();
+
+        Destroy(mItem);
     }
 
     public void endFlash()
