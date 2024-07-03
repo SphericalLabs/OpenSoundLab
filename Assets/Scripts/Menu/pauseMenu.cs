@@ -73,8 +73,7 @@ public class pauseMenu : MonoBehaviour
 
     List<pauseMenuItem> menuItems;
 
-    int optionCount;
-
+    
     void Awake()
     {
         menuItems = new List<pauseMenuItem>();
@@ -83,8 +82,6 @@ public class pauseMenu : MonoBehaviour
             pauseMenuItem temp = items[i].GetComponent<pauseMenuItem>();
             if (temp != null) menuItems.Add(temp);
         }
-
-        optionCount = items.Length - 1;
 
         menuObject.SetActive(false);
         savePanel.SetActive(false);
@@ -139,17 +136,17 @@ public class pauseMenu : MonoBehaviour
 
     void mainMenuActive()
     {
-        for (int i = 0; i < optionCount; i++) items[i].SetActive(true);
-        items[optionCount].SetActive(false);
+        for (int i = 0; i < items.Length - 1; i++) items[i].SetActive(true);
+        items[items.Length - 1].SetActive(false);
     }
 
     void justItemActive(int n)
     {
-        for (int i = 0; i < optionCount; i++)
+        for (int i = 0; i < items.Length - 1; i++)
         {
             items[i].SetActive(i == n);
         }
-        items[optionCount].SetActive(true);
+        items[items.Length - 1].SetActive(true);
     }
 
     public bool GetActive()
@@ -159,7 +156,7 @@ public class pauseMenu : MonoBehaviour
 
     void noneActive()
     {
-        for (int i = 0; i < optionCount; i++) items[i].SetActive(false);
+        for (int i = 0; i < items.Length - 1; i++) items[i].SetActive(false);
     }
 
     public void saveFile(string s)
