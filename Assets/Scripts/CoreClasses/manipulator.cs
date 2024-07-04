@@ -421,6 +421,7 @@ public class manipulator : MonoBehaviour
                         if (selectedObject.transform.parent.gameObject.TryGetComponent<NetworkIdentity>(out NetworkIdentity netIdentity))
                         {
                             NetworkSpawnManager.Instance.CmdDuplicateItem(netIdentity, NetworkMenuManager.Instance.localPlayer.netIdentity, isLeftController());
+                            selectedObject.setGrab(false, null);
                         }
                     }
 
