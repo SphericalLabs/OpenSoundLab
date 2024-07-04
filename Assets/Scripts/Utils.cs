@@ -76,4 +76,92 @@ public class Utils
         return log;
     }
 
+
+    public static T[] AddElementToArray<T>(T[] original, T elementToAdd)
+    {
+        if(elementToAdd == null) return original;
+
+        T[] newArray = new T[original.Length + 1];
+        for (int i = 0; i < original.Length; i++)
+        {
+            newArray[i] = original[i];
+        }
+        newArray[original.Length] = elementToAdd;
+        return newArray;
+    }
+
+
+    // https://chatgpt.com/share/e2a3a329-910c-42cc-83bb-b736f4f2b858
+    // For array sizes lower than 10^3 these methods should not be a problem for the render budget
+    public static T[] RemoveElementFromArray<T>(T[] original, T elementToRemove)
+    {
+        if(elementToRemove == null) return original;
+
+        int index = System.Array.IndexOf(original, elementToRemove);
+        if (index < 0)
+        {
+            return original;
+        }
+
+        T[] newArray = new T[original.Length - 1];
+        for (int i = 0, j = 0; i < original.Length; i++)
+        {
+            if (i == index) continue;
+            newArray[j++] = original[i];
+        }
+        return newArray;
+    }
+
+
+    public static T[] AddElementsToArray<T>(T[] original, T[] elementsToAdd)
+    {
+        if (elementsToAdd == null || elementsToAdd.Length == 0) return original;
+
+        T[] newArray = new T[original.Length + elementsToAdd.Length];
+        for (int i = 0; i < original.Length; i++)
+        {
+            newArray[i] = original[i];
+        }
+        for (int i = 0; i < elementsToAdd.Length; i++)
+        {
+            newArray[original.Length + i] = elementsToAdd[i];
+        }
+        return newArray;
+    }
+
+    public static T[] RemoveElementsFromArray<T>(T[] original, T[] elementsToRemove)
+    {
+        if (elementsToRemove == null || elementsToRemove.Length == 0) return original;
+
+        bool[] toRemove = new bool[original.Length];
+        int newSize = original.Length;
+
+        foreach (T elementToRemove in elementsToRemove)
+        {
+            for (int i = 0; i < original.Length; i++)
+            {
+                if (original[i].Equals(elementToRemove))
+                {
+                    if (!toRemove[i])
+                    {
+                        toRemove[i] = true;
+                        newSize--;
+                    }
+                }
+            }
+        }
+
+        T[] newArray = new T[newSize];
+        for (int i = 0, j = 0; i < original.Length; i++)
+        {
+            if (!toRemove[i])
+            {
+                newArray[j++] = original[i];
+            }
+        }
+
+        return newArray;
+    }
+
+
 }

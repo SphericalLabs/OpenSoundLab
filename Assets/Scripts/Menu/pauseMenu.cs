@@ -123,8 +123,8 @@ public class pauseMenu : MonoBehaviour
         // Remove the item from the menuItems list
         if (menuItems.Contains(mItem)) menuItems.Remove(mItem);
 
-        // Remove the item from the items array
-        items = items.Where(item => item != mItem.gameObject).ToArray();
+        // Remove the item from the items array        
+        Utils.RemoveElementFromArray(items, mItem.gameObject);
 
         Destroy(mItem);
     }
