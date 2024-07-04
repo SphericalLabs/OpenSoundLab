@@ -80,8 +80,6 @@ public class sampleManager : MonoBehaviour
 
         if (f == "") return "";
 
-        f = CorrectPathSeparators(f);
-
         if (f.Substring(0, 3) == "APP")
         {
             f = f.Remove(0, 3);
@@ -92,24 +90,10 @@ public class sampleManager : MonoBehaviour
             f = f.Remove(0, 3);
             f = f.Insert(0, masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples");
         }
-        Debug.Log($"{f}");
         return f;
     }
 
 
-    static string CorrectPathSeparators(string path)
-    {
-        if (Path.DirectorySeparatorChar == '\\')
-        {
-            // Windows-Umgebung: Korrigiere alle / zu \
-            return path.Replace('/', '\\');
-        }
-        else
-        {
-            // Unix-Umgebung (Linux, macOS): Korrigiere alle \ zu /
-            return path.Replace('\\', '/');
-        }
-    }
 
     public void AddSample(string newsample)
     {

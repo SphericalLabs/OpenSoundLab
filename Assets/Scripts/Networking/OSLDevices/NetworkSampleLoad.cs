@@ -1,6 +1,7 @@
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor.PackageManager.UI;
 using UnityEngine;
@@ -61,7 +62,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //create tape
                 if (newValue.Length > 0 && !sampleLoaders[index].hasTape())
                 {
-                    sampleLoaders[index].SetSample(GetFileName(newValue), newValue);
+                    sampleLoaders[index].SetSample(GetFileName(newValue), CorrectPathSeparators(newValue));
                 }
                 break;
             case SyncList<string>.Operation.OP_INSERT:
@@ -72,7 +73,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //create tape
                 if (newValue.Length > 0 && !sampleLoaders[index].hasTape())
                 {
-                    sampleLoaders[index].SetSample(GetFileName(newValue), newValue);
+                    sampleLoaders[index].SetSample(GetFileName(newValue), CorrectPathSeparators(newValue));
                 }
                 else if (newValue.Length <= 0 && sampleLoaders[index].hasTape())
                 {
@@ -132,7 +133,7 @@ public class NetworkSampleLoad : NetworkBehaviour
             if (samplePaths[index].Length > 0 && !sampleLoaders[index].hasTape())
             {
                 Debug.Log("Set tape on host");
-                sampleLoaders[index].SetSample(GetFileName(path), path);
+                sampleLoaders[index].SetSample(GetFileName(path), CorrectPathSeparators(path));
             }
             else if(samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
             {
@@ -144,6 +145,22 @@ public class NetworkSampleLoad : NetworkBehaviour
 
     string GetFileName(string path)
     {
-        return path;
+        string fileName = Path.GetFileName(path);
+        return fileName;
+    }
+
+
+    static string CorrectPathSeparators(string path)
+    {
+        if (Path.DirectorySeparatorChar == '\\')
+        {
+            // Windows-Umgebung: Korrigiere alle / zu \
+            return path.Replace('/', '\\');
+        }
+        else
+        {
+            // Unix-Umgebung (Linux, macOS): Korrigiere alle \ zu /
+            return path.Replace('\\', '/');
+        }
     }
 }
