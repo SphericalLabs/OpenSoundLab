@@ -40,121 +40,143 @@ using System.Linq;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.GZip;
 
-public class sampleManager : MonoBehaviour {
-  public static sampleManager instance;
+public class sampleManager : MonoBehaviour
+{
+    public static sampleManager instance;
 
-  public Dictionary<string, Dictionary<string, string>> sampleDictionary;
+    public Dictionary<string, Dictionary<string, string>> sampleDictionary;
 
-  List<string> customSamples = new List<string>();
+    List<string> customSamples = new List<string>();
 
-  public void ClearCustomSamples() {
-    for (int i = 0; i < customSamples.Count; i++) {
-      samplerLoad[] samplers = FindObjectsOfType<samplerLoad>();
-      for (int i2 = 0; i2 < samplers.Length; i2++) {
-        if (samplers[i2].CurTapeLabel == customSamples[i]) {
-          samplers[i2].ForceEject();
+    public void ClearCustomSamples()
+    {
+        for (int i = 0; i < customSamples.Count; i++)
+        {
+            samplerLoad[] samplers = FindObjectsOfType<samplerLoad>();
+            for (int i2 = 0; i2 < samplers.Length; i2++)
+            {
+                if (samplers[i2].CurTapeLabel == customSamples[i])
+                {
+                    samplers[i2].ForceEject();
+                }
+            }
+
+            sampleDictionary["Custom"].Remove(customSamples[i]);
         }
-      }
 
-      sampleDictionary["Custom"].Remove(customSamples[i]);
+        PlayerPrefs.DeleteAll();
+        customSamples.Clear();
+
+        libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
+        for (int i2 = 0; i2 < libs.Length; i2++)
+        {
+            if (libs[i2].curPrimary == "Custom") libs[i2].updateSecondaryPanels("Custom");
+
+        }
     }
 
-    PlayerPrefs.DeleteAll();
-    customSamples.Clear();
-
-    libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
-    for (int i2 = 0; i2 < libs.Length; i2++) {
-      if (libs[i2].curPrimary == "Custom") libs[i2].updateSecondaryPanels("Custom");
-
-    }
-  }
-
-  public string parseFilename(string f) {
-
-    if (f == "") return "";
-
-        if (f.Substring(0, 3) == "APP") {
-      f = f.Remove(0, 3);
-      f = f.Insert(0, Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "samples");
-    } else if (f.Substring(0, 3) == "DOC") {
-      f = f.Remove(0, 3);
-      f = f.Insert(0, masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples");
-    }
-
-    return f;
-  }
-
-  public void AddSample(string newsample) {
-    if (sampleDictionary["Custom"].ContainsKey(Path.GetFileNameWithoutExtension(newsample))) return;
-
-    if (!File.Exists(newsample)) {
-      return;
-    }
-
-    customSamples.Add(Path.GetFileNameWithoutExtension(newsample));
-
-    sampleDictionary["Custom"][Path.GetFileNameWithoutExtension(newsample)] = newsample;
-
-    libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
-    for (int i2 = 0; i2 < libs.Length; i2++) {
-      if (libs[i2].curPrimary == "Custom") libs[i2].updateSecondaryPanels("Custom");
-    }
-
-    if (!inStartup) {
-      customSampleCount++;
-      PlayerPrefs.SetInt("sampCount", customSampleCount);
-      PlayerPrefs.SetString("samp" + customSampleCount, newsample);
-    }
-  }
-
-  public void AddRecording(string newsample) {
-    if (sampleDictionary["Recordings"].ContainsKey(Path.GetFileNameWithoutExtension(newsample))) {
-      return;
-    }
-
-    sampleDictionary["Recordings"][Path.GetFileNameWithoutExtension(newsample)] = newsample;
-
-    libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
-    for (int i2 = 0; i2 < libs.Length; i2++) {
-      if (libs[i2].curPrimary == "Recordings") libs[i2].updateSecondaryPanels("Recordings");
-    }
-  }
-
-  public void AddSession(string newsample)
-  {
-    if (sampleDictionary["Sessions"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
+    public string parseFilename(string f)
     {
-      return;
+
+        if (f == "") return "";
+
+        if (f.Substring(0, 3) == "APP")
+        {
+            f = f.Remove(0, 3);
+            f = f.Insert(0, Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "samples");
+        }
+        else if (f.Substring(0, 3) == "DOC")
+        {
+            f = f.Remove(0, 3);
+            f = f.Insert(0, masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples");
+        }
+
+        return f;
     }
 
-    sampleDictionary["Sessions"][Path.GetFileNameWithoutExtension(newsample)] = newsample;
-
-    libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
-    for (int i2 = 0; i2 < libs.Length; i2++)
+    public void AddSample(string newsample)
     {
-      if (libs[i2].curPrimary == "Sessions") libs[i2].updateSecondaryPanels("Sessions");
+        if (sampleDictionary["Custom"].ContainsKey(Path.GetFileNameWithoutExtension(newsample))) return;
+
+        if (!File.Exists(newsample))
+        {
+            return;
+        }
+
+        customSamples.Add(Path.GetFileNameWithoutExtension(newsample));
+
+        sampleDictionary["Custom"][Path.GetFileNameWithoutExtension(newsample)] = newsample;
+
+        libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
+        for (int i2 = 0; i2 < libs.Length; i2++)
+        {
+            if (libs[i2].curPrimary == "Custom") libs[i2].updateSecondaryPanels("Custom");
+        }
+
+        if (!inStartup)
+        {
+            customSampleCount++;
+            PlayerPrefs.SetInt("sampCount", customSampleCount);
+            PlayerPrefs.SetString("samp" + customSampleCount, newsample);
+        }
     }
-  }
 
-  int customSampleCount = 0;
-  bool inStartup = false;
-  void AddCustomSamples() {
-    inStartup = true;
+    public void AddRecording(string newsample)
+    {
+        if (sampleDictionary["Recordings"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
+        {
+            return;
+        }
 
-    if (!PlayerPrefs.HasKey("sampCount")) PlayerPrefs.SetInt("sampCount", 0);
+        sampleDictionary["Recordings"][Path.GetFileNameWithoutExtension(newsample)] = newsample;
 
-    customSampleCount = PlayerPrefs.GetInt("sampCount");
-    for (int i = 0; i < customSampleCount; i++) {
-
-      AddSample(PlayerPrefs.GetString("samp" + (i + 1)));
+        libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
+        for (int i2 = 0; i2 < libs.Length; i2++)
+        {
+            if (libs[i2].curPrimary == "Recordings") libs[i2].updateSecondaryPanels("Recordings");
+        }
     }
-    inStartup = false;
-  }
 
-  void loadSampleDictionary(string dir, string pathtype) {
-    if (Directory.Exists(dir)) {
-      string[] subdirs = Directory.GetDirectories(dir);
-      for (int i = 0; i < subdirs.Length; i++) {
+    public void AddSession(string newsample)
+    {
+        if (sampleDictionary["Sessions"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
+        {
+            return;
+        }
+
+        sampleDictionary["Sessions"][Path.GetFileNameWithoutExtension(newsample)] = newsample;
+
+        libraryDeviceInterface[] libs = FindObjectsOfType<libraryDeviceInterface>();
+        for (int i2 = 0; i2 < libs.Length; i2++)
+        {
+            if (libs[i2].curPrimary == "Sessions") libs[i2].updateSecondaryPanels("Sessions");
+        }
+    }
+
+    int customSampleCount = 0;
+    bool inStartup = false;
+    void AddCustomSamples()
+    {
+        inStartup = true;
+
+        if (!PlayerPrefs.HasKey("sampCount")) PlayerPrefs.SetInt("sampCount", 0);
+
+        customSampleCount = PlayerPrefs.GetInt("sampCount");
+        for (int i = 0; i < customSampleCount; i++)
+        {
+
+            AddSample(PlayerPrefs.GetString("samp" + (i + 1)));
+        }
+        inStartup = false;
+    }
+
+    void loadSampleDictionary(string dir, string pathtype)
+    {
+        if (Directory.Exists(dir))
+        {
+            string[] subdirs = Directory.GetDirectories(dir);
+            for (int i = 0; i < subdirs.Length; i++)
+            {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
                 string s = subdirs[i].Replace(dir + "\\", "");
 #elif UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
@@ -162,53 +184,58 @@ public class sampleManager : MonoBehaviour {
 #endif
                 sampleDictionary[s] = new Dictionary<string, string>();
 
-        for (int i2 = 0; i2 < fileEndings.Length; i2++) {
-          string[] subdirFiles = Directory.GetFiles(subdirs[i], fileEndings[i2]);
-          foreach (string d in subdirFiles) {
-            sampleDictionary[s][Path.GetFileNameWithoutExtension(d)] = pathtype + Path.DirectorySeparatorChar + s + Path.DirectorySeparatorChar + Path.GetFileName(d);
-          }
-        }
-      }
+                for (int i2 = 0; i2 < fileEndings.Length; i2++)
+                {
+                    string[] subdirFiles = Directory.GetFiles(subdirs[i], fileEndings[i2]);
+                    foreach (string d in subdirFiles)
+                    {
+                        sampleDictionary[s][Path.GetFileNameWithoutExtension(d)] = pathtype + Path.DirectorySeparatorChar + s + Path.DirectorySeparatorChar + Path.GetFileName(d);
+                    }
+                }
+            }
 
-    } else {
-      Debug.Log("NO SAMPLES FOLDER FOUND");
+        }
+        else
+        {
+            Debug.Log("NO SAMPLES FOLDER FOUND");
+        }
     }
-  }
 
     string[] fileEndings = new string[] { "*.wav"/*, "*.ogg", "*.mp3" */}; // disabled ogg and mp3, since NVorbis and NAudio are not supporting Android / ARM64 and NLayer somehow is also not working as a fallback and it actually would only have supported 44.1khz mp3 files.
 
-  public void Init() {
+    public void Init()
+    {
 
-    // used for bundled samples, not used anymore
-    //#if UNITY_ANDROID
-    //    //if Samples directory doesn't exist, extract default data...
-    //    if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
-    //    {
-    //        Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
-    //        //copy tgz to directory where we can extract it
-    //        WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
-    //        while (!www.isDone) { }
-    //        System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
-    //        //extract it
-    //        Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
-    //        //delete tgz
-    //        File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
-    //    }
-    //#endif
+        // used for bundled samples, not used anymore
+        //#if UNITY_ANDROID
+        //    //if Samples directory doesn't exist, extract default data...
+        //    if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
+        //    {
+        //        Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
+        //        //copy tgz to directory where we can extract it
+        //        WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+        //        while (!www.isDone) { }
+        //        System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
+        //        //extract it
+        //        Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
+        //        //delete tgz
+        //        File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
+        //    }
+        //#endif
 
-    instance = this;
-    sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
+        instance = this;
+        sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
 
-    // used for bundled samples, not used anymore
-    //string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";
-    //loadSampleDictionary(dir, "APP");
+        // used for bundled samples, not used anymore
+        //string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";
+        //loadSampleDictionary(dir, "APP");
 
-    string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
-    Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Custom");
-    Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Recordings");
-    Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Sessions");
-    loadSampleDictionary(dir, "DOC");
-    //AddCustomSamples();
+        string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
+        Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Custom");
+        Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Recordings");
+        Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Sessions");
+        loadSampleDictionary(dir, "DOC");
+        //AddCustomSamples();
 
-  }
+    }
 }

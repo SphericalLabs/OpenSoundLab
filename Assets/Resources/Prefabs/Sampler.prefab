@@ -2286,6 +2286,7 @@ GameObject:
   - component: {fileID: 501391337376685834}
   - component: {fileID: 6194594958333949117}
   - component: {fileID: 8074698319918447103}
+  - component: {fileID: 1819017619217752750}
   m_Layer: 9
   m_Name: Sampler
   m_TagString: instrument
@@ -2360,6 +2361,12 @@ MonoBehaviour:
   CurFile: 
   miniSpeaker: {fileID: 0}
   clipSamples: []
+  onLoadTapeEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onEjectTapeEvents:
+    m_PersistentCalls:
+      m_Calls: []
   queuedSample:
   - 
   - 
@@ -2618,6 +2625,23 @@ MonoBehaviour:
   - {fileID: 114000014110554540}
   - {fileID: 114824114186601482}
   - {fileID: 114000011381102584}
+--- !u!114 &1819017619217752750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e460df4eb04f79a41af610075304281a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  sampleLoaders:
+  - {fileID: 11402188}
 --- !u!1 &194674
 GameObject:
   m_ObjectHideFlags: 0
