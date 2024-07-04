@@ -37,6 +37,7 @@ using System.Collections;
 using System.Collections.Generic;
 using static manipObject;
 using UnityEngine.Events;
+using Mirror;
 
 public class manipulator : MonoBehaviour
 {
@@ -406,7 +407,26 @@ public class manipulator : MonoBehaviour
         {
             if (on)
             {
-                if (selectedObject.GetComponent<handle>() != null) SaveLoadInterface.instance.Copy(selectedObject.transform.parent.gameObject, this);
+                if (selectedObject.GetComponent<handle>() != null)
+                {
+                    if (NetworkManager.singleton.mode == NetworkManagerMode.Host)
+                    {
+                        Debug.Log("Duplicate on host");
+                        NetworkSpawnManager.Instance.DuplicateItem(selectedObject.transform.parent.gameObject, this);
+                        //SaveLoadInterface.instance.Copy(selectedObject.transform.parent.gameObject, this);
+                    }
+                    else
+                    {
+                        Debug.Log("Duplicate on client");
+                        if (selectedObject.transform.parent.gameObject.TryGetComponent<NetworkIdentity>(out NetworkIdentity netIdentity))
+                        {
+                            NetworkSpawnManager.Instance.CmdDuplicateItem(netIdentity, NetworkMenuManager.Instance.localPlayer.netIdentity, isLeftController());
+                            selectedObject.setGrab(false, null);
+                        }
+                    }
+
+
+                } 
             }
             else if (selectedObject.GetComponent<handle>() != null && !triggerDown) Grab(false);
         }
@@ -685,7 +705,6 @@ public class manipulator : MonoBehaviour
                 onInputReleasedEvent.Invoke();
             }
         }
-
     }
 
 }

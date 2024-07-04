@@ -53,7 +53,13 @@ public class menuspawn : MonoBehaviour {
 
   }
 
-  void Start() {    
+    private void OnDestroy()
+    {
+        oslInput.Patcher.PrimaryLeft.started -= togglePad;
+        oslInput.Patcher.PrimaryRight.started -= togglePad;
+    }
+
+    void Start() {    
     menu = menuManager.instance;
   }
 
