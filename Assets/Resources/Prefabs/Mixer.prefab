@@ -461,6 +461,7 @@ GameObject:
   - component: {fileID: -4318158881619070310}
   - component: {fileID: 1244200740706594178}
   - component: {fileID: 37741646473603999}
+  - component: {fileID: 1159812470689806396}
   m_Layer: 0
   m_Name: Mixer
   m_TagString: instrument
@@ -631,6 +632,22 @@ MonoBehaviour:
   xHandles:
   - {fileID: 114224196866840162}
   - {fileID: 114000014187606012}
+--- !u!114 &1159812470689806396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012803914034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7343ffcdc90d341d4ab404fb3d04f864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  sliders: []
 --- !u!1 &1000013633280040
 GameObject:
   m_ObjectHideFlags: 0

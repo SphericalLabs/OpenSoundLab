@@ -50,12 +50,19 @@ public class mixerDeviceInterface : deviceInterface {
   float faderLength = 0;
   float prevFaderLength = 0;
 
+  NetworkSliders networkSliders;
+  NetworkJacks networkJacks;
+
   public override void Awake() {
     base.Awake();
     signal = GetComponent<mixer>();
 
     float xVal = stretchSlider.localPosition.x;
     count = Mathf.FloorToInt((xVal + .075f) / -.04f) + 1;
+
+    networkJacks = GetComponent<NetworkJacks>();
+    networkSliders = GetComponent<NetworkSliders>();
+
     updateMixerCount();
   }
 
@@ -73,6 +80,10 @@ public class mixerDeviceInterface : deviceInterface {
         Vector3 pos = faderList.Last().transform.localPosition;
         pos.z = -.12f * fL + .12f;
         faderList.Last().transform.localPosition = pos;
+
+        networkSliders.sliders = Utils.AddElementToArray(networkSliders.sliders, s.gameObject.GetComponentInChildren<slider>()); // one omniSlider
+        networkJacks.omniJacks = Utils.AddElementsToArray(networkJacks.omniJacks, s.gameObject.GetComponentsInChildren<omniJack>()); // two omniJacks
+        
       }
     } else // count < cur
        {
@@ -80,6 +91,10 @@ public class mixerDeviceInterface : deviceInterface {
         signalGenerator s = signal.incoming.Last();
         faderList.RemoveAt(signal.incoming.Count - 1);
         signal.incoming.RemoveAt(signal.incoming.Count - 1);
+
+        networkSliders.sliders = Utils.RemoveElementFromArray(networkSliders.sliders, s.gameObject.GetComponentInChildren<slider>()); // one omniSlider
+        networkJacks.omniJacks = Utils.RemoveElementsFromArray(networkJacks.omniJacks, s.gameObject.GetComponentsInChildren<omniJack>()); // two omniJacks
+
         Destroy(s.gameObject);
       }
     }
