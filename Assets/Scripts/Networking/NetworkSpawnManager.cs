@@ -97,6 +97,32 @@ public class NetworkSpawnManager : NetworkBehaviour
 
     #endregion
 
+    #region Duplicate Object
+
+    public void DuplicateItem(GameObject obj, manipulator manip)
+    {
+        var g = SaveLoadInterface.instance.Copy(obj, manip);
+        NetworkServer.Spawn(g);
+        Debug.Log($"{g} duplicated by the host");
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdDuplicateItem(NetworkIdentity obj, NetworkIdentity player, bool isLeftHand)
+    {
+        var g = SaveLoadInterface.instance.Copy(obj.gameObject, null);
+        Debug.Log($"{g} duplicated by the client");
+
+        NetworkServer.Spawn(g, player.connectionToClient);
+
+        if (player.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
+        {
+            networkPlayer.GrabNewObjectByHand(g, isLeftHand);
+        }
+    }
+
+
+    #endregion
+
     #region Networked Jacks
     public void AddJack(omniJack omniJack)
     {
