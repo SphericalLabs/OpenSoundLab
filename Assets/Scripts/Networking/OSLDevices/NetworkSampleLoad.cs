@@ -59,7 +59,10 @@ public class NetworkSampleLoad : NetworkBehaviour
         {
             case SyncList<string>.Operation.OP_ADD:
                 //create tape
-                sampleLoaders[index].SetSample(newValue, newValue);
+                if (newValue.Length > 0 && !sampleLoaders[index].hasTape())
+                {
+                    sampleLoaders[index].SetSample(GetFileName(newValue), newValue);
+                }
                 break;
             case SyncList<string>.Operation.OP_INSERT:
                 break;
@@ -67,9 +70,13 @@ public class NetworkSampleLoad : NetworkBehaviour
                 break;
             case SyncList<string>.Operation.OP_SET:
                 //create tape
-                if (!sampleLoaders[index].hasTape())
+                if (newValue.Length > 0 && !sampleLoaders[index].hasTape())
                 {
-                    sampleLoaders[index].SetSample(newValue, newValue);
+                    sampleLoaders[index].SetSample(GetFileName(newValue), newValue);
+                }
+                else if (newValue.Length <= 0 && sampleLoaders[index].hasTape())
+                {
+                    sampleLoaders[index].ForceEject();
                 }
                 break;
             case SyncList<string>.Operation.OP_CLEAR:
@@ -103,6 +110,10 @@ public class NetworkSampleLoad : NetworkBehaviour
             if (isServer)
             {
                 samplePaths[index] = "";
+                if (sampleLoaders[index].hasTape())
+                {
+                    sampleLoaders[index].ForceEject();
+                }
             }
             else
             {
@@ -118,11 +129,21 @@ public class NetworkSampleLoad : NetworkBehaviour
         if (samplePaths[index] != path)
         {
             samplePaths[index] = path;
-
-            if (!sampleLoaders[index].hasTape())
+            if (samplePaths[index].Length > 0 && !sampleLoaders[index].hasTape())
             {
-                sampleLoaders[index].SetSample(path, path);
+                Debug.Log("Set tape on host");
+                sampleLoaders[index].SetSample(GetFileName(path), path);
+            }
+            else if(samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
+            {
+                Debug.Log("Remove tape on host");
+                sampleLoaders[index].ForceEject();
             }
         }
+    }
+
+    string GetFileName(string path)
+    {
+        return path;
     }
 }

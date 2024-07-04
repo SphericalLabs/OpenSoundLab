@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -360,7 +360,7 @@ public class tape : manipObject
         transform.rotation = tapeTrans.rotation;
         tapeTrans.parent = transform;
         transform.localPosition = new Vector3(0, 0, -.0225f);
-        deck.parent.GetComponent<samplerLoad>().LoadTape(this);
+        deck.parent.GetComponent<samplerLoad>().LoadTape(this, false);
     }
 
     IEnumerator streamRoutine(string f)
