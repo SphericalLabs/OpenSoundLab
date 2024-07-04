@@ -2283,6 +2283,7 @@ GameObject:
   - component: {fileID: 2562973838668222775}
   - component: {fileID: 5217655542218533490}
   - component: {fileID: 7473916925398026875}
+  - component: {fileID: 501391337376685834}
   - component: {fileID: 6194594958333949117}
   - component: {fileID: 8074698319918447103}
   m_Layer: 9
@@ -2562,6 +2563,24 @@ MonoBehaviour:
   - {fileID: 114280309562299104}
   - {fileID: 11484470}
   - {fileID: 2025302933936349694}
+--- !u!114 &501391337376685834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc3bb858761450d448cd2706f6e625da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  sliders:
+  - {fileID: 114000012057223614}
+  - {fileID: 114000014216875964}
 --- !u!114 &6194594958333949117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3753,6 +3772,9 @@ MonoBehaviour:
   percentageBounds: {x: 0.2, y: -0.2}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   glowhue: 0.25
 --- !u!65 &65000011516323264
 BoxCollider:
@@ -3979,6 +4001,9 @@ MonoBehaviour:
   percentageBounds: {x: 0.2, y: -0.2}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
+  onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   glowhue: 0.1
 --- !u!65 &65000013631578764
 BoxCollider:
