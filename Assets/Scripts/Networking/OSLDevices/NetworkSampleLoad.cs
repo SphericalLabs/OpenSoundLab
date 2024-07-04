@@ -145,7 +145,9 @@ public class NetworkSampleLoad : NetworkBehaviour
 
     string GetFileName(string path)
     {
-        string fileName = Path.GetFileName(path);
+        string fileName = Path.GetFileNameWithoutExtension(CorrectPathSeparators(path));
+
+        Debug.Log($"Filename {fileName}");
         return fileName;
     }
 
