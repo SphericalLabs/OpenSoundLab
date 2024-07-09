@@ -36,6 +36,7 @@
 #include "util.h"
 #include <math.h>
 #include <stdlib.h>
+#include <random>
 
 #define PI 3.14159265
 
@@ -311,33 +312,60 @@ extern "C" {
         */
     }
 
-    int NoiseProcessBuffer(float buffer[], float& sample, int length, int channels, float frequency, int counter, int speedFrames, bool& updated) {
 
-        if (frequency > .95f)
-        {
-            updated = true;
-            for (int i = 0; i < length; i += channels)
-            {
-                sample = buffer[i] = buffer[i + 1] = -1 + 2 * ((float)rand()) / RAND_MAX;
-            }
-        }
+    struct NoiseProcessor {
+      int base_seed;
+      std::uniform_real_distribution<float> dist;
 
-        else
-        {
-            for (int i = 0; i < length; i += channels)
-            {
-                counter++;
-                if (counter > speedFrames)
-                {
-                    updated = true;
-                    counter = 0;
-                    sample = -1 + 2 * ((float)rand()) / RAND_MAX;
-                }
-                buffer[i] = buffer[i + 1] = sample;
-            }
+      NoiseProcessor(int seed) : base_seed(seed), dist(-1.0f, 1.0f) {}
+
+      void advanceRNG(std::mt19937& rng, int steps) {
+        for (int i = 0; i < steps; ++i) {
+          rng();
         }
-        return counter;
+      }
+    };
+
+    
+
+    NoiseProcessor* CreateNoiseProcessor(int seed) {
+      return new NoiseProcessor(seed);
     }
+
+    void DestroyNoiseProcessor(NoiseProcessor* processor) {
+      delete processor;
+    }
+
+    void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float frequency, int& counter, int speedFrames, bool& updated) {
+      std::mt19937 rng;
+
+      float sample;
+
+      if (frequency > .95f) {
+        updated = true;
+        for (int i = 0; i < length; i += channels) {
+          sample = buffer[i] = buffer[i + 1] = processor->dist(rng);
+        }
+      }
+      else {
+        for (int i = 0; i < length; i += channels) {
+          counter++;
+          if (counter > speedFrames) {
+            updated = true;
+            counter = 0;
+            sample = processor->dist(rng);
+          }
+          buffer[i] = buffer[i + 1] = sample;
+        }
+      }
+    }
+
+    void AdvanceNoiseProcessor(NoiseProcessor* processor, unsigned int steps) {
+      std::mt19937 rng;
+      processor->advanceRNG(rng, steps);
+    }
+
+    
 
     int DrumSignalGenerator(float buffer[], int length, int channels, bool signalOn, int counter)
     {

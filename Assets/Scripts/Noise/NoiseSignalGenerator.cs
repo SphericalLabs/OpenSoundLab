@@ -35,6 +35,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System;
 
 public class NoiseSignalGenerator : signalGenerator {
 
@@ -42,12 +43,25 @@ public class NoiseSignalGenerator : signalGenerator {
   int speedFrames = 1;
 
   int maxLength = 11025 * 16; //  max length of one random value in samples
-  int counter = 0;
+  int counter = 0; // used for downsampling
 
   float curSample = -1.0f;
 
-  [DllImport("OSLNative")]
-  public static extern int NoiseProcessBuffer(float[] buffer, ref float sample, int length, int channels, float frequency, int counter, int speedFrames, ref bool updated);
+  uint noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
+  uint seed = 0; // select a specific noise pattern
+  IntPtr noiseProcessorPointer; // used in OSLNative
+    
+    [DllImport("OSLNative")]
+    private static extern IntPtr CreateNoiseProcessor(int seed);
+
+    [DllImport("OSLNative")]
+    private static extern void DestroyNoiseProcessor(IntPtr processor);
+
+    [DllImport("OSLNative")]
+    private static extern void NoiseProcessBuffer(IntPtr processor, float[] buffer, int length, int channels, float frequency, ref int counter, int speedFrames, ref bool updated);
+
+    [DllImport("OSLNative")]
+    private static extern void AdvanceNoiseProcessor(IntPtr processor, uint steps);
 
   public bool updated = false;
 
@@ -57,7 +71,19 @@ public class NoiseSignalGenerator : signalGenerator {
     speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
   }
 
+  public override void Awake(){
+    base.Awake();
+    noiseProcessorPointer = CreateNoiseProcessor(Utils.GetSecondsSinceUnixEpoch());
+    AdvanceNoiseProcessor(noiseProcessorPointer, noiseStep); // noiseStep should be synced via Mirror if necessary
+    // or call it sync and use to also set seed?
+  }
+
+  public void OnDestroy(){
+    DestroyNoiseProcessor(noiseProcessorPointer);
+  }
+
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    counter = NoiseProcessBuffer(buffer, ref curSample, buffer.Length, channels, speedPercent, counter, speedFrames, ref updated);
+    NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, speedPercent, ref counter, speedFrames, ref updated);
+    noiseStep += (uint)buffer.Length;
   }
 }
