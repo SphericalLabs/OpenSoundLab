@@ -47,10 +47,11 @@ public class NoiseSignalGenerator : signalGenerator {
 
   float curSample = -1.0f;
 
-  uint noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
-  uint seed = 0; // select a specific noise pattern
+  int noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
+  int seed = 0; // select a specific noise pattern
   IntPtr noiseProcessorPointer; // used in OSLNative
-    
+  private readonly object lockObject = new object();
+
     [DllImport("OSLNative")]
     private static extern IntPtr CreateNoiseProcessor(int seed);
 
@@ -61,7 +62,7 @@ public class NoiseSignalGenerator : signalGenerator {
     private static extern void NoiseProcessBuffer(IntPtr processor, float[] buffer, int length, int channels, float frequency, ref int counter, int speedFrames, ref bool updated);
 
     [DllImport("OSLNative")]
-    private static extern void AdvanceNoiseProcessor(IntPtr processor, uint steps);
+    private static extern void SyncNoiseProcessor(IntPtr processor, int seed, int steps);
 
   public bool updated = false;
 
@@ -74,8 +75,8 @@ public class NoiseSignalGenerator : signalGenerator {
   public override void Awake(){
     base.Awake();
     noiseProcessorPointer = CreateNoiseProcessor(Utils.GetSecondsSinceUnixEpoch());
-    AdvanceNoiseProcessor(noiseProcessorPointer, noiseStep); // noiseStep should be synced via Mirror if necessary
-    // or call it sync and use to also set seed?
+    //SyncNoiseProcessor(noiseProcessorPointer, noiseStep); // noiseStep should be synced via Mirror if necessary
+    //// or call it sync and use to also set seed?
   }
 
   public void OnDestroy(){
@@ -83,7 +84,18 @@ public class NoiseSignalGenerator : signalGenerator {
   }
 
   public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, speedPercent, ref counter, speedFrames, ref updated);
-    noiseStep += (uint)buffer.Length;
+    lock (lockObject)
+    {
+        NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, speedPercent, ref counter, speedFrames, ref updated);
+        noiseStep += buffer.Length;
+    }
+  }
+
+  public void syncNoiseSignalGenerator(int seed, int steps){
+    lock (lockObject)
+    {
+        SyncNoiseProcessor(noiseProcessorPointer, seed, steps);
+        noiseStep = steps;
+    }
   }
 }

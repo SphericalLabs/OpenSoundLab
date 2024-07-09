@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <random>
 
+
 #define PI 3.14159265
 
 extern "C" {
@@ -312,39 +313,30 @@ extern "C" {
         */
     }
 
+#include <random>
 
     struct NoiseProcessor {
-      int base_seed;
+      std::mt19937 rng;
       std::uniform_real_distribution<float> dist;
-
-      NoiseProcessor(int seed) : base_seed(seed), dist(-1.0f, 1.0f) {}
-
-      void advanceRNG(std::mt19937& rng, int steps) {
-        for (int i = 0; i < steps; ++i) {
-          rng();
-        }
+      NoiseProcessor(int seed) {
+        rng = std::mt19937(seed);
+        dist = std::uniform_real_distribution<float>(-1.0f, 1.0f);
       }
     };
-
-    
 
     NoiseProcessor* CreateNoiseProcessor(int seed) {
       return new NoiseProcessor(seed);
     }
 
-    void DestroyNoiseProcessor(NoiseProcessor* processor) {
-      delete processor;
-    }
-
-    void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float frequency, int& counter, int speedFrames, bool& updated) {
-      std::mt19937 rng;
-
-      float sample;
-
-      if (frequency > .95f) {
+    void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float sampleRatePercent, int& counter, int speedFrames, bool& updated) {
+      float sample = 0.0f;
+      if (sampleRatePercent > .95f) {
         updated = true;
         for (int i = 0; i < length; i += channels) {
-          sample = buffer[i] = buffer[i + 1] = processor->dist(rng);
+          sample = processor->dist(processor->rng);
+          for (int c = 0; c < channels; ++c) {
+            buffer[i + c] = sample;
+          }
         }
       }
       else {
@@ -353,17 +345,24 @@ extern "C" {
           if (counter > speedFrames) {
             updated = true;
             counter = 0;
-            sample = processor->dist(rng);
+            sample = processor->dist(processor->rng);
           }
-          buffer[i] = buffer[i + 1] = sample;
+          for (int c = 0; c < channels; ++c) {
+            buffer[i + c] = sample;
+          }
         }
       }
     }
 
-    void AdvanceNoiseProcessor(NoiseProcessor* processor, unsigned int steps) {
-      std::mt19937 rng;
-      processor->advanceRNG(rng, steps);
+    void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps) {
+      processor->rng.seed(seed);
+      processor->rng.discard(steps);
     }
+
+    void DestroyNoiseProcessor(NoiseProcessor* processor) {
+      delete processor;
+    }
+
 
     
 
