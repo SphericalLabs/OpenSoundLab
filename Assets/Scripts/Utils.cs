@@ -163,5 +163,11 @@ public class Utils
         return newArray;
     }
 
+    public static int GetSecondsSinceUnixEpoch()
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        int secondsSinceEpoch = (int)now.ToUnixTimeSeconds();
+        return secondsSinceEpoch;
+    }
 
 }

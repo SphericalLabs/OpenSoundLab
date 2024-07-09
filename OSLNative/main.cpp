@@ -36,6 +36,8 @@
 #include "util.h"
 #include <math.h>
 #include <stdlib.h>
+#include <random>
+
 
 #define PI 3.14159265
 
@@ -311,33 +313,58 @@ extern "C" {
         */
     }
 
-    int NoiseProcessBuffer(float buffer[], float& sample, int length, int channels, float frequency, int counter, int speedFrames, bool& updated) {
+#include <random>
 
-        if (frequency > .95f)
-        {
-            updated = true;
-            for (int i = 0; i < length; i += channels)
-            {
-                sample = buffer[i] = buffer[i + 1] = -1 + 2 * ((float)rand()) / RAND_MAX;
-            }
-        }
+    struct NoiseProcessor {
+      std::mt19937 rng;
+      std::uniform_real_distribution<float> dist;
+      NoiseProcessor(int seed) {
+        rng = std::mt19937(seed);
+        dist = std::uniform_real_distribution<float>(-1.0f, 1.0f);
+      }
+    };
 
-        else
-        {
-            for (int i = 0; i < length; i += channels)
-            {
-                counter++;
-                if (counter > speedFrames)
-                {
-                    updated = true;
-                    counter = 0;
-                    sample = -1 + 2 * ((float)rand()) / RAND_MAX;
-                }
-                buffer[i] = buffer[i + 1] = sample;
-            }
-        }
-        return counter;
+    NoiseProcessor* CreateNoiseProcessor(int seed) {
+      return new NoiseProcessor(seed);
     }
+
+    void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float sampleRatePercent, int& counter, int speedFrames, bool& updated) {
+      float sample = 0.0f;
+      if (sampleRatePercent > .95f) {
+        updated = true;
+        for (int i = 0; i < length; i += channels) {
+          sample = processor->dist(processor->rng);
+          for (int c = 0; c < channels; ++c) {
+            buffer[i + c] = sample;
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < length; i += channels) {
+          counter++;
+          if (counter > speedFrames) {
+            updated = true;
+            counter = 0;
+            sample = processor->dist(processor->rng);
+          }
+          for (int c = 0; c < channels; ++c) {
+            buffer[i + c] = sample;
+          }
+        }
+      }
+    }
+
+    void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps) {
+      processor->rng.seed(seed);
+      processor->rng.discard(steps);
+    }
+
+    void DestroyNoiseProcessor(NoiseProcessor* processor) {
+      delete processor;
+    }
+
+
+    
 
     int DrumSignalGenerator(float buffer[], int length, int channels, bool signalOn, int counter)
     {
