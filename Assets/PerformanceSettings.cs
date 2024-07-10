@@ -109,7 +109,7 @@ public class PerformanceSettings : MonoBehaviour
 
     if (Application.platform != RuntimePlatform.Android) return;
 
-    if(Time.frameCount % 100 == 0) boostProcessors(); // keep spamming the metal
+    // if(Time.frameCount % 100 == 0) boostProcessors(); // keep spamming the metal
 
     if (Time.frameCount % (int)targetFps == 0)
     {
