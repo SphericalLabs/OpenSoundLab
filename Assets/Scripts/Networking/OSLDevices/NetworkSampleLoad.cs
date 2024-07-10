@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public class NetworkSampleLoad : NetworkBehaviour
