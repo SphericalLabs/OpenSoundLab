@@ -167,7 +167,15 @@ public class Utils
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
         int secondsSinceEpoch = (int)now.ToUnixTimeSeconds();
+        now.ToUnixTimeMilliseconds();
         return secondsSinceEpoch;
+    }
+
+    static int seedCounter = 0;
+    public static int GetNoiseSeed()
+    {
+        seedCounter++;
+        return GetSecondsSinceUnixEpoch() + seedCounter;        
     }
 
 }

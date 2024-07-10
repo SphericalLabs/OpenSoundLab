@@ -74,7 +74,7 @@ public class NoiseSignalGenerator : signalGenerator {
 
   public override void Awake(){
     base.Awake();
-    noiseProcessorPointer = CreateNoiseProcessor(Utils.GetSecondsSinceUnixEpoch());
+    noiseProcessorPointer = CreateNoiseProcessor(Utils.GetNoiseSeed());
     //SyncNoiseProcessor(noiseProcessorPointer, noiseStep); // noiseStep should be synced via Mirror if necessary
     //// or call it sync and use to also set seed?
   }
