@@ -55,7 +55,7 @@ public class NetworkAudioManager : MonoBehaviour
             //new UniVoiceBusAudioInput(500),
             //new SinusAudioInput(0, 4000, 25),
             new UniVoiceUniMicInput(0, 8000, 25),
-            new UniVoiceAudioSourceOutput.Factory(100, 30)
+            new UniVoiceAudioSourceOutput.Factory()
         );
         agent.Network.OnCreatedChatroom += () => {
             ShowMessage($"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}");
