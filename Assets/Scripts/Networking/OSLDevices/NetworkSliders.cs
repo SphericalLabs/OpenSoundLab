@@ -10,18 +10,18 @@ public class NetworkSliders : NetworkBehaviour
     public readonly SyncList<float> sliderValues = new SyncList<float>(); // synced automatically, but not on first init. changes can and should be handled specifically
 
     // user grabs slider
-    // onPercentChangedEvent is triggered by slider
-    // UpdateSliderValue is triggered by the event
-        // server: directly saves into data model
-        // client: calls CmdUpdateSliderValue which saves new values into interface and model on server
+    // PercentChanged is triggered by slider
+    // OnPercentChanged is triggered by the event
+    // server: directly saves into data model
+    // client: calls CmdOnPercentChanged which saves new values into interface and model on server
     // SyncList of the data model is changed and synced to clients automatically
-    // OnDialsUpdated is triggered because it was registered to changes of the SyncList data model
+    // OnSlidersUpdated is triggered because it was registered to changes of the SyncList data model
 
-    // onPercentChangedEvent -> OnPercentChanged
-    // UpdateSliderValue -> OnPercentChangedHandler
-    // CmdUpdateSliderValue -> CmdOnPercentChangedHandler
-    // OnDialsUpdated -> sliderValuesChangedHandler, sliderValuesCallback, sliderValuesHandler, sliderValuesCallbackHandler, sliderValuesUpdated
-    
+    // onPercentChangedEvent -> PercentChanged
+    // UpdateSliderValue -> OnPercentChanged
+    // CmdUpdateSliderValue -> CmdOnPercentChanged
+    // OnDialsUpdated -> OnSlidersUpdated
+
 
     // client and server
     private void Start()
@@ -30,7 +30,7 @@ public class NetworkSliders : NetworkBehaviour
         for (int i = 0; i < sliders.Length; i++)
         {
             int index = i;
-            sliders[i].onPercentChangedEvent.AddListener(delegate { UpdateSliderValue(index); }); // passing the method to be called, as a lambda delegate in order to also pass the index
+            sliders[i].PercentChanged.AddListener(delegate { OnPercentChanged(index); }); // passing the method to be called, as a lambda delegate in order to also pass the index
         }
     }
 
@@ -49,17 +49,17 @@ public class NetworkSliders : NetworkBehaviour
     {
         if (!isServer)
         {
-            sliderValues.Callback += OnDialsUpdated;
+            sliderValues.Callback += OnSlidersUpdated;
 
             for (int i = 0; i < sliderValues.Count; i++) // Process initial SyncList payload
             {
-                OnDialsUpdated(SyncList<float>.Operation.OP_ADD, i, sliders[i].percent, sliderValues[i]); 
+                OnSlidersUpdated(SyncList<float>.Operation.OP_ADD, i, sliders[i].percent, sliderValues[i]); 
             }
         }
     }
 
     // client
-    void OnDialsUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
+    void OnSlidersUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
     {
         switch (op)
         {
@@ -82,7 +82,7 @@ public class NetworkSliders : NetworkBehaviour
     }
 
     // client and server
-    public void UpdateSliderValue(int index) // called from the sliders' onPercentChangedEvent
+    public void OnPercentChanged(int index) // called from the sliders' onPercentChangedEvent
     {
         Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
         if (isServer)
@@ -91,13 +91,13 @@ public class NetworkSliders : NetworkBehaviour
         }
         else
         {
-            CmdUpdateSliderValue(index, sliders[index].percent); // call a command on server to update data model
+            CmdOnPercentChanged(index, sliders[index].percent); // call a command on server to update data model
         }
     }
 
     // client
     [Command(requiresAuthority = false)] // by default only the client with authority over this object may call a server command, but this disables that
-    public void CmdUpdateSliderValue(int index, float value)
+    public void CmdOnPercentChanged(int index, float value)
     {
         sliderValues[index] = value;
         sliders[index].setPercent(value);

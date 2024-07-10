@@ -53,7 +53,7 @@ public class slider : manipObject {
 
   public Color labelColor = new Color(0f, 0.8f, 1f);
 
-    public UnityEvent onPercentChangedEvent;
+    public UnityEvent PercentChanged;
 
     public override void Awake() {
     base.Awake();
@@ -104,7 +104,7 @@ public class slider : manipObject {
 
         if (invokeEvent)
         {
-            onPercentChangedEvent.Invoke();
+            PercentChanged.Invoke();
         }
 
         //if (labelsPresent) {
