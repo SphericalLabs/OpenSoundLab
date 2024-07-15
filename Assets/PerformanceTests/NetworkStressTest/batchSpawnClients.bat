@@ -1,7 +1,7 @@
 @echo off
 set clients=3
 for /l %%x in (0, 1, %clients%-1) do (
-    start "" "..\..\Builds\OML\OML - Windows\OpenMultiLab.exe" -ip 192.168.0.164 -port 7777 -autoconnect
+    start "" "..\..\..\..\Builds\OML\OML - Windows\OpenMultiLab.exe" -ip 192.168.0.164 -port 7777 -autoconnect
 )
 
 :: -ip: Defaults to localhost if not given.

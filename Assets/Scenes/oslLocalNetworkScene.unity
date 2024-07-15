@@ -3277,10 +3277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d9e61e3900ba0a45a0f18613b61ea28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ipAddress: localhost
-  port: 7777
-  autoConnect: 0
-  relayJoinCode: 
 --- !u!1 &977626888
 GameObject:
   m_ObjectHideFlags: 0
