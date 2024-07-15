@@ -38,7 +38,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 public class mixer : signalGenerator {
-  public List<signalGenerator> incoming = new List<signalGenerator>();
+  public List<signalGenerator> incomingSignals = new List<signalGenerator>();
 
   [DllImport("OSLNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
   [DllImport("OSLNative")] public static extern void AddArrays(float[] a, float[] b, int length);
@@ -57,7 +57,7 @@ public class mixer : signalGenerator {
 
     SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
-    foreach (signalGenerator gen in incoming){
+    foreach (signalGenerator gen in incomingSignals){
       gen.processBuffer(tempBuff, dspTime, channels);
       AddArrays(buffer, tempBuff, buffer.Length);
     }

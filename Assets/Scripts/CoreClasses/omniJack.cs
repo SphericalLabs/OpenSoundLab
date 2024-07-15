@@ -165,7 +165,7 @@ public class omniJack : manipObject
                 far.connected.onEndConnectionEvent.Invoke();
             }
             onEndConnectionEvent.Invoke();
-        }
+        }        
         near = null;
         far = null;
     }

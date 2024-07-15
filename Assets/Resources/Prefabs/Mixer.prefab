@@ -527,7 +527,7 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
-  incoming: []
+  incomingSignals: []
 --- !u!114 &-676961171566042570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1217,7 +1217,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  xBounds: {x: -1.35, y: -0.075}
+  xBounds: {x: -0.675, y: -0.075}
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   rend: {fileID: 0}
   invisibleMesh: 0

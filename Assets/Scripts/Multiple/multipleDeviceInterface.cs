@@ -72,12 +72,13 @@ public class multipleDeviceInterface : deviceInterface
         symbolB.sharedMaterial = mixerMaterial;
 
         CreateInactiveNodes();
-        stretchSlider.onPosSetEvent.AddListener(CalculateSplitterCount);
+        stretchSlider.onPosSetEvent.AddListener(CalculateAndUpdateNodeCount);
 
-        float xVal = stretchSlider.transform.localPosition.x;
+        CalculateAndUpdateNodeCount();        
+        //float xVal = stretchSlider.transform.localPosition.x;
+        //count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
+        //updateSplitterCount();
 
-        count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
-        updateSplitterCount();
         setFlow(isSplitter, true); // reads in default value from the prefab to enable MultiMix and MultiSplit
     }
 
@@ -106,44 +107,24 @@ public class multipleDeviceInterface : deviceInterface
             networkJacks = GetComponent<NetworkJacks>();
             foreach (var jack in networkJacks.omniJacks)
             {
-                newJacks.Add(jack);
+                newJacks.Add(jack); // this adds the manually added omniJacks to the end of the array
             }
 
             networkJacks.omniJacks = newJacks.ToArray();
         }
     }
 
-    public void CalculateSplitterCount()
+    public void CalculateAndUpdateNodeCount()
     {
         float xVal = stretchSlider.transform.localPosition.x;
 
         count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
-        updateSplitterCount();
+        updateNodeCount();
     }
 
-    void updateSplitterCount(bool updateByGrab = false)
+    void updateNodeCount(bool updateByGrab = false)
     {
-        /*
-        int cur = signal.nodes.Count;
-        if (count > cur)
-        {
-            for (int i = 0; i < count - cur; i++)
-            {
-                multipleNodeSignalGenerator s = (Instantiate(splitterNodePrefab, transform, false) as GameObject).GetComponent<multipleNodeSignalGenerator>();
-                s.setup(signal, isSplitter);
-                signal.nodes.Add(s);
-                s.transform.localPosition = new Vector3(-.04f * signal.nodes.Count, 0, 0);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < cur - count; i++)
-            {
-                signalGenerator s = signal.nodes.Last();
-                signal.nodes.RemoveAt(signal.nodes.Count - 1);
-                Destroy(s.gameObject);
-            }
-        }*/
+ 
         if (count == lastCount)
             return;
 
@@ -237,7 +218,7 @@ public class multipleDeviceInterface : deviceInterface
         {
             float xVal = stretchSlider.transform.localPosition.x;
             count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
-            if (count != signal.nodes.Count) updateSplitterCount(true);
+            if (count != signal.nodes.Count) updateNodeCount(true);
         }
     }
 
@@ -287,7 +268,7 @@ public class multipleDeviceInterface : deviceInterface
             Vector3 pos = stretchSlider.transform.localPosition;
             pos.x = (count + 1) * -.04f;
             stretchSlider.transform.localPosition = pos;
-            updateSplitterCount();
+            updateNodeCount();
 
             output.ID = data.jackOutAID;
             signal.nodes[0].jack.ID = data.jackOutBID;
@@ -298,7 +279,7 @@ public class multipleDeviceInterface : deviceInterface
             Vector3 pos = stretchSlider.transform.localPosition;
             pos.x = (count + 1) * -.04f;
             stretchSlider.transform.localPosition = pos;
-            updateSplitterCount();
+            updateNodeCount();
 
             output.ID = data.jackOutID[0];
 
