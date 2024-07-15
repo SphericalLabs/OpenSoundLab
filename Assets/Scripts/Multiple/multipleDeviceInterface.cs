@@ -72,7 +72,7 @@ public class multipleDeviceInterface : deviceInterface
         symbolB.sharedMaterial = mixerMaterial;
 
         CreateInactiveNodes();
-        stretchSlider.onPosSetEvent.AddListener(CalculateSpliterCount);
+        stretchSlider.onPosSetEvent.AddListener(CalculateSplitterCount);
 
         float xVal = stretchSlider.transform.localPosition.x;
 
@@ -113,7 +113,7 @@ public class multipleDeviceInterface : deviceInterface
         }
     }
 
-    public void CalculateSpliterCount()
+    public void CalculateSplitterCount()
     {
         float xVal = stretchSlider.transform.localPosition.x;
 
@@ -228,25 +228,25 @@ public class multipleDeviceInterface : deviceInterface
         signal.setFlow(isSplitter);
     }
 
+    
     void Update()
     {
+        linkJackandGenerator();    
+
         if (stretchSlider.curState == manipObject.manipState.grabbed)
         {
             float xVal = stretchSlider.transform.localPosition.x;
             count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
             if (count != signal.nodes.Count) updateSplitterCount(true);
-
-            if (isSplitter)
-            {
-                if (signal.incoming != input.signal) signal.incoming = input.signal;
-            }
-            else if (signal.incoming != output.signal) signal.incoming = output.signal;
-
-
-            //if (flowSwitch.switchVal != isSplitter) {
-            //  setFlow(flowSwitch.switchVal);
-            //}
         }
+    }
+
+    void linkJackandGenerator(){
+        if (isSplitter)
+        {
+            if (signal.incoming != input.signal) signal.incoming = input.signal;
+        }
+        else if (signal.incoming != output.signal) signal.incoming = output.signal;
     }
 
     public override InstrumentData GetData()
@@ -311,6 +311,8 @@ public class multipleDeviceInterface : deviceInterface
     }
 }
 
+
+// MultiMix and MultiSplit are both prefabs that do not have their own MultiMixDeviceInterface resp. MultiSplitDeviceInterface. They both use MultipleDevice interface and are serialized (save, copy) as MultipleDeviceInterface and thus loaded resp. copied from the Multiple prefab. It's a bit hacky, but the idea was to have both modes separately in the menu and not to have to set the mode each time.
 public class MultipleData : InstrumentData
 {
     public bool isSplitter;

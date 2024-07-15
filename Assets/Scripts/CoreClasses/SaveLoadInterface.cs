@@ -197,18 +197,21 @@ public class SaveLoadInterface : MonoBehaviour
     {
         if (g.GetComponent<deviceInterface>() != null)
         {
+
             InstrumentData data = g.GetComponent<deviceInterface>().GetData();
 
             GameObject g2 = Instantiate(instrumentPrefabs[data.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
             deviceInterface device = g2.GetComponent<deviceInterface>();
             device.Load(data);
 
+            // set volume to zero to avoid surprisingly loud sounds
             if (device is oscillatorDeviceInterface)
             {
                 oscillatorDeviceInterface osc = (oscillatorDeviceInterface)device;
                 osc.ampDial.setPercent(0f);
             }
 
+            // set volume to zero to avoid surprisingly loud sounds
             if (device is samplerDeviceInterface)
             {
                 samplerDeviceInterface sampler = (samplerDeviceInterface)device;
