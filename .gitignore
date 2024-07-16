@@ -214,5 +214,13 @@ user.keystore
 
 # End of https://www.toptal.com/developers/gitignore/api/xcode
 
+/OSLNative/Xcode/build/
+/Assets/OSLNative/macos/arm64 x86_64/*
+!/Assets/OSLNative/macos/arm64 x86_64/Release/
+/Assets/OSLNative/macos/arm64 x86_64/Release/*
+!/Assets/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib
+!/Assets/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib.meta
+
+
 /Assets/Debug
 /Assets/Debug.meta
