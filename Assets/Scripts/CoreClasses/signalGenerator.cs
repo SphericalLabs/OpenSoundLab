@@ -34,8 +34,9 @@
 
 ﻿using UnityEngine;
 using System.Collections;
+using Mirror;
 
-public class signalGenerator : MonoBehaviour
+public class signalGenerator : NetworkBehaviour
 {
     protected bool hasAlreadyBeenCalledInThisBufferRun = false;
 
@@ -56,6 +57,8 @@ public class signalGenerator : MonoBehaviour
         _phase = 0;
         _sampleRate = AudioSettings.outputSampleRate;
         _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
+
+        SubscribeToNetworkEvents();
     }
 
     public virtual void updateTape(string s)
@@ -120,4 +123,50 @@ public class signalGenerator : MonoBehaviour
 
         return buffer;
     }
+
+    #region Mirror
+    private void SubscribeToNetworkEvents()
+    {
+        NetworkSyncEventManager.Instance.SyncEvent += OnSync;
+        if (isServer)
+        {
+            NetworkSyncEventManager.Instance.IntervalSyncEvent += OnIntervalSync;
+        }
+    }
+
+    private void OnSync()
+    {
+        if (isServer)
+        {
+            RpcUpdatePhase(_phase);
+        }
+        else
+        {
+            CmdRequestSync();
+        }
+    }
+
+    private void OnIntervalSync()
+    {
+        if (isServer)
+        {
+            RpcUpdatePhase(_phase);
+        }
+    }
+
+    [Command]
+    private void CmdRequestSync()
+    {
+        RpcUpdatePhase(_phase);
+    }
+
+    [ClientRpc]
+    private void RpcUpdatePhase(double phase)
+    {
+        if (isClient)
+        {
+            this._phase = phase;
+        }
+    }
+    #endregion
 }
