@@ -582,17 +582,6 @@ public class sequencerCVDeviceInterface : deviceInterface
             controlModeList.Add(ctrl.GetComponent<basicSwitch>());
 
 
-
-            //clipPlayerSimple samp = (Instantiate(samplerPrefab, Vector3.zero, Quaternion.identity, transform) as GameObject).GetComponent<clipPlayerSimple>();
-            //samp.transform.localRotation = Quaternion.identity;
-            //samp.transform.localScale = Vector3.one;
-            //samp.transform.localPosition = new Vector3(.081f, -cubeConst * curDimensions[1], -.028f);
-            //samp.seqGen = jack.GetComponent<sequencer>();
-
-            //samp.gameObject.GetComponent<samplerLoad>().SetSample(tapeList[curDimensions[1]][0], tapeList[curDimensions[1]][1]);
-            //samp.gameObject.GetComponent<miniSamplerComponentInterface>().muteButton.startToggled = rowMute[curDimensions[1]];
-
-            //samplerList.Add(samp);
             curDimensions[1]++;
         }
 
@@ -617,14 +606,6 @@ public class sequencerCVDeviceInterface : deviceInterface
         t.GetComponentInChildren<dial>()?.setPercent(cubeFloats[i2][curDimensions[1]]);
     }
 
-    //public void LoadSamplerInfo()
-    //{
-    //    for (int i = 0; i < curDimensions[1]; i++)
-    //    {
-    //        samplerList[i].gameObject.GetComponent<samplerLoad>().SetSample(tapeList[curDimensions[i]][0], tapeList[curDimensions[i]][1]);
-    //        samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().muteButton.keyHit(rowMute[curDimensions[i]]);
-    //    }
-    //}
 
     void updateStepSelectVertical()
     {
@@ -663,14 +644,6 @@ public class sequencerCVDeviceInterface : deviceInterface
             controlModeList.RemoveAt(controlModeList.Count - 1);
             controlMuteList.RemoveAt(controlModeList.Count);
 
-            //clipPlayerSimple clipTemp = samplerList.Last();
-            //int tempIndex = samplerList.Count - 1;
-            //clipTemp.gameObject.GetComponent<samplerLoad>().getTapeInfo(out tapeList[tempIndex][0], out tapeList[tempIndex][1]);
-            //rowMute[tempIndex] = clipTemp.gameObject.GetComponent<miniSamplerComponentInterface>().muteButton.isHit;
-
-            //Destroy(clipTemp.gameObject);
-            //samplerList.RemoveAt(tempIndex);
-
             curDimensions[1]--;
         }
 
@@ -680,12 +653,6 @@ public class sequencerCVDeviceInterface : deviceInterface
     #endregion
 
     #region saveload
-
-    //public void saveRowSampler(int r)
-    //{
-    //    samplerList[r].gameObject.GetComponent<samplerLoad>().getTapeInfo(out tapeList[r][0], out tapeList[r][1]);
-    //    rowMute[r] = samplerList[r].gameObject.GetComponent<miniSamplerComponentInterface>().muteButton.isHit;
-    //}
 
     public override InstrumentData GetData()
     {
@@ -714,43 +681,9 @@ public class sequencerCVDeviceInterface : deviceInterface
           data.jackCvOutID[i] = cvJackOutList[i].GetChild(0).GetInstanceID();
         }
 
-        //for (int i = 0; i < dimensions[1]; i++)
-        //{
-        //    saveRowSampler(i);
-        //}
-
-        //data.rowSamples = tapeList;
         data.buttonMutes = rowMute;
         data.dialSwing = swingDial.percent;
 
-        //data.jackSampleOutIDs = new int[samplerList.Count];
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //    data.jackSampleOutIDs[i] = samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackSampleOut.transform.GetInstanceID();
-        //}
-
-        //data.dialsPitch = new float[samplerList.Count];
-        //for (int i = 0; i < samplerList.Count; i++){
-        //    data.dialsPitch[i] = samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().dialPitch.percent;
-        //}
-
-        //data.dialsAmp = new float[samplerList.Count];
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //    data.dialsAmp[i] = samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().dialAmp.percent;
-        //}
-
-        //data.jackPitch = new int[samplerList.Count];
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //  data.jackPitch[i] = samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackPitch.transform.GetInstanceID();
-        //}
-
-        //data.jackAmp = new int[samplerList.Count];
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //  data.jackAmp[i] = samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackAmp.transform.GetInstanceID();
-        //}
 
         data.switchRange = switchCVRange.switchVal;
 
@@ -804,31 +737,6 @@ public class sequencerCVDeviceInterface : deviceInterface
         beatSlider.setVal(data.sliderSpeed);
         swingDial.setPercent(data.dialSwing);
 
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //    samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackSampleOut.ID = data.jackSampleOutIDs[i];
-        //}
-
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //    samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().dialPitch.setPercent(data.dialsPitch[i]);
-        //}
-
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //    samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().dialAmp.setPercent(data.dialsAmp[i]);
-        //}
-
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //    samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackPitch.ID = data.jackPitch[i];
-        //}
-
-        //for (int i = 0; i < samplerList.Count; i++)
-        //{
-        //    samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackAmp.ID = data.jackAmp[i];
-        //}
-
         switchCVRange.setSwitch(data.switchRange, true);
 
 
@@ -849,18 +757,11 @@ public class SequencerCVData : InstrumentData
   public int[] jackTriggerOutID;
   public int[] jackCvOutID;
   
-  //public string[][] rowSamples;
-  //public int[] jackSampleOutIDs;
   public bool[] buttonMutes;
   public int[] dimensions;
 
   public bool[][] cubeButtons;
   public float[][] cubeDials;
-
-  //public float[] dialsPitch;
-  //public float[] dialsAmp;
-  //public int[] jackPitch;
-  //public int[] jackAmp;
 
   public bool switchRange;
 
