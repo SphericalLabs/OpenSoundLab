@@ -776,11 +776,12 @@ public class DeviceType
     public static readonly DeviceType Oscillator = new DeviceType("Oscillator", DeviceCategory.WaveGenerator, 1);
 
     // SampleGenerator
-    public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 5);
-    public static readonly DeviceType Looper = new DeviceType("Looper", DeviceCategory.SampleGenerator, 4);
-    public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 3);
-    public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 2);
-    public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.SampleGenerator, 1);
+    public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 6);
+    public static readonly DeviceType Looper = new DeviceType("Looper", DeviceCategory.SampleGenerator, 5);
+    public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 4);
+    public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 3);
+    public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.SampleGenerator, 2);
+    public static readonly DeviceType Single = new DeviceType("Single", DeviceCategory.SampleGenerator, 1);
 
     // ModulationGenerator
     public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 6);

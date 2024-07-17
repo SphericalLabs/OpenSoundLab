@@ -2787,6 +2787,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &724434311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 724434313}
+  - component: {fileID: 724434312}
+  m_Layer: 0
+  m_Name: StressTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &724434312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724434311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd5e9649404d2594ea08b88c76574765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ipAddress: localhost
+  port: 7777
+  autoConnect: 0
+--- !u!4 &724434313
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724434311}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.02420893, y: 0.11421182, z: 0.080337286}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &725303546
 GameObject:
   m_ObjectHideFlags: 0
@@ -3233,50 +3280,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920437632}
   m_CullTransparentMesh: 1
---- !u!1 &930154151
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 930154152}
-  - component: {fileID: 930154153}
-  m_Layer: 0
-  m_Name: StressTest
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &930154152
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 930154151}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.7336657, y: -0.65459454, z: 2.1312468}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &930154153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 930154151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d9e61e3900ba0a45a0f18613b61ea28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &977626888
 GameObject:
   m_ObjectHideFlags: 0
@@ -6346,7 +6349,7 @@ GameObject:
   - component: {fileID: 1644050915}
   - component: {fileID: 1644050914}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: RemoveDeviceComponents
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6411,6 +6414,7 @@ MonoBehaviour:
   - {fileID: 5752642161367630598, guid: 0b8a92cd38b651f4aab872e192e7adbf, type: 3}
   - {fileID: 8410313499841020102, guid: 955d8256dca095a4c92b36e4ed68dc3e, type: 3}
   - {fileID: 6160438666838018157, guid: f94f3a283db74f04da5bbd0e8260aeeb, type: 3}
+  - {fileID: 3354574459121457247, guid: 5c89fd6efe6c85b43a9c1485f4cadf4d, type: 3}
   newMaterial: {fileID: 0}
 --- !u!4 &1644050915
 Transform:
@@ -7990,6 +7994,8 @@ MonoBehaviour:
   - {fileID: 1000014214864386, guid: ce7c0e70b11c6714ba4790139f93fe9d, type: 3}
   - {fileID: 161644, guid: 3711d8030be5241469cf044c77b9e4f3, type: 3}
   - {fileID: 1687681188691744, guid: e7529c2cf9fb00c4d9bd37c1c56e8e09, type: 3}
+  - {fileID: 1000013735183428, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
+  - {fileID: 0}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -8411,4 +8417,4 @@ SceneRoots:
   - {fileID: 789507370}
   - {fileID: 6865139194407866217}
   - {fileID: 1644050915}
-  - {fileID: 930154152}
+  - {fileID: 724434313}
