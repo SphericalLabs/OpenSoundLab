@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ? 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ? 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ? 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ? 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -471,10 +471,10 @@ public class sequencerCVDeviceInterface : deviceInterface
             for (int i2 = 0; i2 < curDimensions[1]; i2++)
             {
                 // stepDialPrefab
-                setupStepPrefabColumn(stepDialPrefab, i2);
+                setupStepPrefabColumn(stepDialPrefab, i2, true);
 
                 // stepCubePrefab 
-                setupStepPrefabColumn(stepCubePrefab, i2);
+                setupStepPrefabColumn(stepCubePrefab, i2, false);
 
                 moveByOffset(trigJackOutList[i2], -cubeConst);
                 moveByOffset(cvJackOutList[i2], -cubeConst);
@@ -487,7 +487,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         stepSelect.updatePos(stepSelect.transform.localPosition.x);
     }
 
-    void setupStepPrefabColumn(GameObject prefab, int i2){
+    void setupStepPrefabColumn(GameObject prefab, int i2, bool setupDial){
         Transform t = (Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject).transform;
         t.parent = transform;
         t.localRotation = Quaternion.identity;
@@ -496,12 +496,12 @@ public class sequencerCVDeviceInterface : deviceInterface
         t.localPosition = new Vector3(-cubeConst * xMult, -cubeConst * yMult, 0);
 
         t.localScale = Vector3.one;
-        cubeList[i2].Add(t);
-        cubeDials[i2].Add(t.GetComponentInChildren<dial>());
+        if(!setupDial) cubeList[i2].Add(t);
+        if(setupDial) cubeDials[i2].Add(t.GetComponentInChildren<dial>());
 
         float Hval = (float)i2 / max;
-        t.GetComponent<button>()?.Setup(curDimensions[0], i2, cubeBools[curDimensions[0]][i2], Color.HSVToRGB(Hval, .9f, .05f));
-        t.GetComponentInChildren<dial>()?.setPercent(cubeFloats[0][i2]);
+        if(!setupDial) t.GetComponent<button>()?.Setup(curDimensions[0], i2, cubeBools[curDimensions[0]][i2], Color.HSVToRGB(Hval, .9f, .05f));
+        if(setupDial) t.GetComponentInChildren<dial>()?.setPercent(cubeFloats[0][i2]);
     }
 
     void moveByOffset(Transform t, float offset){
@@ -541,8 +541,8 @@ public class sequencerCVDeviceInterface : deviceInterface
 
             for (int i2 = 0; i2 < curDimensions[0]; i2++)
             {
-                setupStepPrefabRow(stepDialPrefab, i2);
-                setupStepPrefabRow(stepCubePrefab, i2);
+                setupStepPrefabRow(stepDialPrefab, i2, true);
+                setupStepPrefabRow(stepCubePrefab, i2, false);
             }
 
             // TODO: add a third prefab for mute, switch between dials and buttons, 
@@ -578,8 +578,9 @@ public class sequencerCVDeviceInterface : deviceInterface
             ctrl.localPosition = new Vector3(cubeConst * (curDimensions[0] - 1), -cubeConst * curDimensions[1], 0);
 
             controlList.Add(ctrl);
-            controlMuteList.Add(ctrl.GetComponent<button>());
-            controlModeList.Add(ctrl.GetComponent<basicSwitch>());
+            controlMuteList.Add(ctrl.GetComponentInChildren<button>());
+            controlMuteList.Last()._componentInterface = (componentInterface) this;
+            controlModeList.Add(ctrl.GetComponentInChildren<basicSwitch>());
 
 
             curDimensions[1]++;
@@ -588,7 +589,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         updateStepSelectVertical();
     }
 
-    void setupStepPrefabRow(GameObject prefab, int i2){
+    void setupStepPrefabRow(GameObject prefab, int i2, bool setupDial){
         Transform t = (Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject).transform;
         t.parent = transform;
         t.localRotation = Quaternion.identity;
@@ -597,13 +598,13 @@ public class sequencerCVDeviceInterface : deviceInterface
         t.localPosition = new Vector3(-cubeConst * xMult, -cubeConst * yMult, 0);
 
         t.localScale = Vector3.one;
-        cubeList.Last().Add(t);
-        cubeDials.Last().Add(t.GetComponentInChildren<dial>());
+        if(!setupDial)cubeList.Last().Add(t);
+        if(setupDial)cubeDials.Last().Add(t.GetComponentInChildren<dial>());
 
         float Hval = (float)curDimensions[1] / max;
 
-        t.GetComponent<button>()?.Setup(i2, curDimensions[1], cubeBools[i2][curDimensions[1]], Color.HSVToRGB(Hval, .9f, .05f));
-        t.GetComponentInChildren<dial>()?.setPercent(cubeFloats[i2][curDimensions[1]]);
+        if(!setupDial) t.GetComponent<button>()?.Setup(i2, curDimensions[1], cubeBools[i2][curDimensions[1]], Color.HSVToRGB(Hval, .9f, .05f));
+        if(setupDial) t.GetComponentInChildren<dial>()?.setPercent(cubeFloats[i2][curDimensions[1]]);
     }
 
 
