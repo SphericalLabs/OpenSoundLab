@@ -480,7 +480,7 @@ extern "C" {
           endOfSample = true;
           floatingBufferCount = fmod(floatingBufferCount - sampleBounds[0], sampleBounds[1] - sampleBounds[0]) + sampleBounds[0] + 1; // wrap over playhead offset
         }
-        else if (floatingBufferCount < sampleBounds[0] + 1)
+        else if (floatingBufferCount < sampleBounds[0] + 1) // still needed? this introduces problems when resetting to 0 (instead of 1) while having playback speeds below 1, this will always be caught here and then playback stops immediately
         {
           endOfSample = true;
           floatingBufferCount = sampleBounds[1] - fmod(floatingBufferCount - sampleBounds[0], sampleBounds[1] - sampleBounds[0]); // wrap over playhead offset
@@ -495,7 +495,7 @@ extern "C" {
         {
           if (seqBuffer[i] > 0.f && lastSeqGen[0] <= 0.f)
           {
-            if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1;
+            if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1; // WARNING: Due to the code structure in the  ClipSignalGenerator function resetting to 0 (instead of 0 + 1) would mean that playback does not work anymore for speeds lower than 1f. It would always floor() to 0 and would not move through the file anymore.
             else floatingBufferCount = bufferCount = sampleBounds[1];
             active = true;
           }

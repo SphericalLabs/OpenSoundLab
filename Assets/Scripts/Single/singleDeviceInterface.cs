@@ -34,7 +34,11 @@ public class SingleDeviceInterface : deviceInterface
     }
 
     public override void hit(bool on, int ID = -1){
-        //play
+        if(on && ID == 0) player.Play();
+    }
+
+    public void flashTriggerButton(){
+        buttonPlay.queueFlash();
     }
 
 
