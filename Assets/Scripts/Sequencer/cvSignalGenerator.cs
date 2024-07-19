@@ -38,7 +38,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System;
 
-public class sequencerCV : signalGenerator
+public class cvSignalGenerator : signalGenerator
 {
     public static float lowRange = 0.2f; // central place to set these ranges!
     public static float highRange = 1f; // 

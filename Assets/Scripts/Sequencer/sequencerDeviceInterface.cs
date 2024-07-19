@@ -50,7 +50,7 @@ public class sequencerDeviceInterface : deviceInterface {
   int[] curDimensions = new int[] { 0, 0 };
   public List<List<Transform>> cubeList;
   public List<Transform> jackList;
-  public List<sequencer> seqList;
+  public List<trigSignalGenerator> seqList;
   public List<clipPlayerSimple> samplerList;
   public bool[][] cubeStates;
   public bool[] rowMute;
@@ -78,7 +78,7 @@ public class sequencerDeviceInterface : deviceInterface {
     base.Awake();
     cubeList = new List<List<Transform>>();
     jackList = new List<Transform>();
-    seqList = new List<sequencer>();
+    seqList = new List<trigSignalGenerator>();
     samplerList = new List<clipPlayerSimple>();
 
     cubeStates = new bool[max][];
@@ -335,13 +335,13 @@ public class sequencerDeviceInterface : deviceInterface {
       jack.localPosition = new Vector3(-cubeConst / 2f - .001f - cubeConst * (curDimensions[0] - 1), -cubeConst * curDimensions[1], 0);
 
       jackList.Add(jack);
-      seqList.Add(jack.GetComponent<sequencer>());
+      seqList.Add(jack.GetComponent<trigSignalGenerator>());
 
       clipPlayerSimple samp = (Instantiate(samplerPrefab, Vector3.zero, Quaternion.identity, transform) as GameObject).GetComponent<clipPlayerSimple>();
       samp.transform.localRotation = Quaternion.identity;
       samp.transform.localScale = Vector3.one;
       samp.transform.localPosition = new Vector3(.081f, -cubeConst * curDimensions[1], -.028f);
-      samp.seqGen = jack.GetComponent<sequencer>();
+      samp.seqGen = jack.GetComponent<trigSignalGenerator>();
 
       samp.gameObject.GetComponent<samplerLoad>().SetSample(tapeList[curDimensions[1]][0], tapeList[curDimensions[1]][1]);
       samp.gameObject.GetComponent<miniSamplerComponentInterface>().muteButton.startToggled = rowMute[curDimensions[1]];

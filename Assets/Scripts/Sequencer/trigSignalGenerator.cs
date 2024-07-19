@@ -37,7 +37,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-public class sequencer : signalGenerator
+public class trigSignalGenerator : signalGenerator
 {
 
     bool newSignal = false;
