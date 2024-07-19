@@ -42,40 +42,51 @@ public class sequencerCVDeviceInterface : deviceInterface
 
     #region fields
 
-    // out generators are nested in the jackOutPrefabs
+
+
+    // prefabs
     public GameObject triggerJackOutPrefab, cvJackOutPrefab, controlPrefab;
-    public GameObject stepDialPrefab, stepCubePrefab; 
-     
-    public Transform stretchNode;
-    public xHandle stepSelect;
-    public bool running = true;
+    public GameObject stepDialPrefab, stepCubePrefab;
 
-    float swingPercent = 0;
-    int beatSpeed = 0;
+    
 
-    public int[] dimensions = new int[] { 1, 1 };
-    int[] curDimensions = new int[] { 0, 0 };
+    // 3D array of pattern states, x, y, z?
+    public bool[][][] cubeBools;  // the step sequencer button values
+    public float[][][] cubeFloats; // the step sequencer dial values
 
-    public List<List<Transform>> cubeList;
+    public bool[] rowMute; // these should go to the right and be removed in basicSampler
 
-    public bool[][] cubeBools;  // the step sequencer button values
+    // 2D arrays of prepoluated, networked interface elements
+    public List<List<button>> cubeButtons;
+    public List<List<dial>> cubeDials;  
+
+    // signalGenerators
     public List<sequencer> seqList; // trigger generators
-    public List<Transform> trigJackOutList;
-
-    public float[][] cubeFloats; // the step sequencer dial values
     public List<sequencerCV> seqCVList; // cv generators
-    public List<List<dial>> cubeDials;  // the step sequencer dials, keep them so that you don't have to search them in the scene graph on Update()
-    public List<Transform> cvJackOutList;
 
+    // prepopulated control panels
     public List<Transform> controlList;
     public List<button> controlMuteList;
     public List<basicSwitch> controlModeList;
 
-    //public List<clipPlayerSimple> samplerList; // TODO: remove this, will be a seperate device
 
-    public bool[] rowMute; // these should go to the right and be removed in basicSampler
+    public List<List<Transform>> cubeList;
+    public List<Transform> trigJackOutList;    
+    public List<Transform> cvJackOutList;
 
-    //public string[][] tapeList; // why 2-dimensional? TODO: remove
+
+
+    // sequencer
+    public bool running = true;
+    float swingPercent = 0;
+    int beatSpeed = 0;
+
+    // handles
+    public Transform stretchNode;
+    public xHandle stepSelect;
+
+    public int[] dimensions = new int[] { 1, 1 };
+    int[] curDimensions = new int[] { 0, 0 };
 
     float cubeConst = .04f;
 
@@ -84,7 +95,6 @@ public class sequencerCVDeviceInterface : deviceInterface
     public sliderNotched beatSlider;
     public omniJack playTriggerInputJack;
     public button playButton;
-
     dial swingDial;
     signalGenerator clockGenerator; 
     signalGenerator resetGenerator;
