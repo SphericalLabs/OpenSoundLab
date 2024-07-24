@@ -431,9 +431,9 @@ public class sequencerCVDeviceInterface : deviceInterface
             // jacks for triggers
             Transform jackTrig = Instantiate(triggerJackOutPrefab, Vector3.zero, Quaternion.identity).transform;
             jackTrig.parent = transform;
-            jackTrig.localRotation = Quaternion.Euler(0, 90, -90);
+            jackTrig.localRotation = Quaternion.Euler(0, 0, -90);
             jackTrig.localScale = Vector3.one;
-            jackTrig.localPosition = new Vector3(-cubeConst * (maxSteps - 1 + 3), -cubeConst * row, cubeConst * 0.5f);
+            jackTrig.localPosition = new Vector3(-cubeConst * (maxSteps - 1 + 2.5f), -cubeConst * row, -cubeConst * 0.5f);
 
             jackOutTrigTrans[row] = jackTrig;
             jackOutTrigGenerators[row] = jackTrig.GetComponentInChildren<trigSignalGenerator>();
@@ -442,9 +442,9 @@ public class sequencerCVDeviceInterface : deviceInterface
             // jacks for cvs
             Transform jackCV = Instantiate(cvJackOutPrefab, Vector3.zero, Quaternion.identity).transform;
             jackCV.parent = transform;
-            jackCV.localRotation = Quaternion.Euler(0, 90, -90);
+            jackCV.localRotation = Quaternion.Euler(0, 0, -90);
             jackCV.localScale = Vector3.one;
-            jackCV.localPosition = new Vector3(-cubeConst * (maxSteps - 1 + 3), -cubeConst * row, cubeConst * 0.5f);
+            jackCV.localPosition = new Vector3(-cubeConst * (maxSteps - 1 + 2.5f), -cubeConst * row, -cubeConst * 0.5f);
 
             jackOutCVTrans[row] = jackCV;
             jackOutCVGenerators[row] = jackCV.GetComponentInChildren<cvSignalGenerator>();
