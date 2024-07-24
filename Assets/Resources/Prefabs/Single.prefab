@@ -1102,7 +1102,7 @@ MonoBehaviour:
   seqGen: {fileID: 0}
   freqExpGen: {fileID: 0}
   ampGen: {fileID: 0}
-  seqMuted: 0
+  devInterface: {fileID: 0}
 --- !u!114 &6396865805222944688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2647,8 +2647,8 @@ GameObject:
   - component: {fileID: 4809506143125753358}
   - component: {fileID: 2305645656453490579}
   - component: {fileID: 1062251996052205288}
-  - component: {fileID: 1394699584661402533}
   - component: {fileID: 939196593982659206}
+  - component: {fileID: 983667472262172756}
   m_Layer: 0
   m_Name: Hull
   m_TagString: Untagged
@@ -3538,28 +3538,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5479778832448186017}
   m_Mesh: {fileID: 0}
---- !u!64 &1394699584661402533
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5479778832448186017}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
 --- !u!114 &939196593982659206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3594,6 +3572,27 @@ MonoBehaviour:
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
+--- !u!65 &983667472262172756
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5479778832448186017}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.3931644, y: 0.04070449, z: 0.098748714}
+  m_Center: {x: 0.13660276, y: -0.00008785725, z: -0.00007334165}
 --- !u!1 &5637529500674926844
 GameObject:
   m_ObjectHideFlags: 0
@@ -4269,8 +4268,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.31, y: -0.06, z: 0.09}
-  m_Center: {x: 0.04, y: -0.02, z: -0.06}
+  m_Size: {x: 0.3928986, y: 0.038495958, z: 0.095435984}
+  m_Center: {x: 0.032525524, y: -0.03211102, z: -0.061359}
 --- !u!114 &8185299760071139656
 MonoBehaviour:
   m_ObjectHideFlags: 0
