@@ -229,12 +229,12 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         // it is important that this is running here, since this is called from audio thread and directly manipulates the sequencer outputs
         // this is one aspect of making the sequencer sample accurate!
-        for (int i = 0; i < curDimensions[0]; i++)
+        for (int row = 0; row < curDimensions[0]; row++)
         {
-            if (controlPanelMutes[i].isHit) continue;
+            if (controlPanelMutes[row].isHit) continue;
 
-            jackOutTrigGenerators[i].setSignal(stepBools[activePattern, targetStep, i]);
-            jackOutCVGenerators[i].setSignal(stepFloats[activePattern, targetStep, i] * 2f - 1f);
+            jackOutTrigGenerators[row].setSignal(stepBools[activePattern, row, targetStep]);
+            jackOutCVGenerators[row].setSignal(stepFloats[activePattern, row, targetStep] * 2f - 1f);
         }
     }
 
@@ -437,6 +437,7 @@ public class sequencerCVDeviceInterface : deviceInterface
 
             jackOutTrigTrans[row] = jackTrig;
             jackOutTrigGenerators[row] = jackTrig.GetComponentInChildren<trigSignalGenerator>();
+            jackTrig.gameObject.SetActive(even);
 
             // jacks for cvs
             Transform jackCV = Instantiate(cvJackOutPrefab, Vector3.zero, Quaternion.identity).transform;
@@ -447,6 +448,7 @@ public class sequencerCVDeviceInterface : deviceInterface
 
             jackOutCVTrans[row] = jackCV;
             jackOutCVGenerators[row] = jackCV.GetComponentInChildren<cvSignalGenerator>();
+            jackCV.gameObject.SetActive(!even);
 
             // controlPrefab
             Transform ctrl = Instantiate(controlPrefab, Vector3.zero, Quaternion.identity).transform;
@@ -572,6 +574,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         {
             for (int row = 0; row < curDimensions[0]; row++)
             {
+                stepButtons[row, curDimensions[1] - 1].Highlight(false);
                 stepButtonTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
                 stepDialTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
             }
@@ -627,6 +630,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         {
             for (int step = 0; step < curDimensions[1]; step++)
             {
+                stepButtons[curDimensions[0] - 1, step].Highlight(false);
                 stepButtonTrans[curDimensions[0] - 1, step].gameObject.SetActive(false);
                 stepDialTrans[curDimensions[0] - 1, step].gameObject.SetActive(false);
 
