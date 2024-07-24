@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ? 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ? 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ? 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ? 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,9 +34,6 @@
 
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class sequencerCVDeviceInterface : deviceInterface
 {
@@ -83,8 +80,6 @@ public class sequencerCVDeviceInterface : deviceInterface
     int[] curDimensions = new int[] { 0, 0 };
 
     float cubeConst = .04f;
-
-    //int maxDim = 16; // limit for x and y
 
     int maxSteps = 16;
     int maxRows = 8;
@@ -181,8 +176,8 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         if (dimensions[1] < 1) dimensions[1] = 1;
         if (dimensions[0] < 1) dimensions[0] = 1;
-        if (dimensions[1] > maxRows) dimensions[1] = maxRows;
-        if (dimensions[0] > maxSteps) dimensions[0] = maxSteps;
+        if (dimensions[1] > maxSteps) dimensions[1] = maxSteps;
+        if (dimensions[0] > maxRows) dimensions[0] = maxRows;
         UpdateDimensions();
         UpdateStepSelect();
 
@@ -420,17 +415,17 @@ public class sequencerCVDeviceInterface : deviceInterface
 
     void spawnMaxDimensions()
     {
-        bool oddSpawn;
+        bool even;
 
         for (int row = 0; row < maxRows; row++)
         {
-            oddSpawn = row % 2 == 1;
+            even = row % 2 == 0;
 
             for (int step = 0; step < maxSteps; step++)
             {
                 // alternate between trigger and cv rows    
-                setupStepPrefabRow(stepDialPrefab, row, step, oddSpawn); 
-                setupStepPrefabRow(stepButtonPrefab, row, step, !oddSpawn);
+                setupStepPrefabRow(stepButtonPrefab, row, step, even);
+                setupStepPrefabRow(stepDialPrefab, row, step, !even); 
             }
 
             // jacks for triggers
@@ -463,7 +458,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             controlPanelTrans[row] = ctrl;
             controlPanelMutes[row] = ctrl.GetComponentInChildren<button>();
             controlPanelModes[row] = ctrl.GetComponentInChildren<basicSwitch>();
-            controlPanelModes[row].setSwitch(oddSpawn); 
+            controlPanelModes[row].setSwitch(even); 
         }
 
         // shrink to start size
@@ -548,18 +543,23 @@ public class sequencerCVDeviceInterface : deviceInterface
             {
                 if (controlPanelModes[row].switchVal)
                 {
-                    stepButtonTrans[row, curDimensions[1] - 1].gameObject.SetActive(true);
+                    stepButtonTrans[row, curDimensions[1]].gameObject.SetActive(true);
                 }
                 else
                 {
-                    stepDialTrans[row, curDimensions[1] - 1].gameObject.SetActive(true);
+                    stepDialTrans[row, curDimensions[1]].gameObject.SetActive(true);
                 }
 
-                moveByOffset(jackOutTrigTrans[row], -cubeConst);
-                moveByOffset(jackOutCVTrans[row], -cubeConst);
-                moveByOffset(controlPanelTrans[row], -cubeConst);
+                
             }
             curDimensions[1]++;
+        }
+
+        for (int row = 0; row < maxRows; row++)
+        {
+            moveByOffset(jackOutTrigTrans[row], -cubeConst * c);
+            moveByOffset(jackOutCVTrans[row], -cubeConst * c);
+            moveByOffset(controlPanelTrans[row], -cubeConst * c);
         }
 
         stepSelect.xBounds.x = -cubeConst * (curDimensions[1] - 1);
@@ -574,12 +574,15 @@ public class sequencerCVDeviceInterface : deviceInterface
             {
                 stepButtonTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
                 stepDialTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
-
-                moveByOffset(jackOutTrigTrans[row], cubeConst);
-                moveByOffset(jackOutCVTrans[row], cubeConst);
-                moveByOffset(controlPanelTrans[row], cubeConst);
             }
             curDimensions[1]--;
+        }
+
+        for (int row = 0; row < maxRows; row++)
+        {
+            moveByOffset(jackOutTrigTrans[row], cubeConst * c);
+            moveByOffset(jackOutCVTrans[row], cubeConst * c);
+            moveByOffset(controlPanelTrans[row], cubeConst * c);
         }
 
         stepSelect.xBounds.x = -cubeConst * (curDimensions[1] - 1);
@@ -599,18 +602,18 @@ public class sequencerCVDeviceInterface : deviceInterface
         {
             for (int step = 0; step < curDimensions[1]; step++)
             {
-                if (controlPanelModes[curDimensions[0] - 1].switchVal)
+                if (controlPanelModes[curDimensions[0]].switchVal)
                 {
-                    stepButtonTrans[curDimensions[0] - 1, step].gameObject.SetActive(true);
-                    jackOutTrigTrans[curDimensions[0] - 1].gameObject.SetActive(true);
+                    stepButtonTrans[curDimensions[0], step].gameObject.SetActive(true);
+                    jackOutTrigTrans[curDimensions[0]].gameObject.SetActive(true);
                 }
                 else
                 {
-                    stepDialTrans[curDimensions[0] - 1, step].gameObject.SetActive(true);
-                    jackOutCVTrans[curDimensions[0] - 1].gameObject.SetActive(true);
+                    stepDialTrans[curDimensions[0], step].gameObject.SetActive(true);
+                    jackOutCVTrans[curDimensions[0]].gameObject.SetActive(true);
                 }
 
-                controlPanelTrans[curDimensions[0] - 1].gameObject.SetActive(true);
+                controlPanelTrans[curDimensions[0]].gameObject.SetActive(true);
             }
             curDimensions[0]++;
         }
