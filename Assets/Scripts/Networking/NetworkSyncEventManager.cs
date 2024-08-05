@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class NetworkSyncEventManager : MonoBehaviour
 {
@@ -54,4 +55,18 @@ public class NetworkSyncEventManager : MonoBehaviour
         IntervalSyncEvent?.Invoke();
     }
 
+}
+[CustomEditor(typeof(NetworkSyncEventManager))]
+public class MyScriptEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector(); // Draws the default inspector layout
+
+        NetworkSyncEventManager myScript = (NetworkSyncEventManager)target;
+        if (GUILayout.Button("Sync Now"))
+        {
+            myScript.UpdateSync();
+        }
+    }
 }
