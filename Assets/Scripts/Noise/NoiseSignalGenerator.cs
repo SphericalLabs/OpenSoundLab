@@ -67,6 +67,7 @@ public class NoiseSignalGenerator : signalGenerator {
   public bool updated = false;
 
     public int NoiseStep { get => noiseStep; set => noiseStep = value; }
+    public int Seed { get => seed; set => seed = value; }
 
     public void updatePercent(float per) {
     if (speedPercent == per) return;

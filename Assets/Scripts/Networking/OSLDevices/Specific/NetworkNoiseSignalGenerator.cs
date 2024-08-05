@@ -11,10 +11,20 @@ public class NetworkNoiseSignalGenerator : NetworkSignalGenerator
     {
         noiseSignalGenerator = GetComponent<NoiseSignalGenerator>();
     }
-    [SyncVar] int seed = 0; // select a specific noise pattern
-    
+    [SyncVar(hook = nameof(OnUpdateSeed))] 
+    private int seed = 0; // select a specific noise pattern
+
 
     #region Mirror
+    public override void OnStartServer()
+    {
+        seed = noiseSignalGenerator.Seed;
+    }
+    private void OnUpdateSeed(int oldValue, int newValue)
+    {
+        noiseSignalGenerator.Seed = newValue;
+    }
+
     protected override void OnSync()
     {
         if (isServer)
