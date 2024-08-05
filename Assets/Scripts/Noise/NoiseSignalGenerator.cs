@@ -66,7 +66,9 @@ public class NoiseSignalGenerator : signalGenerator {
 
   public bool updated = false;
 
-  public void updatePercent(float per) {
+    public int NoiseStep { get => noiseStep; set => noiseStep = value; }
+
+    public void updatePercent(float per) {
     if (speedPercent == per) return;
     speedPercent = per;
     speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
