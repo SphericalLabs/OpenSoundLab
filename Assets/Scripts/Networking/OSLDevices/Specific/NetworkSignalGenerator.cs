@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class NetworkSignalGenerator : NetworkBehaviour
+public class NetworkSignalGenerator : NetworkSyncListener
 {
     protected signalGenerator signalGenerator;
     protected virtual void Awake()
@@ -11,18 +11,19 @@ public class NetworkSignalGenerator : NetworkBehaviour
         signalGenerator = GetComponent<signalGenerator>();
     }
     #region Mirror
-    protected virtual void SubscribeToNetworkEvents()
+
+    public override void OnStartClient()
     {
-        NetworkSyncEventManager.Instance.SyncEvent += OnSync;
-        if (isServer)
+        base.OnStartClient();
+        if (!isServer)
         {
-            NetworkSyncEventManager.Instance.IntervalSyncEvent += OnIntervalSync;
+            CmdRequestSync();
         }
     }
 
-    protected virtual void OnSync()
+    protected override void OnSync()
     {
-        Debug.Log("On Sync");
+        base.OnSync();
         if (isServer)
         {
             RpcUpdatePhase(signalGenerator._phase);
@@ -33,32 +34,29 @@ public class NetworkSignalGenerator : NetworkBehaviour
         }
     }
 
-    protected virtual void OnIntervalSync()
+    protected override void OnIntervalSync()
     {
-        Debug.Log("On Interval Sync");
+        base.OnIntervalSync();
         if (isServer)
         {
             RpcUpdatePhase(signalGenerator._phase);
         }
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     protected virtual void CmdRequestSync()
     {
-        Debug.Log("CmdRequestSync");
+        Debug.Log($"{gameObject.name} CmdRequestSync");
         RpcUpdatePhase(signalGenerator._phase);
     }
 
     [ClientRpc]
     protected virtual void RpcUpdatePhase(double phase)
     {
-        Debug.Log("RpcUpdate Phase");
-        Debug.Log("New Phase: " + phase);
         if (isClient)
         {
-            Debug.Log("old phase: " + signalGenerator._phase);
+            Debug.Log($"{gameObject.name} old phase: {signalGenerator._phase}, new phase {phase}");
             signalGenerator._phase = phase;
-            Debug.Log("new phase: " + signalGenerator._phase);
         }
     }
     #endregion
