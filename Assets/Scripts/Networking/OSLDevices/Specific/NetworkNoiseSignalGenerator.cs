@@ -32,7 +32,7 @@ public class NetworkNoiseSignalGenerator : NetworkSyncListener
     private void OnUpdateSeed(int oldValue, int newValue)
     {
         Debug.Log($"{gameObject.name} update seed {newValue}");
-        noiseSignalGenerator.Seed = newValue;
+        noiseSignalGenerator.syncNoiseSignalGenerator(newValue, noiseSignalGenerator.NoiseStep);
     }
 
     protected override void OnSync()
@@ -69,7 +69,7 @@ public class NetworkNoiseSignalGenerator : NetworkSyncListener
         if (isClient)
         {
             Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.NoiseStep}, new noiseStep {noiseStep}");
-            noiseSignalGenerator.NoiseStep = noiseStep;
+            noiseSignalGenerator.syncNoiseSignalGenerator(noiseSignalGenerator.Seed, noiseStep);
         }
     }
 

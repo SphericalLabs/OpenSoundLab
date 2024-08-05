@@ -37,20 +37,21 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System;
 
-public class NoiseSignalGenerator : signalGenerator {
+public class NoiseSignalGenerator : signalGenerator
+{
 
-  float speedPercent = 1;
-  int speedFrames = 1;
+    float speedPercent = 1;
+    int speedFrames = 1;
 
-  int maxLength = 11025 * 16; //  max length of one random value in samples
-  int counter = 0; // used for downsampling
+    int maxLength = 11025 * 16; //  max length of one random value in samples
+    int counter = 0; // used for downsampling
 
-  float curSample = -1.0f;
+    float curSample = -1.0f;
 
-  int noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
-  int seed = 0; // select a specific noise pattern
-  IntPtr noiseProcessorPointer; // used in OSLNative
-  private readonly object lockObject = new object();
+    int noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
+    int seed = 0; // select a specific noise pattern
+    IntPtr noiseProcessorPointer; // used in OSLNative
+    private readonly object lockObject = new object();
 
     [DllImport("OSLNative")]
     private static extern IntPtr CreateNoiseProcessor(int seed);
@@ -64,41 +65,48 @@ public class NoiseSignalGenerator : signalGenerator {
     [DllImport("OSLNative")]
     private static extern void SyncNoiseProcessor(IntPtr processor, int seed, int steps);
 
-  public bool updated = false;
+    public bool updated = false;
 
     public int NoiseStep { get => noiseStep; set => noiseStep = value; }
     public int Seed { get => seed; set => seed = value; }
 
-    public void updatePercent(float per) {
-    if (speedPercent == per) return;
-    speedPercent = per;
-    speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
-  }
-
-  public override void Awake(){
-    base.Awake();
-    noiseProcessorPointer = CreateNoiseProcessor(Utils.GetNoiseSeed());
-    //SyncNoiseProcessor(noiseProcessorPointer, noiseStep); // noiseStep should be synced via Mirror if necessary
-    //// or call it sync and use to also set seed?
-  }
-
-  public void OnDestroy(){
-    DestroyNoiseProcessor(noiseProcessorPointer);
-  }
-
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    lock (lockObject)
+    public void updatePercent(float per)
     {
-        NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, speedPercent, ref counter, speedFrames, ref updated);
-        noiseStep += buffer.Length;
+        if (speedPercent == per) return;
+        speedPercent = per;
+        speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
     }
-  }
 
-  public void syncNoiseSignalGenerator(int seed, int steps){
-    lock (lockObject)
+    public override void Awake()
     {
-        SyncNoiseProcessor(noiseProcessorPointer, seed, steps);
-        noiseStep = steps;
+        base.Awake();
+        seed = Utils.GetNoiseSeed();
+        noiseProcessorPointer = CreateNoiseProcessor(seed);
+        //SyncNoiseProcessor(noiseProcessorPointer, noiseStep); // noiseStep should be synced via Mirror if necessary
+        //// or call it sync and use to also set seed?
     }
-  }
+
+    public void OnDestroy()
+    {
+        DestroyNoiseProcessor(noiseProcessorPointer);
+    }
+
+    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    {
+        lock (lockObject)
+        {
+            NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, speedPercent, ref counter, speedFrames, ref updated);
+            noiseStep += buffer.Length;
+        }
+    }
+
+    public void syncNoiseSignalGenerator(int seed, int steps)
+    {
+        lock (lockObject)
+        {
+            SyncNoiseProcessor(noiseProcessorPointer, seed, steps);
+            this.seed = seed;
+            noiseStep = steps;
+        }
+    }
 }
