@@ -1414,11 +1414,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!65 &1157396228423013772
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2898,7 +2898,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7094710955425964603
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3957,11 +3957,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!65 &7376534030149955731
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -19,6 +19,20 @@ public class NetworkSyncListener : NetworkBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        UnSubscribeToNetworkEvents();
+    }
+
+    protected virtual void UnSubscribeToNetworkEvents()
+    {
+        NetworkSyncEventManager.Instance.SyncEvent -= OnSync;
+        if (isServer)
+        {
+            NetworkSyncEventManager.Instance.IntervalSyncEvent -= OnIntervalSync;
+        }
+    }
+
     protected virtual void OnSync()
     {
         Debug.Log($"{gameObject.name} On Sync");
