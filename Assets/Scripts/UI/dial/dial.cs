@@ -120,7 +120,7 @@ public class dial : manipObject
 
     void Update()
     {
-
+    
         if (percent != defaultPercent)
         {
             if (selectObj != null && selectObj.GetComponent<manipulator>() != null)
@@ -131,6 +131,7 @@ public class dial : manipObject
                     if (OSLInput.getInstance().isSecondaryPressed(selectManipulatorObjScript.controllerIndex))
                     {
                         setPercent(defaultPercent, true);
+                        updatePercent();
                     }
                 }
             }
@@ -140,6 +141,7 @@ public class dial : manipObject
                 if (OSLInput.getInstance().isAnySecondaryPressed())
                 {
                     setPercent(defaultPercent, true);
+                    updatePercent();
                 }
             }
         }
