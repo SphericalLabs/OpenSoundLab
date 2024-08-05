@@ -34,6 +34,9 @@
 
 using UnityEngine;
 using System.Collections;
+using static OVRPlugin;
+using static UnityEngine.Rendering.DebugUI.Table;
+using System;
 
 public class sequencerCVDeviceInterface : deviceInterface
 {
@@ -158,6 +161,12 @@ public class sequencerCVDeviceInterface : deviceInterface
             jackOutCVGenerators[i].setRange(lastRangeLow ? cvSignalGenerator.lowRange : cvSignalGenerator.highRange);
         }
 
+        // register switch events
+        for (int row = 0; row < maxRows; row++)
+        {
+            int localRow = row;  // Create a local copy, since closures are passed by reference
+            controlPanelModes[row].onSwitchChangedEvent.AddListener(delegate { doModeSwitch(localRow); });
+        }
     }
 
     void Start()
@@ -209,6 +218,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         }
 
         readAllData();
+
     }
 
     void OnDestroy()
@@ -295,6 +305,40 @@ public class sequencerCVDeviceInterface : deviceInterface
                 stepBools[activePattern, row, step] = stepButtons[row, step].isHit;
             }
         }
+    }
+
+    public void doModeSwitch(int row){
+
+        //for(int row = 0; row < dimensions[0]; row++){
+                
+            if (controlPanelModes[row].switchVal) // trigger mode
+            {
+                jackOutTrigTrans[row].gameObject.SetActive(true);
+                for(int step = 0; step < curDimensions[1]; step++){
+                    stepButtonTrans[row, step].gameObject.SetActive(true);
+                }
+
+                jackOutCVTrans[row].gameObject.SetActive(false);
+                for (int step = 0; step < curDimensions[1]; step++)
+                {
+                    stepDialTrans[row, step].gameObject.SetActive(false);
+                }
+            }
+            else // cv mode
+            {
+                jackOutTrigTrans[row].gameObject.SetActive(false);
+                for (int step = 0; step < curDimensions[1]; step++)
+                {
+                    stepButtonTrans[row, step].gameObject.SetActive(false);
+                }
+
+                jackOutCVTrans[row].gameObject.SetActive(true);
+                for (int step = 0; step < curDimensions[1]; step++)
+                {
+                    stepDialTrans[row, step].gameObject.SetActive(true);
+                }
+            }
+        //}
     }
 
     public void forcePlay(bool on)
