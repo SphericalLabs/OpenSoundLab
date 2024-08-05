@@ -22,6 +22,7 @@ public class NetworkSignalGenerator : NetworkBehaviour
 
     protected virtual void OnSync()
     {
+        Debug.Log("On Sync");
         if (isServer)
         {
             RpcUpdatePhase(signalGenerator._phase);
@@ -34,6 +35,7 @@ public class NetworkSignalGenerator : NetworkBehaviour
 
     protected virtual void OnIntervalSync()
     {
+        Debug.Log("On Interval Sync");
         if (isServer)
         {
             RpcUpdatePhase(signalGenerator._phase);
@@ -43,15 +45,20 @@ public class NetworkSignalGenerator : NetworkBehaviour
     [Command]
     protected virtual void CmdRequestSync()
     {
+        Debug.Log("CmdRequestSync");
         RpcUpdatePhase(signalGenerator._phase);
     }
 
     [ClientRpc]
     protected virtual void RpcUpdatePhase(double phase)
     {
+        Debug.Log("RpcUpdate Phase");
+        Debug.Log("New Phase: " + phase);
         if (isClient)
         {
+            Debug.Log("old phase: " + signalGenerator._phase);
             signalGenerator._phase = phase;
+            Debug.Log("new phase: " + signalGenerator._phase);
         }
     }
     #endregion
