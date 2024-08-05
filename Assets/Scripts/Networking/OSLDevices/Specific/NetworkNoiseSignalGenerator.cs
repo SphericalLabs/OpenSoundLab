@@ -18,6 +18,7 @@ public class NetworkNoiseSignalGenerator : NetworkSyncListener
     #region Mirror
     public override void OnStartServer()
     {
+        Debug.Log($"{gameObject.name} initial noise seed {noiseSignalGenerator.Seed}");
         seed = noiseSignalGenerator.Seed;
     }
     public override void OnStartClient()
