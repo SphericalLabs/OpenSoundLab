@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 using System;
 using Mirror;
 
-public class NetworkNoiseSignalGenerator : NetworkSignalGenerator
+public class NetworkNoiseSignalGenerator : NetworkSyncListener
 {
     private NoiseSignalGenerator noiseSignalGenerator;
-    protected override void Awake()
+    protected virtual void Awake()
     {
         noiseSignalGenerator = GetComponent<NoiseSignalGenerator>();
     }
@@ -20,8 +20,17 @@ public class NetworkNoiseSignalGenerator : NetworkSignalGenerator
     {
         seed = noiseSignalGenerator.Seed;
     }
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (!isServer)
+        {
+            CmdRequestSync();
+        }
+    }
     private void OnUpdateSeed(int oldValue, int newValue)
     {
+        Debug.Log($"{gameObject.name} update seed {newValue}");
         noiseSignalGenerator.Seed = newValue;
     }
 
@@ -29,7 +38,6 @@ public class NetworkNoiseSignalGenerator : NetworkSignalGenerator
     {
         if (isServer)
         {
-            RpcUpdatePhase(noiseSignalGenerator._phase);
             RpcUpdateSteps(noiseSignalGenerator.NoiseStep);
         }
         else
@@ -46,10 +54,11 @@ public class NetworkNoiseSignalGenerator : NetworkSignalGenerator
             RpcUpdateSteps(noiseSignalGenerator.NoiseStep);
         }
     }
-    [Command]
-    protected override void CmdRequestSync()
+    [Command(requiresAuthority = false)]
+    protected void CmdRequestSync()
     {
-        base.CmdRequestSync();
+        Debug.Log($"{gameObject.name} CmdRequestSync");
+
         RpcUpdateSteps(noiseSignalGenerator.NoiseStep);
 
     }
@@ -58,6 +67,7 @@ public class NetworkNoiseSignalGenerator : NetworkSignalGenerator
     {
         if (isClient)
         {
+            Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.NoiseStep}, new noiseStep {noiseStep}");
             noiseSignalGenerator.NoiseStep = noiseStep;
         }
     }
