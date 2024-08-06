@@ -56,6 +56,8 @@ public class NetworkSyncEventManager : MonoBehaviour
     }
 
 }
+
+#if UNITY_EDITOR
 [CustomEditor(typeof(NetworkSyncEventManager))]
 public class MyScriptEditor : Editor
 {
@@ -70,3 +72,4 @@ public class MyScriptEditor : Editor
         }
     }
 }
+#endif
