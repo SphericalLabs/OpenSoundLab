@@ -713,31 +713,46 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         data.activePattern = activePattern;
         data.dimensions = dimensions;
-        data.stepBools = stepBools;
-        data.stepFloats = stepFloats;
 
-        data.jackTriggerOutID = new int[jackOutTrigTrans.Length];
-        for (int i = 0; i < jackOutTrigTrans.Length; i++)
+        //data.stepBools = stepBools;
+        //data.stepFloats = stepFloats;
+        data.stepBools = new bool[maxPattern, maxRows, maxSteps];
+        data.stepFloats = new float[maxPattern, maxRows, maxSteps];
+
+        for (int p = 0; p < maxPattern; p++)
         {
-            data.jackTriggerOutID[i] = jackOutTrigTrans[i].GetChild(0).GetInstanceID();
+            for (int r = 0; r < maxRows; r++)
+            {
+                for (int s = 0; s < maxSteps; s++)
+                {
+                    data.stepBools[p, r, s] = stepBools[p, r, s];
+                    data.stepFloats[p, r, s] = stepFloats[p, r, s];
+                }
+            }
         }
 
-        data.jackCvOutID = new int[jackOutCVTrans.Length];
-        for (int i = 0; i < jackOutCVTrans.Length; i++)
+        data.jackTriggerOutID = new int[maxRows];
+        for (int row = 0; row < jackOutTrigTrans.Length; row++)
         {
-            data.jackCvOutID[i] = jackOutCVTrans[i].GetChild(0).GetInstanceID();
+            data.jackTriggerOutID[row] = jackOutTrigTrans[row].GetChild(0).GetInstanceID();
+        }
+
+        data.jackCvOutID = new int[maxRows];
+        for (int row = 0; row < maxRows; row++)
+        {
+            data.jackCvOutID[row] = jackOutCVTrans[row].GetChild(0).GetInstanceID();
         }
 
         data.rowMutes = new bool[maxRows];
-        for (int i = 0; i < maxRows; i++)
+        for (int row = 0; row < maxRows; row++)
         {
-            data.rowMutes[i] = controlPanelMutes[i].isHit;
+            data.rowMutes[row] = controlPanelMutes[row].isHit;
         }
 
         data.rowModes = new bool[maxRows];
-        for (int i = 0; i < maxRows; i++)
+        for (int row = 0; row < maxRows; row++)
         {
-            data.rowModes[i] = controlPanelModes[i].switchVal;
+            data.rowModes[row] = controlPanelModes[row].switchVal;
         }
 
         data.dialSwing = swingDial.percent;
@@ -751,27 +766,34 @@ public class sequencerCVDeviceInterface : deviceInterface
         SequencerCVData data = d as SequencerCVData;
         base.Load(data);
 
+        // first grow to max size, since awake already shrinks to default values, this would cause trouble in the loading init below
+        SetDimensions(maxRows, maxSteps);
+
         playButton.startToggled = data.switchPlay;
 
-        for (int i = 0; i < maxRows; i++)
+        for (int row = 0; row < maxRows; row++)
         {
-            controlPanelMutes[i].phantomHit(data.rowMutes[i]);
+            controlPanelMutes[row].phantomHit(data.rowMutes[row]);
         }
 
-        for (int i = 0; i < maxRows; i++)
+        for (int row = 0; row < maxRows; row++)
         {
-            controlPanelModes[i].setSwitch(data.rowModes[i]);
+            controlPanelModes[row].setSwitch(data.rowModes[row], true);
+            doModeSwitch(row);
         }
 
         playTriggerInputJack.ID = data.jackTriggerInID;
-        SetDimensions(data.dimensions[0], data.dimensions[1]);
 
-        for (int i = 0; i < data.stepBools.GetLength(0); i++)
+
+        for (int p = 0; p < maxPattern; p++)
         {
-            for (int i2 = 0; i2 < data.stepBools.GetLength(1); i2++)
+            for (int r = 0; r < maxRows; r++)
             {
-                stepBools[data.activePattern, i, i2] = data.stepBools[activePattern, i, i2];
-                stepFloats[data.activePattern, i, i2] = data.stepFloats[activePattern, i, i2];
+                for (int s = 0; s < maxSteps; s++)
+                {
+                    stepBools[p, r, s] = data.stepBools[p, r, s];
+                    stepFloats[p, r, s] = data.stepFloats[p, r, s];
+                }
             }
         }
 
@@ -779,27 +801,31 @@ public class sequencerCVDeviceInterface : deviceInterface
         {
             for (int row = 0; row < data.dimensions[0]; row++)
             {
-                if (data.stepBools[data.activePattern, step, row])
+                if (data.stepBools[data.activePattern, row, step])
                 {
                     stepButtons[row, step].keyHit(true);
                 }
-                stepDials[row, step].setPercent(data.stepFloats[data.activePattern, step, row]);
+                stepDials[row, step].setPercent(data.stepFloats[data.activePattern, row, step], true);
+                //stepDials[row, step].
             }
         }
 
-        for (int i = 0; i < jackOutTrigTrans.Length; i++)
+        for (int rows = 0; rows < maxRows; rows++)
         {
-            jackOutTrigTrans[i].GetComponentInChildren<omniJack>().ID = data.jackTriggerOutID[i];
+            jackOutTrigTrans[rows].GetComponentInChildren<omniJack>().ID = data.jackTriggerOutID[rows];
         }
 
-        for (int i = 0; i < jackOutCVTrans.Length; i++)
+        for (int row = 0; row < maxRows; row++)
         {
-            jackOutCVTrans[i].GetComponentInChildren<omniJack>().ID = data.jackCvOutID[i];
+            jackOutCVTrans[row].GetComponentInChildren<omniJack>().ID = data.jackCvOutID[row];
         }
 
         beatSlider.setVal(data.sliderSpeed);
-        swingDial.setPercent(data.dialSwing);
+        swingDial.setPercent(data.dialSwing, true);
         switchCVRange.setSwitch(data.switchRange, true);
+
+        // at the end shrink size to desired values
+        SetDimensions(data.dimensions[0], data.dimensions[1]);
     }
 
     #endregion

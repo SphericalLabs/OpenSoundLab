@@ -131,7 +131,6 @@ public class dial : manipObject
                     if (OSLInput.getInstance().isSecondaryPressed(selectManipulatorObjScript.controllerIndex))
                     {
                         setPercent(defaultPercent, true);
-                        updatePercent();
                     }
                 }
             }
@@ -141,7 +140,6 @@ public class dial : manipObject
                 if (OSLInput.getInstance().isAnySecondaryPressed())
                 {
                     setPercent(defaultPercent, true);
-                    updatePercent();
                 }
             }
         }
@@ -177,10 +175,13 @@ public class dial : manipObject
             dialFeedback.PercentUpdate();
         }
 
+        updatePercent();
+
         if (invokeEvent)
         {
             onPercentChangedEvent.Invoke();
         }
+
     }
 
     dialColor newDialColor;
