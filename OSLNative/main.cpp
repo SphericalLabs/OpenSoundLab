@@ -328,14 +328,14 @@ extern "C" {
       return new NoiseProcessor(seed);
     }
 
-    void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float sampleRatePercent, int& counter, int speedFrames, bool& updated) {
-      float sample = 0.0f;
+    void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float sampleRatePercent, float& lastSample, int& counter, int speedFrames, bool& updated) {
+      
       if (sampleRatePercent > .95f) {
         updated = true;
         for (int i = 0; i < length; i += channels) {
-          sample = processor->dist(processor->rng);
+          lastSample = processor->dist(processor->rng);
           for (int c = 0; c < channels; ++c) {
-            buffer[i + c] = sample;
+            buffer[i + c] = lastSample;
           }
         }
       }
@@ -345,10 +345,10 @@ extern "C" {
           if (counter > speedFrames) {
             updated = true;
             counter = 0;
-            sample = processor->dist(processor->rng);
+            lastSample = processor->dist(processor->rng);
           }
           for (int c = 0; c < channels; ++c) {
-            buffer[i + c] = sample;
+            buffer[i + c] = lastSample;
           }
         }
       }

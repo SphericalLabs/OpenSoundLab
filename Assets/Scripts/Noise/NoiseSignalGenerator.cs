@@ -40,13 +40,14 @@ using System;
 public class NoiseSignalGenerator : signalGenerator
 {
 
-    float speedPercent = 1;
+    float sampleRatePercent = 1;
     int speedFrames = 1;
 
     int maxLength = 11025 * 16; //  max length of one random value in samples
     int counter = 0; // used for downsampling
 
     float curSample = -1.0f;
+    float lastSample = 0.0f;
 
     int noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
     int seed = 0; // select a specific noise pattern
@@ -60,7 +61,7 @@ public class NoiseSignalGenerator : signalGenerator
     private static extern void DestroyNoiseProcessor(IntPtr processor);
 
     [DllImport("OSLNative")]
-    private static extern void NoiseProcessBuffer(IntPtr processor, float[] buffer, int length, int channels, float frequency, ref int counter, int speedFrames, ref bool updated);
+    private static extern void NoiseProcessBuffer(IntPtr processor, float[] buffer, int length, int channels, float sampleRatePercent, ref float lastSample, ref int counter, int speedFrames, ref bool updated);
 
     [DllImport("OSLNative")]
     private static extern void SyncNoiseProcessor(IntPtr processor, int seed, int steps);
@@ -72,8 +73,8 @@ public class NoiseSignalGenerator : signalGenerator
 
     public void updatePercent(float per)
     {
-        if (speedPercent == per) return;
-        speedPercent = per;
+        if (sampleRatePercent == per) return;
+        sampleRatePercent = per;
         speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
     }
 
@@ -95,7 +96,7 @@ public class NoiseSignalGenerator : signalGenerator
     {
         lock (lockObject)
         {
-            NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, speedPercent, ref counter, speedFrames, ref updated);
+            NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, sampleRatePercent, ref lastSample, ref counter, speedFrames, ref updated);
             noiseStep += buffer.Length;
         }
     }
