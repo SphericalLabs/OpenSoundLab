@@ -103,11 +103,6 @@ public class embeddedSpeaker : MonoBehaviour
         { // plug already patched at output jack, but not yet in another side, use embeddedSpeaker
             curGen = signalGen;
         }
-        //else if (speakerOut.near != null && speakerOut.far.signal != null)
-        //{ // active external patching was disrupted on the other side. 
-        //  // this is a hack, since ideally speakerOut.far.signal would already set to null (but where?)
-        //    curGen = signalGen;
-        //}
         else
         { // active external patching, do not use embeddedSpeaker
             curGen = null;
