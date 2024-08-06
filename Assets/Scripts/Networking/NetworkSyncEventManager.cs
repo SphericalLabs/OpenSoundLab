@@ -7,7 +7,7 @@ public class NetworkSyncEventManager : MonoBehaviour
 {
     public static NetworkSyncEventManager Instance;
     public delegate void SyncHandler();
-    public event SyncHandler SyncEvent;
+    public event SyncHandler OsSyncEvent;
     public event SyncHandler IntervalSyncEvent;
 
     [Header("Fixed Interval Sync")]
@@ -35,6 +35,11 @@ public class NetworkSyncEventManager : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        UnSubscribeToEvents();
+    }
+
     private void SubscribeToEvents()
     {
         OVRManager.HMDAcquired += UpdateSync;
@@ -43,10 +48,18 @@ public class NetworkSyncEventManager : MonoBehaviour
         OVRManager.InputFocusAcquired += UpdateSync;
         OVRManager.TrackingAcquired += UpdateSync;
     }
+    private void UnSubscribeToEvents()
+    {
+        OVRManager.HMDAcquired -= UpdateSync;
+        OVRManager.HMDMounted -= UpdateSync;
+        OVRManager.VrFocusAcquired -= UpdateSync;
+        OVRManager.InputFocusAcquired -= UpdateSync;
+        OVRManager.TrackingAcquired -= UpdateSync;
+    }
 
     public void UpdateSync()
     {
-        SyncEvent?.Invoke();
+        OsSyncEvent?.Invoke();
     }
 
     private IEnumerator IntervalSync()

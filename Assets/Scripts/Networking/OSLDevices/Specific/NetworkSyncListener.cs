@@ -12,7 +12,7 @@ public class NetworkSyncListener : NetworkBehaviour
     #region Mirror
     protected virtual void SubscribeToNetworkEvents()
     {
-        NetworkSyncEventManager.Instance.SyncEvent += OnSync;
+        NetworkSyncEventManager.Instance.OsSyncEvent += OnSync;
         if (isServer)
         {
             NetworkSyncEventManager.Instance.IntervalSyncEvent += OnIntervalSync;
@@ -26,7 +26,7 @@ public class NetworkSyncListener : NetworkBehaviour
 
     protected virtual void UnSubscribeToNetworkEvents()
     {
-        NetworkSyncEventManager.Instance.SyncEvent -= OnSync;
+        NetworkSyncEventManager.Instance.OsSyncEvent -= OnSync;
         if (isServer)
         {
             NetworkSyncEventManager.Instance.IntervalSyncEvent -= OnIntervalSync;
