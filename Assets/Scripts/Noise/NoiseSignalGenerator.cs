@@ -104,6 +104,7 @@ public class NoiseSignalGenerator : signalGenerator
     {
         lock (lockObject)
         {
+            Debug.Log($"Sync noise signal{seed},{steps}");
             SyncNoiseProcessor(noiseProcessorPointer, seed, steps);
             this.seed = seed;
             noiseStep = steps;
