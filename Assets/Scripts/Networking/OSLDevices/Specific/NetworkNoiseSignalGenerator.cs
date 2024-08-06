@@ -13,7 +13,7 @@ public class NetworkNoiseSignalGenerator : NetworkSyncListener
     }
     [SyncVar(hook = nameof(OnUpdateSeed))] 
     private int seed = 0; // select a specific noise pattern
-
+    private bool initialSeedSet = false;
 
     #region Mirror
     public override void OnStartServer()
@@ -32,7 +32,10 @@ public class NetworkNoiseSignalGenerator : NetworkSyncListener
     private void OnUpdateSeed(int oldValue, int newValue)
     {
         Debug.Log($"{gameObject.name} update seed {newValue}");
-        noiseSignalGenerator.syncNoiseSignalGenerator(newValue, noiseSignalGenerator.NoiseStep);
+        if (initialSeedSet)
+        {
+            noiseSignalGenerator.syncNoiseSignalGenerator(newValue, noiseSignalGenerator.NoiseStep);
+        }
     }
 
     protected override void OnSync()
@@ -70,6 +73,7 @@ public class NetworkNoiseSignalGenerator : NetworkSyncListener
         {
             Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.NoiseStep}, new noiseStep {noiseStep}");
             noiseSignalGenerator.syncNoiseSignalGenerator(noiseSignalGenerator.Seed, noiseStep);
+            initialSeedSet = true;
         }
     }
 
