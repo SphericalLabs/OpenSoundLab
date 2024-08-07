@@ -163,19 +163,17 @@ public class Utils
         return newArray;
     }
 
-    public static int GetSecondsSinceUnixEpoch()
-    {
-        DateTimeOffset now = DateTimeOffset.UtcNow;
-        int secondsSinceEpoch = (int)now.ToUnixTimeSeconds();
-        now.ToUnixTimeMilliseconds();
-        return secondsSinceEpoch;
-    }
+    private static int seedCounter = 0;
+    private static readonly int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+    private static readonly int initialSeed = Guid.NewGuid().GetHashCode();
 
-    static int seedCounter = 0;
     public static int GetNoiseSeed()
     {
         seedCounter++;
-        return GetSecondsSinceUnixEpoch() + seedCounter;        
+        long ticks = DateTime.UtcNow.Ticks;
+        int frameCount = UnityEngine.Time.frameCount;
+
+        return initialSeed ^ processId ^ seedCounter ^ (int)(ticks & 0xFFFFFFFF) ^ frameCount;
     }
 
 }
