@@ -4,12 +4,15 @@ using System.Runtime.InteropServices;
 using System;
 using Mirror;
 
-public class NetworkNoiseSignalGenerator : NetworkSyncListener
+public class NetworkNoise : NetworkSyncListener
 {
     private NoiseSignalGenerator noiseSignalGenerator;
     protected virtual void Awake()
     {
         noiseSignalGenerator = GetComponent<NoiseSignalGenerator>();
+        var rateDial = GetComponent<NoiseDeviceInterface>().speedDial;
+        rateDial.onPercentChangedEvent.AddListener(OnDragDial);
+        rateDial.onEndGrabEvents.AddListener(OnStopDragDial);
     }
     [SyncVar(hook = nameof(OnUpdateSeed))] 
     private int seed = 0; // select a specific noise pattern
@@ -77,5 +80,21 @@ public class NetworkNoiseSignalGenerator : NetworkSyncListener
         }
     }
 
+    #endregion
+
+    #region onDial
+    public void OnDragDial()
+    {
+        /*
+        if (Time.frameCount % 8 == 0)
+        {
+            OnSync();
+        }*/
+    }
+
+    public void OnStopDragDial()
+    {
+        OnSync();
+    }
     #endregion
 }
