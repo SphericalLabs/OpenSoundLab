@@ -5,12 +5,12 @@ using Mirror;
 
 public class NetworkOscillator : NetworkSyncListener
 {
-    protected signalGenerator signalGenerator;
+    protected oscillatorSignalGenerator signalGenerator;
     protected oscillatorDeviceInterface oscillatorDeviceInterface;
 
     protected virtual void Awake()
     {
-        signalGenerator = GetComponent<signalGenerator>();
+        signalGenerator = GetComponent<oscillatorSignalGenerator>();
         oscillatorDeviceInterface = GetComponent<oscillatorDeviceInterface>();
         oscillatorDeviceInterface.lfoSwitch.onSwitchChangedEvent.AddListener(OnLfoChange);
 
@@ -72,7 +72,7 @@ public class NetworkOscillator : NetworkSyncListener
     [Command(requiresAuthority = false)]
     protected virtual void CmdRequestSync()
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync phase {signalGenerator._phase}");
+        Debug.Log($"{gameObject.name} CmdRequestSync phase {signalGenerator._phase}, lfo {signalGenerator.lfo}, frequency {signalGenerator.frequency}");
         RpcUpdatePhase(signalGenerator._phase);
     }
 
@@ -81,7 +81,7 @@ public class NetworkOscillator : NetworkSyncListener
     {
         if (isClient && !isServer)
         {
-            Debug.Log($"{gameObject.name} old phase: {signalGenerator._phase}, new phase {phase}");
+            Debug.Log($"{gameObject.name} old phase: {signalGenerator._phase}, new phase {phase}, lfo {signalGenerator.lfo}, frequency {signalGenerator.frequency}");
             signalGenerator._phase = phase;
         }
     }
