@@ -39,10 +39,8 @@ public class NetworkOscillator : NetworkSyncListener
     public override void OnStartClient()
     {
         base.OnStartClient();
-        if (!isServer && oscillatorDeviceInterface.Lfo)
-        {
-            CmdRequestSync();
-        }
+
+        StartCoroutine(WaitForLfoChanged());
     }
 
     protected override void OnSync()
