@@ -37,8 +37,6 @@ using System.Collections;
 
 public class oscillatorDeviceInterface : deviceInterface
 {
-    public delegate void LfoChangeHandler(bool lfo);
-    public event LfoChangeHandler LfoChange;
     public int ID = -1;
     bool active = false;
     bool lfo = false;
@@ -70,7 +68,7 @@ public class oscillatorDeviceInterface : deviceInterface
         viz.sampleStep = lfo ? bufferSize : 1;
         viz.toggleActive(true); // always on, unlike the waveViz on the Scope
 
-        UpdateLFO(false);
+        UpdateLFO();
         UpdateAmp();
         UpdateWave();
     }
@@ -93,7 +91,7 @@ public class oscillatorDeviceInterface : deviceInterface
         if (signal.pwmGen != pwmInput.signal) signal.pwmGen = pwmInput.signal;
     }
 
-    void UpdateLFO(bool sync = true)
+    void UpdateLFO()
     {
         lfo = !lfoSwitch.switchVal;
         viz.sampleStep = lfo ? bufferSize : 1;
@@ -101,11 +99,6 @@ public class oscillatorDeviceInterface : deviceInterface
         signal.lfo = lfo;
         UpdateFreq();
         speaker.volume = lfo ? 0f : 1f;
-
-        if (sync)
-        {
-            LfoChange?.Invoke(lfo);
-        }
     }
 
     void UpdateFreq()
