@@ -65,7 +65,7 @@ public class NetworkNoise : NetworkSyncListener
     [Command(requiresAuthority = false)]
     protected void CmdRequestSync()
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync");
+        Debug.Log($"{gameObject.name} CmdRequestSync noise step {noiseSignalGenerator.NoiseStep}");
 
         RpcUpdateSteps(noiseSignalGenerator.GetStep());
 
@@ -73,7 +73,7 @@ public class NetworkNoise : NetworkSyncListener
     [ClientRpc]
     protected virtual void RpcUpdateSteps(int noiseStep)
     {
-        if (isClient)
+        if (isClient && !isServer)
         {
             Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.GetStep()}, new noiseStep {noiseStep}");
             noiseSignalGenerator.syncNoiseSignalGenerator(syncSeed, noiseStep);

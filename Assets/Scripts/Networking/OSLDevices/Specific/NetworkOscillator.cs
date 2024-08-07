@@ -7,23 +7,29 @@ public class NetworkOscillator : NetworkSyncListener
 {
     protected signalGenerator signalGenerator;
     protected oscillatorDeviceInterface oscillatorDeviceInterface;
-    private bool lfo = false;
 
     protected virtual void Awake()
     {
         signalGenerator = GetComponent<signalGenerator>();
         oscillatorDeviceInterface = GetComponent<oscillatorDeviceInterface>();
-        oscillatorDeviceInterface.LfoChange += OnLfoChange;
+        oscillatorDeviceInterface.lfoSwitch.onSwitchChangedEvent.AddListener(OnLfoChange);
 
         var freqDial = oscillatorDeviceInterface.freqDial;
         freqDial.onPercentChangedEvent.AddListener(OnDragDial);
         freqDial.onEndGrabEvents.AddListener(OnStopDragDial);
     }
     #region Mirror
-    private void OnLfoChange(bool lfo)
+    public void OnLfoChange()
     {
-        this.lfo = lfo;
-        if (lfo)
+        StartCoroutine(WaitForLfoChanged());
+    }
+
+    IEnumerator WaitForLfoChanged()
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"On Change Lfo {oscillatorDeviceInterface.Lfo}");
+
+        if (oscillatorDeviceInterface.Lfo)
         {
             OnSync();
         }
@@ -33,18 +39,12 @@ public class NetworkOscillator : NetworkSyncListener
     public override void OnStartClient()
     {
         base.OnStartClient();
-        if (!isServer && lfo)
-        {
-            CmdRequestSync();
-        }
+
+        StartCoroutine(WaitForLfoChanged());
     }
 
     protected override void OnSync()
     {
-        if (!lfo)
-        {
-            return;
-        }
         base.OnSync();
         if (isServer)
         {
@@ -58,7 +58,7 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnIntervalSync()
     {
-        if (!lfo)
+        if (!oscillatorDeviceInterface.Lfo)
         {
             return;
         }
@@ -72,14 +72,14 @@ public class NetworkOscillator : NetworkSyncListener
     [Command(requiresAuthority = false)]
     protected virtual void CmdRequestSync()
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync");
+        Debug.Log($"{gameObject.name} CmdRequestSync phase {signalGenerator._phase}");
         RpcUpdatePhase(signalGenerator._phase);
     }
 
     [ClientRpc]
     protected virtual void RpcUpdatePhase(double phase)
     {
-        if (isClient)
+        if (isClient && !isServer)
         {
             Debug.Log($"{gameObject.name} old phase: {signalGenerator._phase}, new phase {phase}");
             signalGenerator._phase = phase;
@@ -91,6 +91,10 @@ public class NetworkOscillator : NetworkSyncListener
     #region onDial
     public void OnDragDial()
     {
+        if (!oscillatorDeviceInterface.Lfo)
+        {
+            return;
+        }
         if (Time.frameCount % 8 == 0)
         {
             OnSync();
@@ -99,6 +103,10 @@ public class NetworkOscillator : NetworkSyncListener
 
     public void OnStopDragDial()
     {
+        if (!oscillatorDeviceInterface.Lfo)
+        {
+            return;
+        }
         OnSync();
     }
     #endregion

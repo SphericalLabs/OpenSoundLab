@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ using System.Collections;
 
 public class oscillatorDeviceInterface : deviceInterface
 {
-    public delegate void LfoChangeHandler(bool lfo);
-    public event LfoChangeHandler LfoChange;
     public int ID = -1;
     bool active = false;
     bool lfo = false;
@@ -57,6 +55,8 @@ public class oscillatorDeviceInterface : deviceInterface
     oscillatorSignalGenerator signal;
     int bufferSize;
 
+    public bool Lfo { get => lfo; }
+
     public override void Awake()
     {
         base.Awake();
@@ -68,7 +68,7 @@ public class oscillatorDeviceInterface : deviceInterface
         viz.sampleStep = lfo ? bufferSize : 1;
         viz.toggleActive(true); // always on, unlike the waveViz on the Scope
 
-        UpdateLFO(false);
+        UpdateLFO();
         UpdateAmp();
         UpdateWave();
     }
@@ -91,7 +91,7 @@ public class oscillatorDeviceInterface : deviceInterface
         if (signal.pwmGen != pwmInput.signal) signal.pwmGen = pwmInput.signal;
     }
 
-    void UpdateLFO(bool sync = true)
+    void UpdateLFO()
     {
         lfo = !lfoSwitch.switchVal;
         viz.sampleStep = lfo ? bufferSize : 1;
@@ -99,11 +99,6 @@ public class oscillatorDeviceInterface : deviceInterface
         signal.lfo = lfo;
         UpdateFreq();
         speaker.volume = lfo ? 0f : 1f;
-
-        if (sync)
-        {
-            LfoChange?.Invoke(lfo);
-        }
     }
 
     void UpdateFreq()
