@@ -14,15 +14,15 @@ public class NetworkNoise : NetworkSyncListener
         rateDial.onPercentChangedEvent.AddListener(OnDragDial);
         rateDial.onEndGrabEvents.AddListener(OnStopDragDial);
     }
-    [SyncVar(hook = nameof(OnUpdateSeed))] 
-    private int seed = 0; // select a specific noise pattern
-    private bool initialSeedSet = false;
+    [SyncVar]//(hook = nameof(OnUpdateSeed))] 
+    private int syncSeed = 0; // select a specific noise pattern
+    //private bool initialSeedSet = false;
 
     #region Mirror
     public override void OnStartServer()
     {
         Debug.Log($"{gameObject.name} initial noise seed {noiseSignalGenerator.Seed}");
-        seed = noiseSignalGenerator.Seed;
+        syncSeed = noiseSignalGenerator.Seed;
     }
     public override void OnStartClient()
     {
@@ -32,6 +32,7 @@ public class NetworkNoise : NetworkSyncListener
             CmdRequestSync();
         }
     }
+    /* only needed when seed changed during lifetime
     private void OnUpdateSeed(int oldValue, int newValue)
     {
         Debug.Log($"{gameObject.name} update seed {newValue}");
@@ -39,7 +40,7 @@ public class NetworkNoise : NetworkSyncListener
         {
             noiseSignalGenerator.syncNoiseSignalGenerator(newValue, noiseSignalGenerator.NoiseStep);
         }
-    }
+    }*/
 
     protected override void OnSync()
     {
@@ -75,8 +76,8 @@ public class NetworkNoise : NetworkSyncListener
         if (isClient)
         {
             Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.NoiseStep}, new noiseStep {noiseStep}");
-            noiseSignalGenerator.syncNoiseSignalGenerator(noiseSignalGenerator.Seed, noiseStep);
-            initialSeedSet = true;
+            noiseSignalGenerator.syncNoiseSignalGenerator(syncSeed, noiseStep);
+            //initialSeedSet = true;
         }
     }
 
