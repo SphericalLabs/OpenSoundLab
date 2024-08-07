@@ -7,7 +7,6 @@ public class NetworkOscillator : NetworkSyncListener
 {
     protected signalGenerator signalGenerator;
     protected oscillatorDeviceInterface oscillatorDeviceInterface;
-    private bool lfo = false;
 
     protected virtual void Awake()
     {
@@ -22,18 +21,14 @@ public class NetworkOscillator : NetworkSyncListener
     #region Mirror
     private void OnLfoChange(bool lfo)
     {
-        this.lfo = lfo;
-        if (lfo)
-        {
-            OnSync();
-        }
+        OnSync();
     }
 
 
     public override void OnStartClient()
     {
         base.OnStartClient();
-        if (!isServer && lfo)
+        if (!isServer && oscillatorDeviceInterface.Lfo)
         {
             CmdRequestSync();
         }
@@ -41,7 +36,7 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnSync()
     {
-        if (!lfo)
+        if (!oscillatorDeviceInterface.Lfo)
         {
             return;
         }
@@ -58,7 +53,7 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnIntervalSync()
     {
-        if (!lfo)
+        if (!oscillatorDeviceInterface.Lfo)
         {
             return;
         }
