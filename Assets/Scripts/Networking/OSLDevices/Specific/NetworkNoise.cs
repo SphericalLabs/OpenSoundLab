@@ -84,10 +84,11 @@ public class NetworkNoise : NetworkSyncListener
 
     public void OnDragDial()
     {
-        if (Time.frameCount % 4 == 0)
+        /*
+        if (Time.frameCount % 8 == 0)
         {
             OnSync();
-        }
+        }*/
     }
 
     public void OnStopDragDial()
