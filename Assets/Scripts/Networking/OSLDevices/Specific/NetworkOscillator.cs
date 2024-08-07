@@ -21,8 +21,18 @@ public class NetworkOscillator : NetworkSyncListener
     #region Mirror
     public void OnLfoChange()
     {
+        StartCoroutine(WaitForLfoChanged());
+    }
+
+    IEnumerator WaitForLfoChanged()
+    {
+        yield return new WaitForEndOfFrame();
         Debug.Log($"On Change Lfo {oscillatorDeviceInterface.Lfo}");
-        OnSync();
+
+        if (oscillatorDeviceInterface.Lfo)
+        {
+            OnSync();
+        }
     }
 
 
@@ -37,10 +47,6 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnSync()
     {
-        if (!oscillatorDeviceInterface.Lfo)
-        {
-            return;
-        }
         base.OnSync();
         if (isServer)
         {
@@ -87,6 +93,10 @@ public class NetworkOscillator : NetworkSyncListener
     #region onDial
     public void OnDragDial()
     {
+        if (!oscillatorDeviceInterface.Lfo)
+        {
+            return;
+        }
         if (Time.frameCount % 8 == 0)
         {
             OnSync();
@@ -95,6 +105,10 @@ public class NetworkOscillator : NetworkSyncListener
 
     public void OnStopDragDial()
     {
+        if (!oscillatorDeviceInterface.Lfo)
+        {
+            return;
+        }
         OnSync();
     }
     #endregion
