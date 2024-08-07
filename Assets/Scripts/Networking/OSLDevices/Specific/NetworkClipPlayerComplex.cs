@@ -52,7 +52,7 @@ public class NetworkClipPlayerComplex : NetworkSyncListener
     [ClientRpc]
     protected virtual void RpcUpdateLastBuffer(double _lastBuffer)
     {
-        if (isClient)
+        if (isClient && !isServer)
         {
             Debug.Log($"{gameObject.name} old _lastBuffer: {clipPlayerComplex.LastBuffer}, new _lastBuffer {_lastBuffer}");
 
