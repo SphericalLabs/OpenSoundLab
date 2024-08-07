@@ -82,6 +82,7 @@ public class NetworkNoise : NetworkSyncListener
 
     #endregion
 
+    #region onDial
     public void OnDragDial()
     {
         /*
@@ -95,4 +96,5 @@ public class NetworkNoise : NetworkSyncListener
     {
         OnSync();
     }
+    #endregion
 }

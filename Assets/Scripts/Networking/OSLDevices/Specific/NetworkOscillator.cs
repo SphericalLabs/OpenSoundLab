@@ -7,15 +7,22 @@ public class NetworkOscillator : NetworkSyncListener
 {
     protected signalGenerator signalGenerator;
     protected oscillatorDeviceInterface oscillatorDeviceInterface;
+    private bool lfo = false;
+
     protected virtual void Awake()
     {
         signalGenerator = GetComponent<signalGenerator>();
         oscillatorDeviceInterface = GetComponent<oscillatorDeviceInterface>();
         oscillatorDeviceInterface.LfoChange += OnLfoChange;
+
+        var freqDial = oscillatorDeviceInterface.freqDial;
+        freqDial.onPercentChangedEvent.AddListener(OnDragDial);
+        freqDial.onEndGrabEvents.AddListener(OnStopDragDial);
     }
     #region Mirror
     private void OnLfoChange(bool lfo)
     {
+        this.lfo = lfo;
         if (lfo)
         {
             OnSync();
@@ -26,7 +33,7 @@ public class NetworkOscillator : NetworkSyncListener
     public override void OnStartClient()
     {
         base.OnStartClient();
-        if (!isServer)
+        if (!isServer && lfo)
         {
             CmdRequestSync();
         }
@@ -34,6 +41,10 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnSync()
     {
+        if (!lfo)
+        {
+            return;
+        }
         base.OnSync();
         if (isServer)
         {
@@ -47,6 +58,10 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnIntervalSync()
     {
+        if (!lfo)
+        {
+            return;
+        }
         base.OnIntervalSync();
         if (isServer)
         {
@@ -69,6 +84,22 @@ public class NetworkOscillator : NetworkSyncListener
             Debug.Log($"{gameObject.name} old phase: {signalGenerator._phase}, new phase {phase}");
             signalGenerator._phase = phase;
         }
+    }
+    #endregion
+
+
+    #region onDial
+    public void OnDragDial()
+    {
+        if (Time.frameCount % 8 == 0)
+        {
+            OnSync();
+        }
+    }
+
+    public void OnStopDragDial()
+    {
+        OnSync();
     }
     #endregion
 }
