@@ -27,9 +27,9 @@ public class NetworkOscillator : NetworkSyncListener
     IEnumerator WaitForLfoChanged()
     {
         yield return new WaitForEndOfFrame();
-        Debug.Log($"On Change Lfo {oscillatorDeviceInterface.Lfo}");
+        Debug.Log($"On Change Lfo {!oscillatorDeviceInterface.lfoSwitch.switchVal}");
 
-        if (oscillatorDeviceInterface.Lfo)
+        if (!oscillatorDeviceInterface.lfoSwitch.switchVal)
         {
             OnSync();
         }
@@ -58,7 +58,7 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnIntervalSync()
     {
-        if (!oscillatorDeviceInterface.Lfo)
+        if (oscillatorDeviceInterface.lfoSwitch.switchVal)
         {
             return;
         }
@@ -91,7 +91,7 @@ public class NetworkOscillator : NetworkSyncListener
     #region onDial
     public void OnDragDial()
     {
-        if (!oscillatorDeviceInterface.Lfo)
+        if (oscillatorDeviceInterface.lfoSwitch.switchVal)
         {
             return;
         }
@@ -103,7 +103,7 @@ public class NetworkOscillator : NetworkSyncListener
 
     public void OnStopDragDial()
     {
-        if (!oscillatorDeviceInterface.Lfo)
+        if (oscillatorDeviceInterface.lfoSwitch.switchVal)
         {
             return;
         }
