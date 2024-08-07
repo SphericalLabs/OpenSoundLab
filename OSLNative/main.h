@@ -60,7 +60,7 @@ extern "C" {
     struct NoiseProcessor;
     OSL_API NoiseProcessor* CreateNoiseProcessor(int seed);
     OSL_API void DestroyNoiseProcessor(NoiseProcessor* processor);
-    OSL_API void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float sampleRatePercent, float& lastSample, int& counter, int speedFrames, bool& updated);
+    OSL_API void NoiseProcessBuffer(NoiseProcessor* processor, float* buffer, int length, int channels, float sampleRatePercent, float* lastSample, int* counter, int speedFrames, bool* updated);
     OSL_API void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps);
     OSL_API int GetCurrentSeed(NoiseProcessor* processor);
     OSL_API int GetCurrentStep(NoiseProcessor* processor);

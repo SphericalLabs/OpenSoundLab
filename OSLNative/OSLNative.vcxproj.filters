@@ -128,5 +128,8 @@
     <ClInclude Include="Freeverb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pcg-cpp\include\pcg_random.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
