@@ -320,18 +320,16 @@ extern "C" {
     struct NoiseProcessor {
       pcg32 rng;
       std::uniform_real_distribution<float> dist;
-
-      int seed;
-      int step;
-
-      NoiseProcessor(uint64_t seed) : rng(seed), dist(-1.0f, 1.0f) {}
-
+      uint64_t seed;
+      uint64_t step;
+      NoiseProcessor(uint64_t seed) : rng(seed), dist(-1.0f, 1.0f), seed(seed), step(0) {}
       float generate() {
+        step++;
         return dist(rng);
       }
-
       void jump_ahead(uint64_t steps) {
         rng.advance(steps);
+        step += steps;
       }
     };
 
@@ -372,6 +370,8 @@ extern "C" {
     void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps) {
       processor->rng.seed(seed);
       processor->rng.advance(steps);
+      processor->seed = seed;
+      processor->step = steps;
     }
 
     int GetCurrentSeed(NoiseProcessor* processor) {

@@ -173,7 +173,10 @@ public class Utils
         long ticks = DateTime.UtcNow.Ticks;
         int frameCount = UnityEngine.Time.frameCount;
 
-        return initialSeed ^ processId ^ seedCounter ^ (int)(ticks & 0xFFFFFFFF) ^ frameCount;
+        int seed = initialSeed ^ processId ^ seedCounter ^ (int)(ticks & 0xFFFFFFFF) ^ frameCount;
+
+        // Ensure the seed is always positive by clearing the sign bit
+        return seed & int.MaxValue;
     }
 
 }
