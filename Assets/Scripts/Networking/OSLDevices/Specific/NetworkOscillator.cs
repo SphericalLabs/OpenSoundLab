@@ -18,7 +18,7 @@ public class NetworkOscillator : NetworkSyncListener
     {
         if (lfo)
         {
-            NetworkSyncEventManager.Instance.UpdateSync();
+            OnSync();
         }
     }
 
