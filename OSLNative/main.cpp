@@ -313,56 +313,68 @@ extern "C" {
         */
     }
 
+#include "libs/pcg-cpp/include/pcg_random.hpp"
 #include <random>
 
+    // Define the NoiseProcessor structure in C++
     struct NoiseProcessor {
-      std::mt19937 rng;
+      pcg32 rng;
       std::uniform_real_distribution<float> dist;
-      NoiseProcessor(int seed) {
-        rng = std::mt19937(seed);
-        dist = std::uniform_real_distribution<float>(-1.0f, 1.0f);
+
+      NoiseProcessor(uint64_t seed) : rng(seed), dist(-1.0f, 1.0f) {}
+
+      float generate() {
+        return dist(rng);
+      }
+
+      void jump_ahead(uint64_t steps) {
+        rng.advance(steps);
       }
     };
 
-    NoiseProcessor* CreateNoiseProcessor(int seed) {
-      return new NoiseProcessor(seed);
-    }
+    // Expose functions with C linkage for Unity to use
+    extern "C" {
 
-    void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float sampleRatePercent, float& lastSample, int& counter, int speedFrames, bool& updated) {
-      
-      if (sampleRatePercent > .95f) {
-        updated = true;
-        for (int i = 0; i < length; i += channels) {
-          lastSample = processor->dist(processor->rng);
-          for (int c = 0; c < channels; ++c) {
-            buffer[i + c] = lastSample;
+      NoiseProcessor* CreateNoiseProcessor(uint64_t seed) {
+        return new NoiseProcessor(seed);
+      }
+
+      void DestroyNoiseProcessor(NoiseProcessor* processor) {
+        delete processor;
+      }
+
+      void NoiseProcessBuffer(NoiseProcessor* processor, float* buffer, int length, int channels, float sampleRatePercent, float* lastSample, int* counter, int speedFrames, bool* updated) {
+        if (sampleRatePercent > .95f) {
+          *updated = true;
+          for (int i = 0; i < length; i += channels) {
+            *lastSample = processor->generate();
+            for (int c = 0; c < channels; ++c) {
+              buffer[i + c] = *lastSample;
+            }
+          }
+        }
+        else {
+          for (int i = 0; i < length; i += channels) {
+            (*counter)++;
+            if (*counter > speedFrames) {
+              *updated = true;
+              *counter = 0;
+              *lastSample = processor->generate();
+            }
+            for (int c = 0; c < channels; ++c) {
+              buffer[i + c] = *lastSample;
+            }
           }
         }
       }
-      else {
-        for (int i = 0; i < length; i += channels) {
-          counter++;
-          if (counter > speedFrames) {
-            updated = true;
-            counter = 0;
-            lastSample = processor->dist(processor->rng);
-          }
-          for (int c = 0; c < channels; ++c) {
-            buffer[i + c] = lastSample;
-          }
-        }
+
+      void SyncNoiseProcessor(NoiseProcessor* processor, uint64_t seed, uint64_t steps) {
+        processor->rng.seed(seed);
+        processor->rng.advance(steps);
       }
     }
 
-    void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps) {
-      processor->rng.seed(seed);
-      processor->rng.discard(steps);
-    }
-
-    void DestroyNoiseProcessor(NoiseProcessor* processor) {
-      delete processor;
-    }
-
+    
 
     
 
