@@ -50,7 +50,7 @@ public class NoiseSignalGenerator : signalGenerator
     float lastSample = 0.0f;
 
     int noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
-    int seed = 0; // select a specific noise pattern
+    //int seed = 0; // select a specific noise pattern
     IntPtr noiseProcessorPointer; // used in OSLNative
     private readonly object lockObject = new object();
 
@@ -67,12 +67,27 @@ public class NoiseSignalGenerator : signalGenerator
     private static extern void SyncNoiseProcessor(IntPtr processor, int seed, int steps);
 
     [DllImport("OSLNative")]
-    private static extern void GetCurrentSeedAndStep(IntPtr processor, ref int seed, ref int steps);
+    public static extern int GetCurrentSeed(IntPtr processor);
+
+    [DllImport("OSLNative")]
+    public static extern int GetCurrentStep(IntPtr processor);
+
+    public int GetSeed()
+    {
+        return GetCurrentSeed(noiseProcessorPointer);
+    }
+
+    // Instance method to get the current step
+    public int GetStep()
+    {
+        return GetCurrentStep(noiseProcessorPointer);
+    }
+
 
     public bool updated = false;
 
-    public int NoiseStep { get => noiseStep; set => noiseStep = value; }
-    public int Seed { get => seed; set => seed = value; }
+    //public int NoiseStep { get => noiseStep; set => noiseStep = value; }
+    //public int Seed { get => seed; set => seed = value; }
 
     public void updatePercent(float per)
     {
@@ -84,8 +99,7 @@ public class NoiseSignalGenerator : signalGenerator
     public override void Awake()
     {
         base.Awake();
-        seed = Utils.GetNoiseSeed();
-        noiseProcessorPointer = CreateNoiseProcessor(seed);
+        noiseProcessorPointer = CreateNoiseProcessor(Utils.GetNoiseSeed());
         //SyncNoiseProcessor(noiseProcessorPointer, noiseStep); // noiseStep should be synced via Mirror if necessary
         //// or call it sync and use to also set seed?
     }
@@ -109,9 +123,7 @@ public class NoiseSignalGenerator : signalGenerator
         lock (lockObject)
         {
             Debug.Log($"Sync noise signal{seed},{steps}");
-            SyncNoiseProcessor(noiseProcessorPointer, seed, steps);
-            this.seed = seed;
-            noiseStep = steps;
+            SyncNoiseProcessor(noiseProcessorPointer, seed, steps);        
         }
     }
 }

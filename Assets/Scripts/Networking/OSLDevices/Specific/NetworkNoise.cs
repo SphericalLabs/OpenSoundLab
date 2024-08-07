@@ -21,8 +21,8 @@ public class NetworkNoise : NetworkSyncListener
     #region Mirror
     public override void OnStartServer()
     {
-        Debug.Log($"{gameObject.name} initial noise seed {noiseSignalGenerator.Seed}");
-        syncSeed = noiseSignalGenerator.Seed;
+        Debug.Log($"{gameObject.name} initial noise seed {noiseSignalGenerator.GetSeed()}");
+        syncSeed = noiseSignalGenerator.GetSeed();
     }
     public override void OnStartClient()
     {
@@ -46,7 +46,7 @@ public class NetworkNoise : NetworkSyncListener
     {
         if (isServer)
         {
-            RpcUpdateSteps(noiseSignalGenerator.NoiseStep);
+            RpcUpdateSteps(noiseSignalGenerator.GetStep());
         }
         else
         {
@@ -59,7 +59,7 @@ public class NetworkNoise : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateSteps(noiseSignalGenerator.NoiseStep);
+            RpcUpdateSteps(noiseSignalGenerator.GetStep());
         }
     }
     [Command(requiresAuthority = false)]
@@ -67,7 +67,7 @@ public class NetworkNoise : NetworkSyncListener
     {
         Debug.Log($"{gameObject.name} CmdRequestSync");
 
-        RpcUpdateSteps(noiseSignalGenerator.NoiseStep);
+        RpcUpdateSteps(noiseSignalGenerator.GetStep());
 
     }
     [ClientRpc]
@@ -75,7 +75,7 @@ public class NetworkNoise : NetworkSyncListener
     {
         if (isClient)
         {
-            Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.NoiseStep}, new noiseStep {noiseStep}");
+            Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.GetStep()}, new noiseStep {noiseStep}");
             noiseSignalGenerator.syncNoiseSignalGenerator(syncSeed, noiseStep);
             //initialSeedSet = true;
         }

@@ -371,9 +371,12 @@ extern "C" {
     }
 
     // Function to write the current seed and step to reference variables
-    void GetCurrentSeedAndStep(NoiseProcessor* processor, int& seed, int& steps) {
-      seed = processor->seed;    // Return the stored seed
-      steps = processor->steps;  // Return the current step count
+    int GetCurrentSeed(NoiseProcessor* processor) {
+      return processor->seed;    
+    }
+
+    int GetCurrentStep(NoiseProcessor* processor) {
+      return processor->steps;
     }
 
     // Function to destroy the NoiseProcessor
