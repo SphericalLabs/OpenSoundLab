@@ -315,25 +315,32 @@ extern "C" {
 
 #include <random>
 
+    // Modified NoiseProcessor struct with step tracking and seed storage
     struct NoiseProcessor {
       std::mt19937 rng;
       std::uniform_real_distribution<float> dist;
-      NoiseProcessor(int seed) {
+      int steps;   // Track the number of steps (random number generations)
+      int seed;    // Store the seed value
+
+      NoiseProcessor(int seed) : steps(0), seed(seed) {
         rng = std::mt19937(seed);
         dist = std::uniform_real_distribution<float>(-1.0f, 1.0f);
       }
     };
 
+    // Function to create a new NoiseProcessor
     NoiseProcessor* CreateNoiseProcessor(int seed) {
       return new NoiseProcessor(seed);
     }
 
+    // Function to process the noise buffer
     void NoiseProcessBuffer(NoiseProcessor* processor, float buffer[], int length, int channels, float sampleRatePercent, float& lastSample, int& counter, int speedFrames, bool& updated) {
-      
+
       if (sampleRatePercent > .95f) {
         updated = true;
         for (int i = 0; i < length; i += channels) {
           lastSample = processor->dist(processor->rng);
+          processor->steps++;  // Increment steps each time a random number is generated
           for (int c = 0; c < channels; ++c) {
             buffer[i + c] = lastSample;
           }
@@ -346,6 +353,7 @@ extern "C" {
             updated = true;
             counter = 0;
             lastSample = processor->dist(processor->rng);
+            processor->steps++;  // Increment steps each time a random number is generated
           }
           for (int c = 0; c < channels; ++c) {
             buffer[i + c] = lastSample;
@@ -354,15 +362,24 @@ extern "C" {
       }
     }
 
+    // Function to sync the NoiseProcessor's RNG state
     void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps) {
       processor->rng.seed(seed);
       processor->rng.discard(steps);
+      processor->steps = steps;  // Synchronize the steps counter
+      processor->seed = seed;    // Update the stored seed
     }
 
+    // Function to write the current seed and step to reference variables
+    void GetCurrentSeedAndStep(NoiseProcessor* processor, int& seed, int& steps) {
+      seed = processor->seed;    // Return the stored seed
+      steps = processor->steps;  // Return the current step count
+    }
+
+    // Function to destroy the NoiseProcessor
     void DestroyNoiseProcessor(NoiseProcessor* processor) {
       delete processor;
     }
-
 
     
 

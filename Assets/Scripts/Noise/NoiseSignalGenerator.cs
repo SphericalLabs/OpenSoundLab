@@ -66,6 +66,9 @@ public class NoiseSignalGenerator : signalGenerator
     [DllImport("OSLNative")]
     private static extern void SyncNoiseProcessor(IntPtr processor, int seed, int steps);
 
+    [DllImport("OSLNative")]
+    private static extern void GetCurrentSeedAndStep(IntPtr processor, ref int seed, ref int steps);
+
     public bool updated = false;
 
     public int NoiseStep { get => noiseStep; set => noiseStep = value; }
