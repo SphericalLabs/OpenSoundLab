@@ -50,7 +50,7 @@ public class clipPlayerSimple : clipPlayer
 
     bool active = false;
     
-    double _lastBuffer = 0;
+    //double _lastBuffer = 0;
     float[] lastSeqGen;
 
     float lastPlaybackSpeed = 0f;

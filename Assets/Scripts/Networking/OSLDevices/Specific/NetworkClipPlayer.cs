@@ -2,13 +2,13 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 using Mirror;
-public class NetworkClipPlayerComplex : NetworkSyncListener
+public class NetworkClipPlayer : NetworkSyncListener
 {
-    private clipPlayerComplex clipPlayerComplex;
+    private clipPlayer clipPlayer;
 
     protected virtual void Awake()
     {
-        clipPlayerComplex = GetComponent<clipPlayerComplex>();
+        clipPlayer = GetComponent<clipPlayer>();
     }
     #region Mirror
 
@@ -24,7 +24,7 @@ public class NetworkClipPlayerComplex : NetworkSyncListener
     {
         if (isServer)
         {
-            RpcUpdateLastBuffer(clipPlayerComplex.LastBuffer);
+            RpcUpdateLastBuffer(clipPlayer.LastBuffer);
         }
         else
         {
@@ -37,7 +37,7 @@ public class NetworkClipPlayerComplex : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateLastBuffer(clipPlayerComplex.LastBuffer);
+            RpcUpdateLastBuffer(clipPlayer.LastBuffer);
         }
     }
 
@@ -46,7 +46,7 @@ public class NetworkClipPlayerComplex : NetworkSyncListener
     {
         Debug.Log($"{gameObject.name} CmdRequestSync");
 
-        RpcUpdateLastBuffer(clipPlayerComplex.LastBuffer);
+        RpcUpdateLastBuffer(clipPlayer.LastBuffer);
     }
 
     [ClientRpc]
@@ -54,9 +54,9 @@ public class NetworkClipPlayerComplex : NetworkSyncListener
     {
         if (isClient && !isServer)
         {
-            Debug.Log($"{gameObject.name} old _lastBuffer: {clipPlayerComplex.LastBuffer}, new _lastBuffer {_lastBuffer}");
+            Debug.Log($"{gameObject.name} old _lastBuffer: {clipPlayer.LastBuffer}, new _lastBuffer {_lastBuffer}");
 
-            clipPlayerComplex.LastBuffer = _lastBuffer;
+            clipPlayer.LastBuffer = _lastBuffer;
         }
     }
     #endregion

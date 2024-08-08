@@ -58,8 +58,7 @@ public class clipPlayerComplex : clipPlayer {
 
     public bool active = true;
 
-    double _lastBuffer = 0;
-    public double LastBuffer { get => _lastBuffer; set => _lastBuffer = value; }
+    //double _lastBuffer = 0;
     float[] lastSeqGen;
 
     Texture2D tex;

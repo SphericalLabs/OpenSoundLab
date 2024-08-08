@@ -1389,6 +1389,7 @@ GameObject:
   - component: {fileID: 8324042198422262742}
   - component: {fileID: 6008975786203391811}
   - component: {fileID: 6071241351280792618}
+  - component: {fileID: 2651847580628371311}
   m_Layer: 9
   m_Name: SequencerCV
   m_TagString: instrument
@@ -1745,6 +1746,21 @@ MonoBehaviour:
   syncInterval: 0.05
   xyHandles:
   - {fileID: 114000013778669004}
+--- !u!114 &2651847580628371311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012113822842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1b614aba9b66e044b5d9bdf4caa93aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &1000012189469876
 GameObject:
   m_ObjectHideFlags: 0

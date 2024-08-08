@@ -231,6 +231,7 @@ GameObject:
   - component: {fileID: 560784934872893158}
   - component: {fileID: 7072340009202675053}
   - component: {fileID: 5612161872485133053}
+  - component: {fileID: 5934309788205830595}
   m_Layer: 0
   m_Name: Glide
   m_TagString: instrument
@@ -396,6 +397,21 @@ MonoBehaviour:
   omniJacks:
   - {fileID: 114000012040633690}
   - {fileID: 114000012859573534}
+--- !u!114 &5934309788205830595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41419e0acf48d704cb5268226032784d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &169546
 GameObject:
   m_ObjectHideFlags: 0

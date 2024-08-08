@@ -66,6 +66,7 @@ public class ADSignalGenerator : signalGenerator
     
     float lastPulseFloat = -1f;
 
+    public float GlidedVal { get => glidedVal; set => glidedVal = value; }
     public void Awake()
     {
         minAttack = 1; // in samples
@@ -111,7 +112,7 @@ public class ADSignalGenerator : signalGenerator
     float prevLinearityA = 1f;
     float prevLinearityD = 1f;
     int prevAttackLengthFinal = 0; 
-    int prevReleaseLengthFinal = 0; 
+    int prevReleaseLengthFinal = 0;
 
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
