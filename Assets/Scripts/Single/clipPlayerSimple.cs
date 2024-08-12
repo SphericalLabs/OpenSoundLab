@@ -42,7 +42,7 @@ public class clipPlayerSimple : clipPlayer
 
     public float amplitude = 1;
     public signalGenerator seqGen, freqExpGen, ampGen;
-    public SingleDeviceInterface devInterface;
+    public samplerOneDeviceInterface devInterface;
 
     bool active = false;
     
@@ -67,7 +67,7 @@ public class clipPlayerSimple : clipPlayer
     void Start()
     {
         lastSeqGen = new float[] { 0, 0 };
-        devInterface = GetComponent<SingleDeviceInterface>();
+        devInterface = GetComponent<samplerOneDeviceInterface>();
     }
 
     public void Play()

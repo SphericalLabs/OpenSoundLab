@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SingleDeviceInterface : deviceInterface
+public class samplerOneDeviceInterface : deviceInterface
 {
 
     clipPlayerSimple player;
@@ -45,8 +45,8 @@ public class SingleDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         // TODO implement serialization for knobs, etc
-        SingleData data = new SingleData();
-        data.deviceType = DeviceType.Single;
+        SamplerOneData data = new SamplerOneData();
+        data.deviceType = DeviceType.SamplerOne;
         GetTransformData(data);
 
 
@@ -66,7 +66,7 @@ public class SingleDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d)
     {
-        SingleData data = d as SingleData;
+        SamplerOneData data = d as SamplerOneData;
         base.Load(data);
 
         GetComponent<samplerLoad>().SetSample(data.label, data.file);
@@ -83,7 +83,7 @@ public class SingleDeviceInterface : deviceInterface
 
 }
 
-public class SingleData : InstrumentData{
+public class SamplerOneData : InstrumentData{
     
     public string file;
     public string label;
