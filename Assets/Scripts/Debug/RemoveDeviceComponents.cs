@@ -9,6 +9,7 @@ public class RemoveDeviceComponents : MonoBehaviour
     public GameObject[] targets;
     public Material newMaterial;
 
+    [ContextMenu("Remove Components")]
     public void RemoveComponents()
     {
         foreach (GameObject g in targets)
