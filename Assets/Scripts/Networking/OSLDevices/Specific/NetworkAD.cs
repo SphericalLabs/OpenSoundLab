@@ -6,10 +6,13 @@ using Mirror;
 public class NetworkAD : NetworkSyncListener
 {
     protected ADSignalGenerator adSignalGenerator;
-
+    protected ADDeviceInterface adDeviceInterface;
     protected virtual void Awake()
     {
         adSignalGenerator = GetComponent<ADSignalGenerator>();
+        adDeviceInterface = GetComponent<ADDeviceInterface>();
+        adDeviceInterface.attackDial.onEndGrabEvents.AddListener(OnStopDragDial);
+        adDeviceInterface.releaseDial.onEndGrabEvents.AddListener(OnStopDragDial);
     }
     #region Mirror
 
@@ -59,6 +62,13 @@ public class NetworkAD : NetworkSyncListener
             Debug.Log($"{gameObject.name} old glidedVal: {adSignalGenerator.GlidedVal}, new phase {glidedVal}");
             adSignalGenerator.GlidedVal = glidedVal;
         }
+    }
+    #endregion
+
+    #region onDial
+    public void OnStopDragDial()
+    {
+        OnSync();
     }
     #endregion
 }

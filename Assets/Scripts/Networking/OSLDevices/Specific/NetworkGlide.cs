@@ -6,10 +6,13 @@ using Mirror;
 public class NetworkGlide : NetworkSyncListener
 {
     protected glideSignalGenerator glideSignalGenerator;
+    protected glideDeviceInterface glideDeviceInterface;
 
     protected virtual void Awake()
     {
         glideSignalGenerator = GetComponent<glideSignalGenerator>();
+        glideDeviceInterface = GetComponent<glideDeviceInterface>();
+        glideDeviceInterface.ValueDial.onEndGrabEvents.AddListener(OnStopDragDial);
     }
     #region Mirror
 
@@ -59,6 +62,13 @@ public class NetworkGlide : NetworkSyncListener
             Debug.Log($"{gameObject.name} old glidedVal: {glideSignalGenerator.GlidedVal}, new phase {glidedVal}");
             glideSignalGenerator.GlidedVal = glidedVal;
         }
+    }
+    #endregion
+
+    #region onDial
+    public void OnStopDragDial()
+    {
+        OnSync();
     }
     #endregion
 }
