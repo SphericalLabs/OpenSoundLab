@@ -30,7 +30,7 @@ public class NetworkPlayerTape : NetworkBehaviour
         {
             Debug.Log($"{gameObject.name} On Set hand tape: {newString}");
 
-            SetSamplePath();
+            SetSamplePath(offset, rotationOffset);
         }
     }
 
@@ -52,27 +52,29 @@ public class NetworkPlayerTape : NetworkBehaviour
     }
 
 
-    public void SetHandSamplePath(string path)
+    public void SetHandSamplePath(string path, Vector3 position, Quaternion rotation)
     {
         Debug.Log($"{gameObject.name} Set hand tape: {path}");
         if (isServer)
         {
+            offset = position;
+            rotationOffset = rotation;
             inHandSamplePath = path;
         }
         else
         {
-            CmdUpdateSamplePath(path);
+            CmdUpdateSamplePath(path, position, rotation);
         }
     }
 
     [Command]
-    public void CmdUpdateSamplePath(string path)
+    public void CmdUpdateSamplePath(string path, Vector3 position, Quaternion rotation)
     {
         inHandSamplePath = path;
-        SetSamplePath();
+        SetSamplePath(position, rotation);
     }
 
-    private void SetSamplePath()
+    private void SetSamplePath(Vector3 position, Quaternion rotation)
     {
         if (isLocalPlayer)
         {
@@ -93,7 +95,7 @@ public class NetworkPlayerTape : NetworkBehaviour
                 return;
             }
 
-            GameObject g = Instantiate(tapePrefab, offset, rotationOffset);
+            GameObject g = Instantiate(tapePrefab, position, rotation, handParent.transform);
             g.transform.Rotate(-90, 0, 0, Space.Self);
             tapeInHand = g.GetComponent<tape>();
             tapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));

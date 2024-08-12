@@ -1193,7 +1193,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  sampleLoaders: []
+  sampleLoaders:
+  - {fileID: 114000011237431000}
 --- !u!114 &1719999611711977524
 MonoBehaviour:
   m_ObjectHideFlags: 0

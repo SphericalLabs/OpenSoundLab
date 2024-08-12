@@ -78,8 +78,9 @@ public class masterControl : MonoBehaviour {
   public bool showEnvironment = true;
   double _sampleDuration;
   double _measurePhase;
+    public double MeasurePhase { get => _measurePhase; set => _measurePhase = value; }
 
-  public float glowVal = 1;
+    public float glowVal = 1;
 
   public string SaveDir;
 
@@ -407,7 +408,9 @@ public class masterControl : MonoBehaviour {
   };
 
   public WireMode WireSetting = WireMode.Curved;
-  public void updateWireSetting(int num) {
+
+
+    public void updateWireSetting(int num) {
     if (WireSetting == (WireMode)num) {
       return;
     }
