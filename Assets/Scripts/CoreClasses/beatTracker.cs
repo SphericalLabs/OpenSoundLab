@@ -115,9 +115,9 @@ public class beatTracker : ScriptableObject {
   }
 
   public void updateBeatNoTriplets(int n) {
-    if (n == 4) n = 5;
-    else if (n == 5) n = 7;
-    else if (n == 6) n = 8;
+    //if (n == 4) n = 5; // 12 -> 16
+    //else if (n == 5) n = 7; // 16 -> 32
+    //else if (n == 6) n = 8; // 24 -> 64
     setup(n, curSwingVal);
   }
 
@@ -129,14 +129,14 @@ public class beatTracker : ScriptableObject {
     curResolutionIndex = n;
     curSwingVal = swing;
     calculatedSubSteps = new float[resolutions[curResolutionIndex] * 2];
-    float tempVal = .5f / resolutions[curResolutionIndex];
-    for (int i = 0; i < calculatedSubSteps.Length; i++) calculatedSubSteps[i] = tempVal * i;
+    float stepDuration = .5f / resolutions[curResolutionIndex];
+    for (int i = 0; i < calculatedSubSteps.Length; i++) calculatedSubSteps[i] = stepDuration * i;
 
     // swing offsets for every odd note
     if (swing != .5f) {
-      float tempoffset = swing - .5f;
+      float swingOffset = swing - .5f;
       for (int i = 0; i < calculatedSubSteps.Length; i++) {
-        if (i % 2 == 1) calculatedSubSteps[i] = calculatedSubSteps[i] + tempoffset * tempVal;
+        if (i % 2 == 1) calculatedSubSteps[i] = calculatedSubSteps[i] + swingOffset * stepDuration;
       }
     }
 

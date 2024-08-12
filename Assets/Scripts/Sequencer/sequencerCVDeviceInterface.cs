@@ -167,6 +167,9 @@ public class sequencerCVDeviceInterface : deviceInterface
             int localRow = row;  // Create a local copy, since closures are passed by reference
             controlPanelModes[row].onSwitchChangedEvent.AddListener(delegate { doModeSwitch(localRow); });
         }
+
+        dimensionDisplays[1].text = "";
+        dimensionDisplays[1].gameObject.SetActive(false);
     }
 
     void Start()
