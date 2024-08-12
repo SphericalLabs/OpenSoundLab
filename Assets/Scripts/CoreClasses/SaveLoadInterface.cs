@@ -212,9 +212,9 @@ public class SaveLoadInterface : MonoBehaviour
             }
 
             // set volume to zero to avoid surprisingly loud sounds
-            if (device is samplerDeviceInterface)
+            if (device is samplerTwoDeviceInterface)
             {
-                samplerDeviceInterface sampler = (samplerDeviceInterface)device;
+                samplerTwoDeviceInterface sampler = (samplerTwoDeviceInterface)device;
                 sampler.volumeDial.setPercent(0f);
             }
 

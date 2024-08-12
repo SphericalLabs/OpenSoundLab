@@ -46,7 +46,7 @@ public class clipPlayerComplex : clipPlayer {
     public float windowing = 0f;
     int windowLength = 0;
 
-    public samplerDeviceInterface _sampleInterface;
+    public samplerTwoDeviceInterface _sampleInterface;
 
     public Transform scrubTransform;
     public GameObject[] scrubIndicators;

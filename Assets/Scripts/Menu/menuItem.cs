@@ -159,7 +159,7 @@ public class menuItem : manipObject
         //if (item == deviceType.Freeverb) label.text = "Reverb";
         else if (item == DeviceType.DC) label.text = "DC";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
-        else if (item == DeviceType.Sampler) label.text = "Sampler II";
+        else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
         else if (item == DeviceType.SamplerOne) label.text = "Sampler I";
 
 
@@ -787,7 +787,7 @@ public class DeviceType
     public static readonly DeviceType Looper = new DeviceType("Looper", DeviceCategory.SampleGenerator, 5);
     public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 4);
     public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 3);
-    public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.SampleGenerator, 2);
+    public static readonly DeviceType SamplerTwo = new DeviceType("SamplerTwo", DeviceCategory.SampleGenerator, 2);
     public static readonly DeviceType SamplerOne = new DeviceType("SamplerOne", DeviceCategory.SampleGenerator, 1);
 
     // ModulationGenerator

@@ -36,7 +36,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime;
 
-public class samplerDeviceInterface : deviceInterface {
+public class samplerTwoDeviceInterface : deviceInterface {
   public dial speedDial, volumeDial, headTrimDial, tailTrimDial, windowingDial;
   public omniJack freqExpInput, freqLinInput, volumeInput, controlInput, output;
   public omniJack headInput, tailInput;
@@ -126,7 +126,7 @@ public class samplerDeviceInterface : deviceInterface {
 
   public override InstrumentData GetData() {
     SamplerData data = new SamplerData();
-    data.deviceType = DeviceType.Sampler;
+    data.deviceType = DeviceType.SamplerTwo;
     GetTransformData(data);
     data.speedDial = speedDial.percent;
     data.ampDial = volumeDial.percent;
