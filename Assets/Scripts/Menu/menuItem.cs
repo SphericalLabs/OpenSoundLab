@@ -252,6 +252,10 @@ public class menuItem : manipObject
 
         if (item == DeviceType.Maracas) g.transform.localPosition = new Vector3(0, -.02f, .02f);
 
+        else if (item == DeviceType.Single){
+            g.transform.localPosition = new Vector3(-0.023f, 0f, 0.02f);
+        }
+
         else if (item == DeviceType.Camera)
         {
             g.transform.localRotation = Quaternion.Euler(90, 0, 0);
