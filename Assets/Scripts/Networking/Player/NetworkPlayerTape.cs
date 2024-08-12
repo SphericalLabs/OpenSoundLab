@@ -28,6 +28,8 @@ public class NetworkPlayerTape : NetworkBehaviour
     {
         if (old != newString)
         {
+            Debug.Log($"{gameObject.name} On Set hand tape: {newString}");
+
             SetSamplePath();
         }
     }
@@ -85,7 +87,7 @@ public class NetworkPlayerTape : NetworkBehaviour
         {
             //create new instance
 
-            if (!File.Exists(sampleManager.instance.parseFilename(samplerLoad.CorrectPathSeparators(inHandSamplePath))))
+            if (!File.Exists(sampleManager.instance.parseFilename(sampleManager.CorrectPathSeparators(inHandSamplePath))))
             {
                 Debug.Log("File does't exist");
                 return;
@@ -94,7 +96,7 @@ public class NetworkPlayerTape : NetworkBehaviour
             GameObject g = Instantiate(tapePrefab, offset, rotationOffset);
             g.transform.Rotate(-90, 0, 0, Space.Self);
             tapeInHand = g.GetComponent<tape>();
-            tapeInHand.Setup(samplerLoad.GetFileName(inHandSamplePath), samplerLoad.CorrectPathSeparators(inHandSamplePath));
+            tapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
             tapeInHand.TargetNetworkPlayerTape = this;
         }
     }

@@ -239,4 +239,27 @@ public class sampleManager : MonoBehaviour
         AddCustomSamples();
 
     }
+
+    public static string GetFileName(string path)
+    {
+        string fileName = Path.GetFileNameWithoutExtension(CorrectPathSeparators(path));
+
+        Debug.Log($"Filename {fileName}");
+        return fileName;
+    }
+
+
+    public static string CorrectPathSeparators(string path)
+    {
+        if (Path.DirectorySeparatorChar == '\\')
+        {
+            // Windows-Umgebung: Korrigiere alle / zu \
+            return path.Replace('/', '\\');
+        }
+        else
+        {
+            // Unix-Umgebung (Linux, macOS): Korrigiere alle \ zu /
+            return path.Replace('\\', '/');
+        }
+    }
 }

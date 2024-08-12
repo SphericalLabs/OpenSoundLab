@@ -61,7 +61,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //create tape
                 if (newValue.Length > 0)
                 {
-                    sampleLoaders[index].SetSample(samplerLoad.GetFileName(newValue), samplerLoad.CorrectPathSeparators(newValue));
+                    sampleLoaders[index].SetSample(sampleManager.GetFileName(newValue), sampleManager.CorrectPathSeparators(newValue));
                 }
                 break;
             case SyncList<string>.Operation.OP_INSERT:
@@ -72,7 +72,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //create tape
                 if (newValue.Length > 0)
                 {
-                    sampleLoaders[index].SetSample(samplerLoad.GetFileName(newValue), samplerLoad.CorrectPathSeparators(newValue));
+                    sampleLoaders[index].SetSample(sampleManager.GetFileName(newValue), sampleManager.CorrectPathSeparators(newValue));
                 }
                 else if (newValue.Length <= 0 && sampleLoaders[index].hasTape())
                 {
@@ -132,7 +132,7 @@ public class NetworkSampleLoad : NetworkBehaviour
             if (samplePaths[index].Length > 0 && !sampleLoaders[index].hasTape())
             {
                 Debug.Log("Set tape on host");
-                sampleLoaders[index].SetSample(samplerLoad.GetFileName(path), samplerLoad.CorrectPathSeparators(path));
+                sampleLoaders[index].SetSample(sampleManager.GetFileName(path), sampleManager.CorrectPathSeparators(path));
             }
             else if(samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
             {

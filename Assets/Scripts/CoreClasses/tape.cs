@@ -473,6 +473,7 @@ public class tape : manipObject
             }
             targetHand.SetHandSamplePath(filename);
             targetNetworkPlayerTape = targetHand;
+            //todo set netoffset to hand
         }
     }
 
