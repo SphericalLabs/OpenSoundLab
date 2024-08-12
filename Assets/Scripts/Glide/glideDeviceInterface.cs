@@ -40,7 +40,9 @@ public class glideDeviceInterface : deviceInterface {
   dial valueDial;
   glideSignalGenerator signal;
 
-  public override void Awake() {
+    public dial ValueDial { get => valueDial; set => valueDial = value; }
+
+    public override void Awake() {
     base.Awake();
     valueDial = GetComponentInChildren<dial>();
 //    activeSwitch = GetComponentInChildren<basicSwitch>();
