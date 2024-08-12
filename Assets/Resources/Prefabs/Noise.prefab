@@ -605,6 +605,7 @@ GameObject:
   - component: {fileID: -3973643090797363748}
   - component: {fileID: 4168567202581597113}
   - component: {fileID: 5589605367902422806}
+  - component: {fileID: 8699874061611152599}
   m_Layer: 0
   m_Name: Noise
   m_TagString: instrument
@@ -768,6 +769,21 @@ MonoBehaviour:
   syncInterval: 0
   omniJacks:
   - {fileID: 114000011938180816}
+--- !u!114 &8699874061611152599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012179911288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcf7076d8e7f802459816c3c1302302a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &1000013671002302
 GameObject:
   m_ObjectHideFlags: 0

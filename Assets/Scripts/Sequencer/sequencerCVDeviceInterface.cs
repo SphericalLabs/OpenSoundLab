@@ -261,6 +261,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     }
 
     int curStep = 0;
+    public int CurStep { get => curStep; set => curStep = value; }
     public bool silent = false;
 
     public void executeNextStep()
@@ -389,6 +390,9 @@ public class sequencerCVDeviceInterface : deviceInterface
     int selectedStep = 0;
     void UpdateStepSelect()
     {
+        // bugfix for randomly skipped / missed steps in sequencer. 
+        // this routine would fire even if the step selector handle was not touched or grabbed. 
+        // this could be due to an multithread issue between main and audio thread, which is still unsolved.
         if (stepSelect.curState != manipObject.manipState.grabbed) return;
 
         int s = (int)Mathf.Round(stepSelect.transform.localPosition.x / -cubeConst);

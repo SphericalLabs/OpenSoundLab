@@ -439,11 +439,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000010212168836
 GameObject:
   m_ObjectHideFlags: 0
@@ -806,11 +806,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000010946069216
 GameObject:
   m_ObjectHideFlags: 0
@@ -3620,6 +3620,7 @@ GameObject:
   - component: {fileID: 3268999890355147956}
   - component: {fileID: 3441120879253779692}
   - component: {fileID: 7092770143146360708}
+  - component: {fileID: 3411204429711114029}
   m_Layer: 9
   m_Name: Oscillator
   m_TagString: instrument
@@ -3874,6 +3875,21 @@ MonoBehaviour:
   syncInterval: 0
   switchs:
   - {fileID: 114000011071982876}
+--- !u!114 &3411204429711114029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000014108096392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6f71add6a17f3f44bb1942f3366e4a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &1000014130592554
 GameObject:
   m_ObjectHideFlags: 0
@@ -4672,7 +4688,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2789216137255816880
 RectTransform:
   m_ObjectHideFlags: 0

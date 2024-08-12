@@ -413,6 +413,7 @@ public class omniPlug : manipObject
         Destroy(gameObject);
     }
 
+    // When letting go of a connection and thus also clearing the other side?
     public void Release()
     {
         foreach (omniJack j in targetJackList) j.flash(Color.black);
@@ -482,10 +483,13 @@ public class omniPlug : manipObject
         }
     }
 
+    // When removing a plug but still holding on to it?
     void endConnection()
     {
         connected.endConnection(true);
         connected = null;
+        signal = null;
+        
         plugTrans.parent = transform;
         plugTrans.localPosition = Vector3.zero;
         plugTrans.localRotation = Quaternion.identity;

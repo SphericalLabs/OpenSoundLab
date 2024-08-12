@@ -37,37 +37,43 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Data;
 
-public class glideSignalGenerator : signalGenerator {
+public class glideSignalGenerator : signalGenerator
+{
 
-  public signalGenerator incoming;
-  public bool active = true;
-  public float timeFactor = 1f;
-  private float glidedVal = 0f;
+    public signalGenerator incoming;
+    public bool active = true;
+    public float timeFactor = 1f;
+    private float glidedVal = 0f;
 
-  public void setTimeFactor(float t){
-    
-    t = Mathf.Clamp01(t);
+    public float GlidedVal { get => glidedVal; set => glidedVal = value; }
 
-    float logScale = Utils.map(t, 0f, 1f, 0f, -6f);
+    public void setTimeFactor(float t)
+    {
 
-    timeFactor = Mathf.Pow(10, logScale);
-  }
+        t = Mathf.Clamp01(t);
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
-    
-    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+        float logScale = Utils.map(t, 0f, 1f, 0f, -6f);
 
-    if (incoming != null) { 
-
-      incoming.processBuffer(buffer, dspTime, channels);
-
-      for (int n = 0; n < buffer.Length; n += 2)
-      {
-        glidedVal += (buffer[n] - glidedVal) * timeFactor;
-        buffer[n] = buffer[n + 1] = glidedVal;
-      }
+        timeFactor = Mathf.Pow(10, logScale);
     }
-    
-    recursionCheckPost();
-  }
+
+    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    {
+
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+
+        if (incoming != null)
+        {
+
+            incoming.processBuffer(buffer, dspTime, channels);
+
+            for (int n = 0; n < buffer.Length; n += 2)
+            {
+                glidedVal += (buffer[n] - glidedVal) * timeFactor;
+                buffer[n] = buffer[n + 1] = glidedVal;
+            }
+        }
+
+        recursionCheckPost();
+    }
 }

@@ -59,7 +59,7 @@ public class NetworkSampleLoad : NetworkBehaviour
         {
             case SyncList<string>.Operation.OP_ADD:
                 //create tape
-                if (newValue.Length > 0 && !sampleLoaders[index].hasTape())
+                if (newValue.Length > 0)
                 {
                     sampleLoaders[index].SetSample(GetFileName(newValue), CorrectPathSeparators(newValue));
                 }
@@ -70,7 +70,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 break;
             case SyncList<string>.Operation.OP_SET:
                 //create tape
-                if (newValue.Length > 0 && !sampleLoaders[index].hasTape())
+                if (newValue.Length > 0)
                 {
                     sampleLoaders[index].SetSample(GetFileName(newValue), CorrectPathSeparators(newValue));
                 }

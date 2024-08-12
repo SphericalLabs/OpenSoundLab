@@ -34,6 +34,7 @@
 
 ﻿using UnityEngine;
 using System.Collections;
+using Mirror;
 
 public class signalGenerator : MonoBehaviour
 {
