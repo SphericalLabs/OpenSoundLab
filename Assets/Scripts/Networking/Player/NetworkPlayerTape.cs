@@ -54,7 +54,7 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     public void SetHandSamplePath(string path, Vector3 position, Quaternion rotation)
     {
-        Debug.Log($"{gameObject.name} Set hand tape: {path}");
+        Debug.Log($"{gameObject.name} Set hand tape: {path}, {position}, {rotation}");
         if (isServer)
         {
             offset = position;

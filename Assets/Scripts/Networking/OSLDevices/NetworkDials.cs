@@ -18,6 +18,12 @@ public class NetworkDials : NetworkBehaviour
         }
     }
 
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        dialValues.Clear();
+    }
+
     private void Start()
     {
         //add dials on change callback event
