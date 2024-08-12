@@ -159,8 +159,8 @@ public class menuItem : manipObject
         //if (item == deviceType.Freeverb) label.text = "Reverb";
         else if (item == DeviceType.DC) label.text = "DC";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
-        else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
         else if (item == DeviceType.SamplerOne) label.text = "Sampler I";
+        else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
 
 
         label.gameObject.SetActive(true);

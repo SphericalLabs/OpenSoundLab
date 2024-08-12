@@ -278,7 +278,7 @@ public class SaveLoadInterface : MonoBehaviour
 
 [XmlInclude(typeof(LooperData))]
 [XmlInclude(typeof(RecorderData))]
-[XmlInclude(typeof(SamplerData))]
+[XmlInclude(typeof(SamplerTwoData))]
 [XmlInclude(typeof(SamplerOneData))]
 [XmlInclude(typeof(KeyboardData))]
 [XmlInclude(typeof(SequencerData))] // update?

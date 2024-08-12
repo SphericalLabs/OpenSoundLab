@@ -166,7 +166,7 @@ public class xmlUpdate {
               serializer = new XmlSerializer(typeof(SamplerOneData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             case "SamplerTwos":
-              serializer = new XmlSerializer(typeof(SamplerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              serializer = new XmlSerializer(typeof(SamplerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
             default:
               serializer = new XmlSerializer(typeof(InstrumentData), new XmlRootAttribute { ElementName = xmlNode.Name });

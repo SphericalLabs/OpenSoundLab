@@ -125,7 +125,7 @@ public class samplerTwoDeviceInterface : deviceInterface {
   }
 
   public override InstrumentData GetData() {
-    SamplerData data = new SamplerData();
+    SamplerTwoData data = new SamplerTwoData();
     data.deviceType = DeviceType.SamplerTwo;
     GetTransformData(data);
     data.speedDial = speedDial.percent;
@@ -159,7 +159,7 @@ public class samplerTwoDeviceInterface : deviceInterface {
   }
 
   public override void Load(InstrumentData d) {
-    SamplerData data = d as SamplerData;
+    SamplerTwoData data = d as SamplerTwoData;
     base.Load(data);
     speedDial.setPercent(data.speedDial);
     volumeDial.setPercent(data.ampDial);
@@ -188,7 +188,7 @@ public class samplerTwoDeviceInterface : deviceInterface {
   }
 }
 
-public class SamplerData : InstrumentData {
+public class SamplerTwoData : InstrumentData {
   public string label;
   public string file;
   public float ampDial;
