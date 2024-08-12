@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Android;
 
 public class samplerOneDeviceInterface : deviceInterface
 {
 
     clipPlayerSimple player;
 
-    public omniJack jackTrigger, jackOut, jackPitch, jackAmp;
-    public dial dialPitch, dialAmp;
+    public omniJack jackTrigger, jackOut, jackPitch, jackAmp, jackStart;
+    public dial dialPitch, dialAmp, dialStart;
     public button buttonPlay;
 
     public string currentSample;
@@ -22,8 +23,15 @@ public class samplerOneDeviceInterface : deviceInterface
     // Update is called once per frame
     void Update()
     {
+        // todo: only update when necessary
         player.playbackSpeed = 1f * Mathf.Pow(2, Utils.map(dialPitch.percent, 0f, 1f, -4f, 4f));
         player.amplitude = Mathf.Pow(dialAmp.percent, 2);
+        
+        if (player.sampleStart != dialStart.percent)
+        {
+            player.sampleStart = dialStart.percent;
+            player.updateSampleBounds();
+        }
 
         if (player.freqExpGen != jackPitch.signal) player.freqExpGen = jackPitch.signal;
         if (player.ampGen != jackAmp.signal) player.ampGen = jackAmp.signal;
@@ -57,9 +65,11 @@ public class samplerOneDeviceInterface : deviceInterface
         data.jackTrigID = jackTrigger.transform.GetInstanceID();
         data.jackAmp = jackAmp.transform.GetInstanceID();
         data.jackPitch = jackPitch.transform.GetInstanceID();
+        data.jackStart = jackStart.transform.GetInstanceID();
 
         data.dialPitch = dialPitch.percent;
         data.dialAmp = dialAmp.percent;
+        data.dialStart = dialStart.percent;
 
         return data;
     }
@@ -79,6 +89,9 @@ public class samplerOneDeviceInterface : deviceInterface
 
         dialAmp.setPercent(data.dialAmp);
         jackAmp.ID = data.jackAmp;
+
+        dialStart.setPercent(data.dialStart);
+        jackStart.ID = data.jackStart;
     }
 
 }
@@ -96,6 +109,9 @@ public class SamplerOneData : InstrumentData{
 
     public float dialAmp;
     public int jackAmp;
+
+    public float dialStart;
+    public int jackStart;
 
     //public float dialSampleStart;
         //public int jackSampleStart;

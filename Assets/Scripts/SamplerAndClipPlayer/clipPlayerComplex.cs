@@ -203,23 +203,6 @@ public class clipPlayerComplex : clipPlayer {
         {
             return false;
         }
-
-
-        //if (tempBounds[0] < 0) sampleBounds[0] = 0;
-        //if (tempBounds[0] > consolidatedSampleLength) sampleBounds[0] = consolidatedSampleLength - padding;
-        //if (tempBounds[1] > consolidatedSampleLength) sampleBounds[1] = consolidatedSampleLength;
-        //if (tempBounds[0] >= tempBounds[1])
-        //{
-        //  if (tempBounds[1] >= padding)
-        //  {
-        //    tempBounds[0] = tempBounds[1] - padding;
-        //  }
-        //  else
-        //  {
-        //    tempBounds[1] = consolidatedSampleLength;
-        //    tempBounds[0] = consolidatedSampleLength - padding;
-        //  }
-        //}
     }
 
     public override void DrawClipTex()

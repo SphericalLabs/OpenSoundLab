@@ -1045,13 +1045,15 @@ MonoBehaviour:
   floatingBufferCount: 0
   bufferCount: 0
   trackBounds: {x: 0, y: 1}
-  playbackSpeed: 1
   ID: 0
+  playbackSpeed: 1
   amplitude: 1
+  sampleStart: 0
   seqGen: {fileID: 0}
   freqExpGen: {fileID: 0}
   ampGen: {fileID: 0}
   devInterface: {fileID: 0}
+  consolidatedSampleLength: -1
 --- !u!114 &6396865805222944688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1069,8 +1071,10 @@ MonoBehaviour:
   jackOut: {fileID: 114000014109223676}
   jackPitch: {fileID: 8257217584120589837}
   jackAmp: {fileID: 1155618421894485141}
+  jackStart: {fileID: 4967467073500810606}
   dialPitch: {fileID: 2694766225831041881}
   dialAmp: {fileID: 2728118564238663338}
+  dialStart: {fileID: 3011428839241171724}
   buttonPlay: {fileID: 114000010075456048}
   currentSample: 
 --- !u!114 &2998357149636742116

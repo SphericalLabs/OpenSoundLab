@@ -32,16 +32,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Oculus.Interaction.PoseDetection;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 public class clipPlayerSimple : clipPlayer
 {
 
-    public float playbackSpeed = 1;
     public int ID = 0;
 
+    public float playbackSpeed = 1;
     public float amplitude = 1;
-    public signalGenerator seqGen, freqExpGen, ampGen;
+    public float sampleStart = 0;
+
+    public signalGenerator seqGen, freqExpGen, ampGen, startGen;
     public samplerOneDeviceInterface devInterface;
 
     bool active = false;
@@ -63,11 +67,25 @@ public class clipPlayerSimple : clipPlayer
     float[] freqExpBuffer = new float[0];
     float[] ampBuffer = new float[0];
     float[] trigBuffer = new float[0];
+    float[] startBuffer = new float[0];
 
     void Start()
     {
         lastSeqGen = new float[] { 0, 0 };
         devInterface = GetComponent<samplerOneDeviceInterface>();
+    }
+
+
+    public int consolidatedSampleLength = -1; // sample length regardless of channel count
+    public void updateSampleBounds(){
+        if (!loaded) return;
+
+        // todo: only calc on sample load?
+        // otherwise NaN errors at times
+        consolidatedSampleLength = (int)(clipSamples.Length / clipChannels - 1);
+
+        sampleBounds[0] = (int)(consolidatedSampleLength * sampleStart) + 1;
+        sampleBounds[0] = Mathf.Clamp(sampleBounds[0], 1, consolidatedSampleLength); 
     }
 
     public void Play()
@@ -109,14 +127,18 @@ public class clipPlayerSimple : clipPlayer
                 System.Array.Resize(ref freqExpBuffer, buffer.Length);
             if (ampBuffer.Length != buffer.Length)
                 System.Array.Resize(ref ampBuffer, buffer.Length);
+            if (startBuffer.Length != buffer.Length)
+                System.Array.Resize(ref startBuffer, buffer.Length);
 
             SetArrayToSingleValue(trigBuffer, buffer.Length, 0f);
             SetArrayToSingleValue(freqExpBuffer, buffer.Length, 0f);
             SetArrayToSingleValue(ampBuffer, buffer.Length, 0f);
+            SetArrayToSingleValue(startBuffer, buffer.Length, 0f);
 
             if (seqGen != null) seqGen.processBuffer(trigBuffer, dspTime, channels);
             if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
             if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
+            if (startGen != null) startGen.processBuffer(startBuffer, dspTime, channels);
 
             if (seqGen != null)
             {
@@ -128,6 +150,8 @@ public class clipPlayerSimple : clipPlayer
                     {
                         devInterface.flashTriggerButton(); // was activated by trigger signal
                         lastTriggValue = trigBuffer[n];
+                        // read in current sample in startGen
+
                         break;
                     }
                     lastTriggValue = trigBuffer[n];
