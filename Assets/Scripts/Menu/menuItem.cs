@@ -143,6 +143,7 @@ public class menuItem : manipObject
         GameObject menuPrefab = Resources.Load("MenuPrefabs/" + item.ToString() + "_Menu") as GameObject;
         label.text = item.ToString();
         // Please use the first letter of the original enum name for proper sorting in the menu!
+        // Todo: Refactor these label configs into DeviceType below
         if (item == DeviceType.VCA) label.text = "VCA";
         else if (item == DeviceType.Glide) label.text = "Glide";
         else if (item == DeviceType.Gain) label.text = "Gain / Mute";
@@ -158,6 +159,8 @@ public class menuItem : manipObject
         //if (item == deviceType.Freeverb) label.text = "Reverb";
         else if (item == DeviceType.DC) label.text = "DC";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
+        else if (item == DeviceType.SamplerOne) label.text = "Sampler I";
+        else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
 
 
         label.gameObject.SetActive(true);
@@ -251,6 +254,10 @@ public class menuItem : manipObject
         g.transform.localPosition = g.transform.localPosition + Vector3.forward * .02f;
 
         if (item == DeviceType.Maracas) g.transform.localPosition = new Vector3(0, -.02f, .02f);
+
+        else if (item == DeviceType.SamplerOne){
+            g.transform.localPosition = new Vector3(-0.023f, 0f, 0.02f);
+        }
 
         else if (item == DeviceType.Camera)
         {
@@ -776,11 +783,12 @@ public class DeviceType
     public static readonly DeviceType Oscillator = new DeviceType("Oscillator", DeviceCategory.WaveGenerator, 1);
 
     // SampleGenerator
-    public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 5);
-    public static readonly DeviceType Looper = new DeviceType("Looper", DeviceCategory.SampleGenerator, 4);
-    public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 3);
-    public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 2);
-    public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.SampleGenerator, 1);
+    public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 6);
+    public static readonly DeviceType Looper = new DeviceType("Looper", DeviceCategory.SampleGenerator, 5);
+    public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 4);
+    public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 3);
+    public static readonly DeviceType SamplerTwo = new DeviceType("SamplerTwo", DeviceCategory.SampleGenerator, 2);
+    public static readonly DeviceType SamplerOne = new DeviceType("SamplerOne", DeviceCategory.SampleGenerator, 1);
 
     // ModulationGenerator
     public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 6);

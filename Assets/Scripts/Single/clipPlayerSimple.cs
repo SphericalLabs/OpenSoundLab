@@ -32,9 +32,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 public class clipPlayerSimple : clipPlayer
@@ -45,8 +42,7 @@ public class clipPlayerSimple : clipPlayer
 
     public float amplitude = 1;
     public signalGenerator seqGen, freqExpGen, ampGen;
-
-    public bool seqMuted = false; // electribe-ish midi sequence muting
+    public samplerOneDeviceInterface devInterface;
 
     bool active = false;
     
@@ -66,18 +62,26 @@ public class clipPlayerSimple : clipPlayer
 
     float[] freqExpBuffer = new float[0];
     float[] ampBuffer = new float[0];
-    float[] seqBuffer = new float[0];
+    float[] trigBuffer = new float[0];
 
     void Start()
     {
         lastSeqGen = new float[] { 0, 0 };
+        devInterface = GetComponent<samplerOneDeviceInterface>();
     }
 
-    public void Play(float speed = 1)
+    public void Play()
     {
+        lock (lockObject)
+        {
+            floatingBufferCount = _lastBuffer = sampleBounds[0] + 1; // WARNING: Due to the code structure in the native ClipSignalGenerator function resetting to 0 (instead of 0 + 1) would mean that playback does not work anymore for speeds lower than 1f. It would always floor() to 0 and would not move through the file anymore.
+            active = true;
+        }
+    }
+
+    public void Play(float speed){
         playbackSpeed = speed;
-        _lastBuffer = sampleBounds[0];
-        active = true;
+        Play();
     }
 
     public void Stop()
@@ -85,34 +89,59 @@ public class clipPlayerSimple : clipPlayer
         active = false;
     }
 
+    float lastTriggValue = 0f;
+
+    private readonly object lockObject = new object(); // Lock object
+
     public override void processBuffer(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        if (!loaded) return;
-        floatingBufferCount = _lastBuffer;
+        
+        lock (lockObject)
+        {
+            if (!loaded) return;
 
-        if (seqBuffer.Length != buffer.Length)
-            System.Array.Resize(ref seqBuffer, buffer.Length);
-        if (freqExpBuffer.Length != buffer.Length)
-            System.Array.Resize(ref freqExpBuffer, buffer.Length);
-        if (ampBuffer.Length != buffer.Length)
-            System.Array.Resize(ref ampBuffer, buffer.Length);
+            floatingBufferCount = _lastBuffer;
 
-        SetArrayToSingleValue(seqBuffer, buffer.Length, 0f);
-        SetArrayToSingleValue(freqExpBuffer, buffer.Length, 0f);
-        SetArrayToSingleValue(ampBuffer, buffer.Length, 0f);
+            if (trigBuffer.Length != buffer.Length)
+                System.Array.Resize(ref trigBuffer, buffer.Length);
+            if (freqExpBuffer.Length != buffer.Length)
+                System.Array.Resize(ref freqExpBuffer, buffer.Length);
+            if (ampBuffer.Length != buffer.Length)
+                System.Array.Resize(ref ampBuffer, buffer.Length);
 
-        if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
-        if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
-        if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
+            SetArrayToSingleValue(trigBuffer, buffer.Length, 0f);
+            SetArrayToSingleValue(freqExpBuffer, buffer.Length, 0f);
+            SetArrayToSingleValue(ampBuffer, buffer.Length, 0f);
 
-        floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, null, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, false, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
-          playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, true, false, _sampleDuration, bufferCount, ref active, 0);
-                  
-        _lastBuffer = floatingBufferCount;
+            if (seqGen != null) seqGen.processBuffer(trigBuffer, dspTime, channels);
+            if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
+            if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
 
-        lastAmplitude = amplitude;
-        lastPlaybackSpeed = playbackSpeed;
+            if (seqGen != null)
+            {
+                // Detect presence of at least one trigger pulse
+                // Port to NATIVE at some point
+                for (int n = 0; n < buffer.Length; n += channels) // left only
+                {
+                    if (trigBuffer[n] > 0f && lastTriggValue <= 0f)
+                    {
+                        devInterface.flashTriggerButton(); // was activated by trigger signal
+                        lastTriggValue = trigBuffer[n];
+                        break;
+                    }
+                    lastTriggValue = trigBuffer[n];
+                }
+            }
+
+            floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, null, ampBuffer, trigBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, false, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
+                  playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, true, false, _sampleDuration, bufferCount, ref active, 0);
+
+            _lastBuffer = floatingBufferCount;
+
+            lastAmplitude = amplitude;
+            lastPlaybackSpeed = playbackSpeed;
+        }
         recursionCheckPost();
   }
 }

@@ -13,7 +13,7 @@ public class LocalClientConnector : MonoBehaviour
     {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         ParseCommandLineArgs();
-        Debug.LogError("Press c to connect to localhost or host that was set in commandline variables");
+        Debug.Log("Press c to connect to localhost or host that was set in commandline variables");
         if (autoConnect) ConnectToServer();
 #else
         Debug.LogWarning("ClientConnector is only supported on Windows Standalone or Editor.");

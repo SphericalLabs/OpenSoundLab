@@ -157,8 +157,41 @@ public class button : manipObject
         hits.Enqueue(on);
     }
 
+    bool flashOnQueued = false;
+    bool flashOffQueued = false;
+    int flashOffTimer = 0;
+    private readonly object flashLock = new object(); // Lock object
+
+    public void queueFlash(){
+        lock (flashLock) // called from audio thread and then locks main thread
+        {
+            flashOnQueued = true;
+            flashOffQueued = false;
+            flashOffTimer = 0;
+        }
+    }
+
     void Update()
     {
+        // this old shool mechanism allows for resetting in a better way then with coroutine
+        if(flashOffQueued){            
+            if (flashOffTimer > 4)
+            {
+                setDark();
+                flashOffQueued = false;
+                flashOnQueued = false;
+                flashOffTimer = 0;
+            }
+            flashOffTimer++;
+        }
+
+        // single frame flashes queued from audio thread
+        if (flashOnQueued){
+            setBright();
+            flashOnQueued = false;
+            flashOffQueued = true;
+        }
+
         for (int i = 0; i < hits.Count; i++)
         {
             bool on = hits.Dequeue();
@@ -166,16 +199,23 @@ public class button : manipObject
             toggled = on;
             if (on)
             {
-                if (glowMatOnToggle) rend.material = glowMat;
-                if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", labelEmission);
+                setBright();
             }
             else
             {
-                if (glowMatOnToggle) rend.material = offMat;
-                if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", .1f);
-
+                setDark();
             }
         }
+    }
+
+    private void setBright(){
+        if (glowMatOnToggle) rend.material = glowMat;
+        if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", labelEmission);
+    }
+
+    private void setDark(){
+        if (glowMatOnToggle) rend.material = offMat;
+        if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", .1f);
     }
 
     public bool isHit = false;
@@ -190,8 +230,8 @@ public class button : manipObject
 
         if (on)
         {
-            if (singleID) _componentInterface.hit(on, buttonID);
-            else _componentInterface.hit(on, button2DID[0], button2DID[1]);
+            if (singleID) _componentInterface?.hit(on, buttonID);
+            else _componentInterface?.hit(on, button2DID[0], button2DID[1]);
 
             if (glowMatOnToggle) rend.material = glowMat;
             if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", labelEmission);
@@ -199,8 +239,8 @@ public class button : manipObject
         }
         else
         {
-            if (singleID) _componentInterface.hit(on, buttonID);
-            else _componentInterface.hit(on, button2DID[0], button2DID[1]);
+            if (singleID) _componentInterface?.hit(on, buttonID);
+            else _componentInterface?.hit(on, button2DID[0], button2DID[1]);
 
             if (glowMatOnToggle) rend.material = offMat;
             if (labelRend != null) labelRend.material.SetFloat("_EmissionGain", .1f);
@@ -229,20 +269,20 @@ public class button : manipObject
         curState = state;
         if (curState == manipState.none)
         {
-            if (!singleID) _componentInterface.onSelect(false, button2DID[0], button2DID[1]);
+            if (!singleID) _componentInterface?.onSelect(false, button2DID[0], button2DID[1]);
             selectOverlay.SetActive(false);
             selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(0.5f, 0.5f, 0.5f));
         }
         else if (curState == manipState.selected)
         {
-            if (!singleID) _componentInterface.onSelect(true, button2DID[0], button2DID[1]);
+            if (!singleID) _componentInterface?.onSelect(true, button2DID[0], button2DID[1]);
             selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(0.7f, 0.7f, 0.7f));
             selectOverlay.SetActive(true);
         }
         else if (curState == manipState.grabbed)
         {
             selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(1f, 1f, 1f));
-            if (!singleID) _componentInterface.onSelect(true, button2DID[0], button2DID[1]);
+            if (!singleID) _componentInterface?.onSelect(true, button2DID[0], button2DID[1]);
             if (isToggle)
             {
                 toggled = !toggled;

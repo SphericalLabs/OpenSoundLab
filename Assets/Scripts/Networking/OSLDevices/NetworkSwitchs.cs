@@ -24,7 +24,7 @@ public class NetworkSwitchs : NetworkBehaviour
         for (int i = 0; i < switchs.Length; i++)
         {
             int index = i;
-            switchs[i].onSwitchChangedEvent.AddListener(delegate { UpldateSwitchValue(index); });
+            switchs[i].onSwitchChangedEvent.AddListener(delegate { UpdateSwitchValue(index); });
         }
     }
 
@@ -61,7 +61,7 @@ public class NetworkSwitchs : NetworkBehaviour
         }
     }
 
-    public void UpldateSwitchValue(int index)
+    public void UpdateSwitchValue(int index)
     {
         Debug.Log($"Update button hit of index: {index} to value: {switchs[index].switchVal}");
         if (isServer)

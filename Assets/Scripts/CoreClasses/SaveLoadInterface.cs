@@ -212,9 +212,9 @@ public class SaveLoadInterface : MonoBehaviour
             }
 
             // set volume to zero to avoid surprisingly loud sounds
-            if (device is samplerDeviceInterface)
+            if (device is samplerTwoDeviceInterface)
             {
-                samplerDeviceInterface sampler = (samplerDeviceInterface)device;
+                samplerTwoDeviceInterface sampler = (samplerTwoDeviceInterface)device;
                 sampler.volumeDial.setPercent(0f);
             }
 
@@ -278,7 +278,8 @@ public class SaveLoadInterface : MonoBehaviour
 
 [XmlInclude(typeof(LooperData))]
 [XmlInclude(typeof(RecorderData))]
-[XmlInclude(typeof(SamplerData))]
+[XmlInclude(typeof(SamplerTwoData))]
+[XmlInclude(typeof(SamplerOneData))]
 [XmlInclude(typeof(KeyboardData))]
 [XmlInclude(typeof(SequencerData))] // update?
 [XmlInclude(typeof(XyloRollData))]

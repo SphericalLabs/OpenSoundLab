@@ -120,7 +120,7 @@ public class dial : manipObject
 
     void Update()
     {
-
+    
         if (percent != defaultPercent)
         {
             if (selectObj != null && selectObj.GetComponent<manipulator>() != null)
@@ -175,10 +175,13 @@ public class dial : manipObject
             dialFeedback.PercentUpdate();
         }
 
+        updatePercent();
+
         if (invokeEvent)
         {
             onPercentChangedEvent.Invoke();
         }
+
     }
 
     dialColor newDialColor;
