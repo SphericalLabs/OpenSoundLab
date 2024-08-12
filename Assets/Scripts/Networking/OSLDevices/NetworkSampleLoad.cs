@@ -61,7 +61,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //create tape
                 if (newValue.Length > 0)
                 {
-                    sampleLoaders[index].SetSample(GetFileName(newValue), CorrectPathSeparators(newValue));
+                    sampleLoaders[index].SetSample(samplerLoad.GetFileName(newValue), samplerLoad.CorrectPathSeparators(newValue));
                 }
                 break;
             case SyncList<string>.Operation.OP_INSERT:
@@ -72,7 +72,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //create tape
                 if (newValue.Length > 0)
                 {
-                    sampleLoaders[index].SetSample(GetFileName(newValue), CorrectPathSeparators(newValue));
+                    sampleLoaders[index].SetSample(samplerLoad.GetFileName(newValue), samplerLoad.CorrectPathSeparators(newValue));
                 }
                 else if (newValue.Length <= 0 && sampleLoaders[index].hasTape())
                 {
@@ -132,36 +132,13 @@ public class NetworkSampleLoad : NetworkBehaviour
             if (samplePaths[index].Length > 0 && !sampleLoaders[index].hasTape())
             {
                 Debug.Log("Set tape on host");
-                sampleLoaders[index].SetSample(GetFileName(path), CorrectPathSeparators(path));
+                sampleLoaders[index].SetSample(samplerLoad.GetFileName(path), samplerLoad.CorrectPathSeparators(path));
             }
             else if(samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
             {
                 Debug.Log("Remove tape on host");
                 sampleLoaders[index].ForceEject();
             }
-        }
-    }
-
-    string GetFileName(string path)
-    {
-        string fileName = Path.GetFileNameWithoutExtension(CorrectPathSeparators(path));
-
-        Debug.Log($"Filename {fileName}");
-        return fileName;
-    }
-
-
-    static string CorrectPathSeparators(string path)
-    {
-        if (Path.DirectorySeparatorChar == '\\')
-        {
-            // Windows-Umgebung: Korrigiere alle / zu \
-            return path.Replace('/', '\\');
-        }
-        else
-        {
-            // Unix-Umgebung (Linux, macOS): Korrigiere alle \ zu /
-            return path.Replace('\\', '/');
         }
     }
 }

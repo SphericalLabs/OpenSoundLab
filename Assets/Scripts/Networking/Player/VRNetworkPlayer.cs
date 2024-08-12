@@ -18,6 +18,7 @@ public class ManipulatorVisual
 
 public class VRNetworkPlayer : NetworkBehaviour
 {
+
     [SerializeField] private Transform networkHead;
     [SerializeField] private Transform networkLeftHand;
     [SerializeField] private Transform networkRightHand;
@@ -45,6 +46,11 @@ public class VRNetworkPlayer : NetworkBehaviour
     private bool moveVoiceChatObject = false;
     private NetworkAudioManager networkAudioManager;
     private Transform voiceOverTransform;
+
+    [Header("Network Tape")]
+    public NetworkPlayerTape leftHandNetworkTape;
+    public NetworkPlayerTape rightHandNetworkTape;
+
 
     public override void OnStartLocalPlayer()
     {
@@ -240,6 +246,19 @@ public class VRNetworkPlayer : NetworkBehaviour
         {
             rightManipulatorVisual.Toggle(rightHandManipulatorTriggerd);
         }
+    }
+
+    public NetworkPlayerTape GetTargetTape(manipulator manipulator)
+    {
+        if (manipulator == leftHandManipulator)
+        {
+            return leftHandNetworkTape;
+        }
+        else if (manipulator == rightHandManipulator)
+        {
+            return rightHandNetworkTape;
+        }
+        return null;
     }
     #endregion
 

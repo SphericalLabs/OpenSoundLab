@@ -60,9 +60,14 @@ public class tape : manipObject
     Color tapeColor;
     float tapeHue;
 
+    private NetworkPlayerTape targetNetworkPlayerTape;
+    public NetworkPlayerTape TargetNetworkPlayerTape { get => targetNetworkPlayerTape; set => targetNetworkPlayerTape = value; }
+
     public override void Awake()
     {
         base.Awake();
+        onStartGrabEvents.AddListener(AddPathToHand);
+        onEndGrabEvents.AddListener(RemovePathFromHand);
         gameObject.layer = 13;
         tapeTrans = transform.GetChild(0);
         tapeRend = tapeTrans.GetComponent<Renderer>();
@@ -411,6 +416,7 @@ public class tape : manipObject
     }
 
     GameObject loaderObject;
+
     public override void setState(manipState state)
     {
         if (curState == state) return;
@@ -453,6 +459,29 @@ public class tape : manipObject
             flashEmptySamplers(true);
             if (insertCoroutine != null) StopCoroutine(insertCoroutine);
             transform.parent = manipulatorObj.parent;
+        }
+    }
+
+    void AddPathToHand()
+    {
+        var targetHand = NetworkMenuManager.Instance.localPlayer.GetTargetTape(manipulatorObjScript);
+        if (targetHand != null)
+        {
+            if (targetNetworkPlayerTape != null)
+            {
+                targetNetworkPlayerTape.SetHandSamplePath("");
+            }
+            targetHand.SetHandSamplePath(filename);
+            targetNetworkPlayerTape = targetHand;
+        }
+    }
+
+    void RemovePathFromHand()
+    {
+        if (targetNetworkPlayerTape != null)
+        {
+            targetNetworkPlayerTape.SetHandSamplePath("");
+            targetNetworkPlayerTape = null;
         }
     }
 }

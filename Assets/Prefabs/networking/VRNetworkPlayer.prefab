@@ -247,6 +247,8 @@ GameObject:
   - component: {fileID: 4908395559846709010}
   - component: {fileID: 1510976570374858184}
   - component: {fileID: 505047812653858655}
+  - component: {fileID: 5866239218379377556}
+  - component: {fileID: 3996458545342474352}
   m_Layer: 0
   m_Name: VRNetworkPlayer
   m_TagString: Untagged
@@ -316,6 +318,8 @@ MonoBehaviour:
     activeObject: {fileID: 9062764200818393773}
     inactiveObject: {fileID: 8541192930144982400}
   voiceChatAgentID: 0
+  leftHandNetworkTape: {fileID: 5866239218379377556}
+  rightHandNetworkTape: {fileID: 3996458545342474352}
 --- !u!114 &1413370926042801999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -529,6 +533,42 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5866239218379377556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3626907635682275815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40a4ebc32387f41d4b7f457eaaa59344, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  handParent: {fileID: 6051239364163249757}
+  inHandSamplePath: 
+  tapePrefab: {fileID: 108974, guid: 93676c6f923e2384b9054bd801ae500b, type: 3}
+--- !u!114 &3996458545342474352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3626907635682275815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40a4ebc32387f41d4b7f457eaaa59344, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  handParent: {fileID: 379357248535145770}
+  inHandSamplePath: 
+  tapePrefab: {fileID: 108974, guid: 93676c6f923e2384b9054bd801ae500b, type: 3}
 --- !u!1 &3834834239668693041
 GameObject:
   m_ObjectHideFlags: 0
