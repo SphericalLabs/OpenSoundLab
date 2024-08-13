@@ -31,6 +31,10 @@ public class NetworkDials : NetworkBehaviour
         {
             int index = i;
             dials[i].onPercentChangedEvent.AddListener(delegate { UpdateDialValue(index); });
+            if (dials[i].DialFeedback == null)
+            {
+                dials[i].DialFeedback = dials[i].transform.parent.Find("glowDisk").GetComponent<glowDisk>();
+            }
         }
     }
 

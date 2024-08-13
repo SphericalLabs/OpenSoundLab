@@ -19,9 +19,13 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     public GameObject tapePrefab;
 
-    private void Start()
+    public override void OnStartClient()
     {
-        
+        base.OnStartClient();
+        if (!isServer && inHandSamplePath.Length > 0)
+        {
+            SetSamplePath(offset, rotationOffset);
+        }
     }
 
     public void OnSetHandSamplePath(string old, string newString)
@@ -47,7 +51,7 @@ public class NetworkPlayerTape : NetworkBehaviour
         if (tapeInHand != null && !isLocalPlayer)
         {
             tapeInHand.transform.localRotation = newValue;
-            tapeInHand.transform.Rotate(-90, 0, 0, Space.Self);
+            //tapeInHand.transform.Rotate(-90, 0, 0, Space.Self);
         }
     }
 
@@ -76,16 +80,21 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     private void SetSamplePath(Vector3 position, Quaternion rotation)
     {
-        if (isLocalPlayer)
-        {
-            return;
-        }
         if (tapeInHand != null)
         {
             //destroy current tape
-            Destroy(tapeInHand.gameObject);
+            if (isLocalPlayer)
+            {
+                tapeInHand.setGrab(false, null);
+                Debug.Log($"release grabed tape of {handParent}");
+            }
+            if (!isLocalPlayer)
+            {
+                Destroy(tapeInHand.gameObject);
+                Debug.Log($"Destroy grabed tape of {handParent}");
+            }
         }
-        if (inHandSamplePath.Length > 0)
+        if (!isLocalPlayer && inHandSamplePath.Length > 0)
         {
             //create new instance
 
@@ -95,8 +104,10 @@ public class NetworkPlayerTape : NetworkBehaviour
                 return;
             }
 
+            Debug.Log($"Change sample path of {handParent} to {inHandSamplePath}");
+
             GameObject g = Instantiate(tapePrefab, position, rotation, handParent.transform);
-            g.transform.Rotate(-90, 0, 0, Space.Self);
+            //g.transform.Rotate(-90, 0, 0, Space.Self);
             tapeInHand = g.GetComponent<tape>();
             tapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
             tapeInHand.TargetNetworkPlayerTape = this;
