@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class NetworkMasterControll : NetworkSyncListener
+public class NetworkMasterControl : NetworkSyncListener
 {
     #region Mirror
 
