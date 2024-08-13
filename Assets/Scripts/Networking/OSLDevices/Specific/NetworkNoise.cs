@@ -7,6 +7,9 @@ using Mirror;
 public class NetworkNoise : NetworkSyncListener
 {
     private NoiseSignalGenerator noiseSignalGenerator;
+    [SyncVar]//(hook = nameof(OnUpdateSeed))] 
+    private int syncSeed = 0; // select a specific noise pattern
+    //private bool initialSeedSet = false;
     protected virtual void Awake()
     {
         noiseSignalGenerator = GetComponent<NoiseSignalGenerator>();
@@ -14,9 +17,7 @@ public class NetworkNoise : NetworkSyncListener
         rateDial.onPercentChangedEvent.AddListener(OnDragDial);
         rateDial.onEndGrabEvents.AddListener(OnStopDragDial);
     }
-    [SyncVar]//(hook = nameof(OnUpdateSeed))] 
-    private int syncSeed = 0; // select a specific noise pattern
-    //private bool initialSeedSet = false;
+
 
     #region Mirror
     public override void OnStartServer()
