@@ -18,6 +18,8 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     public GameObject tapePrefab;
 
+    public tape TapeInHand { get => tapeInHand; set => tapeInHand = value; }
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -120,7 +122,7 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     public void PassToOtherHand()
     {
-        Debug.Log($"{gameObject.name} passed to other hand:");
+        Debug.Log($"{gameObject.name} passed to other hand");
         if (isServer)
         {
             inHandSamplePath = "";
