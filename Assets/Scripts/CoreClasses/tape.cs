@@ -476,6 +476,7 @@ public class tape : manipObject
             }
             targetHand.SetHandSamplePath(filename, transform.localPosition, transform.localRotation);
             targetNetworkPlayerTape = targetHand;
+            targetNetworkPlayerTape.TapeInHand = this;
         }
     }
 
