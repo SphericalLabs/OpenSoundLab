@@ -214,7 +214,11 @@ public class sampleManager : MonoBehaviour
         {
             //Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
             //copy tgz to directory where we can extract it
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+            WWW www = new WWW("file://" + Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+#else
             WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+#endif
             while (!www.isDone) { }
             System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
             //extract it

@@ -483,7 +483,8 @@ public class tape : manipObject
     void RemovePathFromHand()
     {
         if (targetNetworkPlayerTape != null)
-        {
+
+            targetNetworkPlayerTape.TapeInHand = null;
             targetNetworkPlayerTape.SetHandSamplePath("", Vector3.zero, Quaternion.identity);
             targetNetworkPlayerTape = null;
         }
