@@ -471,7 +471,8 @@ public class tape : manipObject
         {
             if (targetNetworkPlayerTape != null)
             {
-                targetNetworkPlayerTape.PassToOtherPlayer();
+                targetNetworkPlayerTape.PassToOtherHand();
+                targetNetworkPlayerTape = null;
             }
             targetHand.SetHandSamplePath(filename, transform.localPosition, transform.localRotation);
             targetNetworkPlayerTape = targetHand;

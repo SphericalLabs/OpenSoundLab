@@ -118,9 +118,9 @@ public class NetworkPlayerTape : NetworkBehaviour
 
 
 
-    public void PassToOtherPlayer()
+    public void PassToOtherHand()
     {
-        Debug.Log($"{gameObject.name} passed to other player: {inHandSamplePath}");
+        Debug.Log($"{gameObject.name} passed to other hand:");
         if (isServer)
         {
             inHandSamplePath = "";
