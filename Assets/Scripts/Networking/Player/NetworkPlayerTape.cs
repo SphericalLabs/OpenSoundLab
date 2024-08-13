@@ -107,6 +107,7 @@ public class NetworkPlayerTape : NetworkBehaviour
             networkedTapeInHand = g.GetComponent<tape>();
             networkedTapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
             networkedTapeInHand.TargetNetworkPlayerTape = this;
+            networkedTapeInHand.masterObj = null;
         }
     }
 
@@ -148,7 +149,7 @@ public class NetworkPlayerTape : NetworkBehaviour
         Debug.Log($"RPC {gameObject.name} delet grabed object");
         if (tapeInHand != null)
         {
-            tapeInHand.setGrab(false, handParent.transform);
+            //tapeInHand.setGrab(false, handParent.transform);
             Destroy(tapeInHand.gameObject);
         }
     }
