@@ -50,7 +50,6 @@ public class NetworkPlayerTape : NetworkBehaviour
         if (tapeInHand != null && !isLocalPlayer)
         {
             tapeInHand.transform.localRotation = newValue;
-            //tapeInHand.transform.Rotate(-90, 0, 0, Space.Self);
         }
     }
 
@@ -111,10 +110,36 @@ public class NetworkPlayerTape : NetworkBehaviour
             GameObject g = Instantiate(tapePrefab, handParent.transform);
             g.transform.localPosition = position;
             g.transform.localRotation = rotation;
-            //g.transform.Rotate(-90, 0, 0, Space.Self);
             tapeInHand = g.GetComponent<tape>();
             tapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
             tapeInHand.TargetNetworkPlayerTape = this;
+        }
+    }
+
+
+
+    public void PassToOtherPlayer()
+    {
+        Debug.Log($"{gameObject.name} passed to other player: {inHandSamplePath}");
+        if (isServer)
+        {
+            inHandSamplePath = "";
+            tapeInHand = null;
+        }
+        else
+        {
+            tapeInHand = null;
+            CmdPassToOtherPlayer();
+        }
+    }
+
+    [Command]
+    public void CmdPassToOtherPlayer()
+    {
+        inHandSamplePath = "";
+        if (tapeInHand != null)
+        {
+            Destroy(tapeInHand.gameObject);
         }
     }
 }

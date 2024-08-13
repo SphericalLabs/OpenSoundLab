@@ -110,7 +110,7 @@ public class NetworkSampleLoad : NetworkBehaviour
     {
         if (index >= 0 && index < sampleLoaders.Length)
         {
-            Debug.Log($"Tape of index {index} got removed");
+            //Debug.Log($"Tape of index {index} got removed");
             if (isServer)
             {
                 samplePaths[index] = "";
@@ -135,12 +135,12 @@ public class NetworkSampleLoad : NetworkBehaviour
             samplePaths[index] = path;
             if (samplePaths[index].Length > 0 && !sampleLoaders[index].hasTape())
             {
-                Debug.Log("Set tape on host");
+                //Debug.Log("Set tape on host");
                 sampleLoaders[index].SetSample(sampleManager.GetFileName(path), sampleManager.CorrectPathSeparators(path));
             }
             else if(samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
             {
-                Debug.Log("Remove tape on host");
+                //Debug.Log("Remove tape on host");
                 sampleLoaders[index].ForceEject(false);
             }
         }
