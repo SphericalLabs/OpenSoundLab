@@ -199,6 +199,7 @@ public class tape : manipObject
     manipulator tempM;
     void OnCollisionEnter(Collision coll)
     {
+        Debug.Log("tape collision enter");
         if (curState != manipState.grabbed) return;
         if (coll.transform.name != "tapeInsert") return;
         if (manipulatorObjScript != null)
@@ -213,6 +214,7 @@ public class tape : manipObject
         }
 
         deck = coll.transform;
+        Debug.Log("tape set deck by collision enter");
 
         tapeTrans.position = deck.transform.position;
         tapeTrans.rotation = deck.transform.rotation;

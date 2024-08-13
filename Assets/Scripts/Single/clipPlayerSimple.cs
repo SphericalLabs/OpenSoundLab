@@ -76,22 +76,12 @@ public class clipPlayerSimple : clipPlayer
     }
 
 
-    public int consolidatedSampleLength = -1; // sample length regardless of channel count
-    public void updateSampleBounds(){
-        if (!loaded) return;
-
-        // todo: only calc on sample load?
-        // otherwise NaN errors at times
-        consolidatedSampleLength = (int)(clipSamples.Length / clipChannels - 1);
-
-        sampleBounds[0] = (int)(consolidatedSampleLength * sampleStart) + 1;
-        sampleBounds[0] = Mathf.Clamp(sampleBounds[0], 1, consolidatedSampleLength); 
-    }
 
     public void Play()
     {
         lock (lockObject)
         {
+            updateSampleBounds(startGen != null ? startBuffer[0] : 0f);
             floatingBufferCount = _lastBuffer = sampleBounds[0] + 1; // WARNING: Due to the code structure in the native ClipSignalGenerator function resetting to 0 (instead of 0 + 1) would mean that playback does not work anymore for speeds lower than 1f. It would always floor() to 0 and would not move through the file anymore.
             active = true;
         }
@@ -105,6 +95,20 @@ public class clipPlayerSimple : clipPlayer
     public void Stop()
     {
         active = false;
+    }
+
+
+    public int consolidatedSampleLength = -1; // sample length regardless of channel count
+    public void updateSampleBounds(float externalStartOffset = 0f)
+    {
+        if (!loaded) return;
+
+        // todo: only calc on sample load?
+        // otherwise NaN errors at times
+        consolidatedSampleLength = (int)(clipSamples.Length / clipChannels - 1);
+
+        sampleBounds[0] = (int)(consolidatedSampleLength * (sampleStart + externalStartOffset) + 1);
+        sampleBounds[0] = Mathf.Clamp(sampleBounds[0], 1, consolidatedSampleLength); // don't start from sample 0 because of native implementation
     }
 
     float lastTriggValue = 0f;
@@ -143,14 +147,15 @@ public class clipPlayerSimple : clipPlayer
             if (seqGen != null)
             {
                 // Detect presence of at least one trigger pulse
-                // Port to NATIVE at some point
+                // Port to NATIVE at some point, since trigger signal is also being scanned there already
                 for (int n = 0; n < buffer.Length; n += channels) // left only
                 {
                     if (trigBuffer[n] > 0f && lastTriggValue <= 0f)
                     {
                         devInterface.flashTriggerButton(); // was activated by trigger signal
-                        lastTriggValue = trigBuffer[n];
-                        // read in current sample in startGen
+                        lastTriggValue = trigBuffer[n]; // read in current sample in startGen
+
+                        updateSampleBounds(startGen != null ? startBuffer[n] : 0f); // sample and hold the current start dial and start signal value
 
                         break;
                     }

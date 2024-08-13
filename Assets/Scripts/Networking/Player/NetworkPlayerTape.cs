@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
-using Samples;
 using System.IO;
 using UnityEngine;
 
@@ -19,14 +18,18 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     public GameObject tapePrefab;
 
-    private void Start()
+    public override void OnStartClient()
     {
-        
+        base.OnStartClient();
+        if (!isServer && inHandSamplePath.Length > 0)
+        {
+            SetSamplePath(offset, rotationOffset);
+        }
     }
 
     public void OnSetHandSamplePath(string old, string newString)
     {
-        if (old != newString)
+        if (old != newString && !isServer)
         {
             Debug.Log($"{gameObject.name} On Set hand tape: {newString}");
 
@@ -47,7 +50,7 @@ public class NetworkPlayerTape : NetworkBehaviour
         if (tapeInHand != null && !isLocalPlayer)
         {
             tapeInHand.transform.localRotation = newValue;
-            tapeInHand.transform.Rotate(-90, 0, 0, Space.Self);
+            //tapeInHand.transform.Rotate(-90, 0, 0, Space.Self);
         }
     }
 
@@ -60,6 +63,7 @@ public class NetworkPlayerTape : NetworkBehaviour
             offset = position;
             rotationOffset = rotation;
             inHandSamplePath = path;
+            SetSamplePath(position, rotation);
         }
         else
         {
@@ -71,32 +75,41 @@ public class NetworkPlayerTape : NetworkBehaviour
     public void CmdUpdateSamplePath(string path, Vector3 position, Quaternion rotation)
     {
         inHandSamplePath = path;
+        rotationOffset = rotation;
+        inHandSamplePath = path;
         SetSamplePath(position, rotation);
     }
 
     private void SetSamplePath(Vector3 position, Quaternion rotation)
     {
-        if (isLocalPlayer)
-        {
-            return;
-        }
         if (tapeInHand != null)
         {
             //destroy current tape
-            Destroy(tapeInHand.gameObject);
+            if (isLocalPlayer)
+            {
+                tapeInHand.setGrab(false, null);
+                Debug.Log($"release grabed tape of {handParent}");
+            }
+            if (!isLocalPlayer)
+            {
+                Destroy(tapeInHand.gameObject);
+                Debug.Log($"Destroy grabed tape of {handParent}");
+            }
         }
-        if (inHandSamplePath.Length > 0)
+        if (!isLocalPlayer && inHandSamplePath.Length > 0)
         {
             //create new instance
 
             if (!File.Exists(sampleManager.instance.parseFilename(sampleManager.CorrectPathSeparators(inHandSamplePath))))
             {
-                Debug.Log("File does't exist");
+                Debug.Log("File doesn't exist");
                 return;
             }
 
+            Debug.Log($"Change sample path of {handParent} to {inHandSamplePath}, {position}, {rotation}");
+
             GameObject g = Instantiate(tapePrefab, position, rotation, handParent.transform);
-            g.transform.Rotate(-90, 0, 0, Space.Self);
+            //g.transform.Rotate(-90, 0, 0, Space.Self);
             tapeInHand = g.GetComponent<tape>();
             tapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
             tapeInHand.TargetNetworkPlayerTape = this;
