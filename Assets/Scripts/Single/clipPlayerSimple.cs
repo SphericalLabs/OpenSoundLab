@@ -84,7 +84,6 @@ public class clipPlayerSimple : clipPlayer
             updateSampleBounds(startGen != null ? startBuffer[0] : 0f);
             floatingBufferCount = _lastBuffer = sampleBounds[0] + 1; // WARNING: Due to the code structure in the native ClipSignalGenerator function resetting to 0 (instead of 0 + 1) would mean that playback does not work anymore for speeds lower than 1f. It would always floor() to 0 and would not move through the file anymore.
             active = true;
-            //needsExternalStartOffsetUpdate = true;
         }
     }
 
@@ -112,7 +111,6 @@ public class clipPlayerSimple : clipPlayer
         sampleBounds[0] = Mathf.Clamp(sampleBounds[0], 1, consolidatedSampleLength); // don't start from sample 0 because of native implementation
     }
 
-    bool needsExternalStartOffsetUpdate = false;
     float lastTriggValue = 0f;
 
     private readonly object lockObject = new object(); // Lock object
@@ -146,20 +144,12 @@ public class clipPlayerSimple : clipPlayer
             if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
             if (startGen != null) startGen.processBuffer(startBuffer, dspTime, channels);
 
-            if (needsExternalStartOffsetUpdate)
-            {
-                updateSampleBounds(startGen != null ? startBuffer[0] : 0f);
-                needsExternalStartOffsetUpdate = false;
-            }
-
             if (seqGen != null)
             {
                 // Detect presence of at least one trigger pulse
                 // Port to NATIVE at some point, since trigger signal is also being scanned there already
                 for (int n = 0; n < buffer.Length; n += channels) // left only
                 {
-                    
-
                     if (trigBuffer[n] > 0f && lastTriggValue <= 0f)
                     {
                         devInterface.flashTriggerButton(); // was activated by trigger signal
