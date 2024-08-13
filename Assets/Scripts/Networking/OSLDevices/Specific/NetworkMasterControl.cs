@@ -27,6 +27,19 @@ public class NetworkMasterControl : NetworkSyncListener
 
     private void OnPitchBendChange(float pitchChangeMultiplier)
     {
+        if (isClient)
+        {
+            CmdChangePitchBend(pitchChangeMultiplier);
+        }
+        else
+        {
+            pitchBendMult = pitchChangeMultiplier;
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    private void CmdChangePitchBend(float pitchChangeMultiplier)
+    {
         pitchBendMult = pitchChangeMultiplier;
     }
 
