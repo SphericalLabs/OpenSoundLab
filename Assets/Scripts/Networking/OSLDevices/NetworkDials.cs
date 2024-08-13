@@ -12,6 +12,7 @@ public class NetworkDials : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
+        dialValues.Clear();
         foreach (var dial in dials)
         {
             dialValues.Add(dial.percent);

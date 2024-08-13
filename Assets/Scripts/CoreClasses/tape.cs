@@ -471,11 +471,10 @@ public class tape : manipObject
         {
             if (targetNetworkPlayerTape != null)
             {
-                targetNetworkPlayerTape.SetHandSamplePath("", Vector3.zero, Quaternion.identity);
+                targetNetworkPlayerTape.PassToOtherPlayer();
             }
             targetHand.SetHandSamplePath(filename, transform.localPosition, transform.localRotation);
             targetNetworkPlayerTape = targetHand;
-            //todo set netoffset to hand
         }
     }
 
@@ -483,7 +482,7 @@ public class tape : manipObject
     {
         if (targetNetworkPlayerTape != null)
         {
-            targetNetworkPlayerTape.SetHandSamplePath("", transform.localPosition, transform.localRotation);
+            targetNetworkPlayerTape.SetHandSamplePath("", Vector3.zero, Quaternion.identity);
             targetNetworkPlayerTape = null;
         }
     }

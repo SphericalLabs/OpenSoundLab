@@ -116,17 +116,17 @@ public class samplerLoad : MonoBehaviour
         }
     }
 
-    public void ForceEject()
+    public void ForceEject(bool updateEvent = true)
     {
         if (currentTape != null)
         {
             tape temp = currentTape;
-            UnloadTape(currentTape);
+            UnloadTape(currentTape, updateEvent);
             temp.Eject();
         }
     }
 
-    public void UnloadTape(tape t)
+    public void UnloadTape(tape t, bool updateEvent = true)
     {
 
         if (currentTape == t)
@@ -147,7 +147,10 @@ public class samplerLoad : MonoBehaviour
             }
             for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
 
-            onUnloadTapeEvents.Invoke();
+            if (updateEvent)
+            {
+                onUnloadTapeEvents.Invoke();
+            }
         }
     }
 

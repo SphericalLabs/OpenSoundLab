@@ -2920,6 +2920,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 725303546}
   m_CullTransparentMesh: 1
+--- !u!114 &768504438 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114813368893283652, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+    type: 3}
+  m_PrefabInstance: {fileID: 281112781}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5a82850a82f06b40b597c71022e3d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &772032714 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1000010306020102, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
@@ -3015,6 +3027,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1662621621}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &810218095 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114854839125756656, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+    type: 3}
+  m_PrefabInstance: {fileID: 281112781}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5a82850a82f06b40b597c71022e3d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &836287542
 GameObject:
   m_ObjectHideFlags: 0
@@ -4397,6 +4421,21 @@ PrefabInstance:
       propertyPath: dials.Array.data[0]
       value: 
       objectReference: {fileID: 907586436}
+    - target: {fileID: 3524698432790368088, guid: 0990778168ef9b141b6bf37952c428dc,
+        type: 3}
+      propertyPath: metronome
+      value: 
+      objectReference: {fileID: 1474746739}
+    - target: {fileID: 3524698432790368088, guid: 0990778168ef9b141b6bf37952c428dc,
+        type: 3}
+      propertyPath: startButton
+      value: 
+      objectReference: {fileID: 810218095}
+    - target: {fileID: 3524698432790368088, guid: 0990778168ef9b141b6bf37952c428dc,
+        type: 3}
+      propertyPath: rewindButton
+      value: 
+      objectReference: {fileID: 768504438}
     - target: {fileID: 5292165043200577462, guid: 0990778168ef9b141b6bf37952c428dc,
         type: 3}
       propertyPath: m_LocalPosition.x
