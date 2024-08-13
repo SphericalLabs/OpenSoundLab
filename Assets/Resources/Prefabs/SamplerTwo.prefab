@@ -2287,7 +2287,7 @@ GameObject:
   - component: {fileID: 6194594958333949117}
   - component: {fileID: 8074698319918447103}
   - component: {fileID: 1819017619217752750}
-  - component: {fileID: 763458687017728593}
+  - component: {fileID: 4055278910093383645}
   m_Layer: 9
   m_Name: SamplerTwo
   m_TagString: instrument
@@ -2643,7 +2643,7 @@ MonoBehaviour:
   syncInterval: 0
   sampleLoaders:
   - {fileID: 11402188}
---- !u!114 &763458687017728593
+--- !u!114 &4055278910093383645
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2652,7 +2652,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 191382}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58ca9f7f48a38f044b55147e457ee9ce, type: 3}
+  m_Script: {fileID: 11500000, guid: f5995024f15861841a6392b76471532c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncDirection: 0

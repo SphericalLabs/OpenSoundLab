@@ -42,7 +42,9 @@ public class metronome : componentInterface {
   float minBpm = 60f;
   float maxBpm = 180f;
   float pitchBendMult = 1f;
-
+    public float PitchBendMult { get => pitchBendMult; set => pitchBendMult = value; }
+    public delegate void PitchBendChangeHandler(float pitchBendMult);
+    public event PitchBendChangeHandler PitchBendChange;
   float bpmpercent = .1f;
 
   float volumepercent = 0;
@@ -77,10 +79,10 @@ public class metronome : componentInterface {
     if (ID == 0) masterControl.instance.toggleBeatUpdate(on);
     if (ID == 1 && on) masterControl.instance.resetClock();
 
-    if (ID == 3 && on) pitchBendMult = 1 / 1.03f;
-    if (ID == 3 && !on) pitchBendMult = 1;
-    if (ID == 4 && on) pitchBendMult = 1 * 1.03f;
-    if (ID == 4 && !on) pitchBendMult = 1;
+    if (ID == 3 && on) pitchBendMult = 1 / 1.03f; PitchBendChange?.Invoke(pitchBendMult);
+    if (ID == 3 && !on) pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult);
+    if (ID == 4 && on) pitchBendMult = 1 * 1.03f; PitchBendChange?.Invoke(pitchBendMult);
+    if (ID == 4 && !on) pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult);
 
     if (ID == 5) masterControl.instance.recorder.ToggleRec(on);
 
@@ -103,7 +105,10 @@ public class metronome : componentInterface {
     }
 
     bool rodDir = false;
-  void Update() {
+
+
+
+    void Update() {
     float cyc = Mathf.Repeat(masterControl.instance.curCycle * 4, 1);
 
     if (cyc < 0.5f) {
@@ -131,7 +136,7 @@ public class metronome : componentInterface {
     broadcastBpm();
   }
 
-  void broadcastBpm(){
+  public void broadcastBpm(){
     bpm = Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm) * pitchBendMult;
     masterControl.instance.setBPM(bpm);
     txt.text = bpm.ToString("N1");

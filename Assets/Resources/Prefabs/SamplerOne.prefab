@@ -1162,7 +1162,12 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  omniJacks: []
+  omniJacks:
+  - {fileID: 114000014109223676}
+  - {fileID: 8257217584120589837}
+  - {fileID: 4967467073500810606}
+  - {fileID: 6334415476069173831}
+  - {fileID: 1155618421894485141}
 --- !u!114 &4649485958610890963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1178,7 +1183,10 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  dials: []
+  dials:
+  - {fileID: 2728118564238663338}
+  - {fileID: 2694766225831041881}
+  - {fileID: 3011428839241171724}
 --- !u!114 &5785162210332949624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1211,7 +1219,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  buttons: []
+  buttons:
+  - {fileID: 114000010075456048}
 --- !u!1 &136175904401794717
 GameObject:
   m_ObjectHideFlags: 0

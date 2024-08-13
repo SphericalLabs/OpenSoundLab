@@ -5,6 +5,43 @@ using Mirror;
 
 public class NetworkMasterControl : NetworkSyncListener
 {
+    [SerializeField] private metronome metronome;
+    [SerializeField] private button startButton;
+    [SerializeField] private button rewindButton;
+    [SyncVar(hook = nameof(BroadcastBpm))]
+    private float pitchBendMult = 1f;
+
+    private void Start()
+    {
+        metronome.PitchBendChange += OnPitchBendChange;
+        startButton.onStartGrabEvents.AddListener(OnButtonPress);
+        rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
+    }
+
+    private void OnDestroy()
+    {
+        metronome.PitchBendChange -= OnPitchBendChange;
+        startButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
+        rewindButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
+    }
+
+    private void OnPitchBendChange(float pitchChangeMultiplier)
+    {
+        pitchBendMult = pitchChangeMultiplier;
+    }
+
+    private void BroadcastBpm(float oldPitchBend, float newPitchBend)
+    {
+        Debug.Log("Changed BPM to " + newPitchBend);
+        metronome.broadcastBpm();
+    }
+
+    private void OnButtonPress()
+    {
+        NetworkSyncEventManager.Instance.UpdateSync();
+    }
+
+
     #region Mirror
 
     public override void OnStartClient()
@@ -19,7 +56,8 @@ public class NetworkMasterControl : NetworkSyncListener
     {
         if (isServer)
         {
-            RpcUpdateMeasurePhase(masterControl.instance.MeasurePhase);
+            RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+            pitchBendMult = metronome.PitchBendMult;
         }
         else
         {
@@ -32,7 +70,8 @@ public class NetworkMasterControl : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateMeasurePhase(masterControl.instance.MeasurePhase);
+            RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+            pitchBendMult = metronome.PitchBendMult;
         }
     }
 
@@ -41,11 +80,11 @@ public class NetworkMasterControl : NetworkSyncListener
     {
         Debug.Log($"{gameObject.name} CmdRequestSync");
 
-        RpcUpdateMeasurePhase(masterControl.instance.MeasurePhase);
+        RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
     }
 
     [ClientRpc]
-    protected virtual void RpcUpdateMeasurePhase(double measurePhase)
+    protected virtual void RpcUpdate_measurePhase(double measurePhase)
     {
         if (isClient && !isServer)
         {

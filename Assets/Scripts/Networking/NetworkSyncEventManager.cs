@@ -59,6 +59,7 @@ public class NetworkSyncEventManager : MonoBehaviour
 
     public void UpdateSync()
     {
+        Debug.Log("Update Sync");
         OsSyncEvent?.Invoke();
     }
 

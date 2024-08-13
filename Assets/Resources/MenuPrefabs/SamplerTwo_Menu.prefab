@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 191382, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
       propertyPath: m_Name
-      value: Sampler_Menu
+      value: SamplerTwo_Menu
       objectReference: {fileID: 0}
     - target: {fileID: 410468, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
       propertyPath: m_LocalPosition.x
@@ -419,6 +419,7 @@ PrefabInstance:
     - {fileID: 501391337376685834, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
     - {fileID: 1819017619217752750, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
     - {fileID: 763458687017728593, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
+    - {fileID: 4055278910093383645, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
     m_RemovedGameObjects:
     - {fileID: 8671643866985806808, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
     - {fileID: 1652390098252912, guid: a4dc39fdade1986459f70bf3c6c44354, type: 3}
