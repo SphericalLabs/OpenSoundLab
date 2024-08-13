@@ -33,6 +33,7 @@ public class NetworkMasterControl : NetworkSyncListener
     private void BroadcastBpm(float oldPitchBend, float newPitchBend)
     {
         Debug.Log("Changed BPM to " + newPitchBend);
+        metronome.PitchBendMult = newPitchBend;
         metronome.broadcastBpm();
     }
 
