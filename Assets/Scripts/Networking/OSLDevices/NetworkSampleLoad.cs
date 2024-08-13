@@ -72,11 +72,15 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //create tape
                 if (newValue.Length > 0)
                 {
+                    if (sampleLoaders[index].hasTape() && sampleManager.CorrectPathSeparators(sampleLoaders[index].CurFile) == sampleManager.CorrectPathSeparators(newValue))
+                    {
+                        return;
+                    }
                     sampleLoaders[index].SetSample(sampleManager.GetFileName(newValue), sampleManager.CorrectPathSeparators(newValue));
                 }
                 else if (newValue.Length <= 0 && sampleLoaders[index].hasTape())
                 {
-                    sampleLoaders[index].ForceEject();
+                    sampleLoaders[index].ForceEject(false);
                 }
                 break;
             case SyncList<string>.Operation.OP_CLEAR:
@@ -112,7 +116,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 samplePaths[index] = "";
                 if (sampleLoaders[index].hasTape())
                 {
-                    sampleLoaders[index].ForceEject();
+                    sampleLoaders[index].ForceEject(false);
                 }
             }
             else
@@ -137,7 +141,7 @@ public class NetworkSampleLoad : NetworkBehaviour
             else if(samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
             {
                 Debug.Log("Remove tape on host");
-                sampleLoaders[index].ForceEject();
+                sampleLoaders[index].ForceEject(false);
             }
         }
     }
