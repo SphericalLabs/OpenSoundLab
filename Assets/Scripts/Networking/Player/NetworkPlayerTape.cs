@@ -51,7 +51,7 @@ public class NetworkPlayerTape : NetworkBehaviour
         if (tapeInHand != null && !isLocalPlayer)
         {
             tapeInHand.transform.localRotation = newValue;
-            tapeInHand.transform.Rotate(-90, 0, 0, Space.Self);
+            //tapeInHand.transform.Rotate(-90, 0, 0, Space.Self);
         }
     }
 
@@ -86,9 +86,13 @@ public class NetworkPlayerTape : NetworkBehaviour
             if (isLocalPlayer)
             {
                 tapeInHand.setGrab(false, null);
+                Debug.Log($"release grabed tape of {handParent}");
             }
-            Destroy(tapeInHand.gameObject);
-            Debug.Log($"Destroy grabed tape of {handParent}");
+            if (!isLocalPlayer)
+            {
+                Destroy(tapeInHand.gameObject);
+                Debug.Log($"Destroy grabed tape of {handParent}");
+            }
         }
         if (!isLocalPlayer && inHandSamplePath.Length > 0)
         {
