@@ -130,6 +130,8 @@ public class NetworkPlayerTape : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdPassToOtherPlayer()
     {
+        Debug.Log($"Cmd {gameObject.name} passed to other hand");
+
         inHandSamplePath = "";
         if (networkedTapeInHand != null)
         {
@@ -141,9 +143,11 @@ public class NetworkPlayerTape : NetworkBehaviour
     [ClientRpc]
     public void RpcDeleteGrabedTapeInHand()
     {
+        Debug.Log($"RPC {gameObject.name} delet grabed object");
         if (tapeInHand != null)
         {
             tapeInHand.setGrab(false, handParent.transform);
+            Destroy(tapeInHand.gameObject);
         }
     }
 }
