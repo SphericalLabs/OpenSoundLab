@@ -155,21 +155,7 @@ public class omniJack : manipObject
         if (near.otherPlug.connected == null) signal = null;
         else if (signal != near.otherPlug.signal) signal = near.otherPlug.signal;
     }
-
-    public void endConnection(bool invokeEvents)
-    {
-        if (invokeEvents)
-        {
-            if (far != null && far.connected != null)
-            {
-                far.connected.onEndConnectionEvent.Invoke();
-            }
-            onEndConnectionEvent.Invoke();
-        }        
-        near = null;
-        far = null;
-    }
-
+        
 
     public void beginConnection(omniPlug plug, bool invokeEvents)
     {
@@ -190,6 +176,24 @@ public class omniJack : manipObject
                 far.connected.onBeginnConnectionEvent.Invoke();
             }
         }
+    }
+
+    public void endConnection(bool invokeEvents)
+    {
+        if(near != null && near.gameObject != null)  Destroy(near.gameObject);
+        if(far  != null && far.gameObject  != null)  Destroy(far.gameObject);
+
+        if (invokeEvents)
+        {
+            if (far != null && far.connected != null)
+            {
+                far.connected.onEndConnectionEvent.Invoke();
+            }
+            onEndConnectionEvent.Invoke();
+        }
+
+        near = null;
+        far = null;
     }
 
     float findHue()

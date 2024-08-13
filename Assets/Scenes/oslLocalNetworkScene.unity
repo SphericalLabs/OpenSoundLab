@@ -7913,7 +7913,7 @@ MonoBehaviour:
   enableActiveDiscovery: 1
   BroadcastAddress: 
   serverBroadcastListenPort: 47777
-  ActiveDiscoveryInterval: 3
+  ActiveDiscoveryInterval: 1
   transport: {fileID: 2081794424}
   OnServerFound:
     m_PersistentCalls:

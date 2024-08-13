@@ -157,21 +157,13 @@ public class mixerDeviceInterface : deviceInterface
                 s.gameObject.SetActive(false);
 
                 // each fader has two omniJacks and thus this cleanup runs twice
-                terminateJacks(networkJacks.omniJacks[2 * i]);
-                terminateJacks(networkJacks.omniJacks[2 * i + 1]);
+                networkJacks.omniJacks[2 * i].endConnection(true);
+                networkJacks.omniJacks[2 * i + 1].endConnection(true);
 
             }
         }
     }
 
-    void terminateJacks(omniJack jack){
-        if (/*updateByGrab && */jack.near != null && jack.far != null)
-        {
-            Destroy(jack.near.gameObject);
-            Destroy(jack.far.gameObject);
-            jack.endConnection(true);
-        }
-    }
 
     void Update()
     {
