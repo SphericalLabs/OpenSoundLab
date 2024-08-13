@@ -1548,6 +1548,7 @@ MonoBehaviour:
   jackOutTrigTrans: []
   jackOutCVTrans: []
   running: 1
+  xyHandle: {fileID: 114000013778669004}
   stretchNode: {fileID: 4000013409575508}
   stepSelect: {fileID: 114000012285081508}
   dimensions: 0100000001000000

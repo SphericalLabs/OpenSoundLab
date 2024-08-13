@@ -15,6 +15,9 @@ public class NetworkSequencerCv : NetworkSyncListener
     protected virtual void Awake()
     {
         sequencerCvDeviceInterface = GetComponent<sequencerCVDeviceInterface>();
+        sequencerCvDeviceInterface.beatSlider.onEndGrabEvents.AddListener(OnSync);
+        sequencerCvDeviceInterface.stepSelect.onEndGrabEvents.AddListener(OnSync);
+        sequencerCvDeviceInterface.xyHandle.onEndGrabEvents.AddListener(OnSync);
 
         networkButtons = GetComponent<NetworkButtons>();
         networkDials = GetComponent<NetworkDials>();
@@ -63,7 +66,7 @@ public class NetworkSequencerCv : NetworkSyncListener
     [Command(requiresAuthority = false)]
     protected virtual void CmdRequestSync()
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync glidedVal {sequencerCvDeviceInterface.CurStep}");
+        Debug.Log($"{gameObject.name} CmdRequestSync curStep {sequencerCvDeviceInterface.CurStep}");
         RpcUpdateCurStep(sequencerCvDeviceInterface.CurStep);
     }
 

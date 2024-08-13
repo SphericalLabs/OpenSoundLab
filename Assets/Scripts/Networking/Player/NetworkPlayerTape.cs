@@ -84,10 +84,6 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     private void SetSamplePath(Vector3 position, Quaternion rotation)
     {
-        if (tapeInHand != null)
-        {
-            return;
-        }
         if (networkedTapeInHand != null)
         {
             Destroy(networkedTapeInHand.gameObject);
@@ -111,6 +107,7 @@ public class NetworkPlayerTape : NetworkBehaviour
             networkedTapeInHand = g.GetComponent<tape>();
             networkedTapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
             networkedTapeInHand.TargetNetworkPlayerTape = this;
+            networkedTapeInHand.masterObj = null;
         }
     }
 
@@ -122,22 +119,38 @@ public class NetworkPlayerTape : NetworkBehaviour
         if (isServer)
         {
             inHandSamplePath = "";
-            tapeInHand = null;
+            networkedTapeInHand = null;
+            RpcDeleteGrabedTapeInHand();
+
         }
         else
         {
-            tapeInHand = null;
+            networkedTapeInHand = null;
             CmdPassToOtherPlayer();
         }
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     public void CmdPassToOtherPlayer()
     {
+        Debug.Log($"Cmd {gameObject.name} passed to other hand");
+
         inHandSamplePath = "";
         if (networkedTapeInHand != null)
         {
             Destroy(networkedTapeInHand.gameObject);
+        }
+        RpcDeleteGrabedTapeInHand();
+    }
+
+    [ClientRpc]
+    public void RpcDeleteGrabedTapeInHand()
+    {
+        Debug.Log($"RPC {gameObject.name} delet grabed object");
+        if (tapeInHand != null)
+        {
+            //tapeInHand.setGrab(false, handParent.transform);
+            Destroy(tapeInHand.gameObject);
         }
     }
 }

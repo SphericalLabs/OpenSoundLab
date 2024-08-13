@@ -75,6 +75,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     int beatSpeed = 0;
 
     // handles
+    public xyHandle xyHandle;
     public Transform stretchNode;
     public xHandle stepSelect;
 
