@@ -1052,6 +1052,7 @@ MonoBehaviour:
   seqGen: {fileID: 0}
   freqExpGen: {fileID: 0}
   ampGen: {fileID: 0}
+  startGen: {fileID: 0}
   devInterface: {fileID: 0}
   consolidatedSampleLength: -1
 --- !u!114 &6396865805222944688
@@ -1967,7 +1968,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  percent: 0.5
+  percent: 0
   defaultPercent: 0
   currentDialColor: 1
   controllerRot: 0

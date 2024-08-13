@@ -30,14 +30,13 @@ public class samplerOneDeviceInterface : deviceInterface
         if (player.sampleStart != dialStart.percent)
         {
             player.sampleStart = dialStart.percent;
-            player.updateSampleBounds();
+            // do not update the sample bound on change already, only when a sample is triggered!
         }
 
         if (player.freqExpGen != jackPitch.signal) player.freqExpGen = jackPitch.signal;
         if (player.ampGen != jackAmp.signal) player.ampGen = jackAmp.signal;
         if (player.seqGen != jackTrigger.signal) player.seqGen = jackTrigger.signal;
-
-        // add sample start
+        if (player.startGen != jackStart.signal) player.startGen= jackStart.signal;
 
     }
 
