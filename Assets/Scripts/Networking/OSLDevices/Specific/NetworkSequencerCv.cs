@@ -6,9 +6,26 @@ public class NetworkSequencerCv : NetworkSyncListener
 {
     protected sequencerCVDeviceInterface sequencerCvDeviceInterface;
 
+    NetworkButtons networkButtons;
+    NetworkDials networkDials;
+    NetworkSwitchs networkSwitchs;
+    NetworkJacks networkJacks;
+
+
     protected virtual void Awake()
     {
         sequencerCvDeviceInterface = GetComponent<sequencerCVDeviceInterface>();
+
+        networkButtons = GetComponent<NetworkButtons>();
+        networkDials = GetComponent<NetworkDials>();
+        networkSwitchs = GetComponent<NetworkSwitchs>();
+        networkJacks = GetComponent<NetworkJacks>();
+
+        networkButtons.buttons = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<button>(true), networkButtons.buttons);
+        networkDials.dials = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<dial>(true), networkDials.dials);
+        networkSwitchs.switchs = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<basicSwitch>(true), networkSwitchs.switchs);
+        networkJacks.omniJacks = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<omniJack>(true), networkJacks.omniJacks);
+
     }
     #region Mirror
 
