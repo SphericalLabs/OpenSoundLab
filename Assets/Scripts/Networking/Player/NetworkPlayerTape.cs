@@ -84,10 +84,6 @@ public class NetworkPlayerTape : NetworkBehaviour
 
     private void SetSamplePath(Vector3 position, Quaternion rotation)
     {
-        if (tapeInHand != null)
-        {
-            return;
-        }
         if (networkedTapeInHand != null)
         {
             Destroy(networkedTapeInHand.gameObject);
@@ -122,22 +118,32 @@ public class NetworkPlayerTape : NetworkBehaviour
         if (isServer)
         {
             inHandSamplePath = "";
-            tapeInHand = null;
+            networkedTapeInHand = null;
         }
         else
         {
-            tapeInHand = null;
+            networkedTapeInHand = null;
             CmdPassToOtherPlayer();
         }
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     public void CmdPassToOtherPlayer()
     {
         inHandSamplePath = "";
         if (networkedTapeInHand != null)
         {
             Destroy(networkedTapeInHand.gameObject);
+        }
+        RpcDeleteGrabedTapeInHand();
+    }
+
+    [ClientRpc]
+    public void RpcDeleteGrabedTapeInHand()
+    {
+        if (tapeInHand != null)
+        {
+            tapeInHand.setGrab(false, handParent.transform);
         }
     }
 }
