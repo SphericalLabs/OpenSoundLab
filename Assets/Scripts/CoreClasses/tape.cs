@@ -473,9 +473,10 @@ public class tape : manipObject
             {
                 targetNetworkPlayerTape.SetHandSamplePath("", Vector3.zero, Quaternion.identity);
             }
-            Vector3 position = manipulatorObj.InverseTransformPoint(transform.position);
-            Quaternion rotation = Quaternion.Inverse(manipulatorObj.rotation) * transform.rotation;
-            targetHand.SetHandSamplePath(filename, position, rotation);
+            Debug.Log($"Tape parent {transform.parent}, {transform.localPosition}, {transform.localRotation}");
+            //Vector3 position = manipulatorObj.InverseTransformPoint(transform.position);
+            //Quaternion rotation = Quaternion.Inverse(manipulatorObj.rotation) * transform.rotation;
+            targetHand.SetHandSamplePath(filename, transform.localPosition, transform.localRotation);
             targetNetworkPlayerTape = targetHand;
         }
     }
