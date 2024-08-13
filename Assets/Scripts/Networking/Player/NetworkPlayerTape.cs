@@ -119,6 +119,8 @@ public class NetworkPlayerTape : NetworkBehaviour
         {
             inHandSamplePath = "";
             networkedTapeInHand = null;
+            RpcDeleteGrabedTapeInHand();
+
         }
         else
         {
