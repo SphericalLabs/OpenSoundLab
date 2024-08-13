@@ -108,7 +108,9 @@ public class NetworkPlayerTape : NetworkBehaviour
 
             Debug.Log($"Change sample path of {handParent} to {inHandSamplePath}, {position}, {rotation}");
 
-            GameObject g = Instantiate(tapePrefab, position, rotation, handParent.transform);
+            GameObject g = Instantiate(tapePrefab, handParent.transform);
+            g.transform.localPosition = position;
+            g.transform.localRotation = rotation;
             //g.transform.Rotate(-90, 0, 0, Space.Self);
             tapeInHand = g.GetComponent<tape>();
             tapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
