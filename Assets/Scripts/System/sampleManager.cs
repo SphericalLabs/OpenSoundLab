@@ -244,7 +244,7 @@ public class sampleManager : MonoBehaviour
     {
         string fileName = Path.GetFileNameWithoutExtension(CorrectPathSeparators(path));
 
-        Debug.Log($"Filename {fileName}");
+        //Debug.Log($"Filename {fileName}");
         return fileName;
     }
 
