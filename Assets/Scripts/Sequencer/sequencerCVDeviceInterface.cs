@@ -233,7 +233,14 @@ public class sequencerCVDeviceInterface : deviceInterface
 
     #region running
 
-    int targetStep = 0;
+    int selectedStep = 0; // the currently highlighted one
+    int targetStep = 0; // the step that now needs to be updated for
+    int curStep = 0; // the actual step
+
+    public int CurStep { get => curStep; set => curStep = value; }
+    public bool silent = false;
+
+
     public void SelectStep(int s, bool silent = false)
     {
         selectedStep = targetStep = s;
@@ -251,6 +258,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         }
     }
 
+    // called from Update loop
     void SelectStepUpdate()
     {
         if (targetStep == curStep) return;
@@ -260,10 +268,8 @@ public class sequencerCVDeviceInterface : deviceInterface
         stepSelect.updatePos(-cubeConst * curStep);
     }
 
-    int curStep = 0;
-    public int CurStep { get => curStep; set => curStep = value; }
-    public bool silent = false;
 
+    // called from audio thread
     public void executeNextStep()
     {
         if (stepSelect.curState == manipObject.manipState.grabbed) return;
@@ -387,7 +393,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         }
     }
 
-    int selectedStep = 0;
+    // called from Update loop
     void UpdateStepSelect()
     {
         // bugfix for randomly skipped / missed steps in sequencer. 

@@ -214,7 +214,7 @@ public class sampleManager : MonoBehaviour
         {
             //Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
             //copy tgz to directory where we can extract it
-            WWW www = new WWW("file://" + Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
             while (!www.isDone) { }
             System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
             //extract it

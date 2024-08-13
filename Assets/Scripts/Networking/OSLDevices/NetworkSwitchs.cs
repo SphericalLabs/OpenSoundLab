@@ -32,17 +32,17 @@ public class NetworkSwitchs : NetworkBehaviour
     {
         if (!isServer)
         {
-            switchValues.Callback += OnButtonUpdated;
+            switchValues.Callback += OnSwitchUpdated;
 
             // Process initial SyncList payload
             for (int i = 0; i < switchValues.Count; i++)
             {
-                OnButtonUpdated(SyncList<bool>.Operation.OP_ADD, i, switchs[i].switchVal, switchValues[i]);
+                OnSwitchUpdated(SyncList<bool>.Operation.OP_ADD, i, switchs[i].switchVal, switchValues[i]);
             }
         }
     }
 
-    void OnButtonUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
+    void OnSwitchUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
     {
         switch (op)
         {
@@ -70,15 +70,15 @@ public class NetworkSwitchs : NetworkBehaviour
         }
         else
         {
-            CmdUpdateButtonIsHit(index, switchs[index].switchVal);
+            CmdUpdateSwitchIsChanged(index, switchs[index].switchVal);
         }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdUpdateButtonIsHit(int index, bool value)
+    public void CmdUpdateSwitchIsChanged(int index, bool value)
     {
         switchValues[index] = value;
-        switchs[index].setSwitch(value, false);
+        switchs[index].setSwitch(value, false, true);
     }
 }
 
