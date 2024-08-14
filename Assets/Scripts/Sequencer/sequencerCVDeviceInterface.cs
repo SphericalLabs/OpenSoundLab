@@ -239,6 +239,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     int curStep = 0; // the actual step
 
     public int CurStep { get => curStep; set => curStep = value; }
+    public int TargetStep { get => targetStep; set => targetStep = value; }
     public bool silent = false;
 
 
@@ -398,12 +399,12 @@ public class sequencerCVDeviceInterface : deviceInterface
     }
 
     // called from Update loop
-    void UpdateStepSelect()
+    public void UpdateStepSelect(bool forced = false)
     {
         // bugfix for randomly skipped / missed steps in sequencer. 
         // this routine would fire even if the step selector handle was not touched or grabbed. 
         // this could be due to an multithread issue between main and audio thread, which is still unsolved.
-        if (stepSelect.curState != manipObject.manipState.grabbed) return;
+        if (!forced && stepSelect.curState != manipObject.manipState.grabbed) return;
 
         int s = (int)Mathf.Round(stepSelect.transform.localPosition.x / -cubeConst);
         if (s == selectedStep) return;
@@ -416,8 +417,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     public void togglePlay(bool on)
     {
         _beatManager.toggle(on);
-        if (!on) SelectStep(0, true);
-        else runningUpdated = true;
+        if(on) runningUpdated = true;
     }
 
     public override void hit(bool on, int ID = -1)
