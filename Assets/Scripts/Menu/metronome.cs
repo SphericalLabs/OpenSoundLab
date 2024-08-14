@@ -79,10 +79,10 @@ public class metronome : componentInterface {
     if (ID == 0) masterControl.instance.toggleBeatUpdate(on);
     if (ID == 1 && on) masterControl.instance.resetClock();
 
-    if (ID == 3 && on) pitchBendMult = 1 / 1.03f; PitchBendChange?.Invoke(pitchBendMult);
-    if (ID == 3 && !on) pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult);
-    if (ID == 4 && on) pitchBendMult = 1 * 1.03f; PitchBendChange?.Invoke(pitchBendMult);
-    if (ID == 4 && !on) pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult);
+    if (ID == 3 && on) { pitchBendMult = 1 / 1.03f; PitchBendChange?.Invoke(pitchBendMult); }
+    if (ID == 3 && !on) { pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult); }
+    if (ID == 4 && on) { pitchBendMult = 1 * 1.03f; PitchBendChange?.Invoke(pitchBendMult); }
+    if (ID == 4 && !on) { pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult); }
 
     if (ID == 5) masterControl.instance.recorder.ToggleRec(on);
 

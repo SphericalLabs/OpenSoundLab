@@ -5,50 +5,50 @@ using Mirror;
 
 public class NetworkMasterControl : NetworkSyncListener
 {
-    [SerializeField] private metronome metronome;
+    //[SerializeField] private metronome metronome;
     [SerializeField] private button startButton;
     [SerializeField] private button rewindButton;
-    [SyncVar(hook = nameof(BroadcastBpm))]
-    private float pitchBendMult = 1f;
+    //[SyncVar(hook = nameof(BroadcastBpm))]
+    //private float pitchBendMult = 1f;
 
     private void Start()
     {
-        metronome.PitchBendChange += OnPitchBendChange;
+        //metronome.PitchBendChange += OnPitchBendChange;
         startButton.onStartGrabEvents.AddListener(OnButtonPress);
         rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
     }
 
     private void OnDestroy()
     {
-        metronome.PitchBendChange -= OnPitchBendChange;
+        //metronome.PitchBendChange -= OnPitchBendChange;
         startButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
         rewindButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
     }
 
-    private void OnPitchBendChange(float pitchChangeMultiplier)
-    {
-        if (isClient)
-        {
-            CmdChangePitchBend(pitchChangeMultiplier);
-        }
-        else
-        {
-            pitchBendMult = pitchChangeMultiplier;
-        }
-    }
+    //private void OnPitchBendChange(float pitchChangeMultiplier)
+    //{
+    //    if (isClient)
+    //    {
+    //        CmdChangePitchBend(pitchChangeMultiplier);
+    //    }
+    //    else
+    //    {
+    //        pitchBendMult = pitchChangeMultiplier;
+    //    }
+    //}
 
-    [Command(requiresAuthority = false)]
-    private void CmdChangePitchBend(float pitchChangeMultiplier)
-    {
-        pitchBendMult = pitchChangeMultiplier;
-    }
+    //[Command(requiresAuthority = false)]
+    //private void CmdChangePitchBend(float pitchChangeMultiplier)
+    //{
+    //    pitchBendMult = pitchChangeMultiplier;
+    //}
 
-    private void BroadcastBpm(float oldPitchBend, float newPitchBend)
-    {
-        Debug.Log("Changed BPM to " + newPitchBend);
-        metronome.PitchBendMult = newPitchBend;
-        metronome.broadcastBpm();
-    }
+    //private void BroadcastBpm(float oldPitchBend, float newPitchBend)
+    //{
+    //    Debug.Log("Changed BPM to " + newPitchBend);
+    //    metronome.PitchBendMult = newPitchBend;
+    //    metronome.broadcastBpm();
+    //}
 
     private void OnButtonPress()
     {
@@ -71,7 +71,7 @@ public class NetworkMasterControl : NetworkSyncListener
         if (isServer)
         {
             RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
-            pitchBendMult = metronome.PitchBendMult;
+            //pitchBendMult = metronome.PitchBendMult;
         }
         else
         {
@@ -85,7 +85,7 @@ public class NetworkMasterControl : NetworkSyncListener
         if (isServer)
         {
             RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
-            pitchBendMult = metronome.PitchBendMult;
+            //pitchBendMult = metronome.PitchBendMult;
         }
     }
 

@@ -104,12 +104,14 @@ public class button : manipObject
             labelRend.material.SetFloat("_EmissionGain", .1f);
             labelRend.material.SetColor("_TintColor", labelColor);
         }
+
+        if (disregardStartToggled) return;
+        keyHit(startToggled, true);
     }
 
     void Start()
     {
-        if (disregardStartToggled) return;
-        keyHit(startToggled, true);
+
     }
 
     // used for sequencer highlighting
@@ -141,14 +143,14 @@ public class button : manipObject
         button2DID[0] = IDx;
         button2DID[1] = IDy;
         glowColor = c;
-        keyHit(on);
+        keyHit(on, true);
         startToggled = on;
         glowMat.SetColor("_TintColor", glowColor);
     }
 
     public void setOnAtStart(bool on)
     {
-        keyHit(on);
+        keyHit(on, true);
         startToggled = on;
     }
 

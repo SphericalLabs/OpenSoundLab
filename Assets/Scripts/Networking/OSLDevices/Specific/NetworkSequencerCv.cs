@@ -18,6 +18,9 @@ public class NetworkSequencerCv : NetworkSyncListener
         sequencerCvDeviceInterface.beatSlider.onEndGrabEvents.AddListener(OnSync);
         sequencerCvDeviceInterface.stepSelect.onEndGrabEvents.AddListener(OnSync);
         sequencerCvDeviceInterface.xyHandle.onEndGrabEvents.AddListener(OnSync);
+        //sequencerCvDeviceInterface.beatSlider.onEndGrabEvents.AddListener(NetworkSyncEventManager.Instance.UpdateSync);
+        //sequencerCvDeviceInterface.stepSelect.onEndGrabEvents.AddListener(NetworkSyncEventManager.Instance.UpdateSync);
+        //sequencerCvDeviceInterface.xyHandle.onEndGrabEvents.AddListener(NetworkSyncEventManager.Instance.UpdateSync);
 
         networkButtons = GetComponent<NetworkButtons>();
         networkDials = GetComponent<NetworkDials>();
@@ -44,9 +47,10 @@ public class NetworkSequencerCv : NetworkSyncListener
     protected override void OnSync()
     {
         base.OnSync();
+
         if (isServer)
         {
-            RpcUpdateCurStep(sequencerCvDeviceInterface.CurStep);
+            RpcUpdateCurStep(sequencerCvDeviceInterface.TargetStep);
         }
         else
         {
@@ -59,24 +63,24 @@ public class NetworkSequencerCv : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateCurStep(sequencerCvDeviceInterface.CurStep);
+            RpcUpdateCurStep(sequencerCvDeviceInterface.TargetStep);
         }
     }
 
     [Command(requiresAuthority = false)]
     protected virtual void CmdRequestSync()
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync curStep {sequencerCvDeviceInterface.CurStep}");
-        RpcUpdateCurStep(sequencerCvDeviceInterface.CurStep);
+        Debug.Log($"{gameObject.name} CmdRequestSync curStep {sequencerCvDeviceInterface.TargetStep}");
+        RpcUpdateCurStep(sequencerCvDeviceInterface.TargetStep);
     }
 
     [ClientRpc]
-    protected virtual void RpcUpdateCurStep(int curStep)
+    protected virtual void RpcUpdateCurStep(int targetStep)
     {
         if (isClient && !isServer)
         {
-            Debug.Log($"{gameObject.name} old curStep: {sequencerCvDeviceInterface.CurStep}, new curStep {curStep}");
-            sequencerCvDeviceInterface.CurStep = curStep;
+            Debug.Log($"{gameObject.name} old curStep: {sequencerCvDeviceInterface.TargetStep}, new curStep {targetStep}");
+            sequencerCvDeviceInterface.TargetStep = targetStep;
         }
     }
     #endregion
