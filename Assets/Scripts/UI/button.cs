@@ -109,7 +109,7 @@ public class button : manipObject
     void Start()
     {
         if (disregardStartToggled) return;
-        keyHit(startToggled);
+        keyHit(startToggled, true);
     }
 
     // used for sequencer highlighting
