@@ -149,7 +149,7 @@ public class multipleDeviceInterface : deviceInterface
                 {
                     var nearPlug = networkJacks.omniJacks[i].near;
                     var farPlug = networkJacks.omniJacks[i].far;
-                    networkJacks.omniJacks[i].endConnection(true);
+                    networkJacks.omniJacks[i].endConnection(true, true);
 
                     Destroy(nearPlug.gameObject);
                     Destroy(farPlug.gameObject);
