@@ -109,16 +109,16 @@ public class masterControl : MonoBehaviour {
       Debug.LogWarning("Unity sample rate is " + configuration.sampleRate);
     }
 
-    int bufferSize = 512;
+    //int bufferSize = 512;
 
-    if(Application.platform == RuntimePlatform.WindowsEditor)
-    {
-      bufferSize = 512;
-    } 
-    else if (Application.platform == RuntimePlatform.Android)
-    {
-      bufferSize = 256;
-    }
+    //if(Application.platform == RuntimePlatform.WindowsEditor)
+    //{
+    //  bufferSize = 512;
+    //} 
+    //else if (Application.platform == RuntimePlatform.Android)
+    //{
+    //  bufferSize = 256;
+    //}
 
     Debug.Log("Buffer size is: " + configuration.dspBufferSize);
     //configuration.dspBufferSize = bufferSize;

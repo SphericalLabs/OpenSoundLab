@@ -119,7 +119,7 @@ public class metronome : componentInterface
     public void updateBpm()
     {
         bpm = Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm) * pitchBendMult;
-        masterControl.instance.setBPM(bpm);
+        masterControl.instance?.setBPM(bpm);
         txt.text = bpm.ToString("N1");
     }
 
@@ -137,7 +137,7 @@ public class metronome : componentInterface
 
     public override void hit(bool on, int ID = -1)
     {
-        if (ID == 0) masterControl.instance.toggleBeatUpdate(on);
+        if (ID == 0) masterControl.instance?.toggleBeatUpdate(on);
         if (ID == 1 && on) masterControl.instance.resetClock();
 
         if (ID == 3 && on) pitchBendMult = 1 / 1.03f;
