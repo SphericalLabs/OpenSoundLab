@@ -178,10 +178,12 @@ public class omniJack : manipObject
         }
     }
 
-    public void endConnection(bool invokeEvents)
+    public void endConnection(bool invokeEvents = false, bool destroyBothPlugs = false)
     {
-        if(near != null && near.gameObject != null)  Destroy(near.gameObject);
-        if(far  != null && far.gameObject  != null)  Destroy(far.gameObject);
+        if(destroyBothPlugs){ 
+            if(near != null && near.gameObject != null)  Destroy(near.gameObject);
+            if(far  != null && far.gameObject  != null)  Destroy(far.gameObject);
+        }
 
         if (invokeEvents)
         {

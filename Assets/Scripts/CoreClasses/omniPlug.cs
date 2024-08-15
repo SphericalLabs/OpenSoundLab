@@ -483,10 +483,10 @@ public class omniPlug : manipObject
         }
     }
 
-    // When removing a plug but still holding on to it?
+    // When removing a plug but still holding on to it
     void endConnection()
     {
-        connected.endConnection(true);
+        connected.endConnection(true, false);
         connected = null;
         signal = null;
         

@@ -330,7 +330,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             }
 
             // disable cv
-            jackOutCVTrans[row].GetComponentInChildren<omniJack>().endConnection(true);
+            jackOutCVTrans[row].GetComponentInChildren<omniJack>().endConnection(true, true);
             jackOutCVTrans[row].gameObject.SetActive(false);
             for (int step = 0; step < curDimensions[1]; step++)
             {
@@ -340,7 +340,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         else // cv mode
         {
             // disable trig
-            jackOutTrigTrans[row].GetComponentInChildren<omniJack>().endConnection(true);
+            jackOutTrigTrans[row].GetComponentInChildren<omniJack>().endConnection(true, true);
             jackOutTrigTrans[row].gameObject.SetActive(false);
             for (int step = 0; step < curDimensions[1]; step++)
             {
@@ -695,9 +695,9 @@ public class sequencerCVDeviceInterface : deviceInterface
                 stepButtonTrans[curDimensions[0] - 1, step].gameObject.SetActive(false);
                 stepDialTrans[curDimensions[0] - 1, step].gameObject.SetActive(false);
 
-                jackOutTrigTrans[curDimensions[0] - 1].GetComponentInChildren<omniJack>().endConnection(true);
+                jackOutTrigTrans[curDimensions[0] - 1].GetComponentInChildren<omniJack>().endConnection(true, true);
                 jackOutTrigTrans[curDimensions[0] - 1].gameObject.SetActive(false);
-                jackOutCVTrans[curDimensions[0] - 1].GetComponentInChildren<omniJack>().endConnection(true);
+                jackOutCVTrans[curDimensions[0] - 1].GetComponentInChildren<omniJack>().endConnection(true, true);
                 jackOutCVTrans[curDimensions[0] - 1].gameObject.SetActive(false);                
                 controlPanelTrans[curDimensions[0] - 1].gameObject.SetActive(false);
             }

@@ -157,8 +157,8 @@ public class mixerDeviceInterface : deviceInterface
                 s.gameObject.SetActive(false);
 
                 // each fader has two omniJacks and thus this cleanup runs twice
-                networkJacks.omniJacks[2 * i].endConnection(true);
-                networkJacks.omniJacks[2 * i + 1].endConnection(true);
+                networkJacks.omniJacks[2 * i].endConnection(true, true);
+                networkJacks.omniJacks[2 * i + 1].endConnection(true, true);
 
             }
         }

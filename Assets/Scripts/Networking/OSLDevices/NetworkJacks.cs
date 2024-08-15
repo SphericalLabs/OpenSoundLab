@@ -166,7 +166,7 @@ public class NetworkJacks : NetworkBehaviour
                 Destroy(omniJacks[index].near.gameObject);
                 Destroy(omniJacks[index].far.gameObject);
             }
-            omniJacks[index].endConnection(false);
+            omniJacks[index].endConnection(false, true);
         }
         else
         {
