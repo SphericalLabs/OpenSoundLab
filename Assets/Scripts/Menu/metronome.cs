@@ -35,110 +35,121 @@
 using UnityEngine;
 using System.Collections;
 
-public class metronome : componentInterface {
-  public dial bpmDial, volumeDial;
+public class metronome : componentInterface
+{
+    public dial bpmDial, volumeDial;
 
-  float bpm = 120f;
-  float minBpm = 60f;
-  float maxBpm = 180f;
-  float pitchBendMult = 1f;
+    float bpm = 120f;
+    float minBpm = 60f;
+    float maxBpm = 180f;
+    float pitchBendMult = 1f;
     public float PitchBendMult { get => pitchBendMult; set => pitchBendMult = value; }
     public delegate void PitchBendChangeHandler(float pitchBendMult);
     public event PitchBendChangeHandler PitchBendChange;
-  float bpmpercent = .1f;
+    float bpmpercent = .1f;
 
-  float volumepercent = 0;
+    float volumepercent = 0;
 
-  public Transform rod;
-  public TextMesh txt;
+    public Transform rod;
+    public TextMesh txt;
 
-  public button recButton;
+    public button recButton;
 
-  void Awake() {
-    bpmDial = GetComponentInChildren<dial>();
-    //TODO: This is not very pretty, but the masterBusRecorder needs a reference to the rec button in case a recording is stopped by the system (for example if the filesize limit is reached)!
-    var buttons = GetComponentsInChildren<button>();
-    foreach(button b in buttons)
+    void Awake()
     {
-        if (b.buttonID == 5)
-            recButton = b;
+        bpmDial = GetComponentInChildren<dial>();
+        //TODO: This is not very pretty, but the masterBusRecorder needs a reference to the rec button in case a recording is stopped by the system (for example if the filesize limit is reached)!
+        var buttons = GetComponentsInChildren<button>();
+        foreach (button b in buttons)
+        {
+            if (b.buttonID == 5)
+                recButton = b;
+        }
     }
-  }
 
-  public void Reset() {
-    SetBPM(bpm);
-  }
-
-  public void SetBPM(float targ) {
-    bpmpercent = Utils.map(targ, minBpm, maxBpm, 0f, 1f);
-    bpmDial.setPercent(bpmpercent);
-    readBpmDialAndBroadcast();
-  }
-
-  public override void hit(bool on, int ID = -1) {
-    if (ID == 0) masterControl.instance.toggleBeatUpdate(on);
-    if (ID == 1 && on) masterControl.instance.resetClock();
-
-    if (ID == 3 && on) { pitchBendMult = 1 / 1.03f; PitchBendChange?.Invoke(pitchBendMult); }
-    if (ID == 3 && !on) { pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult); }
-    if (ID == 4 && on) { pitchBendMult = 1 * 1.03f; PitchBendChange?.Invoke(pitchBendMult); }
-    if (ID == 4 && !on) { pitchBendMult = 1; PitchBendChange?.Invoke(pitchBendMult); }
-
-    if (ID == 5) masterControl.instance.recorder.ToggleRec(on);
-
-    broadcastBpm(); // temporary bpm nudging
-  }
-
-  void OnEnable() {
-    bpm = masterControl.instance.bpm;
-    bpmpercent = Utils.map(bpm, minBpm, maxBpm, 0f, 1f);
-
-    bpmDial.setPercent(bpmpercent);
-    txt.text = bpm.ToString("N1");
-
-    //In case the recording has been stopped while the menu was disabled, we have to set the recButton toggle state to false:
-    var recorderState = masterControl.instance.recorder.state;
-    if(recorderState == masterBusRecorder.State.Idle)
+    // this is called each time the menu is being activated
+    void OnEnable()
     {
-        recButton.phantomHit(false);
-    }
+        //In case the recording has been stopped while the menu was disabled, we have to set the recButton toggle state to false:
+        var recorderState = masterControl.instance.recorder.state;
+        if (recorderState == masterBusRecorder.State.Idle)
+        {
+            recButton.phantomHit(false);
+        }
     }
 
     bool rodDir = false;
 
+    void Update()
+    {
+        float cyc = Mathf.Repeat(masterControl.instance.curCycle * 4, 1);
 
+        if (cyc < 0.5f)
+        {
+            rod.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(-80, 80, cyc * 2));
+            if (!rodDir)
+            {
+                rodDir = true;
+            }
+        }
+        else
+        {
+            rod.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(80, -80, (cyc - .5f) * 2));
+            if (rodDir)
+            {
+                rodDir = false;
+            }
+        }
 
-    void Update() {
-    float cyc = Mathf.Repeat(masterControl.instance.curCycle * 4, 1);
+        if (volumepercent != volumeDial.percent)
+        {
+            volumepercent = volumeDial.percent;
+            masterControl.instance.metronomeClick.volume = Mathf.Clamp01(volumepercent - .1f);
+        }
 
-    if (cyc < 0.5f) {
-      rod.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(-80, 80, cyc * 2));
-      if (!rodDir) {
-        rodDir = true;
-      }
-    } else {
-      rod.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(80, -80, (cyc - .5f) * 2));
-      if (rodDir) {
-        rodDir = false;
-      }
+        if (bpmpercent != bpmDial.percent) readBpmDialAndBroadcast();
     }
 
-    if (volumepercent != volumeDial.percent) {
-      volumepercent = volumeDial.percent;
-      masterControl.instance.metronomeClick.volume = Mathf.Clamp01(volumepercent - .1f);
+    public void readBpmDialAndBroadcast()
+    {
+        bpmpercent = bpmDial.percent;
+        updateBpm();
     }
 
-    if (bpmpercent != bpmDial.percent) readBpmDialAndBroadcast();
-  }
+    public void updateBpm()
+    {
+        bpm = Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm) * pitchBendMult;
+        masterControl.instance.setBPM(bpm);
+        txt.text = bpm.ToString("N1");
+    }
 
-  void readBpmDialAndBroadcast() {
-    bpmpercent = bpmDial.percent;
-    broadcastBpm();
-  }
+    public void Reset()
+    {
+        SetBPM(bpm);
+    }
 
-  public void broadcastBpm(){
-    bpm = Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm) * pitchBendMult;
-    masterControl.instance.setBPM(bpm);
-    txt.text = bpm.ToString("N1");
-  }
+    public void SetBPM(float targ)
+    {
+        bpmpercent = Utils.map(targ, minBpm, maxBpm, 0f, 1f);
+        bpmDial.setPercent(bpmpercent);
+        readBpmDialAndBroadcast();
+    }
+
+    public override void hit(bool on, int ID = -1)
+    {
+        if (ID == 0) masterControl.instance.toggleBeatUpdate(on);
+        if (ID == 1 && on) masterControl.instance.resetClock();
+
+        if (ID == 3 && on) pitchBendMult = 1 / 1.03f;
+        if (ID == 3 && !on) pitchBendMult = 1;
+        if (ID == 4 && on) pitchBendMult = 1 * 1.03f; 
+        if (ID == 4 && !on) pitchBendMult = 1; 
+
+        if (ID == 5) masterControl.instance.recorder.ToggleRec(on);
+
+        updateBpm(); // temporary bpm nudging
+    }
+
+
+
 }

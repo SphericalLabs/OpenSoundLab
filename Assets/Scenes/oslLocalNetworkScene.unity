@@ -4430,15 +4430,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1487267532204419318, guid: 0990778168ef9b141b6bf37952c428dc,
+        type: 3}
+      propertyPath: buttons.Array.data[0]
+      value: 
+      objectReference: {fileID: 810218095}
+    - target: {fileID: 1487267532204419318, guid: 0990778168ef9b141b6bf37952c428dc,
+        type: 3}
+      propertyPath: buttons.Array.data[1]
+      value: 
+      objectReference: {fileID: 768504438}
+    - target: {fileID: 1487267532204419318, guid: 0990778168ef9b141b6bf37952c428dc,
+        type: 3}
+      propertyPath: buttons.Array.data[2]
+      value: 
+      objectReference: {fileID: 281112783}
+    - target: {fileID: 1487267532204419318, guid: 0990778168ef9b141b6bf37952c428dc,
+        type: 3}
+      propertyPath: buttons.Array.data[3]
+      value: 
+      objectReference: {fileID: 281112782}
     - target: {fileID: 1489800173863750469, guid: 0990778168ef9b141b6bf37952c428dc,
         type: 3}
       propertyPath: m_Name
       value: NetworkedMasterControl
-      objectReference: {fileID: 0}
-    - target: {fileID: 2756763999734211886, guid: 0990778168ef9b141b6bf37952c428dc,
-        type: 3}
-      propertyPath: dials.Array.size
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2756763999734211886, guid: 0990778168ef9b141b6bf37952c428dc,
         type: 3}
@@ -4447,7 +4462,7 @@ PrefabInstance:
       objectReference: {fileID: 907586436}
     - target: {fileID: 3524698432790368088, guid: 0990778168ef9b141b6bf37952c428dc,
         type: 3}
-      propertyPath: metronome
+      propertyPath: metro
       value: 
       objectReference: {fileID: 1474746739}
     - target: {fileID: 3524698432790368088, guid: 0990778168ef9b141b6bf37952c428dc,
@@ -4513,43 +4528,13 @@ PrefabInstance:
     - target: {fileID: 7188549563921274302, guid: 0990778168ef9b141b6bf37952c428dc,
         type: 3}
       propertyPath: sceneId
-      value: 4026823987
+      value: 3529259738
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1489800173863750469, guid: 0990778168ef9b141b6bf37952c428dc,
-        type: 3}
-      insertIndex: 2
-      addedObject: {fileID: 1140230988}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0990778168ef9b141b6bf37952c428dc, type: 3}
---- !u!1 &1140230987 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1489800173863750469, guid: 0990778168ef9b141b6bf37952c428dc,
-    type: 3}
-  m_PrefabInstance: {fileID: 1140230986}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1140230988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1140230987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  buttons:
-  - {fileID: 810218095}
-  - {fileID: 768504438}
-  - {fileID: 281112783}
-  - {fileID: 281112782}
 --- !u!114 &1144684411 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 248447823999277047, guid: 2249a5c1116df493ca155ab9ad65c63c,
