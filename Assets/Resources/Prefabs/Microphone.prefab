@@ -483,6 +483,7 @@ GameObject:
   - component: {fileID: -5856892812192242412}
   - component: {fileID: 4816038947103938687}
   - component: {fileID: 5441245614958295456}
+  - component: {fileID: 2003269732597734311}
   m_Layer: 9
   m_Name: Microphone
   m_TagString: instrument
@@ -743,6 +744,23 @@ MonoBehaviour:
   syncInterval: 0
   buttons:
   - {fileID: 114000012423527336}
+--- !u!114 &2003269732597734311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000011508732560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d53d1a4367f6a94dbb5478e2d0981f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  dials:
+  - {fileID: 114000010977847198}
 --- !u!1 &1000011586788416
 GameObject:
   m_ObjectHideFlags: 0
