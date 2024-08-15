@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 public class NetworkSequencerCv : NetworkSyncListener
 {
     protected sequencerCVDeviceInterface sequencerCvDeviceInterface;
@@ -18,9 +19,6 @@ public class NetworkSequencerCv : NetworkSyncListener
         sequencerCvDeviceInterface.beatSlider.onEndGrabEvents.AddListener(OnSync);
         sequencerCvDeviceInterface.stepSelect.onEndGrabEvents.AddListener(OnSync);
         sequencerCvDeviceInterface.xyHandle.onEndGrabEvents.AddListener(OnSync);
-        //sequencerCvDeviceInterface.beatSlider.onEndGrabEvents.AddListener(NetworkSyncEventManager.Instance.UpdateSync);
-        //sequencerCvDeviceInterface.stepSelect.onEndGrabEvents.AddListener(NetworkSyncEventManager.Instance.UpdateSync);
-        //sequencerCvDeviceInterface.xyHandle.onEndGrabEvents.AddListener(NetworkSyncEventManager.Instance.UpdateSync);
 
         networkButtons = GetComponent<NetworkButtons>();
         networkDials = GetComponent<NetworkDials>();
@@ -35,6 +33,31 @@ public class NetworkSequencerCv : NetworkSyncListener
     }
     #region Mirror
 
+    public void Start()
+    {
+        GetComponent<NetworkXHandles>().xValues.Callback += OnHandleUpdated;
+    }
+
+    void OnHandleUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
+    {
+        switch (op)
+        {
+            case SyncList<float>.Operation.OP_ADD:                
+                break;
+            case SyncList<float>.Operation.OP_INSERT:
+                break;
+            case SyncList<float>.Operation.OP_REMOVEAT:
+                break;
+            case SyncList<float>.Operation.OP_SET:
+                // careful, this is hardwiring index 0.
+                // this will break if there will be more xHandles on SequencerCV in the future
+                // and the stepSelect handle would have another index because of that.
+                if (index == 0) sequencerCvDeviceInterface.UpdateStepSelect(true);
+                break;
+            case SyncList<float>.Operation.OP_CLEAR:
+                break;
+        }
+    }
 
     public override void OnStartClient()
     {
