@@ -30,7 +30,7 @@ public class NetworkAD : NetworkSyncListener
         base.OnSync();
         if (isServer)
         {
-            RpcUpdateGlidedVal(adSignalGenerator.GlidedVal);
+            RpcUpdateGlidedVal(adSignalGenerator.IsRunning, adSignalGenerator.Stage, adSignalGenerator.Counter, adSignalGenerator.GlidedVal);
         }
         else
         {
@@ -43,7 +43,7 @@ public class NetworkAD : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateGlidedVal(adSignalGenerator.GlidedVal);
+            RpcUpdateGlidedVal(adSignalGenerator.IsRunning, adSignalGenerator.Stage, adSignalGenerator.Counter, adSignalGenerator.GlidedVal);
         }
     }
 
@@ -51,15 +51,18 @@ public class NetworkAD : NetworkSyncListener
     protected virtual void CmdRequestSync()
     {
         Debug.Log($"{gameObject.name} CmdRequestSync glidedVal {adSignalGenerator.GlidedVal}");
-        RpcUpdateGlidedVal(adSignalGenerator.GlidedVal);
+        RpcUpdateGlidedVal(adSignalGenerator.IsRunning, adSignalGenerator.Stage, adSignalGenerator.Counter, adSignalGenerator.GlidedVal);
     }
 
     [ClientRpc]
-    protected virtual void RpcUpdateGlidedVal(float glidedVal)
+    protected virtual void RpcUpdateGlidedVal(bool isRunning, int stage, int counter, float glidedVal)
     {
         if (isClient && !isServer)
         {
             Debug.Log($"{gameObject.name} old glidedVal: {adSignalGenerator.GlidedVal}, new phase {glidedVal}");
+            adSignalGenerator.IsRunning = isRunning;
+            adSignalGenerator.Stage = stage;
+            adSignalGenerator.Counter = counter;
             adSignalGenerator.GlidedVal = glidedVal;
         }
     }

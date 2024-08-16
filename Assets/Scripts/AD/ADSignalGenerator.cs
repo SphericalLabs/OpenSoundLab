@@ -53,12 +53,16 @@ public class ADSignalGenerator : signalGenerator
     int minRelease;
     int maxRelease;
 
+    // inner state
+    bool isRunning = false;
     int stage = 0;
     int counter = 0;
-
     float glidedVal = 0f;
-
-    bool isRunning = false;
+    public bool IsRunning { get => isRunning; set => isRunning = value; }
+    public int Stage{ get => stage; set => stage = value; }
+    public int Counter { get => counter; set => counter = value; }
+    public float GlidedVal { get => glidedVal; set => glidedVal = value; }
+    
 
     float[] pulseBuffer = new float[] { -1, -1 };
     float[] attackBuffer = new float[] { -1, -1 };
@@ -66,13 +70,12 @@ public class ADSignalGenerator : signalGenerator
     
     float lastPulseFloat = -1f;
 
-    public float GlidedVal { get => glidedVal; set => glidedVal = value; }
     public void Awake()
     {
         minAttack = 1; // in samples
-        maxAttack = Mathf.RoundToInt(5.000f * AudioSettings.outputSampleRate);
+        maxAttack = Mathf.RoundToInt(120.000f * AudioSettings.outputSampleRate);
         minRelease = Mathf.RoundToInt(0.010f * AudioSettings.outputSampleRate);
-        maxRelease = Mathf.RoundToInt(5.000f * AudioSettings.outputSampleRate);
+        maxRelease = Mathf.RoundToInt(120.000f * AudioSettings.outputSampleRate);
   }
 
     public void setAttack(float val)
