@@ -90,43 +90,41 @@ public class pauseMenu : MonoBehaviour
     Coroutine flashCoroutine;
     void Start()
     {
+        saveLoadPanel = GetComponentInChildren<uiPanelComponentInterface>(true);
         toggleMenu(false);
     }
 
-    bool networkInitialized = false;
+    uiPanelComponentInterface saveLoadPanel;
+    void connectionChanged(){
+        Debug.Log("adaptSaveLoadMenu");
+        saveLoadPanel.cancel();
+        cancelFileMenu();
+    }
+
+    bool lastServerActive = false;
 
     void Update()
     {
-        if (!networkInitialized)
+        // NetworkClient.OnConnectedEvent and NetworkClient.OnDisconnectedEvent didnt seem to work, so fallback solution is:
+        if (NetworkServer.active != lastServerActive) connectionChanged();
+        lastServerActive = NetworkServer.active;
+
+        // if in main menu, then run this update continously, since the server client state could change at any time
+        // it is a bit brute force and could be improved by a more elegant rewrite
+        if (curItem == itemType.main) 
         {
-            if (NetworkClient.isConnected && !NetworkServer.active) // Client
+            if (!NetworkServer.active) // Now check if Client
             {
-                invalidatePauseMenuItem(newItem);
-                invalidatePauseMenuItem(saveItem);
-                networkInitialized = true;
+                newItem.gameObject.SetActive(false);
+                loadItem.gameObject.SetActive(false);
             }
 
-            if (NetworkClient.isConnected && NetworkServer.active) // Server
+            if (NetworkServer.active) // or Server
             {
-                invalidatePauseMenuItem(loadItem);
-                networkInitialized = true;
+                newItem.gameObject.SetActive(true);
+                loadItem.gameObject.SetActive(true);
             }
-        }
-    }
-
-    void invalidatePauseMenuItem(pauseMenuItem mItem){
-        if (mItem == null) return;
-
-        // Change the material of the item's panel renderer
-        if (mItem.panelRend != null) mItem.transform.Find("Label").GetComponent<Renderer>().sharedMaterial = disabledMaterial;
-
-        // Remove the item from the menuItems list
-        if (menuItems.Contains(mItem)) menuItems.Remove(mItem);
-
-        // Remove the item from the items array        
-        Utils.RemoveElementFromArray(items, mItem.gameObject);
-
-        Destroy(mItem);
+        }        
     }
 
     public void endFlash()
