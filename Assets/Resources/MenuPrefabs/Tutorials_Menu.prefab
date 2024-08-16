@@ -8,6 +8,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -1646224440584684155, guid: f68bd4f19edf48042884cd99ba437b5c,
+        type: 3}
+      propertyPath: _assetId
+      value: 77722947
+      objectReference: {fileID: 0}
     - target: {fileID: 191382, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
       propertyPath: m_Name
       value: Tutorials_Menu
@@ -107,6 +112,36 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 3620889242145859698, guid: f68bd4f19edf48042884cd99ba437b5c,
+        type: 3}
+      propertyPath: buttons.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3620889242145859698, guid: f68bd4f19edf48042884cd99ba437b5c,
+        type: 3}
+      propertyPath: buttons.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3620889242145859698, guid: f68bd4f19edf48042884cd99ba437b5c,
+        type: 3}
+      propertyPath: buttons.Array.data[2]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3620889242145859698, guid: f68bd4f19edf48042884cd99ba437b5c,
+        type: 3}
+      propertyPath: buttons.Array.data[3]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3620889242145859698, guid: f68bd4f19edf48042884cd99ba437b5c,
+        type: 3}
+      propertyPath: buttons.Array.data[4]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3620889242145859698, guid: f68bd4f19edf48042884cd99ba437b5c,
+        type: 3}
+      propertyPath: buttons.Array.data[5]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4177968916582558662, guid: f68bd4f19edf48042884cd99ba437b5c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -184,6 +219,9 @@ PrefabInstance:
     - {fileID: 2552341619532094586, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
     - {fileID: 4995019661440197408, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
     - {fileID: 4293349803145409504, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
+    - {fileID: -7159908804773025030, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
+    - {fileID: -1646224440584684155, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
+    - {fileID: 3620889242145859698, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1969552876724278, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
     - {fileID: 2050939572975437665, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}

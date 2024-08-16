@@ -1380,7 +1380,6 @@ GameObject:
   - component: {fileID: 114000012260190240}
   - component: {fileID: 82000011234211416}
   - component: {fileID: -1032120389096730624}
-  - component: {fileID: -8935482871634940930}
   - component: {fileID: 1949569581949328139}
   - component: {fileID: 1903279370635299361}
   - component: {fileID: 4147326363860942366}
@@ -1388,6 +1387,7 @@ GameObject:
   - component: {fileID: 6001620535929737400}
   - component: {fileID: 1698437452298409454}
   - component: {fileID: 7210411340822125354}
+  - component: {fileID: -5739069815958342831}
   m_Layer: 9
   m_Name: Sequencer
   m_TagString: instrument
@@ -1567,41 +1567,6 @@ MonoBehaviour:
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
---- !u!114 &-8935482871634940930
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000012113822842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  target: {fileID: 4000011047401768}
-  syncPosition: 1
-  syncRotation: 1
-  syncScale: 0
-  onlySyncOnChange: 1
-  compressRotation: 1
-  interpolatePosition: 1
-  interpolateRotation: 1
-  interpolateScale: 0
-  coordinateSpace: 1
-  sendIntervalMultiplier: 1
-  timelineOffset: 0
-  showGizmos: 0
-  showOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
-  bufferResetMultiplier: 3
-  changedDetection: 1
-  positionSensitivity: 0.01
-  rotationSensitivity: 0.01
-  scaleSensitivity: 0.01
 --- !u!114 &1949569581949328139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1721,6 +1686,41 @@ MonoBehaviour:
   syncInterval: 0.05
   xyHandles:
   - {fileID: 114000013778669004}
+--- !u!114 &-5739069815958342831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012113822842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 4000011047401768}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 1
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  sendIntervalMultiplier: 1
+  timelineOffset: 0
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  bufferResetMultiplier: 3
+  changedDetection: 1
+  positionSensitivity: 0.002
+  rotationSensitivity: 0.01
+  scaleSensitivity: 0.01
 --- !u!1 &1000012189469876
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1000013735183428, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
       propertyPath: m_Name
-      value: Single_Menu
+      value: SamplerOne_Menu
       objectReference: {fileID: 0}
     - target: {fileID: 4000013995784494, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
       propertyPath: m_LocalPosition.x
@@ -278,6 +278,7 @@ PrefabInstance:
     - {fileID: 3149062288815739930, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
     - {fileID: 983667472262172756, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
     - {fileID: 6756707014613821897, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
+    - {fileID: 8978376273874809748, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5917212578470315542, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}
     - {fileID: 8655169529649018796, guid: 77cdd02b4a4c97240931d5bb675dce04, type: 3}

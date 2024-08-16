@@ -262,9 +262,9 @@ GameObject:
   - component: {fileID: 11456720}
   - component: {fileID: 114000010194930868}
   - component: {fileID: 3666400540360301204}
-  - component: {fileID: 2591338105249821339}
   - component: {fileID: -1642124330640775617}
   - component: {fileID: 3457113228603339848}
+  - component: {fileID: 5309811433844739898}
   m_Layer: 9
   m_Name: Drum
   m_TagString: instrument
@@ -343,41 +343,6 @@ MonoBehaviour:
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
---- !u!114 &2591338105249821339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 123834}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  target: {fileID: 483362}
-  syncPosition: 1
-  syncRotation: 1
-  syncScale: 0
-  onlySyncOnChange: 1
-  compressRotation: 1
-  interpolatePosition: 1
-  interpolateRotation: 1
-  interpolateScale: 0
-  coordinateSpace: 1
-  sendIntervalMultiplier: 1
-  timelineOffset: 0
-  showGizmos: 0
-  showOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
-  bufferResetMultiplier: 3
-  changedDetection: 1
-  positionSensitivity: 0.01
-  rotationSensitivity: 0.01
-  scaleSensitivity: 0.01
 --- !u!114 &-1642124330640775617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,6 +378,41 @@ MonoBehaviour:
   omniJacks:
   - {fileID: 114000014014702960}
   - {fileID: 114000010119618080}
+--- !u!114 &5309811433844739898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 483362}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 1
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  sendIntervalMultiplier: 1
+  timelineOffset: 0
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  bufferResetMultiplier: 3
+  changedDetection: 1
+  positionSensitivity: 0.002
+  rotationSensitivity: 0.01
+  scaleSensitivity: 0.01
 --- !u!1 &130724
 GameObject:
   m_ObjectHideFlags: 0
@@ -1329,6 +1329,12 @@ MonoBehaviour:
   CurFile: 
   miniSpeaker: {fileID: 0}
   clipSamples: []
+  onLoadTapeEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onUnloadTapeEvents:
+    m_PersistentCalls:
+      m_Calls: []
   queuedSample:
   - 
   - 
@@ -1354,13 +1360,16 @@ MonoBehaviour:
   floatingBufferCount: 0
   bufferCount: 0
   trackBounds: {x: 0, y: 1}
-  playbackSpeed: 1
   ID: 0
+  playbackSpeed: 1
   amplitude: 1
+  sampleStart: 0
   seqGen: {fileID: 11456720}
   freqExpGen: {fileID: 0}
   ampGen: {fileID: 0}
-  seqMuted: 0
+  startGen: {fileID: 0}
+  devInterface: {fileID: 0}
+  consolidatedSampleLength: -1
 --- !u!1 &1000011108821136
 GameObject:
   m_ObjectHideFlags: 0

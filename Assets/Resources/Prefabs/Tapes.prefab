@@ -137,11 +137,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000010305206494
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,11 +411,11 @@ MonoBehaviour:
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &1000013426884842
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,8 +459,8 @@ GameObject:
   - component: {fileID: 114000012300469982}
   - component: {fileID: 82000013040753416}
   - component: {fileID: 826705276682413372}
-  - component: {fileID: -2261303870425227436}
   - component: {fileID: 5396033948670992827}
+  - component: {fileID: -3293953448786578797}
   m_Layer: 0
   m_Name: Tapes
   m_TagString: instrument
@@ -633,41 +633,6 @@ MonoBehaviour:
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
---- !u!114 &-2261303870425227436
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000014101487022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  target: {fileID: 4000011596607418}
-  syncPosition: 1
-  syncRotation: 1
-  syncScale: 0
-  onlySyncOnChange: 1
-  compressRotation: 1
-  interpolatePosition: 1
-  interpolateRotation: 1
-  interpolateScale: 0
-  coordinateSpace: 1
-  sendIntervalMultiplier: 1
-  timelineOffset: 0
-  showGizmos: 0
-  showOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
-  bufferResetMultiplier: 3
-  changedDetection: 1
-  positionSensitivity: 0.01
-  rotationSensitivity: 0.01
-  scaleSensitivity: 0.01
 --- !u!114 &5396033948670992827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -685,6 +650,41 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
+--- !u!114 &-3293953448786578797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000014101487022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 4000011596607418}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 1
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  sendIntervalMultiplier: 1
+  timelineOffset: 0
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  bufferResetMultiplier: 3
+  changedDetection: 1
+  positionSensitivity: 0.002
+  rotationSensitivity: 0.01
+  scaleSensitivity: 0.01
 --- !u!1 &1000014119419114
 GameObject:
   m_ObjectHideFlags: 0

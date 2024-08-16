@@ -9209,7 +9209,7 @@ MonoBehaviour:
   rend: {fileID: 0}
   labelsPresent: 1
   labelColor: {r: 0, g: 0.65, b: 0.15, a: 1}
-  onPercentChangedEvent:
+  PercentChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &65718089779489926
@@ -11157,6 +11157,12 @@ MonoBehaviour:
   CurFile: 
   miniSpeaker: {fileID: 0}
   clipSamples: []
+  onLoadTapeEvents:
+    m_PersistentCalls:
+      m_Calls: []
+  onUnloadTapeEvents:
+    m_PersistentCalls:
+      m_Calls: []
   queuedSample:
   - 
   - 
@@ -14170,7 +14176,7 @@ MonoBehaviour:
   rend: {fileID: 0}
   labelsPresent: 1
   labelColor: {r: 0, g: 0.65, b: 0.15, a: 1}
-  onPercentChangedEvent:
+  PercentChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &65540048349394272
@@ -15590,7 +15596,6 @@ GameObject:
   - component: {fileID: 114816320672579194}
   - component: {fileID: 114955541064349460}
   - component: {fileID: -543654773718035683}
-  - component: {fileID: 7017222406094786027}
   - component: {fileID: 5890015463364658410}
   - component: {fileID: 758851066305749668}
   - component: {fileID: 7589011272204600356}
@@ -15602,6 +15607,7 @@ GameObject:
   - component: {fileID: 8014196460515775066}
   - component: {fileID: 5727283650442714912}
   - component: {fileID: 1296824206965693306}
+  - component: {fileID: 4266512151762694336}
   m_Layer: 0
   m_Name: XyloRoll
   m_TagString: instrument
@@ -15716,41 +15722,6 @@ MonoBehaviour:
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
---- !u!114 &7017222406094786027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1687681188691744}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  target: {fileID: 4844034764459884}
-  syncPosition: 1
-  syncRotation: 1
-  syncScale: 0
-  onlySyncOnChange: 1
-  compressRotation: 1
-  interpolatePosition: 1
-  interpolateRotation: 1
-  interpolateScale: 0
-  coordinateSpace: 1
-  sendIntervalMultiplier: 1
-  timelineOffset: 0
-  showGizmos: 0
-  showOverlay: 0
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
-  bufferResetMultiplier: 3
-  changedDetection: 1
-  positionSensitivity: 0.01
-  rotationSensitivity: 0.01
-  scaleSensitivity: 0.01
 --- !u!114 &5890015463364658410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15964,6 +15935,41 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   keys: []
+--- !u!114 &4266512151762694336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687681188691744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 4844034764459884}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 1
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  sendIntervalMultiplier: 1
+  timelineOffset: 0
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  bufferResetMultiplier: 3
+  changedDetection: 1
+  positionSensitivity: 0.002
+  rotationSensitivity: 0.01
+  scaleSensitivity: 0.01
 --- !u!1 &1694541082181486
 GameObject:
   m_ObjectHideFlags: 0

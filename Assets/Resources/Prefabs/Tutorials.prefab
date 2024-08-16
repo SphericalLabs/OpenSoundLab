@@ -78,15 +78,16 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
+  followType: 0
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 1
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!1 &191382
 GameObject:
   m_ObjectHideFlags: 0
@@ -97,6 +98,9 @@ GameObject:
   m_Component:
   - component: {fileID: 410468}
   - component: {fileID: 6544925126817226767}
+  - component: {fileID: -1646224440584684155}
+  - component: {fileID: 3620889242145859698}
+  - component: {fileID: -7159908804773025030}
   m_Layer: 9
   m_Name: Tutorials
   m_TagString: instrument
@@ -182,6 +186,80 @@ MonoBehaviour:
     videoString: Tutorials/T10.mp4
   videoPlayer: {fileID: 4995019661440197408}
   progressTransform: {fileID: 468380080905245851}
+--- !u!114 &-1646224440584684155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 2067369404
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
+--- !u!114 &3620889242145859698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 6026249276660486304}
+  - {fileID: 7469982831543812946}
+  - {fileID: 1823054050638368208}
+  - {fileID: 114824114186601482}
+  - {fileID: 114000014110554540}
+  - {fileID: 6581840420953744023}
+--- !u!114 &-7159908804773025030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 410468}
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 1
+  onlySyncOnChange: 1
+  compressRotation: 1
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  coordinateSpace: 0
+  sendIntervalMultiplier: 1
+  timelineOffset: 0
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  bufferResetMultiplier: 3
+  changedDetection: 1
+  positionSensitivity: 0.002
+  rotationSensitivity: 0.01
+  scaleSensitivity: 0.01
 --- !u!1 &1000010686554488
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,6 +515,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1000012830027198
 GameObject:
@@ -892,6 +973,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &1969552876724278
 GameObject:
@@ -1178,6 +1262,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &2050939572975437665
 GameObject:
@@ -1533,6 +1620,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &3364776317455700504
 GameObject:
@@ -2477,6 +2567,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 1
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &6128366969028315522
 GameObject:
@@ -2627,6 +2720,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &6406554081310297050
 GameObject:
@@ -3135,6 +3231,9 @@ MonoBehaviour:
   startToggled: 0
   disregardStartToggled: 0
   changeOverlayGlow: 0
+  onToggleChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!1 &9159273178609396002
 GameObject:
@@ -3484,15 +3583,16 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
+  followType: 0
   masterObj: {fileID: 0}
   otherHandle: {fileID: 0}
   matTarg: {fileID: 0}
   ID: 0
+  trashReady: 0
+  curTrash: {fileID: 0}
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
-  trashReady: 0
-  curTrash: {fileID: 0}
 --- !u!4 &7355913016987919704 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: ee1657862adcd0549ac529c98220538d,

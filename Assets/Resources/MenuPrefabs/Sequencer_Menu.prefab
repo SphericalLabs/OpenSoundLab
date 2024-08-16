@@ -392,6 +392,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 1719999611711977524, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: buttons.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2245173925274881457, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -422,16 +427,76 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 4649485958610890963, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dials.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4649485958610890963, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dials.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5050395473694759333, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: _assetId
       value: 4275529132
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573925534737680095, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: omniJacks.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573925534737680095, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: omniJacks.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573925534737680095, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: omniJacks.Array.data[4]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5785162210332949624, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: sampleLoaders.Array.data[0]
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6268804206432728069, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dialAmp
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: jackAmp
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: jackOut
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dialPitch
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: jackPitch
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: buttonPlay
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7339657105381325916, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -771,6 +836,7 @@ PrefabInstance:
     - {fileID: 6001620535929737400, guid: c46773833548a8b48a4f77fe74866d4d, type: 3}
     - {fileID: 1698437452298409454, guid: c46773833548a8b48a4f77fe74866d4d, type: 3}
     - {fileID: 7210411340822125354, guid: c46773833548a8b48a4f77fe74866d4d, type: 3}
+    - {fileID: -5739069815958342831, guid: c46773833548a8b48a4f77fe74866d4d, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1294162313138962, guid: c46773833548a8b48a4f77fe74866d4d, type: 3}
     - {fileID: 1338009703591078, guid: c46773833548a8b48a4f77fe74866d4d, type: 3}
@@ -924,6 +990,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 1719999611711977524, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: buttons.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2245173925274881457, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -954,16 +1025,76 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 4649485958610890963, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dials.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4649485958610890963, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dials.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5050395473694759333, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: _assetId
       value: 4275529132
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573925534737680095, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: omniJacks.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573925534737680095, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: omniJacks.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573925534737680095, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: omniJacks.Array.data[4]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5785162210332949624, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: sampleLoaders.Array.data[0]
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6268804206432728069, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dialAmp
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: jackAmp
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: jackOut
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: dialPitch
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: jackPitch
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396865805222944688, guid: 77cdd02b4a4c97240931d5bb675dce04,
+        type: 3}
+      propertyPath: buttonPlay
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7339657105381325916, guid: 77cdd02b4a4c97240931d5bb675dce04,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
