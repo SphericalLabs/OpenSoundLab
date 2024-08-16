@@ -352,7 +352,7 @@ MonoBehaviour:
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   onlySyncOnChangeCorrectionMultiplier: 2
   rotationSensitivity: 0.01
-  positionPrecision: 0.01
+  positionPrecision: 0.002
   scalePrecision: 0.01
 --- !u!114 &937577235593843328
 MonoBehaviour:
@@ -386,7 +386,7 @@ MonoBehaviour:
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   onlySyncOnChangeCorrectionMultiplier: 2
   rotationSensitivity: 0.01
-  positionPrecision: 0.01
+  positionPrecision: 0.002
   scalePrecision: 0.01
 --- !u!114 &4908395559846709010
 MonoBehaviour:
@@ -420,7 +420,7 @@ MonoBehaviour:
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   onlySyncOnChangeCorrectionMultiplier: 2
   rotationSensitivity: 0.01
-  positionPrecision: 0.01
+  positionPrecision: 0.002
   scalePrecision: 0.01
 --- !u!114 &1510976570374858184
 MonoBehaviour:
