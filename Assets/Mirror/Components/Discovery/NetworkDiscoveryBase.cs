@@ -381,17 +381,16 @@ namespace Mirror.Discovery
         /// <summary>
         /// Sends discovery request from client
         /// </summary>
-        public void BroadcastDiscoveryRequest()
+        public virtual void BroadcastDiscoveryRequest()
         {
             if (clientUdpClient == null)
                 return;
 
-            /*
             if (NetworkClient.isConnected)
             {
                 StopDiscovery();
                 return;
-            }*/
+            }
 
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, serverBroadcastListenPort);
 

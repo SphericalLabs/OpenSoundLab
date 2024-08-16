@@ -30,6 +30,7 @@ public class NetworkMenuManager : MonoBehaviour
     [SerializeField] private Transform discoveryButtonParent;
     [SerializeField] private GameObject discoveryButtonPrefab;
     [SerializeField] private TMP_InputField relayCodeInputField;
+    [SerializeField] private GameObject connectToRelayButton;
     [SerializeField] private TMP_Text ipAdressText;
 
     [Header("Relay Host Menu")]
@@ -201,6 +202,11 @@ public class NetworkMenuManager : MonoBehaviour
         clientGotStopped = false;
         networkDiscovery.StopDiscovery();
         networkManager.StartClient(info.uri);
+    }
+
+    public void OnChangeRelayCodeValue(string value)
+    {
+        connectToRelayButton.SetActive(value.Length >= 5);
     }
 
     #endregion
