@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,6 +93,7 @@ public class omniJack : manipObject
             if (near != null)
             {
                 manipulatorObj.GetComponent<manipulator>().ForceGrab(near);
+                near.AddPlugToHand(near.otherPlug.connected.ID);
             }
             else
             {
@@ -115,6 +116,8 @@ public class omniJack : manipObject
                 manipulatorObj.GetComponent<manipulator>().ForceGrab(far);
 
                 plugRep.SetActive(false);
+                far.AddPlugToHand(ID);
+
             }
             if (near != null) near.setCableHighlighted(true);
             if (far != null) far.setCableHighlighted(true);
@@ -243,5 +246,27 @@ public class omniJack : manipObject
             //mat.SetColor("_EmissionColor", Color.Lerp(Color.black, targColor, Mathf.Abs(Mathf.Sin(t))));
             yield return null;
         }
+    }
+
+    public void CreatePlugInHand(manipulator manipulator)
+    {
+        manipulator.hapticPulse(750);
+
+        GameObject j = Instantiate(plugPrefab, manipulator.transform.position, manipulator.transform.rotation) as GameObject;
+        near = j.GetComponent<omniPlug>();
+        near.transform.localScale = transform.localScale;
+        near.transform.parent = transform;
+        near.transform.localPosition = new Vector3(0, -.0175f, 0);
+        near.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+        near.connected = this;
+        near.signal = homesignal;
+
+        j = Instantiate(plugPrefab, manipulator.transform.position, manipulator.transform.rotation) as GameObject;
+        far = j.GetComponent<omniPlug>();
+        far.Setup(jackTargetHue, outgoing, near);
+        near.Setup(jackTargetHue, !outgoing, far);
+        manipulator.GetComponent<manipulator>().ForceGrab(far);
+
+        far.AddPlugToHand(ID);
     }
 }

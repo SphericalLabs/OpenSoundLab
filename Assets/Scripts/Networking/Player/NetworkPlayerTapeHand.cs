@@ -5,7 +5,7 @@ using Mirror;
 using System.IO;
 using UnityEngine;
 
-public class NetworkPlayerTape : NetworkBehaviour
+public class NetworkPlayerTapeHand : NetworkBehaviour
 {
     public GameObject handParent;
     [SyncVar(hook = nameof(OnSetHandSamplePath))]
@@ -78,7 +78,6 @@ public class NetworkPlayerTape : NetworkBehaviour
     {
         inHandSamplePath = path;
         rotationOffset = rotation;
-        inHandSamplePath = path;
         SetSamplePath(position, rotation);
     }
 
@@ -106,7 +105,7 @@ public class NetworkPlayerTape : NetworkBehaviour
             g.transform.localRotation = rotation;
             networkedTapeInHand = g.GetComponent<tape>();
             networkedTapeInHand.Setup(sampleManager.GetFileName(inHandSamplePath), sampleManager.CorrectPathSeparators(inHandSamplePath));
-            networkedTapeInHand.TargetNetworkPlayerTape = this;
+            networkedTapeInHand.TargetNetworkTapeHand = this;
             networkedTapeInHand.masterObj = null;
         }
     }

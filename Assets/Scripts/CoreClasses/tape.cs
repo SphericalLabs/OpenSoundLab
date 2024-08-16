@@ -60,8 +60,8 @@ public class tape : manipObject
     Color tapeColor;
     float tapeHue;
 
-    private NetworkPlayerTape targetNetworkPlayerTape;
-    public NetworkPlayerTape TargetNetworkPlayerTape { get => targetNetworkPlayerTape; set => targetNetworkPlayerTape = value; }
+    private NetworkPlayerTapeHand targetNetworkTapeHand;
+    public NetworkPlayerTapeHand TargetNetworkTapeHand { get => targetNetworkTapeHand; set => targetNetworkTapeHand = value; }
 
     public override void Awake()
     {
@@ -466,27 +466,27 @@ public class tape : manipObject
 
     void AddPathToHand()
     {
-        var targetHand = NetworkMenuManager.Instance.localPlayer.GetTargetTape(manipulatorObjScript);
+        var targetHand = NetworkMenuManager.Instance.localPlayer.GetTargetTapeHand(manipulatorObjScript);
         if (targetHand != null)
         {
-            if (targetNetworkPlayerTape != null)
+            if (targetNetworkTapeHand != null)
             {
-                targetNetworkPlayerTape.PassToOtherHand();
-                targetNetworkPlayerTape = null;
+                targetNetworkTapeHand.PassToOtherHand();
+                targetNetworkTapeHand = null;
             }
             targetHand.SetHandSamplePath(filename, transform.localPosition, transform.localRotation);
-            targetNetworkPlayerTape = targetHand;
-            targetNetworkPlayerTape.TapeInHand = this;
+            targetNetworkTapeHand = targetHand;
+            targetNetworkTapeHand.TapeInHand = this;
         }
     }
 
     void RemovePathFromHand()
     {
-        if (targetNetworkPlayerTape != null)
+        if (targetNetworkTapeHand != null)
         { 
-            targetNetworkPlayerTape.TapeInHand = null;
-            targetNetworkPlayerTape.SetHandSamplePath("", Vector3.zero, Quaternion.identity);
-            targetNetworkPlayerTape = null;
+            targetNetworkTapeHand.TapeInHand = null;
+            targetNetworkTapeHand.SetHandSamplePath("", Vector3.zero, Quaternion.identity);
+            targetNetworkTapeHand = null;
         }
     }
 }

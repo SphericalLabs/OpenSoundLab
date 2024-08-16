@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,6 +63,11 @@ public class omniPlug : manipObject
     List<Transform> collCandidates = new List<Transform>();
     masterControl.WireMode wireType = masterControl.WireMode.Curved;
 
+
+    private NetworkPlayerPlugHand targetNetworkPlugHand;
+    public NetworkPlayerPlugHand TargetNetworkPlugHand { get => targetNetworkPlugHand; set => targetNetworkPlugHand = value; }
+
+
     public override void Awake()
     {
         base.Awake();
@@ -76,6 +81,7 @@ public class omniPlug : manipObject
         //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
         mouseoverFeedback.SetActive(false);
         plugTrans = transform.GetChild(0);
+        onEndGrabEvents.AddListener(RemovePlugFromHand);
 
         if (masterControl.instance != null)
         {
@@ -655,4 +661,26 @@ public class omniPlug : manipObject
         lr.sharedMaterial = on ? omniCableSelectedMat : omniCableMat;
     }
 
+
+
+    public void AddPlugToHand(int index)
+    {
+        var targetHand = NetworkMenuManager.Instance.localPlayer.GetTargetPlugHand(manipulatorObjScript);
+        if (targetHand != null)
+        {
+            targetHand.SetHandJackIndex(index, transform.localPosition, transform.localRotation);
+            targetNetworkPlugHand = targetHand;
+            targetNetworkPlugHand.PlugInHand = this;
+        }
+    }
+
+    void RemovePlugFromHand()
+    {
+        if (targetNetworkPlugHand != null)
+        {
+            targetNetworkPlugHand.PlugInHand = null;
+            targetNetworkPlugHand.SetHandJackIndex(0, Vector3.zero, Quaternion.identity);
+            targetNetworkPlugHand = null;
+        }
+    }
 }

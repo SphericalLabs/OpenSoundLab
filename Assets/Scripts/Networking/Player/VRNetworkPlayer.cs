@@ -48,8 +48,12 @@ public class VRNetworkPlayer : NetworkBehaviour
     private Transform voiceOverTransform;
 
     [Header("Network Tape")]
-    public NetworkPlayerTape leftHandNetworkTape;
-    public NetworkPlayerTape rightHandNetworkTape;
+    public NetworkPlayerTapeHand leftNetworkTapeHand;
+    public NetworkPlayerTapeHand rightNetworkTapeHand;
+
+    [Header("Network Jack")]
+    public NetworkPlayerPlugHand leftNetworkPlugHand;
+    public NetworkPlayerPlugHand rightNetworkPlugHand;
 
 
     public override void OnStartLocalPlayer()
@@ -248,15 +252,28 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
     }
 
-    public NetworkPlayerTape GetTargetTape(manipulator manipulator)
+    public NetworkPlayerTapeHand GetTargetTapeHand(manipulator manipulator)
     {
         if (manipulator == leftHandManipulator)
         {
-            return leftHandNetworkTape;
+            return leftNetworkTapeHand;
         }
         else if (manipulator == rightHandManipulator)
         {
-            return rightHandNetworkTape;
+            return rightNetworkTapeHand;
+        }
+        return null;
+    }
+
+    public NetworkPlayerPlugHand GetTargetPlugHand(manipulator manipulator)
+    {
+        if (manipulator == leftHandManipulator)
+        {
+            return leftNetworkPlugHand;
+        }
+        else if (manipulator == rightHandManipulator)
+        {
+            return rightNetworkPlugHand;
         }
         return null;
     }
