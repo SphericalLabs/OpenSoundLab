@@ -445,6 +445,7 @@ public class omniPlug : manipObject
             transform.rotation = plugTrans.rotation;
             plugTrans.parent = transform;
             calmTime = 0;
+            connected.beginConnection(this, true);
         }
 
         collCandidates.Clear();
@@ -470,7 +471,7 @@ public class omniPlug : manipObject
         if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(1000);
 
         connected = j;
-        connected.beginConnection(this, true);
+        //connected.beginConnection(this, true);
         signal = connected.homesignal;
 
         plugTrans.position = connected.transform.position;
@@ -562,8 +563,7 @@ public class omniPlug : manipObject
             collCandidates.Clear();
             if (connected != null) collCandidates.Add(connected.transform);
 
-
-
+            AddPlugToHand(otherPlug.connected.ID);
 
             if (manipulatorObjScript != null)
             {

@@ -93,7 +93,7 @@ public class omniJack : manipObject
             if (near != null)
             {
                 manipulatorObj.GetComponent<manipulator>().ForceGrab(near);
-                near.AddPlugToHand(near.otherPlug.connected.ID);
+                //near.AddPlugToHand(near.otherPlug.connected.ID);
             }
             else
             {
@@ -116,7 +116,7 @@ public class omniJack : manipObject
                 manipulatorObj.GetComponent<manipulator>().ForceGrab(far);
 
                 plugRep.SetActive(false);
-                far.AddPlugToHand(ID);
+                //far.AddPlugToHand(ID);
 
             }
             if (near != null) near.setCableHighlighted(true);
@@ -267,6 +267,6 @@ public class omniJack : manipObject
         near.Setup(jackTargetHue, !outgoing, far);
         manipulator.GetComponent<manipulator>().ForceGrab(far);
 
-        far.AddPlugToHand(ID);
+        //far.AddPlugToHand(ID);
     }
 }
