@@ -563,7 +563,6 @@ public class omniPlug : manipObject
             collCandidates.Clear();
             if (connected != null) collCandidates.Add(connected.transform);
 
-            AddPlugToHand(otherPlug.connected.ID);
 
             if (manipulatorObjScript != null)
             {
@@ -587,7 +586,7 @@ public class omniPlug : manipObject
                     transform.localPosition = posDiff;
                 }
 
-
+                AddPlugToHand(otherPlug.connected.ID);
             }
 
             updateJackList();
