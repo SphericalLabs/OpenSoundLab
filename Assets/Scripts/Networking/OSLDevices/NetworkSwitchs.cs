@@ -47,14 +47,14 @@ public class NetworkSwitchs : NetworkBehaviour
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
-                switchs[index].setSwitch(newValue);
+                switchs[index].setSwitch(newValue, true, true);
                 break;
             case SyncList<bool>.Operation.OP_INSERT:
                 break;
             case SyncList<bool>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<bool>.Operation.OP_SET:
-                switchs[index].setSwitch(newValue);
+                switchs[index].setSwitch(newValue, true, true);
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
                 break;

@@ -25,6 +25,7 @@ public class NetworkSequencerCv : NetworkSyncListener
         networkSwitchs = GetComponent<NetworkSwitchs>();
         networkJacks = GetComponent<NetworkJacks>();
 
+        // make sure that nothing is added manually to these scripts, since otherwise it probably would end up doubled after these GetComponentsInChildren calls
         networkButtons.buttons = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<button>(true), networkButtons.buttons);
         networkDials.dials = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<dial>(true), networkDials.dials);
         networkSwitchs.switchs = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<basicSwitch>(true), networkSwitchs.switchs);

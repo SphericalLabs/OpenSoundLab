@@ -157,17 +157,20 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         spawnMaxDimensions();
 
-        for (int i = 0; i < curDimensions[0]; i++)
-        {
-            jackOutCVGenerators[i].setRange(lastRangeLow ? cvSignalGenerator.lowRange : cvSignalGenerator.highRange);
-        }
-
-        // register switch events
+        // register switch events, only now possible after everything has spawned
+        // but they will set they current value and thus make invisible rows visible again
         for (int row = 0; row < maxRows; row++)
         {
             int localRow = row;  // Create a local copy, since closures are passed by reference
             controlPanelModes[row].onSwitchChangedEvent.AddListener(delegate { doModeSwitch(localRow); });
         }
+
+        for (int i = 0; i < curDimensions[0]; i++)
+        {
+            jackOutCVGenerators[i].setRange(lastRangeLow ? cvSignalGenerator.lowRange : cvSignalGenerator.highRange);
+        }
+
+        
 
         dimensionDisplays[1].text = "";
         dimensionDisplays[1].gameObject.SetActive(false);
@@ -178,6 +181,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         _beatManager.setTriggers(executeNextStep, resetSteps);
         _beatManager.updateBeatNoTriplets(beatSpeed);
         _beatManager.updateSwing(swingPercent);
+
     }
 
     void Update()
@@ -321,6 +325,8 @@ public class sequencerCVDeviceInterface : deviceInterface
 
     public void doModeSwitch(int row){
 
+        if (row > curDimensions[0] - 1) return; // this might happen during initialisation when mode switch is synced    
+
         if (controlPanelModes[row].switchVal) // trigger mode
         {
             // enable trig
@@ -354,6 +360,7 @@ public class sequencerCVDeviceInterface : deviceInterface
                 stepDialTrans[row, step].gameObject.SetActive(true);
             }
         }     
+
     }
 
     public void forcePlay(bool on)
