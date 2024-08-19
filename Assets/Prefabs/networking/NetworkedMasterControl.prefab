@@ -67,7 +67,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncDirection: 0
   syncMode: 0
-  syncInterval: 0
+  syncInterval: 0.05
   buttons:
   - {fileID: 0}
   - {fileID: 0}
@@ -87,7 +87,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncDirection: 0
   syncMode: 0
-  syncInterval: 0
+  syncInterval: 0.05
   dials:
   - {fileID: 0}
 --- !u!114 &7188549563921274302

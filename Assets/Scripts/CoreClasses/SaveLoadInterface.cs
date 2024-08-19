@@ -37,6 +37,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Xml.Serialization;
+using Mirror;
 
 public class SaveLoadInterface : MonoBehaviour
 {
@@ -75,6 +76,7 @@ public class SaveLoadInterface : MonoBehaviour
             {
                 GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
                 g.GetComponent<deviceInterface>().Load(dB);
+                NetworkServer.Spawn(g);
             }
         }
         Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
@@ -83,6 +85,7 @@ public class SaveLoadInterface : MonoBehaviour
         {
             GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor /*Vector3.zero, Quaternion.identity*/) as GameObject;
             g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i]);
+            NetworkServer.Spawn(g);
         }
 
         LoadPlugs();

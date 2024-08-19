@@ -21,6 +21,8 @@ public class NetworkVoiceManager : MonoBehaviour
     ChatroomAgent agent;
 
     [Header("UI")]
+
+    public bool displaySpectrum = false;
     public TMP_Text menuMessage;
     public Transform peerViewContainer;
     public PeerView peerViewTemplate;
@@ -129,7 +131,7 @@ public class NetworkVoiceManager : MonoBehaviour
 
     void Update()
     {
-        if (agent == null || agent.PeerOutputs == null) return;
+        if (agent == null || agent.PeerOutputs == null || !displaySpectrum) return;
 
         foreach (var output in agent.PeerOutputs)
         {

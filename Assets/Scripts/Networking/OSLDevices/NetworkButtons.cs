@@ -13,6 +13,7 @@ public class NetworkButtons : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
+        buttonValues.Clear();
         foreach (var button in buttons)
         {
             buttonValues.Add(button.isHit);
