@@ -740,19 +740,22 @@ public class sequencerCVDeviceInterface : deviceInterface
         data.activePattern = activePattern;
         data.dimensions = dimensions;
 
-        //data.stepBools = stepBools;
-        //data.stepFloats = stepFloats;
-        data.stepBools = new bool[maxPattern, maxRows, maxSteps];
-        data.stepFloats = new float[maxPattern, maxRows, maxSteps];
+        // Initialize jagged arrays for stepBools and stepFloats
+        data.stepBools = new bool[maxPattern][][];
+        data.stepFloats = new float[maxPattern][][];
 
         for (int p = 0; p < maxPattern; p++)
         {
+            data.stepBools[p] = new bool[maxRows][];
+            data.stepFloats[p] = new float[maxRows][];
             for (int r = 0; r < maxRows; r++)
             {
+                data.stepBools[p][r] = new bool[maxSteps];
+                data.stepFloats[p][r] = new float[maxSteps];
                 for (int s = 0; s < maxSteps; s++)
                 {
-                    data.stepBools[p, r, s] = stepBools[p, r, s];
-                    data.stepFloats[p, r, s] = stepFloats[p, r, s];
+                    data.stepBools[p][r][s] = stepBools[p, r, s];
+                    data.stepFloats[p][r][s] = stepFloats[p, r, s];
                 }
             }
         }
@@ -792,7 +795,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         SequencerCVData data = d as SequencerCVData;
         base.Load(data);
 
-        // first grow to max size, since awake already shrinks to default values, this would cause trouble in the loading init below
+        // Grow to max size initially
         SetDimensions(maxRows, maxSteps);
 
         playButton.startToggled = data.switchPlay;
@@ -810,15 +813,14 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         playTriggerInputJack.ID = data.jackTriggerInID;
 
-
         for (int p = 0; p < maxPattern; p++)
         {
             for (int r = 0; r < maxRows; r++)
             {
                 for (int s = 0; s < maxSteps; s++)
                 {
-                    stepBools[p, r, s] = data.stepBools[p, r, s];
-                    stepFloats[p, r, s] = data.stepFloats[p, r, s];
+                    stepBools[p, r, s] = data.stepBools[p][r][s];
+                    stepFloats[p, r, s] = data.stepFloats[p][r][s];
                 }
             }
         }
@@ -827,12 +829,11 @@ public class sequencerCVDeviceInterface : deviceInterface
         {
             for (int row = 0; row < data.dimensions[0]; row++)
             {
-                if (data.stepBools[data.activePattern, row, step])
+                if (data.stepBools[data.activePattern][row][step])
                 {
                     stepButtons[row, step].keyHit(true);
                 }
-                stepDials[row, step].setPercent(data.stepFloats[data.activePattern, row, step], true);
-                //stepDials[row, step].
+                stepDials[row, step].setPercent(data.stepFloats[data.activePattern][row][step], true);
             }
         }
 
@@ -850,7 +851,7 @@ public class sequencerCVDeviceInterface : deviceInterface
         swingDial.setPercent(data.dialSwing, true);
         switchCVRange.setSwitch(data.switchRange, true);
 
-        // at the end shrink size to desired values
+        // Shrink to desired size at the end
         SetDimensions(data.dimensions[0], data.dimensions[1]);
     }
 
@@ -873,8 +874,9 @@ public class SequencerCVData : InstrumentData
     public int[] dimensions; // rows, steps
 
     public int activePattern;
-    public bool[,,] stepBools;
-    public float[,,] stepFloats;
+    public bool[][][] stepBools; // Replaced bool[,,] with jagged array
+    public float[][][] stepFloats; // Replaced float[,,] with jagged array
 
     public bool switchRange;
 }
+
