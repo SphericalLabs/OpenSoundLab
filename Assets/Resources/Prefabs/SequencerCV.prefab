@@ -1385,8 +1385,8 @@ GameObject:
   - component: {fileID: 877786763074727456}
   - component: {fileID: 2775410166235138230}
   - component: {fileID: 4564201242544458581}
-  - component: {fileID: 1596437208768586980}
   - component: {fileID: 6623258359152863913}
+  - component: {fileID: 926902449124601550}
   - component: {fileID: 8324042198422262742}
   - component: {fileID: 6008975786203391811}
   - component: {fileID: 6071241351280792618}
@@ -1610,8 +1610,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  omniJacks:
-  - {fileID: 114000010336139522}
+  omniJacks: []
 --- !u!114 &4564201242544458581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1627,25 +1626,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.05
-  dials:
-  - {fileID: 114000012964192894}
---- !u!114 &1596437208768586980
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000012113822842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  buttons:
-  - {fileID: 114000010763487664}
+  dials: []
 --- !u!114 &6623258359152863913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1661,8 +1642,23 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  switchs:
-  - {fileID: 5121695292029034116}
+  switchs: []
+--- !u!114 &926902449124601550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012113822842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons: []
 --- !u!114 &8324042198422262742
 MonoBehaviour:
   m_ObjectHideFlags: 0
