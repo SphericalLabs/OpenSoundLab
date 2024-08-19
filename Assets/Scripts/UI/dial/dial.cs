@@ -148,7 +148,7 @@ public class dial : manipObject
 
         if (curState == manipState.grabbed)
         {
-            updatePercent();
+            updatePercent(true);
         }
     }
 
@@ -189,7 +189,7 @@ public class dial : manipObject
 
     dialColor newDialColor;
 
-    void updatePercent()
+    void updatePercent(bool invokeEvent = false)
     {
 
         percent = Utils.map(realRot, -150f, 150f, 0f, 1f);
@@ -221,7 +221,10 @@ public class dial : manipObject
 
         }
 
-        onPercentChangedEvent.Invoke();
+        if (invokeEvent)
+        {
+            onPercentChangedEvent.Invoke();
+        }
     }
 
 
