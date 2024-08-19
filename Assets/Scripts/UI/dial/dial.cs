@@ -158,6 +158,7 @@ public class dial : manipObject
         if (float.IsNaN(p)) return; // this is used for skipping missing data fields in old save xmls
 
         percent = Mathf.Clamp01(p);
+        Debug.Log($"Set percent {percent}");
         if (isNotched)
         {
             realRot = Utils.map(Mathf.Round(percent * (notchSteps - 1)), 0, notchSteps - 1, -150f, 150f);
