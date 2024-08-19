@@ -32,6 +32,7 @@ public class NetworkMenuManager : MonoBehaviour
     [SerializeField] private TMP_InputField relayCodeInputField;
     [SerializeField] private GameObject connectToRelayButton;
     [SerializeField] private TMP_Text ipAdressText;
+    [SerializeField] private Toggle discoverableToggle;
 
     [Header("Relay Host Menu")]
     [SerializeField] private Transform relayHostMenuParent;
@@ -82,6 +83,7 @@ public class NetworkMenuManager : MonoBehaviour
             }
             else
             {
+                discoverableToggle.SetIsOnWithoutNotify(((OSLNetworkDiscovery)networkDiscovery).isDiscoverable);
                 networkManager.StartHost();
                 ActivateHostUI();
                 yield return new WaitForSeconds(0.5f);
@@ -206,7 +208,7 @@ public class NetworkMenuManager : MonoBehaviour
 
     public void OnChangeRelayCodeValue(string value)
     {
-        connectToRelayButton.SetActive(value.Length >= 5);
+        connectToRelayButton.SetActive(value.Length >= 6);
     }
 
     #endregion

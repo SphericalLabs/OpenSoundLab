@@ -665,6 +665,7 @@ public class omniPlug : manipObject
 
     public void AddPlugToHand(int index)
     {
+        Debug.Log($"Grab Plug connected with {index}");
         var targetHand = NetworkMenuManager.Instance.localPlayer.GetTargetPlugHand(manipulatorObjScript);
         if (targetHand != null)
         {
