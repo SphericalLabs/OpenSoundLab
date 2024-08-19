@@ -106,6 +106,12 @@ public class VRNetworkPlayer : NetworkBehaviour
         StartCoroutine(ConnectToVoiceChatAgent());
     }
 
+    public override void OnStopLocalPlayer()
+    {
+        base.OnStopLocalPlayer();
+        RemoveManipulatorEvents();
+    }
+
     private IEnumerator Start()
     {
         if (!isLocalPlayer)
@@ -181,6 +187,20 @@ public class VRNetworkPlayer : NetworkBehaviour
         {
             rightHandManipulator.onInputTriggerdEvent.AddListener(RightHandTriggerStarted);
             rightHandManipulator.onInputReleasedEvent.AddListener(RightHandTriggerReleased);
+        }
+    }
+
+    public void RemoveManipulatorEvents()
+    {
+        if (leftHandManipulator != null)
+        {
+            leftHandManipulator.onInputTriggerdEvent.RemoveListener(LeftHandTriggerStarted);
+            leftHandManipulator.onInputReleasedEvent.RemoveListener(LeftHandTriggerReleased);
+        }
+        if (rightHandManipulator != null)
+        {
+            rightHandManipulator.onInputTriggerdEvent.RemoveListener(RightHandTriggerStarted);
+            rightHandManipulator.onInputReleasedEvent.RemoveListener(RightHandTriggerReleased);
         }
     }
 
