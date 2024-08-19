@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Adrenak.UniVoice.Samples {
     public static class ToggleExtension{
@@ -18,7 +19,7 @@ namespace Adrenak.UniVoice.Samples {
         public event Action<bool> OnIncomingModified;
         public event Action<bool> OnOutgoingModified;
 
-        [SerializeField] Text idText;
+        [SerializeField] TMP_Text idText;
         [SerializeField] Transform barContainer;
         [SerializeField] Transform barTemplate;
         [SerializeField] Toggle speakerToggle;

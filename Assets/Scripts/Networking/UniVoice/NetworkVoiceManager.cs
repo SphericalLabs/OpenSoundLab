@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 using Adrenak.UniVoice;
 using Adrenak.UniVoice.MirrorNetwork;
@@ -20,7 +21,7 @@ public class NetworkVoiceManager : MonoBehaviour
     ChatroomAgent agent;
 
     [Header("UI")]
-    public Text menuMessage;
+    public TMP_Text menuMessage;
     public Transform peerViewContainer;
     public PeerView peerViewTemplate;
     public Toggle muteSelfToggle;
