@@ -535,6 +535,10 @@ public class sequencerCVDeviceInterface : deviceInterface
         curDimensions[0] = maxRows;
         curDimensions[1] = maxSteps;
         
+        // please note: don't set the default dimensions here, but position the stretchHandle in the prefab instead
+        // still, the following two lines are necessary for shrinking down from maxDimensions
+        // depending on your strechHandle settings you might have to update these dimensions here, too
+        // todo: simplify default settings
         dimensions[0] = 4;
         dimensions[1] = 8;
 
