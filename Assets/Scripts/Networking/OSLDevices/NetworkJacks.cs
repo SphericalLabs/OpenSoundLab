@@ -42,6 +42,7 @@ public class NetworkJacks : NetworkBehaviour
 
     private void Start()
     {
+        Debug.Log("Start network jack");
         for (int i = 0; i < omniJacks.Length; i++)
         {
             NetworkSpawnManager.Instance.AddJack(omniJacks[i]);
@@ -75,7 +76,7 @@ public class NetworkJacks : NetworkBehaviour
                 }
                 else
                 {
-                    ManagePlugConnection(index, newValue);
+                    ManagePlugConnection(index, newValue, false);
                 }
                 break;
             case SyncList<int>.Operation.OP_INSERT:
@@ -99,6 +100,7 @@ public class NetworkJacks : NetworkBehaviour
 
     public void SetJackConnection(int index)
     {
+        Debug.Log($"{gameObject.name} set jack index {index}");
         if (index >= 0 && index < omniJacks.Length)
         {
             if (omniJacks[index].far.connected != null)
@@ -156,10 +158,14 @@ public class NetworkJacks : NetworkBehaviour
     }
 
     //create jack plugs
-    public void ManagePlugConnection(int index, int otherId)
+    public void ManagePlugConnection(int index, int otherId, bool endConnection = true)
     {
         if (otherId == 0)
         {
+            if (!endConnection)
+            {
+                return;
+            }
             if (omniJacks[index].near != null && omniJacks[index].far != null)
             {
                 if (omniJacks[index].near.curState == manipObject.manipState.grabbed || omniJacks[index].far.curState == manipObject.manipState.grabbed)

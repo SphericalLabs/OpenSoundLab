@@ -89,8 +89,7 @@ public class SaveLoadInterface : MonoBehaviour
             NetworkServer.Spawn(g);
         }
 
-        LoadPlugs();
-        ClearSynthSetList();
+        StartCoroutine(LoadPlugs());
     }
 
     public bool PreviewLoad(string filename, Transform par)
@@ -162,9 +161,10 @@ public class SaveLoadInterface : MonoBehaviour
         synthSet.SaveToFile(filename);
     }
 
-    void LoadPlugs()
+    IEnumerator LoadPlugs()
     {
         Debug.Log("Load Plugs");
+        yield return new WaitForEndOfFrame();
         Dictionary<int, omniPlug> temp = new Dictionary<int, omniPlug>();
         List<PlugData> ResortedPlugList = new List<PlugData>();
 
@@ -194,8 +194,10 @@ public class SaveLoadInterface : MonoBehaviour
                 }
             }
             if (targetJack == null) Debug.LogError("NO JACK FOR " + ResortedPlugList[i].connected);
-            temp[ResortedPlugList[i].ID].Activate(temp[ResortedPlugList[i].otherPlug], targetJack, ResortedPlugList[i].plugPath, ResortedPlugList[i].cordColor);
+            temp[ResortedPlugList[i].ID].Activate(temp[ResortedPlugList[i].otherPlug], targetJack, ResortedPlugList[i].plugPath, ResortedPlugList[i].cordColor, true);
         }
+
+        ClearSynthSetList();
     }
 
     public GameObject Copy(GameObject g, manipulator m)

@@ -116,7 +116,7 @@ public class omniPlug : manipObject
         //lr.material.SetColor("_TintColor", c);
     }
 
-    public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor)
+    public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor, bool invokeEvent = false)
     {
         float h, s, v;
         //Color.RGBToHSV(tempColor, out h, out s, out v);
@@ -139,7 +139,7 @@ public class omniPlug : manipObject
 
         otherPlug = siblingPlug;
         connected = jackIn;
-        connected.beginConnection(this, false);
+        connected.beginConnection(this, invokeEvent);
         signal = connected.homesignal;
 
         plugTrans.position = connected.transform.position;
