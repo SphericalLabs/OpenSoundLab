@@ -277,7 +277,17 @@ public class manipulator : MonoBehaviour
             dur *= 0.07f;
         }
 
+        if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Quest_3)
+        {
+            hapticPower *= 3f;
+            dur *= 0.07f;
+        }
 
+        if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Link_Quest_3)
+        {
+            hapticPower *= 4f;
+            dur *= 0.07f;
+        }
 
         List<UnityEngine.XR.InputDevice> devices = new List<UnityEngine.XR.InputDevice>();
 
