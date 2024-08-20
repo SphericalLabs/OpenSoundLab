@@ -56,15 +56,23 @@ public class uiPanelComponentInterface : componentInterface {
   int curSelect = -1;
 
   bool initialized = false;
-  void Start() {
+
+  void Awake(){
     panels = new List<UIpanel>();
     panelNodes = new List<Transform>();
     filenames = new List<string>();
+
     loadButton.SetActive(false);
     saveButton.SetActive(false);
 
     spawnPanels();
     initialized = true;
+
+    }
+
+  void Start() {
+
+
   }
 
   void Update() {

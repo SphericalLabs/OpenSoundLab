@@ -96,7 +96,7 @@ public class pauseMenu : MonoBehaviour
 
     uiPanelComponentInterface saveLoadPanel;
     void connectionChanged(){
-        Debug.Log("adaptSaveLoadMenu");
+        //Debug.Log("adaptSaveLoadMenu");
         saveLoadPanel.cancel();
         cancelFileMenu();
     }
@@ -194,11 +194,6 @@ public class pauseMenu : MonoBehaviour
             justItemActive(3);
             curItem = itemType.exitItem;
         }
-        if (t == itemType.newItem)
-        {
-            justItemActive(0);
-            curItem = itemType.newItem;
-        }
         if (t == itemType.tooltipItem)
         {
             masterControl.instance.toggleTooltips();
@@ -206,6 +201,19 @@ public class pauseMenu : MonoBehaviour
         if (t == itemType.exampleItem)
         {
             masterControl.instance.toggleExamples();
+        }
+        if (t == itemType.newItem)
+        {
+            justItemActive(0);
+            curItem = itemType.newItem;
+        }
+        if (t == itemType.loadItem)
+        {
+            noneActive();
+            savePanel.SetActive(true);
+            savePanel.GetComponent<uiPanelComponentInterface>().refreshFiles(false);
+
+            curItem = itemType.loadItem;
         }
         if (t == itemType.saveItem)
         {
@@ -220,14 +228,6 @@ public class pauseMenu : MonoBehaviour
             noneActive();
             wireSettingsPanel.SetActive(true);
             curItem = itemType.wireSettingsItem;
-        }
-        if (t == itemType.loadItem)
-        {
-            noneActive();
-            savePanel.SetActive(true);
-            savePanel.GetComponent<uiPanelComponentInterface>().refreshFiles(false);
-
-            curItem = itemType.loadItem;
         }
         if (t == itemType.cancelItem)
         {
