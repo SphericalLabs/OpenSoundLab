@@ -76,14 +76,15 @@ public class SaveLoadInterface : MonoBehaviour
             {
                 GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
                 g.GetComponent<deviceInterface>().Load(dB);
+                //Debug.Log("load data");
                 NetworkServer.Spawn(g);
             }
         }
-        Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
+        //Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
         int c = synthSet.InstrumentList.Count;
         for (int i = 0; i < c; i++)
         {
-            GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor /*Vector3.zero, Quaternion.identity*/) as GameObject;
+            GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType]/*, patchAnchor Vector3.zero, Quaternion.identity*/) as GameObject;
             g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i]);
             NetworkServer.Spawn(g);
         }
@@ -163,6 +164,7 @@ public class SaveLoadInterface : MonoBehaviour
 
     void LoadPlugs()
     {
+        Debug.Log("Load Plugs");
         Dictionary<int, omniPlug> temp = new Dictionary<int, omniPlug>();
         List<PlugData> ResortedPlugList = new List<PlugData>();
 

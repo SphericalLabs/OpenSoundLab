@@ -17,11 +17,14 @@ public class NetworkJacks : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-
+        Debug.Log("Start network jack on sever");
         //set ID connected jacks into a synclist
         foreach (var jack in omniJacks)
         {
-            jack.ID = GetNextId;
+            if (jack.ID == -1)
+            {
+                jack.ID = GetNextId;
+            }
             jackIds.Add(jack.ID);
             connectedJackIds.Add(0);
         }
