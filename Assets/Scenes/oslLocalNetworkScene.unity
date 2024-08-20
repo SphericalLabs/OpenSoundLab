@@ -1202,7 +1202,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 79575265}
+      objectReference: {fileID: 4300000, guid: c58d39a82b48cf54bbe799e0a04d32e4, type: 2}
     - target: {fileID: 2295654263132812952, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1228,6 +1228,11 @@ PrefabInstance:
       propertyPath: itemType
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3464993252344822625, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_SelectedEditorRenderState
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5660292252743075318, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: onStartGrabEvents.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -1252,8 +1257,10 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 79575265}
-    m_RemovedComponents: []
+      objectReference: {fileID: 4300000, guid: c58d39a82b48cf54bbe799e0a04d32e4, type: 2}
+    m_RemovedComponents:
+    - {fileID: 7528170323211124910, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
+    - {fileID: 124512545865607688, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4000013181359966, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
