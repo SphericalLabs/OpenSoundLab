@@ -279,7 +279,7 @@ public class manipulator : MonoBehaviour
 
         if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Quest_3)
         {
-            hapticPower *= 3f;
+            hapticPower *= 4f;
             dur *= 0.07f;
         }
 
