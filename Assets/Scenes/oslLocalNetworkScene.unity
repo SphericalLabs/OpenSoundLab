@@ -1114,6 +1114,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainMenu
       objectReference: {fileID: 0}
+    - target: {fileID: 4000010721398236, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.28969997
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012627125964, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.2247
+      objectReference: {fileID: 0}
     - target: {fileID: 4000012630833762, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1158,6 +1166,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.0549
       objectReference: {fileID: 0}
+    - target: {fileID: 4000013748106256, guid: 4e021dc50e0cf8c45a2230a614ba4ba4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.15909998
+      objectReference: {fileID: 0}
     - target: {fileID: 82000010023805524, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: spreadCustomCurve.m_RotationOrder
@@ -1178,6 +1190,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 79575265}
+    - target: {fileID: 289218981006982105, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0935
+      objectReference: {fileID: 0}
     - target: {fileID: 363605052255444655, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1222,6 +1239,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2461426935403234710, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
+        type: 3}
+      propertyPath: m_Text
+      value: COLOCATE
       objectReference: {fileID: 0}
     - target: {fileID: 2464170895310861772, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
         type: 3}
