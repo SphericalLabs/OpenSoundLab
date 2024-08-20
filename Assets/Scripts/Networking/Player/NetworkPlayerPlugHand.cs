@@ -23,7 +23,7 @@ public class NetworkPlayerPlugHand : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        if (!isServer && connectedJackIndex > 0)
+        if (!isServer && connectedJackIndex != 0)
         {
             SetSamplePlug(offset, rotationOffset);
         }
@@ -87,7 +87,7 @@ public class NetworkPlayerPlugHand : NetworkBehaviour
             Destroy(networkedPlugInHand.gameObject);
             Debug.Log($"Destroy grabed plug of {handParent}");
         }
-        if (!isLocalPlayer && connectedJackIndex > 0)
+        if (!isLocalPlayer && connectedJackIndex != 0)
         {
             //check if target jack of ID existst
             var targetJack = NetworkSpawnManager.Instance.GetJackById(connectedJackIndex);
