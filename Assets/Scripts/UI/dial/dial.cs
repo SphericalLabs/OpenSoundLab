@@ -41,7 +41,7 @@ using UnityEngine.Events;
 public class dial : manipObject
 {
 
-    public float percent = 0.5f;
+    public float percent = 0f;
     public float defaultPercent;
 
     public enum dialColor { generic, frequency, amplitude };
@@ -88,7 +88,6 @@ public class dial : manipObject
         CapsuleCollider coll = GetComponent<CapsuleCollider>(); // globally make them bigger
         coll.radius *= 1.1f;
 
-        
     }
 
     void loadMaterials(dialColor colorVariant)
@@ -115,7 +114,7 @@ public class dial : manipObject
 
     void Start()
     {
-        setPercent(percent, true);
+        setPercent(percent);
         //updatePercent();
     }
 

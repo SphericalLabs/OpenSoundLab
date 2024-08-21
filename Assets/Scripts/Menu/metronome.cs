@@ -46,9 +46,9 @@ public class metronome : componentInterface
     public float PitchBendMult { get => pitchBendMult; set => pitchBendMult = value; }
     public delegate void PitchBendChangeHandler(float pitchBendMult);
     public event PitchBendChangeHandler PitchBendChange;
-    public float bpmpercent = .5f;
+    float bpmpercent = .1f;
 
-    public float volumepercent = 0;
+    float volumepercent = 0;
 
     public Transform rod;
     public TextMesh txt;
@@ -65,10 +65,6 @@ public class metronome : componentInterface
             if (b.buttonID == 5)
                 recButton = b;
         }
-
-        // hacky bugfix to make sure that the bpm dial is properly read and initialized even if the menu has not yet been opened once.
-        // this is important in scenarios, where a host is taking connections even if that host hasn't had the menu open yet.
-        Update(); 
     }
 
     // this is called each time the menu is being activated
@@ -105,6 +101,13 @@ public class metronome : componentInterface
             }
         }
 
+        if (volumepercent != volumeDial.percent)
+        {
+            volumepercent = volumeDial.percent;
+            masterControl.instance.metronomeClick.volume = Mathf.Clamp01(volumepercent - .1f);
+        }
+
+        if (bpmpercent != bpmDial.percent) readBpmDialAndBroadcast();
     }
 
     public void readBpmDialAndBroadcast()

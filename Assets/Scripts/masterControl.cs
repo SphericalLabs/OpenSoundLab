@@ -84,7 +84,6 @@ public class masterControl : MonoBehaviour {
   public bool jacksEnabled = true;
 
   public masterBusRecorder recorder;
-  public metronome metro;
 
   void Awake() {
     instance = this;
@@ -344,17 +343,7 @@ public class masterControl : MonoBehaviour {
       Camera.main.backgroundColor = new Color(0f,0f,0f,0f);
     }
 
-    // moved this polling here, since metronome is not always active and thus does not always read dials in Update
-    // important for syncing bpm while menu is closed
-    if (metro.volumepercent != metro.volumeDial.percent)
-    {
-        metro.volumepercent = metro.volumeDial.percent;
-        masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
-    }
-
-    if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
-
-    }
+  }
 
   private void OnAudioFilterRead(float[] buffer, int channels) {
     if (!beatUpdateRunning) return;

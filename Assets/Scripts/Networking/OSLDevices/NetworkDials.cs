@@ -25,8 +25,7 @@ public class NetworkDials : NetworkBehaviour
         dialValues.Clear();
     }
 
-    // Moved to awake because metronome might not have been setActive when somebody joins
-    void Awake()
+    private void Start()
     {
         //add dials on change callback event
         for (int i = 0; i < dials.Length; i++)
