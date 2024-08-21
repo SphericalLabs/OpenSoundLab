@@ -33,12 +33,8 @@
 // limitations under the License.
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Oculus;
-using Unity.XR.Oculus;
+using System;
 
 public class masterControl : MonoBehaviour {
 
@@ -272,7 +268,7 @@ public class masterControl : MonoBehaviour {
   void beatResetEventLocal() { }
 
   public void setBPM(float b) {
-    bpm = Mathf.RoundToInt(b);
+    bpm = (float)MathF.Round(b, 1);
     measurePeriod = 480f / bpm;
     _measurePhase = curCycle * measurePeriod;
   }
