@@ -46,9 +46,9 @@ public class metronome : componentInterface
     public float PitchBendMult { get => pitchBendMult; set => pitchBendMult = value; }
     public delegate void PitchBendChangeHandler(float pitchBendMult);
     public event PitchBendChangeHandler PitchBendChange;
-    float bpmpercent = .1f;
-
-    float volumepercent = 0;
+    
+    public float bpmpercent = .1f;
+    public float volumepercent = 0;
 
     public Transform rod;
     public TextMesh txt;
@@ -101,13 +101,6 @@ public class metronome : componentInterface
             }
         }
 
-        if (volumepercent != volumeDial.percent)
-        {
-            volumepercent = volumeDial.percent;
-            masterControl.instance.metronomeClick.volume = Mathf.Clamp01(volumepercent - .1f);
-        }
-
-        if (bpmpercent != bpmDial.percent) readBpmDialAndBroadcast();
     }
 
     public void readBpmDialAndBroadcast()

@@ -35,6 +35,7 @@
 using UnityEngine;
 using System.IO;
 using System;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class masterControl : MonoBehaviour {
 
@@ -84,6 +85,7 @@ public class masterControl : MonoBehaviour {
   public bool jacksEnabled = true;
 
   public masterBusRecorder recorder;
+  public metronome metro;
 
   void Awake() {
     instance = this;
@@ -287,25 +289,32 @@ public class masterControl : MonoBehaviour {
   public Transform patchAnchor;
 
   Vector2 leftStick, rightStick;
-  private void Start()
-  {
-    if(!PlayerPrefs.HasKey("showTutorialsOnStartup")){
-      PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
-      PlayerPrefs.Save();
+    private void Start()
+    {
+        if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
+        {
+            PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
+            PlayerPrefs.Save();
+        }
+
+        if (PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null)
+        {
+
+            GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
+
+            //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
+            g.transform.position = new Vector3(0f, 1.3f, 0.75f);
+            g.transform.Rotate(0f, -180f, 0f);
+
+            //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
+
+        }
+
+        GameObject metronomeObject = GameObject.Find("Metronome");
+        if (metronomeObject != null)
+            metro = metronomeObject.GetComponent<metronome>();
+            
     }
-
-    if(PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null){
-
-      GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
-
-      //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
-      g.transform.position = new Vector3(0f, 1.3f, 0.75f); 
-      g.transform.Rotate(0f, -180f, 0f);
-
-      //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
-
-    }
-  }
 
   int lastBeat = -1;
   
@@ -340,10 +349,17 @@ public class masterControl : MonoBehaviour {
 
     if (leftStick.x < -0.5f && rightStick.x > 0.5f) // press both outward
     {
-      Camera.main.backgroundColor = new Color(0f,0f,0f,0f);
-    }
+            Camera.main.backgroundColor = new Color(0f,0f,0f,0f);
+        }
 
-  }
+    if (metro.volumepercent != metro.volumeDial.percent)
+    {
+        metro.volumepercent = metro.volumeDial.percent;
+        masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
+    }
+    if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
+    
+}
 
   private void OnAudioFilterRead(float[] buffer, int channels) {
     if (!beatUpdateRunning) return;
