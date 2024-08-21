@@ -67,6 +67,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
 
             source.loop = true;
             source.clip = buffer.AudioClip;
+            source.spatialize = true;
 
             if (minSegCount != 0)
                 ctd.MinSegCount = Mathf.Clamp(minSegCount, 1, buffer.SegCount);
