@@ -84,6 +84,18 @@ public class menuManager : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // todo: make metronome a normal object then you don't need these visibility and init hacks    
+        Activate(true, transform); // bugfix for hidden metronome not networking properly
+        StartCoroutine(delayedActivate(false, transform, 0.2f)); // closing it right away, so that nobody is irritated
+    }
+
+    IEnumerator delayedActivate(bool on, Transform trans, float sec){
+        yield return new WaitForSecondsRealtime(sec);
+        Activate(on, trans);
+    }
+
     void loadNonMenuItems()
     {
         GameObject temp = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;

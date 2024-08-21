@@ -166,14 +166,20 @@ public class masterControl : MonoBehaviour {
 
     recorder = GetComponentInChildren<masterBusRecorder>();
 
-  }
+    // todo: get rid of this hack
+    GameObject metronomeObject = GameObject.Find("Metronome");
+    if (metronomeObject != null)
+        metro = metronomeObject.GetComponent<metronome>();
 
-  //public void resetMasterClockDSPTime(bool wasChanged){
-  //  if (wasChanged) resetClock();
-  //}
-  //}
 
-  public void toggleInstrumentVolume(bool on) {
+    }
+
+    //public void resetMasterClockDSPTime(bool wasChanged){
+    //  if (wasChanged) resetClock();
+    //}
+    //}
+
+    public void toggleInstrumentVolume(bool on) {
     masterMixer.SetFloat("instrumentVolume", on ? 0 : -18);
   }
 
@@ -309,11 +315,7 @@ public class masterControl : MonoBehaviour {
             //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
 
         }
-
-        GameObject metronomeObject = GameObject.Find("Metronome");
-        if (metronomeObject != null)
-            metro = metronomeObject.GetComponent<metronome>();
-            
+    
     }
 
   int lastBeat = -1;
