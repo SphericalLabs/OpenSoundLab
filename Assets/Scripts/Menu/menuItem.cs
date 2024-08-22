@@ -291,6 +291,43 @@ public class menuItem : manipObject
             Destroy(g.transform.Find("NOTEhandle").gameObject);
         }*/
 
+        else if (item == DeviceType.Microphone){            
+            g.transform.localPosition = new Vector3(0f, 0f, 0.0224f);
+            g.transform.localScale = Vector3.one * 0.39f;
+        }
+
+        else if (item == DeviceType.MultiMix)
+        {
+            g.transform.localPosition = new Vector3(0.0118f, 0.0065f, 0.0293f); 
+            g.transform.localScale = Vector3.one * 0.47f;
+        }
+
+        else if (item == DeviceType.MultiSplit)
+        {
+            g.transform.localPosition = new Vector3(0.0118f, 0.0065f, 0.0293f);
+            g.transform.localScale = Vector3.one * 0.47f;
+        }
+
+        else if (item == DeviceType.SamplerOne)
+        {
+            g.transform.localPosition = new Vector3(-0.0191f, 0.006f, 0.02f);
+            g.transform.localScale = Vector3.one * 0.14f;
+        }
+
+        else if (item == DeviceType.SequencerCV)
+        {
+            g.transform.localPosition = new Vector3(0.0201f, 0.0057f, 0.0301f);
+        }
+
+        else if (item == DeviceType.Tutorials)
+        {
+            g.transform.localPosition = new Vector3(0f, -0.0121f, 0.0195f);
+        }
+        else if (item == DeviceType.VCA)
+        {
+            g.transform.localScale = Vector3.one * 0.42f;
+        }
+
         else if (item == DeviceType.Airhorn)
         {
             g.transform.localPosition = new Vector3(-0.005f, -.018f, 0.02f);
@@ -319,18 +356,18 @@ public class menuItem : manipObject
             //g.transform.localPosition = new Vector3(.015f, 0, .02f);
             //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
         }*/
-        else if (item == DeviceType.Multiple)
-        {
-            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
-        }
-        else if (item == DeviceType.MultiMix)
-        {
-            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
-        }
-        else if (item == DeviceType.MultiSplit)
-        {
-            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
-        }
+        //else if (item == DeviceType.Multiple)
+        //{
+        //    g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+        //}
+        //else if (item == DeviceType.MultiMix)
+        //{
+        //    g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+        //}
+        //else if (item == DeviceType.MultiSplit)
+        //{
+        //    g.transform.localPosition = new Vector3(.0185f, 0, .02f);
+        //}
         else if (item == DeviceType.Sequencer)
         {
             g.transform.localScale = Vector3.one * .166f;
