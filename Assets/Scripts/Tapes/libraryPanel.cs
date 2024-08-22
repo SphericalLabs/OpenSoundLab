@@ -119,9 +119,10 @@ public class libraryPanel : UIpanel
             {
                 secondaryText = IDtext;
                 if (ghostGroup != null) Destroy(ghostGroup);
-                ghostGroup = Instantiate(ghostGroupPrefab, manipulatorObj.transform, false) as GameObject;
-                ghostGroup.transform.localPosition = tape.correctOffset;
-                ghostGroup.transform.localRotation = Quaternion.identity;
+                // Deactivated TapeGroup for now
+                //ghostGroup = Instantiate(ghostGroupPrefab, manipulatorObj.transform, false) as GameObject;
+                //ghostGroup.transform.localPosition = tape.correctOffset;
+                //ghostGroup.transform.localRotation = Quaternion.identity;
             }
         }
         else
@@ -276,7 +277,8 @@ public class libraryPanel : UIpanel
         if (transform.InverseTransformPoint(t.position).magnitude > 10)
         {
             if (secondary) _panelRing._deviceInterface.forceTape(t, primaryText, secondaryText);
-            else if (!manipulatorObjScript.wasGazeBased) _panelRing._deviceInterface.forceGroup(t, secondaryText);
+            // Deactivated TapeGroup for now
+            //else if (!manipulatorObjScript.wasGazeBased) _panelRing._deviceInterface.forceGroup(t, secondaryText);
         }
     }
 }
