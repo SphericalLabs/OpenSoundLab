@@ -647,7 +647,10 @@ public class sequencerCVDeviceInterface : deviceInterface
             for (int row = 0; row < curDimensions[0]; row++)
             {
                 stepButtons[row, curDimensions[1] - 1].Highlight(false);
+                stepButtons[row, curDimensions[1] - 1].keyHit(false); // reset
                 stepButtonTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
+
+                stepDials[row, curDimensions[1] - 1].setPercent(0.5f); // reset               
                 stepDialTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
             }
             curDimensions[1]--;
@@ -696,14 +699,18 @@ public class sequencerCVDeviceInterface : deviceInterface
         updateStepSelectVertical();
     }
 
-    void removeRows(int c)
+    void removeRows(int rows)
     {
-        for (int i = 0; i < c; i++)
+        for (int row = 0; row < rows; row++)
         {
+            controlPanelModes[curDimensions[0] - 1].setSwitch((curDimensions[0] - 1) % 2 == 0 ? true : false); // reset
+
             for (int step = 0; step < curDimensions[1]; step++)
             {
                 stepButtons[curDimensions[0] - 1, step].Highlight(false);
+                stepButtons[curDimensions[0] - 1, step].keyHit(false); // reset
                 stepButtonTrans[curDimensions[0] - 1, step].gameObject.SetActive(false);
+                stepDials[curDimensions[0] - 1, step].setPercent(0.5f); // reset
                 stepDialTrans[curDimensions[0] - 1, step].gameObject.SetActive(false);
 
                 jackOutTrigTrans[curDimensions[0] - 1].GetComponentInChildren<omniJack>().endConnection(true, true);
