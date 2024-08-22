@@ -36,7 +36,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Mirror;
 
 public class libraryDeviceInterface : deviceInterface {
 
@@ -171,43 +170,15 @@ public class libraryDeviceInterface : deviceInterface {
     t.GetComponent<manipulator>().ForceGrab(g);
   }
 
-    public void forceGroup(Transform trans, string p)
-    {
-        if (sampleManager.instance.sampleDictionary[p].Keys.Count == 0) return;
+  public void forceGroup(Transform t, string p) {
+    if (sampleManager.instance.sampleDictionary[p].Keys.Count == 0) return;
+    tapeGroupDeviceInterface g = (Instantiate(tapegroupPrefab, t.position + tape.correctOffset, t.rotation) as GameObject).GetComponent<tapeGroupDeviceInterface>();
+    t.GetComponent<manipulator>().ForceGrab(g.GetComponentInChildren<handle>());
+    g.Setup(p);
+    g.transform.Rotate(0, 180, 0, Space.Self);
+  }
 
-        GameObject g = Instantiate(tapegroupPrefab, trans.position + tape.correctOffset, trans.rotation);
-
-        // duplicate from menuItem spawn, todo: consider refactoring
-        if (NetworkSpawnManager.Instance != null)
-        {
-
-            Vector3 direction = Camera.main.transform.position - transform.position /*+ Vector3.down * 0.10f*/;
-
-            // Generate a quaternion that looks towards the camera
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            Vector3 localPositionOffset = Vector3.zero;
-            Vector3 localRotationOffset = Vector3.zero;
-
-            if (NetworkManager.singleton.mode == NetworkManagerMode.Host)
-            {
-                Debug.Log("Spawn on host");
-                manipulator manip = trans.GetComponent<manipulator>();
-                NetworkSpawnManager.Instance.CreatItem(tapegroupPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, manip);
-            }
-            else
-            {
-                Debug.Log("Spawn on client");
-                manipulator manip = trans.GetComponent<manipulator>();
-                NetworkSpawnManager.Instance.CmdCreatItem(tapegroupPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity, manip.isLeftController());
-            }
-        }
-        tapeGroupDeviceInterface tg = g.GetComponent<tapeGroupDeviceInterface>();
-        trans.GetComponent<manipulator>().ForceGrab(tg.GetComponentInChildren<handle>());
-        tg.Setup(p);
-        //tg.transform.Rotate(0, 180, 0, Space.Self);
-    }
-
-    public void panelEvent(int ID, bool secondary, int panelID) {
+  public void panelEvent(int ID, bool secondary, int panelID) {
     if (!secondary) updateSecondaryPanels(_panelRingPrimary.labels[ID]);
     else updateTape(_panelRingSecondary.labels[ID], _panelRingSecondary.panels[panelID].transform);
   }
