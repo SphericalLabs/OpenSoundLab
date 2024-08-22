@@ -12,8 +12,18 @@ public class NetworkSamplerTwo : NetworkSyncListener
     {
         clipPlayer = GetComponent<clipPlayer>();
         samplerTwoDeviceInterface = GetComponent<samplerTwoDeviceInterface>();
-        samplerTwoDeviceInterface.headSlider.onEndGrabEvents.AddListener(OnSync);
-        samplerTwoDeviceInterface.tailSlider.onEndGrabEvents.AddListener(OnSync);
+        samplerTwoDeviceInterface.headSlider.onPercentChangedEvent.AddListener(OnContinuousChange);
+        samplerTwoDeviceInterface.tailSlider.onPercentChangedEvent.AddListener(OnContinuousChange);
+
+        var speedDial = samplerTwoDeviceInterface.speedDial;
+        speedDial.onPercentChangedEvent.AddListener(OnContinuousChange);
+        speedDial.onEndGrabEvents.AddListener(OnSync);
+
+        var playButton = samplerTwoDeviceInterface.playButton;
+        playButton.onToggleChangedEvent.AddListener(OnSync);
+        var resetButton = samplerTwoDeviceInterface.resetButton;
+        resetButton.onToggleChangedEvent.AddListener(OnSync);
+
     }
     #region Mirror
 
@@ -65,4 +75,15 @@ public class NetworkSamplerTwo : NetworkSyncListener
         }
     }
     #endregion
+
+
+    public void OnContinuousChange()
+    {
+        if (Time.frameCount % 8 == 0)
+        {
+            OnSync();
+        }
+    }
+
+
 }

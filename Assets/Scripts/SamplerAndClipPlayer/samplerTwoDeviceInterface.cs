@@ -41,7 +41,7 @@ public class samplerTwoDeviceInterface : deviceInterface {
   public omniJack freqExpInput, freqLinInput, volumeInput, controlInput, output;
   public omniJack headInput, tailInput;
   public basicSwitch dirSwitch, loopSwitch;
-  public button playButton, turntableButton;
+  public button playButton, resetButton, turntableButton;
   public sliderUneven headSlider, tailSlider;
   public GameObject turntableObject;
   clipPlayerComplex player;
