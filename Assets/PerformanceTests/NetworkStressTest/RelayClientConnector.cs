@@ -25,7 +25,7 @@ public class RelayClientConnector : MonoBehaviour
         {
             if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Local)
             {
-                SceneManager.LoadScene((int)masterControl.Scenes.Relay);
+                SceneManager.LoadSceneAsync((int)masterControl.Scenes.Relay);
             }
             else if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Relay)
             {

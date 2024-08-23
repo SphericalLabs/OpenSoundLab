@@ -3921,6 +3921,8 @@ MonoBehaviour:
   useNativeIfAvailable: 1
   bpmDial: {fileID: 114000011640485668}
   volumeDial: {fileID: 114345964446883482}
+  bpmpercent: 0.1
+  volumepercent: 0
   rod: {fileID: 4000010100700574}
   txt: {fileID: 102000011060624102}
   recButton: {fileID: 0}
@@ -11267,7 +11269,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2312689872756948784
 Transform:
   m_ObjectHideFlags: 0

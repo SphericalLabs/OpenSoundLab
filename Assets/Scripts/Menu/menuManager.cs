@@ -38,6 +38,7 @@ using System.Collections.Generic;
 using UnityEngine.Analytics;
 using System;
 using System.Linq;
+using OVR.OpenVR;
 
 public class menuManager : MonoBehaviour
 {
@@ -244,7 +245,8 @@ public class menuManager : MonoBehaviour
                 menuItemScripts[i].Appear(on);
                 //menuItemScripts[i].transform.localScale = Vector3.one;
             }
-            transform.position = pad.Find("manipCollViz").position;
+            Transform manip = pad.Find("manipCollViz");            
+            transform.position = manip != null ? manip.position : Vector3.zero;
             transform.Translate(Vector3.left * -0.03f); // somehow this is only applied from the second menu spawn on
 
             faceCenterEye();

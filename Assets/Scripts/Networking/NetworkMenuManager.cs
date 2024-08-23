@@ -78,7 +78,7 @@ public class NetworkMenuManager : MonoBehaviour
                 }
                 else
                 {
-                    SceneManager.LoadScene((int)masterControl.Scenes.Local);
+                    SceneManager.LoadSceneAsync((int)masterControl.Scenes.Local);
                 }
             }
             else
@@ -230,7 +230,7 @@ public class NetworkMenuManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         yield return new WaitForSeconds(0.1f);
-        SceneManager.LoadScene((int)masterControl.Scenes.Relay);
+        SceneManager.LoadSceneAsync((int)masterControl.Scenes.Relay);
     }
 
     private IEnumerator StartRelayHostWaitTime()
@@ -305,18 +305,18 @@ public class NetworkMenuManager : MonoBehaviour
     public void StopRelayClient()
     {
         networkManager.StopClient();
-        SceneManager.LoadScene((int)masterControl.Scenes.Local);
+        SceneManager.LoadSceneAsync((int)masterControl.Scenes.Local);
     }
 
     public void StopRelayHost()
     {
         networkManager.StopHost();
-        SceneManager.LoadScene((int)masterControl.Scenes.Local);
+        SceneManager.LoadSceneAsync((int)masterControl.Scenes.Local);
     }
 
     public void GoBackToLocalScene()
     {
-        SceneManager.LoadScene((int)masterControl.Scenes.Local);
+        SceneManager.LoadSceneAsync((int)masterControl.Scenes.Local);
     }
     #endregion
 
