@@ -63,7 +63,6 @@ public class masterControl : MonoBehaviour {
   public Color tipColor = new Color(88 / 255f, 114 / 255f, 174 / 255f);
 
   public AudioSource backgroundAudio, metronomeClick;
-  public GameObject exampleSetups;
 
   public UnityEngine.UI.Toggle muteEnvToggle;
 
@@ -263,7 +262,6 @@ public class masterControl : MonoBehaviour {
   public bool examplesOn = true;
   public bool toggleExamples() {
     examplesOn = !examplesOn;
-    exampleSetups.SetActive(examplesOn);
 
     if (!examplesOn) {
       GameObject prevParent = GameObject.Find("exampleParent");
