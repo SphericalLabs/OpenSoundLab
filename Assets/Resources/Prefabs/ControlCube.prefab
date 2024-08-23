@@ -159,7 +159,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncDirection: 0
   syncMode: 0
-  syncInterval: 0.05
+  syncInterval: 0
   controlCube: {fileID: 114000011525452526}
   syncPercent: {x: 0, y: 0, z: 0}
 --- !u!114 &2079345808753194052
