@@ -35,8 +35,6 @@
 using UnityEngine;
 using System.IO;
 using System;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using UnityEditor.SearchService;
 using UnityEngine.SceneManagement;
 
 public class masterControl : MonoBehaviour {
