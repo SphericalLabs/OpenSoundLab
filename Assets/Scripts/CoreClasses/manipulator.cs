@@ -349,9 +349,9 @@ public class manipulator : MonoBehaviour
         // late injection of gazed at object, in the case that the trigger was pulled so fast that there was not intermediate select stage and thus selectedObject has not been populated properly
         if (selectedObject == null && !OSLInput.getInstance().areBothSidesPressed())
         {
-            if (gazedObjectTracker.Instance.gazedAtManipObject != null)
+            if (gazedObjectTracker.Instance?.gazedAtManipObject != null)
             {
-                selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+                selectedObject = gazedObjectTracker.Instance?.gazedAtManipObject;
                 wasGazeBased = true;
             }
         }
@@ -407,9 +407,9 @@ public class manipulator : MonoBehaviour
         copying = on;
 
         // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-        if (selectedObject == null && gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !OSLInput.getInstance().areBothSidesPressed())
+        if (selectedObject == null && gazedObjectTracker.Instance?.gazedAtManipObject != null && gazedObjectTracker.Instance?.gazedAtManipObject is handle && !OSLInput.getInstance().areBothSidesPressed())
         {
-            selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+            selectedObject = gazedObjectTracker.Instance?.gazedAtManipObject;
             wasGazeBased = true;
         }
 
@@ -561,7 +561,7 @@ public class manipulator : MonoBehaviour
             if (oslInput.isCopyStarted(controllerIndex))
             {
                 // gaze injection, need to check that a handle is looked at and not something like a dial, etc.
-                if (gazedObjectTracker.Instance.gazedAtManipObject != null && gazedObjectTracker.Instance.gazedAtManipObject is handle && !OSLInput.getInstance().areBothSidesPressed()) copyEnabled = true;
+                if (gazedObjectTracker.Instance?.gazedAtManipObject != null && gazedObjectTracker.Instance?.gazedAtManipObject is handle && !OSLInput.getInstance().areBothSidesPressed()) copyEnabled = true;
 
                 if (copyEnabled) SetCopy(true);
                 else if (deleteEnabled) DeleteSelection(true);
@@ -593,12 +593,12 @@ public class manipulator : MonoBehaviour
         if (oslInput.isTriggerReleased(controllerIndex))
         {
             // manage deletion via gaze'n'drop
-            if (gazedObjectTracker.Instance.gazedAtTrashcan != null)
+            if (gazedObjectTracker.Instance?.gazedAtTrashcan != null)
             {
                 if (selectedObject != null && selectedObject is handle)
                 {
                     handle selectedHandle = (handle)selectedObject;
-                    selectedHandle.curTrash = gazedObjectTracker.Instance.gazedAtTrashcan;
+                    selectedHandle.curTrash = gazedObjectTracker.Instance?.gazedAtTrashcan;
                     selectedHandle.curTrash.setReady(true);
                     hapticPulse(1000);
                     selectedHandle.trashReady = true;
@@ -626,7 +626,7 @@ public class manipulator : MonoBehaviour
         if (grabbing) return;
 
         // if there was a gaze, and now the current gaze is something else (or null), then deselect and clear the old gaze
-        if (selectedObject != null && selectedObject != gazedObjectTracker.Instance.gazedAtManipObject && wasGazeBased)
+        if (selectedObject != null && selectedObject != gazedObjectTracker.Instance?.gazedAtManipObject && wasGazeBased)
         {
             selectedObject.setSelect(false, transform);
             selectedObject = null;
@@ -687,32 +687,33 @@ public class manipulator : MonoBehaviour
             }
         }
 
-
-        if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
-        {
-            if (OSLInput.getInstance().areBothSidesPressed()) return; // no gaze interaction when dragging the world
-
-            if (selectedObject == null && OSLInput.getInstance().isTriggerHalfPressed(controllerIndex))
+        if(gazedObjectTracker.Instance != null){ 
+            if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
             {
-                selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
-                selectedObject.setSelect(true, transform);
-                wasGazeBased = true;
-                //selectedObject = gazeSelectedObj;
-            }
-            else if (OSLInput.getInstance().isTriggerFullPressed(controllerIndex))
-            {
+                if (OSLInput.getInstance().areBothSidesPressed()) return; // no gaze interaction when dragging the world
 
-                selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
-                //selectedObject = gazeSelectedObj;
-                selectedTransform = selectedObject.transform;
-                SetTrigger(true);
-                wasGazeBased = true;
+                if (selectedObject == null && OSLInput.getInstance().isTriggerHalfPressed(controllerIndex))
+                {
+                    selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+                    selectedObject.setSelect(true, transform);
+                    wasGazeBased = true;
+                    //selectedObject = gazeSelectedObj;
+                }
+                else if (OSLInput.getInstance().isTriggerFullPressed(controllerIndex))
+                {
 
-                // do we need this?
-                activeTip.SetActive(false);
-                tipL.gameObject.SetActive(true);
-                tipR.gameObject.SetActive(true);
-                onInputReleasedEvent.Invoke();
+                    selectedObject = gazedObjectTracker.Instance.gazedAtManipObject;
+                    //selectedObject = gazeSelectedObj;
+                    selectedTransform = selectedObject.transform;
+                    SetTrigger(true);
+                    wasGazeBased = true;
+
+                    // do we need this?
+                    activeTip.SetActive(false);
+                    tipL.gameObject.SetActive(true);
+                    tipR.gameObject.SetActive(true);
+                    onInputReleasedEvent.Invoke();
+                }
             }
         }
     }

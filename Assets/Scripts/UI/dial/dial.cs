@@ -137,7 +137,7 @@ public class dial : manipObject
                 }
             }
 
-            else if (gazedObjectTracker.Instance.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
+            else if (gazedObjectTracker.Instance?.gazedAtManipObject == this && manipulator.NoneTouched()) // this is being gazed at and both controller don't have touch, this ensures physical touch first and only
             {
                 if (OSLInput.getInstance().isAnySecondaryPressed())
                 {

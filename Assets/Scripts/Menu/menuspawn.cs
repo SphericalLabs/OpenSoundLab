@@ -35,13 +35,40 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class menuspawn : MonoBehaviour {
   
-  bool active = false;
-    
-  public menuManager menu;
-  private OSLInput oslInput;
+    bool active = false;
+
+    private menuManager _menu;  // Private backing field
+    public menuManager menu
+    {
+        get
+        {
+            if (_menu == null)
+            {
+                _menu = FindObjectOfType<menuManager>();
+                if (_menu == null)
+                {
+                    GameObject mainMenu = GameObject.Find("MainMenu");
+                    if (mainMenu != null)
+                    {
+                        _menu = mainMenu.GetComponent<menuManager>();
+                    }
+
+                    if (_menu == null)
+                    {
+                        Debug.LogError("menuManager instance not found in the scene. Please ensure that a GameObject named 'MainMenu' with a menuManager script attached is present.");
+                    }
+                }
+            }
+            return _menu;
+        }
+    }
+
+
+    private OSLInput oslInput;
 
 
   private void Awake()
@@ -59,8 +86,7 @@ public class menuspawn : MonoBehaviour {
         oslInput.Patcher.PrimaryRight.started -= togglePad;
     }
 
-    void Start() {    
-    menu = menuManager.instance;
+  void Start() {    
   }
 
 

@@ -36,12 +36,21 @@ using UnityEngine;
 using System.IO;
 using System;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using UnityEditor.SearchService;
+using UnityEngine.SceneManagement;
 
 public class masterControl : MonoBehaviour {
 
   public static masterControl instance;
   public UnityEngine.Audio.AudioMixer masterMixer;
   public static float versionNumber = -1f;
+
+  // this enum will be cast as int, make sure that the scenes in the build dialogue have exactly the same order
+    public enum Scenes {
+        Base,
+        Local,
+        Relay
+    };
 
   public enum platform {
     Oculus,
@@ -86,8 +95,13 @@ public class masterControl : MonoBehaviour {
 
   public masterBusRecorder recorder;
   public metronome metro;
+  public GameObject CameraRig;
 
   void Awake() {
+
+    DontDestroyOnLoad(this);
+    DontDestroyOnLoad(CameraRig);
+
     instance = this;
     float f;
     bool success = float.TryParse(Application.version, out f);
@@ -321,12 +335,16 @@ public class masterControl : MonoBehaviour {
   int lastBeat = -1;
   
   void Update() {
+
+    // Load the local scene after some grace period for initialization
+    // masterControl and the OVRCamerRig are persistent and will stay
+    if (Time.frameCount == 5) SceneManager.LoadSceneAsync(1);
     
       // metronome plays bound to screen updates! 
       // Prone to jitter and CPU hanging! 
       // Do not trust the metronome! Build your own one!
       // Other sequencers avoid Update calls, continue even if Update call stack hangs
-      if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { 
+    if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { 
       //metronomeClick.Play();
       lastBeat = Mathf.FloorToInt(curCycle * 8f);
     }
@@ -354,14 +372,16 @@ public class masterControl : MonoBehaviour {
             Camera.main.backgroundColor = new Color(0f,0f,0f,0f);
         }
 
-    if (metro.volumepercent != metro.volumeDial.percent)
-    {
-        metro.volumepercent = metro.volumeDial.percent;
-        masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
+    if(metro != null){ 
+        if (metro.volumepercent != metro.volumeDial.percent)
+        {
+            metro.volumepercent = metro.volumeDial.percent;
+            masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
+        }
+        if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
     }
-    if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
-    
-}
+
+  }
 
   private void OnAudioFilterRead(float[] buffer, int channels) {
     if (!beatUpdateRunning) return;

@@ -23,11 +23,11 @@ public class RelayClientConnector : MonoBehaviour
 
         if (relayJoinCode != "")
         {
-            if (SceneManager.GetActiveScene().buildIndex == 0)
+            if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Local)
             {
-                SceneManager.LoadScene(1);
+                SceneManager.LoadScene((int)masterControl.Scenes.Relay);
             }
-            else if (SceneManager.GetActiveScene().buildIndex == 1)
+            else if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Relay)
             {
                 SetupRelay();
                 if (autoConnect) StartCoroutine(DelayedConnectRelay(5));

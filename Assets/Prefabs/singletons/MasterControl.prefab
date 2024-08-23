@@ -18,8 +18,10 @@ GameObject:
   - component: {fileID: 114625744848687504}
   - component: {fileID: 114568204637131020}
   - component: {fileID: 835394206}
+  - component: {fileID: 7013683895444878039}
+  - component: {fileID: 5880465922533874342}
   m_Layer: 0
-  m_Name: MC
+  m_Name: MasterControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,13 +34,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012983180942}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4283083945714840}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114000012009452044
 MonoBehaviour:
@@ -96,11 +99,13 @@ MonoBehaviour:
   handlesEnabled: 1
   jacksEnabled: 1
   recorder: {fileID: 0}
+  metro: {fileID: 0}
   tooltipsOn: 1
   examplesOn: 1
   dialUsed: 0
-  BinauralSetting: 1
-  WireSetting: 0
+  tutorialsPrefab: {fileID: 0}
+  patchAnchor: {fileID: 0}
+  WireSetting: 1
 --- !u!82 &82000010201573614
 AudioSource:
   m_ObjectHideFlags: 0
@@ -166,7 +171,7 @@ AudioSource:
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -181,7 +186,7 @@ AudioSource:
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -196,7 +201,7 @@ AudioSource:
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
 --- !u!114 &114000011258731548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,13 +217,14 @@ MonoBehaviour:
   hmdPrefab: {fileID: 1000010370273460, guid: a088ff9398153d742b0ed890d1c5d328, type: 3}
   controllerPrefab: {fileID: 1000011093787898, guid: 30d7393a0032e72459b33001a37fc053,
     type: 3}
-  hmdTargetVive: {fileID: 0}
-  controllerLTargetVive: {fileID: 0}
-  controllerRTargetVive: {fileID: 0}
   hmdTargetOculus: {fileID: 0}
   controllerLTargetOculus: {fileID: 0}
   controllerRTargetOculus: {fileID: 0}
   hiresCamSelect: {fileID: 0}
+  usePersonalizedHands: 0
+  personalizedHandsPrefabStr: rubber-med-gloves/rubber-med-gloves
+  OVRControllerPrefabL: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
+  OVRControllerPrefabR: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
 --- !u!114 &114465591553212382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,6 +277,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eb56fda7f7b14ccb8953a7ff29903f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7013683895444878039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012983180942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 908267b565c2f6f4984fb75f0966bf36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cpuDial: {fileID: 0}
+  gpuDial: {fileID: 0}
+  fovDial: {fileID: 0}
+  scaleDial: {fileID: 0}
+  fpsDial: {fileID: 0}
+--- !u!114 &5880465922533874342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012983180942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 908267b565c2f6f4984fb75f0966bf36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cpuDial: {fileID: 0}
+  gpuDial: {fileID: 0}
+  fovDial: {fileID: 0}
+  scaleDial: {fileID: 0}
+  fpsDial: {fileID: 0}
 --- !u!1 &1581954127674324
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,12 +335,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1581954127674324}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4000014106015952}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &82362240975233946
 AudioSource:
