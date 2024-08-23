@@ -2552,21 +2552,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CalibrationUI
       objectReference: {fileID: 0}
-    - target: {fileID: 248447823999277046, guid: 2249a5c1116df493ca155ab9ad65c63c,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 248447824229387034, guid: 2249a5c1116df493ca155ab9ad65c63c,
         type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1644651126}
-    - target: {fileID: 4033507039496224215, guid: 2249a5c1116df493ca155ab9ad65c63c,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
