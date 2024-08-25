@@ -97,9 +97,13 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void StartAuthorityGrabing()
     {
-        //Debug.Log($"Start Grab of {gameObject.name}");
+        //todo don't take authority if already has authority and is grabed by multiple devices
         if (!isServer && !authority)
+        {
             NetworkMenuManager.Instance.localPlayer.CmdGetObjectAuthority(netIdentity);
+            //todo already allow to be moved by client, try to switch _netTransform direction
+            _netTransform.syncDirection = SyncDirection.ClientToServer;
+        }
         else if (isServer)
         {
             netIdentity.RemoveClientAuthority();
@@ -112,6 +116,14 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void EndGrabing()
     {
+        //todo only remove authority if not grabed by any handle
+        foreach(handle handle in _handles)
+        {
+            if (handle.curState == manipObject.manipState.grabbed)
+            {
+                return; //needs testing
+            }
+        }
         //Debug.Log($"End Grab of {gameObject.name}");
         if (!isServer && isOwned)
         {
