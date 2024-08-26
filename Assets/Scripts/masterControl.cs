@@ -171,8 +171,6 @@ public class masterControl : MonoBehaviour {
     beatUpdateEvent += beatUpdateEventLocal;
     beatResetEvent += beatResetEventLocal;
 
-    setBPM(120);
-
     GetComponent<sampleManager>().Init();
 
     recorder = GetComponentInChildren<masterBusRecorder>();
@@ -205,8 +203,11 @@ public class masterControl : MonoBehaviour {
 
         }
 
-        SceneManager.LoadSceneAsync((int)Scenes.Local);
+        SceneManager.LoadScene((int)Scenes.Local);
+
+
     }
+
 
     int lastBeat = -1;
 

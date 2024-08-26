@@ -67,6 +67,11 @@ public class metronome : componentInterface
         }
     }
 
+    private void Start()
+    {
+        readBpmDialAndBroadcast();
+    }
+
     // this is called each time the menu is being activated
     void OnEnable()
     {
