@@ -67,7 +67,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         base.OnStartAuthority();
         UpdateDebugText();
-        //Debug.Log($"Start Authority of {gameObject.name}");
+        Debug.Log($"Start Authority of {gameObject.name}");
         CmdOnControlledByClient(true);
     }
 
@@ -75,7 +75,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         base.OnStopAuthority();
         UpdateDebugText();
-        //Debug.Log($"Stop Authority of {gameObject.name}");
+        Debug.Log($"Stop Authority of {gameObject.name}");
         //force release on manipulatorObject
         foreach (var handle in _handles)
         {
@@ -97,12 +97,16 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void StartAuthorityGrabing()
     {
-        //todo don't take authority if already has authority and is grabed by multiple devices
-        if (!isServer && !authority)
+        Debug.Log($"Start authority grab of {gameObject.name}");
+        //todo don't take authority if already has authority and all handles are grabed
+        if (!isServer)
         {
-            NetworkMenuManager.Instance.localPlayer.CmdGetObjectAuthority(netIdentity);
-            //todo already allow to be moved by client, try to switch _netTransform direction
-            _netTransform.syncDirection = SyncDirection.ClientToServer;
+            if (!authority && !AllHandlesGrabbed())
+            {
+                NetworkMenuManager.Instance.localPlayer.CmdGetObjectAuthority(netIdentity);
+                //todo already allow to be moved by client, try to switch _netTransform direction
+                _netTransform.syncDirection = SyncDirection.ClientToServer;
+            }
         }
         else if (isServer)
         {
@@ -116,15 +120,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void EndGrabing()
     {
-        //todo only remove authority if not grabed by any handle
-        foreach(handle handle in _handles)
-        {
-            if (handle.curState == manipObject.manipState.grabbed)
-            {
-                return; //needs testing
-            }
-        }
-        //Debug.Log($"End Grab of {gameObject.name}");
+        Debug.Log($"End authority grab of {gameObject.name}");
         if (!isServer && isOwned)
         {
             if (_netTransform != null)
@@ -135,6 +131,18 @@ public class NetworkAuthorityHandle : NetworkBehaviour
             CmdRemoveObjectAuthority();
         }
         UpdateDebugText();
+    }
+
+    bool AllHandlesGrabbed()
+    {
+        foreach(handle h in _handles)
+        {
+            if(h.curState != manipObject.manipState.grabbed)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     #endregion
