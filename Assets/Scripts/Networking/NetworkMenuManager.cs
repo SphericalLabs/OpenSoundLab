@@ -164,6 +164,7 @@ public class NetworkMenuManager : MonoBehaviour
 
     public void DiscorverServer()
     {
+        DeleteAllServerDiscoveryButtons();
         discoveredServers.Clear();
         networkDiscovery.StartDiscovery();
     }
@@ -174,7 +175,6 @@ public class NetworkMenuManager : MonoBehaviour
         Debug.Log("On discover servers");
         discoveredServers[info.serverId] = info;
 
-        DeleteAllServerDiscoveryButtons();
 
         //create a UI button if a server get discoverd
         foreach (ServerResponse newinfo in discoveredServers.Values)
@@ -338,7 +338,7 @@ public class NetworkMenuManager : MonoBehaviour
             relayHostMenuParent.gameObject.SetActive(false);
             clientMenuParent.gameObject.SetActive(false);
 
-            ipAdressText.text = $"Adress: {IPManager.GetLocalIPAddress()}";
+            ipAdressText.text = $"Your ip adress: {IPManager.GetLocalIPAddress()}";
         }
 
         if (backButtonObject != null)
