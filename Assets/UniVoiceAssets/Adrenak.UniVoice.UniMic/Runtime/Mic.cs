@@ -121,8 +121,8 @@ namespace Adrenak.UniMic {
         }
 
         void Awake() {
-            if(Application.isPlaying)
-                DontDestroyOnLoad(gameObject);
+            //if(Application.isPlaying)
+            //    DontDestroyOnLoad(gameObject);
             if (Devices.Count > 0)
                 CurrentDeviceIndex = 0;
         }
