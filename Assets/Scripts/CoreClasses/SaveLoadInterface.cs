@@ -43,8 +43,7 @@ public class SaveLoadInterface : MonoBehaviour
 {
     xmlSaveLoad synthSet;
     public GameObject plugPrefab;
-    public static SaveLoadInterface instance;
-    public metronome nome;
+    public static SaveLoadInterface instance;    
     Dictionary<string, GameObject> instrumentPrefabs;
 
     void Awake()
@@ -132,7 +131,7 @@ public class SaveLoadInterface : MonoBehaviour
 
         masterControl.instance.setBPM(s.BPM);
         masterControl.updateBinaural(s.binauralMode);
-        nome.SetBPM(s.BPM);
+        metronome.Instance.SetBPM(s.BPM);
         synthSet.SystemList.Add(s);
         return s.version;
     }

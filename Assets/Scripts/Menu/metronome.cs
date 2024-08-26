@@ -54,9 +54,13 @@ public class metronome : componentInterface
     public TextMesh txt;
 
     public button recButton;
+    public static metronome Instance;
+
 
     void Awake()
     {
+        Instance = this;
+
         bpmDial = GetComponentInChildren<dial>();
         //TODO: This is not very pretty, but the masterBusRecorder needs a reference to the rec button in case a recording is stopped by the system (for example if the filesize limit is reached)!
         var buttons = GetComponentsInChildren<button>();
