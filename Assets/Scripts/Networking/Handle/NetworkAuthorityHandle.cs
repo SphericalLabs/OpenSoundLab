@@ -52,6 +52,10 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     public void OnControlledByClient(bool old, bool newBool)
     {
         _netTransform.syncDirection = controlledByClient ? SyncDirection.ClientToServer : SyncDirection.ServerToClient;
+        if (!_netTransform.enabled)
+        {
+            _netTransform.enabled = true;
+        }
     }
 
     public void UpdateDebugText()
@@ -67,7 +71,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         base.OnStartAuthority();
         UpdateDebugText();
-        Debug.Log($"Start Authority of {gameObject.name}");
+        //Debug.Log($"Start Authority of {gameObject.name}");
         CmdOnControlledByClient(true);
     }
 
@@ -75,7 +79,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     {
         base.OnStopAuthority();
         UpdateDebugText();
-        Debug.Log($"Stop Authority of {gameObject.name}");
+        //Debug.Log($"Stop Authority of {gameObject.name}");
         //force release on manipulatorObject
         foreach (var handle in _handles)
         {
@@ -105,7 +109,8 @@ public class NetworkAuthorityHandle : NetworkBehaviour
             {
                 NetworkMenuManager.Instance.localPlayer.CmdGetObjectAuthority(netIdentity);
                 //todo already allow to be moved by client, try to switch _netTransform direction
-                _netTransform.syncDirection = SyncDirection.ClientToServer;
+                //_netTransform.syncDirection = SyncDirection.ClientToServer;
+                _netTransform.enabled = false;
             }
         }
         else if (isServer)
@@ -125,6 +130,10 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         {
             if (_netTransform != null)
             {
+                if (!_netTransform.enabled)
+                {
+                    _netTransform.enabled = true;
+                }
                 _netTransform.CmdTeleport(transform.position, transform.rotation);
             }
             CmdOnControlledByClient(false);
