@@ -182,7 +182,95 @@ public class masterControl : MonoBehaviour {
     if (metronomeObject != null)
         metro = metronomeObject.GetComponent<metronome>();
 
+  }
 
+    private void Start()
+    {
+        if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
+        {
+            PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
+            PlayerPrefs.Save();
+        }
+
+        if (PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null)
+        {
+
+            GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
+
+            //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
+            g.transform.position = new Vector3(0f, 1.3f, 0.75f);
+            g.transform.Rotate(0f, -180f, 0f);
+
+            //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
+
+        }
+
+        SceneManager.LoadSceneAsync((int)Scenes.Local);
+    }
+
+    int lastBeat = -1;
+
+    void Update()
+    {
+
+        // metronome plays bound to screen updates! 
+        // Prone to jitter and CPU hanging! 
+        // Do not trust the metronome! Build your own one!
+        // Other sequencers avoid Update calls, continue even if Update call stack hangs
+        if (lastBeat != Mathf.FloorToInt(curCycle * 8f))
+        {
+            //metronomeClick.Play();
+            lastBeat = Mathf.FloorToInt(curCycle * 8f);
+        }
+
+
+        if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch))
+        {
+            nextWireSetting();
+        }
+
+        if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
+        {
+            nextBinauralSetting();
+        }
+
+        leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.LTouch);
+        rightStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+
+        if (leftStick.x > 0.5f && rightStick.x < -0.5f) // press both inwards
+        {
+            Camera.main.backgroundColor = Color.white;
+        }
+
+        if (leftStick.x < -0.5f && rightStick.x > 0.5f) // press both outward
+        {
+            Camera.main.backgroundColor = new Color(0f, 0f, 0f, 0f);
+        }
+
+        if (metro != null)
+        {
+            if (metro.volumepercent != metro.volumeDial.percent)
+            {
+                metro.volumepercent = metro.volumeDial.percent;
+                masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
+            }
+            if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
+        }
+
+    }
+
+    private void OnAudioFilterRead(float[] buffer, int channels)
+    {
+        if (!beatUpdateRunning) return;
+        double dspTime = AudioSettings.dspTime;
+
+        for (int i = 0; i < buffer.Length; i += channels)
+        {
+            beatUpdateEvent(curCycle);
+            _measurePhase += _sampleDuration;
+            if (_measurePhase > measurePeriod) _measurePhase -= measurePeriod;
+            curCycle = (float)(_measurePhase / measurePeriod);
+        }
     }
 
     //public void resetMasterClockDSPTime(bool wasChanged){
@@ -305,91 +393,7 @@ public class masterControl : MonoBehaviour {
   public Transform patchAnchor;
 
   Vector2 leftStick, rightStick;
-    private void Start()
-    {
-        if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
-        {
-            PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
-            PlayerPrefs.Save();
-        }
-
-        if (PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null)
-        {
-
-            GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
-
-            //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
-            g.transform.position = new Vector3(0f, 1.3f, 0.75f);
-            g.transform.Rotate(0f, -180f, 0f);
-
-            //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
-
-        }
-    
-    }
-
-  int lastBeat = -1;
-  
-  void Update() {
-
-    // Load the local scene after some grace period for initialization
-    // masterControl and the OVRCamerRig are persistent and will stay
-    if (Time.frameCount == 5) SceneManager.LoadSceneAsync(1);
-    
-      // metronome plays bound to screen updates! 
-      // Prone to jitter and CPU hanging! 
-      // Do not trust the metronome! Build your own one!
-      // Other sequencers avoid Update calls, continue even if Update call stack hangs
-    if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { 
-      //metronomeClick.Play();
-      lastBeat = Mathf.FloorToInt(curCycle * 8f);
-    }
-
-
-    if(OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch)){
-      nextWireSetting();
-    }
-
-    if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
-    {
-      nextBinauralSetting();
-    }
-
-    leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.LTouch);
-    rightStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
-
-    if (leftStick.x > 0.5f && rightStick.x < -0.5f) // press both inwards
-    {
-      Camera.main.backgroundColor = Color.white;
-    }
-
-    if (leftStick.x < -0.5f && rightStick.x > 0.5f) // press both outward
-    {
-            Camera.main.backgroundColor = new Color(0f,0f,0f,0f);
-        }
-
-    if(metro != null){ 
-        if (metro.volumepercent != metro.volumeDial.percent)
-        {
-            metro.volumepercent = metro.volumeDial.percent;
-            masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
-        }
-        if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
-    }
-
-  }
-
-  private void OnAudioFilterRead(float[] buffer, int channels) {
-    if (!beatUpdateRunning) return;
-    double dspTime = AudioSettings.dspTime;
-
-    for (int i = 0; i < buffer.Length; i += channels) {
-      beatUpdateEvent(curCycle);
-      _measurePhase += _sampleDuration;
-      if (_measurePhase > measurePeriod) _measurePhase -= measurePeriod;
-      curCycle = (float)(_measurePhase / measurePeriod);
-    }
-  }
+   
 
   public void openRecordings() {
 //    System.Diagnostics.Process.Start("explorer.exe", "/root," + SaveDir + Path.DirectorySeparatorChar + "Samples" + Path.DirectorySeparatorChar + "Recordings" + Path.DirectorySeparatorChar);
