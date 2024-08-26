@@ -53,7 +53,7 @@ namespace IAS.CoLocationMUVR
 		
 		private void Update()
 		{
-			//FollowPlayer();
+			FollowPlayer();
 
 			//toggle on/off UI
 			if (Input.GetKeyDown(KeyCode.P) || OVRInput.GetDown(OVRInput.Button.Start))
