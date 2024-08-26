@@ -6540,7 +6540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d703205f23f14a2b9c128a63a21d5a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableActiveDiscovery: 0
+  enableActiveDiscovery: 1
   BroadcastAddress: 
   serverBroadcastListenPort: 47777
   ActiveDiscoveryInterval: 1
