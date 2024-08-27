@@ -8,6 +8,7 @@ public class NetworkSlidersUneven : NetworkBehaviour
     public sliderUneven[] sliders;
 
     public readonly SyncList<float> sliderValues = new SyncList<float>();
+    private float[] lastGrabedTimes;
 
     public override void OnStartServer()
     {
@@ -20,11 +21,14 @@ public class NetworkSlidersUneven : NetworkBehaviour
 
     private void Start()
     {
+        lastGrabedTimes = new float[sliders.Length];
+
         //add dials on change callback event
         for (int i = 0; i < sliders.Length; i++)
         {
             int index = i;
             sliders[i].onPercentChangedEvent.AddListener(delegate { UpdateSliderValue(index); });
+            sliders[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
         }
     }
 
@@ -54,7 +58,7 @@ public class NetworkSlidersUneven : NetworkBehaviour
             case SyncList<float>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<float>.Operation.OP_SET:
-                if (sliders[index].curState != manipObject.manipState.grabbed)
+                if (sliders[index].curState != manipObject.manipState.grabbed && IsEndGrabCooldownOver(index))
                 {
                     sliders[index].setPercent(newValue);
                 }
@@ -82,5 +86,22 @@ public class NetworkSlidersUneven : NetworkBehaviour
     {
         sliderValues[index] = value;
         sliders[index].setPercent(value);
+    }
+
+    public void UpdateLastGrabedTime(int index)
+    {
+        if (index >= 0 && index < lastGrabedTimes.Length)
+        {
+            lastGrabedTimes[index] = Time.time;
+        }
+    }
+
+    private bool IsEndGrabCooldownOver(int index)
+    {
+        if (lastGrabedTimes[index] + 0.5f < Time.time)
+        {
+            return true;
+        }
+        return false;
     }
 }

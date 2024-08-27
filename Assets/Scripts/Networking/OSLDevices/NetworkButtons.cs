@@ -10,6 +10,8 @@ public class NetworkButtons : NetworkBehaviour
 
     public readonly SyncList<bool> buttonValues = new SyncList<bool>();
 
+    private float[] lastGrabedTimes;
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -22,11 +24,13 @@ public class NetworkButtons : NetworkBehaviour
 
     private void Start()
     {
+        lastGrabedTimes = new float[buttons.Length];
         //add dials on change callback event
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;
             buttons[i].onToggleChangedEvent.AddListener(delegate { UpdateButtonIsHit(index); });
+            buttons[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
         }
     }
 
@@ -56,7 +60,10 @@ public class NetworkButtons : NetworkBehaviour
             case SyncList<bool>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<bool>.Operation.OP_SET:
-                buttons[index].keyHit(newValue, false);
+                if (buttons[index].curState != manipObject.manipState.grabbed && IsEndGrabCooldownOver(index))
+                {
+                    buttons[index].keyHit(newValue, false);
+                }
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
                 break;
@@ -81,5 +88,23 @@ public class NetworkButtons : NetworkBehaviour
     {
         buttonValues[index] = value;
         buttons[index].keyHit(value, false);
+    }
+
+
+    public void UpdateLastGrabedTime(int index)
+    {
+        if (index >= 0 && index < lastGrabedTimes.Length)
+        {
+            lastGrabedTimes[index] = Time.time;
+        }
+    }
+
+    private bool IsEndGrabCooldownOver(int index)
+    {
+        if (lastGrabedTimes[index] + 0.5f < Time.time)
+        {
+            return true;
+        }
+        return false;
     }
 }

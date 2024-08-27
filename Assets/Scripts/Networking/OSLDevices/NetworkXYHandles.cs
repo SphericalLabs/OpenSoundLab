@@ -8,6 +8,7 @@ public class NetworkXYHandles : NetworkBehaviour
     public xyHandle[] xyHandles;
 
     public readonly SyncList<Vector2> xyValues = new SyncList<Vector2>();
+    private float[] lastGrabedTimes;
 
     public override void OnStartServer()
     {
@@ -20,11 +21,15 @@ public class NetworkXYHandles : NetworkBehaviour
 
     private void Awake()
     {
+        lastGrabedTimes = new float[xyHandles.Length];
+
         //add dials on change callback event
         for (int i = 0; i < xyHandles.Length; i++)
         {
             int index = i;
             xyHandles[i].onHandleChangedEvent.AddListener(delegate { UpdateHandleValue(index); });
+            xyHandles[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+
         }
     }
 
@@ -55,7 +60,7 @@ public class NetworkXYHandles : NetworkBehaviour
             case SyncList<Vector2>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<Vector2>.Operation.OP_SET:
-                if (xyHandles[index].curState != manipObject.manipState.grabbed)
+                if (xyHandles[index].curState != manipObject.manipState.grabbed && IsEndGrabCooldownOver(index))
                 {
                     xyHandles[index].updatePos(newValue);
                 }
@@ -83,5 +88,22 @@ public class NetworkXYHandles : NetworkBehaviour
     {
         xyValues[index] = value;
         xyHandles[index].updatePos(value);
+    }
+
+    public void UpdateLastGrabedTime(int index)
+    {
+        if (index >= 0 && index < lastGrabedTimes.Length)
+        {
+            lastGrabedTimes[index] = Time.time;
+        }
+    }
+
+    private bool IsEndGrabCooldownOver(int index)
+    {
+        if (lastGrabedTimes[index] + 0.5f < Time.time)
+        {
+            return true;
+        }
+        return false;
     }
 }
