@@ -9,6 +9,8 @@ public class NetworkDials : NetworkBehaviour
 
     public readonly SyncList<float> dialValues = new SyncList<float>();
 
+    private float[] lastGrabedTimes;
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -27,15 +29,18 @@ public class NetworkDials : NetworkBehaviour
 
     private void Start()
     {
+        lastGrabedTimes = new float[dials.Length];
         //add dials on change callback event
         for (int i = 0; i < dials.Length; i++)
         {
             int index = i;
             dials[i].onPercentChangedEvent.AddListener(delegate { UpdateDialValue(index); });
+            dials[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
             if (dials[i].DialFeedback == null)
             {
                 dials[i].DialFeedback = dials[i].transform.parent.Find("glowDisk").GetComponent<glowDisk>();
             }
+            lastGrabedTimes[i] = -1f;
         }
     }
 
@@ -65,7 +70,7 @@ public class NetworkDials : NetworkBehaviour
             case SyncList<float>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<float>.Operation.OP_SET:
-                if (dials[index].curState != manipObject.manipState.grabbed)
+                if (dials[index].curState != manipObject.manipState.grabbed && IsEndGrabCooldownOver(index))
                 {
                     dials[index].setPercent(newValue);
                 }
@@ -93,5 +98,22 @@ public class NetworkDials : NetworkBehaviour
     {
         dialValues[index] = value;
         dials[index].setPercent(value);
+    }
+
+    public void UpdateLastGrabedTime(int index)
+    {
+        if (index >= 0 && index < lastGrabedTimes.Length)
+        {
+            lastGrabedTimes[index] = Time.time;
+        }
+    }
+
+    private bool IsEndGrabCooldownOver(int index)
+    {
+        if (lastGrabedTimes[index] + 0.5f < Time.time)
+        {
+            return true;
+        }
+        return false;
     }
 }
