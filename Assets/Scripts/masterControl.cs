@@ -442,28 +442,51 @@ public class masterControl : MonoBehaviour {
     Invisible
   };
 
-  public WireMode WireSetting = WireMode.Curved;
+    public WireMode WireSetting = WireMode.Curved;
 
 
-    public void updateWireSetting(int num) {
-    if (WireSetting == (WireMode)num) {
-      return;
+    public void updateWireSetting(int num)
+    {
+        // make straight in case for loading legacy with curved
+        if ((WireMode)num == WireMode.Curved)
+        {
+            num = (int)WireMode.Straight;
+        }
+
+        if (WireSetting == (WireMode)num)
+        {
+            return;
+        }
+        WireSetting = (WireMode)num;
+
+        omniPlug[] plugs = FindObjectsOfType<omniPlug>();
+        for (int i = 0; i < plugs.Length; i++)
+        {
+            plugs[i].updateLineType(WireSetting);
+        }
     }
-    WireSetting = (WireMode)num;
 
-    omniPlug[] plugs = FindObjectsOfType<omniPlug>();
-    for (int i = 0; i < plugs.Length; i++) {
-      plugs[i].updateLineType(WireSetting);
+    //public void nextWireSetting()
+    //{
+    //  updateWireSetting((WireSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(WireMode)).Length);
+    //}
+
+    // avoid curved for now until path points are synced
+    public void nextWireSetting()
+    {
+        if (WireSetting == WireMode.Straight)
+        {
+            updateWireSetting((int)WireMode.Invisible);
+        }
+        else
+        {
+            updateWireSetting((int)WireMode.Straight);
+        }
     }
-  }
 
-  public void nextWireSetting()
-  {
-    updateWireSetting((WireSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(WireMode)).Length);
-  }
 
-  public void nextBinauralSetting()
-  {
-    updateBinaural((BinauralSetting.GetHashCode() + 1 ) % System.Enum.GetNames(typeof(BinauralMode)).Length); 
-  }
+    public void nextBinauralSetting()
+    {
+        updateBinaural((BinauralSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(BinauralMode)).Length);
+    }
 }
