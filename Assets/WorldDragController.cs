@@ -21,6 +21,9 @@ public class WorldDragController : MonoBehaviour
     
     if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
     if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
+    if (leftHandAnchor == null) leftHandAnchor = GameObject.Find("LeftHandAnchor").transform;
+    if (centerEyeAnchor == null) centerEyeAnchor = GameObject.Find("CenterEyeAnchor").transform;
+    if (rightHandAnchor == null) rightHandAnchor = GameObject.Find("RightHandAnchor").transform;
 
     // don't start the moving if grabbing something else already
     if (!isDragging && (leftManip.isGrabbing() || rightManip.isGrabbing())) return; 

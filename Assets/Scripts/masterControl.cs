@@ -192,8 +192,8 @@ public class masterControl : MonoBehaviour {
 
         if (PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null)
         {
-
-            GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
+            
+            GameObject g = Instantiate(tutorialsPrefab, GameObject.Find("PatchAnchor").transform, false) as GameObject;
 
             //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
             g.transform.position = new Vector3(0f, 1.3f, 0.75f);

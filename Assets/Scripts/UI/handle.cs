@@ -74,7 +74,7 @@ public class handle : manipObject
     {
         base.Awake();
         if (masterObj == null) masterObj = transform.parent;
-        //masterObjParent = GameObject.Find("PatchAnchor").transform; // move this to instantiation?
+        masterObjParent = GameObject.Find("PatchAnchor").transform; // move this to instantiation?
         if (ID == 0)
         {
             if (GetComponent<Renderer>() == null) mat = matTarg.GetComponent<Renderer>().material;
