@@ -102,10 +102,7 @@ GameObject:
   - component: {fileID: 3620889242145859698}
   - component: {fileID: -7159908804773025030}
   - component: {fileID: 2991248631652025560}
-<<<<<<< HEAD
-  - component: {fileID: 8660313338792123566}
-=======
->>>>>>> 42b09da404514b573fe2e74ba3725b86815409b9
+  - component: {fileID: 8537957467515194317}
   m_Layer: 9
   m_Name: Tutorials
   m_TagString: instrument
@@ -280,8 +277,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-<<<<<<< HEAD
---- !u!114 &8660313338792123566
+--- !u!114 &8537957467515194317
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -298,8 +294,6 @@ MonoBehaviour:
   syncInterval: 0
   debugtextMesh: {fileID: 0}
   controlledByClient: 0
-=======
->>>>>>> 42b09da404514b573fe2e74ba3725b86815409b9
 --- !u!1 &1000010686554488
 GameObject:
   m_ObjectHideFlags: 0
