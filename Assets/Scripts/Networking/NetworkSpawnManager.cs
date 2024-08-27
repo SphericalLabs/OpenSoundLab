@@ -37,7 +37,7 @@ public class NetworkSpawnManager : NetworkBehaviour
         }
     }
 
-    public void CreatItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, manipulator manip)
+    public void CreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, manipulator manip)
     {
         var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
         if (prefab != null)
@@ -61,7 +61,7 @@ public class NetworkSpawnManager : NetworkBehaviour
     }
 
     [Command (requiresAuthority = false)]
-    public void CmdCreatItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, NetworkIdentity player, bool isLeftHand)
+    public void CmdCreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, NetworkIdentity player, bool isLeftHand)
     {
         var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
         if (prefab != null)

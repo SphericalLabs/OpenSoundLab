@@ -682,13 +682,13 @@ public class menuItem : manipObject
             {
                 Debug.Log("Spawn on host");
                 manipulator manip = manipulatorObj.GetComponent<manipulator>();
-                NetworkSpawnManager.Instance.CreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, manip);
+                NetworkSpawnManager.Instance.CreateItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, manip);
             }
             else
             {
                 Debug.Log("Spawn on client");
                 manipulator manip = manipulatorObj.GetComponent<manipulator>();
-                NetworkSpawnManager.Instance.CmdCreatItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity, manip.isLeftController());
+                NetworkSpawnManager.Instance.CmdCreateItem(itemPrefab.name, transform.position, lookRotation, localPositionOffset, localRotationOffset, NetworkMenuManager.Instance.localPlayer.netIdentity, manip.isLeftController());
             }
 
         }
