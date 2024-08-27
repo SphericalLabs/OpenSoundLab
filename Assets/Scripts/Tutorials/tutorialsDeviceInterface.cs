@@ -35,6 +35,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Video;
+using System;
 
 
 
@@ -54,7 +55,9 @@ public class tutorialsDeviceInterface : deviceInterface
 
   public Transform progressTransform;
   private Vector3 maxProgressScale;
-  //private float minProgressScale;
+    //private float minProgressScale;
+
+  public event Action<tutorialPanel, bool> OnTriggerOpenTutorial;
 
   [System.Serializable]
   public class TutorialRecord
@@ -152,14 +155,20 @@ public class tutorialsDeviceInterface : deviceInterface
     }
 
   }
+    public void triggerOpenTutorial(tutorialPanel tut, bool startPaused = false)
+    {
+        playButton.keyHit(false);
+        OnTriggerOpenTutorial?.Invoke(tut, startPaused);
+        InternalOpenTutorial(tut, startPaused);
+    }
 
-  public void triggerOpenTutorial(tutorialPanel tut, bool startPaused = false)
-  {
-    playButton.keyHit(false);
-    StartCoroutine(openTutorial(tut, startPaused));
-  }
+    // New method to be called directly without triggering the event
+    public void InternalOpenTutorial(tutorialPanel tut, bool startPaused = false)
+    {
+        StartCoroutine(openTutorial(tut, startPaused));
+    }
 
-  IEnumerator openTutorial(tutorialPanel tut, bool startPaused = false)
+    IEnumerator openTutorial(tutorialPanel tut, bool startPaused = false)
   {
 
     selectedTutorial = tut;

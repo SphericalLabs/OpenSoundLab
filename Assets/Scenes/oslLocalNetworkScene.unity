@@ -877,7 +877,7 @@ MonoBehaviour:
       m_Calls: []
   buttonThickness: 20
   selectedColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-  grabedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  grabbedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
 --- !u!1 &197822667
 GameObject:
   m_ObjectHideFlags: 0
@@ -1659,7 +1659,7 @@ MonoBehaviour:
       m_Calls: []
   buttonThickness: 20
   selectedColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-  grabedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  grabbedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
 --- !u!4 &456664587 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4000013181359966, guid: 4e021dc50e0cf8c45a2230a614ba4ba4,
@@ -1826,7 +1826,7 @@ MonoBehaviour:
       m_Calls: []
   buttonThickness: 20
   selectedColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-  grabedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  grabbedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
 --- !u!1 &617956366
 GameObject:
   m_ObjectHideFlags: 0
@@ -3071,7 +3071,7 @@ MonoBehaviour:
       m_Calls: []
   buttonThickness: 20
   selectedColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-  grabedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  grabbedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
 --- !u!1001 &1140230986
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3433,7 +3433,7 @@ MonoBehaviour:
       m_Calls: []
   buttonThickness: 20
   selectedColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-  grabedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  grabbedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
 --- !u!1 &1265280763
 GameObject:
   m_ObjectHideFlags: 0
@@ -3916,7 +3916,7 @@ MonoBehaviour:
       m_Calls: []
   buttonThickness: 20
   selectedColor: {r: 0.7924528, g: 0.7924528, b: 0.7924528, a: 1}
-  grabedColor: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 1}
+  grabbedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
 --- !u!1 &1458989014
 GameObject:
   m_ObjectHideFlags: 0
@@ -4412,7 +4412,7 @@ MonoBehaviour:
       m_Calls: []
   buttonThickness: 20
   selectedColor: {r: 0.6, g: 0.6, b: 0.6, a: 1}
-  grabedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  grabbedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
 --- !u!1 &1644050913
 GameObject:
   m_ObjectHideFlags: 0
@@ -5398,6 +5398,7 @@ MonoBehaviour:
   - {fileID: 1000014214864386, guid: ce7c0e70b11c6714ba4790139f93fe9d, type: 3}
   - {fileID: 161644, guid: 3711d8030be5241469cf044c77b9e4f3, type: 3}
   - {fileID: 1687681188691744, guid: e7529c2cf9fb00c4d9bd37c1c56e8e09, type: 3}
+  - {fileID: 191382, guid: f68bd4f19edf48042884cd99ba437b5c, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
