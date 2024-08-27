@@ -102,7 +102,7 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     public virtual void StartAuthorityGrabing()
     {
         Debug.Log($"Start authority grab of {gameObject.name}");
-        //todo don't take authority if already has authority and all handles are grabed
+        //todo don't take authority if already has authority and all handles are grabbed
         if (!isServer)
         {
             if (!authority && !AllHandlesGrabbed())

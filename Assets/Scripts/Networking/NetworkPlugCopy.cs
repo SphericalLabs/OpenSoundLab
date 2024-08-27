@@ -19,10 +19,10 @@ public class NetworkPlugCopy : manipObject
         otherEnd.localPosition = new Vector3(0, -.0175f, 0);
         otherEnd.localRotation = Quaternion.Euler(-90, 0, 0);
 
-        onStartGrabEvents.AddListener(OnGrabedByOther);
+        onStartGrabEvents.AddListener(OnGrabbedByOther);
     }
 
-    public void OnGrabedByOther()
+    public void OnGrabbedByOther()
     {
         //delete this and send passing to network
         if (networkPlayerPlugHand != null)

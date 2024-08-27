@@ -85,7 +85,7 @@ public class NetworkPlayerPlugHand : NetworkBehaviour
         if (networkedPlugInHand != null)
         {
             Destroy(networkedPlugInHand.gameObject);
-            Debug.Log($"Destroy grabed plug of {handParent}");
+            Debug.Log($"Destroy grabbed plug of {handParent}");
         }
         if (!isLocalPlayer && connectedJackIndex != 0)
         {
@@ -113,7 +113,7 @@ public class NetworkPlayerPlugHand : NetworkBehaviour
         {
             connectedJackIndex = 0;
             networkedPlugInHand = null;
-            RpcDeleteGrabedPlugInHand();
+            RpcDeleteGrabbedPlugInHand();
 
         }
         else
@@ -133,13 +133,13 @@ public class NetworkPlayerPlugHand : NetworkBehaviour
         {
             Destroy(networkedPlugInHand.gameObject);
         }
-        RpcDeleteGrabedPlugInHand();
+        RpcDeleteGrabbedPlugInHand();
     }
 
     [ClientRpc]
-    public void RpcDeleteGrabedPlugInHand()
+    public void RpcDeleteGrabbedPlugInHand()
     {
-        Debug.Log($"RPC {gameObject.name} delet grabed plug");
+        Debug.Log($"RPC {gameObject.name} delet grabbed plug");
         if (plugInHand != null)
         {
             Destroy(plugInHand.gameObject);

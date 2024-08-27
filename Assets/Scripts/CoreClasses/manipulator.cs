@@ -59,8 +59,8 @@ public class manipulator : MonoBehaviour
 
     OSLInput oslInput;
 
-    private Transform grabedFollowPointTransform;
-    public Transform GrabedFollowPointTransform { get { return grabedFollowPointTransform; } }
+    private Transform grabbedFollowPointTransform;
+    public Transform GrabbedFollowPointTransform { get { return grabbedFollowPointTransform; } }
 
     public UnityEvent onInputTriggerdEvent;
     public UnityEvent onInputReleasedEvent;
@@ -75,9 +75,9 @@ public class manipulator : MonoBehaviour
 
         instances.Add(this);
 
-        grabedFollowPointTransform = new GameObject().transform;
-        grabedFollowPointTransform.name = "ManipulatorFollowPoint";
-        grabedFollowPointTransform.parent = transform;
+        grabbedFollowPointTransform = new GameObject().transform;
+        grabbedFollowPointTransform.name = "ManipulatorFollowPoint";
+        grabbedFollowPointTransform.parent = transform;
     }
 
     private void OnDestroy()

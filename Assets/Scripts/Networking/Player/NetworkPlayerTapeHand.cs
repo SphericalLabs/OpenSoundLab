@@ -86,7 +86,7 @@ public class NetworkPlayerTapeHand : NetworkBehaviour
         if (networkedTapeInHand != null)
         {
             Destroy(networkedTapeInHand.gameObject);
-            Debug.Log($"Destroy grabed tape of {handParent}");
+            Debug.Log($"Destroy grabbed tape of {handParent}");
         }
         if (!isLocalPlayer && inHandSamplePath.Length > 0)
         {
@@ -119,7 +119,7 @@ public class NetworkPlayerTapeHand : NetworkBehaviour
         {
             inHandSamplePath = "";
             networkedTapeInHand = null;
-            RpcDeleteGrabedTapeInHand();
+            RpcDeleteGrabbedTapeInHand();
 
         }
         else
@@ -139,13 +139,13 @@ public class NetworkPlayerTapeHand : NetworkBehaviour
         {
             Destroy(networkedTapeInHand.gameObject);
         }
-        RpcDeleteGrabedTapeInHand();
+        RpcDeleteGrabbedTapeInHand();
     }
 
     [ClientRpc]
-    public void RpcDeleteGrabedTapeInHand()
+    public void RpcDeleteGrabbedTapeInHand()
     {
-        Debug.Log($"RPC {gameObject.name} delet grabed object");
+        Debug.Log($"RPC {gameObject.name} delet grabbed object");
         if (tapeInHand != null)
         {
             //tapeInHand.setGrab(false, handParent.transform);

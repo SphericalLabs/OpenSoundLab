@@ -11,7 +11,7 @@ public class ManipUiObject : manipObject
     protected Image image;
     protected Color normalColor;
     public Color selectedColor = new Color(0.6f, 0.6f, 0.6f, 1f);
-    public Color grabedColor = new Color(0.8f, 0.8f, 0.8f, 1f);
+    public Color grabbedColor = new Color(0.8f, 0.8f, 0.8f, 1f);
 
 
     protected virtual void Start()
@@ -45,7 +45,7 @@ public class ManipUiObject : manipObject
         }
         else if (curState == manipState.grabbed)
         {
-            image.color = grabedColor;
+            image.color = grabbedColor;
             OnGrab();
         }
     }

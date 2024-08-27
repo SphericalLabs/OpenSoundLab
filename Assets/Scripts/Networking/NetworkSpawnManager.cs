@@ -23,7 +23,7 @@ public class NetworkSpawnManager : NetworkBehaviour
     }
 
     #region Create Item
-    public void CreatItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset)
+    public void CreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset)
     {
         var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
         if (prefab != null)
@@ -71,7 +71,7 @@ public class NetworkSpawnManager : NetworkBehaviour
             g.transform.Rotate(localRotationOffset, Space.Self);
             NetworkServer.Spawn(g, player.connectionToClient);
 
-            //todo send local player the info of the prefab and set grabed
+            //todo send local player the info of the prefab and set grabbed
             Debug.Log($"{player.gameObject} spawned {prefabName}");
             if (player.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
             {

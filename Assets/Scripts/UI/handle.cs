@@ -122,8 +122,8 @@ public class handle : manipObject
             switch (followType)
             {
                 case FollowType.Follow:
-                    masterObj.transform.position = manipulatorObjScript.GrabedFollowPointTransform.position;
-                    masterObj.transform.rotation = manipulatorObjScript.GrabedFollowPointTransform.rotation;
+                    masterObj.transform.position = manipulatorObjScript.GrabbedFollowPointTransform.position;
+                    masterObj.transform.rotation = manipulatorObjScript.GrabbedFollowPointTransform.rotation;
                     break;
                 case FollowType.Parenting:
                     if (masterObj.parent != manipulatorObj.parent)
@@ -364,8 +364,8 @@ public class handle : manipObject
             switch (followType)
             {
                 case FollowType.Follow:
-                    manipulatorObjScript.GrabedFollowPointTransform.position = masterObj.transform.position;
-                    manipulatorObjScript.GrabedFollowPointTransform.rotation = masterObj.transform.rotation;
+                    manipulatorObjScript.GrabbedFollowPointTransform.position = masterObj.transform.position;
+                    manipulatorObjScript.GrabbedFollowPointTransform.rotation = masterObj.transform.rotation;
                     break;
                 case FollowType.Parenting:
                     masterObj.parent = manipulatorObj.parent;
