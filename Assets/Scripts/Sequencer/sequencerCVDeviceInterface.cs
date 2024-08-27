@@ -703,7 +703,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     {
         for (int row = 0; row < rows; row++)
         {
-            controlPanelModes[curDimensions[0] - 1].setSwitch((curDimensions[0] - 1) % 2 == 0 ? true : false); // reset
+            // controlPanelModes[curDimensions[0] - 1].setSwitch((curDimensions[0] - 1) % 2 == 0 ? true : false); // reset mode
 
             for (int step = 0; step < curDimensions[1]; step++)
             {
