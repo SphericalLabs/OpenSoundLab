@@ -191,7 +191,7 @@ namespace Adrenak.UniMic {
             // todo: use the OSL_Native Compressor / Limiter here
             // but probably Meta Quest already does some dynamic gain regulation and other filtering on their mic
             // still that some handling of different output levels varying between platforms would be helpful, or allow for 
-            float gaindB = 12;
+            float gaindB = 18;
             float gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
 
             while (AudioClip != null && Microphone.IsRecording(CurrentDeviceName)) {
