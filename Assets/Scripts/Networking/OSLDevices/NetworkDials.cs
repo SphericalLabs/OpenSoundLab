@@ -82,7 +82,7 @@ public class NetworkDials : NetworkBehaviour
 
     public void UpdateDialValue(int index)
     {
-        Debug.Log($"Update dial value of index: {index} to value: {dials[index].percent}");
+        //Debug.Log($"Update dial value of index: {index} to value: {dials[index].percent}");
         if (isServer)
         {
             dialValues[index] = dials[index].percent;
