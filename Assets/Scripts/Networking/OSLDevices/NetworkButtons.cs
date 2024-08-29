@@ -10,7 +10,7 @@ public class NetworkButtons : NetworkBehaviour
 
     public readonly SyncList<bool> buttonValues = new SyncList<bool>();
 
-    private float[] lastGrabedTimes;
+    private float[] lastToggeldTimes;
 
     public override void OnStartServer()
     {
@@ -24,13 +24,13 @@ public class NetworkButtons : NetworkBehaviour
 
     private void Start()
     {
-        lastGrabedTimes = new float[buttons.Length];
+        lastToggeldTimes = new float[buttons.Length];
         //add dials on change callback event
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;
             buttons[i].onToggleChangedEvent.AddListener(delegate { UpdateButtonIsHit(index); });
-            buttons[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            buttons[i].onToggleChangedEvent.AddListener(delegate { UpdateLastToggledTime(index); });
         }
     }
 
@@ -60,7 +60,7 @@ public class NetworkButtons : NetworkBehaviour
             case SyncList<bool>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<bool>.Operation.OP_SET:
-                if (buttons[index].curState != manipObject.manipState.grabbed && IsEndGrabCooldownOver(index))
+                if (IsToggleCooldownOver(index))
                 {
                     buttons[index].keyHit(newValue, false);
                 }
@@ -90,18 +90,17 @@ public class NetworkButtons : NetworkBehaviour
         buttons[index].keyHit(value, false);
     }
 
-
-    public void UpdateLastGrabedTime(int index)
+    public void UpdateLastToggledTime(int index)
     {
-        if (index >= 0 && index < lastGrabedTimes.Length)
+        if (index >= 0 && index < lastToggeldTimes.Length)
         {
-            lastGrabedTimes[index] = Time.time;
+            lastToggeldTimes[index] = Time.time;
         }
     }
 
-    private bool IsEndGrabCooldownOver(int index)
+    private bool IsToggleCooldownOver(int index)
     {
-        if (lastGrabedTimes[index] + 0.5f < Time.time)
+        if (lastToggeldTimes[index] + 0.5f < Time.time)
         {
             return true;
         }
