@@ -53,7 +53,10 @@ public class NetworkButtons : NetworkBehaviour
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
-                buttons[index].keyHit(newValue, false);
+                if (buttons[index].isHit != newValue)
+                {
+                    buttons[index].keyHit(newValue, false);
+                }
                 break;
             case SyncList<bool>.Operation.OP_INSERT:
                 break;

@@ -423,6 +423,10 @@ public class omniPlug : manipObject
     public void Release()
     {
         foreach (omniJack j in targetJackList) j.flash(Color.black);
+        if (otherPlug.connected != null)
+        {
+            otherPlug.connected.onEndGrabEvents.Invoke();
+        }
         if (connected == null)
         {
             if (lr) lr.positionCount = 0;
@@ -447,7 +451,6 @@ public class omniPlug : manipObject
             calmTime = 0;
             connected.beginConnection(this, true);
         }
-
         collCandidates.Clear();
     }
 

@@ -233,12 +233,12 @@ public class NetworkJacks : NetworkBehaviour
 
     public void SetJackGrab(int index, bool b)
     {
-        Debug.Log($"{gameObject.name} jack of index {index} is grabed {b}");
         if (index >= 0 && index < jackGrabedSync.Count)
         {
             if (isServer)
             {
                 jackGrabedSync[index] = b;
+                Debug.Log($"{gameObject.name} jack of index {index} is grabed {b}");
             }
             else
             {
@@ -253,6 +253,7 @@ public class NetworkJacks : NetworkBehaviour
         if (index >= 0 && index < jackGrabedSync.Count)
         {
             jackGrabedSync[index] = b;
+            Debug.Log($"CMD {gameObject.name} jack of index {index} is grabed {b}");
         }
     }
 }
