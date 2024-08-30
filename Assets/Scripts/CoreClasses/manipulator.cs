@@ -143,7 +143,7 @@ public class manipulator : MonoBehaviour
         grabbing = on;
         showTip();
 
-        if (selectedObject != null)
+        if (selectedObject != null && selectedObject.CanBeGrabed)
         {
             selectedObject.setGrab(grabbing, transform);
             if (!on) toggleController(true);
@@ -177,7 +177,7 @@ public class manipulator : MonoBehaviour
 
     public void ForceGrab(manipObject o)
     {
-        if (selectedObject != null) release();
+        if (selectedObject != null || !selectedObject.CanBeGrabed) release();
 
         grabbing = true;
         selectedObject = o;

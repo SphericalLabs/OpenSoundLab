@@ -13,6 +13,7 @@ public class NetworkJacks : NetworkBehaviour
 
     public readonly SyncList<int> jackIds = new SyncList<int>();
     public readonly SyncList<int> connectedJackIds = new SyncList<int>();
+    public readonly SyncList<bool> jackGrabedSync = new SyncList<bool>();
 
     public override void OnStartServer()
     {
@@ -27,6 +28,7 @@ public class NetworkJacks : NetworkBehaviour
             }
             jackIds.Add(jack.ID);
             connectedJackIds.Add(0);
+            jackGrabedSync.Add(false);
         }
         //add update events to jacks
     }
@@ -37,6 +39,7 @@ public class NetworkJacks : NetworkBehaviour
         if (!isServer)
         {
             connectedJackIds.Callback += OnConnectionUpdated;
+            jackGrabedSync.Callback += OnJackGrabedUpdated;
         }
     }
 
@@ -49,6 +52,8 @@ public class NetworkJacks : NetworkBehaviour
             int index = i;
             omniJacks[i].onBeginnConnectionEvent.AddListener(delegate { SetJackConnection(index); });
             omniJacks[i].onEndConnectionEvent.AddListener(delegate { EndJackConnection(index); });
+            omniJacks[i].onStartGrabEvents.AddListener(delegate { SetJackGrab(index, true); });
+            omniJacks[i].onEndGrabEvents.AddListener(delegate { SetJackGrab(index, false); });
         }
 
         for (int i = 0; i < jackIds.Count; i++)
@@ -201,4 +206,53 @@ public class NetworkJacks : NetworkBehaviour
         }
     }
 
+
+
+
+    void OnJackGrabedUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
+    {
+        switch (op)
+        {
+            case SyncList<bool>.Operation.OP_ADD:
+                omniJacks[index].CanBeGrabed = newValue;
+                break;
+            case SyncList<bool>.Operation.OP_INSERT:
+                break;
+            case SyncList<bool>.Operation.OP_REMOVEAT:
+                break;
+            case SyncList<bool>.Operation.OP_SET:
+                if (omniJacks[index].curState != manipObject.manipState.grabbed)
+                {
+                    omniJacks[index].CanBeGrabed = newValue;
+                }
+                break;
+            case SyncList<bool>.Operation.OP_CLEAR:
+                break;
+        }
+    }
+
+    public void SetJackGrab(int index, bool b)
+    {
+        Debug.Log($"{gameObject.name} jack of index {index} is grabed {b}");
+        if (index >= 0 && index < jackGrabedSync.Count)
+        {
+            if (isServer)
+            {
+                jackGrabedSync[index] = b;
+            }
+            else
+            {
+                CmdUpdateJackGrabed(index, b);
+            }
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdUpdateJackGrabed(int index, bool b)
+    {
+        if (index >= 0 && index < jackGrabedSync.Count)
+        {
+            jackGrabedSync[index] = b;
+        }
+    }
 }
