@@ -60,7 +60,7 @@ public class NetworkKey : NetworkBehaviour
             case SyncList<bool>.Operation.OP_SET:
                 if (IsKeyHitCooldownOver(index))
                 {
-                    keys[index].phantomHit(newValue);
+                    keys[index].phantomHit(newValue, true);
                 }
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
