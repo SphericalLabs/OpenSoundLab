@@ -1,6 +1,7 @@
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 
@@ -223,7 +224,7 @@ public class NetworkJacks : NetworkBehaviour
             case SyncList<bool>.Operation.OP_SET:
                 if (omniJacks[index].curState != manipObject.manipState.grabbed)
                 {
-                    omniJacks[index].CanBeGrabed = newValue;
+                    omniJacks[index].CanBeGrabed = !newValue;
                 }
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
@@ -253,6 +254,7 @@ public class NetworkJacks : NetworkBehaviour
         if (index >= 0 && index < jackGrabedSync.Count)
         {
             jackGrabedSync[index] = b;
+            omniJacks[index].CanBeGrabed = !b;
             Debug.Log($"CMD {gameObject.name} jack of index {index} is grabed {b}");
         }
     }
