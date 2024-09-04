@@ -20,6 +20,15 @@ public class NetworkPlayerPlugHand : NetworkBehaviour
 
     public omniPlug PlugInHand { get => plugInHand; set => plugInHand = value; }
 
+    //check if it delets plug if like that
+    private void Update()
+    {
+        if (isLocalPlayer && connectedJackIndex != 0 && plugInHand == null)
+        {
+            SetHandJackIndex(0, Vector3.zero, Quaternion.identity);
+        }
+    }
+
     public override void OnStartClient()
     {
         base.OnStartClient();
