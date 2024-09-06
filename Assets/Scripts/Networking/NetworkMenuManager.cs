@@ -183,10 +183,23 @@ public class NetworkMenuManager : MonoBehaviour
 
     public void FindServer()
     {
+        StopDiscovery();
+        StartCoroutine(FindServerWaitTime());
+    }
+
+    IEnumerator FindServerWaitTime()
+    {
+        yield return new WaitForSeconds(1f);
         discoveredServers.Clear();
         networkDiscovery.StartDiscovery();
     }
 
+    public void StopDiscovery()
+    {
+        discoveredServers.Clear();
+        networkDiscovery.StopDiscovery();
+        DeleteAllServerDiscoveryButtons();
+    }
 
     public void JoinLocalHost(ServerResponse info)
     {
@@ -338,7 +351,7 @@ public class NetworkMenuManager : MonoBehaviour
             relayHostMenuParent.gameObject.SetActive(false);
             clientMenuParent.gameObject.SetActive(false);
 
-            ipAdressText.text = $"Adress: {IPManager.GetLocalIPAddress()}";
+            ipAdressText.text = $"Your iP address: {IPManager.GetLocalIPAddress()}";
         }
 
         if (backButtonObject != null)

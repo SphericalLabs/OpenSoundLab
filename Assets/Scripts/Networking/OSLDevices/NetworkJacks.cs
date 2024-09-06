@@ -53,8 +53,8 @@ public class NetworkJacks : NetworkBehaviour
             int index = i;
             omniJacks[i].onBeginnConnectionEvent.AddListener(delegate { SetJackConnection(index); });
             omniJacks[i].onEndConnectionEvent.AddListener(delegate { EndJackConnection(index); });
-            omniJacks[i].onStartGrabEvents.AddListener(delegate { SetJackGrab(index, true); });
-            omniJacks[i].onEndGrabEvents.AddListener(delegate { SetJackGrab(index, false); });
+            omniJacks[i].onNotGrabableEvent.AddListener(delegate { SetJackGrab(index, true); });
+            omniJacks[i].onIsGrabableEvent.AddListener(delegate { SetJackGrab(index, false); });
         }
 
         for (int i = 0; i < jackIds.Count; i++)

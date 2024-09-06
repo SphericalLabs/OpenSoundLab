@@ -4521,7 +4521,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2081794422}
         m_TargetAssemblyTypeName: NetworkMenuManager, Assembly-CSharp
-        m_MethodName: DeleteAllServerDiscoveryButtons
+        m_MethodName: StopDiscovery
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

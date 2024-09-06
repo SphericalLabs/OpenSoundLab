@@ -425,7 +425,7 @@ public class omniPlug : manipObject
         foreach (omniJack j in targetJackList) j.flash(Color.black);
         if (otherPlug.connected != null)
         {
-            otherPlug.connected.onEndGrabEvents.Invoke();
+            otherPlug.connected.onIsGrabableEvent.Invoke();
         }
         if (connected == null)
         {
