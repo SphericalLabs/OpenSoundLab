@@ -1541,7 +1541,7 @@ GameObject:
   - component: {fileID: 403954027}
   - component: {fileID: 403954028}
   m_Layer: 5
-  m_Name: Is DiscoverableToggle
+  m_Name: IsDiscoverableToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1969,7 +1969,7 @@ GameObject:
   - component: {fileID: 631727447}
   - component: {fileID: 631727446}
   m_Layer: 5
-  m_Name: qText
+  m_Name: QText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2149,7 +2149,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Other hosts in network
+  m_text: Other Hosts in Network
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3441,7 +3441,7 @@ GameObject:
   - component: {fileID: 1265280765}
   - component: {fileID: 1265280764}
   m_Layer: 5
-  m_Name: ipAdress
+  m_Name: IpAddress
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3467,7 +3467,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'adress:'
+  m_text: 'Address:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4144,7 +4144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1514022584}
   m_Layer: 5
-  m_Name: DicoveryUI
+  m_Name: DiscoveryUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5424,7 +5424,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d703205f23f14a2b9c128a63a21d5a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableActiveDiscovery: 1
+  enableActiveDiscovery: 0
   BroadcastAddress: 
   serverBroadcastListenPort: 47777
   ActiveDiscoveryInterval: 1
@@ -5596,7 +5596,7 @@ GameObject:
   - component: {fileID: 2112697115}
   - component: {fileID: 2112697114}
   m_Layer: 5
-  m_Name: rttText
+  m_Name: RttText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
