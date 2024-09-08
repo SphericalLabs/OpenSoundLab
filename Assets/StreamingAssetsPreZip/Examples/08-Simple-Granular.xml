@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SynthSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Instruments>
-    <Instruments xsi:type="SamplerData">
+    <Instruments xsi:type="SamplerTwoData">
       <ID>-458604</ID>
-      <deviceType>Sampler</deviceType>
+      <deviceType>SamplerTwo</deviceType>
       <position>
         <x>0.347833633</x>
         <y>1.17036211</y>
