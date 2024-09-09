@@ -85,7 +85,7 @@ public class NetworkKey : NetworkBehaviour
     public void CmdKeyButtonIsHit(int index, bool value)
     {
         keyValues[index] = value;
-        keys[index].phantomHit(value);
+        keys[index].phantomHit(value, true);
     }
 
 
