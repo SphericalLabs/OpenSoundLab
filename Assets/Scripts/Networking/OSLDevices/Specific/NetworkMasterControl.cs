@@ -135,6 +135,8 @@ public class NetworkMasterControl : NetworkBehaviour
 
     private bool IsBinauralCooldownOver()
     {
+        return true;
+
         if (lastBinauralTime + 0.5f < Time.time)
         {
             return true;
@@ -144,6 +146,8 @@ public class NetworkMasterControl : NetworkBehaviour
 
     private bool IsWireCooldownOver()
     {
+        return true;
+
         if (lastWireTime + 0.5f < Time.time)
         {
             return true;
@@ -153,6 +157,8 @@ public class NetworkMasterControl : NetworkBehaviour
 
     private bool IsDisplayCooldownOver()
     {
+        return true;
+
         if (lastDisplayTime + 0.5f < Time.time)
         {
             return true;

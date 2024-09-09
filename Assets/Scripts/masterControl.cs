@@ -459,7 +459,7 @@ public class masterControl : MonoBehaviour {
         omniPlug[] plugs = FindObjectsOfType<omniPlug>();
         for (int i = 0; i < plugs.Length; i++)
         {
-            plugs[i].updateLineType(WireSetting);
+            if(plugs[i].outputPlug) plugs[i].updateLineType();
         }
 
         onWireChangedEvent.Invoke();
