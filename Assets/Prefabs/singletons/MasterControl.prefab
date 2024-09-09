@@ -19,7 +19,6 @@ GameObject:
   - component: {fileID: 114568204637131020}
   - component: {fileID: 835394206}
   - component: {fileID: 7013683895444878039}
-  - component: {fileID: 5880465922533874342}
   m_Layer: 0
   m_Name: MasterControl
   m_TagString: Untagged
@@ -68,7 +67,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
-  nome: {fileID: 0}
 --- !u!114 &114000010410631886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86,7 +84,6 @@ MonoBehaviour:
   tipColor: {r: 0.34509805, g: 0.44705883, b: 0.68235296, a: 1}
   backgroundAudio: {fileID: 0}
   metronomeClick: {fileID: 82362240975233946}
-  exampleSetups: {fileID: 0}
   muteEnvToggle: {fileID: 0}
   bpm: 120
   curCycle: 0
@@ -100,6 +97,7 @@ MonoBehaviour:
   jacksEnabled: 1
   recorder: {fileID: 0}
   metro: {fileID: 0}
+  CameraRig: {fileID: 0}
   tooltipsOn: 1
   examplesOn: 1
   dialUsed: 0
@@ -278,23 +276,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7013683895444878039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000012983180942}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 908267b565c2f6f4984fb75f0966bf36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cpuDial: {fileID: 0}
-  gpuDial: {fileID: 0}
-  fovDial: {fileID: 0}
-  scaleDial: {fileID: 0}
-  fpsDial: {fileID: 0}
---- !u!114 &5880465922533874342
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
