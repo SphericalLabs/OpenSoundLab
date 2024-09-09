@@ -436,14 +436,22 @@ public class masterControl : MonoBehaviour {
     }
   }
 
-  public enum WireMode {
+    public enum WireMode {
     Curved,
     Straight,
     Invisible
-  };
+    };
 
     public WireMode WireSetting = WireMode.Curved;
 
+    public enum DisplayMode {
+        All,
+        InputAndSpeaker,
+        Speaker,
+        Nothing
+    }
+
+    public DisplayMode DisplaySetting = DisplayMode.All; // todo: implement display switching
 
     public void updateWireSetting(int num)
     {
