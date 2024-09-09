@@ -103,7 +103,18 @@ MonoBehaviour:
   dialUsed: 0
   tutorialsPrefab: {fileID: 0}
   patchAnchor: {fileID: 0}
+  onBinauralChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onWireChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onDisplayChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  BinauralSetting: 0
   WireSetting: 1
+  DisplaySetting: 0
 --- !u!82 &82000010201573614
 AudioSource:
   m_ObjectHideFlags: 0

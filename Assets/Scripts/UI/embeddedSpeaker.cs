@@ -63,7 +63,7 @@ public class embeddedSpeaker : MonoBehaviour
 
     void Start()
     {
-        audio.spatialize = (masterControl.instance.BinauralSetting == masterControl.BinauralMode.All);
+        audio.spatialize = (masterControl.instance.BinauralSetting == BinauralMode.All);
     }
 
     public void updateSecondary(bool on)

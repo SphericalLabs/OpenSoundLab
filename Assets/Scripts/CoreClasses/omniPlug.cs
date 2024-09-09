@@ -61,7 +61,8 @@ public class omniPlug : manipObject
 
     List<omniJack> targetJackList = new List<omniJack>();
     List<Transform> collCandidates = new List<Transform>();
-    masterControl.WireMode wireType = masterControl.WireMode.Curved;
+
+    WireMode wireType = WireMode.Straight;
 
 
     private NetworkPlayerPlugHand targetNetworkPlugHand;
@@ -254,10 +255,10 @@ public class omniPlug : manipObject
             if (!noChange)
             {
                 calming();
-                updateLineVerts();
+                updateLineVerts(); // todo: cleanup
             }
 
-            updateLineVerts();
+            updateLineVerts(); // todo: cleanup
             if (noChange) calmLine();
         }
     }
@@ -358,7 +359,7 @@ public class omniPlug : manipObject
     }
 
 
-    public void updateLineType(masterControl.WireMode num)
+    public void updateLineType(WireMode num)
     {
         wireType = num;
         updateLineVerts();
@@ -368,13 +369,13 @@ public class omniPlug : manipObject
     bool forcedWireShow = false;
     void updateLineVerts(bool justLast = false)
     {
-        if (wireType == masterControl.WireMode.Curved)
+        if (wireType == WireMode.Curved)
         {
             lr.positionCount = plugPath.Count;
             if (justLast) lr.SetPosition(plugPath.Count - 1, plugPath.Last());
             else lr.SetPositions(plugPath.ToArray());
         }
-        else if (wireType == masterControl.WireMode.Straight && plugPath.Count > 2)
+        else if (wireType == WireMode.Straight && plugPath.Count > 2) 
         {
             lr.positionCount = 2;
             lr.SetPosition(0, plugPath[0]);
@@ -386,8 +387,9 @@ public class omniPlug : manipObject
             lr.SetPosition(0, plugPath[0]);
             lr.SetPosition(1, plugPath.Last());
         }
-        else
+        else // WireMode.Invisible
         {
+            lr.positionCount = 0;
             lr.positionCount = 0;
         }
     }

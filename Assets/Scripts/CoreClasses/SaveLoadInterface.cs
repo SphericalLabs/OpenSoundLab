@@ -130,7 +130,7 @@ public class SaveLoadInterface : MonoBehaviour
         if (justpreview) return s.version;
 
         masterControl.instance.setBPM(s.BPM);
-        masterControl.instance.updateBinaural(s.binauralMode);
+        masterControl.instance.updateBinauralSetting(s.binauralMode);
         metronome.Instance.SetBPM(s.BPM);
         synthSet.SystemList.Add(s);
         return s.version;

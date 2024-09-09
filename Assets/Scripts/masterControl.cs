@@ -36,6 +36,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class masterControl : MonoBehaviour {
 
@@ -412,13 +413,15 @@ public class masterControl : MonoBehaviour {
     return (new System.Uri(path)).AbsoluteUri;
   }
 
-  public enum BinauralMode {    
-    Speaker,
-    All
-  };
+
+  public UnityEvent onBinauralChangedEvent;
+  public UnityEvent onWireChangedEvent;
+  public UnityEvent onDisplayChangedEvent;
+
+
   public BinauralMode BinauralSetting = BinauralMode.Speaker;
 
-  public void updateBinaural(int num) {
+  public void updateBinauralSetting(int num) {
     if (BinauralSetting == (BinauralMode)num) {
       return;
     }
@@ -434,24 +437,14 @@ public class masterControl : MonoBehaviour {
       if (BinauralSetting == BinauralMode.All) embeddedSpeakers[i].audio.spatialize = true;
       else embeddedSpeakers[i].audio.spatialize = false;
     }
+
+    onBinauralChangedEvent.Invoke();
   }
 
-    public enum WireMode {
-    Curved,
-    Straight,
-    Invisible
-    };
 
-    public WireMode WireSetting = WireMode.Curved;
 
-    public enum DisplayMode {
-        All,
-        InputAndSpeaker,
-        Speaker,
-        Nothing
-    }
-
-    public DisplayMode DisplaySetting = DisplayMode.All; // todo: implement display switching
+    public WireMode WireSetting = WireMode.Straight;
+       
 
     public void updateWireSetting(int num)
     {
@@ -461,10 +454,6 @@ public class masterControl : MonoBehaviour {
             num = (int)WireMode.Straight;
         }
 
-        if (WireSetting == (WireMode)num)
-        {
-            return;
-        }
         WireSetting = (WireMode)num;
 
         omniPlug[] plugs = FindObjectsOfType<omniPlug>();
@@ -472,6 +461,8 @@ public class masterControl : MonoBehaviour {
         {
             plugs[i].updateLineType(WireSetting);
         }
+
+        onWireChangedEvent.Invoke();
     }
 
     //public void nextWireSetting()
@@ -482,7 +473,7 @@ public class masterControl : MonoBehaviour {
     // avoid curved for now until path points are synced
     public void nextWireSetting()
     {
-        if (WireSetting == WireMode.Straight)
+        if (WireSetting == WireMode.Straight || WireSetting == WireMode.Curved)
         {
             updateWireSetting((int)WireMode.Invisible);
         }
@@ -495,6 +486,33 @@ public class masterControl : MonoBehaviour {
 
     public void nextBinauralSetting()
     {
-        updateBinaural((BinauralSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(BinauralMode)).Length);
+        updateBinauralSetting((BinauralSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(BinauralMode)).Length);
+    }
+
+
+    public DisplayMode DisplaySetting = DisplayMode.All; // todo: implement display switching with actual consequences for the Renderers of the devices
+
+    public void updateDisplaySetting(int num){
+        DisplaySetting = (DisplayMode)num;
+        onDisplayChangedEvent.Invoke();
     }
 }
+
+public enum WireMode
+{
+    Curved,
+    Straight,
+    Invisible
+};
+public enum DisplayMode
+{
+    All,
+    InputAndSpeaker,
+    Speaker,
+    Nothing
+}
+public enum BinauralMode
+{
+    Speaker,
+    All
+};
