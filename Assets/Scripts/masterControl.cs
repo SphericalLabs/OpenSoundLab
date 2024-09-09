@@ -416,9 +416,9 @@ public class masterControl : MonoBehaviour {
     Speaker,
     All
   };
-  public static BinauralMode BinauralSetting = BinauralMode.Speaker;
+  public BinauralMode BinauralSetting = BinauralMode.Speaker;
 
-  public static void updateBinaural(int num) {
+  public void updateBinaural(int num) {
     if (BinauralSetting == (BinauralMode)num) {
       return;
     }

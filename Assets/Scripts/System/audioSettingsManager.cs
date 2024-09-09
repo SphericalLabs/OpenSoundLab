@@ -84,7 +84,7 @@ public class audioSettingsManager : MonoBehaviour {
     if (!on) return;
     int num = System.Int32.Parse(binauralGroup.ActiveToggles().First().transform.parent.name);
     PlayerPrefs.SetInt("audioBinaural", num);
-    masterControl.updateBinaural(num);
+    masterControl.instance.updateBinaural(num);
   }
 
   public void UpdateQuality(bool on) {
