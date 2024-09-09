@@ -19,37 +19,37 @@ public class NetworkMasterControl : NetworkBehaviour
 
     void OnWireSettingChanged(WireMode oldValue, WireMode newValue)
     {
-        if(IsWireCooldownOver()){
+        //if(IsWireCooldownOver()){
             masterControl.instance.updateWireSetting((int)newValue);
-        }
+        //}
     }
 
     void OnDisplaySettingChanged(DisplayMode oldValue, DisplayMode newValue)
     {
-        if (IsDisplayCooldownOver())
-        {
+        //if (IsDisplayCooldownOver())
+        //{
             masterControl.instance.updateDisplaySetting((int)newValue);
-        }
+        //}
     }
 
     void OnBinauralSettingChanged(BinauralMode oldValue, BinauralMode newValue)
     {
-        if (IsBinauralCooldownOver())
-        {
+        //if (IsBinauralCooldownOver())
+        //{
             masterControl.instance.updateBinauralSetting((int)newValue);
-        }
+        //}
     }
 
     void Start()
     {
         masterControl.instance.onBinauralChangedEvent.AddListener(UpdateBinaural);
-        masterControl.instance.onBinauralChangedEvent.AddListener(delegate{ lastBinauralTime = Time.time; });
+        //masterControl.instance.onBinauralChangedEvent.AddListener(delegate{ lastBinauralTime = Time.time; });
 
         masterControl.instance.onWireChangedEvent.AddListener(UpdateWire);
-        masterControl.instance.onWireChangedEvent.AddListener(delegate { lastWireTime = Time.time; });
+        //masterControl.instance.onWireChangedEvent.AddListener(delegate { lastWireTime = Time.time; });
 
         masterControl.instance.onDisplayChangedEvent.AddListener(UpdateDisplay);
-        masterControl.instance.onDisplayChangedEvent.AddListener(delegate { lastDisplayTime = Time.time; });
+        //masterControl.instance.onDisplayChangedEvent.AddListener(delegate { lastDisplayTime = Time.time; });
     }
 
     public override void OnStartClient()
@@ -128,41 +128,41 @@ public class NetworkMasterControl : NetworkBehaviour
         masterControl.instance.updateDisplaySetting((int)mode);
     }
 
-    // cooldown time measurements
-    float lastBinauralTime = 0f;
-    float lastWireTime = 0f;
-    float lastDisplayTime = 0f;
+    //// cooldown time measurements
+    //float lastBinauralTime = 0f;
+    //float lastWireTime = 0f;
+    //float lastDisplayTime = 0f;
 
-    private bool IsBinauralCooldownOver()
-    {
-        return true;
+    //private bool IsBinauralCooldownOver()
+    //{
+    //    return true;
 
-        if (lastBinauralTime + 0.5f < Time.time)
-        {
-            return true;
-        }
-        return false;
-    }
+    //    if (lastBinauralTime + 0.5f < Time.time)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
 
-    private bool IsWireCooldownOver()
-    {
-        return true;
+    //private bool IsWireCooldownOver()
+    //{
+    //    return true;
 
-        if (lastWireTime + 0.5f < Time.time)
-        {
-            return true;
-        }
-        return false;
-    }
+    //    if (lastWireTime + 0.5f < Time.time)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
 
-    private bool IsDisplayCooldownOver()
-    {
-        return true;
+    //private bool IsDisplayCooldownOver()
+    //{
+    //    return true;
 
-        if (lastDisplayTime + 0.5f < Time.time)
-        {
-            return true;
-        }
-        return false;
-    }
+    //    if (lastDisplayTime + 0.5f < Time.time)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
 }
