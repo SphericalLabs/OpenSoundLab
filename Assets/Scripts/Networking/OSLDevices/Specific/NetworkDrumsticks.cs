@@ -48,7 +48,7 @@ public class NetworkDrumsticks : NetworkBehaviour
     }
 
     //update drumsticks on other devices
-    void SetDrumstickHandTarget()
+    void SetDrumstickHandTarget(NetworkIdentity targetPlayer, bool leftHand)
     {
         //find player
         //let stick follow hand
@@ -59,8 +59,45 @@ public class NetworkDrumsticks : NetworkBehaviour
 
     public void OnChangeHandTarget(int index, bool grabbed)
     {
-        //find and set target player
+        GetLocalPlayerHand(index, grabbed, out NetworkIdentity playerIdentity, out bool leftHand);
 
-        //set if lefthand
+        if (isServer)
+        {
+            UpdateHandTarget(index, playerIdentity, leftHand);
+        }
+        else
+        {
+            CmdOnChangeHandTarget(index, playerIdentity, leftHand);
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdOnChangeHandTarget(int index, NetworkIdentity target, bool leftHand)
+    {
+        UpdateHandTarget(index, target, leftHand);
+    }
+
+    void UpdateHandTarget(int index, NetworkIdentity target, bool leftHand)
+    {
+        if (grabberHand[index].player != target && grabberHand[index].isLeftHand != leftHand)
+        {
+            var newTarget = new HandTraget();
+            newTarget.player = target;
+            newTarget.isLeftHand = leftHand;
+
+            grabberHand[index] = newTarget;
+        }
+    }
+
+    private void GetLocalPlayerHand(int index,bool isGrabbed, out NetworkIdentity networkIdentity, out bool leftHand)
+    {
+        networkIdentity = null;
+        leftHand = false;
+
+        if (isGrabbed && index >= 0 && index < drumsticks.Length)
+        {
+            leftHand = NetworkMenuManager.Instance.localPlayer.IsObjectGrabbedByLeftHand(drumsticks[index]);
+            networkIdentity = NetworkMenuManager.Instance.localPlayer.netIdentity;
+        }
     }
 }

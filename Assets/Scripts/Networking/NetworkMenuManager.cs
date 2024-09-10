@@ -350,7 +350,7 @@ public class NetworkMenuManager : MonoBehaviour
             relayHostMenuParent.gameObject.SetActive(false);
             clientMenuParent.gameObject.SetActive(false);
 
-            ipAdressText.text = $"Your iP address: {IPManager.GetLocalIPAddress()}";
+            ipAdressText.text = $"Your Address: {IPManager.GetLocalIPAddress()}";
         }
 
         if (backButtonObject != null)

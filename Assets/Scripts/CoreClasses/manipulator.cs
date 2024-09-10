@@ -62,6 +62,8 @@ public class manipulator : MonoBehaviour
     private Transform grabbedFollowPointTransform;
     public Transform GrabbedFollowPointTransform { get { return grabbedFollowPointTransform; } }
 
+    public manipObject SelectedObject { get => selectedObject; set => selectedObject = value; }
+
     public UnityEvent onInputTriggerdEvent;
     public UnityEvent onInputReleasedEvent;
 

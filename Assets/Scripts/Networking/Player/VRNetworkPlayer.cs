@@ -305,6 +305,16 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
         return null;
     }
+
+
+    public bool IsObjectGrabbedByLeftHand(manipObject manipObject)
+    {
+        if (leftHandManipulator.SelectedObject == manipObject)
+        {
+            return true;
+        }
+        return false;
+    }
     #endregion
 
 
