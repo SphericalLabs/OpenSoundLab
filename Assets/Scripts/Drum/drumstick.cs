@@ -185,6 +185,7 @@ public class drumstick : manipObject
             else
             {
                 hasFollowTarget = false;
+                CanBeGrabed = true;
                 StartCoroutine(returnRoutine());
             }
         }

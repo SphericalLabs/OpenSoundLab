@@ -20,7 +20,7 @@ public class NetworkDrumsticks : NetworkBehaviour
 
     private float[] lastHoldTimes;
 
-    private void Start()
+    private void Awake()
     {
         drumpad.onHitEvent.AddListener(OnHitDrumpad);
         lastHoldTimes = new float[drumsticks.Length];
@@ -50,6 +50,8 @@ public class NetworkDrumsticks : NetworkBehaviour
             holdingHands.Callback += OnHandTargetUpdated;
             for (int i = 0; i < holdingHands.Count; i++)
             {
+                Debug.Log($"start client holdinghand {holdingHands[i]}");
+
                 OnHandTargetUpdated(SyncList<HoldingHand>.Operation.OP_ADD, i, holdingHands[i], holdingHands[i]);
             }
         }
@@ -61,6 +63,7 @@ public class NetworkDrumsticks : NetworkBehaviour
         {
             case SyncList<HoldingHand>.Operation.OP_ADD:
                 //when hand is added
+                Debug.Log("Add holdinghand");
                 SetDrumstickHandTarget(index, newItem.player, newItem.isLeftHand);
                 break;
             case SyncList<HoldingHand>.Operation.OP_INSERT:
@@ -191,6 +194,7 @@ public class NetworkDrumsticks : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdOnHitDrumpad()
     {
+        Debug.Log("cmd hit drumpad");
         drumpad.keyHit(true, false);
         RpcOnHitDrumpad();
     }
@@ -198,7 +202,8 @@ public class NetworkDrumsticks : NetworkBehaviour
     [ClientRpc]
     public void RpcOnHitDrumpad()
     {
-        if (!isServer && drumpad.isHit)
+        Debug.Log("rpc hit drumpad");
+        if (!isServer && !drumpad.isHit)
         {
             drumpad.keyHit(true, false);
         }
