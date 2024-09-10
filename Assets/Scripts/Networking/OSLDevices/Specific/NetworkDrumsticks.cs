@@ -24,7 +24,7 @@ public class NetworkDrumsticks : NetworkBehaviour
         {
             int index = i;
             drumsticks[i].onStartFollowEvent.AddListener(delegate { OnChangeStickFollow(index, true); });
-            drumsticks[i].onStartFollowEvent.AddListener(delegate { OnChangeStickFollow(index, false); });
+            drumsticks[i].onEndFollowEvent.AddListener(delegate { OnChangeStickFollow(index, false); });
             grabberHand.Add(new HandTraget());
         }
     }
