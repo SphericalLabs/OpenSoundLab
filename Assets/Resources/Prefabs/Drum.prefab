@@ -223,6 +223,12 @@ MonoBehaviour:
   ID: -1
   _interface: {fileID: 114000010194930868}
   skinnable: 1
+  onStartFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!54 &54000014099792322
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -432,6 +438,7 @@ MonoBehaviour:
   drumsticks:
   - {fileID: 11499928}
   - {fileID: 11476070}
+  drumpad: {fileID: 11491414}
 --- !u!1 &130724
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,6 +570,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   stickTip: {fileID: 484334}
+  onHitEvent:
+    m_PersistentCalls:
+      m_Calls: []
   isHit: 0
 --- !u!114 &3235592054643787987
 MonoBehaviour:
@@ -1009,6 +1019,12 @@ MonoBehaviour:
   ID: 1
   _interface: {fileID: 114000010194930868}
   skinnable: 1
+  onStartFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!54 &54000010415593268
 Rigidbody:
   m_ObjectHideFlags: 0

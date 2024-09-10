@@ -138,7 +138,7 @@ public class drumstick : manipObject {
   }
 
   Coroutine returnRoutineID;
-  IEnumerator returnRoutine() {
+  public IEnumerator returnRoutine() {
     Vector3 curPos = transform.localPosition;
     Quaternion curRot = transform.localRotation;
 
