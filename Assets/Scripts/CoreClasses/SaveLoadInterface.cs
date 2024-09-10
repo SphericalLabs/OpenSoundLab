@@ -79,11 +79,11 @@ public class SaveLoadInterface : MonoBehaviour
                 NetworkServer.Spawn(g);
             }
         }
-        //Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
+        Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
         int c = synthSet.InstrumentList.Count;
         for (int i = 0; i < c; i++)
         {
-            GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType]/*, patchAnchor Vector3.zero, Quaternion.identity*/) as GameObject;
+            GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;
             g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i]);
             NetworkServer.Spawn(g);
         }
@@ -234,7 +234,7 @@ public class SaveLoadInterface : MonoBehaviour
             g2.transform.localScale = g.transform.localScale;
 
             Vector3 v = g.transform.localScale;
-            if (v.x < 0) v.x *= -1; // needs mirroring if dragged while copyijg, because left controller was always mirrored and this copies down to the duplicate
+            if (v.x < 0) v.x *= -1; // needs mirroring if dragged while copying, because left controller was always mirrored and this copies down to the duplicate
             g2.transform.localScale = v;
 
             if (m != null)

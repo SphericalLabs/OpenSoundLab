@@ -32,6 +32,7 @@ public class NetworkSpawnManager : NetworkBehaviour
             g.transform.Translate(localPositionOffset, Space.Self);
             g.transform.Rotate(localRotationOffset, Space.Self);
             NetworkServer.Spawn(g);
+            g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
             Debug.Log($"{prefabName} spawned by the host");
         }
@@ -70,6 +71,7 @@ public class NetworkSpawnManager : NetworkBehaviour
             g.transform.Translate(localPositionOffset, Space.Self);
             g.transform.Rotate(localRotationOffset, Space.Self);
             NetworkServer.Spawn(g, player.connectionToClient);
+            g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
             //todo send local player the info of the prefab and set grabbed
             Debug.Log($"{player.gameObject} spawned {prefabName}");
@@ -90,6 +92,7 @@ public class NetworkSpawnManager : NetworkBehaviour
             g.transform.Translate(localPositionOffset, Space.Self);
             g.transform.Rotate(localRotationOffset, Space.Self);
             NetworkServer.Spawn(g);
+            g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
             Debug.Log($"Spawned {prefabName}");
         }
@@ -103,6 +106,7 @@ public class NetworkSpawnManager : NetworkBehaviour
     {
         var g = SaveLoadInterface.instance.Copy(obj, manip);
         NetworkServer.Spawn(g);
+        g.transform.parent = GameObject.Find("PatchAnchor").transform;
         Debug.Log($"{g} duplicated by the host");
     }
 
@@ -113,6 +117,7 @@ public class NetworkSpawnManager : NetworkBehaviour
         Debug.Log($"{g} duplicated by the client");
 
         NetworkServer.Spawn(g, player.connectionToClient);
+        g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
         if (player.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
         {
