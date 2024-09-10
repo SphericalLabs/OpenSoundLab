@@ -97,6 +97,10 @@ public class masterControl : MonoBehaviour {
 
   void Awake() {
 
+    if (!Application.isEditor && !Debug.isDebugBuild){ 
+        Debug.unityLogger.logEnabled = false; 
+    }
+
     DontDestroyOnLoad(this);
     DontDestroyOnLoad(CameraRig);
 
