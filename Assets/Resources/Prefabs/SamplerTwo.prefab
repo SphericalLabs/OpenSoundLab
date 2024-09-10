@@ -791,6 +791,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7784f2c5c78ac4d8ed0395f6d19393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index: 0
+  _phase: 0
+  useNativeIfAvailable: 1
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
@@ -2132,8 +2135,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.12, y: 0.04, z: 0.02}
-  m_Center: {x: 0, y: 0, z: -0.02}
+  m_Size: {x: 0.12, y: 0.045554493, z: 0.05199006}
+  m_Center: {x: 0, y: 0.0011433845, z: -0.0040049697}
 --- !u!1 &179596
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,6 +18,14 @@ public class OSLNetworkDiscovery : NetworkDiscovery
     public void SetIsDiscoverable(bool b)
     {
         isDiscoverable = b;
+        if (b)
+        {
+            AdvertiseServer();
+        }
+        else
+        {
+
+        }
     }
 
     protected override void ProcessClientRequest(ServerRequest request, IPEndPoint endpoint)

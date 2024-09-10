@@ -61,7 +61,6 @@ public class omniPlug : manipObject
 
     List<omniJack> targetJackList = new List<omniJack>();
     List<Transform> collCandidates = new List<Transform>();
-    masterControl.WireMode wireType = masterControl.WireMode.Curved;
 
 
     private NetworkPlayerPlugHand targetNetworkPlugHand;
@@ -96,7 +95,7 @@ public class omniPlug : manipObject
 
         //mat.SetColor("_TintColor", jackColor);
         //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", jackColor);
-        wireType = masterControl.instance.WireSetting;
+
         outputPlug = outputting;
         otherPlug = other;
 
@@ -254,10 +253,10 @@ public class omniPlug : manipObject
             if (!noChange)
             {
                 calming();
-                updateLineVerts();
+                updateLineVerts(); // todo: cleanup
             }
 
-            updateLineVerts();
+            updateLineVerts(); // todo: cleanup
             if (noChange) calmLine();
         }
     }
@@ -358,9 +357,8 @@ public class omniPlug : manipObject
     }
 
 
-    public void updateLineType(masterControl.WireMode num)
+    public void updateLineType()
     {
-        wireType = num;
         updateLineVerts();
     }
 
@@ -368,13 +366,15 @@ public class omniPlug : manipObject
     bool forcedWireShow = false;
     void updateLineVerts(bool justLast = false)
     {
-        if (wireType == masterControl.WireMode.Curved)
+        if (!outputPlug) return; // only outputPlugs use their LineRenderers
+
+        if (masterControl.instance.WireSetting == WireMode.Curved)
         {
             lr.positionCount = plugPath.Count;
             if (justLast) lr.SetPosition(plugPath.Count - 1, plugPath.Last());
             else lr.SetPositions(plugPath.ToArray());
         }
-        else if (wireType == masterControl.WireMode.Straight && plugPath.Count > 2)
+        else if (masterControl.instance.WireSetting == WireMode.Straight && plugPath.Count >= 2) 
         {
             lr.positionCount = 2;
             lr.SetPosition(0, plugPath[0]);
@@ -386,7 +386,7 @@ public class omniPlug : manipObject
             lr.SetPosition(0, plugPath[0]);
             lr.SetPosition(1, plugPath.Last());
         }
-        else
+        else // WireMode.Invisible
         {
             lr.positionCount = 0;
         }
@@ -423,6 +423,10 @@ public class omniPlug : manipObject
     public void Release()
     {
         foreach (omniJack j in targetJackList) j.flash(Color.black);
+        if (otherPlug.connected != null)
+        {
+            otherPlug.connected.onIsGrabableEvent.Invoke();
+        }
         if (connected == null)
         {
             if (lr) lr.positionCount = 0;
@@ -447,7 +451,6 @@ public class omniPlug : manipObject
             calmTime = 0;
             connected.beginConnection(this, true);
         }
-
         collCandidates.Clear();
     }
 

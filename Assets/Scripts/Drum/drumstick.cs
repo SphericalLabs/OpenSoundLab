@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Events;
 
 public class drumstick : manipObject {
 
@@ -56,7 +57,10 @@ public class drumstick : manipObject {
 
   public bool skinnable = true;
 
-  public override void Awake() {
+    public UnityEvent onStartFollowEvent;
+    public UnityEvent onEndFollowEvent;
+
+    public override void Awake() {
     base.Awake();
     gameObject.layer = 10; //manipulator
     pads = new List<drumpad>();
@@ -204,6 +208,7 @@ public class drumstick : manipObject {
     if (curState == state) return;
 
     if (curState == manipState.grabbed) {
+            onEndFollowEvent.Invoke();
       transform.parent = masterObj;
       glowTrans.gameObject.SetActive(false);
       returnRoutineID = StartCoroutine(returnRoutine());
@@ -220,6 +225,7 @@ public class drumstick : manipObject {
       if (_interface != null) _interface.onGrab(true, -1);
       if (returnRoutineID != null) StopCoroutine(returnRoutineID);
       highlight.SetActive(false);
+            onStartFollowEvent.Invoke();
       glowTrans.gameObject.SetActive(true);
       transform.parent = manipulatorObj.parent;
 

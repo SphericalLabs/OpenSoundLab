@@ -10,6 +10,8 @@ public class NetworkButtons : NetworkBehaviour
 
     public readonly SyncList<bool> buttonValues = new SyncList<bool>();
 
+    private float[] lastToggeldTimes;
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -22,11 +24,13 @@ public class NetworkButtons : NetworkBehaviour
 
     private void Start()
     {
+        lastToggeldTimes = new float[buttons.Length];
         //add dials on change callback event
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;
             buttons[i].onToggleChangedEvent.AddListener(delegate { UpdateButtonIsHit(index); });
+            buttons[i].onToggleChangedEvent.AddListener(delegate { UpdateLastToggledTime(index); });
         }
     }
 
@@ -49,14 +53,20 @@ public class NetworkButtons : NetworkBehaviour
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
-                buttons[index].keyHit(newValue, false);
+                if (buttons[index].isHit != newValue)
+                {
+                    buttons[index].keyHit(newValue, false);
+                }
                 break;
             case SyncList<bool>.Operation.OP_INSERT:
                 break;
             case SyncList<bool>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<bool>.Operation.OP_SET:
-                buttons[index].keyHit(newValue, false);
+                if (IsToggleCooldownOver(index))
+                {
+                    buttons[index].keyHit(newValue, false);
+                }
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
                 break;
@@ -81,5 +91,22 @@ public class NetworkButtons : NetworkBehaviour
     {
         buttonValues[index] = value;
         buttons[index].keyHit(value, false);
+    }
+
+    public void UpdateLastToggledTime(int index)
+    {
+        if (index >= 0 && index < lastToggeldTimes.Length)
+        {
+            lastToggeldTimes[index] = Time.time;
+        }
+    }
+
+    private bool IsToggleCooldownOver(int index)
+    {
+        if (lastToggeldTimes[index] + 0.5f < Time.time)
+        {
+            return true;
+        }
+        return false;
     }
 }

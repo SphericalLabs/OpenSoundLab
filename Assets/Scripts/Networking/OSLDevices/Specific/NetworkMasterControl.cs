@@ -1,102 +1,168 @@
+using Mirror;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
-using Mirror;
 
-public class NetworkMasterControl : NetworkSyncListener
+public class NetworkMasterControl : NetworkBehaviour
 {
-    [SerializeField] private button startButton;
-    [SerializeField] private button rewindButton;
-    [SerializeField] private metronome metro;
+    [SyncVar(hook = nameof(OnWireSettingChanged))]
+    public WireMode WireSetting;
 
-    private void Start()
+    [SyncVar(hook = nameof(OnDisplaySettingChanged))]
+    public DisplayMode DisplaySetting;
+
+    [SyncVar(hook = nameof(OnBinauralSettingChanged))]
+    public BinauralMode BinauralSetting;
+    
+
+    void OnWireSettingChanged(WireMode oldValue, WireMode newValue)
     {
-        startButton.onStartGrabEvents.AddListener(OnButtonPress);
-        rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
-        
-        GetComponent<NetworkDials>().dialValues.Callback += OnBpmDialUpdated;
-        
+        //if(IsWireCooldownOver()){
+            masterControl.instance.updateWireSetting((int)newValue);
+        //}
     }
 
-    void OnBpmDialUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
+    void OnDisplaySettingChanged(DisplayMode oldValue, DisplayMode newValue)
     {
-        switch (op)
-        {
-            case SyncList<float>.Operation.OP_ADD:
-                break;
-            case SyncList<float>.Operation.OP_INSERT:
-                break;
-            case SyncList<float>.Operation.OP_REMOVEAT:
-                break;
-            case SyncList<float>.Operation.OP_SET:
-                // careful, this is hardwiring index 0.                
-                if (index == 0) metro.readBpmDialAndBroadcast();
-                break;
-            case SyncList<float>.Operation.OP_CLEAR:
-                break;
-        }
+        //if (IsDisplayCooldownOver())
+        //{
+            masterControl.instance.updateDisplaySetting((int)newValue);
+        //}
     }
 
-    private void OnDestroy()
+    void OnBinauralSettingChanged(BinauralMode oldValue, BinauralMode newValue)
     {
-        startButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
-        rewindButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
+        //if (IsBinauralCooldownOver())
+        //{
+            masterControl.instance.updateBinauralSetting((int)newValue);
+        //}
     }
 
-    private void OnButtonPress()
+    void Start()
     {
-        NetworkSyncEventManager.Instance.UpdateSync();
+        masterControl.instance.onBinauralChangedEvent.AddListener(UpdateBinaural);
+        //masterControl.instance.onBinauralChangedEvent.AddListener(delegate{ lastBinauralTime = Time.time; });
+
+        masterControl.instance.onWireChangedEvent.AddListener(UpdateWire);
+        //masterControl.instance.onWireChangedEvent.AddListener(delegate { lastWireTime = Time.time; });
+
+        masterControl.instance.onDisplayChangedEvent.AddListener(UpdateDisplay);
+        //masterControl.instance.onDisplayChangedEvent.AddListener(delegate { lastDisplayTime = Time.time; });
     }
-
-
-    #region Mirror
 
     public override void OnStartClient()
     {
-        base.OnStartClient();
-        if (!isServer)
-        {
-            CmdRequestSync();
-        }
+        // Process initial SyncList payload
+        // after it had already been received, but no hook was triggered automatically on first init
+        OnDisplaySettingChanged(masterControl.instance.DisplaySetting, DisplaySetting);
+        OnBinauralSettingChanged(masterControl.instance.BinauralSetting, BinauralSetting);
+        OnWireSettingChanged(masterControl.instance.WireSetting, WireSetting);
     }
-    protected override void OnSync()
+
+
+    void Update()
     {
+        
+    }
+
+    void UpdateBinaural(){
+        Debug.Log($"Update BinauralSetting: {masterControl.instance.BinauralSetting}");
         if (isServer)
         {
-            RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+            BinauralSetting = masterControl.instance.BinauralSetting;
         }
         else
         {
-            CmdRequestSync();
-        }
-    }
-
-    protected override void OnIntervalSync()
-    {
-        base.OnIntervalSync();
-        if (isServer)
-        {
-            RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+            CmdBinauralUpdate(masterControl.instance.BinauralSetting);
         }
     }
 
     [Command(requiresAuthority = false)]
-    protected void CmdRequestSync()
+    public void CmdBinauralUpdate(BinauralMode mode)
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync");
-
-        RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+        BinauralSetting = mode;
+        masterControl.instance.updateBinauralSetting((int)mode);
     }
 
-    [ClientRpc]
-    protected virtual void RpcUpdate_measurePhase(double measurePhase)
-    {
-        if (isClient && !isServer)
-        {
-            Debug.Log($"{gameObject.name} old _measurePhase: { masterControl.instance.MeasurePhase}, new _measurePhase {measurePhase}");
 
-            masterControl.instance.MeasurePhase = measurePhase;
+
+    void UpdateWire(){
+        Debug.Log($"Update WireSetting: {masterControl.instance.WireSetting}");
+        if (isServer)
+        {
+            WireSetting = masterControl.instance.WireSetting;
+        }
+        else
+        {
+            CmdWireUpdate(masterControl.instance.WireSetting);
         }
     }
-    #endregion
+
+    [Command(requiresAuthority = false)]
+    public void CmdWireUpdate(WireMode mode)
+    {
+        WireSetting = mode;
+        masterControl.instance.updateWireSetting((int)mode);
+    }
+
+
+
+    void UpdateDisplay(){
+        Debug.Log($"Update DisplaySetting: {masterControl.instance.DisplaySetting}");
+        if (isServer)
+        {
+            DisplaySetting = masterControl.instance.DisplaySetting;
+        }
+        else
+        {
+            CmdDisplayUpdate(masterControl.instance.DisplaySetting);
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdDisplayUpdate(DisplayMode mode)
+    {
+        DisplaySetting = mode;
+        masterControl.instance.updateDisplaySetting((int)mode);
+    }
+
+    //// cooldown time measurements
+    //float lastBinauralTime = 0f;
+    //float lastWireTime = 0f;
+    //float lastDisplayTime = 0f;
+
+    //private bool IsBinauralCooldownOver()
+    //{
+    //    return true;
+
+    //    if (lastBinauralTime + 0.5f < Time.time)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    //private bool IsWireCooldownOver()
+    //{
+    //    return true;
+
+    //    if (lastWireTime + 0.5f < Time.time)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    //private bool IsDisplayCooldownOver()
+    //{
+    //    return true;
+
+    //    if (lastDisplayTime + 0.5f < Time.time)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
 }

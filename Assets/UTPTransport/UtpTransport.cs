@@ -65,7 +65,7 @@ namespace Utp
 		/// </summary>
 		private void Awake()
 		{
-			SetupDefaultCallbacks();
+			//SetupDefaultCallbacks();
 
 			//Logging delegates
 			if (LoggerLevel < LogLevel.Verbose) UtpLog.Verbose = _ => { };

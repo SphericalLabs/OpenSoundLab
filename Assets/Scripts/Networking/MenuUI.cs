@@ -15,12 +15,12 @@ namespace UI
 	/// </summary>
 	[DisallowMultipleComponent]
 	[AddComponentMenu("Network/MenuUI")]
-	[RequireComponent(typeof(MyNetworkManager))]
+	[RequireComponent(typeof(OslRelayNetworkManager))]
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	[HelpURL("https://mirror-networking.com/docs/Components/NetworkManagerHUD.html")]
 	public class MenuUI : MonoBehaviour
 	{
-		private MyNetworkManager m_Manager;
+		private OslRelayNetworkManager m_Manager;
 
 		/// <summary>
 		/// Whether to show the default control HUD at runtime.
@@ -39,7 +39,7 @@ namespace UI
 
 		void Awake()
 		{
-			m_Manager = GetComponent<MyNetworkManager>();
+			m_Manager = GetComponent<OslRelayNetworkManager>();
 		}
 
 		void OnGUI()
@@ -100,7 +100,7 @@ namespace UI
 					if (GUILayout.Button("Server Only")) m_Manager.StartStandardServer();
 				}
 
-				if (MyNetworkManager.isLoggedIn)
+				if (OslRelayNetworkManager.isLoggedIn)
 				{
 					// Server + Client
 					if (Application.platform != RuntimePlatform.WebGLPlayer)

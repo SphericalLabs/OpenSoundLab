@@ -9,6 +9,8 @@ public class NetworkKey : NetworkBehaviour
 
     public readonly SyncList<bool> keyValues = new SyncList<bool>();
 
+    private float[] lastKeyHitTimes;
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -20,11 +22,13 @@ public class NetworkKey : NetworkBehaviour
 
     private void Start()
     {
+        lastKeyHitTimes = new float[keys.Length];
         //add dials on change callback event
         for (int i = 0; i < keys.Length; i++)
         {
             int index = i;
             keys[i].onKeyChangedEvent.AddListener(delegate { UpdateKeyIsHit(index); });
+            keys[i].onKeyChangedEvent.AddListener(delegate { UpdateLastKeyHitTime(index); });
         }
     }
 
@@ -54,7 +58,10 @@ public class NetworkKey : NetworkBehaviour
             case SyncList<bool>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<bool>.Operation.OP_SET:
-                keys[index].phantomHit(newValue);
+                if (IsKeyHitCooldownOver(index))
+                {
+                    keys[index].phantomHit(newValue, true);
+                }
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
                 break;
@@ -78,7 +85,25 @@ public class NetworkKey : NetworkBehaviour
     public void CmdKeyButtonIsHit(int index, bool value)
     {
         keyValues[index] = value;
-        keys[index].phantomHit(value);
+        keys[index].phantomHit(value, true);
+    }
+
+
+    public void UpdateLastKeyHitTime(int index)
+    {
+        if (index >= 0 && index < lastKeyHitTimes.Length)
+        {
+            lastKeyHitTimes[index] = Time.time;
+        }
+    }
+
+    private bool IsKeyHitCooldownOver(int index)
+    {
+        if (lastKeyHitTimes[index] + 0.5f < Time.time)
+        {
+            return true;
+        }
+        return false;
     }
 }
 

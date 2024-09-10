@@ -62,6 +62,8 @@ public class manipulator : MonoBehaviour
     private Transform grabbedFollowPointTransform;
     public Transform GrabbedFollowPointTransform { get { return grabbedFollowPointTransform; } }
 
+    public manipObject SelectedObject { get => selectedObject; set => selectedObject = value; }
+
     public UnityEvent onInputTriggerdEvent;
     public UnityEvent onInputReleasedEvent;
 
@@ -143,7 +145,7 @@ public class manipulator : MonoBehaviour
         grabbing = on;
         showTip();
 
-        if (selectedObject != null)
+        if (selectedObject != null && selectedObject.CanBeGrabed)
         {
             selectedObject.setGrab(grabbing, transform);
             if (!on) toggleController(true);
@@ -177,7 +179,7 @@ public class manipulator : MonoBehaviour
 
     public void ForceGrab(manipObject o)
     {
-        if (selectedObject != null) release();
+        if (selectedObject != null || !selectedObject.CanBeGrabed) release();
 
         grabbing = true;
         selectedObject = o;

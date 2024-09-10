@@ -61,6 +61,9 @@ public class omniJack : manipObject
     public UnityEvent onBeginnConnectionEvent;
     public UnityEvent onEndConnectionEvent;
 
+    public UnityEvent onNotGrabableEvent;
+    public UnityEvent onIsGrabableEvent;
+
     public override void Awake()
     {
         base.Awake();
@@ -97,7 +100,6 @@ public class omniJack : manipObject
             }
             else
             {
-
                 if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(750);
 
                 GameObject j = Instantiate(plugPrefab, manipulatorObj.position, manipulatorObj.rotation) as GameObject;
@@ -117,6 +119,7 @@ public class omniJack : manipObject
 
                 plugRep.SetActive(false);
                 //far.AddPlugToHand(ID);
+                onNotGrabableEvent.Invoke();
 
             }
             if (near != null) near.setCableHighlighted(true);
@@ -268,5 +271,12 @@ public class omniJack : manipObject
         manipulator.GetComponent<manipulator>().ForceGrab(far);
 
         //far.AddPlugToHand(ID);
+        StartCoroutine(WaitForDisableGrab());
+    }
+
+    IEnumerator WaitForDisableGrab()
+    {
+        yield return new WaitForSeconds(0.5f);
+        onNotGrabableEvent.Invoke();
     }
 }

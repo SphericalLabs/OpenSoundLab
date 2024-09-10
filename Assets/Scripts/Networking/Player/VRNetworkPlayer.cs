@@ -116,6 +116,14 @@ public class VRNetworkPlayer : NetworkBehaviour
     {
         if (!isLocalPlayer)
         {
+            if (NetworkManager.singleton is Network.LocalNetworkManager && networkHead != null)
+            {
+                for (int i = networkHead.childCount - 1; i >= 0; i--)
+                {
+                    Destroy(networkHead.GetChild(i).gameObject);
+                }
+            }
+
             yield return new WaitForSeconds(1f);
             if (!moveVoiceChatObject)
             {
@@ -296,6 +304,16 @@ public class VRNetworkPlayer : NetworkBehaviour
             return rightNetworkPlugHand;
         }
         return null;
+    }
+
+
+    public bool IsObjectGrabbedByLeftHand(manipObject manipObject)
+    {
+        if (leftHandManipulator.SelectedObject == manipObject)
+        {
+            return true;
+        }
+        return false;
     }
     #endregion
 

@@ -93,10 +93,10 @@ public class RelayClientConnector : MonoBehaviour
     }
 
 
-    MyNetworkManager relayManager;
+    OslRelayNetworkManager relayManager;
     private void SetupRelay()
     {
-        relayManager = FindObjectOfType<MyNetworkManager>();
+        relayManager = FindObjectOfType<OslRelayNetworkManager>();
         if (relayManager == null)
         {
             Debug.LogError("MyNetworkManager not found in the scene.");
