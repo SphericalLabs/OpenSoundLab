@@ -8,7 +8,6 @@ using TMPro;
 using UnityEngine.UI;
 using System.Net;
 using UnityEngine.SceneManagement;
-using Utp;
 
 public class NetworkMenuManager : MonoBehaviour
 {
@@ -63,10 +62,10 @@ public class NetworkMenuManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             if (isRelayScene)
             {
-                if (networkManager is MyNetworkManager)
+                if (networkManager is OslRelayNetworkManager)
                 {
-                    ((RelayNetworkManager)networkManager).onFailedStartHostEvent.AddListener(GoBackToLocalScene);
-                    ((RelayNetworkManager)networkManager).onFailedConnectToServerEvent.AddListener(GoBackToLocalScene);
+                    ((OslRelayNetworkManager)networkManager).onFailedStartHostEvent.AddListener(GoBackToLocalScene);
+                    ((OslRelayNetworkManager)networkManager).onFailedConnectToServerEvent.AddListener(GoBackToLocalScene);
                     if (relayCode.Length > 0)
                     {
                         StartCoroutine(JoinRelayHostWaitTime(relayCode));
@@ -115,9 +114,9 @@ public class NetworkMenuManager : MonoBehaviour
         }
         yield return new WaitForEndOfFrame();
         clientGotStopped = false;
-        if (networkManager is MyNetworkManager)
+        if (networkManager is OslRelayNetworkManager)
         {
-            ((MyNetworkManager)networkManager).StartStandardHost();
+            ((OslRelayNetworkManager)networkManager).StartStandardHost();
         }
         else
         {
@@ -248,14 +247,14 @@ public class NetworkMenuManager : MonoBehaviour
 
     private IEnumerator StartRelayHostWaitTime()
     {
-        if (networkManager is MyNetworkManager)
+        if (networkManager is OslRelayNetworkManager)
         {
-            var myNetworkManager = ((MyNetworkManager)networkManager);
-            if (!MyNetworkManager.isLoggedIn)
+            var myNetworkManager = ((OslRelayNetworkManager)networkManager);
+            if (!OslRelayNetworkManager.isLoggedIn)
             {
                 //check if loggin works
                 myNetworkManager.UnityLogin();
-                while (!MyNetworkManager.isLoggedIn)
+                while (!OslRelayNetworkManager.isLoggedIn)
                 {
                     yield return new WaitForEndOfFrame();
                 }
@@ -287,9 +286,9 @@ public class NetworkMenuManager : MonoBehaviour
 
     private IEnumerator JoinRelayHostWaitTime(string joinCode)
     {
-        if (networkManager is MyNetworkManager)
+        if (networkManager is OslRelayNetworkManager)
         {
-            var myNetworkManager = ((MyNetworkManager)networkManager);
+            var myNetworkManager = ((OslRelayNetworkManager)networkManager);
 
 
             while (myNetworkManager.isNetworkActive)
@@ -299,10 +298,10 @@ public class NetworkMenuManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
             clientGotStopped = false;
 
-            if (!MyNetworkManager.isLoggedIn)
+            if (!OslRelayNetworkManager.isLoggedIn)
             {
                 myNetworkManager.UnityLogin();
-                while (!MyNetworkManager.isLoggedIn)
+                while (!OslRelayNetworkManager.isLoggedIn)
                 {
                     yield return new WaitForEndOfFrame();
                 }
@@ -337,13 +336,13 @@ public class NetworkMenuManager : MonoBehaviour
     #region UI
     public void ActivateHostUI()
     {
-        if (networkManager is MyNetworkManager && ((MyNetworkManager)networkManager).IsRelayEnabled())
+        if (networkManager is OslRelayNetworkManager && ((OslRelayNetworkManager)networkManager).IsRelayEnabled())
         {
             hostMenuParent.gameObject.SetActive(false);
             relayHostMenuParent.gameObject.SetActive(true);
             clientMenuParent.gameObject.SetActive(false);
 
-            relayJoinCodeText.text = $"Room Code: {((MyNetworkManager)networkManager).relayJoinCode}";
+            relayJoinCodeText.text = $"Room Code: {((OslRelayNetworkManager)networkManager).relayJoinCode}";
         }
         else
         {

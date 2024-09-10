@@ -9,7 +9,7 @@ using Utp;
 
 namespace Network 
 {
-    public class MyNetworkManager : RelayNetworkManager
+    public class OslRelayNetworkManager : RelayNetworkManager
     {
         /// <summary>
         /// The local player object that spawns in.

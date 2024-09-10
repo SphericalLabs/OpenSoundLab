@@ -265,6 +265,7 @@ GameObject:
   - component: {fileID: -1642124330640775617}
   - component: {fileID: 3457113228603339848}
   - component: {fileID: 5309811433844739898}
+  - component: {fileID: 6911249329470394662}
   m_Layer: 9
   m_Name: Drum
   m_TagString: instrument
@@ -413,6 +414,24 @@ MonoBehaviour:
   positionSensitivity: 0.002
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
+--- !u!114 &6911249329470394662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96be40aaa35b743d086ea3f3a8fecdb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  drumsticks:
+  - {fileID: 11499928}
+  - {fileID: 11476070}
 --- !u!1 &130724
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,6 +1537,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000011556914824
 GameObject:
   m_ObjectHideFlags: 0
@@ -2018,6 +2043,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013482807498
 GameObject:
   m_ObjectHideFlags: 0
@@ -2295,6 +2326,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7784f2c5c78ac4d8ed0395f6d19393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index: 0
+  _phase: 0
+  useNativeIfAvailable: 1
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
