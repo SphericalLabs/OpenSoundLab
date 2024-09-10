@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
+// Copyright ï¿½ 2020-2023 GPLv3 Ludwig Zeller OpenSoundLab
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // 
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,45 +35,63 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
-public class drumpad : MonoBehaviour {
-  public Material onMat;
-  Renderer rend;
-  Material offMat;
-  Material glowMat;
-  deviceInterface _deviceInterface;
-  public Transform stickTip;
+public class drumpad : MonoBehaviour
+{
+    public Material onMat;
+    Renderer rend;
+    Material offMat;
+    Material glowMat;
+    deviceInterface _deviceInterface;
+    public Transform stickTip;
 
-  Color glowColor = Color.HSVToRGB(.4f, .5f, .1f);
-  void Awake() {
-    _deviceInterface = transform.parent.GetComponent<deviceInterface>();
-    rend = GetComponent<Renderer>();
-    offMat = rend.material;
-    glowMat = new Material(onMat);
-    glowMat.SetColor("_TintColor", glowColor);
-  }
+    public UnityEvent onHitEvent;
 
-  void Update() {
-    if (Input.GetKeyDown(KeyCode.Space)) {
-      keyHit(true);
+
+    Color glowColor = Color.HSVToRGB(.4f, .5f, .1f);
+    void Awake()
+    {
+        _deviceInterface = transform.parent.GetComponent<deviceInterface>();
+        rend = GetComponent<Renderer>();
+        offMat = rend.material;
+        glowMat = new Material(onMat);
+        glowMat.SetColor("_TintColor", glowColor);
     }
-  }
 
-  IEnumerator offRoutine() {
-    yield return new WaitForSeconds(0.1f);
-    _deviceInterface.hit(false);
-    rend.material = offMat;
-  }
-
-  Coroutine offCoroutine;
-  public bool isHit = false;
-  public void keyHit(bool on) {
-    isHit = on;
-    if (on) {
-      _deviceInterface.hit(on);
-      rend.material = glowMat;
-      if (offCoroutine != null) StopCoroutine(offRoutine());
-      offCoroutine = StartCoroutine(offRoutine());
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            keyHit(true);
+        }
     }
-  }
+
+    IEnumerator offRoutine()
+    {
+        yield return new WaitForSeconds(0.1f);
+        _deviceInterface.hit(false);
+        rend.material = offMat;
+        isHit = false;
+    }
+
+    Coroutine offCoroutine;
+    public bool isHit = false;
+    public void keyHit(bool on, bool invokeEvent = true)
+    {
+        isHit = on;
+        Debug.Log($"Hit drumpad {on}, {invokeEvent}");
+        if (on)
+        {
+            _deviceInterface.hit(on);
+            rend.material = glowMat;
+            if (offCoroutine != null) StopCoroutine(offRoutine());
+            offCoroutine = StartCoroutine(offRoutine());
+
+        }
+        if (invokeEvent)
+        {
+            onHitEvent.Invoke();
+        }
+    }
 }

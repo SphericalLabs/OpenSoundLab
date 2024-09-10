@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public struct HandTraget
+public struct HoldingHand
 {
     public NetworkIdentity player;
     public bool isLeftHand;
@@ -13,15 +13,24 @@ public class NetworkDrumsticks : NetworkBehaviour
 {
     public drumstick[] drumsticks;
 
-    public SyncList<HandTraget> grabberHand = new SyncList<HandTraget>();
+    public drumpad drumpad;
 
-    private void Start()
+    public SyncList<HoldingHand> holdingHands = new SyncList<HoldingHand>();
+
+
+    private float[] lastHoldTimes;
+
+    private void Awake()
     {
+        drumpad.onHitEvent.AddListener(OnHitDrumpad);
+        lastHoldTimes = new float[drumsticks.Length];
         for (int i = 0; i < drumsticks.Length; i++)
         {
             int index = i;
             drumsticks[i].onStartFollowEvent.AddListener(delegate { OnChangeStickFollow(index, true); });
             drumsticks[i].onEndFollowEvent.AddListener(delegate { OnChangeStickFollow(index, false); });
+
+            lastHoldTimes[i] = -1f;
         }
     }
 
@@ -30,7 +39,7 @@ public class NetworkDrumsticks : NetworkBehaviour
         base.OnStartServer();
         for (int i = 0; i < drumsticks.Length; i++)
         {
-            grabberHand.Add(new HandTraget());
+            holdingHands.Add(new HoldingHand());
         }
     }
 
@@ -38,44 +47,75 @@ public class NetworkDrumsticks : NetworkBehaviour
     {
         if (!isServer)
         {
-            grabberHand.Callback += OnHandTargetUpdated;
-            for (int i = 0; i < grabberHand.Count; i++)
+            holdingHands.Callback += OnHandTargetUpdated;
+            for (int i = 0; i < holdingHands.Count; i++)
             {
-                OnHandTargetUpdated(SyncList<HandTraget>.Operation.OP_ADD, i, grabberHand[i], grabberHand[i]);
+                Debug.Log($"start client holdinghand {holdingHands[i]}");
+
+                OnHandTargetUpdated(SyncList<HoldingHand>.Operation.OP_ADD, i, holdingHands[i], holdingHands[i]);
             }
         }
     }
 
-    void OnHandTargetUpdated(SyncList<HandTraget>.Operation op, int index, HandTraget oldItem, HandTraget newItem)
+    void OnHandTargetUpdated(SyncList<HoldingHand>.Operation op, int index, HoldingHand oldItem, HoldingHand newItem)
     {
         switch (op)
         {
-            case SyncList<HandTraget>.Operation.OP_ADD:
-                break;
-            case SyncList<HandTraget>.Operation.OP_INSERT:
-                break;
-            case SyncList<HandTraget>.Operation.OP_REMOVEAT:
-                break;
-            case SyncList<HandTraget>.Operation.OP_SET:
+            case SyncList<HoldingHand>.Operation.OP_ADD:
                 //when hand is added
+                Debug.Log("Add holdinghand");
+                SetDrumstickHandTarget(index, newItem.player, newItem.isLeftHand);
                 break;
-            case SyncList<HandTraget>.Operation.OP_CLEAR:
+            case SyncList<HoldingHand>.Operation.OP_INSERT:
+                break;
+            case SyncList<HoldingHand>.Operation.OP_REMOVEAT:
+                break;
+            case SyncList<HoldingHand>.Operation.OP_SET:
+                //when hand is added
+                SetDrumstickHandTarget(index, newItem.player, newItem.isLeftHand);
+                break;
+            case SyncList<HoldingHand>.Operation.OP_CLEAR:
                 break;
         }
     }
 
     //update drumsticks on other devices
-    void SetDrumstickHandTarget(NetworkIdentity targetPlayer, bool leftHand)
+    void SetDrumstickHandTarget(int index, NetworkIdentity targetPlayer, bool leftHand)
     {
-        //find player
-        //let stick follow hand
-        //disable grabbable
+        Debug.Log("Try to set stick hand");
+        if (drumsticks[index].curState != manipObject.manipState.grabbed && IsEndHoldCooldownOver(index)) 
+        {
+            Debug.Log($"Set stick hand target {index}, {targetPlayer}, {leftHand}");
+            if (targetPlayer == null)
+            {
+                drumsticks[index].CanBeGrabed = true;
+                drumsticks[index].SetFollowTarget(null);
+                //drumsticks[index].transform.parent = drumsticks[index].masterObj;
+                //drumsticks[index].StartCoroutine(drumsticks[index].returnRoutine());
+            }
+            else if (targetPlayer.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
+            {
+                var hand = networkPlayer.TargetNetworkHand(leftHand);
 
-        //if target null reenable grabbable
+                drumsticks[index].SetFollowTarget(hand);
+                /*
+                drumsticks[index].transform.parent = hand;
+
+                drumsticks[index].transform.localPosition = Vector3.zero;
+                drumsticks[index].transform.localRotation = Quaternion.identity;*/
+
+                drumsticks[index].CanBeGrabed = false;
+            }
+        }
     }
 
     public void OnChangeStickFollow(int index, bool grabbed)
     {
+        if (!grabbed)
+        {
+            UpdateLastGrabedTime(index);
+        }
+
         GetLocalPlayerHand(index, grabbed, out NetworkIdentity playerIdentity, out bool leftHand);
 
         if (isServer)
@@ -92,18 +132,19 @@ public class NetworkDrumsticks : NetworkBehaviour
     public void CmdOnChangeStickFollow(int index, NetworkIdentity target, bool leftHand)
     {
         UpdateHandTarget(index, target, leftHand);
+        SetDrumstickHandTarget(index, target, leftHand);
     }
 
     void UpdateHandTarget(int index, NetworkIdentity target, bool leftHand)
     {
         Debug.Log($"Update Hand Target of stick {index} to {target} by lefthand {leftHand}");
-        if (grabberHand[index].player != target || grabberHand[index].isLeftHand != leftHand)
+        if (holdingHands[index].player != target || holdingHands[index].isLeftHand != leftHand)
         {
-            var newTarget = new HandTraget();
+            var newTarget = new HoldingHand();
             newTarget.player = target;
             newTarget.isLeftHand = leftHand;
 
-            grabberHand[index] = newTarget;
+            holdingHands[index] = newTarget;
         }
     }
 
@@ -118,4 +159,54 @@ public class NetworkDrumsticks : NetworkBehaviour
             networkIdentity = NetworkMenuManager.Instance.localPlayer.netIdentity;
         }
     }
+
+
+    public void UpdateLastGrabedTime(int index)
+    {
+        if (index >= 0 && index < lastHoldTimes.Length)
+        {
+            lastHoldTimes[index] = Time.time;
+        }
+    }
+
+    private bool IsEndHoldCooldownOver(int index)
+    {
+        if (lastHoldTimes[index] + 0.5f < Time.time)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    public void OnHitDrumpad()
+    {
+        if (isServer)
+        {
+            RpcOnHitDrumpad();
+        }
+        else
+        {
+            CmdOnHitDrumpad();
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdOnHitDrumpad()
+    {
+        Debug.Log("cmd hit drumpad");
+        drumpad.keyHit(true, false);
+        RpcOnHitDrumpad();
+    }
+
+    [ClientRpc]
+    public void RpcOnHitDrumpad()
+    {
+        Debug.Log("rpc hit drumpad");
+        if (!isServer && !drumpad.isHit)
+        {
+            drumpad.keyHit(true, false);
+        }
+    }
+
 }

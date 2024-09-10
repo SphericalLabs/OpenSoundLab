@@ -177,7 +177,7 @@ public class VRNetworkPlayer : NetworkBehaviour
         TargetManipulator(isLeftHand).ForceGrab(item.GetComponentInChildren<handle>());
     }
 
-    private manipulator TargetManipulator(bool isLeftHand)
+    public manipulator TargetManipulator(bool isLeftHand)
     {
         return isLeftHand ? leftHandManipulator : rightHandManipulator;
     }
@@ -306,7 +306,6 @@ public class VRNetworkPlayer : NetworkBehaviour
         return null;
     }
 
-
     public bool IsObjectGrabbedByLeftHand(manipObject manipObject)
     {
         if (leftHandManipulator.SelectedObject == manipObject)
@@ -315,6 +314,13 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
         return false;
     }
+
+
+    public Transform TargetNetworkHand(bool isLeftHand)
+    {
+        return isLeftHand ? networkLeftHand : networkRightHand;
+    }
+
     #endregion
 
 
