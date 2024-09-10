@@ -152,7 +152,9 @@ public class clipPlayerSimple : clipPlayer
                 {
                     if (trigBuffer[n] > 0f && lastTriggValue <= 0f)
                     {
-                        devInterface.flashTriggerButton(); // was activated by trigger signal
+                        // careful, this is specific to SamplerOne but this code is also used on Drum:
+                        devInterface?.flashTriggerButton(); // was activated by trigger signal
+
                         lastTriggValue = trigBuffer[n]; // read in current sample in startGen
 
                         updateSampleBounds(startGen != null ? startBuffer[n] : 0f); // sample and hold the current start dial and start signal value
