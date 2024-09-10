@@ -16,6 +16,10 @@ public class NetworkAuthorityHandle : NetworkBehaviour
 
     public virtual void Start()
     {
+        // Mirror network spawns to root level. Since every device has a NetworkAuthorityHandle, this is a good place to inject the resorting into PatchAnchor
+        Transform pAnchor = GameObject.Find("PatchAnchor").transform;
+        if (pAnchor != null && transform.parent != pAnchor) transform.parent = pAnchor;
+
         _netTransform = GetComponent<NetworkTransformBase>();
         _handles = GetComponentsInChildren<handle>();
         if (_handles != null && _handles.Length > 0)
