@@ -15,17 +15,34 @@ public class NetworkDrumsticks : NetworkBehaviour
 
     public SyncList<HandTraget> grabberHand = new SyncList<HandTraget>();
 
-    public override void OnStartClient()
+    private void Start()
     {
-        grabberHand.Callback += OnHandTargetUpdated;
-
-        // Process initial SyncList payload
         for (int i = 0; i < drumsticks.Length; i++)
         {
             int index = i;
             drumsticks[i].onStartFollowEvent.AddListener(delegate { OnChangeStickFollow(index, true); });
             drumsticks[i].onEndFollowEvent.AddListener(delegate { OnChangeStickFollow(index, false); });
+        }
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        for (int i = 0; i < drumsticks.Length; i++)
+        {
             grabberHand.Add(new HandTraget());
+        }
+    }
+
+    public override void OnStartClient()
+    {
+        if (!isServer)
+        {
+            grabberHand.Callback += OnHandTargetUpdated;
+            for (int i = 0; i < grabberHand.Count; i++)
+            {
+                OnHandTargetUpdated(SyncList<HandTraget>.Operation.OP_ADD, i, grabberHand[i], grabberHand[i]);
+            }
         }
     }
 
