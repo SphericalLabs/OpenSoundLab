@@ -175,7 +175,7 @@ public class SaveLoadInterface : MonoBehaviour
             o.outputPlug = synthSet.PlugList[i].outputPlug;
             temp[o.ID] = o;
 
-            if (!o.outputPlug) ResortedPlugList.Insert(0, synthSet.PlugList[i]);
+            if (!o.outputPlug) ResortedPlugList.Insert(0, synthSet.PlugList[i]); // sorts the non output plugs to the beginning
             else ResortedPlugList.Add(synthSet.PlugList[i]);
         }
 
@@ -192,7 +192,12 @@ public class SaveLoadInterface : MonoBehaviour
                     break;
                 }
             }
-            if (targetJack == null) Debug.LogError("NO JACK FOR " + ResortedPlugList[i].connected);
+            if (targetJack == null) // jack not found
+            {
+                Debug.LogError("NO JACK FOR " + ResortedPlugList[i].connected);
+                continue; // just skip invalid plugs and keep on loading the patch
+            }
+
             temp[ResortedPlugList[i].ID].Activate(temp[ResortedPlugList[i].otherPlug], targetJack, ResortedPlugList[i].plugPath, ResortedPlugList[i].cordColor, true);
         }
 
