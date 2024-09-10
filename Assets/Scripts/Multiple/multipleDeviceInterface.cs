@@ -72,9 +72,10 @@ public class multipleDeviceInterface : deviceInterface
         symbolB.sharedMaterial = mixerMaterial;
 
         CreateInactiveNodes();
+
         stretchSlider.onPosSetEvent.AddListener(CalculateAndUpdateNodeCount);
 
-        CalculateAndUpdateNodeCount();        
+        CalculateAndUpdateNodeCount();         
         //float xVal = stretchSlider.transform.localPosition.x;
         //count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
         //updateSplitterCount();
@@ -103,6 +104,9 @@ public class multipleDeviceInterface : deviceInterface
                 }
                 s.gameObject.SetActive(false);
             }
+
+            // update internal list, too
+            updateNodeCount(false);
 
             networkJacks = GetComponent<NetworkJacks>();
             foreach (var jack in networkJacks.omniJacks)
@@ -259,8 +263,6 @@ public class multipleDeviceInterface : deviceInterface
 
         input.ID = data.jackInID;
 
-        setFlow(data.isSplitter);
-        //flowSwitch.setSwitch(isSplitter);
 
         if (data.jackCount < 2)
         {
@@ -289,6 +291,8 @@ public class multipleDeviceInterface : deviceInterface
             }
 
         }
+
+        setFlow(data.isSplitter, true);
     }
 }
 
