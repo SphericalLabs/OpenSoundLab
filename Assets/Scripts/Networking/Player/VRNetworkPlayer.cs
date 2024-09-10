@@ -315,6 +315,12 @@ public class VRNetworkPlayer : NetworkBehaviour
         return false;
     }
 
+
+    public Transform TargetNetworkHand(bool isLeftHand)
+    {
+        return isLeftHand ? networkLeftHand : networkRightHand;
+    }
+
     #endregion
 
 

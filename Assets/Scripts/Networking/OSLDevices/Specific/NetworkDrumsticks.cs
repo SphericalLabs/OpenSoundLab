@@ -104,8 +104,8 @@ public class NetworkDrumsticks : NetworkBehaviour
             }
             else if (targetPlayer.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
             {
-                var hand = networkPlayer.TargetManipulator(leftHand);
-                drumsticks[index].transform.parent = hand.transform.parent;
+                var hand = networkPlayer.TargetNetworkHand(leftHand);
+                drumsticks[index].transform.parent = hand;
 
                 drumsticks[index].transform.localPosition = Vector3.zero;
                 drumsticks[index].transform.localRotation = Quaternion.identity;
@@ -138,6 +138,7 @@ public class NetworkDrumsticks : NetworkBehaviour
     public void CmdOnChangeStickFollow(int index, NetworkIdentity target, bool leftHand)
     {
         UpdateHandTarget(index, target, leftHand);
+        SetDrumstickHandTarget(index, target, leftHand);
     }
 
     void UpdateHandTarget(int index, NetworkIdentity target, bool leftHand)
@@ -186,6 +187,7 @@ public class NetworkDrumsticks : NetworkBehaviour
 
     public void OnHitDrumpad()
     {
+        Debug.Log("On hit drumpad");
         if (isServer)
         {
             RpcOnHitDrumpad();
@@ -199,6 +201,7 @@ public class NetworkDrumsticks : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdOnHitDrumpad()
     {
+        Debug.Log("Cmd On hit drumpad");
         drumpad.keyHit(true, false);
         RpcOnHitDrumpad();
     }
@@ -206,6 +209,7 @@ public class NetworkDrumsticks : NetworkBehaviour
     [ClientRpc]
     public void RpcOnHitDrumpad()
     {
+        Debug.Log("Rpc On hit drumpad");
         if (!isServer && drumpad.isHit)
         {
             drumpad.keyHit(true, false);
