@@ -23,8 +23,8 @@ public class NetworkDrumsticks : NetworkBehaviour
         for (int i = 0; i < drumsticks.Length; i++)
         {
             int index = i;
-            drumsticks[i].onStartGrabEvents.AddListener(delegate { OnChangeHandTarget(index, true); });
-            drumsticks[i].onEndGrabEvents.AddListener(delegate { OnChangeHandTarget(index, false); });
+            drumsticks[i].onStartFollowEvent.AddListener(delegate { OnChangeStickFollow(index, true); });
+            drumsticks[i].onStartFollowEvent.AddListener(delegate { OnChangeStickFollow(index, false); });
             grabberHand.Add(new HandTraget());
         }
     }
@@ -57,7 +57,7 @@ public class NetworkDrumsticks : NetworkBehaviour
         //if target null reenable grabbable
     }
 
-    public void OnChangeHandTarget(int index, bool grabbed)
+    public void OnChangeStickFollow(int index, bool grabbed)
     {
         GetLocalPlayerHand(index, grabbed, out NetworkIdentity playerIdentity, out bool leftHand);
 
@@ -67,19 +67,20 @@ public class NetworkDrumsticks : NetworkBehaviour
         }
         else
         {
-            CmdOnChangeHandTarget(index, playerIdentity, leftHand);
+            CmdOnChangeStickFollow(index, playerIdentity, leftHand);
         }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdOnChangeHandTarget(int index, NetworkIdentity target, bool leftHand)
+    public void CmdOnChangeStickFollow(int index, NetworkIdentity target, bool leftHand)
     {
         UpdateHandTarget(index, target, leftHand);
     }
 
     void UpdateHandTarget(int index, NetworkIdentity target, bool leftHand)
     {
-        if (grabberHand[index].player != target && grabberHand[index].isLeftHand != leftHand)
+        Debug.Log($"Update Hand Target of stick {index} to {target} by lefthand {leftHand}");
+        if (grabberHand[index].player != target || grabberHand[index].isLeftHand != leftHand)
         {
             var newTarget = new HandTraget();
             newTarget.player = target;
