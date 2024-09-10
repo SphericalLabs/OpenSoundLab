@@ -117,6 +117,7 @@ public class NetworkSpawnManager : NetworkBehaviour
         Debug.Log($"{g} duplicated by the client");
 
         NetworkServer.Spawn(g, player.connectionToClient);
+        g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
         if (player.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
         {

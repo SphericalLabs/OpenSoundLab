@@ -1,8 +1,9 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldDragController : MonoBehaviour
+public class WorldDragController : NetworkBehaviour
 {
   public manipulator leftManip, rightManip;
   public Transform leftHandAnchor, rightHandAnchor;
@@ -18,7 +19,8 @@ public class WorldDragController : MonoBehaviour
 
   void Update()
   {
-    
+    if (!isServer) return;
+
     if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
     if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
     if (leftHandAnchor == null) leftHandAnchor = GameObject.Find("LeftHandAnchor").transform;
