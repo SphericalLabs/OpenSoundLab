@@ -55,18 +55,6 @@ public class NetworkDrumsticks : NetworkBehaviour
         }
     }
 
-
-    private void OnDestroy()
-    {
-        for (int i = 0; i < drumsticks.Length; i++)
-        {
-            if (drumsticks[i].transform.parent != drumsticks[i].masterObj)
-            {
-                Destroy(drumsticks[i].gameObject);
-            }
-        }
-    }
-
     void OnHandTargetUpdated(SyncList<HoldingHand>.Operation op, int index, HoldingHand oldItem, HoldingHand newItem)
     {
         switch (op)

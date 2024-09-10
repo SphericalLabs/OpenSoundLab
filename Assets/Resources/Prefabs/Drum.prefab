@@ -272,6 +272,7 @@ GameObject:
   - component: {fileID: 3457113228603339848}
   - component: {fileID: 5309811433844739898}
   - component: {fileID: 6911249329470394662}
+  - component: {fileID: 7640833390518928009}
   m_Layer: 9
   m_Name: Drum
   m_TagString: instrument
@@ -439,6 +440,23 @@ MonoBehaviour:
   - {fileID: 11499928}
   - {fileID: 11476070}
   drumpad: {fileID: 11491414}
+--- !u!114 &7640833390518928009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e460df4eb04f79a41af610075304281a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  sampleLoaders:
+  - {fileID: 114000013781471044}
 --- !u!1 &130724
 GameObject:
   m_ObjectHideFlags: 0
