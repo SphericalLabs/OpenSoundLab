@@ -22,6 +22,7 @@ public class NetworkDrumsticks : NetworkBehaviour
 
     private void Start()
     {
+        drumpad.onHitEvent.AddListener(OnHitDrumpad);
         lastHoldTimes = new float[drumsticks.Length];
         for (int i = 0; i < drumsticks.Length; i++)
         {
@@ -40,7 +41,6 @@ public class NetworkDrumsticks : NetworkBehaviour
         {
             holdingHands.Add(new HoldingHand());
         }
-        drumpad.onHitEvent.AddListener(OnHitDrumpad);
     }
 
     public override void OnStartClient()
@@ -98,17 +98,20 @@ public class NetworkDrumsticks : NetworkBehaviour
             if (targetPlayer == null)
             {
                 drumsticks[index].CanBeGrabed = true;
-
-                drumsticks[index].transform.parent = drumsticks[index].masterObj;
-                drumsticks[index].StartCoroutine(drumsticks[index].returnRoutine());
+                drumsticks[index].SetFollowTarget(null);
+                //drumsticks[index].transform.parent = drumsticks[index].masterObj;
+                //drumsticks[index].StartCoroutine(drumsticks[index].returnRoutine());
             }
             else if (targetPlayer.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
             {
                 var hand = networkPlayer.TargetNetworkHand(leftHand);
+
+                drumsticks[index].SetFollowTarget(hand);
+                /*
                 drumsticks[index].transform.parent = hand;
 
                 drumsticks[index].transform.localPosition = Vector3.zero;
-                drumsticks[index].transform.localRotation = Quaternion.identity;
+                drumsticks[index].transform.localRotation = Quaternion.identity;*/
 
                 drumsticks[index].CanBeGrabed = false;
             }
@@ -187,7 +190,6 @@ public class NetworkDrumsticks : NetworkBehaviour
 
     public void OnHitDrumpad()
     {
-        Debug.Log("On hit drumpad");
         if (isServer)
         {
             RpcOnHitDrumpad();
@@ -201,7 +203,6 @@ public class NetworkDrumsticks : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdOnHitDrumpad()
     {
-        Debug.Log("Cmd On hit drumpad");
         drumpad.keyHit(true, false);
         RpcOnHitDrumpad();
     }
@@ -209,7 +210,6 @@ public class NetworkDrumsticks : NetworkBehaviour
     [ClientRpc]
     public void RpcOnHitDrumpad()
     {
-        Debug.Log("Rpc On hit drumpad");
         if (!isServer && drumpad.isHit)
         {
             drumpad.keyHit(true, false);
