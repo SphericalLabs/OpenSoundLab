@@ -92,7 +92,7 @@ public class NetworkJacks : NetworkBehaviour
             case SyncList<int>.Operation.OP_SET:
                 if (omniJacks[index].far != null && omniJacks[index].far.connected != null && omniJacks[index].far.connected.ID == newValue)
                 {
-                    Debug.Log($"Jack of id {omniJacks[index].ID} is already connected with jack of id {newValue} on this client");
+                    //Debug.Log($"Jack of id {omniJacks[index].ID} is already connected with jack of id {newValue} on this client");
                 }
                 else if (oldValue != newValue)
                 {

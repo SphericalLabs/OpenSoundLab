@@ -235,6 +235,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1189954494756940
 GameObject:
   m_ObjectHideFlags: 0
@@ -1420,6 +1426,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1815144750506192
 GameObject:
   m_ObjectHideFlags: 0
@@ -1738,6 +1750,7 @@ GameObject:
   - component: {fileID: 4012177607082860}
   - component: {fileID: 114179934575807804}
   - component: {fileID: 114187759859482556}
+  - component: {fileID: 4804065152061968279}
   - component: {fileID: -1189849042087619097}
   - component: {fileID: 4154067765021610075}
   - component: {fileID: 1491786296731476279}
@@ -1801,6 +1814,9 @@ MonoBehaviour:
   isSplitter: 1
   mixerMaterial: {fileID: 2100000, guid: d1714881939c4bb449221a1ddd66ebf6, type: 2}
   splitterMaterial: {fileID: 2100000, guid: fd6ec927535bd064ebadec2c33162cd1, type: 2}
+  OnIsSplitterChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &114187759859482556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1818,6 +1834,22 @@ MonoBehaviour:
   useNativeIfAvailable: 1
   incoming: {fileID: 0}
   nodes: []
+--- !u!114 &4804065152061968279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1984383435952320}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80990de298bc15c45a3eca61c667ff09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  isSplitter: 0
 --- !u!114 &-1189849042087619097
 MonoBehaviour:
   m_ObjectHideFlags: 0

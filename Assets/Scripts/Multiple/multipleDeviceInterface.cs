@@ -37,6 +37,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+using UnityEngine.Events;
 
 public class multipleDeviceInterface : deviceInterface
 {
@@ -61,6 +62,7 @@ public class multipleDeviceInterface : deviceInterface
     public Material mixerMaterial;
     public Material splitterMaterial;
 
+    public UnityEvent OnIsSplitterChanged;
 
     public override void Awake()
     {
@@ -168,7 +170,7 @@ public class multipleDeviceInterface : deviceInterface
         handleB.localScale = new Vector3(.04f * (signal.nodes.Count + 1), 0.04f, 0.04f);
     }
 
-    void setFlow(bool on, bool init = false)
+    public void setFlow(bool on, bool init = false)
     {
         if (isSplitter == on && !init) return;
         isSplitter = on;
@@ -211,6 +213,8 @@ public class multipleDeviceInterface : deviceInterface
         for (int i = 0; i < signal.nodes.Count; i++) signal.nodes[i].setFlow(isSplitter);
 
         signal.setFlow(isSplitter);
+
+        OnIsSplitterChanged.Invoke();
     }
 
     
@@ -293,6 +297,7 @@ public class multipleDeviceInterface : deviceInterface
         }
 
         setFlow(data.isSplitter, true);
+
     }
 }
 
