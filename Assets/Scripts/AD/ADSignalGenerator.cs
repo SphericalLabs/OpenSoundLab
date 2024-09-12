@@ -137,7 +137,7 @@ public class ADSignalGenerator : signalGenerator
 
             SetArrayToSingleValue(attackBuffer, attackBuffer.Length, 0f);
             attackInput.processBuffer(attackBuffer, dspTime, channels);
-            attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + attackBuffer[0] * maxAttack, minAttack, maxAttack)); // left only
+            attackLengthFinal = Mathf.RoundToInt(Mathf.Clamp(attackLength + Mathf.Pow(attackBuffer[0], 3) * maxAttack, minAttack, maxAttack)); // left only
         }
         else
         {
@@ -151,7 +151,7 @@ public class ADSignalGenerator : signalGenerator
 
             SetArrayToSingleValue(releaseBuffer, releaseBuffer.Length, 0f); 
             releaseInput.processBuffer(releaseBuffer, dspTime, channels);
-            releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + releaseBuffer[0] * maxRelease, minRelease, maxRelease)); // left only
+            releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + Mathf.Pow(releaseBuffer[0], 3) * maxRelease, minRelease, maxRelease)); // left only
         }
         else
         {

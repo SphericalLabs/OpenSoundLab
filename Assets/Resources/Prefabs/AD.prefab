@@ -1137,6 +1137,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012869793228
 GameObject:
   m_ObjectHideFlags: 0
@@ -1283,6 +1289,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1000013101032572
@@ -1635,7 +1647,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  percent: 0.5
+  percent: 0.15
   defaultPercent: 0
   currentDialColor: 0
   controllerRot: 0
@@ -2179,6 +2191,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3974444902285636297
 GameObject:
   m_ObjectHideFlags: 0
@@ -2540,6 +2558,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &5091795263407212133
