@@ -57,7 +57,7 @@ public class multipleDeviceInterface : deviceInterface
     int count = 0;
     int lastCount = 0;
 
-    public bool isSplitter = true;
+    public bool isSplitter = true; // this is overwritten by the prefab inspector config
 
     public Material mixerMaterial;
     public Material splitterMaterial;
@@ -172,8 +172,8 @@ public class multipleDeviceInterface : deviceInterface
 
     public void setFlow(bool on, bool init = false)
     {
-        if (isSplitter == on && !init) return;
-        isSplitter = on;
+        //if (isSplitter == on && !init) return;
+        //isSplitter = on;
 
         if (isSplitter)
         {
@@ -244,7 +244,7 @@ public class multipleDeviceInterface : deviceInterface
         data.deviceType = isSplitter ? DeviceType.MultiSplit : DeviceType.MultiMix; // this defines which prefab is loaded, even though both share the same deviceInterface
         GetTransformData(data);
 
-        data.isSplitter = isSplitter;
+        //data.isSplitter = isSplitter;
         data.jackInID = input.transform.GetInstanceID();
 
         data.jackCount = count + 1;
@@ -296,7 +296,7 @@ public class multipleDeviceInterface : deviceInterface
 
         }
 
-        setFlow(data.isSplitter, true);
+        setFlow(isSplitter, true);
 
     }
 }
@@ -305,7 +305,7 @@ public class multipleDeviceInterface : deviceInterface
 // MultiMix and MultiSplit are both prefabs that do not have their own MultiMixDeviceInterface resp. MultiSplitDeviceInterface. They both use MultipleDevice interface and are serialized (save, copy) as MultipleDeviceInterface and thus loaded resp. copied from the Multiple prefab. It's a bit hacky, but the idea was to have both modes separately in the menu and not to have to set the mode each time.
 public class MultipleData : InstrumentData
 {
-    public bool isSplitter;
+    //public bool isSplitter;
     public int jackOutAID;
     public int jackOutBID;
     public int jackCount;
