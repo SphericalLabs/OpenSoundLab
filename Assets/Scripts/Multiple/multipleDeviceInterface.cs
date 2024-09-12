@@ -241,7 +241,7 @@ public class multipleDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         MultipleData data = new MultipleData();
-        data.deviceType = DeviceType.Multiple;
+        data.deviceType = isSplitter ? DeviceType.MultiSplit : DeviceType.MultiMix; // this defines which prefab is loaded, even though both share the same deviceInterface
         GetTransformData(data);
 
         data.isSplitter = isSplitter;
