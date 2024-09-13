@@ -19,4 +19,5 @@
   <uses-feature android:name="com.oculus.feature.PASSTHROUGH" android:required="true" />
   <uses-feature android:name="oculus.software.eye_tracking" android:required="false" />
   <uses-permission android:name="com.oculus.permission.EYE_TRACKING" />
+  <uses-feature android:name="com.oculus.feature.BOUNDARYLESS_APP" android:required="true"/>
 </manifest>
