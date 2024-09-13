@@ -26,7 +26,7 @@
     </Instruments>
     <Instruments xsi:type="MultipleData">
       <ID>-486420</ID>
-      <deviceType>Multiple</deviceType>
+      <deviceType>MultiSplit</deviceType>
       <position>
         <x>-0.1629268</x>
         <y>1.01801252</y>
@@ -43,7 +43,6 @@
         <z>0.779201269</z>
         <w>-0.154100135</w>
       </rotation>
-      <isSplitter>true</isSplitter>
       <jackOutAID>0</jackOutAID>
       <jackOutBID>0</jackOutBID>
       <jackCount>3</jackCount>
@@ -56,7 +55,7 @@
     </Instruments>
     <Instruments xsi:type="MultipleData">
       <ID>-486094</ID>
-      <deviceType>Multiple</deviceType>
+      <deviceType>MultiSplit</deviceType>
       <position>
         <x>0.244527966</x>
         <y>1.16595924</y>
@@ -73,7 +72,6 @@
         <z>0.0844322</z>
         <w>0.6265935</w>
       </rotation>
-      <isSplitter>true</isSplitter>
       <jackOutAID>0</jackOutAID>
       <jackOutBID>0</jackOutBID>
       <jackCount>3</jackCount>
@@ -86,7 +84,7 @@
     </Instruments>
     <Instruments xsi:type="MultipleData">
       <ID>-485768</ID>
-      <deviceType>Multiple</deviceType>
+      <deviceType>MultiSplit</deviceType>
       <position>
         <x>0.0438278</x>
         <y>1.01262832</y>
@@ -103,7 +101,6 @@
         <z>-0.9954234</z>
         <w>-0.008745617</w>
       </rotation>
-      <isSplitter>true</isSplitter>
       <jackOutAID>0</jackOutAID>
       <jackOutBID>0</jackOutBID>
       <jackCount>2</jackCount>

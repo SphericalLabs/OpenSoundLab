@@ -4852,7 +4852,7 @@
     </Instruments>
     <Instruments xsi:type="MultipleData">
       <ID>-162364</ID>
-      <deviceType>Multiple</deviceType>
+      <deviceType>MultiMix</deviceType>
       <position>
         <x>0.343250155</x>
         <y>1.46727645</y>
@@ -4874,7 +4874,6 @@
           <z>272.716553</z>
         </eulerAngles>
       </rotation>
-      <isSplitter>false</isSplitter>
       <jackOutAID>0</jackOutAID>
       <jackOutBID>0</jackOutBID>
       <jackCount>2</jackCount>

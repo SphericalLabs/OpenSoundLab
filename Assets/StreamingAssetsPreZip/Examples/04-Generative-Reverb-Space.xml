@@ -163,7 +163,7 @@
     </Instruments>
     <Instruments xsi:type="MultipleData">
       <ID>-572268</ID>
-      <deviceType>Multiple</deviceType>
+      <deviceType>MultiSplit</deviceType>
       <position>
         <x>-0.1910963</x>
         <y>1.69104242</y>
@@ -180,7 +180,6 @@
         <z>0.03491572</z>
         <w>-0.232624874</w>
       </rotation>
-      <isSplitter>true</isSplitter>
       <jackOutAID>0</jackOutAID>
       <jackOutBID>0</jackOutBID>
       <jackCount>3</jackCount>
