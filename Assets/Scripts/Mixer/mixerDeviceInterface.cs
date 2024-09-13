@@ -224,7 +224,6 @@ public class mixerDeviceInterface : deviceInterface
         pos.x = (count - 1) * -.04f - .076f;
         stretchSlider.localPosition = pos;
 
-        createInactiveFaders();
         updateMixerCount();
 
         pos = lengthSlider.localPosition;
