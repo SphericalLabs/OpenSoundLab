@@ -80,7 +80,6 @@ public class menuItem : manipObject
     //  MIDIIN,
     //  MIDIOUT,
     //  Mixer,
-    //  Multiple, // Only MultiMix and MultiSplit are shown in the menu palette, but they will be serialized and loaded as preconfigured Multiples on save/load
     //  MultiMix,
     //  MultiSplit,
     //  Noise,
@@ -851,7 +850,6 @@ public class DeviceType
     public static readonly DeviceType VCA = new DeviceType("VCA", DeviceCategory.ModulationProcessor, 1);
 
     // Mixing
-    public static readonly DeviceType Multiple = new DeviceType("Multiple", DeviceCategory.Mixing, 5);
     public static readonly DeviceType Mixer = new DeviceType("Mixer", DeviceCategory.Mixing, 4);
     public static readonly DeviceType Gain = new DeviceType("Gain", DeviceCategory.Mixing, 3);
     public static readonly DeviceType MultiMix = new DeviceType("MultiMix", DeviceCategory.Mixing, 2);
