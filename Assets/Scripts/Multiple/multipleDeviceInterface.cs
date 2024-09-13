@@ -67,7 +67,6 @@ public class multipleDeviceInterface : deviceInterface
     public override void Awake()
     {
         signal = GetComponent<multipleSignalGenerator>();
-        //flowSwitch = GetComponentInChildren<basicSwitch>();
         signal.nodes = new List<multipleNodeSignalGenerator>();
 
         symbolA.sharedMaterial = mixerMaterial;
@@ -77,12 +76,9 @@ public class multipleDeviceInterface : deviceInterface
 
         stretchSlider.onPosSetEvent.AddListener(CalculateAndUpdateNodeCount);
 
-        CalculateAndUpdateNodeCount();         
-        //float xVal = stretchSlider.transform.localPosition.x;
-        //count = Mathf.FloorToInt((xVal - .02f) / -.04f) - 1;
-        //updateSplitterCount();
+        CalculateAndUpdateNodeCount();                 
 
-        setFlow(isSplitter, true); // reads in default value from the prefab to enable MultiMix and MultiSplit
+        setFlow(); // reads in default value from the prefab to enable MultiMix and MultiSplit
     }
 
     void CreateInactiveNodes()
@@ -170,11 +166,8 @@ public class multipleDeviceInterface : deviceInterface
         handleB.localScale = new Vector3(.04f * (signal.nodes.Count + 1), 0.04f, 0.04f);
     }
 
-    public void setFlow(bool on, bool init = false)
+    public void setFlow()
     {
-        //if (isSplitter == on && !init) return;
-        //isSplitter = on;
-
         if (isSplitter)
         {
             symbolA.transform.localPosition = new Vector3(.0025f, .0012f, .0217f);
@@ -241,10 +234,10 @@ public class multipleDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         MultipleData data = new MultipleData();
-        data.deviceType = isSplitter ? DeviceType.MultiSplit : DeviceType.MultiMix; // this defines which prefab is loaded, even though both share the same deviceInterface
+        
+        data.deviceType = isSplitter ? DeviceType.MultiSplit : DeviceType.MultiMix; // this defines which prefab is loaded, even though both share the same deviceInterface. isSplitter is set in the prefabs.
         GetTransformData(data);
 
-        //data.isSplitter = isSplitter;
         data.jackInID = input.transform.GetInstanceID();
 
         data.jackCount = count + 1;
@@ -296,16 +289,14 @@ public class multipleDeviceInterface : deviceInterface
 
         }
 
-        setFlow(isSplitter, true);
+        setFlow();
 
     }
 }
 
 
-// MultiMix and MultiSplit are both prefabs that do not have their own MultiMixDeviceInterface resp. MultiSplitDeviceInterface. They both use MultipleDevice interface and are serialized (save, copy) as MultipleDeviceInterface and thus loaded resp. copied from the Multiple prefab. It's a bit hacky, but the idea was to have both modes separately in the menu and not to have to set the mode each time.
 public class MultipleData : InstrumentData
 {
-    //public bool isSplitter;
     public int jackOutAID;
     public int jackOutBID;
     public int jackCount;
