@@ -156,20 +156,6 @@ public class menuManager : MonoBehaviour
                 if (devType == DeviceType.Timeline) continue;
                 if (devType == DeviceType.Reverb) continue;
 
-                // MultiMix and MultiSplit hack, want to have Multiple available for loading, but not in the menu palette
-                if (devType == DeviceType.Multiple)
-                {
-                    GameObject tmpObj2 = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
-                    tmpObj2.transform.parent = rootNode.transform;
-                    //menuItems.Add(tmpObj2);
-                    menuItem m2 = tmpObj2.GetComponent<menuItem>();
-                    refObjects[devType] = m2.Setup(devType);
-                    //menuItemScripts.Add(m); 
-                    tmpObj2.SetActive(false);
-                    continue;
-                }
-
-
                 if (devType == DeviceType.Camera) continue; // skip for windows, too, throws error otherwise
                 if (devType == DeviceType.Pano) continue;
                 if (devType == DeviceType.TapeGroup) continue;
