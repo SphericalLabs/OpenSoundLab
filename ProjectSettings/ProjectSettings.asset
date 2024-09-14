@@ -16,7 +16,7 @@ PlayerSettings:
   productName: OpenMultiLab
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
-  m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_ShowUnitySplashScreen: 1
   m_ShowUnitySplashLogo: 1
   m_SplashScreenOverlayOpacity: 1
@@ -139,14 +139,10 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.58
+  bundleVersion: 0.70
   preloadedAssets:
   - {fileID: 0}
   - {fileID: 11400000, guid: c363b5179947cbb40899ebae53ad2c59, type: 2}
-  - {fileID: 11400000, guid: 3099c588a3391ca4a8bb43f81f2d3b89, type: 2}
-  - {fileID: 11400000, guid: 4111133830c7bbe45a449ccd73094916, type: 2}
-  - {fileID: 6607199958307399662, guid: 888fd814a99cacd4091ef31088347959, type: 2}
-  - {fileID: 8207365043489784020, guid: 93c4f4428c8e3814dbf9d469c39e85d4, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -976,10 +972,10 @@ PlayerSettings:
       PointOfService: False
       RecordedCallsFolder: False
       Contacts: False
-      InternetClient: False
       Proximity: False
       CodeGeneration: False
       BackgroundMediaPlayback: False
+      InternetClient: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
