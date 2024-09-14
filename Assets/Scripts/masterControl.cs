@@ -185,6 +185,8 @@ public class masterControl : MonoBehaviour {
     if (metronomeObject != null)
         metro = metronomeObject.GetComponent<metronome>();
 
+    metro.bpmDial.onPercentChangedEvent.AddListener(metro.readBpmDialAndBroadcast);
+
   }
 
     private void Start()
@@ -260,7 +262,7 @@ public class masterControl : MonoBehaviour {
                 metro.volumepercent = metro.volumeDial.percent;
                 masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
             }
-            if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
+            //if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
         }
 
     }

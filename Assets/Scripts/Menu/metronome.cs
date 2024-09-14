@@ -133,7 +133,7 @@ public class metronome : componentInterface
     public void SetBPM(float targ)
     {
         bpmpercent = Utils.map(targ, minBpm, maxBpm, 0f, 1f);
-        bpmDial.setPercent(bpmpercent);
+        bpmDial.setPercent(bpmpercent, true);
         readBpmDialAndBroadcast();
     }
 

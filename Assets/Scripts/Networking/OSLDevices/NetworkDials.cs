@@ -72,7 +72,7 @@ public class NetworkDials : NetworkBehaviour
             case SyncList<float>.Operation.OP_SET:
                 if (dials[index].curState != manipObject.manipState.grabbed && IsEndGrabCooldownOver(index))
                 {
-                    dials[index].setPercent(newValue);
+                    dials[index].setPercent(newValue, true);
                 }
                 break;
             case SyncList<float>.Operation.OP_CLEAR:

@@ -52,6 +52,13 @@ public class NetworkMasterControl : NetworkBehaviour
         //masterControl.instance.onDisplayChangedEvent.AddListener(delegate { lastDisplayTime = Time.time; });
     }
 
+    private void OnDestroy()
+    {
+        masterControl.instance.onBinauralChangedEvent.RemoveListener(UpdateBinaural); 
+        masterControl.instance.onWireChangedEvent.RemoveListener(UpdateWire); 
+        masterControl.instance.onDisplayChangedEvent.RemoveListener(UpdateDisplay);
+    }
+
     public override void OnStartClient()
     {
         // Process initial SyncList payload
