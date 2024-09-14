@@ -37,6 +37,8 @@ using System.IO;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using System.Net;
+using System.Linq;
 
 public class masterControl : MonoBehaviour {
 
@@ -180,14 +182,25 @@ public class masterControl : MonoBehaviour {
 
     recorder = GetComponentInChildren<masterBusRecorder>();
 
-    // todo: get rid of this hack
-    GameObject metronomeObject = GameObject.Find("Metronome");
-    if (metronomeObject != null)
-        metro = metronomeObject.GetComponent<metronome>();
 
-    metro.bpmDial.onPercentChangedEvent.AddListener(metro.readBpmDialAndBroadcast);
+    SceneManager.activeSceneChanged += findMetronome;
 
   }
+
+    public void findMetronome(Scene prev, Scene next)
+    {
+        if (next.buildIndex == (int)Scenes.Base) return;
+
+        // todo: get rid of this hack
+        metronome[] metronomes = GameObject.FindObjectsByType<metronome>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        metronome m = metronomes.FirstOrDefault();
+
+        if (m != null)
+        {
+            metro = m;
+            metro.bpmDial.onPercentChangedEventLocal.AddListener(metro.readBpmDialAndBroadcast);
+        }
+    }
 
     private void Start()
     {
@@ -211,7 +224,6 @@ public class masterControl : MonoBehaviour {
         }
 
         SceneManager.LoadScene((int)Scenes.Local);
-
 
     }
 

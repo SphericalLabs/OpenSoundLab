@@ -70,6 +70,7 @@ public class dial : manipObject
     private OSLInput oslInput;
 
     public UnityEvent onPercentChangedEvent;
+    public UnityEvent onPercentChangedEventLocal; // this is another event that is not registered by mirror, this can be used safely to trigger local only routines
 
     public override void Awake()
     {
@@ -185,6 +186,7 @@ public class dial : manipObject
             onPercentChangedEvent.Invoke();
         }
 
+        onPercentChangedEventLocal.Invoke();
     }
 
     dialColor newDialColor;
