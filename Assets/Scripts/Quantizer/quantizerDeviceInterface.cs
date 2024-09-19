@@ -51,7 +51,7 @@ public class quantizerDeviceInterface : deviceInterface {
   void Update() {
 
     signal.selectedScale = Mathf.RoundToInt(scaleDial.percent * (signal.scales.Count - 1));
-    signal.transpose = transposeDial.percent * 0.1f;
+    signal.transpose = transposeDial.percent * 0.1f * 11f / 12f; // the last setting is not a full octave!
     signal.octave = Utils.map(octaveDial.percent, 0f, 1f, -0.4f, 0.4f); // +/- 4 octaves
 
     if (signal.incoming != input.signal) signal.incoming = input.signal;
