@@ -10,15 +10,15 @@
 The Licensor grants you a non-exclusive, worldwide, royalty-free license to use, modify, and distribute the Software, subject to the terms and conditions of this agreement. You may also use the Software or its derivatives to create commercial music, media, or art output.
 
 ## 3. Restrictions  
-a. You may create derivative works based on the Software's source code, but only for academic purposes such as teaching workshops or conducting research, or for artistic purposes such as performances or distributed studio recordings.  
-b. You may not distribute or publish derivative works through any official or unofficial app stores of major providers (including but not limited to Meta, SideQuest, Apple, Pico, and similar entities).  
-c. You may not monetize the Software or its derivatives directly through selling licenses or offering online services, plugins, or merchandise. However, you may provide free binaries of derivative works on platforms like GitHub or through other developer platforms for academic and artistic purposes.
+- You may create derivative works based on the Software's source code, but only for academic purposes such as teaching workshops or conducting research, or for artistic purposes such as performances or distributed studio recordings.  
+- You may not distribute or publish derivative works through any official or unofficial app stores of major providers (including but not limited to Meta, SideQuest, Apple, Pico, and similar entities).  
+- You may not monetize the Software or its derivatives directly through selling licenses or offering online services, plugins, or merchandise. However, you may provide free binaries of derivative works on platforms like GitHub or through other developer platforms for academic and artistic purposes.
 
 ## 4. Distribution of Derivative Works  
 When distributing derivative works, you must:  
-a. Share the derivative source code.  
-b. Include a copy of this license agreement or clearly link to it from within a Credits section in the derivative app.  
-c. Reproduce the license terms of all other libraries as already present within the Software.
+- Share the derivative source code.  
+- Include a copy of this license agreement or clearly link to it from within a Credits section in the derivative app.  
+- Reproduce the license terms of all other libraries as already present within the Software.
 
 ## 5. Trademarks  
 - "Spherical Labs" and "sphericals.io" are trademarks of the Licensor; you are not allowed to appear as if your derivatives are authored or authorized by these trademarks.  
