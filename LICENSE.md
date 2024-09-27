@@ -1,29 +1,22 @@
 # OpenSoundLab 
 
-Copyright © 2020-2022 GPLv3 Ludwig Zeller
+Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+You may obtain a copy of the License at 
+https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 
 OpenSoundLab is based on a version SoundStage VR that has been altered by Maximilian Maroe and James Surine. SoundStage VR was originally conceived by Logan Olson before it was sold to Google LLC in 2017. Please see https://github.com/ludzeller/OpenSoundLab/commits/master for a list of changes and use diff tools if you want to find out specific changes.
 
-OpenSoundLab is a ™ trademark represented by Ludwig Zeller. You are not allowed to use this trademark for your own derivate software, but are allowed to give a new name to your project.
+OpenSoundLab and Spherical Labs are a ™ trademarks represented by Ludwig Zeller. You are not allowed to use these trademarks for your own derivate software, but are allowed to give a new name to your project.
 
 Licenses of third-party libraries are listed in [LICENSE-Libs.md](LICENSE-Libs.md).
 
 The video tutorials are copyright © 2022 Ludwig Zeller and licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
-You can obtain the source code of OpenSoundLab from [https://github.com/ludzeller/OpenSoundLab](https://github.com/ludzeller/OpenSoundLab) or [http://www.opensoundlab.org](http://www.opensoundlab.org).
+You can obtain the source code of OpenSoundLab from [https://github.com/ludzeller/OpenSoundLab](https://github.com/SphericalLabs/OpenSoundLab) or [http://www.opensoundlab.org](http://www.opensoundlab.org).
 
 # SoundStage VR
 
