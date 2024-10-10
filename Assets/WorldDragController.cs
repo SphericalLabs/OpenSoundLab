@@ -16,13 +16,16 @@ public class WorldDragController : NetworkBehaviour
   bool isHorizontal = false;
   Transform[] transArray;
 
+  void Awake(){
+    // These references to the manipulators will be reused by VRNetworkPlayer so don't skip finding them if on client
+    if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
+    if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
+  }
 
   void Update()
   {
+    // Skip if on client
     if (!isServer) return;
-
-    if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
-    if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
     if (leftHandAnchor == null) leftHandAnchor = GameObject.Find("LeftHandAnchor").transform;
     if (centerEyeAnchor == null) centerEyeAnchor = GameObject.Find("CenterEyeAnchor").transform;
     if (rightHandAnchor == null) rightHandAnchor = GameObject.Find("RightHandAnchor").transform;
