@@ -137,6 +137,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1400333985897997594, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1400333985897997594, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+        type: 3}
+      propertyPath: projectionSurfaceType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6393751841341310333, guid: 50afd51f2d9d3574d98e902dc51c7e90,
         type: 3}
       propertyPath: shouldBoundaryVisibilityBeSuppressed
@@ -195,6 +205,11 @@ PrefabInstance:
     - target: {fileID: 6393751841348119737, guid: 50afd51f2d9d3574d98e902dc51c7e90,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6425963460851864121, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
