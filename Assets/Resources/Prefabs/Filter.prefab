@@ -113,8 +113,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.0000020191073, y: 0.0000020191073, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: -0.026000064, y: -0.050859988, z: -0.011490091}
-  m_LocalScale: {x: 0.8000019, y: 0.8000019, z: 0.8000025}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4000011025669954}
   - {fileID: 4000010137382130}
@@ -229,6 +229,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1000010636603940
@@ -457,7 +463,7 @@ Transform:
   m_GameObject: {fileID: 1000010757114696}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: 0.0165, y: -0.0002, z: 0}
+  m_LocalPosition: {x: 0.0156, y: -0.0002, z: -0}
   m_LocalScale: {x: 0.085205145, y: 0.08520482, z: 0.08520478}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -513,9 +519,9 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010757114696}
-  m_Text: CUTOFF CV IN
+  m_Text: CUTOFF CV
   m_OffsetZ: 0
-  m_CharacterSize: 0.03
+  m_CharacterSize: 0.025
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 1
@@ -1123,6 +1129,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7784f2c5c78ac4d8ed0395f6d19393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index: 0
+  _phase: 0
+  useNativeIfAvailable: 1
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
@@ -1157,8 +1166,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071048, y: 0.00000013021571, z: 0.70710886, w: -0.00000005140314}
   m_LocalPosition: {x: 0.002900019, y: 0.085200004, z: -0.0067901746}
-  m_LocalScale: {x: 0.8000004, y: 0.8000004, z: 0.80000067}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.99999994, y: 0.99999994, z: 0.99999994}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4000010054993516}
   - {fileID: 4000013304078570}
@@ -1273,6 +1282,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1101021866177444
@@ -1651,8 +1666,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.0000020191073, y: 0.0000020191073, z: 0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0.031000042, y: -0.0501, z: -0.011490306}
-  m_LocalScale: {x: 0.8000019, y: 0.8000019, z: 0.8000025}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4737282873067686}
   - {fileID: 4591646748165152}
@@ -1767,6 +1782,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &11150229186375478
@@ -1950,6 +1971,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &646129951174984302
 GameObject:
   m_ObjectHideFlags: 0
@@ -2129,6 +2153,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 4
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &2251638775376113915
@@ -2612,6 +2639,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3254699730181108768
 GameObject:
   m_ObjectHideFlags: 0
@@ -2708,6 +2738,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 4
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &3601203309325798146

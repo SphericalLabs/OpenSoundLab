@@ -113,8 +113,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.000002004206, y: 0.000002004206, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: -0.1808998, y: -0.083799995, z: -0.01962177}
-  m_LocalScale: {x: 0.8000019, y: 0.8000019, z: 0.8000025}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4000011025669954}
   - {fileID: 4000010137382130}
@@ -229,6 +229,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1000010636603940
@@ -1315,6 +1321,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7784f2c5c78ac4d8ed0395f6d19393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index: 0
+  _phase: 0
+  useNativeIfAvailable: 1
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
@@ -1695,8 +1704,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.000002004206, y: 0.000002004206, z: 0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0.18349977, y: -0.0808, z: -0.01962341}
-  m_LocalScale: {x: 0.8000019, y: 0.8000019, z: 0.8000025}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4737282873067686}
   - {fileID: 4591646748165152}
@@ -1811,6 +1820,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &79651693864711491
@@ -3541,6 +3556,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 11
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &8446214836861030364

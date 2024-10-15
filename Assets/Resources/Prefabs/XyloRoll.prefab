@@ -4024,6 +4024,12 @@ MonoBehaviour:
   ID: 1
   _interface: {fileID: 0}
   skinnable: 0
+  onStartFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!54 &54516877195389542
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5469,6 +5475,12 @@ MonoBehaviour:
   ID: 1
   _interface: {fileID: 0}
   skinnable: 0
+  onStartFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEndFollowEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!54 &54939087927447382
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6437,6 +6449,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1293097651559686
@@ -9090,6 +9108,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 4
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1418883701491334
@@ -13043,6 +13064,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1562188261907970
 GameObject:
   m_ObjectHideFlags: 0
@@ -16777,9 +16801,9 @@ Transform:
   m_GameObject: {fileID: 1739788609633996}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -0.6041, y: 0, z: -0.0867}
-  m_LocalScale: {x: 0.7710531, y: 0.77105314, z: 0.77105325}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -0.6041, y: 0.0013, z: -0.0862}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4781798277314330}
   - {fileID: 4024983189001302}
@@ -16894,6 +16918,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1740319729883320
@@ -20303,6 +20333,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1874690567598494
 GameObject:
   m_ObjectHideFlags: 0
@@ -20518,6 +20551,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 4
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1887341488726168
@@ -21563,6 +21599,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1960764750448678
