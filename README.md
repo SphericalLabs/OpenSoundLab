@@ -31,7 +31,7 @@ Coming later...
 - Master bus recorder in 48kHz, 24bit, WAV
 - Master bus overload warning
 - AD: Two stage envelope generator with lin/exp control and CV modulation
-- Delay: A highly flexible delay line, buffer can range from 1ms to 120s, CV modulation
+- Delay: A highly flexible delay line, buffer can range from 1ms to 12.5s, CV modulation
 - Reverb: Classic Freeverb stereo reverb with CV modulation
 - Scope: Oscilloscope / spectral analyser with trigger on rise
 - Added 1V/Oct tracking scheme for Oscillator, Keyboard, Sampler, etc.
