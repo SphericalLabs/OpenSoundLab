@@ -1,6 +1,4 @@
-# OpenMultiLab
-
-In this branch Chris Leisi, Christoph Müller and Ludwig Zeller are currently working on making OpenSoundLab multi-user capable via Mirror, Unity Relay and UniVoice. Until further notice, this branch will yield separate binaries that go under the name of OpenMultiLab. Our commits here might not always behave well or build without errors. Please handle with care! This ongoing work is part of the SNSF Spark research project "Emerging Practices in Modular Synthesis: Towards a Virtual Ethnography for Mixed Realities".
+# OpenSoundLab
 
 [[Trailer](https://youtu.be/HYn9THRtBvs)] [[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)] [[Download](https://github.com/ludzeller/OpenSoundLab/releases/)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.gg/Jrmg5na3Ru)]
 [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)]
@@ -9,17 +7,15 @@ OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed rea
 
 OSL is a fork of Logan Olson's magnificent [SoundStage VR](https://github.com/googlearchive/soundstagevr). OSL enhances the original version so that it is better suited for performing in the context of experimental electronic sound and music, to make it feel less like a game and more like an actual sound laboratory. We recreate the experience of working in spatial setups, but without being bound to mimicking the physical past. Where are the limits of the digital realm, and where are its sweet spots?
 
-The project received generous funding by an educational grant of the University of Applied Sciences and Arts Northwestern Switzerland ([IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)).
+The project received generous funding by an educational grant of the University of Applied Sciences and Arts Northwestern Switzerland ([IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)) and is currently continued in the context of the SNSF Spark research project "Emerging Practices in Modular Synthesis: Towards a Virtual Ethnography for Mixed Realities".
 
 This repository is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep other users in sync with our ongoing development. 
 
 ### Installation
-[OpenSoundLab-0.48](https://github.com/ludzeller/OpenSoundLab/releases/download/0.48/OpenSoundLab-0.48.zip) (BETA 2023-01-03)
-
-At the moment you have to use [sideloading](https://uploadvr.com/sideloading-quest-how-to/) in order to install the .apk binary. You need to register as a developer with Meta, enable the developer mode on your headset with the mobile companion app and use adb or SideQuest to copy the binary to your headset via USB or WiFi. That way you can also manage samples and download your recordings. Having your headset in developer mode is therefore pretty much a requirement for using OSL. Please note that the .apk includes the video tutorials and is therefore over 1GB in size.
+OpenSoundLab will be available at Meta Quest's Early Access soon. We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub. 
 
 ### Built with
-Unity v2022.3.20f1, Meta XR SDK 62.
+Unity v2022.3.20f1, Meta XR SDK 68.
 
 ### Build instructions
 Coming soon...
@@ -30,11 +26,12 @@ Coming later...
 ### Changes in comparison to SoundStage VR
 
 #### New features
+- Multi-user (local and global) via Mirror, Unity Relay and UniVoice
 - Mixed-reality passthrough mode
 - Master bus recorder in 48kHz, 24bit, WAV
 - Master bus overload warning
 - AD: Two stage envelope generator with lin/exp control and CV modulation
-- Delay: A highly flexible delay line, buffer can range from 1ms to 12.5s, CV modulation
+- Delay: A highly flexible delay line, buffer can range from 1ms to 120s, CV modulation
 - Reverb: Classic Freeverb stereo reverb with CV modulation
 - Scope: Oscilloscope / spectral analyser with trigger on rise
 - Added 1V/Oct tracking scheme for Oscillator, Keyboard, Sampler, etc.
@@ -83,7 +80,10 @@ Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980
 ###### LEAD
 Ludwig Zeller
 
-###### PROGRAMMING
+###### MULTI-USER
+Chris Elvis Leisi, Christoph Müller
+
+###### DSP
 Hannes Barfuss, Ludwig Zeller
 
 ###### MENU SYMBOLS
