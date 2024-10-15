@@ -149,6 +149,8 @@ public class omniPlug : manipObject
 
         lastOtherPlugPos = otherPlug.plugTrans.transform.position;
         lastPos = transform.position;
+
+        matchPlugtoJackScale();
     }
 
     public PlugData GetData()
