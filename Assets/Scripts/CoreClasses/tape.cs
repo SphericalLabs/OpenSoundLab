@@ -337,15 +337,15 @@ public class tape : manipObject
             tapeTrans.parent = deck;
             tapeTrans.Rotate(-90, 0, 0);
 
-      transform.parent = tapeTrans.parent;
-      transform.position = tapeTrans.position;
-      transform.rotation = tapeTrans.rotation;
-      tapeTrans.parent = transform;
-      deck.parent.GetComponent<samplerLoad>().LoadTape(this);
-      if (insertCoroutine != null) StopCoroutine(insertCoroutine);
-      transform.localScale = Vector3.one;
-      insertCoroutine = StartCoroutine(insertRoutine());      
-    }
+            transform.parent = tapeTrans.parent;
+            transform.position = tapeTrans.position;
+            transform.rotation = tapeTrans.rotation;
+            tapeTrans.parent = transform;
+            deck.parent.GetComponent<samplerLoad>().LoadTape(this);
+            if (insertCoroutine != null) StopCoroutine(insertCoroutine);
+            transform.localScale = Vector3.one;
+            insertCoroutine = StartCoroutine(insertRoutine());
+        }
   }
 
     public void ForceLoad(Transform targetDeck)
@@ -356,15 +356,15 @@ public class tape : manipObject
         tapeTrans.parent = deck;
         tapeTrans.Rotate(-90, 0, 0);
 
-    transform.parent = tapeTrans.parent;
-    transform.position = tapeTrans.position;
-    transform.rotation = tapeTrans.rotation;
-    tapeTrans.parent = transform;
-    transform.localPosition = new Vector3(0, 0, -.0225f);
-    deck.parent.GetComponent<samplerLoad>().LoadTape(this, false);
+        transform.parent = tapeTrans.parent;
+        transform.position = tapeTrans.position;
+        transform.rotation = tapeTrans.rotation;
+        tapeTrans.parent = transform;
+        transform.localPosition = new Vector3(0, 0, -.0225f);
+        deck.parent.GetComponent<samplerLoad>().LoadTape(this, false);
 
-    transform.localScale = Vector3.one;
-  }
+        transform.localScale = Vector3.one;
+    }
 
     IEnumerator streamRoutine(string f)
     {

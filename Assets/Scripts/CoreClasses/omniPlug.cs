@@ -466,29 +466,30 @@ public class omniPlug : manipObject
         }
         else
         {
+            // i.e. if it is attached to the manipulator?
             if (plugTrans.parent != connected.transform)
-            { // i.e. if it is attached to the manipulator?
-                if (plugTrans.parent != connected.transform)
-                {
-                    plugTrans.position = connected.transform.position;
-                    plugTrans.rotation = connected.transform.rotation;
-                    plugTrans.parent = connected.transform;
-                    plugTrans.Rotate(-90, 0, 0);
-                    plugTrans.Translate(0, 0, -0.03f);
-                }
-                plugTrans.Translate(0, 0, 0.014f);
-
-                transform.parent = plugTrans.parent;
-                transform.position = plugTrans.position;
-                transform.rotation = plugTrans.rotation;
-                plugTrans.parent = transform;
-                calmTime = 0;
-                connected.beginConnection(this, true);
-
+            {
+                plugTrans.position = connected.transform.position;
+                plugTrans.rotation = connected.transform.rotation;
+                plugTrans.parent = connected.transform;
+                plugTrans.Rotate(-90, 0, 0);
+                plugTrans.Translate(0, 0, -0.03f);
             }
+            plugTrans.Translate(0, 0, 0.014f);
+
+            transform.parent = plugTrans.parent;
+            transform.position = plugTrans.position;
+            transform.rotation = plugTrans.rotation;
+            plugTrans.parent = transform;
+            calmTime = 0;
+            connected.beginConnection(this, true);
 
             collCandidates.Clear();
         }
+
+        matchPlugtoJackScale();
+        otherPlug.matchPlugtoJackScale();
+
     }
 
     public void matchPlugtoJackScale()
@@ -547,7 +548,10 @@ public class omniPlug : manipObject
         plugTrans.rotation = connected.transform.rotation;
         plugTrans.parent = connected.transform;
         plugTrans.Rotate(-90, 0, 0);
-        plugTrans.Translate(0, 0, -.02f);
+        plugTrans.Translate(0, 0, -.03f);
+
+        matchPlugtoJackScale();
+        if (otherPlug != null) otherPlug.matchPlugtoJackScale();
     }
 
 
