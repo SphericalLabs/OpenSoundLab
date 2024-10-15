@@ -48,7 +48,6 @@ public class miniSamplerComponentInterface : componentInterface
         if (player.freqExpGen != jackPitch.signal) player.freqExpGen = jackPitch.signal;
         if (player.ampGen != jackAmp.signal) player.ampGen = jackAmp.signal;
 
-        player.seqMuted = muteButton.isHit;
     }
 
     public override void hit(bool on, int ID = -1)

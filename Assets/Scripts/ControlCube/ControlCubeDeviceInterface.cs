@@ -26,71 +26,87 @@
 // limitations under the License.
 
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 
-public class ControlCubeDeviceInterface : deviceInterface {
+public class ControlCubeDeviceInterface : deviceInterface
+{
 
-  public Vector3 percent;
-  public ControlCubeSingleSignalGenerator[] signals;
-  public omniJack[] outputs;
-  public cubeZone cubeManip;
+    public Vector3 percent;
+    public ControlCubeSingleSignalGenerator[] signals;
+    public omniJack[] outputs;
+    public cubeZone cubeManip;
 
-  public override void Awake() {
-    base.Awake();
-    Setup(percent);
-  }
+    public UnityEvent onPercentChangedEvent;
 
-  void Setup(Vector3 p) {
-    percent = p;
-    cubeManip.updateLines(percent); 
-    updatePercent(percent);
-    //toggleMute(true);
-  }
+    public override void Awake()
+    {
+        base.Awake();
+        Setup(percent);
+    }
 
-  public override void hit(bool on, int ID = -1) {
+    public void Setup(Vector3 p)
+    {
+        percent = p;
+        cubeManip.updateLines(percent);
+        updatePercent(percent);
+        //toggleMute(true);
+    }
 
-  }
+    public override void hit(bool on, int ID = -1)
+    {
 
-  void Update() {
-  }
+    }
 
-  public void updatePercent(Vector3 p) {
-    percent = p;
+    void Update()
+    {
+    }
 
-    signals[0].value = (percent.x - .5f) * 2;
-    signals[1].value = (percent.y - .5f) * 2;
-    signals[2].value = (percent.z - .5f) * 2;
+    public void updatePercent(Vector3 p, bool invokeChange = false)
+    {
+        percent = p;
 
-  }
+        signals[0].value = (percent.x - .5f) * 2;
+        signals[1].value = (percent.y - .5f) * 2;
+        signals[2].value = (percent.z - .5f) * 2;
 
-  public override InstrumentData GetData() {
-    ControlCubeData data = new ControlCubeData();
+        if (invokeChange)
+        {
+            onPercentChangedEvent.Invoke();
+        }
+    }
 
-    data.deviceType = DeviceType.ControlCube;
-    GetTransformData(data);
+    public override InstrumentData GetData()
+    {
+        ControlCubeData data = new ControlCubeData();
 
-    data.jackOutID = new int[4];
-    for (int i = 0; i < 3; i++) data.jackOutID[i] = outputs[i].transform.GetInstanceID();
+        data.deviceType = DeviceType.ControlCube;
+        GetTransformData(data);
 
-    data.dimensionValues = new float[3];
-    for (int i = 0; i < 3; i++) data.dimensionValues[i] = percent[i];
+        data.jackOutID = new int[4];
+        for (int i = 0; i < 3; i++) data.jackOutID[i] = outputs[i].transform.GetInstanceID();
 
-    return data;
-  }
+        data.dimensionValues = new float[3];
+        for (int i = 0; i < 3; i++) data.dimensionValues[i] = percent[i];
 
-  public override void Load(InstrumentData d) {
-    ControlCubeData data = d as ControlCubeData;
+        return data;
+    }
 
-    base.Load(data);
+    public override void Load(InstrumentData d)
+    {
+        ControlCubeData data = d as ControlCubeData;
 
-    for (int i = 0; i < 3; i++) outputs[i].ID = data.jackOutID[i];
-    for (int i = 0; i < 3; i++) percent[i] = data.dimensionValues[i];
-        
-    Setup(percent);
-  }
+        base.Load(data);
+
+        for (int i = 0; i < 3; i++) outputs[i].ID = data.jackOutID[i];
+        for (int i = 0; i < 3; i++) percent[i] = data.dimensionValues[i];
+
+        Setup(percent);
+    }
 }
 
-public class ControlCubeData : InstrumentData {
-  public int[] jackOutID;
-  public float[] dimensionValues;
+public class ControlCubeData : InstrumentData
+{
+    public int[] jackOutID;
+    public float[] dimensionValues;
 }

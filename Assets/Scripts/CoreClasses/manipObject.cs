@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright Â© 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright Â© 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright Â© 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright Â© 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,80 +27,107 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
-public class manipObject : MonoBehaviour {
-  public manipState curState = manipState.none;
+public class manipObject : MonoBehaviour
+{
+    public manipState curState = manipState.none;
 
-  public Transform manipulatorObj, selectObj;
-  public manipulator manipulatorObjScript;
-  public bool stickyGrip = false;
-  public bool canBeDeleted = false;
+    public Transform manipulatorObj, selectObj;
+    public manipulator manipulatorObjScript;
+    public bool stickyGrip = false;
+    public bool canBeDeleted = false;
 
-  bool selected = false;
-  bool grabbed = false;
+    protected bool selected = false;
+    protected bool grabbed = false;
 
-  public virtual void Awake() {
-    gameObject.layer = 9;
-  }
+    public UnityEvent onStartGrabEvents;
+    public UnityEvent onEndGrabEvents;
 
-  public enum manipState {
-    none,
-    selected,
-    grabbed
-  };
+    private bool canBeGrabed = true;
 
-  public virtual void copy(manipulator m) {
-  }
+    public bool CanBeGrabed { get => canBeGrabed; set => canBeGrabed = value; }
 
-  public virtual void selfdelete() {
-  }
-
-  public virtual void grabUpdate(Transform t) {
-  }
-
-  public virtual void selectUpdate(Transform t) {
-  }
-
-  public virtual void setState(manipState state) {
-    curState = state;
-  }
-
-  public virtual void onTouch(bool on, manipulator m) {
-  }
-
-  public virtual void setTouch(bool on) { }
-  public virtual void setPress(bool on) { }
-  public virtual void updateTouchPos(Vector2 p) { }
-
-  void OnDisable() {
-    if (curState == manipState.grabbed) if (manipulatorObjScript != null) manipulatorObjScript.ForceRelease();
-    StopAllCoroutines();
-  }
-
-
-  public void setSelect(bool on, Transform t) {
-    selected = on;
-    if (selected) {
-      selectObj = t;
-      setState(manipState.selected);
-    } else {
-      selectObj = null;
-      setState(manipState.none);
+    public virtual void Awake()
+    {
+        gameObject.layer = 9;
     }
-  }
 
-  public virtual void setGrab(bool on, Transform t) {
-    grabbed = on;
-    if (on) {
+    public enum manipState
+    {
+        none,
+        selected,
+        grabbed
+    };
 
-      manipulatorObj = t;
-      manipulatorObjScript = t.GetComponent<manipulator>();
-      setState(manipState.grabbed);
-    } else {
-      manipulatorObj = null;
-      manipulatorObjScript = null;
-      if (selected) setState(manipState.selected);
-      else setState(manipState.none);
+    public virtual void copy(manipulator m)
+    {
     }
-  }
+
+    public virtual void selfdelete()
+    {
+    }
+
+    public virtual void grabUpdate(Transform t)
+    {
+    }
+
+    public virtual void selectUpdate(Transform t)
+    {
+    }
+
+    public virtual void setState(manipState state)
+    {
+        curState = state;
+    }
+
+    public virtual void onTouch(bool on, manipulator m)
+    {
+    }
+
+    public virtual void setTouch(bool on) { }
+    public virtual void setPress(bool on) { }
+    public virtual void updateTouchPos(Vector2 p) { }
+
+    void OnDisable()
+    {
+        if (curState == manipState.grabbed) if (manipulatorObjScript != null) manipulatorObjScript.ForceRelease();
+        StopAllCoroutines();
+    }
+
+
+    public void setSelect(bool on, Transform t)
+    {
+        selected = on;
+        if (selected)
+        {
+            selectObj = t;
+            setState(manipState.selected);
+        }
+        else
+        {
+            selectObj = null;
+            setState(manipState.none);
+        }
+    }
+
+    public virtual void setGrab(bool on, Transform t)
+    {
+        grabbed = on;
+        if (on)
+        {
+            manipulatorObj = t;
+            manipulatorObjScript = t.GetComponent<manipulator>();
+            setState(manipState.grabbed);
+            onStartGrabEvents.Invoke();
+        }
+        else
+        {
+            manipulatorObj = null;
+            manipulatorObjScript = null;
+            if (selected) setState(manipState.selected);
+            else setState(manipState.none);
+            onEndGrabEvents.Invoke();
+        }
+    }
 }

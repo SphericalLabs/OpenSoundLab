@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright Â© 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright Â© 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright Â© 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright Â© 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class slider : manipObject {
   public float percent = 0f;
@@ -45,7 +46,9 @@ public class slider : manipObject {
 
   public Color labelColor = new Color(0f, 0.8f, 1f);
 
-  public override void Awake() {
+    public UnityEvent PercentChanged;
+
+    public override void Awake() {
     base.Awake();
     if (rend == null) rend = GetComponent<Renderer>();
     offMat = rend.material;
@@ -73,7 +76,7 @@ public class slider : manipObject {
     Vector3 p = transform.localPosition;
     p.x = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset, -xBound, xBound);
     transform.localPosition = p;
-    updatePercent();
+    updatePercent(true);
 
     if (Mathf.FloorToInt(percent / .05f) != lastNotch) {
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(500);
@@ -88,21 +91,27 @@ public class slider : manipObject {
     updatePercent();
   }
 
-  void updatePercent() {
+  void updatePercent(bool invokeEvent = false) {
     percent = .5f + transform.localPosition.x / (2 * xBound);
 
-    //if (labelsPresent) {
-    //  if (percent <= 0.5f) {
-    //    labels[0].SetColor("_TintColor", labelColor * (0.15f + 0.5f - percent) * 2);
-    //    labels[1].SetColor("_TintColor", labelColor * (0.15f + percent) * 2);
-    //    labels[2].SetColor("_TintColor", labelColor * 0.15f);
-    //  } else {
-    //    labels[0].SetColor("_TintColor", labelColor * 0.15f);
-    //    labels[1].SetColor("_TintColor", labelColor * (1.15f - percent) * 2);
-    //    labels[2].SetColor("_TintColor", labelColor * (percent - 0.35f) * 2);
-    //  }
-    //}
-  }
+
+        if (invokeEvent)
+        {
+            PercentChanged.Invoke();
+        }
+
+        //if (labelsPresent) {
+        //  if (percent <= 0.5f) {
+        //    labels[0].SetColor("_TintColor", labelColor * (0.15f + 0.5f - percent) * 2);
+        //    labels[1].SetColor("_TintColor", labelColor * (0.15f + percent) * 2);
+        //    labels[2].SetColor("_TintColor", labelColor * 0.15f);
+        //  } else {
+        //    labels[0].SetColor("_TintColor", labelColor * 0.15f);
+        //    labels[1].SetColor("_TintColor", labelColor * (1.15f - percent) * 2);
+        //    labels[2].SetColor("_TintColor", labelColor * (percent - 0.35f) * 2);
+        //  }
+        //}
+    }
 
   float offset = 0;
 

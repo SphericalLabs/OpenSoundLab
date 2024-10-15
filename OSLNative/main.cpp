@@ -36,6 +36,9 @@
 #include "util.h"
 #include <math.h>
 #include <stdlib.h>
+#include <random>
+#include "libs/pcg-cpp/include/pcg_random.hpp"
+#include <random>
 
 #define PI 3.14159265
 
@@ -311,33 +314,75 @@ extern "C" {
         */
     }
 
-    int NoiseProcessBuffer(float buffer[], float& sample, int length, int channels, float frequency, int counter, int speedFrames, bool& updated) {
 
-        if (frequency > .95f)
-        {
-            updated = true;
-            for (int i = 0; i < length; i += channels)
-            {
-                sample = buffer[i] = buffer[i + 1] = -1 + 2 * ((float)rand()) / RAND_MAX;
-            }
-        }
 
-        else
-        {
-            for (int i = 0; i < length; i += channels)
-            {
-                counter++;
-                if (counter > speedFrames)
-                {
-                    updated = true;
-                    counter = 0;
-                    sample = -1 + 2 * ((float)rand()) / RAND_MAX;
-                }
-                buffer[i] = buffer[i + 1] = sample;
-            }
-        }
-        return counter;
+    // Define the NoiseProcessor structure in C++
+    struct NoiseProcessor {
+      pcg32 rng;
+      std::uniform_real_distribution<float> dist;
+      uint64_t seed;
+      uint64_t step;
+      NoiseProcessor(uint64_t seed) : rng(seed), dist(-1.0f, 1.0f), seed(seed), step(0) {}
+      float generate() {
+        step++;
+        return dist(rng);
+      }
+      void jump_ahead(uint64_t steps) {
+        rng.advance(steps);
+        step += steps;
+      }
+    };
+
+    
+    NoiseProcessor* CreateNoiseProcessor(int seed) {
+      return new NoiseProcessor(seed);
     }
+
+    void DestroyNoiseProcessor(NoiseProcessor* processor) {
+      delete processor;
+    }
+
+    void NoiseProcessBuffer(NoiseProcessor* processor, float* buffer, int length, int channels, float sampleRatePercent, float* lastSample, int* counter, int speedFrames, bool* updated) {
+      if (sampleRatePercent > .95f) {
+        *updated = true;
+        for (int i = 0; i < length; i += channels) {
+          *lastSample = processor->generate();
+          for (int c = 0; c < channels; ++c) {
+            buffer[i + c] = *lastSample;
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < length; i += channels) {
+          (*counter)++;
+          if (*counter > speedFrames) {
+            *updated = true;
+            *counter = 0;
+            *lastSample = processor->generate();
+          }
+          for (int c = 0; c < channels; ++c) {
+            buffer[i + c] = *lastSample;
+          }
+        }
+      }
+    }
+
+    void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps) {
+      processor->rng.seed(seed);
+      processor->rng.advance(steps);
+      processor->seed = seed;
+      processor->step = steps;
+    }
+
+    int GetCurrentSeed(NoiseProcessor* processor) {
+      return processor->seed;
+    }
+
+    int GetCurrentStep(NoiseProcessor* processor) {
+      return processor->step;
+    }
+
+    
 
     int DrumSignalGenerator(float buffer[], int length, int channels, bool signalOn, int counter)
     {
@@ -453,7 +498,7 @@ extern "C" {
           endOfSample = true;
           floatingBufferCount = fmod(floatingBufferCount - sampleBounds[0], sampleBounds[1] - sampleBounds[0]) + sampleBounds[0] + 1; // wrap over playhead offset
         }
-        else if (floatingBufferCount < sampleBounds[0] + 1)
+        else if (floatingBufferCount < sampleBounds[0] + 1) // still needed? this introduces problems when resetting to 0 (instead of 1) while having playback speeds below 1, this will always be caught here and then playback stops immediately
         {
           endOfSample = true;
           floatingBufferCount = sampleBounds[1] - fmod(floatingBufferCount - sampleBounds[0], sampleBounds[1] - sampleBounds[0]); // wrap over playhead offset
@@ -468,7 +513,7 @@ extern "C" {
         {
           if (seqBuffer[i] > 0.f && lastSeqGen[0] <= 0.f)
           {
-            if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1;
+            if (playbackSpeed >= 0) floatingBufferCount = bufferCount = sampleBounds[0] + 1; // WARNING: Due to the code structure in the  ClipSignalGenerator function resetting to 0 (instead of 0 + 1) would mean that playback does not work anymore for speeds lower than 1f. It would always floor() to 0 and would not move through the file anymore.
             else floatingBufferCount = bufferCount = sampleBounds[1];
             active = true;
           }

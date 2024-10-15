@@ -34,7 +34,7 @@
 
 #if UNITY_EDITOR
 
-using UnityEngine;
+    using UnityEngine;
     using UnityEditor;
     using UnityEditor.Build;
     using System.IO;
@@ -47,12 +47,12 @@ using UnityEngine;
         public int callbackOrder { get { return 0; } }
         public void OnPreprocessBuild(BuildTarget target, string path) {
      
-            string dataDirectory = Application.dataPath + "/Plugins/Android/Examples/";
+            string dataDirectory = Application.dataPath + "/StreamingAssetsPreZip/Examples/";
             string fileToCreate = Application.streamingAssetsPath + "/Examples.tgz";
      
             Utility_SharpZipCommands.CreateTarGZ_FromDirectory (fileToCreate, dataDirectory);
 
-            dataDirectory = Application.dataPath + "/Plugins/Android/Samples/";
+            dataDirectory = Application.dataPath + "/StreamingAssetsPreZip/Samples/";
             fileToCreate = Application.streamingAssetsPath + "/Samples.tgz";
      
             Utility_SharpZipCommands.CreateTarGZ_FromDirectory (fileToCreate, dataDirectory);
@@ -60,4 +60,4 @@ using UnityEngine;
         }
     }
      
-    #endif
+#endif

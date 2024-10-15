@@ -26,18 +26,25 @@
 // limitations under the License.
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System;
+using UnityEngine.SceneManagement;
+using UnityEngine.Events;
+using System.Net;
 using System.Linq;
-using Oculus;
-using Unity.XR.Oculus;
 
 public class masterControl : MonoBehaviour {
 
   public static masterControl instance;
   public UnityEngine.Audio.AudioMixer masterMixer;
   public static float versionNumber = -1f;
+
+  // this enum will be cast as int, make sure that the scenes in the build dialogue have exactly the same order
+    public enum Scenes {
+        Base,
+        Local,
+        Relay
+    };
 
   public enum platform {
     Oculus,
@@ -50,7 +57,6 @@ public class masterControl : MonoBehaviour {
   public Color tipColor = new Color(88 / 255f, 114 / 255f, 174 / 255f);
 
   public AudioSource backgroundAudio, metronomeClick;
-  public GameObject exampleSetups;
 
   public UnityEngine.UI.Toggle muteEnvToggle;
 
@@ -71,8 +77,9 @@ public class masterControl : MonoBehaviour {
   public bool showEnvironment = true;
   double _sampleDuration;
   double _measurePhase;
+    public double MeasurePhase { get => _measurePhase; set => _measurePhase = value; }
 
-  public float glowVal = 1;
+    public float glowVal = 1;
 
   public string SaveDir;
 
@@ -80,8 +87,18 @@ public class masterControl : MonoBehaviour {
   public bool jacksEnabled = true;
 
   public masterBusRecorder recorder;
+  public metronome metro;
+  public GameObject CameraRig;
 
   void Awake() {
+
+    if (!Application.isEditor && !Debug.isDebugBuild){ 
+        Debug.unityLogger.logEnabled = false; 
+    }
+
+    DontDestroyOnLoad(this);
+    DontDestroyOnLoad(CameraRig);
+
     instance = this;
     float f;
     bool success = float.TryParse(Application.version, out f);
@@ -101,16 +118,16 @@ public class masterControl : MonoBehaviour {
       Debug.LogWarning("Unity sample rate is " + configuration.sampleRate);
     }
 
-    int bufferSize = 512;
+    //int bufferSize = 512;
 
-    if(Application.platform == RuntimePlatform.WindowsEditor)
-    {
-      bufferSize = 512;
-    } 
-    else if (Application.platform == RuntimePlatform.Android)
-    {
-      bufferSize = 256;
-    }
+    //if(Application.platform == RuntimePlatform.WindowsEditor)
+    //{
+    //  bufferSize = 512;
+    //} 
+    //else if (Application.platform == RuntimePlatform.Android)
+    //{
+    //  bufferSize = 256;
+    //}
 
     Debug.Log("Buffer size is: " + configuration.dspBufferSize);
     //configuration.dspBufferSize = bufferSize;
@@ -154,20 +171,127 @@ public class masterControl : MonoBehaviour {
     beatUpdateEvent += beatUpdateEventLocal;
     beatResetEvent += beatResetEventLocal;
 
-    setBPM(120);
-
     GetComponent<sampleManager>().Init();
 
-   recorder = GetComponentInChildren<masterBusRecorder>();
+    recorder = GetComponentInChildren<masterBusRecorder>();
+
+
+    SceneManager.activeSceneChanged += findMetronome;
 
   }
 
-  //public void resetMasterClockDSPTime(bool wasChanged){
-  //  if (wasChanged) resetClock();
-  //}
-  //}
+    public void findMetronome(Scene prev, Scene next)
+    {
+        if (next.buildIndex == (int)Scenes.Base) return;
 
-  public void toggleInstrumentVolume(bool on) {
+        // todo: get rid of this hack
+        metronome[] metronomes = GameObject.FindObjectsByType<metronome>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        metronome m = metronomes.FirstOrDefault();
+
+        if (m != null)
+        {
+            metro = m;
+            metro.bpmDial.onPercentChangedEventLocal.AddListener(metro.readBpmDialAndBroadcast);
+        }
+    }
+
+    private void Start()
+    {
+        if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
+        {
+            PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
+            PlayerPrefs.Save();
+        }
+
+        if (PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null)
+        {
+            
+            GameObject g = Instantiate(tutorialsPrefab, GameObject.Find("PatchAnchor").transform, false) as GameObject;
+
+            //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
+            g.transform.position = new Vector3(0f, 1.3f, 0.75f);
+            g.transform.Rotate(0f, -180f, 0f);
+
+            //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
+
+        }
+
+        SceneManager.LoadScene((int)Scenes.Local);
+
+    }
+
+
+    int lastBeat = -1;
+
+    void Update()
+    {
+
+        // metronome plays bound to screen updates! 
+        // Prone to jitter and CPU hanging! 
+        // Do not trust the metronome! Build your own one!
+        // Other sequencers avoid Update calls, continue even if Update call stack hangs
+        if (lastBeat != Mathf.FloorToInt(curCycle * 8f))
+        {
+            //metronomeClick.Play();
+            lastBeat = Mathf.FloorToInt(curCycle * 8f);
+        }
+
+
+        if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch))
+        {
+            nextWireSetting();
+        }
+
+        if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
+        {
+            nextBinauralSetting();
+        }
+
+        leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.LTouch);
+        rightStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+
+        if (leftStick.x > 0.5f && rightStick.x < -0.5f) // press both inwards
+        {
+            Camera.main.backgroundColor = Color.white;
+        }
+
+        if (leftStick.x < -0.5f && rightStick.x > 0.5f) // press both outward
+        {
+            Camera.main.backgroundColor = new Color(0f, 0f, 0f, 0f);
+        }
+
+        if (metro != null)
+        {
+            if (metro.volumepercent != metro.volumeDial.percent)
+            {
+                metro.volumepercent = metro.volumeDial.percent;
+                masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
+            }
+            //if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
+        }
+
+    }
+
+    private void OnAudioFilterRead(float[] buffer, int channels)
+    {
+        if (!beatUpdateRunning) return;
+        double dspTime = AudioSettings.dspTime;
+
+        for (int i = 0; i < buffer.Length; i += channels)
+        {
+            beatUpdateEvent(curCycle);
+            _measurePhase += _sampleDuration;
+            if (_measurePhase > measurePeriod) _measurePhase -= measurePeriod;
+            curCycle = (float)(_measurePhase / measurePeriod);
+        }
+    }
+
+    //public void resetMasterClockDSPTime(bool wasChanged){
+    //  if (wasChanged) resetClock();
+    //}
+    //}
+
+    public void toggleInstrumentVolume(bool on) {
     masterMixer.SetFloat("instrumentVolume", on ? 0 : -18);
   }
 
@@ -237,7 +361,6 @@ public class masterControl : MonoBehaviour {
   public bool examplesOn = true;
   public bool toggleExamples() {
     examplesOn = !examplesOn;
-    exampleSetups.SetActive(examplesOn);
 
     if (!examplesOn) {
       GameObject prevParent = GameObject.Find("exampleParent");
@@ -263,7 +386,7 @@ public class masterControl : MonoBehaviour {
   void beatResetEventLocal() { }
 
   public void setBPM(float b) {
-    bpm = Mathf.RoundToInt(b);
+    bpm = (float)MathF.Round(b, 1);
     measurePeriod = 480f / bpm;
     _measurePhase = curCycle * measurePeriod;
   }
@@ -283,75 +406,7 @@ public class masterControl : MonoBehaviour {
   public Transform patchAnchor;
 
   Vector2 leftStick, rightStick;
-  private void Start()
-  {
-    if(!PlayerPrefs.HasKey("showTutorialsOnStartup")){
-      PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
-      PlayerPrefs.Save();
-    }
-
-    if(PlayerPrefs.GetInt("showTutorialsOnStartup") == 1){
-
-      GameObject g = Instantiate(tutorialsPrefab, patchAnchor, false) as GameObject;
-
-      //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
-      g.transform.position = new Vector3(0f, 1.3f, 0.75f); 
-      g.transform.Rotate(0f, -180f, 0f);
-
-      //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
-
-    }
-  }
-
-  int lastBeat = -1;
-  
-  void Update() {
-    
-      // metronome plays bound to screen updates! 
-      // Prone to jitter and CPU hanging! 
-      // Do not trust the metronome! Build your own one!
-      // Other sequencers avoid Update calls, continue even if Update call stack hangs
-      if (lastBeat != Mathf.FloorToInt(curCycle * 8f)) { 
-      //metronomeClick.Play();
-      lastBeat = Mathf.FloorToInt(curCycle * 8f);
-    }
-
-
-    if(OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch)){
-      nextWireSetting();
-    }
-
-    if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
-    {
-      nextBinauralSetting();
-    }
-
-    leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.LTouch);
-    rightStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
-
-    if (leftStick.x > 0.5f && rightStick.x < -0.5f) // press both inwards
-    {
-      Camera.main.backgroundColor = Color.white;
-    }
-
-    if (leftStick.x < -0.5f && rightStick.x > 0.5f) // press both outward
-    {
-      Camera.main.backgroundColor = new Color(0f,0f,0f,0f);
-    }
-
-  }
-
-  private void OnAudioFilterRead(float[] buffer, int channels) {
-    if (!beatUpdateRunning) return;
-    double dspTime = AudioSettings.dspTime;
-
-    for (int i = 0; i < buffer.Length; i += channels) {
-      beatUpdateEvent(curCycle);
-      _measurePhase += _sampleDuration;
-      if (_measurePhase > measurePeriod) _measurePhase -= measurePeriod;
-      curCycle = (float)(_measurePhase / measurePeriod);
-    }
-  }
+   
 
   public void openRecordings() {
 //    System.Diagnostics.Process.Start("explorer.exe", "/root," + SaveDir + Path.DirectorySeparatorChar + "Samples" + Path.DirectorySeparatorChar + "Recordings" + Path.DirectorySeparatorChar);
@@ -369,13 +424,15 @@ public class masterControl : MonoBehaviour {
     return (new System.Uri(path)).AbsoluteUri;
   }
 
-  public enum BinauralMode {    
-    Speaker,
-    All
-  };
-  public static BinauralMode BinauralSetting = BinauralMode.Speaker;
 
-  public static void updateBinaural(int num) {
+  public UnityEvent onBinauralChangedEvent;
+  public UnityEvent onWireChangedEvent;
+  public UnityEvent onDisplayChangedEvent;
+
+
+  public BinauralMode BinauralSetting = BinauralMode.Speaker;
+
+  public void updateBinauralSetting(int num) {
     if (BinauralSetting == (BinauralMode)num) {
       return;
     }
@@ -391,34 +448,82 @@ public class masterControl : MonoBehaviour {
       if (BinauralSetting == BinauralMode.All) embeddedSpeakers[i].audio.spatialize = true;
       else embeddedSpeakers[i].audio.spatialize = false;
     }
+
+    onBinauralChangedEvent.Invoke();
   }
 
-  public enum WireMode {
+
+
+    public WireMode WireSetting = WireMode.Straight;
+       
+
+    public void updateWireSetting(int num)
+    {
+        // make straight in case for loading legacy with curved
+        if ((WireMode)num == WireMode.Curved)
+        {
+            num = (int)WireMode.Straight;
+        }
+
+        WireSetting = (WireMode)num;
+
+        omniPlug[] plugs = FindObjectsOfType<omniPlug>();
+        for (int i = 0; i < plugs.Length; i++)
+        {
+            if(plugs[i].outputPlug) plugs[i].updateLineType();
+        }
+
+        onWireChangedEvent.Invoke();
+    }
+
+    //public void nextWireSetting()
+    //{
+    //  updateWireSetting((WireSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(WireMode)).Length);
+    //}
+
+    // avoid curved for now until path points are synced
+    public void nextWireSetting()
+    {
+        if (WireSetting == WireMode.Straight || WireSetting == WireMode.Curved)
+        {
+            updateWireSetting((int)WireMode.Invisible);
+        }
+        else
+        {
+            updateWireSetting((int)WireMode.Straight);
+        }
+    }
+
+
+    public void nextBinauralSetting()
+    {
+        updateBinauralSetting((BinauralSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(BinauralMode)).Length);
+    }
+
+
+    public DisplayMode DisplaySetting = DisplayMode.All; // todo: implement display switching with actual consequences for the Renderers of the devices
+
+    public void updateDisplaySetting(int num){
+        DisplaySetting = (DisplayMode)num;
+        onDisplayChangedEvent.Invoke();
+    }
+}
+
+public enum WireMode
+{
     Curved,
     Straight,
     Invisible
-  };
-
-  public WireMode WireSetting = WireMode.Curved;
-  public void updateWireSetting(int num) {
-    if (WireSetting == (WireMode)num) {
-      return;
-    }
-    WireSetting = (WireMode)num;
-
-    omniPlug[] plugs = FindObjectsOfType<omniPlug>();
-    for (int i = 0; i < plugs.Length; i++) {
-      plugs[i].updateLineType(WireSetting);
-    }
-  }
-
-  public void nextWireSetting()
-  {
-    updateWireSetting((WireSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(WireMode)).Length);
-  }
-
-  public void nextBinauralSetting()
-  {
-    updateBinaural((BinauralSetting.GetHashCode() + 1 ) % System.Enum.GetNames(typeof(BinauralMode)).Length); 
-  }
+};
+public enum DisplayMode
+{
+    All,
+    InputAndSpeaker,
+    Speaker,
+    Nothing
 }
+public enum BinauralMode
+{
+    Speaker,
+    All
+};

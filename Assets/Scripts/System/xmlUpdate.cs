@@ -95,9 +95,6 @@ public class xmlUpdate {
             case "Drums":
               serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "Multiples":
-              serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
             case "MultiMixes":
               serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -137,9 +134,6 @@ public class xmlUpdate {
             case "Reverbs":
               serializer = new XmlSerializer(typeof(ReverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
-            case "Samplers":
-              serializer = new XmlSerializer(typeof(SamplerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
             case "Sequencers":
               serializer = new XmlSerializer(typeof(SequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
@@ -158,10 +152,17 @@ public class xmlUpdate {
             case "Artefacts":
               serializer = new XmlSerializer(typeof(ArtefactData), new XmlRootAttribute { ElementName = xmlNode.Name });
               break;
+            case "SamplerOnes":
+              serializer = new XmlSerializer(typeof(SamplerOneData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
+            case "SamplerTwos":
+              serializer = new XmlSerializer(typeof(SamplerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
+              break;
             default:
               serializer = new XmlSerializer(typeof(InstrumentData), new XmlRootAttribute { ElementName = xmlNode.Name });
-              break;
+              break;                        
           }
+
           data.Add((InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode)));
 
           switch (xmlNode.Name) {
@@ -189,7 +190,6 @@ public class xmlUpdate {
             case "Quantizers":
               data[data.Count - 1].deviceType = DeviceType.Quantizer;
               break;
-
             case "ADs":
               data[data.Count - 1].deviceType = DeviceType.AD;
               break;
@@ -217,9 +217,6 @@ public class xmlUpdate {
               break;
             case "Drums":
               data[data.Count - 1].deviceType = DeviceType.Drum;
-              break;
-            case "Multiples":
-              data[data.Count - 1].deviceType = DeviceType.Multiple;
               break;
             case "Recorders":
               data[data.Count - 1].deviceType = DeviceType.Recorder;
@@ -254,9 +251,6 @@ public class xmlUpdate {
             case "Reverbs":
               data[data.Count - 1].deviceType = DeviceType.Reverb;
               break;
-            case "Samplers":
-              data[data.Count - 1].deviceType = DeviceType.Sampler;
-              break;
             case "Sequencers":
               data[data.Count - 1].deviceType = DeviceType.Sequencer;
               break;
@@ -275,6 +269,12 @@ public class xmlUpdate {
               break;
             case "Artefacts":
               data[data.Count - 1].deviceType = DeviceType.Artefact;
+              break;
+            case "SamplerOnes":
+              data[data.Count - 1].deviceType = DeviceType.SamplerOne;
+              break;
+            case "SamplerTwos":
+              data[data.Count - 1].deviceType = DeviceType.SamplerTwo;
               break;
             default:
               break;

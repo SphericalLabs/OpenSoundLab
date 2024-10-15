@@ -157,9 +157,10 @@ public class libraryDeviceInterface : deviceInterface {
     tape g = (Instantiate(tapePrefab, t.position, t.rotation) as GameObject).GetComponent<tape>();
     if (sampleManager.instance.sampleDictionary[p][s] != null) g.Setup(s, sampleManager.instance.sampleDictionary[p][s]);
     else g.Setup(curSecondary, sampleManager.instance.sampleDictionary[curPrimary][curSecondary]);
-    t.GetComponent<manipulator>().ForceGrab(g);
+    g.transform.parent = t.transform.parent;
     g.transform.localPosition = tape.correctOffset; // corrects position when grabbing
     g.transform.localRotation = Quaternion.Euler(-90, -90, -90);
+    t.GetComponent<manipulator>().ForceGrab(g);
   }
 
   public void forceGroup(Transform t, string p) {

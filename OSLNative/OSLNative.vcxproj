@@ -277,6 +277,7 @@
     <ClInclude Include="MasterBusRecorder\AudioPluginInterface.h" />
     <ClInclude Include="MasterBusRecorder\AudioPluginUtil.h" />
     <ClInclude Include="MasterBusRecorder\PluginList.h" />
+    <ClInclude Include="pcg-cpp\include\pcg_random.hpp" />
     <ClInclude Include="resample.h" />
     <ClInclude Include="resample_tables.h" />
     <ClInclude Include="RingBuffer.h" />

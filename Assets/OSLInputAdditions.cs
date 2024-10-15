@@ -22,12 +22,12 @@ public partial class OSLInput
 
     public bool isTriggerStarted(int controllerIndex)
     {
-      return (Patcher.TriggerLeft.WasPressedThisFrame() && controllerIndex == 0) || (Patcher.TriggerRight.WasPressedThisFrame() && controllerIndex == 1);
+      return (Patcher.TriggerLeft.WasPressedThisFrame() && controllerIndex == 0) || (Patcher.TriggerRight.WasPressedThisFrame() && controllerIndex == 1 || Input.GetMouseButtonDown(0));
     }    
     
     public bool isTriggerReleased(int controllerIndex)
     {
-      return (Patcher.TriggerLeft.WasReleasedThisFrame() && controllerIndex == 0) || (Patcher.TriggerRight.WasReleasedThisFrame() && controllerIndex == 1);
+      return (Patcher.TriggerLeft.WasReleasedThisFrame() && controllerIndex == 0) || (Patcher.TriggerRight.WasReleasedThisFrame() && controllerIndex == 1 || Input.GetMouseButtonUp(0));
     }
 
     public bool isCopyStarted(int controllerIndex)

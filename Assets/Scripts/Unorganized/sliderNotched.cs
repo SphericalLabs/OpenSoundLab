@@ -29,116 +29,143 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Events;
 
-public class sliderNotched : manipObject {
-  public float percent = 0f;
-  public float xBound = 0.04f;
+public class sliderNotched : manipObject
+{
+    public float percent = 0f;
+    public float xBound = 0.04f;
 
-  public int switchVal = 0;
-  public int notchCount = 4;
-  public Transform labelHolder;
+    public int switchVal = 0;
+    public int notchCount = 4;
+    public Transform labelHolder;
 
-  Color customColor;
-  public Material glowMat;
-  Renderer rend;
-  Material offMat;
-  public bool labelsPresent = true;
+    Color customColor;
+    public Material glowMat;
+    Renderer rend;
+    Material offMat;
+    public bool labelsPresent = true;
 
-  public GameObject[] labelObjects;
+    public GameObject[] labelObjects;
 
-  public GameObject titleLabel;
+    public GameObject titleLabel;
 
-  Material[] labels;
-  Color labelColor = new Color(0, 0.65f, 0.15f);
+    Material[] labels;
+    Color labelColor = new Color(0, 0.65f, 0.15f);
 
-  public override void Awake() {
-    base.Awake();
-    rend = GetComponent<Renderer>();
-    offMat = rend.sharedMaterial;
-    customColor = Color.HSVToRGB(Random.value, 0.8f, .2f);
+    public UnityEvent onPercentChangedEvent;
 
-    //glowMat = new Material(onMat);
-    //glowMat.SetFloat("_EmissionGain", .7f);
-    //glowMat.SetColor("_TintColor", customColor);
+    public override void Awake()
+    {
+        base.Awake();
+        rend = GetComponent<Renderer>();
+        offMat = rend.sharedMaterial;
+        customColor = Color.HSVToRGB(Random.value, 0.8f, .2f);
 
-    if (labelsPresent) {
-      labels = new Material[labelObjects.Length];
-      for (int i = 0; i < labelObjects.Length; i++) {
-        labels[i] = labelObjects[labelObjects.Length - 1 - i].GetComponent<Renderer>().material;
-        labels[i].SetColor("_TintColor", labelColor);
-      }
+        //glowMat = new Material(onMat);
+        //glowMat.SetFloat("_EmissionGain", .7f);
+        //glowMat.SetColor("_TintColor", customColor);
+
+        if (labelsPresent)
+        {
+            labels = new Material[labelObjects.Length];
+            for (int i = 0; i < labelObjects.Length; i++)
+            {
+                labels[i] = labelObjects[labelObjects.Length - 1 - i].GetComponent<Renderer>().material;
+                labels[i].SetColor("_TintColor", labelColor);
+            }
+        }
+
+        if (titleLabel != null)
+        {
+            titleLabel.GetComponent<Renderer>().material.SetColor("_TintColor", labelColor);
+        }
+        setVal(switchVal);
     }
 
-    if (titleLabel != null) {
-      titleLabel.GetComponent<Renderer>().material.SetColor("_TintColor", labelColor);
+    float targetX = 0;
+    int lastSwitchVal = 0;
+    float goalX = 0f;
+    public override void grabUpdate(Transform t)
+    {
+        targetX = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset, -xBound, xBound);
+        percent = .5f + targetX / (2 * xBound);
+        updateSwitchVal(true);
     }
-    setVal(switchVal);
-    
-    
-}
 
-float targetX = 0;
-  int lastSwitchVal = 0;
-  float goalX = 0f;
-  public override void grabUpdate(Transform t) {
-    targetX = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset, -xBound, xBound);
-    percent = .5f + targetX / (2 * xBound);
-    updateSwitchVal();
-  }
+    void updateSwitchVal(bool invokeEvent = false)
+    {
 
-  void updateSwitchVal() {
-    
-    switchVal = Mathf.RoundToInt(percent * (notchCount - 1));
-    if(switchVal != lastSwitchVal) manipulatorObjScript.hapticPulse();
+        switchVal = Mathf.RoundToInt(percent * (notchCount - 1));
+        if (switchVal != lastSwitchVal) manipulatorObjScript.hapticPulse();
 
-    float modPercent = switchVal / (float)(notchCount - 1);
-    modPercent = Mathf.Lerp(modPercent, percent, .25f);
+        float modPercent = switchVal / (float)(notchCount - 1);
+        modPercent = Mathf.Lerp(modPercent, percent, .25f);
 
-    float modX = (modPercent - .5f) * (2 * xBound);
-    goalX = Mathf.Lerp(goalX, modX, 0.5f);
+        float modX = (modPercent - .5f) * (2 * xBound);
+        goalX = Mathf.Lerp(goalX, modX, 0.5f);
 
-    Vector3 p = transform.localPosition;
-    p.x = goalX;
-    transform.localPosition = p;
-    updateLabels();
-    lastSwitchVal = switchVal;
-  }
+        Vector3 p = transform.localPosition;
+        p.x = goalX;
+        transform.localPosition = p;
+        lastSwitchVal = switchVal;
 
-  public void setValByPercent(float p){
-    setVal(Mathf.RoundToInt(p * (notchCount - 1)));
-  }
-
-  public void setVal(int v) {
-    switchVal = v;
-    percent = (float)v / (notchCount - 1);
-    Vector3 pos = transform.localPosition;
-    pos.x = Mathf.Lerp(-xBound, xBound, percent);
-    transform.localPosition = pos;
-    updateLabels();
-  }
-
-  void updateLabels() {
-    if (labelsPresent) {
-      for (int i = 0; i < labels.Length; i++) {
-        labels[i].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, (i == switchVal) ? .9f : .1f));
-        labels[i].SetFloat("_EmissionGain", (i == switchVal) ? .3f : .05f);
-      }
+        if (invokeEvent)
+        {
+            onPercentChangedEvent.Invoke();
+        }
+        updateLabels();
     }
-  }
 
-  float offset = 0;
-
-  public override void setState(manipState state) {
-    curState = state;
-    if (curState == manipState.none) {
-      rend.sharedMaterial = offMat;
-    } else if (curState == manipState.selected) {
-      rend.sharedMaterial = glowMat;
-      //glowMat.SetFloat("_EmissionGain", .5f);
-    } else if (curState == manipState.grabbed) {
-      rend.sharedMaterial = glowMat;
-      //glowMat.SetFloat("_EmissionGain", .7f);
-      offset = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
+    public void setValByPercent(float p)
+    {
+        setVal(Mathf.RoundToInt(p * (notchCount - 1)));
     }
-  }
+
+    public void setVal(int v)
+    {
+        switchVal = v;
+        percent = (float)v / (notchCount - 1);
+        Vector3 pos = transform.localPosition;
+        pos.x = Mathf.Lerp(-xBound, xBound, percent);
+        transform.localPosition = pos;
+        if (labels != null)
+        {
+            updateLabels();
+        }
+    }
+
+    void updateLabels()
+    {
+        if (labelsPresent)
+        {
+            for (int i = 0; i < labels.Length; i++)
+            {
+                labels[i].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, (i == switchVal) ? .9f : .1f));
+                labels[i].SetFloat("_EmissionGain", (i == switchVal) ? .3f : .05f);
+            }
+        }
+    }
+
+    float offset = 0;
+
+    public override void setState(manipState state)
+    {
+        curState = state;
+        if (curState == manipState.none)
+        {
+            rend.sharedMaterial = offMat;
+        }
+        else if (curState == manipState.selected)
+        {
+            rend.sharedMaterial = glowMat;
+            //glowMat.SetFloat("_EmissionGain", .5f);
+        }
+        else if (curState == manipState.grabbed)
+        {
+            rend.sharedMaterial = glowMat;
+            //glowMat.SetFloat("_EmissionGain", .7f);
+            offset = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
+        }
+    }
 }

@@ -29,7 +29,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class speaker : MonoBehaviour
+public class speaker : signalGenerator
 {
 
     public float volume = 1;

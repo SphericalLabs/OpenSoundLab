@@ -1,0 +1,14 @@
+{
+    "name": "UTPTests",
+    "references": [
+        "Mirror",
+        "UtpTransport",
+        "Unity.Services.Relay",
+        "Unity.Services.Core",
+        "Unity.Services.Authentication",
+        "Unity.Networking.Transport"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

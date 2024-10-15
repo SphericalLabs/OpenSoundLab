@@ -27,6 +27,7 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class sliderUneven : manipObject {
   public float percent = 0f;
@@ -39,7 +40,9 @@ public class sliderUneven : manipObject {
   Material glowMat;
   Color labelColor = new Color(0, 0.65f, 0.15f);
 
-  public float glowhue = -1;
+    public UnityEvent onPercentChangedEvent;
+
+    public float glowhue = -1;
 
   public override void Awake() {
     base.Awake();
@@ -60,7 +63,7 @@ public class sliderUneven : manipObject {
     Vector3 p = transform.localPosition;
     p.x = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset, bounds.x, bounds.y);
     transform.localPosition = p;
-    updatePercent();
+    updatePercent(true);
 
     if (Mathf.FloorToInt(percent / .05f) != lastNotch) {
       if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(500);
@@ -75,9 +78,13 @@ public class sliderUneven : manipObject {
     updatePercent();
   }
 
-  void updatePercent() {
-    percent = Mathf.InverseLerp(percentageBounds.x, percentageBounds.y, transform.localPosition.x);
-  }
+  void updatePercent(bool invokeEvent = false) {
+        percent = Mathf.InverseLerp(percentageBounds.x, percentageBounds.y, transform.localPosition.x);
+        if (invokeEvent)
+        {
+            onPercentChangedEvent.Invoke();
+        }
+    }
 
   float offset = 0;
 

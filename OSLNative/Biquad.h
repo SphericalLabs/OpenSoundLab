@@ -62,10 +62,10 @@ extern "C" {
 /* Allocates a new instance and returns a pointer to it.
 channels: The number of channels the biquad should process. Cannot be changed afterwards.
 All other parameters: See  Biquad_process documentation. */
-SOUNDSTAGE_API Biquad *Biquad_new(int type, float frequency, float Q, float gain, float sampleRate, int channels);
+OSL_API Biquad *Biquad_new(int type, float frequency, float Q, float gain, float sampleRate, int channels);
     
 /* Deletes an existing instance. */
-SOUNDSTAGE_API void Biquad_free(Biquad *x);
+OSL_API void Biquad_free(Biquad *x);
 
 /*
 Processes a block of INTERLEAVED (!) audio data.
@@ -83,7 +83,7 @@ Params:
  
  Though all values are passed every time, the biquad re-calculates coefficients only if necessary.
  */
-SOUNDSTAGE_API void Biquad_process(Biquad *x, int type, float frequency, float Q, float gain, float sampleRate, float *in, float *out, int n);
+OSL_API void Biquad_process(Biquad *x, int type, float frequency, float Q, float gain, float sampleRate, float *in, float *out, int n);
 
 #ifdef __cplusplus
 }

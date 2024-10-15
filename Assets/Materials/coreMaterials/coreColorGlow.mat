@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: coreColorGlow
   m_Shader: {fileID: 4800000, guid: 44c43a9bc2da6d8499ed7935bd5b9991, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _ALPHAPREMULTIPLY_ON
@@ -21,6 +23,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -66,7 +69,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
-    - _EmissionGain: 0.06262785
+    - _EmissionGain: 0.4397351
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 0
@@ -83,5 +86,5 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 0.40392157}
     - _EmissionColor: {r: 34.08462, g: 34.08462, b: 34.08462, a: 1}
-    - _TintColor: {r: 0.01252557, g: 0.032566473, b: 0.06262785, a: 0.1252557}
+    - _TintColor: {r: 0.08794702, g: 0.2286622, b: 0.4397351, a: 0.8794702}
   m_BuildTextureStacks: []

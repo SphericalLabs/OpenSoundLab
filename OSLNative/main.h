@@ -56,7 +56,15 @@ extern "C" {
     OSL_API void NormalizeClip(float buffer[], int length);
     OSL_API void MicFunction(float a[], float b[], int length, float val);
     OSL_API void ColorTest(char a[]);
-    OSL_API int NoiseProcessBuffer(float buffer[], float& sample, int length, int channels, float frequency, int counter, int speedFrames, bool& updated);
+        
+    struct NoiseProcessor;
+    OSL_API NoiseProcessor* CreateNoiseProcessor(int seed);
+    OSL_API void DestroyNoiseProcessor(NoiseProcessor* processor);
+    OSL_API void NoiseProcessBuffer(NoiseProcessor* processor, float* buffer, int length, int channels, float sampleRatePercent, float* lastSample, int* counter, int speedFrames, bool* updated);
+    OSL_API void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps);
+    OSL_API int GetCurrentSeed(NoiseProcessor* processor);
+    OSL_API int GetCurrentStep(NoiseProcessor* processor);
+
     OSL_API void GateProcessBuffer(float buffer[], int length, int channels, bool incoming, float controlBuffer[], bool bControlSig, float amp);
     OSL_API double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[], float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount
 		, int sampleBounds[2], float playbackSpeed, float lastPlaybackSpeed, void* clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active, int windowLength);
