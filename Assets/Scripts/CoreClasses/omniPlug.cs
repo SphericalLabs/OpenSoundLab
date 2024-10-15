@@ -641,9 +641,6 @@ public class omniPlug : manipObject
             collCandidates.Clear();
             if (connected != null) collCandidates.Add(connected.transform);
 
-
-
-
             Vector3 posDiff = Vector3.zero;
 
             if (manipulatorObjScript.wasGazeBased) // remote patching
@@ -669,9 +666,8 @@ public class omniPlug : manipObject
         }
 
         updateJackList();
-        foreach (omniJack j in targetJackList) j.flash(cordColor);
-        setCableHighlighted(true);
-        if (otherPlug != null) otherPlug.setCableHighlighted(true);
+
+        //foreach (omniJack j in targetJackList) j.flash(cordColor); 
 
     }
 
