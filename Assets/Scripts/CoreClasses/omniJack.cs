@@ -95,16 +95,17 @@ public class omniJack : manipObject
             {
                 if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse(750);
 
-                GameObject j = Instantiate(plugPrefab, manipulatorObj.position, manipulatorObj.rotation) as GameObject;
+                GameObject j = Instantiate(plugPrefab, transform.position, transform.rotation, transform) as GameObject;
                 near = j.GetComponent<omniPlug>();
-                near.transform.localScale = transform.localScale;
-                near.transform.parent = transform;
-                near.transform.localPosition = new Vector3(0, -.0175f, 0);
-                near.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                //near.transform.localScale = transform.localScale;
+                //near.transform.parent = transform;
+                //near.transform.localPosition = new Vector3(0, -.0175f, 0);   
+                near.transform.localRotation = Quaternion.Euler(-90, 0, 0); // consider burning this rotation into the prefab already
+                //near.transform.Translate(0, 0, 0.02f);
                 near.connected = this;
                 near.signal = homesignal;
 
-                near.matchPlugtoJackScale();
+                //near.matchPlugtoJackScale();
 
 
                 j = Instantiate(plugPrefab, manipulatorObj.position, manipulatorObj.rotation) as GameObject;

@@ -170,9 +170,9 @@ public class omniPlug : manipObject
         if (lastPos != transform.position)
         {
             findClosestJack();            
-            if (connected != null) transform.LookAt(connected.transform.position);
+            //if (connected != null) transform.LookAt(connected.transform.position);
             // this is orienting the plugs towards the candidates
-            else if (closestJack != null) transform.LookAt(closestJack.position);
+            /*else*/ if (closestJack != null) transform.LookAt(closestJack.position);
             updateLineNeeded = true;
             lastPos = transform.position;
         }
@@ -203,7 +203,7 @@ public class omniPlug : manipObject
             {
                 if (Vector3.Distance(plugPath[0], transform.position) > .005f)
                 {
-                    plugPath.Insert(0, otherPlug.plugTrans.transform.position);
+                    plugPath.Insert(0, otherPlug.plugTrans.position);
                     calmTime = 0;
                     noChange = false;
                 }
@@ -472,11 +472,11 @@ public class omniPlug : manipObject
 
         plugTrans.position = connected.transform.position;
         plugTrans.rotation = connected.transform.rotation;
-        plugTrans.parent = connected.transform;
+        plugTrans.parent = connected.transform; // plugMesh set as child of connected jack
         plugTrans.Rotate(-90, 0, 0);
-        plugTrans.Translate(0, 0, -.03f);
+        plugTrans.Translate(0, 0, -0.01f); // do not insert fully
 
-        matchPlugtoJackScale(connected); // apparently not working, probably because
+        //matchPlugtoJackScale(connected); // apparently not working, probably because
     }
 
 
@@ -503,14 +503,16 @@ public class omniPlug : manipObject
                 plugTrans.rotation = connected.transform.rotation;
                 plugTrans.parent = connected.transform;
                 plugTrans.Rotate(-90, 0, 0);
-                plugTrans.Translate(0, 0, -0.03f);
+                //plugTrans.Translate(0, 0, -0.03f);
             }
-            plugTrans.Translate(0, 0, 0.014f);
-
-            transform.parent = plugTrans.parent;
+            plugTrans.Translate(0, 0, 0.01f); // undo preview position from previewConnection
+            transform.parent = plugTrans.parent; // omniPlug set as child of connected jack
             transform.position = plugTrans.position;
             transform.rotation = plugTrans.rotation;
-            plugTrans.parent = transform;
+            plugTrans.parent = transform; // plugMesh set as child of omniPlug
+
+            //plugTrans.Translate(0, 0, 0.014f);
+
             calmTime = 0;
             connected.beginConnection(this, true);
 
@@ -553,7 +555,7 @@ public class omniPlug : manipObject
         plugTrans.rotation = connected.transform.rotation;
         plugTrans.parent = connected.transform;
         plugTrans.Rotate(-90, 0, 0);
-        plugTrans.Translate(0, 0, -.02f);
+        //plugTrans.Translate(0, 0, -.02f);
 
         transform.parent = plugTrans.parent;
         transform.position = plugTrans.position;
