@@ -14,36 +14,6 @@ This repository is work-in-progress. Please always link to this repository if yo
 ### Installation
 OpenSoundLab will be available at Meta Quest's Early Access soon. We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub. 
 
-### FAQ
-
-**Q: There are already so many sound and music apps for VR, why should I consider OpenSoundLab?**
-
-**A:** First of all, OpenSoundLab is among the very few sound apps for XR that are open-source and can thus be adapted, expanded and repaired as needed for your creative or academic needs. Apart from that, the vision for OpenSoundLab is to offer a "mixed-reality first" experience that blends effortlessly in your physical surrounding instead of teleporting you to a fancy (or goofy) virtual environment. Instead of gamification, expansive modular sound work is at the center of OpenSoundLab. OSL is also one of the few modular sound apps that allow you to collaborate with others or host virtual concerts, etc. In combination with the very low latency LAN mode and the shared space colocation functionality it contributes to the idea of a hybrid studio environment in a way that most other apps don't. OpenSoundLab has a rather reduced set of features or devices, but we want to get the user experience right in order to make sure that you flow in spatial way that other apps, or screen-based workflows or physical gear can not achieve. This goes in line with a "modular spirit" that puts creative improvisation from atomic modules at the core.
-
-**Q: Does the OSLLv1 allow me to make my own app and publish it to an app store such as for Meta Quest or Apple Vision?**
-
-**A:** The OSLLv1 license allows you to repair, adapt and port the app to your likings. However, you are not allowed to publish the app to any app store, be it commercially or for free, or offer any other commercial services around the app. You may however distribute your app e.g. via GitHub or send it e.g. to your band members for online collaboration and performances.
-
-**Q: May I use OpenSoundLab to teach paid workshops or do paid gigs or produce and publish paid music?**
-
-**A:** Yes, this is allowed. Please feel invited to share what you do with OpenSoundLab on the Discord server.
-
-**Q: Can I use the trademarks OpenSoundLab and Spherical Labs or sphericals.io for my derivative?**
-
-**A:** OpenSoundLab, Spherical Labs and sphericals.io are trademarks that you may not use for your derivatives. However, if you fork our repository on GitHub, it is ok to keep these trademarks visible in the repository and your app identifiers. As soon as you share your derivative outside of GitHub you should come up with your own names. If in doubt, please reach out.
-
-**Q: Can I create my own devices/features for OSL and share them with others?**
-
-**A:** You are cordially invited to add whatever feature you want to add to your derivative of OSL and you may also share these features as long as you do not publish them through an app store (free or commercially) or through other any means that are commercial by nature. Please feel free to propose your self-developed features for incorporation in OpenSoundLab.
-
-**Q: I want to help to improve OSL. Are you accepting pull requests?**
-
-**A:** Yes, but we have to talk about the license terms for your code contribution. The easiest way to help is by committing precise bug reports in the issues of the GitHub repository. You can also propose new features and improvements there.
-
-**Q: I really want to make money with my OSL derivative, can we talk?**
-
-**A:** Sure, feel free to reach out and discuss your idea.
-
 ### Build instructions
 * Download one the latest tagged version from the releases https://github.com/SphericalLabs/OpenSoundLab/releases and unzip it
 * Alternatively, you can clone the repository and checkout the desired tag manually
@@ -72,6 +42,14 @@ git checkout DESIRED_TAG
 * Put on the headset and check if the app was installed correctly
 * If you already had OpenSoundLab installed from the App Store you might have to deinstall the app first
 * Please note that the Tutorial videos are not included in the repository and thus your build
+
+
+### Mailing list
+Please subscribe to our [newsletter](http://eepurl.com/h-9PsD) in order to get updates about new releases.
+
+### Discord
+Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980) on Discord in order to stay up-to-date, receive/offer support, present your experiments and get to know other OSL users.
+
 
 ### Changes in comparison to SoundStage VR
 
@@ -120,12 +98,35 @@ git checkout DESIRED_TAG
 - Removed oscillator from ADSR, ControlCube, Keyboard
 - Disabled timeline and MIDI for XyloRoll and Keyboard until fixed
 
+### FAQ
 
-### Mailing list
-Please subscribe to our [newsletter](http://eepurl.com/h-9PsD) in order to get updates about new releases.
+**Q: There are already so many sound and music apps for VR, why should I consider OpenSoundLab?**
 
-### Discord
-Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980) on Discord in order to stay up-to-date, receive/offer support, present your experiments and get to know other OSL users.
+**A:** First of all, OpenSoundLab is among the very few sound apps for XR that are open-source and can thus be adapted, expanded and repaired as needed for your creative or academic needs. Apart from that, the vision for OpenSoundLab is to offer a "mixed-reality first" experience that blends effortlessly in your physical surrounding instead of teleporting you to a fancy (or goofy) virtual environment. Instead of gamification, expansive modular sound work is at the center of OpenSoundLab. OSL is also one of the few modular sound apps that allow you to collaborate with others or host virtual concerts, etc. In combination with the very low latency LAN mode and the shared space colocation functionality it contributes to the idea of a hybrid studio environment in a way that most other apps don't. OpenSoundLab has a rather reduced set of features or devices, but we want to get the user experience right in order to make sure that you flow in spatial way that other apps, or screen-based workflows or physical gear can not achieve. This goes in line with a "modular spirit" that puts creative improvisation from atomic modules at the core.
+
+**Q: Does the OSLLv1 allow me to make my own app and publish it to an app store such as for Meta Quest or Apple Vision?**
+
+**A:** The OSLLv1 license allows you to repair, adapt and port the app to your likings. However, you are not allowed to publish the app to any app store, be it commercially or for free, or offer any other commercial services around the app. You may however distribute your app e.g. via GitHub or send it e.g. to your band members for online collaboration and performances.
+
+**Q: May I use OpenSoundLab to teach paid workshops or do paid gigs or produce and publish paid music?**
+
+**A:** Yes, this is allowed. Please feel invited to share what you do with OpenSoundLab on the Discord server.
+
+**Q: Can I use the trademarks OpenSoundLab and Spherical Labs or sphericals.io for my derivative?**
+
+**A:** OpenSoundLab, Spherical Labs and sphericals.io are trademarks that you may not use for your derivatives. However, if you fork our repository on GitHub, it is ok to keep these trademarks visible in the repository and your app identifiers. As soon as you share your derivative outside of GitHub you should come up with your own names. If in doubt, please reach out.
+
+**Q: Can I create my own devices/features for OSL and share them with others?**
+
+**A:** You are cordially invited to add whatever feature you want to add to your derivative of OSL and you may also share these features as long as you do not publish them through an app store (free or commercially) or through other any means that are commercial by nature. Please feel free to propose your self-developed features for incorporation in OpenSoundLab.
+
+**Q: I want to help to improve OSL. Are you accepting pull requests?**
+
+**A:** Yes, but we have to talk about the license terms for your code contribution. The easiest way to help is by committing precise bug reports in the issues of the GitHub repository. You can also propose new features and improvements there.
+
+**Q: I really want to make money with my OSL derivative, can we talk?**
+
+**A:** Sure, feel free to reach out and discuss your idea.
 
 ### Project Team for OpenSoundLab
 ###### LEAD
