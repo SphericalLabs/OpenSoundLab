@@ -60,6 +60,7 @@ public class omniPlug : manipObject
     private NetworkPlayerPlugHand targetNetworkPlugHand;
     public NetworkPlayerPlugHand TargetNetworkPlugHand { get => targetNetworkPlugHand; set => targetNetworkPlugHand = value; }
 
+    MeshFilter plugMeshFilter;
 
     public override void Awake()
     {
@@ -67,6 +68,8 @@ public class omniPlug : manipObject
         gameObject.layer = 12; //jacks
                                //mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
         lr = GetComponent<LineRenderer>();
+
+        plugMeshFilter = this.GetComponentInChildren<MeshFilter>();
 
         cordColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
         //lr.material.SetColor("_TintColor", cordColor);
@@ -109,49 +112,7 @@ public class omniPlug : manipObject
         //lr.material.SetColor("_TintColor", c);
     }
 
-    // this is called when cables are created by loading or via multi-user
-    public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor, bool invokeEvent = false)
-    {
-        float h, s, v;
-        //Color.RGBToHSV(tempColor, out h, out s, out v);
-
-        //Color c1 = Color.HSVToRGB(h, .8f, .5f);
-        //Color c2 = Color.HSVToRGB(h, .8f, .2f);
-
-        //cordColor = tempColor;
-        //lr.material.SetColor("_TintColor", c2);
-        //mat.SetColor("_TintColor", c1);
-        //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", c1);
-
-        if (outputPlug)
-        {
-
-            plugPath = tempPath.ToList<Vector3>();
-            updateLineVerts();
-            calmTime = 1;
-        }
-
-        otherPlug = siblingPlug;
-        connected = jackIn;
-        connected.beginConnection(this, invokeEvent);
-        signal = connected.homesignal;
-
-        plugTrans.position = connected.transform.position;
-        plugTrans.rotation = connected.transform.rotation;
-        plugTrans.parent = connected.transform;
-        plugTrans.Rotate(-90, 0, 0);
-        plugTrans.Translate(0, 0, -.02f);
-
-        transform.parent = plugTrans.parent;
-        transform.position = plugTrans.position;
-        transform.rotation = plugTrans.rotation;
-        plugTrans.parent = transform;
-
-        lastOtherPlugPos = otherPlug.plugTrans.transform.position;
-        lastPos = transform.position;
-
-        matchPlugtoJackScale();
-    }
+    
 
     public PlugData GetData()
     {
@@ -208,8 +169,9 @@ public class omniPlug : manipObject
         bool updateLineNeeded = false;
         if (lastPos != transform.position)
         {
-            findClosestJack();
+            findClosestJack();            
             if (connected != null) transform.LookAt(connected.transform.position);
+            // this is orienting the plugs towards the candidates
             else if (closestJack != null) transform.LookAt(closestJack.position);
             updateLineNeeded = true;
             lastPos = transform.position;
@@ -452,47 +414,7 @@ public class omniPlug : manipObject
         Destroy(gameObject);
     }
 
-    // This is called when patching live
-    public void Release()
-    {
-        foreach (omniJack j in targetJackList) j.flash(Color.black);
-        if (otherPlug.connected != null)
-        {
-            otherPlug.connected.onIsGrabableEvent.Invoke();
-        }
-        if (connected == null)
-        {
-            if (lr) lr.positionCount = 0;
-            otherPlug.Destruct();
-            Destroy(gameObject);
-        }
-        else
-        {
-            // i.e. if it is attached to the manipulator?
-            if (plugTrans.parent != connected.transform)
-            {
-                plugTrans.position = connected.transform.position;
-                plugTrans.rotation = connected.transform.rotation;
-                plugTrans.parent = connected.transform;
-                plugTrans.Rotate(-90, 0, 0);
-                plugTrans.Translate(0, 0, -0.03f);
-            }
-            plugTrans.Translate(0, 0, 0.014f);
-
-            transform.parent = plugTrans.parent;
-            transform.position = plugTrans.position;
-            transform.rotation = plugTrans.rotation;
-            plugTrans.parent = transform;
-            calmTime = 0;
-            connected.beginConnection(this, true);
-
-            collCandidates.Clear();
-        }
-
-        matchPlugtoJackScale();
-        otherPlug.matchPlugtoJackScale();
-
-    }
+    
 
     public void matchPlugtoJackScale()
     {
@@ -536,6 +458,7 @@ public class omniPlug : manipObject
         collCandidates.Add(j.transform);
     }
 
+
     // this is called when a preview connection is made, when the plug is half inserted
     void previewConnection(omniJack j)
     {
@@ -553,12 +476,95 @@ public class omniPlug : manipObject
         plugTrans.Rotate(-90, 0, 0);
         plugTrans.Translate(0, 0, -.03f);
 
-        matchPlugtoJackScale();
-        if (otherPlug != null) otherPlug.matchPlugtoJackScale();
+        matchPlugtoJackScale(connected); // apparently not working, probably because
     }
 
 
+    // This is called when fully inserting a plug during local live patching (not loading or via multi-user)
+    public void Release()
+    {
+        foreach (omniJack j in targetJackList) j.flash(Color.black);
+        if (otherPlug.connected != null)
+        {
+            otherPlug.connected.onIsGrabableEvent.Invoke();
+        }
+        if (connected == null)
+        {
+            if (lr) lr.positionCount = 0;
+            otherPlug.Destruct();
+            Destroy(gameObject);
+        }
+        else
+        {
+            // i.e. if it is attached to the manipulator?
+            if (plugTrans.parent != connected.transform)
+            {
+                plugTrans.position = connected.transform.position;
+                plugTrans.rotation = connected.transform.rotation;
+                plugTrans.parent = connected.transform;
+                plugTrans.Rotate(-90, 0, 0);
+                plugTrans.Translate(0, 0, -0.03f);
+            }
+            plugTrans.Translate(0, 0, 0.014f);
 
+            transform.parent = plugTrans.parent;
+            transform.position = plugTrans.position;
+            transform.rotation = plugTrans.rotation;
+            plugTrans.parent = transform;
+            calmTime = 0;
+            connected.beginConnection(this, true);
+
+            collCandidates.Clear();
+        }
+
+        matchPlugtoJackScale();
+
+    }
+
+
+    // this is called when cables are created by loading or via multi-user
+    public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor, bool invokeEvent = false)
+    {
+        float h, s, v;
+        //Color.RGBToHSV(tempColor, out h, out s, out v);
+
+        //Color c1 = Color.HSVToRGB(h, .8f, .5f);
+        //Color c2 = Color.HSVToRGB(h, .8f, .2f);
+
+        //cordColor = tempColor;
+        //lr.material.SetColor("_TintColor", c2);
+        //mat.SetColor("_TintColor", c1);
+        //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", c1);
+
+        if (outputPlug)
+        {
+
+            plugPath = tempPath.ToList<Vector3>();
+            updateLineVerts();
+            calmTime = 1;
+        }
+
+        otherPlug = siblingPlug;
+        connected = jackIn;
+        connected.beginConnection(this, invokeEvent);
+        signal = connected.homesignal;
+
+        plugTrans.position = connected.transform.position;
+        plugTrans.rotation = connected.transform.rotation;
+        plugTrans.parent = connected.transform;
+        plugTrans.Rotate(-90, 0, 0);
+        plugTrans.Translate(0, 0, -.02f);
+
+        transform.parent = plugTrans.parent;
+        transform.position = plugTrans.position;
+        transform.rotation = plugTrans.rotation;
+        plugTrans.parent = transform;
+
+        lastOtherPlugPos = otherPlug.plugTrans.transform.position;
+        lastPos = transform.position;
+
+        matchPlugtoJackScale();
+    }
 
     void OnCollisionExit(Collision coll)
     {
