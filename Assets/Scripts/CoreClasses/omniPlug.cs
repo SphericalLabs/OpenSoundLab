@@ -37,7 +37,6 @@ public class omniPlug : manipObject
     public int ID = -1;
     public bool outputPlug = false;
     public omniJack connected;
-    bool justPreviewConnected = true;
 
     Color cordColor;
     LineRenderer lr;
@@ -110,6 +109,7 @@ public class omniPlug : manipObject
         //lr.material.SetColor("_TintColor", c);
     }
 
+    // this is called when cables are created by loading or via multi-user
     public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor, bool invokeEvent = false)
     {
         float h, s, v;
@@ -190,10 +190,10 @@ public class omniPlug : manipObject
         {
             if (collCandidates.Contains(closestJack))
             {
-                if (connected == null) updateConnection(closestJack.GetComponent<omniJack>());
+                if (connected == null) previewConnection(closestJack.GetComponent<omniJack>());
                 else if (closestJack != connected.transform)
                 {
-                    updateConnection(closestJack.GetComponent<omniJack>());
+                    previewConnection(closestJack.GetComponent<omniJack>());
                 }
             }
             if (connected != null)
@@ -452,7 +452,7 @@ public class omniPlug : manipObject
         Destroy(gameObject);
     }
 
-    // When letting go of a connection and thus also clearing the other side?
+    // This is called when patching live
     public void Release()
     {
         foreach (omniJack j in targetJackList) j.flash(Color.black);
@@ -536,7 +536,8 @@ public class omniPlug : manipObject
         collCandidates.Add(j.transform);
     }
 
-    void updateConnection(omniJack j)
+    // this is called when a preview connection is made, when the plug is half inserted
+    void previewConnection(omniJack j)
     {
         if (connected == j) return;
         if (connected != null) endConnection();
