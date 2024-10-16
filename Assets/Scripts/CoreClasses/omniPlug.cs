@@ -43,7 +43,9 @@ public class omniPlug : manipObject
     public Material omniCableMat, omniCableSelectedMat;
     //Material mat;
 
-    Transform plugTrans;
+    public Transform plugTrans;
+    public Transform wireTrans;
+
     List<Vector3> plugPath = new List<Vector3>();
     public omniPlug otherPlug;
 
@@ -76,7 +78,10 @@ public class omniPlug : manipObject
         //mat.SetColor("_TintColor", cordColor);
         //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
         mouseoverFeedback.SetActive(false);
-        plugTrans = transform.GetChild(0);
+
+        //plugTrans = transform.GetChild(0);
+        //wireTrans = transform.GetChild(1);
+
         onEndGrabEvents.AddListener(RemovePlugFromHand);
 
         if (masterControl.instance != null)
@@ -99,7 +104,7 @@ public class omniPlug : manipObject
         if (outputPlug)
         {
             //lr.material.SetColor("_TintColor", cordColor);
-            plugPath.Add(otherPlug.transform.position);
+            plugPath.Add(otherPlug.wireTrans.position);
 
             updateLineVerts();
             lastOtherPlugPos = otherPlug.transform.position;
@@ -183,8 +188,8 @@ public class omniPlug : manipObject
                  && (Vector3.Distance(plugPath.Last(), transform.position) > .002f)
                  && (Vector3.Distance(plugPath[0], transform.position) > .002f))
             {
-                Vector3 a = plugTrans.position - plugPath.Last();
-                Vector3 b = otherPlug.plugTrans.transform.position - plugPath[0];
+                Vector3 a = wireTrans.position - plugPath.Last();
+                Vector3 b = otherPlug.wireTrans.transform.position - plugPath[0];
                 for (int i = 0; i < plugPath.Count; i++) plugPath[i] += Vector3.Lerp(b, a, (float)i / (plugPath.Count - 1));
                 noChange = false;
             }
@@ -193,17 +198,17 @@ public class omniPlug : manipObject
             {
                 if (Vector3.Distance(plugPath.Last(), transform.position) > .005f)
                 {
-                    plugPath.Add(plugTrans.position);
+                    plugPath.Add(wireTrans.position);
                     calmTime = 0;
                     noChange = false;
                 }
             }
 
-            if (plugPath[0] != otherPlug.plugTrans.transform.position)
+            if (plugPath[0] != otherPlug.wireTrans.transform.position)
             {
                 if (Vector3.Distance(plugPath[0], transform.position) > .005f)
                 {
-                    plugPath.Insert(0, otherPlug.plugTrans.position);
+                    plugPath.Insert(0, otherPlug.wireTrans.position);
                     calmTime = 0;
                     noChange = false;
                 }
@@ -483,7 +488,8 @@ public class omniPlug : manipObject
     // This is called when fully inserting a plug during local live patching (not loading or via multi-user)
     public void Release()
     {
-        foreach (omniJack j in targetJackList) j.flash(Color.black);
+        //foreach (omniJack j in targetJackList) j.flash(Color.black);
+
         if (otherPlug.connected != null)
         {
             otherPlug.connected.onIsGrabableEvent.Invoke();
