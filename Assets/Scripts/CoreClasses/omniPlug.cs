@@ -135,6 +135,8 @@ public class omniPlug : manipObject
         return data;
     }
 
+    bool updateLineNeeded = false;
+
     void Update()
     {
         if (Time.frameCount % 12 == 0) UpdateLineRendererWidth();
@@ -151,6 +153,7 @@ public class omniPlug : manipObject
         }
 
         bool noChange = true;
+        updateLineNeeded = false;
 
         if (curState == manipState.grabbed)
         {
@@ -159,8 +162,9 @@ public class omniPlug : manipObject
                 if (connected == null) previewConnection(closestJack.GetComponent<omniJack>());
                 else if (closestJack != connected.transform)
                 {
-                    previewConnection(closestJack.GetComponent<omniJack>());
+                    previewConnection(closestJack.GetComponent<omniJack>());                    
                 }
+                updateLineNeeded = true;
             }
             if (connected != null)
             {
@@ -171,14 +175,15 @@ public class omniPlug : manipObject
             }
         }
 
-        bool updateLineNeeded = false;
+
         if (lastPos != transform.position)
         {
-            findClosestJack();            
-            //if (connected != null) transform.LookAt(connected.transform.position);
-            // this is orienting the plugs towards the candidates
-            /*else*/ if (closestJack != null) transform.LookAt(closestJack.position);
-            updateLineNeeded = true;
+            if (connected == null) // scanning for jacks
+            {
+                findClosestJack();
+                if (closestJack != null) transform.LookAt(closestJack.position);
+            }
+            updateLineNeeded = true; // always trigger path update when moved
             lastPos = transform.position;
         }
 
@@ -214,16 +219,16 @@ public class omniPlug : manipObject
                 }
             }
 
-            lrFlowEffect();
+            //lrFlowEffect();
 
-            if (!noChange)
-            {
-                calming();
-                updateLineVerts(); // todo: cleanup
-            }
+            //if (!noChange)
+            //{
+            //    calming();
+            //    updateLineVerts(); // todo: cleanup
+            //}
 
             updateLineVerts();
-            if (noChange) calmLine();
+            //if (noChange) calmLine();
 
         }
     }
@@ -232,8 +237,8 @@ public class omniPlug : manipObject
     {
         try
         {
-            if (otherPlug != null) lr.startWidth = getPlugLength(otherPlug) * 0.13f;
-            lr.endWidth = getPlugLength(this) * 0.13f;
+            if (otherPlug != null) lr.startWidth = getPlugLength(otherPlug) * 0.12f;
+            lr.endWidth = getPlugLength(this) * 0.12f;
         }
         catch (InvalidOperationException ex)
         {
