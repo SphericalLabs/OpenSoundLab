@@ -58,6 +58,7 @@ public class omniPlug : manipObject
     List<omniJack> targetJackList = new List<omniJack>();
     List<Transform> collCandidates = new List<Transform>();
 
+    public MeshFilter resizeMeshFilter;
 
     private NetworkPlayerPlugHand targetNetworkPlugHand;
     public NetworkPlayerPlugHand TargetNetworkPlugHand { get => targetNetworkPlugHand; set => targetNetworkPlugHand = value; }
@@ -424,35 +425,35 @@ public class omniPlug : manipObject
         Destroy(gameObject);
     }
 
-    
 
-    public void matchPlugtoJackScale()
-    {
-        matchPlugtoJackScale(connected);
-    }
 
-    // this matches the scale of the plug to the scale of the jack, regardless of their orientation
-    public void matchPlugtoJackScale(omniJack jackReference)
+    // this matches the scale of the plug to the scale of the jack
+    public void matchPlugtoJackScale(omniJack jackReference, bool preview = false)
     {
         if (jackReference != null)
         {
-            MeshFilter targetMeshFilter = jackReference.GetComponentInChildren<MeshFilter>();
-            MeshFilter resizeMeshFilter = this.GetComponentInChildren<MeshFilter>();
-
-            if (targetMeshFilter != null && resizeMeshFilter != null)
+            if (preview)
             {
-                Vector3 targetLocalSize = targetMeshFilter.mesh.bounds.size;
-                Vector3 resizeLocalSize = resizeMeshFilter.mesh.bounds.size;
+                // skip if already pretty much the same size
+                if (Vector3.Distance(plugTrans.transform.lossyScale, jackReference.transform.lossyScale) < 0.0001f) return;
 
-                float targetWidth = targetLocalSize.x * jackReference.transform.localScale.x;
-                float resizeWidth = resizeLocalSize.x * this.transform.localScale.x;
-
-                // Calculate scale factor
-                float scaleFactor = targetWidth / resizeWidth;
-
-                this.transform.localScale *= scaleFactor * 0.9f;
+                // mitigates the scaling difference
+                plugTrans.localScale = new Vector3(
+                       jackReference.transform.lossyScale.x / plugTrans.transform.lossyScale.x,
+                       jackReference.transform.lossyScale.y / plugTrans.transform.lossyScale.y,
+                       jackReference.transform.lossyScale.z / plugTrans.transform.lossyScale.z
+                   );
             }
+            else
+            {
+                plugTrans.localScale = Vector3.one; // reset plugTrans adjustments from preview
+                transform.localScale = Vector3.one; // reset localScale after parenting adjusted scale 
+            }
+
         }
+
+        UpdateLineRendererWidth();
+
     }
 
     void OnCollisionEnter(Collision coll)
@@ -486,14 +487,17 @@ public class omniPlug : manipObject
         plugTrans.Rotate(-90, 0, 0);
         plugTrans.Translate(0, 0, -0.01f); // do not insert fully
 
-        //matchPlugtoJackScale(connected); // apparently not working, probably because
+        
+        plugTrans.parent = transform; // needs the right parents for this
+        matchPlugtoJackScale(connected, true);
+        plugTrans.parent = connected.transform; // but put back immediately
+
     }
 
 
     // This is called when fully inserting a plug during local live patching (not loading or via multi-user)
     public void Release()
     {
-        //foreach (omniJack j in targetJackList) j.flash(Color.black);
 
         if (otherPlug.connected != null)
         {
@@ -517,7 +521,7 @@ public class omniPlug : manipObject
                 //plugTrans.Translate(0, 0, -0.03f);
             }
             plugTrans.Translate(0, 0, 0.01f); // undo preview position from previewConnection
-            transform.parent = plugTrans.parent; // omniPlug set as child of connected jack
+            transform.parent = plugTrans.parent; // omniPlug set as child of connected jack 
             transform.position = plugTrans.position;
             transform.rotation = plugTrans.rotation;
             plugTrans.parent = transform; // plugMesh set as child of omniPlug
@@ -530,7 +534,7 @@ public class omniPlug : manipObject
             collCandidates.Clear();
         }
 
-        matchPlugtoJackScale();
+        matchPlugtoJackScale(connected, false); 
 
     }
 
@@ -539,15 +543,6 @@ public class omniPlug : manipObject
     public void Activate(omniPlug siblingPlug, omniJack jackIn, Vector3[] tempPath, Color tempColor, bool invokeEvent = false)
     {
         float h, s, v;
-        //Color.RGBToHSV(tempColor, out h, out s, out v);
-
-        //Color c1 = Color.HSVToRGB(h, .8f, .5f);
-        //Color c2 = Color.HSVToRGB(h, .8f, .2f);
-
-        //cordColor = tempColor;
-        //lr.material.SetColor("_TintColor", c2);
-        //mat.SetColor("_TintColor", c1);
-        //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", c1);
 
         if (outputPlug)
         {
@@ -576,7 +571,7 @@ public class omniPlug : manipObject
         lastOtherPlugPos = otherPlug.plugTrans.transform.position;
         lastPos = transform.position;
 
-        matchPlugtoJackScale();
+        matchPlugtoJackScale(connected, false);
     }
 
     void OnCollisionExit(Collision coll)
