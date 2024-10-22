@@ -437,6 +437,8 @@ public class omniPlug : manipObject
                 // skip if already pretty much the same size
                 if (Vector3.Distance(plugTrans.transform.lossyScale, jackReference.transform.lossyScale) < 0.0001f) return;
 
+                plugTrans.localScale = Vector3.one;
+
                 // mitigates the scaling difference
                 plugTrans.localScale = new Vector3(
                        jackReference.transform.lossyScale.x / plugTrans.transform.lossyScale.x,
@@ -485,12 +487,12 @@ public class omniPlug : manipObject
         plugTrans.rotation = connected.transform.rotation;
         plugTrans.parent = connected.transform; // plugMesh set as child of connected jack
         plugTrans.Rotate(-90, 0, 0);
-        plugTrans.Translate(0, 0, -0.01f); // do not insert fully
-
         
         plugTrans.parent = transform; // needs the right parents for this
         matchPlugtoJackScale(connected, true);
         plugTrans.parent = connected.transform; // but put back immediately
+
+        plugTrans.Translate(0, 0, -0.01f * plugTrans.lossyScale.x); // do not insert fully
 
     }
 
@@ -520,7 +522,7 @@ public class omniPlug : manipObject
                 plugTrans.Rotate(-90, 0, 0);
                 //plugTrans.Translate(0, 0, -0.03f);
             }
-            plugTrans.Translate(0, 0, 0.01f); // undo preview position from previewConnection
+            plugTrans.Translate(0, 0, 0.01f * plugTrans.lossyScale.x); // undo preview position from previewConnection
             transform.parent = plugTrans.parent; // omniPlug set as child of connected jack 
             transform.position = plugTrans.position;
             transform.rotation = plugTrans.rotation;
