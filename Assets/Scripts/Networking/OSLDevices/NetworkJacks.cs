@@ -195,8 +195,8 @@ public class NetworkJacks : NetworkBehaviour
                 omniPlug o2 = (Instantiate(otherJack.plugPrefab, otherJack.transform.position, otherJack.transform.rotation) as GameObject).GetComponent<omniPlug>();
                 o2.outputPlug = !otherJack.outgoing;
                 Vector3[] tempPath = new Vector3[] {
-                    omniJack.transform.position,
-                    otherJack.transform.position
+                    o1.wireTrans.position,
+                    o2.wireTrans.position                    
                 };
 
                 Color tempColor = Color.HSVToRGB(0, .8f, .5f);

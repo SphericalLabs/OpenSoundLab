@@ -154,8 +154,7 @@ public class omniPlug : manipObject
         }
 
         bool noChange = true;
-        updateLineNeeded = false;
-
+        
         if (curState == manipState.grabbed)
         {
             if (collCandidates.Contains(closestJack))
@@ -574,6 +573,7 @@ public class omniPlug : manipObject
         lastPos = transform.position;
 
         matchPlugtoJackScale(connected, false);
+        //updateLineNeeded = true;
     }
 
     void OnCollisionExit(Collision coll)
