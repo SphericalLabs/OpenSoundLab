@@ -15,8 +15,13 @@ public class NetworkPlugCopy : manipObject
         this.networkPlayerPlugHand = networkPlayerPlugHand;
         this.targetJack = targetJack;
 
-        otherEnd.SetParent(targetJack.gameObject.transform);
-        otherEnd.localPosition = new Vector3(0, -.0175f, 0);
+        // this code here is for the preview of plugs that are currently being patched by another client
+        // this code does not have the full wire width and plug size matching that omniPlug has, but it currently does the job
+        // as soon as the client releases and fully patches the new cable omniplug.Activate() is called and properly sets everything up
+
+        otherEnd.transform.parent = targetJack.gameObject.transform;
+        otherEnd.transform.localScale = Vector3.one;
+        otherEnd.localPosition = new Vector3(0, -0.03f, 0);        
         otherEnd.localRotation = Quaternion.Euler(-90, 0, 0);
 
         onStartGrabEvents.AddListener(OnGrabbedByOther);
