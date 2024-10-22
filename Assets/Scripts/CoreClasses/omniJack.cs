@@ -133,7 +133,7 @@ public class omniJack : manipObject
 
         if (curState == manipState.none)
         {
-            if (near == null) dimCoroutine = StartCoroutine(dimRoutine());
+            if (near == null) plugRep.SetActive(false);
             else near.mouseoverEvent(false);
 
             if (near != null) near.setCableHighlighted(false);
@@ -142,7 +142,7 @@ public class omniJack : manipObject
         }
         else if (curState == manipState.selected)
         {
-            if (dimCoroutine != null) StopCoroutine(dimCoroutine);
+            //if (dimCoroutine != null) StopCoroutine(dimCoroutine);
             //jackColor = Color.HSVToRGB(findHue(), 0.8f, 0.2f);
             //jackRepRend.material.SetFloat("_EmissionGain", .1f);
             //jackRepRend.material.SetColor("_TintColor", jackColor);
@@ -216,21 +216,6 @@ public class omniJack : manipObject
         else return Random.Range(.45f, .7f);
     }
 
-    Coroutine dimCoroutine;
-    IEnumerator dimRoutine()
-    {
-        float t = 0;
-        while (t < 1)
-        {
-            t = Mathf.Clamp01(t + Time.deltaTime * 2);
-            //jackRepRend.material.SetFloat("_EmissionGain", Mathf.Lerp(.1f, 0, t));
-            //jackRepRend.material.SetColor("_TintColor", Color.Lerp(jackColor, Color.black, t));
-            yield return null;
-        }
-        plugRep.SetActive(false);
-    }
-
-
     Coroutine flashCoroutine;
     public void flash(Color c)
     {
@@ -244,15 +229,17 @@ public class omniJack : manipObject
         }
     }
 
-  Color targColor = new Color(.5f, .5f, 1f);
-  IEnumerator flashRoutine() {
-    float t = 0;
-    while (true) {
-      t += Time.deltaTime * 6;
-      //mat.SetColor("_EmissionColor", Color.Lerp(Color.black, targColor, Mathf.Abs(Mathf.Sin(t))));
-      yield return null;
+    Color targColor = new Color(.5f, .5f, 1f);
+    IEnumerator flashRoutine()
+    {
+        float t = 0;
+        while (true)
+        {
+            t += Time.deltaTime * 6;
+            //mat.SetColor("_EmissionColor", Color.Lerp(Color.black, targColor, Mathf.Abs(Mathf.Sin(t))));
+            yield return null;
+        }
     }
-  }
 
     public void CreatePlugInHand(manipulator manipulator)
     {
