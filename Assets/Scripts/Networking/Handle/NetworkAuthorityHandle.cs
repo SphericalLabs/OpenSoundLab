@@ -129,6 +129,10 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     //invoked by vrcontroller
     public virtual void EndGrabing()
     {
+        if (!NoHandlesGrabbed())
+        {
+            return;
+        }
         Debug.Log($"End authority grab of {gameObject.name}");
         if (!isServer && isOwned)
         {
@@ -157,6 +161,20 @@ public class NetworkAuthorityHandle : NetworkBehaviour
         }
         return true;
     }
+
+
+    bool NoHandlesGrabbed()
+    {
+        foreach (handle h in _handles)
+        {
+            if (h.curState == manipObject.manipState.grabbed)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     #endregion
 
