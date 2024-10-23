@@ -66,9 +66,9 @@ public class ADSignalGenerator : signalGenerator
     public void Awake()
     {
         minAttack = 1; // in samples
-        maxAttack = Mathf.RoundToInt(120.000f * AudioSettings.outputSampleRate);
+        maxAttack = Mathf.RoundToInt(20.000f * AudioSettings.outputSampleRate);
         minRelease = Mathf.RoundToInt(0.010f * AudioSettings.outputSampleRate);
-        maxRelease = Mathf.RoundToInt(120.000f * AudioSettings.outputSampleRate);
+        maxRelease = Mathf.RoundToInt(20.000f * AudioSettings.outputSampleRate);
   }
 
     public void setAttack(float val)
