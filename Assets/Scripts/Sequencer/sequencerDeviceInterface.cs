@@ -101,6 +101,10 @@ public class sequencerDeviceInterface : deviceInterface {
     _beatManager.setTriggers(executeNextStep, resetSteps);
     _beatManager.updateBeatNoTriplets(beatSpeed);
     _beatManager.updateSwing(swingPercent);
+
+    // trigger a global sync, since spawning the Sequencer can introduce severe lag
+    // please note that this will be called from host and all clients, so the sync will be called each time a Sequencer is instantiated and fully initialized
+    NetworkSyncEventManager.Instance.UpdateSync();
   }
 
   public void SetDimensions(int dimX, int dimY) {

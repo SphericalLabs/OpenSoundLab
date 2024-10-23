@@ -179,6 +179,10 @@ public class MicrophoneSignalGenerator : signalGenerator {
       // waits until there are n samples in the buffer in order to avoid drop outs
       audioSource.Play();
     }
+    
+    // trigger a global sync, since spawning the Microphone can introduce severe lag
+    // please note that this will be called from host and all clients, so the sync will be called each time a Microphone is instantiated and fully initialized
+    NetworkSyncEventManager.Instance.UpdateSync(); 
 
     yield return null;
 
