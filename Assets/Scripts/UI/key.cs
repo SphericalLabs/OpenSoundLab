@@ -177,8 +177,7 @@ public class key : manipObject
         touching = on;
         if (m != null)
         {
-            if (on) m.hapticPulse(3000);
-            else m.hapticPulse(700);
+            if (on) m.hapticPulse(700);            
         }
 
         keyHitCheck();
