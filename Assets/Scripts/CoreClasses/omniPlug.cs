@@ -171,7 +171,7 @@ public class omniPlug : manipObject
                 if (!collCandidates.Contains(connected.transform))
                 {
                     endConnection();
-                }
+                }   
             }
         }
 
@@ -233,36 +233,11 @@ public class omniPlug : manipObject
         }
     }
 
-    void UpdateLineRendererWidth()
-    {
-        try
-        {
-            if (otherPlug != null) lr.startWidth = getPlugLength(otherPlug) * 0.12f;
-            lr.endWidth = getPlugLength(this) * 0.12f;
-        }
-        catch (InvalidOperationException ex)
-        {
-            // this is the case when an already connected plug is temporarily connected to a jack but still grabbed
-            // in this case the plug and the MeshRenderer are at different points in the scene graph
-            // the plug is with the manipulator, the MeshRenderer is with the jack
-        }
-    }
-
-    Renderer actualPlugRenderer;
-    float getPlugLength(omniPlug plug)
+    public void UpdateLineRendererWidth()
     {
 
-        actualPlugRenderer = plug.GetComponentInChildren<MeshRenderer>();
-
-        if (actualPlugRenderer != null)
-        {
-            Bounds bounds = actualPlugRenderer.bounds;
-            return bounds.size.magnitude;
-        }
-        else
-        {
-            throw new InvalidOperationException($"MeshRenderer not found on omniPlug '{plug.name}' or its children.");
-        }
+        if (otherPlug != null) lr.startWidth = otherPlug.plugTrans.transform.lossyScale.x * 0.011f;
+        lr.endWidth = plugTrans.transform.lossyScale.x * 0.011f;
     }
 
 
@@ -488,10 +463,17 @@ public class omniPlug : manipObject
         plugTrans.Rotate(-90, 0, 0);
         
         plugTrans.parent = transform; // needs the right parents for this
-        matchPlugtoJackScale(connected, true);
+        matchPlugtoJackScale(connected, true);        
+        
+
         plugTrans.parent = connected.transform; // but put back immediately
 
         plugTrans.Translate(0, 0, -0.01f * plugTrans.lossyScale.x); // do not insert fully
+
+        UpdateLineRendererWidth();
+        // if connecting an outgoing plug that will not have its line renderer active,
+        // then this will trigger the update of the other side that actually leads to visible results
+        if (otherPlug != null) otherPlug.UpdateLineRendererWidth();
 
     }
 
