@@ -236,8 +236,8 @@ public class omniPlug : manipObject
     public void UpdateLineRendererWidth()
     {
 
-        if (otherPlug != null) lr.startWidth = otherPlug.plugTrans.transform.lossyScale.x * 0.011f;
-        lr.endWidth = plugTrans.transform.lossyScale.x * 0.011f;
+        if (otherPlug != null) lr.startWidth = otherPlug.plugTrans.transform.lossyScale.x * 0.010f;
+        lr.endWidth = plugTrans.transform.lossyScale.x * 0.010f;
     }
 
 
