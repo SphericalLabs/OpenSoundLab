@@ -327,6 +327,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7784f2c5c78ac4d8ed0395f6d19393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index: 0
+  _phase: 0
+  useNativeIfAvailable: 1
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
@@ -510,8 +513,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010201930890}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.00011, y: -0.01, z: 0.00022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -918,6 +921,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000010341080928
 GameObject:
   m_ObjectHideFlags: 0
@@ -944,8 +953,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010341080928}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0007, y: -0.01, z: 0.0001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1863,8 +1872,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000010903491998}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0007, y: -0.01, z: 0.0001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2233,8 +2242,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000011316366552}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0002, y: -0.01, z: 0.0001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2542,6 +2551,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1000011629785924
@@ -3843,6 +3858,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012593598996
 GameObject:
   m_ObjectHideFlags: 0
@@ -4176,6 +4197,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1000012769559402
@@ -4550,8 +4577,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000013256246604}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0007, y: -0.01, z: 0.0001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5230,6 +5257,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1000013835307270

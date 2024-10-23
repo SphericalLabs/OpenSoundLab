@@ -195,6 +195,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3620102534535782083
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,13 +227,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3620102534535782083}
   serializedVersion: 2
-  m_LocalRotation: {x: -7.1054274e-15, y: -7.1054274e-15, z: -1, w: 0}
-  m_LocalPosition: {x: 0, y: -0.04039, z: -0.0001}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.01, z: -0.0001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4000010431361700}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3688509547182603840
 MeshFilter:
   m_ObjectHideFlags: 0

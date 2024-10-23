@@ -204,6 +204,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &159476
 GameObject:
   m_ObjectHideFlags: 0
@@ -950,8 +953,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000012180182938}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0003, y: -0.01, z: 0.0007}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1155,6 +1158,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000012869793228
 GameObject:
   m_ObjectHideFlags: 0
@@ -1303,6 +1312,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000013101032572
 GameObject:
   m_ObjectHideFlags: 0
@@ -1329,8 +1344,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000013101032572}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0003, y: -0.01, z: -0.0005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1581,6 +1596,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &454934336691462055
 GameObject:
   m_ObjectHideFlags: 0
@@ -1775,6 +1793,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7784f2c5c78ac4d8ed0395f6d19393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  index: 0
+  _phase: 0
+  useNativeIfAvailable: 1
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
@@ -2140,6 +2161,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2416762181299732101
 GameObject:
   m_ObjectHideFlags: 0
@@ -2348,7 +2372,7 @@ GameObject:
   - component: {fileID: 2149423467798799208}
   - component: {fileID: 4251506144082477074}
   - component: {fileID: 517171151125500796}
-  - component: {fileID: 8802093079495806730}
+  - component: {fileID: 3709555995038387549}
   m_Layer: 0
   m_Name: handle0
   m_TagString: Untagged
@@ -3272,7 +3296,7 @@ MonoBehaviour:
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
---- !u!65 &8802093079495806730
+--- !u!65 &3709555995038387549
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3292,7 +3316,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.20884457, y: 0.05380246, z: 0.047952905}
-  m_Center: {x: -0.02457805, y: 0.0060666995, z: -0.009017527}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2769090092196179859
 GameObject:
   m_ObjectHideFlags: 0
@@ -3389,6 +3413,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 4
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &2777184327606219814
@@ -3583,8 +3610,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3365300628446059157}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0006, y: -0.01, z: 0.0007}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3788,6 +3815,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3606959721698394622
 GameObject:
   m_ObjectHideFlags: 0
@@ -3814,8 +3847,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3606959721698394622}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0006, y: -0.01, z: 0.0007}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4560,6 +4593,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4613558777773001520
 GameObject:
   m_ObjectHideFlags: 0
@@ -4683,8 +4722,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4747511714036973852}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0006, y: -0.01, z: 0.0007}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5549,6 +5588,12 @@ MonoBehaviour:
   onEndConnectionEvent:
     m_PersistentCalls:
       m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7217309753971637426
 GameObject:
   m_ObjectHideFlags: 0
@@ -6196,8 +6241,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8199792489107797990}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071069, w: 0.70710677}
-  m_LocalPosition: {x: 0.014999996, y: -0.020000003, z: -0.006000003}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0006, y: -0.01, z: 0.0007}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6498,6 +6543,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onEndConnectionEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onNotGrabableEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onIsGrabableEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &8775240965028762475
