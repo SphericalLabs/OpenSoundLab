@@ -42,7 +42,6 @@ public class key : manipObject
 
     public bool sticky = true;
 
-    Color glowColor = Color.HSVToRGB(.4f, .5f, .1f);
 
     public bool isKeyboard = false;
 
@@ -53,9 +52,8 @@ public class key : manipObject
         base.Awake();
         _deviceInterface = transform.parent.GetComponent<deviceInterface>();
         rend = GetComponent<Renderer>();
-        offMat = rend.material;
+        offMat = rend.sharedMaterial;
         glowMat = new Material(onMat);
-        glowMat.SetColor("_TintColor", glowColor);
     }
 
     bool initialized = false;
@@ -66,8 +64,8 @@ public class key : manipObject
 
     public void setOffMat(Material m)
     {
-        rend.material = m;
-        offMat = rend.material;
+        rend.sharedMaterial = m;
+        offMat = rend.sharedMaterial;
     }
 
     public bool isHit = false;
@@ -213,36 +211,26 @@ public class key : manipObject
         switch (s)
         {
             case keyState.off:
-                rend.material = offMat;
+                rend.sharedMaterial = offMat;
                 break;
             case keyState.touched:
-                rend.material = glowMat;
-                setKeyColor(.65f, .3f);
+                rend.sharedMaterial = glowMat;
                 break;
             case keyState.grabbedOn:
-                rend.material = glowMat;
-                setKeyColor(.4f, .4f);
+                rend.sharedMaterial = glowMat;
                 break;
             case keyState.grabbedOff:
-                rend.material = glowMat;
-                setKeyColor(.65f, .4f);
+                rend.sharedMaterial = glowMat;
                 break;
             case keyState.selectedOff:
-                rend.material = glowMat;
-                setKeyColor(.4f, .3f);
+                rend.sharedMaterial = glowMat;
                 break;
             case keyState.selectedOn:
-                rend.material = glowMat;
-                setKeyColor(.5f, .4f);
+                rend.sharedMaterial = glowMat;
                 break;
             default:
                 break;
         }
     }
 
-    public void setKeyColor(float hue, float gain)
-    {
-        rend.material.SetColor("_TintColor", Color.HSVToRGB(hue, .9f, .5f));
-        rend.material.SetFloat("_EmissionGain", gain);
-    }
 }
