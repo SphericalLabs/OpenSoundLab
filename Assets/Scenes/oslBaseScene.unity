@@ -269,13 +269,7 @@ PrefabInstance:
       propertyPath: controllerRTargetOculus
       value: 
       objectReference: {fileID: 1786302418}
-    - target: {fileID: 8594279878258766552, guid: 083403f7558b3c14ea83c5b29d4e4f01,
-        type: 3}
-      propertyPath: sceneId
-      value: 3070221476
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8493758469973672386, guid: 083403f7558b3c14ea83c5b29d4e4f01, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
