@@ -35,17 +35,31 @@ public class cubeZone : manipObject
     public Transform[] lines;
     Material mat;
 
-    Color onColor = new Color(0.414f, 0.444f, 0.750f, 0.466f);
-    Color offColor = new Color(0, 0, 0, .466f);
+    //Color onColor = new Color(0.1346236f + 0.1f, 0.1921309f + 0.1f, 0.2205881f + 0.1f, 0.3333333f + 0.1f);
+    //Color offColor = new Color(0.1346236f, 0.1921309f, 0.2205881f, 0.3333333f);
+    Color untouchedColor;
+    Color touchedColor;
 
     public override void Awake()
     {
         base.Awake();
         mat = GetComponent<Renderer>().material;
+        touchedColor = mat.GetColor("_BaseColor");
+        untouchedColor = incrementColor(touchedColor, 0.12f);
+        mat.SetColor("_BaseColor", untouchedColor);
         _deviceInterface = GetComponentInParent<ControlCubeDeviceInterface>();
         updatePercent(p, false);
 
         if (lines[0] != null) lineWidth = lines[0].localScale.x;
+    }
+
+    private Color incrementColor(Color color, float increment)
+    {
+        float r = Mathf.Min(color.r + increment, 1.0f);
+        float g = Mathf.Min(color.g + increment, 1.0f);
+        float b = Mathf.Min(color.b + increment, 1.0f);
+        float a = Mathf.Min(color.a + increment, 1.0f);
+        return new Color(r, g, b, a);
     }
 
     Vector3 controllerPosAtBeginDragging;
@@ -93,8 +107,8 @@ public class cubeZone : manipObject
 
     void colorChange(bool on)
     {
-        if (on) mat.SetColor("_SpecColor", offColor);
-        else mat.SetColor("_SpecColor", onColor);
+        if (on) mat.SetColor("_BaseColor", touchedColor);
+        else mat.SetColor("_BaseColor", untouchedColor);
     }
 
     public override void setState(manipState state)
