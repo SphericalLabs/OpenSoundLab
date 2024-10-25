@@ -99,8 +99,8 @@ public class ResonanceAudioAcousticMesh {
   public static ResonanceAudioAcousticMesh GenerateFromTerrain(Terrain terrain,
                                                                Shader surfaceMaterialShader) {
     var terrainData = terrain.terrainData;
-    var heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapWidth,
-                                           terrainData.heightmapHeight);
+    var heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapResolution,
+                                           terrainData.heightmapResolution);
 
     // First sub-sample the height map.
     int m;

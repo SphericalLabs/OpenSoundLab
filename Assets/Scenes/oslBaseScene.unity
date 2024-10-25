@@ -195,7 +195,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6393751841347891359, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1889368720}
   m_SourcePrefab: {fileID: 100100000, guid: 50afd51f2d9d3574d98e902dc51c7e90, type: 3}
 --- !u!1001 &1670915411
 PrefabInstance:
@@ -254,6 +258,18 @@ PrefabInstance:
       propertyPath: CameraRig
       value: 
       objectReference: {fileID: 2087082596}
+    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: instrumentsDirect
+      value: 
+      objectReference: {fileID: 243908066445770446, guid: 69a3764621178d84a968b8979649e7df,
+        type: 2}
+    - target: {fileID: 114000010410631886, guid: 083403f7558b3c14ea83c5b29d4e4f01,
+        type: 3}
+      propertyPath: instrumentsSpatialized
+      value: 
+      objectReference: {fileID: -7253321729163234219, guid: 69a3764621178d84a968b8979649e7df,
+        type: 2}
     - target: {fileID: 114000011258731548, guid: 083403f7558b3c14ea83c5b29d4e4f01,
         type: 3}
       propertyPath: hmdTargetOculus
@@ -292,6 +308,35 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1425685551}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1889368716 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6393751841347891359, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+    type: 3}
+  m_PrefabInstance: {fileID: 1425685551}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1889368720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889368716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 113e4aa2cd3db44d1ac0cb7e9794964b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  globalGainDb: 0
+  occlusionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  stereoSpeakerModeEnabled: 0
+  recorderSeamless: 0
+  recorderSourceTag: Untagged
+  recorderAmbisonicsOrder: 1
+  recorderMaxTime: 0
+  recorderAutoStart: 0
+  recorderFoldout: 0
 --- !u!1 &2087082596 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6393751841347891353, guid: 50afd51f2d9d3574d98e902dc51c7e90,

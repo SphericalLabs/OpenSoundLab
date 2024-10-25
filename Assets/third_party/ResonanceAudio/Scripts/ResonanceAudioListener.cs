@@ -16,7 +16,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+
+#if UNITY_EDITOR
 using System.IO;
+#endif
 
 /// Resonance Audio listener component that enhances AudioListener to provide advanced spatial audio
 /// features.
@@ -96,32 +99,37 @@ public class ResonanceAudioListener : MonoBehaviour {
   }
 
   void OnDisable() {
+#if UNITY_EDITOR
     if (Application.isEditor && IsRecording) {
       // Stop soundfield recorder.
       StopSoundfieldRecorder();
       Debug.LogWarning("Soundfield recording is stopped.");
     }
-
     // Trigger saving to file when returning from Play Mode.
     if (Application.isPlaying && HasRecordedData) {
       WriteSoundfieldRecordingToFile();
     }
+#endif
   }
 
   void Start() {
-    // Init soundfield recorder when Play Mode starts.
-    if (Application.isEditor && Application.isPlaying && recorderMaxTime > 1.0f) {
+#if UNITY_EDITOR
+      // Init soundfield recorder when Play Mode starts.
+      if (Application.isEditor && Application.isPlaying && recorderMaxTime > 1.0f) {
       InitSoundFieldRecorder();
 
       if (recorderAutoStart)
         StartSoundfieldRecorder();
     }
+#endif
   }
 
   void Update() {
     if (Application.isEditor && !Application.isPlaying && !IsRecording) {
-      // Update soundfield recorder properties.
-      UpdateTaggedSources();
+#if UNITY_EDITOR
+        // Update soundfield recorder properties.
+        UpdateTaggedSources();
+#endif
     } else {
       // Update global properties.
       ResonanceAudio.UpdateAudioListener(this);
@@ -136,9 +144,9 @@ public class ResonanceAudioListener : MonoBehaviour {
     }
     return 0.0;
   }
-
-  /// Starts soundfield recording.
-  public void StartSoundfieldRecorder() {
+#if UNITY_EDITOR
+    /// Starts soundfield recording.
+    public void StartSoundfieldRecorder() {
     if (!Application.isEditor) {
       Debug.LogError("Soundfield recording is only supported in Unity Editor.");
       return;
@@ -176,6 +184,7 @@ public class ResonanceAudioListener : MonoBehaviour {
     }
   }
 
+
   /// Stops soundfield recording
   public void StopSoundfieldRecorder()
   {
@@ -203,8 +212,10 @@ public class ResonanceAudioListener : MonoBehaviour {
     }
   }
 
-  /// Stops soundfield recording and saves the recorded data into target file path.
-  private void WriteSoundfieldRecordingToFile() {
+  
+
+    /// Stops soundfield recording and saves the recorded data into target file path.
+    private void WriteSoundfieldRecordingToFile() {
     if (!Application.isEditor) {
       Debug.LogError("Soundfield recording is only supported in Unity Editor.");
       return;
@@ -252,6 +263,7 @@ public class ResonanceAudioListener : MonoBehaviour {
     recorderStartTime = 0.0;
   }
 
+
   // Initialize the sound field recorder with current parameters.
   private bool InitSoundFieldRecorder() {
     bool result = ResonanceAudio.InitRecording(recorderAmbisonicsOrder, recorderMaxTime);
@@ -262,8 +274,9 @@ public class ResonanceAudioListener : MonoBehaviour {
     return result;
   }
 
-  // Updates the list of the target spatial audio sources to be recorded.
-  private void UpdateTaggedSources() {
+
+    // Updates the list of the target spatial audio sources to be recorded.
+    private void UpdateTaggedSources() {
     recorderTaggedSources.Clear();
     var sources = GameObject.FindObjectsOfType<AudioSource>();
     for (int i = 0; i < sources.Length; ++i) {
@@ -281,4 +294,5 @@ public class ResonanceAudioListener : MonoBehaviour {
       recorderTaggedSources[i].Stop();
     }
   }
+#endif
 }

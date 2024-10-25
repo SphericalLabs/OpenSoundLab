@@ -32,6 +32,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Net;
 using System.Linq;
+using UnityEngine.Audio;
 
 public class masterControl : MonoBehaviour {
 
@@ -431,26 +432,39 @@ public class masterControl : MonoBehaviour {
 
 
   public BinauralMode BinauralSetting = BinauralMode.Speaker;
+  public AudioMixerGroup instrumentsDirect;
+  public AudioMixerGroup instrumentsSpatialized;
 
-  public void updateBinauralSetting(int num) {
-    if (BinauralSetting == (BinauralMode)num) {
-      return;
+    public void updateBinauralSetting(int num)
+    {
+        if (BinauralSetting == (BinauralMode)num)
+        {
+            return;
+        }
+        BinauralSetting = (BinauralMode)num;
+
+        //speakerDeviceInterface[] standaloneSpeakers = FindObjectsOfType<speakerDeviceInterface>();
+        //for (int i = 0; i < standaloneSpeakers.Length; i++) {
+        //  if (BinauralSetting == BinauralMode.None) standaloneSpeakers[i].audio.spatialize = false;
+        //  else standaloneSpeakers[i].audio.spatialize = true;
+        //}
+        embeddedSpeaker[] embeddedSpeakers = FindObjectsOfType<embeddedSpeaker>();
+        for (int i = 0; i < embeddedSpeakers.Length; i++)
+        {
+            if (BinauralSetting == BinauralMode.All)
+            {
+                embeddedSpeakers[i].audio.spatialize = true;
+                embeddedSpeakers[i].audio.outputAudioMixerGroup = instrumentsSpatialized;
+            }
+            else
+            {
+                embeddedSpeakers[i].audio.spatialize = false;
+                embeddedSpeakers[i].audio.outputAudioMixerGroup = instrumentsDirect;
+            }
+        }
+
+        onBinauralChangedEvent.Invoke();
     }
-    BinauralSetting = (BinauralMode)num;
-
-    //speakerDeviceInterface[] standaloneSpeakers = FindObjectsOfType<speakerDeviceInterface>();
-    //for (int i = 0; i < standaloneSpeakers.Length; i++) {
-    //  if (BinauralSetting == BinauralMode.None) standaloneSpeakers[i].audio.spatialize = false;
-    //  else standaloneSpeakers[i].audio.spatialize = true;
-    //}
-    embeddedSpeaker[] embeddedSpeakers = FindObjectsOfType<embeddedSpeaker>();
-    for (int i = 0; i < embeddedSpeakers.Length; i++) {
-      if (BinauralSetting == BinauralMode.All) embeddedSpeakers[i].audio.spatialize = true;
-      else embeddedSpeakers[i].audio.spatialize = false;
-    }
-
-    onBinauralChangedEvent.Invoke();
-  }
 
 
 

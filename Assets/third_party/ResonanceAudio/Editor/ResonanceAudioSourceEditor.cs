@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -143,7 +145,7 @@ public class ResonanceAudioSourceEditor : Editor {
   /// @endcond
 
   private void DrawDirectivityPattern(float alpha, float sharpness, Color color, int size) {
-    directivityTexture.Resize(size, size);
+    directivityTexture.Reinitialize(size, size);
     // Draw the axes.
     Color axisColor = color.a * Color.black;
     for (int i = 0; i < size; ++i) {
@@ -163,3 +165,4 @@ public class ResonanceAudioSourceEditor : Editor {
     GUILayout.Box(directivityTexture);
   }
 }
+#endif

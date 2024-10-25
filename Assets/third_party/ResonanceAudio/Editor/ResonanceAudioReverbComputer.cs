@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEngine;
 using System;
@@ -166,3 +168,4 @@ public static class ResonanceAudioReverbComputer {
   // The radius of the listener sphere, which is used to intersect rays and collect energies.
   private const float listenerSphereRadius = 0.1f;
 }
+#endif
