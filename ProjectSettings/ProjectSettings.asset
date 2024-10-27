@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: sphericals.io
-  productName: OpenMultiLab-0.73
+  productName: OpenMultiLab-0.73R
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 0}
@@ -940,7 +940,7 @@ PlayerSettings:
   metroSplashScreenUseBackgroundColor: 1
   platformCapabilities:
     WindowsStoreApps:
-      EnterpriseAuthentication: False
+      CodeGeneration: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -972,10 +972,10 @@ PlayerSettings:
       PointOfService: False
       RecordedCallsFolder: False
       Contacts: False
-      InternetClient: False
-      CodeGeneration: False
-      BackgroundMediaPlayback: False
       Proximity: False
+      InternetClient: False
+      BackgroundMediaPlayback: False
+      EnterpriseAuthentication: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
@@ -1048,7 +1048,7 @@ PlayerSettings:
   cloudProjectId: 4f7e68e3-9b92-4f5b-850b-af3c33580bb8
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: OpenSoundLab
+  projectName: OpenSoundLab - Testing 1
   organizationId: opensoundlab
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 1
