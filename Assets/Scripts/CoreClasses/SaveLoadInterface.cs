@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System;
 using System.Xml.Serialization;
 using Mirror;
+using System.Reflection;
 
 public class SaveLoadInterface : MonoBehaviour
 {
@@ -203,6 +204,20 @@ public class SaveLoadInterface : MonoBehaviour
         {
 
             InstrumentData data = g.GetComponent<deviceInterface>().GetData();
+
+
+            // Use reflection to find and modify integer fields starting with "jack"
+            Type dataType = data.GetType();
+
+            // Iterate through all fields (public and non-public)
+            foreach (FieldInfo field in dataType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (field.Name.StartsWith("jack") && field.FieldType == typeof(int))
+                {
+                    // set IDs of jacks to -1, otherwise NetworkJack gets confused for patching
+                    field.SetValue(data, -1);
+                }
+            }
 
             GameObject g2 = Instantiate(instrumentPrefabs[data.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
             deviceInterface device = g2.GetComponent<deviceInterface>();
