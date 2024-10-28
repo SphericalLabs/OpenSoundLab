@@ -20,7 +20,7 @@ public class artefactSignalGenerator : signalGenerator
 
     public signalGenerator input;
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
         if (input != null)

@@ -95,7 +95,7 @@ public class multipleNodeSignalGenerator : signalGenerator {
     }
   }
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     if (sig == null) {
       SetArrayToSingleValue(buffer, buffer.Length, 0.0f);
       return;

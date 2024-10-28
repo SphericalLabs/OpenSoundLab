@@ -33,7 +33,7 @@ public class ControlCubeAudioSignalGenerator : signalGenerator {
   public Vector3 values = new Vector3(0, 0, 0);
   public oscillatorSignalGenerator osc1;
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     osc1.processBuffer(buffer, dspTime, channels);
   }
 }

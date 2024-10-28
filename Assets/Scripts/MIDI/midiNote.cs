@@ -84,7 +84,7 @@ public class midiNote : signalGenerator {
     noteOn = on;
   }
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     SetArrayToSingleValue(buffer, buffer.Length, noteOn ? 1f : -1f);
   }
 }

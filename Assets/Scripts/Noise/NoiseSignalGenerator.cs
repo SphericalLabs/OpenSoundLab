@@ -102,7 +102,7 @@ public class NoiseSignalGenerator : signalGenerator
         DestroyNoiseProcessor(noiseProcessorPointer);
     }
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         lock (lockObject)
         {

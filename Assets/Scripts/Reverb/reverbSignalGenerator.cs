@@ -73,7 +73,7 @@ public class reverbSignalGenerator : signalGenerator {
 
   float lowpassL = 0;
   float lowpassR = 0;
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     if (!incoming) {
       SetArrayToSingleValue(buffer, buffer.Length, 0);

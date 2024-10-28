@@ -62,7 +62,7 @@ public class multipleSignalGenerator : signalGenerator {
     flow = on;
   }
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     if (flow) {
 
       if (lastIncomingDspTime != dspTime) {

@@ -205,7 +205,7 @@ public class waveTranscribeRecorder : signalGenerator {
   //float[] oldBuffer;
   bool playingLastFrame = false;
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     //if (lastIncomingDspTime == dspTime) {
 
     //  for (int i = 0; i < buffer.Length; i++) {

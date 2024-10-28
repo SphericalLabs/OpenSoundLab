@@ -43,7 +43,7 @@ public class mixer : signalGenerator {
     tempBuff = new float[1];
   }
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
 
   if (tempBuff.Length != buffer.Length)
       System.Array.Resize(ref tempBuff, buffer.Length);
