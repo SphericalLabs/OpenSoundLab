@@ -145,13 +145,13 @@ public class midiOutDeviceInterface : deviceInterface {
     for (int i = 0; i < CClist.Count; i++) {
       jacks.Add(CClist[i].input.transform.GetInstanceID());
     }
-    data.CCjacks = jacks.ToArray();
+    data.jackCCID = jacks.ToArray();
 
     jacks.Clear();
     for (int i = 0; i < Notelist.Count; i++) {
       jacks.Add(Notelist[i].input.transform.GetInstanceID());
     }
-    data.NOTEjacks = jacks.ToArray();
+    data.jackNoteID = jacks.ToArray();
 
     return data;
   }
@@ -174,8 +174,8 @@ public class midiOutDeviceInterface : deviceInterface {
     CCupdate();
     NoteUpdate();
 
-    for (int i = 0; i < CClist.Count; i++) CClist[i].input.ID = data.CCjacks[i];
-    for (int i = 0; i < Notelist.Count; i++) Notelist[i].input.ID = data.NOTEjacks[i];
+    for (int i = 0; i < CClist.Count; i++) CClist[i].input.ID = data.jackCCID[i];
+    for (int i = 0; i < Notelist.Count; i++) Notelist[i].input.ID = data.jackNoteID[i];
   }
 }
 
@@ -183,6 +183,6 @@ public class MIDIoutData : InstrumentData {
   public string connection;
   public float CChandle;
   public float notehandle;
-  public int[] CCjacks;
-  public int[] NOTEjacks;
+  public int[] jackCCID;
+  public int[] jackNoteID;
 }

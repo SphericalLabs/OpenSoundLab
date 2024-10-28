@@ -156,7 +156,7 @@ public class cameraDeviceInterface : deviceInterface {
     data.deviceType = DeviceType.Camera;
     GetTransformData(data);
 
-    data.inputID = input.transform.GetInstanceID();
+    data.jackInput = input.transform.GetInstanceID();
 
     data.screenPosition = screenTrans.localPosition;
     data.screenRotation = screenTrans.localRotation;
@@ -174,7 +174,7 @@ public class cameraDeviceInterface : deviceInterface {
     screenTrans.localPosition = data.screenPosition;
     screenTrans.localRotation = data.screenRotation;
     screenTrans.localScale = data.screenScale;
-    input.ID = data.inputID;
+    input.ID = data.jackInput;
   }
 }
 
@@ -182,6 +182,6 @@ public class CameraData : InstrumentData {
   public Vector3 screenPosition;
   public Vector3 screenScale;
   public Quaternion screenRotation;
-  public int inputID;
+  public int jackInput;
   public bool screenDisabled;
 }
