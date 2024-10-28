@@ -92,7 +92,21 @@ public class omniPlug : manipObject
         }
 
         omniCableViz = new Material(omniCableMat); // copy the base material
-        lr.material = omniCableViz; // todo: make switchable
+        vizColor = new Color(0f, 0f, 0f);
+        
+    }
+
+    public void activateWireMode(WireMode mode){
+        if (outputPlug)
+        {
+            updateLineType();
+            if (mode == WireMode.Visualized){
+                lr.material = omniCableViz;
+            } else {
+                lr.material = omniCableMat;
+            }
+        }
+        
     }
 
     public void Setup(float c, bool outputting, omniPlug other)
@@ -216,46 +230,29 @@ public class omniPlug : manipObject
                 }
             }
 
-            if (connected != null && connected.signal != null)
+            if (curState != manipState.selected && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
             {
                 lr.material.SetColor(
                     "_Color",
                     mapValueToColor(
-                        Mathf.Clamp(
-                            Mathf.Max(connected.signal.prevFirstSample, connected.signal.firstSample), // look at two previous buffers, since otherwise single triggers might not be visualized correctly, ca. 90hz for audio network and 72hz for graphics can lead to missed trigs
+                        // look at two previous buffers, since otherwise single triggers might not be visualized correctly, ca. 90hz for audio network and 72hz for graphics can lead to missed trigs
+                        Mathf.Clamp( connected.signal.firstSample != 0f ? connected.signal.firstSample : connected.signal.prevFirstSample, 
                             -1f, 1f)
                         )
                     );
             }
 
-            //lrFlowEffect();
-
-            //if (!noChange)
-            //{
-            //    calming();
-            //    updateLineVerts(); // todo: cleanup
-            //}
-
             updateLineVerts();
-            //if (noChange) calmLine();
 
         }
     }
 
+    Color vizColor;
     private Color mapValueToColor(float val)
     {
-        if (val < 0f)
-        {
-            // Map from -1 (blue) to 0 (black)
-            float t = (val + 1f) / 1f; // t ranges from 0 to 1
-            return Color.Lerp(Color.blue, Color.black, t);
-        }
-        else
-        {
-            // Map from 0 (black) to 1 (red)
-            float t = val / 1f; // t ranges from 0 to 1
-            return Color.Lerp(Color.black, Color.red, t);
-        }
+        vizColor.r = val > 0f ? val : 0f; // red for positive
+        vizColor.b = val < 0f ? -val : 0f; // minus for negative
+        return vizColor;
     }
 
 
@@ -380,7 +377,7 @@ public class omniPlug : manipObject
             if (justLast) lr.SetPosition(plugPath.Count - 1, plugPath.Last());
             else lr.SetPositions(plugPath.ToArray());
         }
-        else if (masterControl.instance.WireSetting == WireMode.Straight && plugPath.Count >= 2)
+        else if ( (masterControl.instance.WireSetting == WireMode.Straight || masterControl.instance.WireSetting == WireMode.Visualized) && plugPath.Count >= 2)
         {
             lr.positionCount = 2;
             lr.SetPosition(0, plugPath[0]);
