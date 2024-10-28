@@ -216,8 +216,17 @@ public class omniPlug : manipObject
                 }
             }
 
-            if(connected != null && connected.signal != null)
-                lr.material.SetColor("_Color", mapValueToColor(Mathf.Clamp(connected.signal.firstSample, -1f, 1f)));
+            if (connected != null && connected.signal != null)
+            {
+                lr.material.SetColor(
+                    "_Color",
+                    mapValueToColor(
+                        Mathf.Clamp(
+                            Mathf.Max(connected.signal.prevFirstSample, connected.signal.firstSample), // look at two previous buffers, since otherwise single triggers might not be visualized correctly, ca. 90hz for audio network and 72hz for graphics can lead to missed trigs
+                            -1f, 1f)
+                        )
+                    );
+            }
 
             //lrFlowEffect();
 
