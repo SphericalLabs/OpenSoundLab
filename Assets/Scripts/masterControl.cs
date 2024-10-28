@@ -513,7 +513,8 @@ public enum WireMode
 {
     Curved,
     Straight,
-    Invisible
+    Invisible,
+    Visualized
 };
 public enum DisplayMode
 {

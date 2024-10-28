@@ -44,7 +44,7 @@ public class speaker : signalGenerator
     {
         if (incoming == null) return;
         double dspTime = AudioSettings.dspTime;
-        incoming.processBuffer(buffer, dspTime, channels);
+        incoming.processBufferVisualized(buffer, dspTime, channels);
 
         if (monoMode)
         {

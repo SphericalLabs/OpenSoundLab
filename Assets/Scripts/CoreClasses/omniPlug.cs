@@ -38,9 +38,10 @@ public class omniPlug : manipObject
     public bool outputPlug = false;
     public omniJack connected;
 
-    Color cordColor;
     LineRenderer lr;
     public Material omniCableMat, omniCableSelectedMat;
+    public Material omniCableViz;
+
     //Material mat;
 
     public Transform plugTrans;
@@ -74,7 +75,7 @@ public class omniPlug : manipObject
 
         plugMeshFilter = this.GetComponentInChildren<MeshFilter>();
 
-        cordColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        
         //lr.material.SetColor("_TintColor", cordColor);
         //mat.SetColor("_TintColor", cordColor);
         //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
@@ -89,6 +90,9 @@ public class omniPlug : manipObject
         {
             if (!masterControl.instance.jacksEnabled) GetComponent<Collider>().enabled = false;
         }
+
+        omniCableViz = new Material(omniCableMat); // copy the base material
+        lr.material = omniCableViz; // todo: make switchable
     }
 
     public void Setup(float c, bool outputting, omniPlug other)
@@ -111,13 +115,6 @@ public class omniPlug : manipObject
             lastOtherPlugPos = otherPlug.transform.position;
         }
     }
-
-    public void setLineColor(Color c)
-    {
-        cordColor = c;
-        //lr.material.SetColor("_TintColor", c);
-    }
-
     
 
     public PlugData GetData()
@@ -131,7 +128,7 @@ public class omniPlug : manipObject
         data.connected = connected.transform.GetInstanceID();
         data.otherPlug = otherPlug.transform.GetInstanceID();
         data.plugPath = plugPath.ToArray();
-        data.cordColor = cordColor;
+        data.cordColor = Color.black; // todo: remove this without breaking xmls
 
         return data;
     }
@@ -187,7 +184,7 @@ public class omniPlug : manipObject
             lastPos = transform.position;
         }
 
-        if (outputPlug)
+        if (outputPlug) // output plugs are rendered
         {
             if ((curState != manipState.grabbed && otherPlug.curState != manipState.grabbed)
                  && (Vector3.Distance(plugPath.Last(), transform.position) > .002f)
@@ -219,6 +216,9 @@ public class omniPlug : manipObject
                 }
             }
 
+            if(connected != null && connected.signal != null)
+                lr.material.SetColor("_Color", mapValueToColor(Mathf.Clamp(connected.signal.firstSample, -1f, 1f)));
+
             //lrFlowEffect();
 
             //if (!noChange)
@@ -232,6 +232,23 @@ public class omniPlug : manipObject
 
         }
     }
+
+    private Color mapValueToColor(float val)
+    {
+        if (val < 0f)
+        {
+            // Map from -1 (blue) to 0 (black)
+            float t = (val + 1f) / 1f; // t ranges from 0 to 1
+            return Color.Lerp(Color.blue, Color.black, t);
+        }
+        else
+        {
+            // Map from 0 (black) to 1 (red)
+            float t = val / 1f; // t ranges from 0 to 1
+            return Color.Lerp(Color.black, Color.red, t);
+        }
+    }
+
 
     public void UpdateLineRendererWidth()
     {

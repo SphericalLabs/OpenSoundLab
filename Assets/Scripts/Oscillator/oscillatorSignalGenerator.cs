@@ -89,11 +89,11 @@ public class oscillatorSignalGenerator : signalGenerator
 
     try
     {
-      if (freqExpGen != null) freqExpGen.processBuffer(frequencyExpBuffer, dspTime, channels);
-      if (freqLinGen != null) freqLinGen.processBuffer(frequencyLinBuffer, dspTime, channels);
-      if (ampGen != null) ampGen.processBuffer(amplitudeBuffer, dspTime, channels);
-      if (syncGen != null) syncGen.processBuffer(syncBuffer, dspTime, channels);
-      if (pwmGen != null) pwmGen.processBuffer(pwmBuffer, dspTime, channels);
+      if (freqExpGen != null) freqExpGen.processBufferVisualized(frequencyExpBuffer, dspTime, channels);
+      if (freqLinGen != null) freqLinGen.processBufferVisualized(frequencyLinBuffer, dspTime, channels);
+      if (ampGen != null) ampGen.processBufferVisualized(amplitudeBuffer, dspTime, channels);
+      if (syncGen != null) syncGen.processBufferVisualized(syncBuffer, dspTime, channels);
+      if (pwmGen != null) pwmGen.processBufferVisualized(pwmBuffer, dspTime, channels);
   } catch (System.StackOverflowException e) {
       Debug.LogWarning("catched a stackoverflow because of recursive patch connections");
     }

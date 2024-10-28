@@ -72,6 +72,13 @@ public class signalGenerator : MonoBehaviour
 
     }
 
+    public float firstSample = 0f;
+    public void processBufferVisualized(float[] buffer, double dspTime, int channels){
+        processBuffer(buffer, dspTime, channels);
+
+        firstSample = buffer[0];
+    }
+
     public virtual void processBuffer(float[] buffer, double dspTime, int channels)
     {
 
