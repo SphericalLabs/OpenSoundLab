@@ -159,9 +159,9 @@ public class midiDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     MIDIinData data = d as MIDIinData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
     if (data.connection != "") _midiComponentInterface.ConnectByName(data.connection);
 

@@ -63,9 +63,9 @@ public class tapeGroupDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     TapeGroupData data = d as TapeGroupData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
     Setup(data.samplegroup);
   }

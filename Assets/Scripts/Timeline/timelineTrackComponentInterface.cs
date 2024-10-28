@@ -63,9 +63,9 @@ public class timelineTrackComponentInterface : componentInterface {
   };
 
   public void Load(trackComponent t) {
-    jackIn.ID = t.jackInID;
-    sampleOut.ID = t.sampleOutID;
-    pulseOut.ID = t.pulseOutID;
+    jackIn.SetID(t.jackInID, false);
+    sampleOut.SetID(t.sampleOutID, false);
+    pulseOut.SetID(t.pulseOutID, false);
     GetComponentInChildren<samplerLoad>().SetSample(t.label, t.filename);
   }
 

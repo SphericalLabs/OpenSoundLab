@@ -174,13 +174,13 @@ public class looperDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     LooperData data = d as LooperData;
-    base.Load(data);
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
-    recordTrigger.ID = data.recordTriggerID;
-    playTrigger.ID = data.playTriggerID;
+    base.Load(data, true);
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode)          ;
+    recordTrigger.SetID(data.recordTriggerID, copyMode);
+    playTrigger.SetID(data.playTriggerID, copyMode);
     durSlider.setVal(data.dur);
   }
 }

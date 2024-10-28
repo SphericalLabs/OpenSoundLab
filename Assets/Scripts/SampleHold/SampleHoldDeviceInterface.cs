@@ -55,13 +55,13 @@ public class SampleHoldDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     SampleHoldData data = d as SampleHoldData;
-    base.Load(data);
+    base.Load(data, true);
 
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
-    trigInput.ID = data.jackTriggerID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
+    trigInput.SetID(data.jackTriggerID, copyMode);
 
   }
 }

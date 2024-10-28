@@ -481,16 +481,16 @@ public class sequencerDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     SequencerData data = d as SequencerData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
     playButton.startToggled = data.onSwitch;
 
     tapeList = data.rowSamples;
     rowMute = data.rowMute;
 
-    controlInput.ID = data.jackInID;
+    controlInput.SetID(data.jackInID, copyMode);
     SetDimensions(data.dimensions[0], data.dimensions[1]);
 
     for (int i = 0; i < data.cubeStates.Length; i++) {
@@ -507,14 +507,14 @@ public class sequencerDeviceInterface : deviceInterface {
       }
     }
     for (int i = 0; i < jackList.Count; i++) {
-      jackList[i].GetComponentInChildren<omniJack>().ID = data.jackOutIDs[i];
+      jackList[i].GetComponentInChildren<omniJack>().SetID(data.jackOutIDs[i], copyMode);
     }
     beatSlider.setVal(data.speedMult);
 
     swingDial.setPercent(data.swing);
 
     for (int i = 0; i < samplerList.Count; i++) {
-      samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackSampleOut.ID = data.sampleJackOutIDs[i];
+      samplerList[i].gameObject.GetComponent<miniSamplerComponentInterface>().jackSampleOut.SetID(data.sampleJackOutIDs[i], copyMode);
     }
   }
 }

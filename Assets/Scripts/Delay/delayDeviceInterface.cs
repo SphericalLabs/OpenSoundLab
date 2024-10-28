@@ -84,17 +84,17 @@ public class delayDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         DelayData data = d as DelayData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
-        omniJackIn.ID = data.jackInID;
-        omniJackOut.ID = data.jackOutID;
-        omniJackModTime.ID = data.cTimeID;
-        omniJackModFeedback.ID = data.cFeedbackID;
-        omniJackModTrigger.ID = data.cTriggerID;
-        omniJackModMix.ID = data.cMixID;
+        omniJackIn.SetID(data.jackInID, copyMode);
+        omniJackOut.SetID(data.jackOutID, copyMode);
+        omniJackModTime.SetID(data.cTimeID, copyMode);
+        omniJackModFeedback.SetID(data.cFeedbackID, copyMode);
+        omniJackModTrigger.SetID(data.cTriggerID, copyMode);
+        omniJackModMix.SetID(data.cMixID, copyMode);
 
         timeDial.setPercent(data.timeState);
         feedbackDial.setPercent(data.feedbackState);

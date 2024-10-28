@@ -80,10 +80,10 @@ public class microphoneDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     MicrophoneData data = d as MicrophoneData;
-    base.Load(data);
-    output.ID = data.jackOutID;
+    base.Load(data, true);
+    output.SetID(data.jackOutID, copyMode);
     ampDial.setPercent(data.amp);
     active.setOnAtStart(data.activeState);
   }

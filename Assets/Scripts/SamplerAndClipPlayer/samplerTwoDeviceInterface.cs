@@ -151,9 +151,9 @@ public class samplerTwoDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     SamplerTwoData data = d as SamplerTwoData;
-    base.Load(data);
+    base.Load(data, copyMode);
     speedDial.setPercent(data.speedDial);
     volumeDial.setPercent(data.ampDial);
     headTrimDial.setPercent(data.headTrimDial);
@@ -161,13 +161,13 @@ public class samplerTwoDeviceInterface : deviceInterface {
     windowingDial.setPercent(data.windowingDial);
     GetComponent<samplerLoad>().SetSample(data.label, data.file);
 
-    volumeInput.ID = data.jackInAmpID;
-    freqExpInput.ID = data.jackInFreqExpID;
-    freqLinInput.ID = data.jackInFreqLinID;
-    controlInput.ID = data.jackInSeqID;
-    headInput.ID = data.jackHeadID; 
-    tailInput.ID = data.jackTailID;    
-    output.ID = data.jackOutID;
+    volumeInput.SetID(data.jackInAmpID, copyMode);
+    freqExpInput.SetID(data.jackInFreqExpID, copyMode);
+    freqLinInput.SetID(data.jackInFreqLinID, copyMode);
+    controlInput.SetID(data.jackInSeqID, copyMode);
+    headInput.SetID(data.jackHeadID, copyMode); 
+    tailInput.SetID(data.jackTailID, copyMode);    
+    output.SetID(data.jackOutID, copyMode);
 
     playButton.startToggled = data.playToggle;
     dirSwitch.setSwitch(data.dirSwitch);

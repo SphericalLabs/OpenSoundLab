@@ -165,16 +165,16 @@ public class cameraDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     CameraData data = d as CameraData;
-    base.Load(data);
+    base.Load(data, true);
 
     previewButton.startToggled = !data.screenDisabled;
 
     screenTrans.localPosition = data.screenPosition;
     screenTrans.localRotation = data.screenRotation;
     screenTrans.localScale = data.screenScale;
-    input.ID = data.jackInput;
+    input.SetID(data.jackInput, copyMode);
   }
 }
 

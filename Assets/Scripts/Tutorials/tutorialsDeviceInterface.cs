@@ -222,10 +222,10 @@ public class tutorialsDeviceInterface : deviceInterface
     return data;
   }
 
-  public override void Load(InstrumentData d)
+  public override void Load(InstrumentData d, bool copyMode)
   {
     TutorialsData data = d as TutorialsData;
-    base.Load(data);
+    base.Load(data, copyMode);
   }
 
   }

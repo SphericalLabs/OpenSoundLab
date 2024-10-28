@@ -142,10 +142,10 @@ public class oscillatorDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         OscillatorData data = d as OscillatorData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
         freqDial.setPercent(data.freq);
         ampDial.setPercent(data.amp);
@@ -155,12 +155,12 @@ public class oscillatorDeviceInterface : deviceInterface
         lfoSwitch.setSwitch(!data.lfo);
 
         ID = data.ID;
-        signalOutput.ID = data.jackOutID;
-        ampInput.ID = data.jackInAmpID;
-        freqExpInput.ID = data.jackInFreqExpID;
-        freqLinInput.ID = data.jackInFreqLinID;
-        syncInput.ID = data.jackInSyncID;
-        pwmInput.ID = data.jackInPwmID;
+        signalOutput.SetID(data.jackOutID, copyMode);
+        ampInput.SetID(data.jackInAmpID, copyMode);
+        freqExpInput.SetID(data.jackInFreqExpID, copyMode);
+        freqLinInput.SetID(data.jackInFreqLinID, copyMode);
+        syncInput.SetID(data.jackInSyncID, copyMode);
+        pwmInput.SetID(data.jackInPwmID, copyMode);
     }
 }
 

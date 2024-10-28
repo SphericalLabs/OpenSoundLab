@@ -88,14 +88,14 @@ public class compressorDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         CompressorData data = d as CompressorData;
-        base.Load(data);
+        base.Load(data, true);
 
-        input.ID = data.jackInID;
-        output.ID = data.jackOutID;
-        sidechain.ID = data.jackSidechainID;
+        input.SetID(data.jackInID, copyMode);
+        output.SetID(data.jackOutID, copyMode);
+        sidechain.SetID(data.jackSidechainID, copyMode);
 
         attackDial.setPercent(data.attackState);
         releaseDial.setPercent(data.releaseState);

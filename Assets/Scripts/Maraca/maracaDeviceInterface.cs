@@ -73,10 +73,10 @@ public class maracaDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     MaracaData data = d as MaracaData;
-    base.Load(data);
-    jackOut.ID = data.jackOutID;
+    base.Load(data, true);
+    jackOut.SetID(data.jackOutID, copyMode);
   }
 }
 

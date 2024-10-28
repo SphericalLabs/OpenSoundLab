@@ -73,24 +73,24 @@ public class samplerOneDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         SamplerOneData data = d as SamplerOneData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
         GetComponent<samplerLoad>().SetSample(data.label, data.file);
 
-        jackTrigger.ID = data.jackTrigID;
-        jackOut.ID = data.jackOutID;
+        jackTrigger.SetID(data.jackTrigID, copyMode);
+        jackOut.SetID(data.jackOutID, copyMode);
 
         dialPitch.setPercent(data.dialPitch);
-        jackPitch.ID = data.jackPitch;
+        jackPitch.SetID(data.jackPitch, copyMode);
 
         dialAmp.setPercent(data.dialAmp);
-        jackAmp.ID = data.jackAmp;
+        jackAmp.SetID(data.jackAmp, copyMode);
 
         dialStart.setPercent(data.dialStart);
-        jackStart.ID = data.jackStart;
+        jackStart.SetID(data.jackStart, copyMode);
     }
 
 }

@@ -52,7 +52,7 @@ public class midiNote : signalGenerator {
   }
 
   public void UpdateJackID(int ID) {
-    if (ID != -1) jackOut.ID = ID;
+    if (ID != -1) jackOut.SetID(ID, false);
   }
 
   public int GetJackID() {

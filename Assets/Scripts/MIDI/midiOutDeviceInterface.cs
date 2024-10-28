@@ -156,9 +156,9 @@ public class midiOutDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     MIDIoutData data = d as MIDIoutData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
     if (data.connection != "") _midiComponentInterface.ConnectByName(data.connection);
 
@@ -174,8 +174,8 @@ public class midiOutDeviceInterface : deviceInterface {
     CCupdate();
     NoteUpdate();
 
-    for (int i = 0; i < CClist.Count; i++) CClist[i].input.ID = data.jackCCID[i];
-    for (int i = 0; i < Notelist.Count; i++) Notelist[i].input.ID = data.jackNoteID[i];
+    for (int i = 0; i < CClist.Count; i++) CClist[i].input.SetID(data.jackCCID[i], copyMode);
+    for (int i = 0; i < Notelist.Count; i++) Notelist[i].input.SetID(data.jackNoteID[i], copyMode);
   }
 }
 

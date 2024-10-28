@@ -79,12 +79,12 @@ public class DCDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     DCData data = d as DCData;
-    base.Load(data);
+    base.Load(data, true);
 
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
 
     //isBipolar.setSwitch(data.isBipolar, true);
     attenDial.setPercent(data.dial);

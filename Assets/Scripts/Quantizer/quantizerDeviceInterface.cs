@@ -65,12 +65,12 @@ public class quantizerDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     QuantizerData data = d as QuantizerData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
 
     transposeDial.setPercent(data.transposeState);
     scaleDial.setPercent(data.scaleState);

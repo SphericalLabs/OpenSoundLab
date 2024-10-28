@@ -68,12 +68,12 @@ public class gainDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     GainData data = d as GainData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
 
     ampDial.setPercent(data.dialState);
     activeSwitch.setSwitch(data.switchState);

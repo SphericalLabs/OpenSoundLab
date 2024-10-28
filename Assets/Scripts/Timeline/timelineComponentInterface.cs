@@ -521,8 +521,8 @@ public class timelineComponentInterface : componentInterface {
   public void SetTimelineData(TimelineComponentData data) {
     playButton.startToggled = data.playing;
     recButton.startToggled = data.recording;
-    playInput.ID = data.playTrigID;
-    recInput.ID = data.recTrigID;
+    playInput.SetID(data.playTrigID, false);
+    recInput.SetID(data.recTrigID, false);
 
     overdub = data.overdub;
     snapping = data.snap;

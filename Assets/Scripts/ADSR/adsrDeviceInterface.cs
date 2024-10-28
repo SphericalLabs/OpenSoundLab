@@ -94,12 +94,12 @@ public class adsrDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     ADSRData data = d as ADSRData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
-    output.ID = data.jackOutID;
-    input.ID = data.jackInID;
+    output.SetID(data.jackOutID, copyMode);
+    input.SetID(data.jackInID, copyMode);
 
     for (int i = 0; i < 3; i++) _adsrInterface.xyHandles[i].setPercent(data.ADSRdata[i]);
     _adsrInterface.setDefaults = false;

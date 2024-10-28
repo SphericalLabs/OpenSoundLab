@@ -82,16 +82,16 @@ public class airhornDeviceInterface : deviceInterface {
   }
 
   bool alreadyLoaded = false;
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     AirhornData data = d as AirhornData;
-    base.Load(data);
+    base.Load(data, true);
     for (int i = 0; i < 4; i++) {
       if (data.samples[i][0] != "") samplers[i].GetComponent<samplerLoad>().SetSample(data.samples[i][0], data.samples[i][1]);
       else samplers[i].GetComponent<samplerLoad>().ForceEject();
     }
 
     alreadyLoaded = true;
-    jackOut.ID = data.jackOutID;
+    jackOut.SetID(data.jackOutID, copyMode);
   }
 }
 

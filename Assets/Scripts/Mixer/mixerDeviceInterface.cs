@@ -206,11 +206,11 @@ public class mixerDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         MixerData data = d as MixerData;
-        base.Load(data);
-        output.GetComponent<omniJack>().ID = data.jackOutID;
+        base.Load(data, copyMode);
+        output.GetComponent<omniJack>().SetID(data.jackOutID, copyMode);
 
         count = data.sliders.Length;
         Vector3 pos = stretchSlider.localPosition;
@@ -226,8 +226,8 @@ public class mixerDeviceInterface : deviceInterface
         for (int i = 0; i < count; i++)
         {
             signal.incomingSignals[i].GetComponent<fader>().fadeSlider.setPercent(data.sliders[i]);
-            signal.incomingSignals[i].GetComponent<fader>().inputA.ID = data.jackInID[2 * i];
-            signal.incomingSignals[i].GetComponent<fader>().inputB.ID = data.jackInID[2 * i + 1];
+            signal.incomingSignals[i].GetComponent<fader>().inputA.SetID(data.jackInID[2 * i], copyMode);
+            signal.incomingSignals[i].GetComponent<fader>().inputB.SetID(data.jackInID[2 * i + 1], copyMode);
         }
     }
 }
