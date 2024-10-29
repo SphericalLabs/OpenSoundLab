@@ -230,7 +230,7 @@ public class omniPlug : manipObject
                 }
             }
 
-            if (curState != manipState.selected && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
+            if (!isHighlighted && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
             {
                 lr.material.SetColor(
                     "_Color",
@@ -248,13 +248,28 @@ public class omniPlug : manipObject
     }
 
     Color vizColor;
+    float sign;
+    float absVal;
+    float cubeRoot;
+
     private Color mapValueToColor(float val)
     {
+        val = posNegRoot(val, 0.5f); // add some logarithmic stretching, otherwise audio signals and pitch cvs tend to be too dark
         vizColor.r = val > 0f ? val : 0f; // red for positive
         vizColor.b = val < 0f ? -val : 0f; // minus for negative
         return vizColor;
     }
 
+    private float posNegRoot(float x, float exponent)
+    {
+        if (x == 0f) return 0f; // Handle zero explicitly to avoid unnecessary calculations
+
+        sign = Mathf.Sign(x);
+        absVal = Mathf.Abs(x);
+        cubeRoot = Mathf.Pow(absVal, exponent); // More accurate exponent for cube root
+
+        return sign * cubeRoot;
+    }
 
     public void UpdateLineRendererWidth()
     {
@@ -753,9 +768,10 @@ public class omniPlug : manipObject
 
     }
 
-
+    bool isHighlighted = false;
     public void setCableHighlighted(bool on)
     {
+        isHighlighted = on;
         lr.sharedMaterial = on ? omniCableSelectedMat : omniCableMat;
     }
 
