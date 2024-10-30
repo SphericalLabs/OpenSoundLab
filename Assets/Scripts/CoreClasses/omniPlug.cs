@@ -210,25 +210,29 @@ public class omniPlug : manipObject
                 noChange = false;
             }
 
-            if (updateLineNeeded)
-            {
-                if (Vector3.Distance(plugPath.Last(), transform.position) > .005f)
-                {
-                    plugPath.Add(wireTrans.position);
-                    calmTime = 0;
-                    noChange = false;
-                }
-            }
+            //if (updateLineNeeded)
+            //if(true)
+            //{
+            //    if (Vector3.Distance(plugPath.Last(), transform.position) > .005f)
+            //    {
+            //        plugPath[plugPath.Count - 1] = wireTrans.position;
+            //plugPath[0] = otherPlug.wireTrans.position;
+            ////plugPath.Add(wireTrans.position);
+            //calmTime = 0;
+            //        noChange = false;
+            //    //}
 
-            if (plugPath[0] != otherPlug.wireTrans.transform.position)
-            {
-                if (Vector3.Distance(plugPath[0], transform.position) > .005f)
-                {
-                    plugPath.Insert(0, otherPlug.wireTrans.position);
-                    calmTime = 0;
-                    noChange = false;
-                }
-            }
+            //    //if (plugPath[0] != otherPlug.wireTrans.transform.position)
+            //    //{
+            //    //    if (Vector3.Distance(plugPath[0], transform.position) > .005f)
+            //    //    {
+            //            //plugPath[0] = otherPlug.wireTrans.position;
+            //            //plugPath.Insert(0, otherPlug.wireTrans.position);
+            //            calmTime = 0;
+            //            noChange = false;
+                    //}
+                //}
+            //}
 
             if (!isHighlighted && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
             {
@@ -242,6 +246,7 @@ public class omniPlug : manipObject
                     );
             }
 
+            
             updateLineVerts();
 
         }
@@ -317,64 +322,10 @@ public class omniPlug : manipObject
 
     float calmingConstant = .5f;
 
-    void calming()
-    {
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                Vector3 dest = (plugPath[i - 1] + plugPath[i] + plugPath[i + 1]) / 3;
-                plugPath[i] = Vector3.Lerp(plugPath[i], dest, calmingConstant);
-            }
-        }
-
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                if (Vector3.Distance(plugPath[i - 1], plugPath[i]) < .01f) plugPath.RemoveAt(i);
-            }
-        }
-
-        updateLineVerts();
-    }
-
+   
     public void OnDestroy() { }
 
-    void calmLine()
-    {
-        if (calmTime == 1)
-        {
-            return;
-        }
-
-        Vector3 beginPoint = plugPath[0];
-        Vector3 endPoint = plugPath.Last();
-
-        calmTime = Mathf.Clamp01(calmTime + Time.deltaTime / 1.5f);
-
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                Vector3 dest = (plugPath[i - 1] + plugPath[i] + plugPath[i + 1]) / 3;
-                plugPath[i] = Vector3.Lerp(plugPath[i], dest, Mathf.Lerp(calmingConstant, 0, calmTime));
-            }
-        }
-
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                if (Vector3.Distance(plugPath[i - 1], plugPath[i]) < .01f) plugPath.RemoveAt(i);
-            }
-        }
-        plugPath[0] = beginPoint;
-        plugPath[plugPath.Count - 1] = endPoint;
-        updateLineVerts();
-    }
-
-
+    
     public void updateLineType()
     {
         updateLineVerts();
@@ -386,23 +337,23 @@ public class omniPlug : manipObject
     {
         if (!outputPlug) return; // only outputPlugs use their LineRenderers
 
-        if (masterControl.instance.WireSetting == WireMode.Curved)
+        if (masterControl.instance.WireSetting == WireMode.Curved) // deprecated
         {
             lr.positionCount = plugPath.Count;
             if (justLast) lr.SetPosition(plugPath.Count - 1, plugPath.Last());
             else lr.SetPositions(plugPath.ToArray());
         }
-        else if ( (masterControl.instance.WireSetting == WireMode.Straight || masterControl.instance.WireSetting == WireMode.Visualized) && plugPath.Count >= 2)
+        else if ( (masterControl.instance.WireSetting == WireMode.Straight || masterControl.instance.WireSetting == WireMode.Visualized))
         {
             lr.positionCount = 2;
-            lr.SetPosition(0, plugPath[0]);
-            lr.SetPosition(1, plugPath.Last());
+            lr.SetPosition(0, wireTrans.position);
+            if (otherPlug != null) lr.SetPosition(1, otherPlug.wireTrans.position);
         }
         else if (forcedWireShow)
         {
             lr.positionCount = 2;
-            lr.SetPosition(0, plugPath[0]);
-            lr.SetPosition(1, plugPath.Last());
+            lr.SetPosition(0, wireTrans.position);
+            if (otherPlug != null) lr.SetPosition(1, otherPlug.wireTrans.position);
         }
         else // WireMode.Invisible
         {
