@@ -174,7 +174,16 @@ public class VRNetworkPlayer : NetworkBehaviour
     public void RpcGrabNewObjectByHand(NetworkConnectionToClient target, NetworkIdentity item, bool isLeftHand)
     {
         Debug.Log($"Spawned item with name {item.gameObject} to this player, by lefthand {isLeftHand}");
-        TargetManipulator(isLeftHand).ForceGrab(item.GetComponentInChildren<handle>());
+        try
+        { // hotfix for session killing null reference exception
+            handle h = item.GetComponentInChildren<handle>();
+            if(h != null) TargetManipulator(isLeftHand).ForceGrab(h);
+        }
+        catch (System.Exception e) { 
+            Debug.LogWarning("An exception was caught during spawning that would have killed the session:"); 
+            Debug.LogWarning(e); 
+            // todo: cleanup grab on new object
+        }
     }
 
     public manipulator TargetManipulator(bool isLeftHand)
