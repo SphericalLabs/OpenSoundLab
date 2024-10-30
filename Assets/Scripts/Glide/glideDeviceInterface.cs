@@ -63,12 +63,12 @@ public class glideDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     GlideData data = d as GlideData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
 
     valueDial.setPercent(data.dialState);
 //    activeSwitch.setSwitch(data.switchState);

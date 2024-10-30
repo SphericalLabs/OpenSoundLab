@@ -25,7 +25,7 @@ public class NetworkJacks : NetworkBehaviour
         {
             if (jack.ID == -1)
             {
-                jack.ID = GetNextId;
+                jack.SetID(GetNextId, false);
             }
             jackIds.Add(jack.ID);
             connectedJackIds.Add(0);
@@ -59,7 +59,7 @@ public class NetworkJacks : NetworkBehaviour
 
         for (int i = 0; i < jackIds.Count; i++)
         {
-            omniJacks[i].ID = jackIds[i];
+            omniJacks[i].SetID(jackIds[i], false);
             OnConnectionUpdated(SyncList<int>.Operation.OP_ADD, i, 0, connectedJackIds[i]);
         }
     }

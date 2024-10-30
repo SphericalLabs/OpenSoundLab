@@ -246,12 +246,12 @@ public class multipleDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         MultipleData data = d as MultipleData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
-        input.ID = data.jackInID;
+        input.SetID(data.jackInID, copyMode);
 
 
         if (data.jackCount < 2)
@@ -262,8 +262,8 @@ public class multipleDeviceInterface : deviceInterface
             stretchSlider.transform.localPosition = pos;
             updateNodeCount();
 
-            output.ID = data.jackOutAID;
-            signal.nodes[0].jack.ID = data.jackOutBID;
+            output.SetID(data.jackOutAID, copyMode)         ;
+            signal.nodes[0].jack.SetID(data.jackOutBID, copyMode);
         }
         else
         {
@@ -273,11 +273,11 @@ public class multipleDeviceInterface : deviceInterface
             stretchSlider.transform.localPosition = pos;
             updateNodeCount();
 
-            output.ID = data.jackOutID[0];
+            output.SetID(data.jackOutID[0], copyMode);
 
             for (int i = 1; i < data.jackCount; i++)
             {
-                signal.nodes[i - 1].jack.ID = data.jackOutID[i];
+                signal.nodes[i - 1].jack.SetID(data.jackOutID[i], copyMode);
             }
 
         }

@@ -68,7 +68,7 @@ public class SaveLoadInterface : MonoBehaviour
             foreach (InstrumentData dB in dataB)
             {
                 GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
-                g.GetComponent<deviceInterface>().Load(dB);
+                g.GetComponent<deviceInterface>().Load(dB, false);
                 //Debug.Log("load data");
                 NetworkServer.Spawn(g);
             }
@@ -78,7 +78,7 @@ public class SaveLoadInterface : MonoBehaviour
         for (int i = 0; i < c; i++)
         {
             GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;
-            g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i]);
+            g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i], false);
             NetworkServer.Spawn(g);
         }
 
@@ -205,23 +205,9 @@ public class SaveLoadInterface : MonoBehaviour
 
             InstrumentData data = g.GetComponent<deviceInterface>().GetData();
 
-
-            // Use reflection to find and modify integer fields starting with "jack"
-            Type dataType = data.GetType();
-
-            // Iterate through all fields (public and non-public)
-            foreach (FieldInfo field in dataType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                if (field.Name.StartsWith("jack") && field.FieldType == typeof(int))
-                {
-                    // set IDs of jacks to -1, otherwise NetworkJack gets confused for patching
-                    field.SetValue(data, -1);
-                }
-            }
-
             GameObject g2 = Instantiate(instrumentPrefabs[data.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
             deviceInterface device = g2.GetComponent<deviceInterface>();
-            device.Load(data);
+            device.Load(data, true);
 
             // set volume to zero to avoid surprisingly loud sounds
             if (device is oscillatorDeviceInterface)

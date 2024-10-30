@@ -45,7 +45,7 @@ public class SampleHoldSignalGenerator : signalGenerator
     [DllImport("OSLNative")]
     public static extern void CopyArray(float[] from, float[] to, int length);
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
         if (incoming == null) // no signal, just 0

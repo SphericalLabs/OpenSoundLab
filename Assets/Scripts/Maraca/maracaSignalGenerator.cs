@@ -36,7 +36,7 @@ public class maracaSignalGenerator : signalGenerator {
   [DllImport("OSLNative")]
   public static extern void MaracaProcessBuffer(float[] buffer, int length, int channels, float amp, ref double _phase, double _sampleDuration);
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     amp = curShake;
     MaracaProcessBuffer(buffer, buffer.Length, channels, amp, ref _phase, _sampleDuration);
   }

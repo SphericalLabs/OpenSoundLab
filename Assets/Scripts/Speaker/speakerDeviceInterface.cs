@@ -52,7 +52,7 @@ public class speakerDeviceInterface : deviceInterface {
 
   public void Activate(int[] prevIDs) {
     ID = prevIDs[0];
-    input.ID = prevIDs[1];
+    input.SetID(prevIDs[1], false);
   }
     
   void Update() {
@@ -75,7 +75,7 @@ public class speakerDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     SpeakerData data = d as SpeakerData;
 
     transform.localPosition = data.position;
@@ -83,7 +83,7 @@ public class speakerDeviceInterface : deviceInterface {
     transform.localScale = data.scale;
 
     ID = data.ID;
-    input.ID = data.jackInID;
+    input.SetID(data.jackInID, copyMode);
     channelSwitcher.setSwitch(data.channelState, true);
 
   }

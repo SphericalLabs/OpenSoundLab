@@ -96,11 +96,11 @@ public class NoiseDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     NoiseData data = d as NoiseData;
-    base.Load(data);
+    base.Load(data, copyMode);
     ID = data.ID;
-    output.ID = data.jackOutID;
+    output.SetID(data.jackOutID, copyMode);
     speedDial.setPercent(data.dialState);
   }
 }

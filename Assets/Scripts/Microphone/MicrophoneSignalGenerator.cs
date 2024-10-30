@@ -200,7 +200,7 @@ public class MicrophoneSignalGenerator : signalGenerator {
     SetArrayToSingleValue(buffer, buffer.Length, 0.0f); // this zeroes the buffer that is directly played from the AudioSource, so that only the OSL patch is heard
   }
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     if (!active || !activated) {
       return;
     }

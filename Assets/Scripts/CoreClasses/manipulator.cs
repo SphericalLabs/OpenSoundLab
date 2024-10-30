@@ -172,6 +172,8 @@ public class manipulator : MonoBehaviour
 
     public void ForceGrab(manipObject o)
     {
+        if (o == null) return; // suspected race condition that potentially occurs in network sessions, especially in higher latency scenarios
+
         if (selectedObject != null || !selectedObject.CanBeGrabed) release();
 
         grabbing = true;

@@ -113,13 +113,13 @@ public class scopeDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     ScopeData data = d as ScopeData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
     ID = data.ID;
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
 
     muteButton.setOnAtStart(data.muteState);
     triggerButton.setOnAtStart(data.triggerState);

@@ -52,7 +52,7 @@ public class cvSignalGenerator : signalGenerator
         outVal = f;
     }
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         SetArrayToSingleValue(buffer, buffer.Length, outVal * rangeMultiplier);
     }

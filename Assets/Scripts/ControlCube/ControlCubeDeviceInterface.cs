@@ -92,13 +92,13 @@ public class ControlCubeDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         ControlCubeData data = d as ControlCubeData;
 
-        base.Load(data);
+        base.Load(data, copyMode);
 
-        for (int i = 0; i < 3; i++) outputs[i].ID = data.jackOutID[i];
+        for (int i = 0; i < 3; i++) outputs[i].SetID(data.jackOutID[i], copyMode);
         for (int i = 0; i < 3; i++) percent[i] = data.dimensionValues[i];
 
         Setup(percent);

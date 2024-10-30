@@ -227,7 +227,7 @@ public class waveTranscribeLooper : signalGenerator {
   double lastIncomingDspTime = -1;
   float[] oldBuffer;
   bool playingLastFrame = false;
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     int tempColumnMult = columnMult;
 
     if (lastIncomingDspTime == dspTime) {

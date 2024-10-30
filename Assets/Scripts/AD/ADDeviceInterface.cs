@@ -70,15 +70,15 @@ public class ADDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         ADData data = d as ADData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
-        input.ID = data.jackInID;
-        output.ID = data.jackOutID;
-        attackInput.ID = data.jackAttackInID;
-        releaseInput.ID = data.jackReleaseInID;
+        input.SetID(data.jackInID, copyMode);
+        output.SetID(data.jackOutID, copyMode);
+        attackInput.SetID(data.jackAttackInID, copyMode);
+        releaseInput.SetID(data.jackReleaseInID, copyMode);
 
         attackDial.setPercent(data.attackState);
         releaseDial.setPercent(data.releaseState);

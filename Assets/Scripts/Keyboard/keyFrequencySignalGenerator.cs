@@ -57,7 +57,7 @@ public class keyFrequencySignalGenerator : signalGenerator {
   }
   float filteredVal = 0;
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     KeyFrequencySignalGenerator(buffer, buffer.Length, channels, semitone, keyMultConst, ref filteredVal);
     recursionCheckPost();

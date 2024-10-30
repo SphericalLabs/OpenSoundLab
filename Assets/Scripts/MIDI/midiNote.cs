@@ -52,7 +52,7 @@ public class midiNote : signalGenerator {
   }
 
   public void UpdateJackID(int ID) {
-    if (ID != -1) jackOut.ID = ID;
+    if (ID != -1) jackOut.SetID(ID, false);
   }
 
   public int GetJackID() {
@@ -84,7 +84,7 @@ public class midiNote : signalGenerator {
     noteOn = on;
   }
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     SetArrayToSingleValue(buffer, buffer.Length, noteOn ? 1f : -1f);
   }
 }

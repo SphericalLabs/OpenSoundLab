@@ -42,13 +42,13 @@ public class artefactDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         ArtefactData data = d as ArtefactData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
-        input.ID = data.jackInID;
-        output.ID = data.jackOutID;
+        input.SetID(data.jackInID, copyMode);
+        output.SetID(data.jackOutID, copyMode);
 
         noiseDial.setPercent(data.noiseAmount);
         jitterDial.setPercent(data.jitterAmount);

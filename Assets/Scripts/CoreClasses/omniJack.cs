@@ -38,7 +38,25 @@ public class omniJack : manipObject
 
     public GameObject plugPrefab;
     public GameObject plugRep;
-    public int ID = -1;
+    private int _ID = -1;
+
+    public int ID
+    {
+        get { return _ID; }
+        private set { _ID = value; }
+    }
+
+    /// <summary>
+    /// Set copyMode to false if you actually want to set the field.
+    /// </summary>
+    /// <param name="newID">The new identifier to assign.</param>
+    /// <param name="copyMode">
+    /// Indicates if the operation is a copy. 
+    /// When <c>true</c>, the ID is not updated to prevent duplicate assignments.
+    /// </param>
+    public void SetID(int newID, bool copyMode){
+        if (!copyMode) ID = newID; // only set when loading, not when copying devices, otherwise multiple plugs in one jack can occur
+    }
 
     public signalGenerator signal, homesignal;
     //Material mat;

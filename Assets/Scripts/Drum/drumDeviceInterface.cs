@@ -73,13 +73,13 @@ public class drumDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     DrumData data = d as DrumData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
     ID = data.ID;
-    sampOut.ID = data.jackOutSampID;
-    sigOut.ID = data.jackOutSigID;
+    sampOut.SetID(data.jackOutSampID, copyMode);
+    sigOut.SetID(data.jackOutSigID, copyMode);
     samp.SetSample(data.tapeLabel, data.tapeFile);
   }
 

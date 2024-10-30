@@ -57,7 +57,7 @@ public class drumSignalGenerator : signalGenerator
         }
     }
 
-    public override void processBuffer(float[] buffer, double dspTime, int channels)
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         counter = DrumSignalGenerator(buffer, buffer.Length, channels, signalOn, counter);
         if (counter < 0)

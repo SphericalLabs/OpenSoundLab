@@ -794,10 +794,10 @@ public class sequencerCVDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         SequencerCVData data = d as SequencerCVData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
         // Grow to max size initially
         SetDimensions(maxRows, maxSteps);
@@ -815,7 +815,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             doModeSwitch(row);
         }
 
-        playTriggerInputJack.ID = data.jackTriggerInID;
+        playTriggerInputJack.SetID(data.jackTriggerInID, copyMode);
 
         for (int p = 0; p < maxPattern; p++)
         {
@@ -843,12 +843,12 @@ public class sequencerCVDeviceInterface : deviceInterface
 
         for (int rows = 0; rows < maxRows; rows++)
         {
-            jackOutTrigTrans[rows].GetComponentInChildren<omniJack>().ID = data.jackTriggerOutID[rows];
+            jackOutTrigTrans[rows].GetComponentInChildren<omniJack>().SetID(data.jackTriggerOutID[rows], copyMode);
         }
 
         for (int row = 0; row < maxRows; row++)
         {
-            jackOutCVTrans[row].GetComponentInChildren<omniJack>().ID = data.jackCvOutID[row];
+            jackOutCVTrans[row].GetComponentInChildren<omniJack>().SetID(data.jackCvOutID[row], copyMode);
         }
 
         beatSlider.setVal(data.sliderSpeed);

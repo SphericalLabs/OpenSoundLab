@@ -113,14 +113,14 @@ public class filterDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     FilterData data = d as FilterData;
-    base.Load(data);
+    base.Load(data, true);
 
     ID = data.ID;
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
-    controlInput.ID = data.jackControlInID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
+    controlInput.SetID(data.jackControlInID, copyMode);
 
     resonanceDial.setPercent(data.resonance);
     frequencyDial.setPercent(data.frequency);

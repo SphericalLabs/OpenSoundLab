@@ -270,13 +270,13 @@ public class keyboardDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         KeyboardData data = d as KeyboardData;
-        base.Load(data);
+        base.Load(data, true);
 
-        freqOutput.ID = data.freqOutID;
-        gateOutput.ID = data.gateOutID;
+        freqOutput.SetID(data.freqOutID, copyMode);
+        gateOutput.SetID(data.gateOutID, copyMode);
 
 
         if (data.midiInConnection != null & data.midiInConnection != "")

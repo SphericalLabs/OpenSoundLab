@@ -85,14 +85,14 @@ public class recorderDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     RecorderData data = d as RecorderData;
-    base.Load(data);
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
-    recordTrigger.ID = data.recordTriggerID;
-    playTrigger.ID = data.playTriggerID;
-    backTrigger.ID = data.backTriggerID;
+    base.Load(data, copyMode);
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
+    recordTrigger.SetID(data.recordTriggerID, copyMode);
+    playTrigger.SetID(data.playTriggerID, copyMode);
+    backTrigger.SetID(data.backTriggerID, copyMode);
     durSlider.setVal(data.dur);
     normalizeSwitch.setSwitch(data.normalize, true);
     buttons[5].setOnAtStart(data.mutedState);

@@ -59,7 +59,7 @@ public class timelineTrackSignalGenerator : signalGenerator {
   }
 
   float lastBuffer = 0;
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
 
     if (incoming != null) {
       incoming.processBuffer(buffer, dspTime, channels);

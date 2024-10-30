@@ -55,12 +55,12 @@ public class polarizerDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     PolarizerData data = d as PolarizerData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
 
     uni2biSelector.setSwitch(data.switchState);
   }

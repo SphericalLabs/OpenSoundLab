@@ -138,7 +138,7 @@ public class xylorollSignalGenerator : signalGenerator {
     for (int i = 0; i < voices.Count; i++) voices[i].key.updateOctave(val);
   }
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     for (int i = 0; i < buffer.Length; i++) buffer[i] = 0;
 
     float[] b1 = new float[buffer.Length];

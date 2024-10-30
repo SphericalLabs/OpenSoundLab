@@ -77,14 +77,14 @@ public class freeverbDeviceInterface : deviceInterface {
         return data;
     }
 
-    public override void Load(InstrumentData d) {
+    public override void Load(InstrumentData d, bool copyMode) {
         FreeverbData data = d as FreeverbData;
-        base.Load(data);
-        omniJackIn.ID = data.jackInID;
-        omniJackOut.ID = data.jackOutID;
-        omniJackModSize.ID = data.cSizeID;
-        omniJackModFreeze.ID = data.cFreezeID;
-        omniJackModMix.ID = data.cMixID;
+        base.Load(data, true);
+        omniJackIn.SetID(data.jackInID, copyMode);
+        omniJackOut.SetID(data.jackOutID, copyMode);
+        omniJackModSize.SetID(data.cSizeID, copyMode);
+        omniJackModFreeze.SetID(data.cFreezeID, copyMode);
+        omniJackModMix.SetID(data.cMixID, copyMode);
 
         size.setPercent(data.size);
         damping.setPercent(data.size);

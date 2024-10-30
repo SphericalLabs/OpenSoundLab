@@ -38,9 +38,10 @@ public class omniPlug : manipObject
     public bool outputPlug = false;
     public omniJack connected;
 
-    Color cordColor;
     LineRenderer lr;
     public Material omniCableMat, omniCableSelectedMat;
+    public Material omniCableViz;
+
     //Material mat;
 
     public Transform plugTrans;
@@ -69,19 +70,11 @@ public class omniPlug : manipObject
     {
         base.Awake();
         gameObject.layer = 12; //jacks
-                               //mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
         lr = GetComponent<LineRenderer>();
 
         plugMeshFilter = this.GetComponentInChildren<MeshFilter>();
 
-        cordColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-        //lr.material.SetColor("_TintColor", cordColor);
-        //mat.SetColor("_TintColor", cordColor);
-        //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
         mouseoverFeedback.SetActive(false);
-
-        //plugTrans = transform.GetChild(0);
-        //wireTrans = transform.GetChild(1);
 
         onEndGrabEvents.AddListener(RemovePlugFromHand);
 
@@ -89,35 +82,39 @@ public class omniPlug : manipObject
         {
             if (!masterControl.instance.jacksEnabled) GetComponent<Collider>().enabled = false;
         }
+
+        omniCableViz = new Material(omniCableMat); // copy the base material
+        vizColor = new Color(0f, 0f, 0f);
+        
+    }
+
+    public void activateWireMode(WireMode mode){
+        if (outputPlug)
+        {
+            updateLineType();
+            if (mode == WireMode.Visualized){
+                lr.material = omniCableViz;
+            } else {
+                lr.material = omniCableMat;
+            }
+        }
+        
     }
 
     public void Setup(float c, bool outputting, omniPlug other)
     {
-        //Color jackColor = Color.HSVToRGB(c, .8f, .5f);
-        //cordColor = Color.HSVToRGB(c, .8f, .2f);
-
-        //mat.SetColor("_TintColor", jackColor);
-        //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", jackColor);
 
         outputPlug = outputting;
         otherPlug = other;
 
         if (outputPlug)
         {
-            //lr.material.SetColor("_TintColor", cordColor);
             plugPath.Add(otherPlug.wireTrans.position);
 
             updateLineVerts();
             lastOtherPlugPos = otherPlug.transform.position;
         }
     }
-
-    public void setLineColor(Color c)
-    {
-        cordColor = c;
-        //lr.material.SetColor("_TintColor", c);
-    }
-
     
 
     public PlugData GetData()
@@ -130,8 +127,8 @@ public class omniPlug : manipObject
         data.outputPlug = outputPlug;
         data.connected = connected.transform.GetInstanceID();
         data.otherPlug = otherPlug.transform.GetInstanceID();
-        data.plugPath = plugPath.ToArray();
-        data.cordColor = cordColor;
+        data.plugPath = plugPath.ToArray(); // todo: get rid of plugPath saving
+        data.cordColor = Color.black; // todo: remove this without breaking xmls
 
         return data;
     }
@@ -153,7 +150,6 @@ public class omniPlug : manipObject
             return;
         }
 
-        bool noChange = true;
         
         if (curState == manipState.grabbed)
         {
@@ -187,7 +183,7 @@ public class omniPlug : manipObject
             lastPos = transform.position;
         }
 
-        if (outputPlug)
+        if (outputPlug) // output plugs are rendered
         {
             if ((curState != manipState.grabbed && otherPlug.curState != manipState.grabbed)
                  && (Vector3.Distance(plugPath.Last(), transform.position) > .002f)
@@ -196,58 +192,55 @@ public class omniPlug : manipObject
                 Vector3 a = wireTrans.position - plugPath.Last();
                 Vector3 b = otherPlug.wireTrans.transform.position - plugPath[0];
                 for (int i = 0; i < plugPath.Count; i++) plugPath[i] += Vector3.Lerp(b, a, (float)i / (plugPath.Count - 1));
-                noChange = false;
             }
 
-            if (updateLineNeeded)
+            if (!isHighlighted && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
             {
-                if (Vector3.Distance(plugPath.Last(), transform.position) > .005f)
-                {
-                    plugPath.Add(wireTrans.position);
-                    calmTime = 0;
-                    noChange = false;
-                }
+                lr.material.SetColor(
+                    "_BaseColor",
+                    mapValueToColor(
+                        // look at two previous buffers, since otherwise single triggers might not be visualized correctly, ca. 90hz for audio network and 72hz for graphics can lead to missed trigs
+                        Mathf.Clamp( connected.signal.firstSample != 0f ? connected.signal.firstSample : connected.signal.prevFirstSample, 
+                            -1f, 1f)
+                        )
+                    );
             }
-
-            if (plugPath[0] != otherPlug.wireTrans.transform.position)
-            {
-                if (Vector3.Distance(plugPath[0], transform.position) > .005f)
-                {
-                    plugPath.Insert(0, otherPlug.wireTrans.position);
-                    calmTime = 0;
-                    noChange = false;
-                }
-            }
-
-            //lrFlowEffect();
-
-            //if (!noChange)
-            //{
-            //    calming();
-            //    updateLineVerts(); // todo: cleanup
-            //}
 
             updateLineVerts();
-            //if (noChange) calmLine();
-
         }
+    }
+
+    Color vizColor;
+    float sign;
+    float absVal;
+    float cubeRoot;
+
+    private Color mapValueToColor(float val)
+    {
+        val = posNegRoot(val, 0.5f); // add some logarithmic stretching, otherwise audio signals and pitch cvs tend to be too dark
+        vizColor.r = val > 0f ? val : 0f; // red for positive
+        vizColor.b = val < 0f ? -val : 0f; // minus for negative
+        return vizColor;
+    }
+
+    private float posNegRoot(float x, float exponent)
+    {
+        if (x == 0f) return 0f; // Handle zero explicitly to avoid unnecessary calculations
+
+        sign = Mathf.Sign(x);
+        absVal = Mathf.Abs(x);
+        cubeRoot = Mathf.Pow(absVal, exponent); // More accurate exponent for cube root
+
+        return sign * cubeRoot;
     }
 
     public void UpdateLineRendererWidth()
     {
 
-        if (otherPlug != null) lr.startWidth = otherPlug.plugTrans.transform.lossyScale.x * 0.010f;
-        lr.endWidth = plugTrans.transform.lossyScale.x * 0.010f;
+        lr.startWidth = plugTrans.transform.lossyScale.x * 0.010f;
+        if (otherPlug != null) lr.endWidth = otherPlug.plugTrans.transform.lossyScale.x * 0.010f;
     }
 
-
-    float flowVal = 0;
-    void lrFlowEffect()
-    {
-        flowVal = Mathf.Repeat(flowVal - Time.deltaTime, 1);
-        //lr.material.mainTextureOffset = new Vector2(flowVal, 0);
-        //lr.material.SetFloat("_EmissionGain", .1f);
-    }
 
     Transform closestJack;
     float jackDist = 0;
@@ -279,64 +272,10 @@ public class omniPlug : manipObject
 
     float calmingConstant = .5f;
 
-    void calming()
-    {
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                Vector3 dest = (plugPath[i - 1] + plugPath[i] + plugPath[i + 1]) / 3;
-                plugPath[i] = Vector3.Lerp(plugPath[i], dest, calmingConstant);
-            }
-        }
-
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                if (Vector3.Distance(plugPath[i - 1], plugPath[i]) < .01f) plugPath.RemoveAt(i);
-            }
-        }
-
-        updateLineVerts();
-    }
-
+   
     public void OnDestroy() { }
 
-    void calmLine()
-    {
-        if (calmTime == 1)
-        {
-            return;
-        }
-
-        Vector3 beginPoint = plugPath[0];
-        Vector3 endPoint = plugPath.Last();
-
-        calmTime = Mathf.Clamp01(calmTime + Time.deltaTime / 1.5f);
-
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                Vector3 dest = (plugPath[i - 1] + plugPath[i] + plugPath[i + 1]) / 3;
-                plugPath[i] = Vector3.Lerp(plugPath[i], dest, Mathf.Lerp(calmingConstant, 0, calmTime));
-            }
-        }
-
-        for (int i = 0; i < plugPath.Count; i++)
-        {
-            if (i != 0 && i != plugPath.Count - 1)
-            {
-                if (Vector3.Distance(plugPath[i - 1], plugPath[i]) < .01f) plugPath.RemoveAt(i);
-            }
-        }
-        plugPath[0] = beginPoint;
-        plugPath[plugPath.Count - 1] = endPoint;
-        updateLineVerts();
-    }
-
-
+    
     public void updateLineType()
     {
         updateLineVerts();
@@ -348,23 +287,23 @@ public class omniPlug : manipObject
     {
         if (!outputPlug) return; // only outputPlugs use their LineRenderers
 
-        if (masterControl.instance.WireSetting == WireMode.Curved)
+        if (masterControl.instance.WireSetting == WireMode.Curved) // deprecated
         {
             lr.positionCount = plugPath.Count;
             if (justLast) lr.SetPosition(plugPath.Count - 1, plugPath.Last());
             else lr.SetPositions(plugPath.ToArray());
         }
-        else if (masterControl.instance.WireSetting == WireMode.Straight && plugPath.Count >= 2)
+        else if ( (masterControl.instance.WireSetting == WireMode.Straight || masterControl.instance.WireSetting == WireMode.Visualized))
         {
             lr.positionCount = 2;
-            lr.SetPosition(0, plugPath[0]);
-            lr.SetPosition(1, plugPath.Last());
+            lr.SetPosition(0, wireTrans.position);
+            if (otherPlug != null) lr.SetPosition(1, otherPlug.wireTrans.position);
         }
         else if (forcedWireShow)
         {
             lr.positionCount = 2;
-            lr.SetPosition(0, plugPath[0]);
-            lr.SetPosition(1, plugPath.Last());
+            lr.SetPosition(0, wireTrans.position);
+            if (otherPlug != null) lr.SetPosition(1, otherPlug.wireTrans.position);
         }
         else // WireMode.Invisible
         {
@@ -568,7 +507,6 @@ public class omniPlug : manipObject
     }
 
 
-
     // When removing a plug but still holding on to it
     void endConnection()
     {
@@ -649,7 +587,6 @@ public class omniPlug : manipObject
                 // grabbing a freshly spawned far plug or a plug that was already connected
                 Transform grabReference = connected == null ? gazedObjectTracker.Instance.gazedAtManipObject.transform : connected.transform;
 
-
                 // translate based on reference, in this case for gaze-based remote patching          
                 transform.position = grabReference.transform.position + grabReference.transform.up * -0.075f;
                 gazeBasedPosRotStart();
@@ -668,7 +605,6 @@ public class omniPlug : manipObject
 
         updateJackList();
 
-        //foreach (omniJack j in targetJackList) j.flash(cordColor); 
 
     }
 
@@ -730,9 +666,10 @@ public class omniPlug : manipObject
 
     }
 
-
+    bool isHighlighted = false;
     public void setCableHighlighted(bool on)
     {
+        isHighlighted = on;
         lr.sharedMaterial = on ? omniCableSelectedMat : omniCableMat;
     }
 

@@ -72,10 +72,10 @@ public class touchpadDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     TouchPadData data = d as TouchPadData;
-    base.Load(data);
-    output.ID = data.jackOutID;
+    base.Load(data, copyMode);
+    output.SetID(data.jackOutID, copyMode);
   }
 }
 

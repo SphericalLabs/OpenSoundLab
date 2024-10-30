@@ -61,13 +61,13 @@ public class vcaDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     vcaData data = d as vcaData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
-    controlInput.ID = data.jackControlID;
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
+    controlInput.SetID(data.jackControlID, copyMode);
 
     ampDial.setPercent(data.dialState);
 

@@ -76,7 +76,7 @@ public class deviceInterface : componentInterface {
     data.ID = transform.GetInstanceID();
   }
 
-  public virtual void Load(InstrumentData data) {
+  public virtual void Load(InstrumentData data, bool copyMode) {
     transform.localPosition = data.position;
     transform.localRotation = data.rotation;
     transform.localScale = data.scale;

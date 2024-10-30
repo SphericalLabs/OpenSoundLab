@@ -62,11 +62,11 @@ public class reverbDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     ReverbData data = d as ReverbData;
-    base.Load(data);
-    input.ID = data.jackInID;
-    output.ID = data.jackOutID;
+    base.Load(data, copyMode);
+    input.SetID(data.jackInID, copyMode);
+    output.SetID(data.jackOutID, copyMode);
 
     level.setPercent(data.dialState);
     reverbControl.setPercent(data.reverbPercent);

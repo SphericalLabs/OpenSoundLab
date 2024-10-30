@@ -470,28 +470,26 @@ public class masterControl : MonoBehaviour {
         omniPlug[] plugs = FindObjectsOfType<omniPlug>();
         for (int i = 0; i < plugs.Length; i++)
         {
-            if(plugs[i].outputPlug) plugs[i].updateLineType();
+            plugs[i].activateWireMode(WireSetting);
         }
 
         onWireChangedEvent.Invoke();
     }
 
-    //public void nextWireSetting()
-    //{
-    //  updateWireSetting((WireSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(WireMode)).Length);
-    //}
-
-    // avoid curved for now until path points are synced
     public void nextWireSetting()
     {
-        if (WireSetting == WireMode.Straight || WireSetting == WireMode.Curved)
-        {
-            updateWireSetting((int)WireMode.Invisible);
-        }
-        else
-        {
-            updateWireSetting((int)WireMode.Straight);
-        }
+        // Get the total number of WireMode enum values
+        int totalModes = System.Enum.GetNames(typeof(WireMode)).Length;
+
+        // Get the current WireSetting as an integer
+        int currentSetting = (int)WireSetting;
+
+        // Calculate the next setting, ensuring it skips 0 and wraps around properly
+        // Avoid curved for now until path points are synced
+        int nextSetting = (currentSetting % (totalModes - 1)) + 1;
+
+        // Update the WireSetting with the new value
+        updateWireSetting(nextSetting);
     }
 
 
@@ -513,6 +511,7 @@ public enum WireMode
 {
     Curved,
     Straight,
+    Visualized,
     Invisible
 };
 public enum DisplayMode

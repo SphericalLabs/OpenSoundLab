@@ -477,10 +477,10 @@ public class xylorollDeviceInterface : deviceInterface
         return data;
     }
 
-    public override void Load(InstrumentData d)
+    public override void Load(InstrumentData d, bool copyMode)
     {
         XyloRollData data = d as XyloRollData;
-        base.Load(data);
+        base.Load(data, copyMode);
 
         for (int i = 0; i < 3; i++) _adsrInterface.xyHandles[i].setPercent(data.ADSRdata[i]);
         _adsrInterface.setDefaults = false;
@@ -510,7 +510,7 @@ public class xylorollDeviceInterface : deviceInterface
             _midiOut.ConnectByName(data.midiOutConnection);
         }
 
-        output.ID = data.jackOutID;
+        output.SetID(data.jackOutID, copyMode);
 
         if (data.timelinePresent)
         {
@@ -528,7 +528,7 @@ public class xylorollDeviceInterface : deviceInterface
         }
         else
         {
-            if (data.seqInID != 0) _timeline.playInput.ID = data.seqInID;
+            if (data.seqInID != 0) _timeline.playInput.SetID(data.seqInID, copyMode);
         }
         selectedKeys = data.selectedKeys;
 

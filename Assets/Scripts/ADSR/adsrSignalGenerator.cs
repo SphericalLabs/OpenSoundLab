@@ -166,7 +166,7 @@ public class adsrSignalGenerator : signalGenerator {
   int curFrame = 0;
   int frameCount = 0;
   bool markForReleaseInNextFrame = false; // workaround, ADSRSignalGenerator expects to be released not 1 sample, but one buffer later...
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
     if (markForReleaseInNextFrame){

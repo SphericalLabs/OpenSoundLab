@@ -32,7 +32,7 @@ using UnityEngine;
 public class airhornSignalGenerator : signalGenerator {
   public clipPlayerSimple curPlayer;
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     curPlayer.processBuffer(buffer, dspTime, channels);
   }
 }

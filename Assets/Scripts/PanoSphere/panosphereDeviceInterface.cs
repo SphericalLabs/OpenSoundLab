@@ -98,9 +98,9 @@ public class panosphereDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     PanoData data = d as PanoData;
-    base.Load(data);
+    base.Load(data, copyMode);
     imageLoad.instance.addPano(this);
     loadImage(data.filename);
     showButton.startToggled = data.active;

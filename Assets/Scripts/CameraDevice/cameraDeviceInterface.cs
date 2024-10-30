@@ -156,7 +156,7 @@ public class cameraDeviceInterface : deviceInterface {
     data.deviceType = DeviceType.Camera;
     GetTransformData(data);
 
-    data.inputID = input.transform.GetInstanceID();
+    data.jackInput = input.transform.GetInstanceID();
 
     data.screenPosition = screenTrans.localPosition;
     data.screenRotation = screenTrans.localRotation;
@@ -165,16 +165,16 @@ public class cameraDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     CameraData data = d as CameraData;
-    base.Load(data);
+    base.Load(data, true);
 
     previewButton.startToggled = !data.screenDisabled;
 
     screenTrans.localPosition = data.screenPosition;
     screenTrans.localRotation = data.screenRotation;
     screenTrans.localScale = data.screenScale;
-    input.ID = data.inputID;
+    input.SetID(data.jackInput, copyMode);
   }
 }
 
@@ -182,6 +182,6 @@ public class CameraData : InstrumentData {
   public Vector3 screenPosition;
   public Vector3 screenScale;
   public Quaternion screenRotation;
-  public int inputID;
+  public int jackInput;
   public bool screenDisabled;
 }

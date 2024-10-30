@@ -128,9 +128,9 @@ public class timelineDeviceInterface : deviceInterface {
     return data;
   }
 
-  public override void Load(InstrumentData d) {
+  public override void Load(InstrumentData d, bool copyMode) {
     TimelineData data = d as TimelineData;
-    base.Load(data);
+    base.Load(data, copyMode);
 
     _timeline.SetTimelineData(data.timelineData);
 

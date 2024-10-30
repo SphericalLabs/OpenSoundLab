@@ -42,7 +42,7 @@ public class DCSignalGenerator : signalGenerator
   [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-  public override void processBuffer(float[] buffer, double dspTime, int channels)
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels)
   {
 
     if (incoming != null) // attennuverter mode
