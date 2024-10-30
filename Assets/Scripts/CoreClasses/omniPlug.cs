@@ -127,7 +127,7 @@ public class omniPlug : manipObject
         data.outputPlug = outputPlug;
         data.connected = connected.transform.GetInstanceID();
         data.otherPlug = otherPlug.transform.GetInstanceID();
-        data.plugPath = plugPath.ToArray();
+        data.plugPath = plugPath.ToArray(); // todo: get rid of plugPath saving
         data.cordColor = Color.black; // todo: remove this without breaking xmls
 
         return data;
@@ -237,8 +237,8 @@ public class omniPlug : manipObject
     public void UpdateLineRendererWidth()
     {
 
-        if (otherPlug != null) lr.startWidth = otherPlug.plugTrans.transform.lossyScale.x * 0.010f;
-        lr.endWidth = plugTrans.transform.lossyScale.x * 0.010f;
+        lr.startWidth = plugTrans.transform.lossyScale.x * 0.010f;
+        if (otherPlug != null) lr.endWidth = otherPlug.plugTrans.transform.lossyScale.x * 0.010f;
     }
 
 
