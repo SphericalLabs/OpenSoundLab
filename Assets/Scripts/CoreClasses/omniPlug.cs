@@ -70,19 +70,11 @@ public class omniPlug : manipObject
     {
         base.Awake();
         gameObject.layer = 12; //jacks
-                               //mat = transform.GetChild(0).GetChild(0).GetComponent<Renderer>().material;
         lr = GetComponent<LineRenderer>();
 
         plugMeshFilter = this.GetComponentInChildren<MeshFilter>();
 
-        
-        //lr.material.SetColor("_TintColor", cordColor);
-        //mat.SetColor("_TintColor", cordColor);
-        //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", cordColor);
         mouseoverFeedback.SetActive(false);
-
-        //plugTrans = transform.GetChild(0);
-        //wireTrans = transform.GetChild(1);
 
         onEndGrabEvents.AddListener(RemovePlugFromHand);
 
@@ -111,18 +103,12 @@ public class omniPlug : manipObject
 
     public void Setup(float c, bool outputting, omniPlug other)
     {
-        //Color jackColor = Color.HSVToRGB(c, .8f, .5f);
-        //cordColor = Color.HSVToRGB(c, .8f, .2f);
-
-        //mat.SetColor("_TintColor", jackColor);
-        //mouseoverFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", jackColor);
 
         outputPlug = outputting;
         otherPlug = other;
 
         if (outputPlug)
         {
-            //lr.material.SetColor("_TintColor", cordColor);
             plugPath.Add(otherPlug.wireTrans.position);
 
             updateLineVerts();
@@ -164,7 +150,6 @@ public class omniPlug : manipObject
             return;
         }
 
-        bool noChange = true;
         
         if (curState == manipState.grabbed)
         {
@@ -207,32 +192,7 @@ public class omniPlug : manipObject
                 Vector3 a = wireTrans.position - plugPath.Last();
                 Vector3 b = otherPlug.wireTrans.transform.position - plugPath[0];
                 for (int i = 0; i < plugPath.Count; i++) plugPath[i] += Vector3.Lerp(b, a, (float)i / (plugPath.Count - 1));
-                noChange = false;
             }
-
-            //if (updateLineNeeded)
-            //if(true)
-            //{
-            //    if (Vector3.Distance(plugPath.Last(), transform.position) > .005f)
-            //    {
-            //        plugPath[plugPath.Count - 1] = wireTrans.position;
-            //plugPath[0] = otherPlug.wireTrans.position;
-            ////plugPath.Add(wireTrans.position);
-            //calmTime = 0;
-            //        noChange = false;
-            //    //}
-
-            //    //if (plugPath[0] != otherPlug.wireTrans.transform.position)
-            //    //{
-            //    //    if (Vector3.Distance(plugPath[0], transform.position) > .005f)
-            //    //    {
-            //            //plugPath[0] = otherPlug.wireTrans.position;
-            //            //plugPath.Insert(0, otherPlug.wireTrans.position);
-            //            calmTime = 0;
-            //            noChange = false;
-                    //}
-                //}
-            //}
 
             if (!isHighlighted && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
             {
@@ -246,9 +206,7 @@ public class omniPlug : manipObject
                     );
             }
 
-            
             updateLineVerts();
-
         }
     }
 
@@ -283,14 +241,6 @@ public class omniPlug : manipObject
         lr.endWidth = plugTrans.transform.lossyScale.x * 0.010f;
     }
 
-
-    float flowVal = 0;
-    void lrFlowEffect()
-    {
-        flowVal = Mathf.Repeat(flowVal - Time.deltaTime, 1);
-        //lr.material.mainTextureOffset = new Vector2(flowVal, 0);
-        //lr.material.SetFloat("_EmissionGain", .1f);
-    }
 
     Transform closestJack;
     float jackDist = 0;
@@ -557,7 +507,6 @@ public class omniPlug : manipObject
     }
 
 
-
     // When removing a plug but still holding on to it
     void endConnection()
     {
@@ -638,7 +587,6 @@ public class omniPlug : manipObject
                 // grabbing a freshly spawned far plug or a plug that was already connected
                 Transform grabReference = connected == null ? gazedObjectTracker.Instance.gazedAtManipObject.transform : connected.transform;
 
-
                 // translate based on reference, in this case for gaze-based remote patching          
                 transform.position = grabReference.transform.position + grabReference.transform.up * -0.075f;
                 gazeBasedPosRotStart();
@@ -657,7 +605,6 @@ public class omniPlug : manipObject
 
         updateJackList();
 
-        //foreach (omniJack j in targetJackList) j.flash(cordColor); 
 
     }
 
