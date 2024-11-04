@@ -15,7 +15,7 @@ This repository is work-in-progress. Please always link to this repository if yo
 OpenSoundLab will be available at Meta Quest's Early Access soon. We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub. 
 
 ### Build instructions
-* Download one the latest tagged version from the releases https://github.com/SphericalLabs/OpenSoundLab/releases and unzip it
+* Download the latest tagged version from the releases https://github.com/SphericalLabs/OpenSoundLab/releases and unzip it
 * Alternatively, you can clone the repository and checkout the desired tag manually
 ```
 git clone https://github.com/SphericalLabs/OpenSoundLab
@@ -31,10 +31,10 @@ git checkout DESIRED_TAG
 * Add the downloaded repository (the folder containing Assets, OSLNative, etc.) to the Unity Hub: Projects > Add Project from Disk (click the triangle for that)
 * Click the editor version of the added repository and select Unity v2022.3.20f1 for Android
 * Open the project for the first time, this might take some time
+* Unity might ask you to restart when done importing, click Restart Editor
 * Make sure that the developer mode is activated on the headset
 * Connect your Meta Quest headset via USB
-* If connected for the first time, put on the headset and to accept the connection to the computer
-* Unity might ask you for a restart when done importing, click Restart Editor
+* If connected for the first time, put on the headset and accept the connection to the computer
 * If you want to use Unity Relay, you have to set up a Unity Project ID and add that in Project Settings > Services
 * In Unity, click File > Build Settings
 * Check if your headset is listed at "Run Device"
