@@ -20,9 +20,10 @@ public class NetworkMenuManager : MonoBehaviour
     private bool clientGotStopped = false;
 
     public static string relayCode = "";
+    private bool autoConnectToLastServer = false;
+    private string lastServerAddress = "";
 
     public string userName;
-
     readonly Dictionary<long, OSLServerResonse> discoveredServers = new Dictionary<long, OSLServerResonse>();
 
     [Header("UI")]
@@ -35,6 +36,7 @@ public class NetworkMenuManager : MonoBehaviour
     [SerializeField] private GameObject connectToRelayButton;
     [SerializeField] private TMP_Text ipAdressText;
     [SerializeField] private Toggle discoverableToggle;
+    [SerializeField] private Toggle connectToLastServerToggle;
 
     [Header("Relay Host Menu")]
     [SerializeField] private Transform relayHostMenuParent;
@@ -87,10 +89,12 @@ public class NetworkMenuManager : MonoBehaviour
             else
             {
                 discoverableToggle.SetIsOnWithoutNotify(networkDiscovery.isDiscoverable);
+                connectToLastServerToggle.SetIsOnWithoutNotify(autoConnectToLastServer);
                 networkManager.StartHost();
                 ActivateHostUI();
                 yield return new WaitForSeconds(0.5f);
                 networkDiscovery.AdvertiseServer();
+                networkDiscovery.StartDiscovery();
             }
         }
 
@@ -136,6 +140,7 @@ public class NetworkMenuManager : MonoBehaviour
         }
         yield return new WaitForSeconds(0.5f);
         networkDiscovery.AdvertiseServer();
+        networkDiscovery.StartDiscovery();
     }
 
 
@@ -237,6 +242,7 @@ public class NetworkMenuManager : MonoBehaviour
         clientGotStopped = false;
         networkDiscovery.StopDiscovery();
         networkManager.StartClient(info.uri);
+        lastServerAddress = info.EndPoint.Address.ToString();
     }
 
     public void OnChangeRelayCodeValue(string value)
@@ -384,6 +390,11 @@ public class NetworkMenuManager : MonoBehaviour
         ipAdressText.text = $"Your Address: {IPManager.GetLocalIPAddress()}";
     }
 
+    public void SetAutoConnectToLastServer(bool value)
+    {
+        autoConnectToLastServer = value;
+    }
+
     public void ActivateClientUI()
     {
         hostMenuParent.gameObject.SetActive(false);
@@ -420,6 +431,13 @@ public class NetworkMenuManager : MonoBehaviour
     //create running server button
     public void CreateServerDiscoveryButton(OSLServerResonse info)
     {
+        Debug.Log(($"Auto connect {autoConnectToLastServer} last ip {lastServerAddress}, new ip {info.EndPoint.Address}"));
+        if (autoConnectToLastServer && lastServerAddress == info.EndPoint.Address.ToString())
+        {
+            JoinLocalHost(info);
+            return;
+        }
+        
         GameObject obj = Instantiate(discoveryButtonPrefab, discoveryButtonParent);
         TMP_Text[] objText = obj.GetComponentsInChildren<TMP_Text>();
         if(info.userName.Length > 0)
