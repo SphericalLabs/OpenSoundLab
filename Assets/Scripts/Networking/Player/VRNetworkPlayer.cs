@@ -31,6 +31,9 @@ public class VRNetworkPlayer : NetworkBehaviour
     private manipulator leftHandManipulator;
     private manipulator rightHandManipulator;
 
+    [SyncVar(hook = nameof(OnUserNameChanged))]
+    public string userName;
+
     [Header("Manipulators")]
     [SyncVar (hook = nameof(OnLeftHandManipulatorTriggerd))]
     public bool leftHandManipulatorTriggerd;
@@ -70,6 +73,7 @@ public class VRNetworkPlayer : NetworkBehaviour
         if (NetworkMenuManager.Instance != null)
         {
             NetworkMenuManager.Instance.localPlayer = this;
+            ChangeUserName(NetworkMenuManager.Instance.userName);
         }
 
         //deactivate meshrenderers
@@ -130,6 +134,29 @@ public class VRNetworkPlayer : NetworkBehaviour
                 OnVoiceChatIDChanged(voiceChatAgentID, voiceChatAgentID);
             }
         }
+    }
+
+    public void ChangeUserName(string newUserName)
+    {
+        if (isServer)
+        {
+            userName = newUserName;
+        }
+        else
+        {
+            CmdChangeUserName(newUserName);
+        }
+    }
+
+    [Command (requiresAuthority = false)]
+    public void CmdChangeUserName(string newUserName)
+    {
+        userName = newUserName;
+    }
+
+    public void OnUserNameChanged(string oldValue, string newValue)
+    {
+        //todo update text
     }
 
     // Update is called once per frame

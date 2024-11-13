@@ -328,7 +328,10 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             CheckForCloseOnInactivityTimeExpired();
         }
 
-        private void UpdateCaretPosition(int newPos) => InputField.caretPosition = newPos;
+        private void UpdateCaretPosition(int newPos)
+        {
+            InputField.caretPosition = newPos;
+        }
 
 
         /// <summary>
@@ -636,6 +639,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             m_CaretPosition = InputField.caretPosition;
 
             InputField.text = InputField.text.Insert(m_CaretPosition, value);
+            
             m_CaretPosition += value.Length;
 
             UpdateCaretPosition(m_CaretPosition);

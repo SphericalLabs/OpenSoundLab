@@ -16,14 +16,17 @@ public class NetworkMenuManager : MonoBehaviour
     [SerializeField] private bool createHostOnStart = true;
     [SerializeField] private bool isRelayScene = true;
     [SerializeField] private NetworkManager networkManager;
-    [SerializeField] private NetworkDiscovery networkDiscovery;
+    [SerializeField] private OSLNetworkDiscovery networkDiscovery;
     private bool clientGotStopped = false;
 
     public static string relayCode = "";
 
-    readonly Dictionary<long, ServerResponse> discoveredServers = new Dictionary<long, ServerResponse>();
+    public string userName;
+
+    readonly Dictionary<long, OSLServerResonse> discoveredServers = new Dictionary<long, OSLServerResonse>();
 
     [Header("UI")]
+    [SerializeField] private TMP_InputField userNameInputField;
     [Header("Host Menu")]
     [SerializeField] private Transform hostMenuParent;
     [SerializeField] private Transform discoveryButtonParent;
@@ -53,6 +56,7 @@ public class NetworkMenuManager : MonoBehaviour
     // Start is called before the first frame update
     IEnumerator Start()
     {
+        LoadUserName();
         if (relayCodeInputField != null && relayCode.Length > 0)
         {
             relayCodeInputField.SetTextWithoutNotify(relayCode);
@@ -82,7 +86,7 @@ public class NetworkMenuManager : MonoBehaviour
             }
             else
             {
-                discoverableToggle.SetIsOnWithoutNotify(((OSLNetworkDiscovery)networkDiscovery).isDiscoverable);
+                discoverableToggle.SetIsOnWithoutNotify(networkDiscovery.isDiscoverable);
                 networkManager.StartHost();
                 ActivateHostUI();
                 yield return new WaitForSeconds(0.5f);
@@ -168,7 +172,7 @@ public class NetworkMenuManager : MonoBehaviour
     }
 
 
-    public void OnDiscoveredServer(ServerResponse info)
+    public void OnDiscoveredServer(OSLServerResonse info)
     {
         Debug.Log("On discover servers");
         discoveredServers[info.serverId] = info;
@@ -176,8 +180,17 @@ public class NetworkMenuManager : MonoBehaviour
         DeleteAllServerDiscoveryButtons();
 
         //create a UI button if a server get discoverd
-        foreach (ServerResponse newinfo in discoveredServers.Values)
-            CreateServerDiscoveryButton(newinfo);
+        foreach (OSLServerResonse newinfo in discoveredServers.Values)
+        {
+            if (newinfo.version == Application.version)
+            {
+                CreateServerDiscoveryButton(newinfo);
+            }
+            else
+            {
+                Debug.Log($"Host {newinfo.userName} and ip {info.EndPoint.Address} has a different verion number {newinfo.version}, so you can't connect to it");
+            }
+        }
     }
 
     public void FindServer()
@@ -200,13 +213,13 @@ public class NetworkMenuManager : MonoBehaviour
         DeleteAllServerDiscoveryButtons();
     }
 
-    public void JoinLocalHost(ServerResponse info)
+    public void JoinLocalHost(OSLServerResonse info)
     {
         networkManager.StopHost();
         StartCoroutine(JoinLocalHostWaitTime(info));
     }
 
-    private IEnumerator JoinLocalHostWaitTime(ServerResponse info)
+    private IEnumerator JoinLocalHostWaitTime(OSLServerResonse info)
     {
         while (networkManager.isNetworkActive)
         {
@@ -384,35 +397,6 @@ public class NetworkMenuManager : MonoBehaviour
         clientMenuParent.gameObject.SetActive(false);
     }
 
-    /*
-    void OnGUI()
-    {
-        GUILayout.BeginArea(new Rect(10, 10, 300, 500));
-
-        GUILayout.Label($"Discovered Servers [{discoveredServers.Count}]:");
-
-        StatusLabels();
-
-        GUILayout.EndArea();
-    }
-
-    void StatusLabels()
-    {
-        // server / client status message
-        if (NetworkServer.active)
-        {
-            GUILayout.Label("Server: active. Transport: " + Transport.activeTransport);
-            if (networkManager.IsRelayEnabled())
-            {
-                GUILayout.Label("Relay enabled. Join code: " + networkManager.relayJoinCode);
-            }
-        }
-        if (NetworkClient.isConnected)
-        {
-            GUILayout.Label("Client: address = " + IPManager.GetLocalIPAddress());
-        }
-    }*/
-
     public void DeleteAllServerDiscoveryButtons()
     {
         for (int i = discoveryButtonParent.childCount; i > 0; i--)
@@ -422,14 +406,49 @@ public class NetworkMenuManager : MonoBehaviour
     }
 
     //create running server button
-    public void CreateServerDiscoveryButton(ServerResponse info)
+    public void CreateServerDiscoveryButton(OSLServerResonse info)
     {
-        GameObject obj = GameObject.Instantiate(discoveryButtonPrefab, discoveryButtonParent);
-        TMP_Text objText = obj.GetComponentInChildren<TMP_Text>();
-        objText.text = info.EndPoint.Address.ToString();
+        GameObject obj = Instantiate(discoveryButtonPrefab, discoveryButtonParent);
+        TMP_Text[] objText = obj.GetComponentsInChildren<TMP_Text>();
+        if(info.userName.Length > 0)
+        {
+            objText[0].text = info.userName;
+            objText[1].text = info.EndPoint.Address.ToString();
+        }
+        else
+        {
+            objText[0].text = info.EndPoint.Address.ToString();
+            objText[1].text = "";
+        }
 
-        obj.GetComponent<Button>().onClick.AddListener(delegate { NetworkMenuManager.Instance.JoinLocalHost(info); });
+        obj.GetComponent<Button>().onClick.AddListener(delegate { JoinLocalHost(info); });
     }
+
+    public void LoadUserName()
+    {
+        if (PlayerPrefs.HasKey("UserName"))
+        {
+            userName = PlayerPrefs.GetString("UserName");
+            userNameInputField.SetTextWithoutNotify(userName);
+            if (localPlayer != null)
+            {
+                localPlayer.ChangeUserName(userName);
+            }
+        }
+    }
+
+
+    public void OnChangeUserName(string userName)
+    {
+        this.userName = userName;
+        PlayerPrefs.SetString("UserName", userName);
+        PlayerPrefs.Save();
+        if (localPlayer != null)
+        {
+            localPlayer.ChangeUserName(userName);
+        }
+    }
+
     #endregion
 
     #region Player
