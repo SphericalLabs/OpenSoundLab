@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using Unity.Collections.LowLevel.Unsafe;
 
 [System.Serializable]
 public class ManipulatorVisual
@@ -33,6 +34,7 @@ public class VRNetworkPlayer : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnUserNameChanged))]
     public string userName;
+    public TMPro.TMP_Text userNameText;
 
     [Header("Manipulators")]
     [SyncVar (hook = nameof(OnLeftHandManipulatorTriggerd))]
@@ -76,13 +78,15 @@ public class VRNetworkPlayer : NetworkBehaviour
             ChangeUserName(NetworkMenuManager.Instance.userName);
         }
 
-        //deactivate meshrenderers
-        if (networkHead != null)
+        if (userNameText != null)
         {
-            for(int i = networkHead.childCount - 1; i >= 0; i--)
-            {
-                Destroy(networkHead.GetChild(i).gameObject);
-            }
+            userNameText.gameObject.SetActive(false);
+        }
+
+        //deactivate meshrenderers
+        if (networkHead != null && networkHead.childCount > 0)
+        {
+            Destroy(networkHead.GetChild(0).gameObject);
         }
         if (networkLeftHand != null)
         {
@@ -120,11 +124,15 @@ public class VRNetworkPlayer : NetworkBehaviour
     {
         if (!isLocalPlayer)
         {
-            if (NetworkManager.singleton is Network.LocalNetworkManager && networkHead != null)
+            if (NetworkManager.singleton is Network.LocalNetworkManager)
             {
-                for (int i = networkHead.childCount - 1; i >= 0; i--)
+                if (userNameText != null)
                 {
-                    Destroy(networkHead.GetChild(i).gameObject);
+                    userNameText.gameObject.SetActive(false);
+                }
+                if (networkHead != null && networkHead.childCount > 0)
+                {
+                    Destroy(networkHead.GetChild(0).gameObject);
                 }
             }
 
@@ -141,6 +149,10 @@ public class VRNetworkPlayer : NetworkBehaviour
         if (isServer)
         {
             userName = newUserName;
+            if (userNameText != null)
+            {
+                userNameText.text = userName;
+            }
         }
         else
         {
@@ -152,11 +164,19 @@ public class VRNetworkPlayer : NetworkBehaviour
     public void CmdChangeUserName(string newUserName)
     {
         userName = newUserName;
+        if (userNameText != null)
+        {
+            userNameText.text = userName;
+        }
     }
 
     public void OnUserNameChanged(string oldValue, string newValue)
     {
         //todo update text
+        if (userNameText != null)
+        {
+            userNameText.text = newValue;
+        }
     }
 
     // Update is called once per frame

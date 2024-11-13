@@ -104,6 +104,14 @@ public class NetworkMenuManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Time.frameCount % 720 == 0)
+        {
+            UpdateIpAddress();
+        }
+    }
+
     public void RestartHost()
     {
         networkManager.StopHost();
@@ -362,14 +370,18 @@ public class NetworkMenuManager : MonoBehaviour
             hostMenuParent.gameObject.SetActive(true);
             relayHostMenuParent.gameObject.SetActive(false);
             clientMenuParent.gameObject.SetActive(false);
-
-            ipAdressText.text = $"Your Address: {IPManager.GetLocalIPAddress()}";
+            UpdateIpAddress();
         }
 
         if (backButtonObject != null)
         {
             backButtonObject.SetActive(false);
         }
+    }
+
+    private void UpdateIpAddress()
+    {
+        ipAdressText.text = $"Your Address: {IPManager.GetLocalIPAddress()}";
     }
 
     public void ActivateClientUI()
