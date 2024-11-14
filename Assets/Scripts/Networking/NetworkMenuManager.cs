@@ -19,7 +19,7 @@ public class NetworkMenuManager : MonoBehaviour
     [SerializeField] private NetworkManager networkManager;
     [SerializeField] private OSLNetworkDiscovery networkDiscovery;
     private bool clientGotStopped = false;
-
+    private float lastDiscoverServerTime;
     public static string relayCode = "";
     private bool autoConnectToLastServer = false;
     private string lastServerAddress = "";
@@ -115,6 +115,11 @@ public class NetworkMenuManager : MonoBehaviour
         {
             UpdateIpAddress();
         }
+        if (!networkDiscovery.isDiscoverable && lastDiscoverServerTime + 5 < Time.time)
+        {
+            discoveredServers.Clear();
+            DeleteAllServerDiscoveryButtons();
+        }
     }
 
     public void RestartHost()
@@ -189,6 +194,7 @@ public class NetworkMenuManager : MonoBehaviour
     {
         Debug.Log("On discover servers");
         discoveredServers[info.serverId] = info;
+        lastDiscoverServerTime = Time.time;
 
         DeleteAllServerDiscoveryButtons();
 
