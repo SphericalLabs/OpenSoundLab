@@ -94,6 +94,7 @@ public class NetworkMenuManager : MonoBehaviour
                 ActivateHostUI();
                 yield return new WaitForSeconds(0.5f);
                 networkDiscovery.AdvertiseServer();
+                yield return new WaitForSeconds(0.5f);
                 networkDiscovery.StartDiscovery();
             }
         }
@@ -140,9 +141,9 @@ public class NetworkMenuManager : MonoBehaviour
         }
         yield return new WaitForSeconds(0.5f);
         networkDiscovery.AdvertiseServer();
+        yield return new WaitForSeconds(1f);
         networkDiscovery.StartDiscovery();
     }
-
 
     public void StopClient()
     {
@@ -195,14 +196,7 @@ public class NetworkMenuManager : MonoBehaviour
         //create a UI button if a server get discoverd
         foreach (OSLServerResonse newinfo in discoveredServers.Values)
         {
-            if (newinfo.version == Application.version)
-            {
-                CreateServerDiscoveryButton(newinfo);
-            }
-            else
-            {
-                Debug.Log($"Host {newinfo.userName} and ip {info.EndPoint.Address} has a different verion number {newinfo.version}, so you can't connect to it");
-            }
+            CreateServerDiscoveryButton(newinfo);
         }
     }
 
@@ -431,6 +425,17 @@ public class NetworkMenuManager : MonoBehaviour
     //create running server button
     public void CreateServerDiscoveryButton(OSLServerResonse info)
     {
+        if (info.version != Application.version)
+        {
+            GameObject obj = Instantiate(discoveryButtonPrefab, discoveryButtonParent);
+            TMP_Text[] objText = obj.GetComponentsInChildren<TMP_Text>();
+            objText[0].text = $"{info.userName}";
+            objText[1].text = $"different version: {info.version} (your {Application.version})";
+            
+            Debug.Log($"Host {info.userName} and ip {info.EndPoint.Address} has a different verion number {info.version}, so you can't connect to it");
+            return;
+        }
+        
         Debug.Log(($"Auto connect {autoConnectToLastServer} last ip {lastServerAddress}, new ip {info.EndPoint.Address}"));
         if (autoConnectToLastServer && lastServerAddress == info.EndPoint.Address.ToString())
         {
@@ -438,20 +443,20 @@ public class NetworkMenuManager : MonoBehaviour
             return;
         }
         
-        GameObject obj = Instantiate(discoveryButtonPrefab, discoveryButtonParent);
-        TMP_Text[] objText = obj.GetComponentsInChildren<TMP_Text>();
+        GameObject obj2 = Instantiate(discoveryButtonPrefab, discoveryButtonParent);
+        TMP_Text[] objText2 = obj2.GetComponentsInChildren<TMP_Text>();
         if(info.userName.Length > 0)
         {
-            objText[0].text = info.userName;
-            objText[1].text = info.EndPoint.Address.ToString();
+            objText2[0].text = info.userName;
+            objText2[1].text = info.EndPoint.Address.ToString();
         }
         else
         {
-            objText[0].text = info.EndPoint.Address.ToString();
-            objText[1].text = "";
+            objText2[0].text = info.EndPoint.Address.ToString();
+            objText2[1].text = "";
         }
 
-        obj.GetComponent<Button>().onClick.AddListener(delegate { JoinLocalHost(info); });
+        obj2.GetComponent<Button>().onClick.AddListener(delegate { JoinLocalHost(info); });
     }
 
     public void LoadUserName()
