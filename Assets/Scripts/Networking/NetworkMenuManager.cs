@@ -386,11 +386,15 @@ public class NetworkMenuManager : MonoBehaviour
         {
             networkDiscovery.AdvertiseServer();
             discoveryUiParent.SetActive(false);
+            discoveredServers.Clear();
+            DeleteAllServerDiscoveryButtons();
         }
         else
         {
             discoveryUiParent.SetActive(true);
             networkDiscovery.StartDiscovery();
+            discoveredServers.Clear();
+            DeleteAllServerDiscoveryButtons();
         }
     }
 
