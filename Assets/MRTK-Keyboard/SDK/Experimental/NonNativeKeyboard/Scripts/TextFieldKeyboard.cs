@@ -22,6 +22,10 @@ public class TextFieldKeyboard : MonoBehaviour
 
     public void OpenKeyboard()
     {
+        if (inputField == NonNativeKeyboard.Instance.InputField && NonNativeKeyboard.Instance.gameObject.gameObject)
+        {
+            return;
+        }
         NonNativeKeyboard.Instance.InputField = inputField;
         NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
 

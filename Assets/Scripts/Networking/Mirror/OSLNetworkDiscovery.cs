@@ -18,6 +18,7 @@ namespace Mirror.Discovery
         {
             return isDiscoverable = !isDiscoverable;
         }
+        /*
         public void SetIsDiscoverable(bool b)
         {
             isDiscoverable = b;
@@ -29,7 +30,7 @@ namespace Mirror.Discovery
             {
 
             }
-        }
+        }*/
 
         #region Server
 

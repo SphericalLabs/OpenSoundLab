@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Net;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class NetworkMenuManager : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class NetworkMenuManager : MonoBehaviour
     [SerializeField] private TMP_InputField userNameInputField;
     [Header("Host Menu")]
     [SerializeField] private Transform hostMenuParent;
+    [SerializeField] private GameObject discoveryUiParent;
     [SerializeField] private Transform discoveryButtonParent;
     [SerializeField] private GameObject discoveryButtonPrefab;
     [SerializeField] private TMP_InputField relayCodeInputField;
@@ -93,8 +95,7 @@ public class NetworkMenuManager : MonoBehaviour
                 networkManager.StartHost();
                 ActivateHostUI();
                 yield return new WaitForSeconds(0.5f);
-                networkDiscovery.AdvertiseServer();
-                networkDiscovery.StartDiscovery();
+                SetIsDiscoverable(networkDiscovery.isDiscoverable);
             }
         }
 
@@ -139,8 +140,8 @@ public class NetworkMenuManager : MonoBehaviour
             networkManager.StartHost();
         }
         yield return new WaitForSeconds(0.5f);
-        networkDiscovery.AdvertiseServer();
-        networkDiscovery.StartDiscovery();
+        SetIsDiscoverable(networkDiscovery.isDiscoverable);
+        //networkDiscovery.StartDiscovery();
     }
 
     public void StopClient()
@@ -374,6 +375,22 @@ public class NetworkMenuManager : MonoBehaviour
         if (backButtonObject != null)
         {
             backButtonObject.SetActive(false);
+        }
+    }
+    
+    
+    public void SetIsDiscoverable(bool b)
+    {
+        networkDiscovery.isDiscoverable = b;
+        if (b)
+        {
+            networkDiscovery.AdvertiseServer();
+            discoveryUiParent.SetActive(false);
+        }
+        else
+        {
+            discoveryUiParent.SetActive(true);
+            networkDiscovery.StartDiscovery();
         }
     }
 

@@ -1557,7 +1557,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 403954025}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1567,8 +1567,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 58.5, y: -63.5}
-  m_SizeDelta: {x: 100, y: 20}
+  m_AnchoredPosition: {x: 72.34, y: -63.5}
+  m_SizeDelta: {x: 127.68, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &403954027
 MonoBehaviour:
@@ -1617,8 +1617,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2081794423}
-        m_TargetAssemblyTypeName: OSLNetworkDiscovery, Assembly-CSharp
+      - m_Target: {fileID: 2081794422}
+        m_TargetAssemblyTypeName: NetworkMenuManager, Assembly-CSharp
         m_MethodName: SetIsDiscoverable
         m_Mode: 0
         m_Arguments:
@@ -4083,8 +4083,8 @@ MonoBehaviour:
   m_ReadOnly: 0
   m_RichText: 1
   m_GlobalFontAsset: {fileID: 0}
-  m_OnFocusSelectAll: 1
-  m_ResetOnDeActivation: 1
+  m_OnFocusSelectAll: 0
+  m_ResetOnDeActivation: 0
   m_KeepTextSelectionVisible: 0
   m_RestoreOriginalTextOnEscape: 1
   m_isRichTextEditingAllowed: 0
@@ -4156,7 +4156,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1332928657}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4164,8 +4164,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 9, y: -0.5}
-  m_SizeDelta: {x: -28, y: -3}
+  m_AnchoredPosition: {x: 21.78, y: -0.5}
+  m_SizeDelta: {x: -2.45, y: -3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1332928659
 MonoBehaviour:
@@ -4187,7 +4187,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Discoverable
+  m_text: Is Discoverable
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5051,8 +5051,8 @@ MonoBehaviour:
   m_ReadOnly: 0
   m_RichText: 1
   m_GlobalFontAsset: {fileID: 0}
-  m_OnFocusSelectAll: 1
-  m_ResetOnDeActivation: 1
+  m_OnFocusSelectAll: 0
+  m_ResetOnDeActivation: 0
   m_KeepTextSelectionVisible: 0
   m_RestoreOriginalTextOnEscape: 1
   m_isRichTextEditingAllowed: 0
@@ -6417,6 +6417,7 @@ MonoBehaviour:
   userName: 
   userNameInputField: {fileID: 1311718536}
   hostMenuParent: {fileID: 920437633}
+  discoveryUiParent: {fileID: 1514022583}
   discoveryButtonParent: {fileID: 1652807079}
   discoveryButtonPrefab: {fileID: 254986997595531099, guid: fb3b4035ab8f5401096b02e1c38188ce,
     type: 3}
@@ -6463,7 +6464,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   secretHandshake: -7130575583690982118
-  isDiscoverable: 1
+  isDiscoverable: 0
 --- !u!114 &2081794424
 MonoBehaviour:
   m_ObjectHideFlags: 0

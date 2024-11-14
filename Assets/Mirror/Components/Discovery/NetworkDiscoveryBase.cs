@@ -158,6 +158,7 @@ namespace Mirror.Discovery
         /// </summary>
         public void AdvertiseServer()
         {
+            Debug.Log(("Advertise Server"));
             if (!SupportedOnThisPlatform)
                 throw new PlatformNotSupportedException("Network discovery not supported in this platform");
 
@@ -307,6 +308,7 @@ namespace Mirror.Discovery
         /// </summary>
         public void StartDiscovery()
         {
+            Debug.Log(("Start Discovery"));
             if (!SupportedOnThisPlatform)
                 throw new PlatformNotSupportedException("Network discovery not supported in this platform");
 

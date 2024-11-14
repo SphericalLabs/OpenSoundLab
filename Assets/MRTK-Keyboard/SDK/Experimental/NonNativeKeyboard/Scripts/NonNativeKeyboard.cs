@@ -6,6 +6,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Microsoft.MixedReality.Toolkit.Experimental.UI
@@ -77,6 +78,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
 
         #endregion Callbacks
 
+        private EventSystem eventSystem;
         public bool allwaysCapsLook = false;
 
         /// <summary>
@@ -252,7 +254,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         void Awake()
         {
             Instance = this;
-
+            eventSystem = FindObjectOfType<EventSystem>();
             m_StartingScale = transform.localScale;
             Bounds canvasBounds = RectTransformUtility.CalculateRelativeRectTransformBounds(transform);
 
@@ -432,6 +434,9 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             PresentKeyboard();
             Clear();
             InputField.text = startText;
+            m_CaretPosition = startText.Length;
+            //eventSystem.SetSelectedGameObject(InputField.gameObject, null);
+            UpdateCaretPosition(m_CaretPosition);
 
             if (allwaysCapsLook)
             {
@@ -642,6 +647,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             
             m_CaretPosition += value.Length;
 
+            eventSystem.SetSelectedGameObject(InputField.gameObject, null);
             UpdateCaretPosition(m_CaretPosition);
         }
 
@@ -741,7 +747,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
                     Debug.LogErrorFormat("The {0} key on this keyboard hasn't been assigned a function.", functionKey.name);
                     break;
                 }
-
+                
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -778,6 +784,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
                 {
                     --m_CaretPosition;
                     InputField.text = InputField.text.Remove(m_CaretPosition, 1);
+                    eventSystem.SetSelectedGameObject(InputField.gameObject, null);
                     UpdateCaretPosition(m_CaretPosition);
                 }
             }
@@ -891,6 +898,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             if (m_CaretPosition > 0)
             {
                 --m_CaretPosition;
+                eventSystem.SetSelectedGameObject(InputField.gameObject, null);
                 UpdateCaretPosition(m_CaretPosition);
             }
         }
@@ -905,6 +913,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             if (m_CaretPosition < InputField.text.Length)
             {
                 ++m_CaretPosition;
+                eventSystem.SetSelectedGameObject(InputField.gameObject, null);
                 UpdateCaretPosition(m_CaretPosition);
             }
         }
@@ -922,6 +931,8 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             //SetMicrophoneDefault();
             OnClosed(this, EventArgs.Empty);            
             gameObject.SetActive(false);
+            InputField.OnDeselect(null);
+            eventSystem.SetSelectedGameObject(null, null);
         }
 
         /// <summary>
