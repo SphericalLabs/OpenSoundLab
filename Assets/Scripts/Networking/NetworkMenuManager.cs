@@ -94,7 +94,6 @@ public class NetworkMenuManager : MonoBehaviour
                 ActivateHostUI();
                 yield return new WaitForSeconds(0.5f);
                 networkDiscovery.AdvertiseServer();
-                yield return new WaitForSeconds(0.5f);
                 networkDiscovery.StartDiscovery();
             }
         }
@@ -141,7 +140,6 @@ public class NetworkMenuManager : MonoBehaviour
         }
         yield return new WaitForSeconds(0.5f);
         networkDiscovery.AdvertiseServer();
-        yield return new WaitForSeconds(1f);
         networkDiscovery.StartDiscovery();
     }
 
