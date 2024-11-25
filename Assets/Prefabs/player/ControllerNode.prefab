@@ -148,6 +148,12 @@ MonoBehaviour:
   selectedTransform: {fileID: 0}
   selectedObject: {fileID: 0}
   onColor: {r: 0.030034602, g: 0.20529422, b: 0.3647059, a: 1}
+  onInputTriggerdEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onInputReleasedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   emptyGrab: 0
   triggerDown: 0
   pinchPinkyDown: 0
@@ -192,7 +198,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7304bae9e78fe73418b508eb43024123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menu: {fileID: 0}
 --- !u!1 &1000010960589858
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,7 +376,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 968aff1bdb7797449b200e80168986c7, type: 2}
+  - {fileID: 2100000, guid: 950c36baa40853b4b8fcf2eeda50f869, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -520,7 +525,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 968aff1bdb7797449b200e80168986c7, type: 2}
+  - {fileID: 2100000, guid: 950c36baa40853b4b8fcf2eeda50f869, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
