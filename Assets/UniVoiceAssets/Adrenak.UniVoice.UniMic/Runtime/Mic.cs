@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Adrenak.UniMic {
-    [ExecuteAlways]
+    //[ExecuteAlways]
     public class Mic : MonoBehaviour {
         // ================================================
         #region MEMBERS
@@ -156,36 +156,45 @@ namespace Adrenak.UniMic {
             Frequency = frequency;
             SampleDurationMS = sampleDurationMS;
 
-            AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
+            AudioClip = Microphone.Start(CurrentDeviceName, true, 10, Frequency);
             Sample = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
+            temp = new float[Sample.Length]; // Allocate temp here
+            Debug.Log("UniVoice audio channels: " + AudioClip.channels);
 
-            StartCoroutine(ReadRawAudio());
+            readRawAudioCoroutine = StartCoroutine(ReadRawAudio());
 
             OnStartRecording?.Invoke();
         }
+
+
+        private Coroutine readRawAudioCoroutine;
 
         /// <summary>
         /// Ends the Mic stream.
         /// </summary>
         public void StopRecording() {
-            if (!Microphone.IsRecording(CurrentDeviceName)) return;
+            //if (!Microphone.IsRecording(CurrentDeviceName)) return;
 
             IsRecording = false;
 
             Microphone.End(CurrentDeviceName);
-            Destroy(AudioClip);
+            //Destroy(AudioClip);
             AudioClip = null;
 
-            StopCoroutine(ReadRawAudio());
+            if (readRawAudioCoroutine != null)
+            {
+                StopCoroutine(readRawAudioCoroutine);
+                readRawAudioCoroutine = null;
+            }
 
             OnStopRecording?.Invoke();
         }
 
+        private float[] temp;
         IEnumerator ReadRawAudio() {
-            int loops = 0;
-            int readAbsPos = 0;
-            int prevPos = 0;
-            float[] temp = new float[Sample.Length];
+            long loops = 0;
+            long readAbsPos = 0;
+            int prevPos = 0;            
 
             // set the gain for the mic input in dB here
             // todo: use the OSL_Native Compressor / Limiter here
@@ -207,21 +216,28 @@ namespace Adrenak.UniMic {
                     var nextReadAbsPos = readAbsPos + temp.Length;
 
                     if (nextReadAbsPos < currAbsPos) {
-                        AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
+                        try
+                        {
+                            AudioClip.GetData(temp, (int)(readAbsPos % AudioClip.samples));
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.LogError($"Failed to get audio data: {ex.Message}");
+                            yield break;
+                        }
 
                         for (int i = 0; i < temp.Length; i++)
                         {
                             temp[i] *= gainMult;
                         }
+                                                
+                        Array.Copy(temp, Sample, temp.Length);
 
-                        Sample = temp;
                         m_SampleCount++;
                         OnSampleReady?.Invoke(m_SampleCount, Sample);
 
-                        OnTimestampedSampleReady?.Invoke(
-                            (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds),
-                            Sample
-                        );
+                        long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                        OnTimestampedSampleReady?.Invoke(timestamp, Sample);
 
                         readAbsPos = nextReadAbsPos;
                         isNewDataAvailable = true;
@@ -233,6 +249,11 @@ namespace Adrenak.UniMic {
             }
         }
         #endregion
+
+        void OnDestroy()
+        {
+            StopRecording();
+        }
 
         [Obsolete("UpdateDevices method is no longer needed. Devices property is now always up to date")]
         public void UpdateDevices() { }
