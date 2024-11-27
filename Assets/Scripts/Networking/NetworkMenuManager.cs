@@ -115,7 +115,7 @@ public class NetworkMenuManager : MonoBehaviour
         {
             UpdateIpAddress();
         }
-        if (!networkDiscovery.isDiscoverable && lastDiscoverServerTime + 5 < Time.time)
+        if (networkDiscovery != null && !networkDiscovery.isDiscoverable && lastDiscoverServerTime + 5 < Time.time)
         {
             discoveredServers.Clear();
             DeleteAllServerDiscoveryButtons();

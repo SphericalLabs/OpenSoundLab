@@ -49,7 +49,7 @@ public class VRNetworkPlayer : NetworkBehaviour
     [SyncVar (hook = nameof(OnVoiceChatIDChanged))]
     public int voiceChatAgentID;
     private bool moveVoiceChatObject = false;
-    private NetworkAudioManager networkAudioManager;
+    private NetworkVoiceManager networkVoiceManager;
     private Transform voiceOverTransform;
 
     [Header("Network Tape")]
@@ -384,13 +384,13 @@ public class VRNetworkPlayer : NetworkBehaviour
     private IEnumerator ConnectToVoiceChatAgent()
     {
         //Debug.Log("Try connect to VoiceChatAgent by local Player");
-        if (networkAudioManager == null)
+        if (networkVoiceManager == null)
         {
-            networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
+            networkVoiceManager = FindObjectOfType<NetworkVoiceManager>();
         }
-        if (networkAudioManager != null)
+        if (networkVoiceManager != null)
         {
-            while (networkAudioManager.GetAgentID() < 0)
+            while (networkVoiceManager.GetAgentID() < 0)
             {
                 yield return new WaitForSeconds(1f);
                 //Debug.Log("Wait for Agent ID over -1");
@@ -399,11 +399,11 @@ public class VRNetworkPlayer : NetworkBehaviour
             //Debug.Log($"set agent id {networkAudioManager.GetAgentID()}");
             if (isServer)
             {
-                voiceChatAgentID = networkAudioManager.GetAgentID();
+                voiceChatAgentID = networkVoiceManager.GetAgentID();
             }
             else
             {
-                CmdSetVoiceChatID(networkAudioManager.GetAgentID());
+                CmdSetVoiceChatID(networkVoiceManager.GetAgentID());
             }
         }
     }
@@ -425,13 +425,13 @@ public class VRNetworkPlayer : NetworkBehaviour
             return;
         }
         //Search audio source object
-        if (networkAudioManager == null)
+        if (networkVoiceManager == null)
         {
-            networkAudioManager = GameObject.FindObjectOfType<NetworkAudioManager>();
+            networkVoiceManager = GameObject.FindObjectOfType<NetworkVoiceManager>();
         }
-        if (networkAudioManager != null)
+        if (networkVoiceManager != null)
         {
-            var audioOutput = networkAudioManager.GetSourceOutput((short)voiceChatAgentID);
+            var audioOutput = networkVoiceManager.GetSourceOutput((short)voiceChatAgentID);
             if (audioOutput != null)
             {
                 moveVoiceChatObject = true;
