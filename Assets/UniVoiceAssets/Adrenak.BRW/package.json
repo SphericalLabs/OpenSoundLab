@@ -1,0 +1,15 @@
+{
+	"name": "com.adrenak.brw",
+	"version": "1.0.1",
+	"displayName": "Adrenak.BRW: Byte Reader Writer",
+	"description": "Byte reading and writing utilities for common C# and Unity types. ",
+	"unity": "2018.4",
+	"author": {
+		"name": "Vatsal Ambastha",
+		"email": "ambastha.vatsal@gmail.com",
+		"url": "www.vatsalambastha.com"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	}
+}

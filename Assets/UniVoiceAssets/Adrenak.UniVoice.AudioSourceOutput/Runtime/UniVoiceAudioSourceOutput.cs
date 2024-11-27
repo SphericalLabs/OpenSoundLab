@@ -25,6 +25,25 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             return matches.Count();
         }
 
+        /// <summary>
+        /// Removes all segments with an index lower than the specified givenIndex to prevent memory leaks.
+        /// </summary>
+        /// <param name="givenIndex">The threshold index. All segments with an index lower than this will be removed.</param>
+        private void RemoveSegmentsLowerThan(int givenIndex)
+        {
+            // Identify all keys with index less than givenIndex
+            var keysToRemove = segments
+                .Where(kvp => kvp.Key < givenIndex)
+                .Select(kvp => kvp.Key)
+                .ToList(); // Create a separate list to avoid modifying the collection during iteration
+
+            foreach (var key in keysToRemove)
+            {
+                segments.Remove(key);
+                Debug.unityLogger.Log(TAG, $"Removed segment with index: {key}");
+            }
+        }
+
         public AudioSource AudioSource { get; private set; }
         public int MinSegCount { get; private set; }
 
@@ -121,6 +140,8 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
                 if (!AudioSource.isPlaying)
                     AudioSource.Play();
             }
+
+            //RemoveSegmentsLowerThan(lastIndex); // todo: get rid of LINQ
         }
 
         /// <summary>
@@ -147,7 +168,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             if (locIdx == bufferIndex) return;
 
             // Finally write into the buffer 
-            segments.Add(index, Status.Ahead);
+            segments.Add(index, Status.Ahead); 
             circularAudioClip.Write(index, audioSamples);
         }
 
