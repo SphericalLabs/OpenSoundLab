@@ -51,11 +51,15 @@ public class NetworkAudioManager : MonoBehaviour
     void InitializeAgent()
     {
         // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
         agent = new ChatroomAgent(
             new UniVoiceMirrorNetwork(),
             new UniVoiceUniMicInput(0, 16000, 10),
             //new UniVoiceUniMicInput(0, 8000, 25),
-            new UniVoiceAudioSourceOutput.Factory(20, 10) // default is 10, 5
+            new UniVoiceAudioSourceOutput.Factory(200, 10) // default is 10, 5
         );
         agent.Network.OnCreatedChatroom += () => {
             ShowMessage($"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}");

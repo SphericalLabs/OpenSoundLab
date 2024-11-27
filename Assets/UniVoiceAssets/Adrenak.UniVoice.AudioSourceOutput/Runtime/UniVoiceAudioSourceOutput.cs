@@ -18,11 +18,25 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             Behind
         }
 
-        Dictionary<int, Status> segments = new Dictionary<int, Status>();
-        int GetSegmentCountByStatus(Status status) {
-            var matches = segments.Where(x => x.Value == status);
-            if (matches == null) return 0;
-            return matches.Count();
+        private Dictionary<int, Status> segments = new Dictionary<int, Status>();
+
+        /// <summary>
+        /// Retrieves the count of segments that match the specified status.
+        /// </summary>
+        /// <param name="status">The status to count.</param>
+        /// <returns>The number of segments with the specified status.</returns>
+        private int GetSegmentCountByStatus(Status status)
+        {
+            int count = 0;
+            // Iterate through the Values collection directly for better performance
+            foreach (Status segmentStatus in segments.Values)
+            {
+                if (segmentStatus == status)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
 
         /// <summary>
@@ -31,16 +45,23 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// <param name="givenIndex">The threshold index. All segments with an index lower than this will be removed.</param>
         private void RemoveSegmentsLowerThan(int givenIndex)
         {
-            // Identify all keys with index less than givenIndex
-            var keysToRemove = segments
-                .Where(kvp => kvp.Key < givenIndex)
-                .Select(kvp => kvp.Key)
-                .ToList(); // Create a separate list to avoid modifying the collection during iteration
+            // Initialize with an estimated capacity to minimize reallocations
+            List<int> keysToRemove = new List<int>(segments.Count / 2);
 
-            foreach (var key in keysToRemove)
+            // Iterate through the Keys collection directly
+            foreach (int key in segments.Keys)
+            {
+                if (key < givenIndex)
+                {
+                    keysToRemove.Add(key);
+                }
+            }
+
+            // Batch removal to minimize dictionary resize operations
+            foreach (int key in keysToRemove)
             {
                 segments.Remove(key);
-                Debug.unityLogger.Log(TAG, $"Removed segment with index: {key}");
+                // Debug.unityLogger.Log(TAG, $"Removed segment with index: {key}");
             }
         }
 
@@ -107,6 +128,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         }
 
         int lastIndex = -1;
+        int loops = 0;
         /// <summary>
         /// This is to make sure that if a segment is missed, its previous 
         /// contents won't be played again when the clip loops back.
@@ -114,20 +136,33 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         private void Update() {
             if (AudioSource.clip == null) return;
 
+            // index loops from 0 to SegCount - 1
             var index = (int)(AudioSource.GetCurrentNormPosition() * circularAudioClip.SegCount);
+
+            if(lastIndex > index){
+                loops++;
+                // remove all segments with index lower than the given index
+                RemoveSegmentsLowerThan(loops * circularAudioClip.SegCount + index); // this will render the behind mechanism useless
+            }
 
             // Check every frame to see if the AudioSource has 
             // just moved to a new segment in the AudioBuffer 
+            // Note: This is probably missing segments every now and then, when the clip played more segments than one or two
             if (lastIndex != index) {
                 // If so, clear the audio buffer so that in case the
                 // AudioSource loops around, the old contents are not played.
+                // Note: This only deletes the last segment, but if segment is very short there will be more segments between frames
+                // Note: This does not remove the segment from the Dictionary
                 circularAudioClip.Clear(lastIndex);
 
+                // Note: This ensures that indices are marked as used and not fed again
                 segments.EnsureKey(lastIndex, Status.Behind);
                 segments.EnsureKey(index, Status.Current);
 
                 lastIndex = index;
             }
+
+            // Since the index that is calculated here is only between 0 and circularAudioClip.SegCount - 1, it actually has another addressing than the feeding mechanism. The waiting mechanism below is therefore only active at the very beginning of the patch, to give it a heads
 
             // Check if the number of ready segments is sufficient for us to 
             // play the audio. Whereas if the number is 0, we must stop audio
@@ -141,7 +176,6 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
                     AudioSource.Play();
             }
 
-            //RemoveSegmentsLowerThan(lastIndex); // todo: get rid of LINQ
         }
 
         /// <summary>
@@ -177,7 +211,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// </summary>
         /// <param name="segment"></param>
         public void Feed(ChatroomAudioSegment segment) =>
-            Feed(segment.segmentIndex, segment.frequency, segment.channelCount, segment.samples);
+        Feed(segment.segmentIndex, segment.frequency, segment.channelCount, segment.samples);
 
         /// <summary>
         /// Disposes the instance by deleting the GameObject of the component.
