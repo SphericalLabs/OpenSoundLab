@@ -202,9 +202,12 @@ namespace Adrenak.UniMic {
             float gaindB = 18;
             float gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
 
-            while (IsRecording && AudioClip != null && Microphone.IsRecording(CurrentDeviceName))
+            // Accessing CurrentDevicename each frame is expensive, apparently it queries the OS each time. Cache it.
+            string currDevName = CurrentDeviceName;
+
+            while (IsRecording && AudioClip != null && Microphone.IsRecording(currDevName))
             {
-                int currPos = Microphone.GetPosition(CurrentDeviceName);
+                int currPos = Microphone.GetPosition(currDevName);
                 if (currPos < prevPos) loops++;
                 prevPos = currPos;
 
