@@ -53,11 +53,19 @@ public class NetworkVoiceManager : MonoBehaviour
 
     void InitializeAgent()
     {
+
+        //foreach (var device in Microphone.devices)
+        //{
+        //    int min, max = 0;
+        //    Microphone.GetDeviceCaps(device, out min, out max);
+        //    Debug.Log("Name: " + device + "min freq: " + min + "max freq: " + max);
+        //}
+
+        // Microphone reports 16000 as min and max on Quest 3, does not start if 24000 is set, but is starting properly with 8000 or 48000 (in MicrophoneSignalGenerator), so probably integer divisions and multiples are supported by Unity
+
         agent = new ChatroomAgent(
             new UniVoiceMirrorNetwork(),
-            //new UniVoiceBusAudioInput(400),
-            // new SinusAudioInput(0, 4000, 25),
-            new UniVoiceUniMicInput(0, 8000, 25),
+            new UniVoiceUniMicInput(0, 16000, 10),
             new UniVoiceAudioSourceOutput.Factory(20, 10) // default is 10, 5
         );
         agent.Network.OnCreatedChatroom += () => {
