@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace Adrenak.UniMic {
     //[ExecuteAlways]
@@ -156,7 +157,7 @@ namespace Adrenak.UniMic {
             Frequency = frequency;
             SampleDurationMS = sampleDurationMS;
 
-            AudioClip = Microphone.Start(CurrentDeviceName, true, 10, Frequency);
+            AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
             Sample = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
             temp = new float[Sample.Length]; // Allocate temp here
             Debug.Log("UniVoice audio channels: " + AudioClip.channels);
@@ -191,47 +192,42 @@ namespace Adrenak.UniMic {
         }
 
         private float[] temp;
-        IEnumerator ReadRawAudio() {
-            long loops = 0;
-            long readAbsPos = 0;
-            int prevPos = 0;            
+        IEnumerator ReadRawAudio()
+        {
+            int loops = 0;
+            int readAbsPos = 0;
+            int prevPos = 0;
 
-            // set the gain for the mic input in dB here
-            // todo: use the OSL_Native Compressor / Limiter here
-            // but probably Meta Quest already does some dynamic gain regulation and other filtering on their mic
-            // still that some handling of different output levels varying between platforms would be helpful, or allow for 
+            // Set the gain for the mic input in dB
             float gaindB = 18;
             float gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
 
-            while (AudioClip != null && Microphone.IsRecording(CurrentDeviceName)) {
-                bool isNewDataAvailable = true;
+            while (IsRecording && AudioClip != null && Microphone.IsRecording(CurrentDeviceName))
+            {
+                int currPos = Microphone.GetPosition(CurrentDeviceName);
+                if (currPos < prevPos) loops++;
+                prevPos = currPos;
 
-                while (isNewDataAvailable) {
-                    int currPos = Microphone.GetPosition(CurrentDeviceName);
-                    if (currPos < prevPos)
-                        loops++;
-                    prevPos = currPos;
+                var currAbsPos = loops * AudioClip.samples + currPos;
+                var nextReadAbsPos = readAbsPos + Sample.Length;
 
-                    var currAbsPos = loops * AudioClip.samples + currPos;
-                    var nextReadAbsPos = readAbsPos + temp.Length;
+                if ((currAbsPos - nextReadAbsPos) > 0)
+                {
+                    float[] availableSamples = new float[(int)(currAbsPos - nextReadAbsPos)];
+                    AudioClip.GetData(availableSamples, (int)(readAbsPos % AudioClip.samples));
 
-                    if (nextReadAbsPos < currAbsPos) {
-                        try
-                        {
-                            AudioClip.GetData(temp, (int)(readAbsPos % AudioClip.samples));
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.LogError($"Failed to get audio data: {ex.Message}");
-                            yield break;
-                        }
+                    for (int i = 0; i < availableSamples.Length; i++)
+                    {
+                        availableSamples[i] *= gainMult;
+                    }
 
-                        for (int i = 0; i < temp.Length; i++)
-                        {
-                            temp[i] *= gainMult;
-                        }
-                                                
-                        Array.Copy(temp, Sample, temp.Length);
+                    int tempPos = 0;
+
+                    while (tempPos + Sample.Length < availableSamples.Length)
+                    {
+                        //Debug.Log($"availableSamples.Length: {availableSamples.Length}, tempPos: {tempPos}, Sample.Length: {Sample.Length}");
+
+                        Array.Copy(availableSamples, tempPos, Sample, 0, Sample.Length);
 
                         m_SampleCount++;
                         OnSampleReady?.Invoke(m_SampleCount, Sample);
@@ -239,15 +235,20 @@ namespace Adrenak.UniMic {
                         long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                         OnTimestampedSampleReady?.Invoke(timestamp, Sample);
 
-                        readAbsPos = nextReadAbsPos;
-                        isNewDataAvailable = true;
+                        tempPos += Sample.Length;
+                        readAbsPos += Sample.Length;
                     }
-                    else
-                        isNewDataAvailable = false;
                 }
+                else
+                {
+                    Debug.Log($"Skipping frame: currAbsPos={currAbsPos}, nextReadAbsPos={nextReadAbsPos}");
+                }
+
+                // Wait for the next frame before continuing the loop
                 yield return null;
             }
         }
+
         #endregion
 
         void OnDestroy()
