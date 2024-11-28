@@ -66,7 +66,7 @@ public class NetworkVoiceManager : MonoBehaviour
         agent = new ChatroomAgent(
             new UniVoiceMirrorNetwork(),
             new UniVoiceUniMicInput(0, 16000, 10),
-            new UniVoiceAudioSourceOutput.Factory(200, 15, 40) // default is 10, 5, 10
+            new UniVoiceAudioSourceOutput.Factory(200, 3, 10) // default is 10, 5, 10
         );
         agent.Network.OnCreatedChatroom += () => {
             ShowMessage($"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}");
@@ -163,7 +163,7 @@ public class NetworkVoiceManager : MonoBehaviour
                 var sampleRate = AudioSettings.outputSampleRate;
                 var frequencyResolution = sampleRate / 2 / size;
 
-                var audioSource = (output.Value as UniVoiceAudioSourceOutput).AudioSource;
+                var audioSource = (output.Value as UniVoiceAudioSourceOutput).audioSource;
                 var spectrumData = new float[size];
                 audioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
 

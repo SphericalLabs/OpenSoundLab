@@ -162,12 +162,12 @@ namespace Adrenak.UniMic {
         /// <summary>
         /// Starts to stream the input of the current Mic device
         /// </summary>
-        public void StartRecording(int frequency = 16000, int sampleDurationMS = 10) {
+        public void StartRecording(int frequency = 16000, int segmentLengthInMilliSec = 10) {
             StopRecording();
             IsRecording = true;
 
             Frequency = frequency;
-            SampleDurationMS = sampleDurationMS;
+            SampleDurationMS = segmentLengthInMilliSec;
 
             AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
 
