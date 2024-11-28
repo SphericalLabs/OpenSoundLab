@@ -212,7 +212,7 @@ namespace Adrenak.UniMic {
             int prevPos = 0;
 
             // Set the gain for the mic input in dB
-            float gaindB = 18;
+            float gaindB = 14;
             float gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
 
             // Accessing CurrentDevicename each frame is expensive, apparently it queries the OS each time. Cache it.
