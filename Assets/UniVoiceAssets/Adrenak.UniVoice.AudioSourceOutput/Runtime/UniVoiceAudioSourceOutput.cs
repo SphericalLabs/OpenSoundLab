@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -39,6 +40,38 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             return count;
         }
 
+
+        /// <summary>
+        /// Returns the highest integer key in the segments dictionary.
+        /// </summary>
+        /// <returns>The highest integer key.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the segments dictionary is empty.</exception>
+        public int GetHighestSegmentIndex()
+        {
+            if (segments == null || segments.Count == 0)
+            {
+                throw new InvalidOperationException("The segments dictionary is empty.");
+            }
+
+            // Initialize with the first key in the dictionary
+            using (var enumerator = segments.Keys.GetEnumerator())
+            {
+                enumerator.MoveNext();
+                int maxKey = enumerator.Current;
+
+                // Iterate through the keys to find the maximum key
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Current > maxKey)
+                    {
+                        maxKey = enumerator.Current;
+                    }
+                }
+
+                return maxKey;
+            }
+        }
+
         /// <summary>
         /// Removes all segments with an index lower than the specified givenIndex to prevent memory leaks.
         /// </summary>
@@ -67,6 +100,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
 
         public AudioSource AudioSource { get; private set; }
         public int MinSegCount { get; private set; }
+        public int MaxSegCount { get; private set; }
 
         CircularAudioClip circularAudioClip;
 
@@ -101,7 +135,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// Default: 0. Results in the value being set to the max possible.
         /// </param>
         public static UniVoiceAudioSourceOutput New
-        (CircularAudioClip buffer, AudioSource source, int minSegCount = 0) {
+        (CircularAudioClip buffer, AudioSource source, int minSegCount = 0, int maxSegCount = 20) {
             var ctd = source.gameObject.AddComponent<UniVoiceAudioSourceOutput>();
             //DontDestroyOnLoad(ctd.gameObject);
 
@@ -109,16 +143,16 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             source.clip = buffer.AudioClip;
             source.spatialize = true;
 
-            if (minSegCount != 0)
-                ctd.MinSegCount = Mathf.Clamp(minSegCount, 1, buffer.SegCount);
-            else
-                ctd.MinSegCount = buffer.SegCount;
+            
+            ctd.MinSegCount = Mathf.Clamp(minSegCount, 0, buffer.SegCount);
+            ctd.MaxSegCount = Mathf.Clamp(maxSegCount, 2, buffer.SegCount);
+
             ctd.circularAudioClip = buffer;
             ctd.AudioSource = source;
 
             Debug.unityLogger.Log(TAG, $"Created with the following params:" +
             $"buffer SegCount: {buffer.SegCount}" +
-            $"buffer SegDataLen: {buffer.SegDataLen}" +
+            $"buffer SegDataLen: {buffer.SegLenghtInSamples}" +
             $"buffer MinSegCount: {ctd.MinSegCount}" +
             $"buffer AudioClip channels: {buffer.AudioClip.channels}" +
             $"buffer AudioClip frequency: {buffer.AudioClip.frequency}" +
@@ -129,26 +163,31 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
 
         int lastIndex = -1;
         int loops = 0;
+        int readyCount = 0;
         /// <summary>
         /// This is to make sure that if a segment is missed, its previous 
         /// contents won't be played again when the clip loops back.
         /// </summary>
-        private void Update() {
+        private void Update()
+        {
             if (AudioSource.clip == null) return;
 
             // index loops from 0 to SegCount - 1
             var index = (int)(AudioSource.GetCurrentNormPosition() * circularAudioClip.SegCount);
 
-            if(lastIndex > index){
+            if (lastIndex > index)
+            {
                 loops++;
                 // remove all segments with index lower than the given index
-                RemoveSegmentsLowerThan(loops * circularAudioClip.SegCount + index); // this will render the behind mechanism useless
+                RemoveSegmentsLowerThan(loops * circularAudioClip.SegCount + index); // this will render the behind mechanism useless                
             }
+
 
             // Check every frame to see if the AudioSource has 
             // just moved to a new segment in the AudioBuffer 
             // Note: This is probably missing segments every now and then, when the clip played more segments than one or two
-            if (lastIndex != index) {
+            if (lastIndex != index)
+            {
                 // If so, clear the audio buffer so that in case the
                 // AudioSource loops around, the old contents are not played.
                 // Note: This only deletes the last segment, but if segment is very short there will be more segments between frames
@@ -167,15 +206,44 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             // Check if the number of ready segments is sufficient for us to 
             // play the audio. Whereas if the number is 0, we must stop audio
             // and wait for the minimum ready segment count to be met again.
-            var readyCount = GetSegmentCountByStatus(Status.Ahead);
-            if (readyCount == 0)
+            readyCount = GetSegmentCountByStatus(Status.Ahead);
+            if (readyCount < MinSegCount)
+            { // wait to fill segment buffer
+                Debug.Log("UniVoice buffer not full enough");
                 AudioSource.mute = true;
-            else if (readyCount >= MinSegCount) {
+                if (AudioSource.isPlaying)
+                    AudioSource.Pause();
+            }
+            else if (readyCount >= MinSegCount)
+            {
                 AudioSource.mute = false;
                 if (!AudioSource.isPlaying)
                     AudioSource.Play();
-            }
 
+                //if (readyCount >= MaxSegCount)
+                //{ // catchup
+
+                //    Debug.Log("UniVoice buffer too full");
+                //    // skip audio to catch up with playback
+                //    //int currentAbsIndex = loops * circularAudioClip.SegCount + index;
+
+                //    // jump between min and maxsegcount as a solid restarting point
+                //    int indicesToSkip = readyCount - ((MaxSegCount - MinSegCount) / 2);
+
+                //    // wrapped position
+                //    int newIndex = (index + indicesToSkip) % circularAudioClip.SegCount;
+
+                //    // set the time in samples
+                //    AudioSource.timeSamples = newIndex * circularAudioClip.SegLenghtInSamples;
+
+                //    // full loops
+                //    int loopsToAdd = (index + indicesToSkip) / circularAudioClip.SegCount;
+                //    loops += loopsToAdd;
+
+                //    int absoluteNewIndex = loops * circularAudioClip.SegCount + newIndex;
+                //    RemoveSegmentsLowerThan(absoluteNewIndex);
+                //}
+            }
         }
 
         /// <summary>
@@ -188,7 +256,8 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// </param>
         /// 
         /// <param name="audioSamples">The audio samples being fed</param>
-        public void Feed(int index, int frequency, int channelCount, float[] audioSamples) {
+        public void Feed(int index, int frequency, int channelCount, float[] audioSamples)
+        {
             // If we already have this index, don't bother
             // It's been passed already without playing.
             if (segments.ContainsKey(index)) return;
@@ -202,7 +271,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             if (locIdx == bufferIndex) return;
 
             // Finally write into the buffer 
-            segments.Add(index, Status.Ahead); 
+            segments.Add(index, Status.Ahead);
             circularAudioClip.Write(index, audioSamples);
         }
 
@@ -226,12 +295,14 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         public class Factory : IAudioOutputFactory {
             public int BufferSegCount { get; private set; }
             public int MinSegCount { get; private set; }
+            public int MaxSegCount { get; private set; }
 
-            public Factory() : this(10, 5) { }
+            public Factory() : this(10, 5, 10) { }
 
-            public Factory(int bufferSegCount, int minSegCount) {
+            public Factory(int bufferSegCount, int minSegCount, int maxSegCount) {
                 BufferSegCount = bufferSegCount;
                 MinSegCount = minSegCount;
+                MaxSegCount = maxSegCount;
             }
 
             public IAudioOutput Create(int samplingRate, int channelCount, int segmentLength) {
@@ -240,7 +311,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
                         samplingRate, channelCount, segmentLength, BufferSegCount
                     ),
                     new GameObject($"UniVoiceAudioSourceOutput").AddComponent<AudioSource>(),
-                    MinSegCount
+                    MinSegCount, MaxSegCount
                 );
             }
         }

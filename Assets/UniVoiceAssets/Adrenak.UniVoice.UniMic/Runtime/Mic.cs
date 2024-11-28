@@ -4,10 +4,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 
 namespace Adrenak.UniMic {
     //[ExecuteAlways]
+
+    
+
     public class Mic : MonoBehaviour {
+
+
+        [DllImport("OSLNative")]
+        public static extern void MultiplyArrayBySingleValue(float[] a, int length, float val);
+        [DllImport("OSLNative")]
+        public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+
         // ================================================
         #region MEMBERS
         // ================================================
@@ -24,7 +36,7 @@ namespace Adrenak.UniMic {
         /// <summary>
         /// Last populated audio sample
         /// </summary>
-        public float[] Sample { get; private set; }
+        public float[] Segment { get; private set; }
 
         /// <summary>
         /// Sample duration/length in milliseconds
@@ -158,8 +170,9 @@ namespace Adrenak.UniMic {
             SampleDurationMS = sampleDurationMS;
 
             AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
-            Sample = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
-            temp = new float[Sample.Length]; // Allocate temp here
+
+            Segment = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
+
             Debug.Log("UniVoice audio channels: " + AudioClip.channels);
 
             readRawAudioCoroutine = StartCoroutine(ReadRawAudio());
@@ -191,7 +204,7 @@ namespace Adrenak.UniMic {
             OnStopRecording?.Invoke();
         }
 
-        private float[] temp;
+        
         IEnumerator ReadRawAudio()
         {
             int loops = 0;
@@ -212,34 +225,31 @@ namespace Adrenak.UniMic {
                 prevPos = currPos;
 
                 var currAbsPos = loops * AudioClip.samples + currPos;
-                var nextReadAbsPos = readAbsPos + Sample.Length;
+                var nextReadAbsPos = readAbsPos + Segment.Length;
 
                 if ((currAbsPos - nextReadAbsPos) > 0)
                 {
                     float[] availableSamples = new float[(int)(currAbsPos - nextReadAbsPos)];
                     AudioClip.GetData(availableSamples, (int)(readAbsPos % AudioClip.samples));
 
-                    for (int i = 0; i < availableSamples.Length; i++)
-                    {
-                        availableSamples[i] *= gainMult;
-                    }
-
+                    MultiplyArrayBySingleValue(availableSamples, availableSamples.Length, gainMult);
+                    
                     int tempPos = 0;
 
-                    while (tempPos + Sample.Length < availableSamples.Length)
+                    while (tempPos + Segment.Length < availableSamples.Length)
                     {
                         //Debug.Log($"availableSamples.Length: {availableSamples.Length}, tempPos: {tempPos}, Sample.Length: {Sample.Length}");
 
-                        Array.Copy(availableSamples, tempPos, Sample, 0, Sample.Length);
+                        Array.Copy(availableSamples, tempPos, Segment, 0, Segment.Length);
 
                         m_SampleCount++;
-                        OnSampleReady?.Invoke(m_SampleCount, Sample);
+                        OnSampleReady?.Invoke(m_SampleCount, Segment);
 
                         long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                        OnTimestampedSampleReady?.Invoke(timestamp, Sample);
+                        OnTimestampedSampleReady?.Invoke(timestamp, Segment);
 
-                        tempPos += Sample.Length;
-                        readAbsPos += Sample.Length;
+                        tempPos += Segment.Length;
+                        readAbsPos += Segment.Length;
                     }
                 }
                 else

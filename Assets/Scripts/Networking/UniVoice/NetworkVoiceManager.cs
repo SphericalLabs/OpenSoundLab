@@ -66,7 +66,7 @@ public class NetworkVoiceManager : MonoBehaviour
         agent = new ChatroomAgent(
             new UniVoiceMirrorNetwork(),
             new UniVoiceUniMicInput(0, 16000, 10),
-            new UniVoiceAudioSourceOutput.Factory(200, 10) // default is 10, 5
+            new UniVoiceAudioSourceOutput.Factory(200, 15, 40) // default is 10, 5, 10
         );
         agent.Network.OnCreatedChatroom += () => {
             ShowMessage($"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}");
