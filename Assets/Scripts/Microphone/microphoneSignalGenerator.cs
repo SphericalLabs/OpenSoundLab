@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
 
-public class MicrophoneSignalGenerator : signalGenerator {
+public class microphoneSignalGenerator : signalGenerator {
 
   [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
