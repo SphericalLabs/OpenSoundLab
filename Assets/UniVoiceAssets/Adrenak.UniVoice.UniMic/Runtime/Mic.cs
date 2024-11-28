@@ -133,11 +133,30 @@ namespace Adrenak.UniMic {
             return Instance;
         }
 
+        float gaindB = 0f;
+        float gainMult = 1f;
+
         void Awake() {
             //if(Application.isPlaying)
             //    DontDestroyOnLoad(gameObject);
             if (Devices.Count > 0)
                 CurrentDeviceIndex = 0;
+
+            gaindB = 12;
+
+            if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Quest_2 ||
+            Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Link_Quest_2)
+            {
+                gaindB = 14;
+            }
+
+            if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Quest_3 ||
+            Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Link_Quest_3)
+            {
+                gaindB = 14;
+            }
+
+            gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
         }
 
         /// <summary>
@@ -210,10 +229,6 @@ namespace Adrenak.UniMic {
             int loops = 0;
             int readAbsPos = 0;
             int prevPos = 0;
-
-            // Set the gain for the mic input in dB
-            float gaindB = 14;
-            float gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
 
             // Accessing CurrentDevicename each frame is expensive, apparently it queries the OS each time. Cache it.
             string currDevName = CurrentDeviceName;

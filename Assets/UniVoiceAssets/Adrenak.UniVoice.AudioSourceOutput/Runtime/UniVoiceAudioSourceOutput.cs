@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq; // Added for LINQ operations
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace Adrenak.UniVoice.AudioSourceOutput
 {
@@ -85,6 +86,9 @@ namespace Adrenak.UniVoice.AudioSourceOutput
         /// </summary>
         private ConcurrentQueue<Action> mainThreadActions = new ConcurrentQueue<Action>();
 
+        private string outputMixer = "MIXER";
+        private string outputMixerGroup = "univoice";
+
         /// <summary>
         /// Initializes the UniVoiceAudioSourceOutput.
         /// </summary>
@@ -116,12 +120,26 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 audioSource = gameObject.AddComponent<AudioSource>();
             }
 
+            AudioMixer audioMixer = Resources.Load<AudioMixer>(outputMixer);
+            AudioMixerGroup[] mixerGroups = audioMixer.FindMatchingGroups(string.Empty);
+
+            foreach (AudioMixerGroup group in mixerGroups)
+            {
+                if (group.name == outputMixerGroup)
+                {
+                    audioSource.outputAudioMixerGroup = group;
+                    break;
+                }
+            }
+
             // Configure AudioSource settings
             audioSource.playOnAwake = false;
             audioSource.loop = false;
             audioSource.spatialize = true;
-            audioSource.mute = true;
-            audioSource.Pause();
+            audioSource.spatializePostEffects = true;
+            audioSource.spatialBlend = 1f;
+            audioSource.mute = false;
+            
 
             Debug.unityLogger.Log(TAG, $"Initialized with frequency: {frequency}, channels: {this.channelCount}, segmentLength: {segmentLengthInSamples}, MinSegCount: {MinSegCount}, MaxSegCount: {MaxSegCount}");
         }
@@ -222,16 +240,15 @@ namespace Adrenak.UniVoice.AudioSourceOutput
 
                 if (readyCount < MinSegCount)
                 {
-                    // Insufficient buffer, enqueue mute and pause actions if not already muted
-                    EnqueueMainThreadAction(() =>
-                    {
-                        if (!audioSource.mute)
-                        {
-                            audioSource.mute = true;
-                            audioSource.Pause();
-                            Debug.unityLogger.Log(TAG, "Muted and paused due to insufficient buffer.");
-                        }
-                    });
+                    //// Insufficient buffer, enqueue mute and pause actions if not already muted
+                    //EnqueueMainThreadAction(() =>
+                    //{
+                    //    if (!audioSource.mute)
+                    //    {
+                    //        audioSource.mute = true;
+                    //        Debug.unityLogger.Log(TAG, "Muted due to insufficient buffer.");
+                    //    }
+                    //});
                 }
                 else if (readyCount >= MaxSegCount)
                 {
@@ -241,16 +258,15 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 }
                 else
                 {
-                    // Sufficient buffer, enqueue unmute and unpause actions if muted
-                    EnqueueMainThreadAction(() =>
-                    {
-                        if (audioSource.mute)
-                        {
-                            audioSource.mute = false;
-                            audioSource.UnPause();
-                            Debug.unityLogger.Log(TAG, "Unmuted and resumed playback.");
-                        }
-                    });
+                    //// Sufficient buffer, enqueue unmute actions if muted
+                    //EnqueueMainThreadAction(() =>
+                    //{
+                    //    if (audioSource.mute)
+                    //    {
+                    //        audioSource.mute = false;
+                    //        Debug.unityLogger.Log(TAG, "Unmuted playback.");
+                    //    }
+                    //});
                 }
 
                 // Initialize a separate output sample index
