@@ -32,7 +32,7 @@ using UnityEngine.Events;
 
 public class button : manipObject
 {
-    public bool isToggle = false;
+    public bool isSwitch = false;
     public bool toggleKey = false;
     public int buttonID;
     public int[] button2DID = new int[] { 0, 0 };
@@ -255,7 +255,7 @@ public class button : manipObject
     {
         if (curState == manipState.grabbed && state != curState)
         {
-            if (!isToggle) keyHit(false, true);
+            if (!isSwitch) keyHit(false, true);
             if (!glowMatOnToggle)
             {
                 rend.material = offMat;
@@ -278,7 +278,7 @@ public class button : manipObject
         {
             selectOverlay.GetComponent<Renderer>().material.SetColor("_TintColor", new Color(1f, 1f, 1f));
             if (!singleID) _componentInterface?.onSelect(true, button2DID[0], button2DID[1]);
-            if (isToggle)
+            if (isSwitch)
             {
                 toggled = !toggled;
                 if (toggled) keyHit(true, true);
@@ -301,7 +301,7 @@ public class button : manipObject
             {
                 if (!on)
                 {
-                    if (!isToggle) keyHit(false, true);
+                    if (!isSwitch) keyHit(false, true);
                     if (!glowMatOnToggle)
                     {
                         rend.material = offMat;
@@ -312,7 +312,7 @@ public class button : manipObject
 
                     m.hapticPulse();
 
-                    if (isToggle)
+                    if (isSwitch)
                     {
                         toggled = !toggled;
                         if (toggled) keyHit(true, true);

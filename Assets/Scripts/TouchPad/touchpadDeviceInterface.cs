@@ -32,31 +32,31 @@ public class touchpadDeviceInterface : deviceInterface {
 
   touchpadSignalGenerator pad;
   omniJack output;
-  basicSwitch modeSelector;
+  basicSwitch isTrigger;
   button touchPad;
   public bool switchedOn = false;
   bool wasToggleInPreviousFrame = false;
 
   void Update()
   {
-    if (!wasToggleInPreviousFrame && modeSelector.switchVal) touchPad.keyHit(false);
-    wasToggleInPreviousFrame = modeSelector.switchVal;
+    if (!wasToggleInPreviousFrame && isTrigger.switchVal) touchPad.keyHit(false);
+    wasToggleInPreviousFrame = isTrigger.switchVal;
   }
 
   public override void Awake() {
     base.Awake();
     pad = GetComponent<touchpadSignalGenerator>();
     output = GetComponentInChildren<omniJack>();
-    modeSelector = GetComponentInChildren<basicSwitch>();
+    isTrigger = GetComponentInChildren<basicSwitch>();
     touchPad = GetComponentInChildren<button>();
   }
 
   public override void hit(bool on, int ID = -1) {
-    if(modeSelector.switchVal){ // momentarily trigger
-      touchPad.isToggle = false;
+    if(isTrigger.switchVal){ // momentarily trigger
+      touchPad.isSwitch = false;
       pad.signalOn = on;
     } else { // permanent switch
-      touchPad.isToggle = true;
+      touchPad.isSwitch = true;
       //if (on) switchedOn = !switchedOn;
       pad.signalOn = touchPad.isHit;
     }
@@ -69,6 +69,7 @@ public class touchpadDeviceInterface : deviceInterface {
     GetTransformData(data);
 
     data.jackOutID = output.transform.GetInstanceID();
+    data.isTrigger = isTrigger.switchVal;
     return data;
   }
 
@@ -76,9 +77,11 @@ public class touchpadDeviceInterface : deviceInterface {
     TouchPadData data = d as TouchPadData;
     base.Load(data, copyMode);
     output.SetID(data.jackOutID, copyMode);
+    isTrigger.setSwitch(data.isTrigger);
   }
 }
 
 public class TouchPadData : InstrumentData {
   public int jackOutID;
+  public bool isTrigger;
 }
