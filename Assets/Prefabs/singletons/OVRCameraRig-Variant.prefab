@@ -455,7 +455,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71a155ece80369d4e99bdaf5e59169b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _occlusionShadersMode: 1
+  _occlusionShadersMode: 2
   _removeHands: 0
   _cameraRig: {fileID: 6393751841341310327}
 --- !u!1 &6393751841347891355 stripped
