@@ -50,12 +50,16 @@ public class NetworkAudioManager : MonoBehaviour
 
     void InitializeAgent()
     {
+        // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
+        // Careful: This script is not currently being used!
         agent = new ChatroomAgent(
             new UniVoiceMirrorNetwork(),
-            //new UniVoiceBusAudioInput(500),
-            //new SinusAudioInput(0, 4000, 25),
-            new UniVoiceUniMicInput(0, 8000, 25),
-            new UniVoiceAudioSourceOutput.Factory(20, 10) // default is 10, 5
+            new UniVoiceUniMicInput(0, 16000, 10),
+            //new UniVoiceUniMicInput(0, 8000, 25),
+            new UniVoiceAudioSourceOutput.Factory(200, 10, 20) // default is 10, 5
         );
         agent.Network.OnCreatedChatroom += () => {
             ShowMessage($"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}");
@@ -152,7 +156,7 @@ public class NetworkAudioManager : MonoBehaviour
                 var sampleRate = AudioSettings.outputSampleRate;
                 var frequencyResolution = sampleRate / 2 / size;
 
-                var audioSource = (output.Value as UniVoiceAudioSourceOutput).AudioSource;
+                var audioSource = (output.Value as UniVoiceAudioSourceOutput).audioSource;
                 var spectrumData = new float[size];
                 audioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
 

@@ -2378,6 +2378,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1000010878650878
 GameObject:
   m_ObjectHideFlags: 0
@@ -8700,6 +8703,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1303048483121190
 GameObject:
   m_ObjectHideFlags: 0
@@ -10739,6 +10745,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &537940435920267909
 GameObject:
   m_ObjectHideFlags: 0
@@ -11848,6 +11857,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3035397866869824105
 GameObject:
   m_ObjectHideFlags: 0
@@ -12041,6 +12053,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 4
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &3151853537499514499
@@ -15124,6 +15139,9 @@ MonoBehaviour:
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onPercentChangedEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8472863758491401039
 GameObject:
   m_ObjectHideFlags: 0
@@ -15612,6 +15630,9 @@ MonoBehaviour:
   isBipolar: 0
   notchSteps: 5
   onPercentChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onPercentChangedEventLocal:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &9215941584575005156

@@ -197,7 +197,7 @@ public class omniPlug : manipObject
             if (!isHighlighted && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
             {
                 lr.material.SetColor(
-                    "_Color",
+                    "_BaseColor",
                     mapValueToColor(
                         // look at two previous buffers, since otherwise single triggers might not be visualized correctly, ca. 90hz for audio network and 72hz for graphics can lead to missed trigs
                         Mathf.Clamp( connected.signal.firstSample != 0f ? connected.signal.firstSample : connected.signal.prevFirstSample, 

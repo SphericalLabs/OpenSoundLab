@@ -25,4 +25,6 @@
   <uses-permission android:name="com.oculus.permission.EYE_TRACKING" />
   <uses-feature android:name="com.oculus.feature.BOUNDARYLESS_APP" android:required="true" />
   <uses-permission android:name="com.oculus.permission.BOUNDARY_VISIBILITY" />
+  <uses-permission android:name="com.oculus.permission.USE_ANCHOR_API" />
+  <uses-permission android:name="com.oculus.permission.USE_SCENE" />
 </manifest>

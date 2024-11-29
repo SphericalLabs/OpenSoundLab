@@ -28,7 +28,6 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Events;
-using UnityEngine.XR.OpenXR.Input;
 
 public class xyHandle : manipObject
 {

@@ -29,8 +29,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using UnityEngine.SceneManagement;
 
-public class MicrophoneSignalGenerator : signalGenerator {
+public class microphoneSignalGenerator : signalGenerator {
 
   [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
@@ -63,7 +64,13 @@ public class MicrophoneSignalGenerator : signalGenerator {
   int targetBuffering;
 
   public override void Awake() {
+    if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Relay)
+    {
+        Destroy(gameObject);
+    }
+
     base.Awake();
+
     sharedBuffer = new float[MAX_BUFFER_LENGTH];
 
     AudioSettings.GetDSPBufferSize(out bufferSize, out numBuffers);

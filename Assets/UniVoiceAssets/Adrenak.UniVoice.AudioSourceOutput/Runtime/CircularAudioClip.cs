@@ -7,7 +7,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
     public class CircularAudioClip {
         public AudioClip AudioClip { get; private set; }
         public int SegCount { get; private set; }
-        public int SegDataLen { get; private set; }
+        public int SegLenghtInSamples { get; private set; }
 
         // Holds the first valid segment index received by the buffer to make sure that future
         // writes are not of older indices
@@ -18,26 +18,26 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// </summary>
         /// <param name="frequency">The frequency of the audio</param>
         /// <param name="channels">Number of channels in the audio</param>
-        /// <param name="segDataLen">Number of samples in the audio </param>
+        /// <param name="segLenghtInSamples">Number of samples in the audio </param>
         /// <param name="segCount">Number of segments stored in buffer </param>
         public CircularAudioClip(
             int frequency,
             int channels,
-            int segDataLen,
+            int segLenghtInSamples,
             int segCount = 3,
             string clipName = null
         ) {
             clipName = clipName ?? "clip";
             AudioClip = AudioClip.Create(
                 clipName,
-                segDataLen * segCount,
+                segLenghtInSamples * segCount,
                 channels,
                 frequency,
                 false
             );
 
             firstIndex = -1;
-            SegDataLen = segDataLen;
+            SegLenghtInSamples = segLenghtInSamples;
             SegCount = segCount;
         }
 
@@ -52,7 +52,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// <param name="audioSegment">Audio samples data</param>
         public bool Write(int absoluteIndex, float[] audioSegment) {
             // Reject if the segment length is wrong
-            if (audioSegment.Length != SegDataLen) return false;
+            if (audioSegment.Length != SegLenghtInSamples) return false;
 
             if (absoluteIndex < 0 || absoluteIndex < firstIndex) return false;
 
@@ -64,7 +64,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
 
             // Set the segment at the clip data at the right index
             if (localIndex >= 0)
-                AudioClip.SetData(audioSegment, localIndex * SegDataLen);
+                AudioClip.SetData(audioSegment, localIndex * SegLenghtInSamples);
             return true;
         }
 
@@ -87,7 +87,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             // loop that around and use the local index
             if (index >= SegCount)
                 index = GetNormalizedIndex(index);
-            AudioClip.SetData(new float[SegDataLen], index * SegDataLen);
+            AudioClip.SetData(new float[SegLenghtInSamples], index * SegLenghtInSamples);
             return true;
         }
 
@@ -95,7 +95,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// Clear the entire buffer
         /// </summary>
         public void Clear() {
-            AudioClip.SetData(new float[SegDataLen * SegCount], 0);
+            AudioClip.SetData(new float[SegLenghtInSamples * SegCount], 0);
         }
     }
 }

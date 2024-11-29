@@ -3,10 +3,23 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
 
 namespace Adrenak.UniMic {
-    [ExecuteAlways]
+    //[ExecuteAlways]
+
+    
+
     public class Mic : MonoBehaviour {
+
+
+        [DllImport("OSLNative")]
+        public static extern void MultiplyArrayBySingleValue(float[] a, int length, float val);
+        [DllImport("OSLNative")]
+        public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+
         // ================================================
         #region MEMBERS
         // ================================================
@@ -23,7 +36,7 @@ namespace Adrenak.UniMic {
         /// <summary>
         /// Last populated audio sample
         /// </summary>
-        public float[] Sample { get; private set; }
+        public float[] Segment { get; private set; }
 
         /// <summary>
         /// Sample duration/length in milliseconds
@@ -120,11 +133,30 @@ namespace Adrenak.UniMic {
             return Instance;
         }
 
+        float gaindB = 0f;
+        float gainMult = 1f;
+
         void Awake() {
             //if(Application.isPlaying)
             //    DontDestroyOnLoad(gameObject);
             if (Devices.Count > 0)
                 CurrentDeviceIndex = 0;
+
+            gaindB = 12;
+
+            if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Quest_2 ||
+            Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Link_Quest_2)
+            {
+                gaindB = 14;
+            }
+
+            if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Quest_3 ||
+            Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Link_Quest_3)
+            {
+                gaindB = 14;
+            }
+
+            gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
         }
 
         /// <summary>
@@ -149,90 +181,108 @@ namespace Adrenak.UniMic {
         /// <summary>
         /// Starts to stream the input of the current Mic device
         /// </summary>
-        public void StartRecording(int frequency = 16000, int sampleDurationMS = 10) {
+        public void StartRecording(int frequency = 16000, int segmentLengthInMilliSec = 10) {
             StopRecording();
             IsRecording = true;
 
             Frequency = frequency;
-            SampleDurationMS = sampleDurationMS;
+            SampleDurationMS = segmentLengthInMilliSec;
 
             AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
-            Sample = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
 
-            StartCoroutine(ReadRawAudio());
+            Segment = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
+
+            Debug.Log("UniVoice audio channels: " + AudioClip.channels);
+
+            readRawAudioCoroutine = StartCoroutine(ReadRawAudio());
 
             OnStartRecording?.Invoke();
         }
+
+
+        private Coroutine readRawAudioCoroutine;
 
         /// <summary>
         /// Ends the Mic stream.
         /// </summary>
         public void StopRecording() {
-            if (!Microphone.IsRecording(CurrentDeviceName)) return;
+            //if (!Microphone.IsRecording(CurrentDeviceName)) return;
 
             IsRecording = false;
 
             Microphone.End(CurrentDeviceName);
-            Destroy(AudioClip);
+            //Destroy(AudioClip);
             AudioClip = null;
 
-            StopCoroutine(ReadRawAudio());
+            if (readRawAudioCoroutine != null)
+            {
+                StopCoroutine(readRawAudioCoroutine);
+                readRawAudioCoroutine = null;
+            }
 
             OnStopRecording?.Invoke();
         }
 
-        IEnumerator ReadRawAudio() {
+        
+        IEnumerator ReadRawAudio()
+        {
             int loops = 0;
             int readAbsPos = 0;
             int prevPos = 0;
-            float[] temp = new float[Sample.Length];
 
-            // set the gain for the mic input in dB here
-            // todo: use the OSL_Native Compressor / Limiter here
-            // but probably Meta Quest already does some dynamic gain regulation and other filtering on their mic
-            // still that some handling of different output levels varying between platforms would be helpful, or allow for 
-            float gaindB = 18;
-            float gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
+            // Accessing CurrentDevicename each frame is expensive, apparently it queries the OS each time. Cache it.
+            string currDevName = CurrentDeviceName;
 
-            while (AudioClip != null && Microphone.IsRecording(CurrentDeviceName)) {
-                bool isNewDataAvailable = true;
+            while (IsRecording && AudioClip != null && Microphone.IsRecording(currDevName))
+            {
+                int currPos = Microphone.GetPosition(currDevName);
+                if (currPos < prevPos) loops++;
+                prevPos = currPos;
 
-                while (isNewDataAvailable) {
-                    int currPos = Microphone.GetPosition(CurrentDeviceName);
-                    if (currPos < prevPos)
-                        loops++;
-                    prevPos = currPos;
+                var currAbsPos = loops * AudioClip.samples + currPos;
+                var nextReadAbsPos = readAbsPos + Segment.Length;
 
-                    var currAbsPos = loops * AudioClip.samples + currPos;
-                    var nextReadAbsPos = readAbsPos + temp.Length;
+                if ((currAbsPos - nextReadAbsPos) > 0)
+                {
+                    float[] availableSamples = new float[(int)(currAbsPos - nextReadAbsPos)];
+                    AudioClip.GetData(availableSamples, (int)(readAbsPos % AudioClip.samples));
 
-                    if (nextReadAbsPos < currAbsPos) {
-                        AudioClip.GetData(temp, readAbsPos % AudioClip.samples);
+                    MultiplyArrayBySingleValue(availableSamples, availableSamples.Length, gainMult);
+                    
+                    int tempPos = 0;
 
-                        for (int i = 0; i < temp.Length; i++)
-                        {
-                            temp[i] *= gainMult;
-                        }
+                    while (tempPos + Segment.Length < availableSamples.Length)
+                    {
+                        //Debug.Log($"availableSamples.Length: {availableSamples.Length}, tempPos: {tempPos}, Sample.Length: {Sample.Length}");
 
-                        Sample = temp;
+                        Array.Copy(availableSamples, tempPos, Segment, 0, Segment.Length);
+
                         m_SampleCount++;
-                        OnSampleReady?.Invoke(m_SampleCount, Sample);
+                        OnSampleReady?.Invoke(m_SampleCount, Segment);
 
-                        OnTimestampedSampleReady?.Invoke(
-                            (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds),
-                            Sample
-                        );
+                        long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                        OnTimestampedSampleReady?.Invoke(timestamp, Segment);
 
-                        readAbsPos = nextReadAbsPos;
-                        isNewDataAvailable = true;
+                        tempPos += Segment.Length;
+                        readAbsPos += Segment.Length;
                     }
-                    else
-                        isNewDataAvailable = false;
                 }
+                else
+                {
+                    Debug.Log($"Skipping frame: currAbsPos={currAbsPos}, nextReadAbsPos={nextReadAbsPos}");
+                }
+
+                // Wait for the next frame before continuing the loop
                 yield return null;
             }
         }
+
         #endregion
+
+        void OnDestroy()
+        {
+            StopRecording();
+        }
 
         [Obsolete("UpdateDevices method is no longer needed. Devices property is now always up to date")]
         public void UpdateDevices() { }

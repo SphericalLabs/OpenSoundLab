@@ -183,9 +183,7 @@ public class tutorialsDeviceInterface : deviceInterface
       yield return new WaitForSeconds(.1f);
     }
     videoPlayer.skipOnDrop = false;
-    videoPlayer.renderMode = VideoRenderMode.MaterialOverride;
-    videoPlayer.targetMaterialRenderer = videoPlayer.GetComponentInChildren<Renderer>();
-    videoPlayer.targetMaterialProperty = "_MainTex";
+
     if(!startPaused) forcePlay();
   }
 

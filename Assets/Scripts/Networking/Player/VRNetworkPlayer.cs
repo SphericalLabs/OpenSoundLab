@@ -436,7 +436,7 @@ public class VRNetworkPlayer : NetworkBehaviour
             {
                 moveVoiceChatObject = true;
                 voiceOverTransform = audioOutput.transform;
-                audioOutput.AudioSource.spatialBlend = 1f;
+                audioOutput.audioSource.spatialBlend = 1f;
                 //Debug.Log($"found voicechat output object {gameObject.name}");
             }
         }

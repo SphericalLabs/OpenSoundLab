@@ -31,7 +31,7 @@ using System.Collections.Generic;
 
 public class microphoneDeviceInterface : deviceInterface {
 
-  MicrophoneSignalGenerator signal;
+  microphoneSignalGenerator signal;
   omniJack output;
   omniPlug outputplug;
   dial ampDial;
@@ -41,7 +41,7 @@ public class microphoneDeviceInterface : deviceInterface {
 
   public override void Awake() {
     base.Awake();
-    signal = GetComponent<MicrophoneSignalGenerator>();
+    signal = GetComponent<microphoneSignalGenerator>();
     output = GetComponentInChildren<omniJack>();
     ampDial = GetComponentInChildren<dial>();
     active = GetComponentInChildren<button>();
