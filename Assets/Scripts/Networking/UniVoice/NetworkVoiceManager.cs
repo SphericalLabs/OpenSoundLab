@@ -68,8 +68,8 @@ public class NetworkVoiceManager : MonoBehaviour
             new UniVoiceUniMicInput(0, 16000, 10),
             new UniVoiceAudioSourceOutput.Factory(200, 3, 10) // default is 10, 5, 10
         );
-        agent.Network.OnCreatedChatroom += () => {
-            ShowMessage($"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}");
+        agent.Network.OnCreatedChatroom += () => {            
+            ShowMessage(agent.Network.OwnID != -1 ? $"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}" : "");
         };
 
         agent.Network.OnChatroomCreationFailed += ex => {
