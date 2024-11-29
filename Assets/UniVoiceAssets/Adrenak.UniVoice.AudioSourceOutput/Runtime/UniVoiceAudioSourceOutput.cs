@@ -11,7 +11,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput
     /// This class feeds incoming mono audio segments directly to a stereo AudioSource via OnAudioFilterRead.
     /// It manages playback synchronization, handles missing segments, and implements smooth crossfades during catchup.
     /// </summary>
-    [RequireComponent(typeof(AudioSource))]
+    
     public class UniVoiceAudioSourceOutput : MonoBehaviour, IAudioOutput
     {
         private const string TAG = "UniVoiceAudioSourceOutput";
@@ -134,12 +134,10 @@ namespace Adrenak.UniVoice.AudioSourceOutput
 
             // Configure AudioSource settings
             audioSource.playOnAwake = false;
-            audioSource.loop = false;
-            audioSource.spatialize = true;
-            audioSource.spatializePostEffects = true;
+            audioSource.loop = false;            
+            audioSource.spatialize = true; // Please note that the AudioSource must be after this script in order for the spatialization to work
             audioSource.spatialBlend = 1f;
             audioSource.mute = false;
-            
 
             Debug.unityLogger.Log(TAG, $"Initialized with frequency: {frequency}, channels: {this.channelCount}, segmentLength: {segmentLengthInSamples}, MinSegCount: {MinSegCount}, MaxSegCount: {MaxSegCount}");
         }
@@ -364,11 +362,11 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 crossfadeSamplesLeft = crossfadeSampleCount;
             }
 
-            // Enqueue a crossfade initiation log on the main thread
-            EnqueueMainThreadAction(() =>
-            {
-                Debug.unityLogger.Log(TAG, $"Initiated crossfade for skipping {segmentsToSkip} segments.");
-            });
+            //// Enqueue a crossfade initiation log on the main thread
+            //EnqueueMainThreadAction(() =>
+            //{
+            //    Debug.unityLogger.Log(TAG, $"Initiated crossfade for skipping {segmentsToSkip} segments.");
+            //});
         }
 
         /// <summary>
