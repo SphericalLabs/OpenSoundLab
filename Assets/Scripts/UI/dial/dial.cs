@@ -54,7 +54,7 @@ public class dial : manipObject
 
     public float realRot = 0f;
     public float prevShakeRot = 0f;
-    public float fineMult = 5f;
+    public float fineMult = 15f;
 
     public bool isNotched = false;
     public bool isBipolar = false;

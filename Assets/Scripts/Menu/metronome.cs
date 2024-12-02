@@ -27,6 +27,8 @@
 
 using UnityEngine;
 using System.Collections;
+using System;
+
 
 public class metronome : componentInterface
 {
@@ -113,7 +115,7 @@ public class metronome : componentInterface
 
     public void updateBpm()
     {
-        bpm = Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm) * pitchBendMult;
+        bpm = (float) Math.Round(Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm), 1) * pitchBendMult;
         masterControl.instance?.setBPM(bpm);
         txt.text = bpm.ToString("N1");
     }
