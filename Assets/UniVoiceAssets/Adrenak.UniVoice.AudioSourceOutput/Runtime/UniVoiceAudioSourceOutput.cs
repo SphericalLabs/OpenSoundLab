@@ -198,39 +198,44 @@ namespace Adrenak.UniVoice.AudioSourceOutput
             lock (playLock)
             {
                 int samplesPerChannel = data.Length / channels;
-                //Array.Clear(data, 0, data.Length);
 
                 // Determine buffer state
                 readyCount = segments.Count;
 
-                if(fillingUp && readyCount >= MinSegCount + (MinSegCount - MaxSegCount) / 2){
+                if (fillingUp && readyCount >= MinSegCount + (MaxSegCount - MinSegCount) / 2)
+                {
                     fillingUp = false; // enough segments gathered
                     return;
                 }
 
                 if (readyCount < MinSegCount)
                 {
-                    //// Insufficient buffer, enqueue mute and pause actions if not already muted
+                    // Insufficient buffer, log and wait until enough segments are ready
                     EnqueueMainThreadAction(() =>
                     {
-                        Debug.unityLogger.Log(TAG, "Insufficient segments available.");
+                        Debug.unityLogger.Log(TAG, "Insufficient segments available: " + readyCount);
                     });
 
                     fillingUp = true;
-
-                    // let's wait until enough segments are ready
                     return;
                 }
-                else if (readyCount >= MaxSegCount)
-                {
-                    // Buffer overflow, initiate catchup
-                    int segmentsToSkip = readyCount - ((MaxSegCount - MinSegCount) / 2);
-                    SkipSegments(segmentsToSkip);
-                }
-                
 
-                // Fill playbackQueue with available segments up to MaxSegCount
-                while (playbackQueue.Count < MaxSegCount && !segments.IsEmpty)
+                // Compute total available samples in playbackQueue
+                int totalAvailableSamples = 0;
+
+                if (playbackQueue.Count > 0)
+                {
+                    float[] currentSegment = playbackQueue.Peek();
+                    totalAvailableSamples += (currentSegment.Length - playbackSampleIndex) * UpsampleFactor;
+                }
+
+                foreach (var segment in playbackQueue.Skip(1))
+                {
+                    totalAvailableSamples += segment.Length * UpsampleFactor;
+                }
+
+                // Fill playbackQueue with enough segments to fill data, up to MaxSegCount
+                while (totalAvailableSamples < samplesPerChannel && playbackQueue.Count < MaxSegCount && !segments.IsEmpty)
                 {
                     // Find the smallest available segment index
                     int minKey = segments.Keys.Min();
@@ -238,17 +243,10 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                     if (segments.TryRemove(minKey, out float[] segment))
                     {
                         playbackQueue.Enqueue(segment);
+                        totalAvailableSamples += segment.Length * UpsampleFactor;
 
-                        // Update nextSegmentIndex to the next expected index after the smallest one
-                        if (minKey >= nextSegmentIndex)
-                        {
-                            nextSegmentIndex = minKey + 1;
-                        }
-                        else
-                        {
-                            // Handle cases where minKey is less than nextSegmentIndex
-                            nextSegmentIndex = Math.Max(nextSegmentIndex, minKey + 1);
-                        }
+                        // Update nextSegmentIndex
+                        nextSegmentIndex = Math.Max(nextSegmentIndex, minKey + 1);
                     }
                     else
                     {
@@ -257,11 +255,9 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                     }
                 }
 
-
-                // Initialize a separate output sample index
+                // Initialize output sample index
                 int outputSampleIndex = 0;
 
-                // Fill the data buffer with audio samples with on-the-fly upsampling
                 while (outputSampleIndex < samplesPerChannel && playbackQueue.Count > 0)
                 {
                     float[] currentSegment = playbackQueue.Peek();
@@ -274,21 +270,49 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                         continue;
                     }
 
-                    float sample = currentSegment[playbackSampleIndex];
+                    // Get current sample
+                    float currentSample = currentSegment[playbackSampleIndex];
 
-                    // Insert each sample three times for upsampling
-                    for (int up = 0; up < UpsampleFactor && outputSampleIndex < samplesPerChannel; up++)
+                    // Get next sample
+                    float nextSample = currentSample; // Default to current sample
+
+                    if (playbackSampleIndex + 1 < currentSegment.Length)
                     {
-                        for (int ch = 0; ch < channels; ch++)
-                        {
-                            data[outputSampleIndex * channels + ch] += sample;
-                        }
-                        outputSampleIndex++;
+                        nextSample = currentSegment[playbackSampleIndex + 1];
                     }
+                    else
+                    {
+                        // At the end of current segment, try to get the first sample of the next segment
+                        if (playbackQueue.Count > 1)
+                        {
+                            float[] nextSegment = playbackQueue.ElementAt(1);
+                            if (nextSegment.Length > 0)
+                            {
+                                nextSample = nextSegment[0];
+                            }
+                        }
+                    }
+
+                    // Use the UpsampleSegmentLinear function
+                    UpsampleSegmentLinear(currentSample, nextSample, UpsampleFactor, data, ref outputSampleIndex, samplesPerChannel, channels);
 
                     playbackSampleIndex++;
                 }
-                
+            }
+        }
+
+        private void UpsampleSegmentLinear(float currentSample, float nextSample, int upsampleFactor, float[] outputData, ref int outputSampleIndex, int samplesPerChannel, int channels)
+        {
+            for (int up = 0; up < upsampleFactor && outputSampleIndex < samplesPerChannel; up++)
+            {
+                float t = (float)up / upsampleFactor;
+                float interpolatedSample = Mathf.Lerp(currentSample, nextSample, t);
+
+                for (int ch = 0; ch < channels; ch++)
+                {
+                    outputData[outputSampleIndex * channels + ch] += interpolatedSample;
+                }
+                outputSampleIndex++;
             }
         }
 
