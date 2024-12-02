@@ -57,13 +57,6 @@ namespace Adrenak.UniVoice.AudioSourceOutput
         private object playLock = new object();
 
         /// <summary>
-        /// Crossfade parameters.
-        /// </summary>
-        private const int crossfadeSampleCount = 512; // Number of samples over which to perform crossfade
-        private bool isCrossfading = false;
-        private int crossfadeSamplesLeft = 0;
-
-        /// <summary>
         /// AudioSource component.
         /// </summary>
         public AudioSource audioSource;
@@ -189,7 +182,9 @@ namespace Adrenak.UniVoice.AudioSourceOutput
             Feed(segment.segmentIndex, segment.frequency, segment.channelCount, segment.samples);
 
         // 16khz to 48khz
-        public int UpsampleFactor = 3; 
+        public int UpsampleFactor = 3;
+        public int readyCount = 0;
+        public bool fillingUp = false;
 
         /// <summary>
         /// OnAudioFilterRead is called on a separate audio thread to supply audio data.
@@ -203,7 +198,36 @@ namespace Adrenak.UniVoice.AudioSourceOutput
             lock (playLock)
             {
                 int samplesPerChannel = data.Length / channels;
-                Array.Clear(data, 0, data.Length);
+                //Array.Clear(data, 0, data.Length);
+
+                // Determine buffer state
+                readyCount = segments.Count;
+
+                if(fillingUp && readyCount >= MinSegCount + (MinSegCount - MaxSegCount) / 2){
+                    fillingUp = false; // enough segments gathered
+                    return;
+                }
+
+                if (readyCount < MinSegCount)
+                {
+                    //// Insufficient buffer, enqueue mute and pause actions if not already muted
+                    EnqueueMainThreadAction(() =>
+                    {
+                        Debug.unityLogger.Log(TAG, "Insufficient segments available.");
+                    });
+
+                    fillingUp = true;
+
+                    // let's wait until enough segments are ready
+                    return;
+                }
+                else if (readyCount >= MaxSegCount)
+                {
+                    // Buffer overflow, initiate catchup
+                    int segmentsToSkip = readyCount - ((MaxSegCount - MinSegCount) / 2);
+                    SkipSegments(segmentsToSkip);
+                }
+                
 
                 // Fill playbackQueue with available segments up to MaxSegCount
                 while (playbackQueue.Count < MaxSegCount && !segments.IsEmpty)
@@ -233,39 +257,6 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                     }
                 }
 
-                // Determine buffer state
-                int readyCount = segments.Count;
-
-                if (readyCount < MinSegCount)
-                {
-                    //// Insufficient buffer, enqueue mute and pause actions if not already muted
-                    //EnqueueMainThreadAction(() =>
-                    //{
-                    //    if (!audioSource.mute)
-                    //    {
-                    //        audioSource.mute = true;
-                    //        Debug.unityLogger.Log(TAG, "Muted due to insufficient buffer.");
-                    //    }
-                    //});
-                }
-                else if (readyCount >= MaxSegCount)
-                {
-                    // Buffer overflow, initiate catchup
-                    int segmentsToSkip = readyCount - ((MaxSegCount - MinSegCount) / 2);
-                    SkipSegments(segmentsToSkip);
-                }
-                else
-                {
-                    //// Sufficient buffer, enqueue unmute actions if muted
-                    //EnqueueMainThreadAction(() =>
-                    //{
-                    //    if (audioSource.mute)
-                    //    {
-                    //        audioSource.mute = false;
-                    //        Debug.unityLogger.Log(TAG, "Unmuted playback.");
-                    //    }
-                    //});
-                }
 
                 // Initialize a separate output sample index
                 int outputSampleIndex = 0;
@@ -297,47 +288,10 @@ namespace Adrenak.UniVoice.AudioSourceOutput
 
                     playbackSampleIndex++;
                 }
-
-                // Insert silence for any remaining samples
-                while (outputSampleIndex < samplesPerChannel)
-                {
-                    for (int ch = 0; ch < channels; ch++)
-                    {
-                        data[outputSampleIndex * channels + ch] += 0f;
-                    }
-                    outputSampleIndex++;
-                }
-
-                // Apply crossfade if active
-                if (isCrossfading)
-                {
-                    ApplyCrossfade(data, channels);
-                }
+                
             }
         }
 
-
-        /// <summary>
-        /// Applies a smooth crossfade to the current audio buffer to prevent artifacts.
-        /// </summary>
-        /// <param name="data">Audio data buffer.</param>
-        /// <param name="channels">Number of audio channels.</param>
-        private void ApplyCrossfade(float[] data, int channels)
-        {
-            if (crossfadeSamplesLeft > 0)
-            {
-                float fadeFactor = 1f - ((float)crossfadeSamplesLeft / crossfadeSampleCount);
-                for (int i = 0; i < data.Length; i++)
-                {
-                    data[i] *= fadeFactor;
-                }
-                crossfadeSamplesLeft--;
-                if (crossfadeSamplesLeft <= 0)
-                {
-                    isCrossfading = false;
-                }
-            }
-        }
 
         /// <summary>
         /// Skips a specified number of segments to catch up with the playback.
@@ -357,16 +311,8 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                     }
                 }
 
-                // Initiate crossfade
-                isCrossfading = true;
-                crossfadeSamplesLeft = crossfadeSampleCount;
             }
 
-            //// Enqueue a crossfade initiation log on the main thread
-            //EnqueueMainThreadAction(() =>
-            //{
-            //    Debug.unityLogger.Log(TAG, $"Initiated crossfade for skipping {segmentsToSkip} segments.");
-            //});
         }
 
         /// <summary>
@@ -383,24 +329,23 @@ namespace Adrenak.UniVoice.AudioSourceOutput
         /// </summary>
         public class Factory : IAudioOutputFactory
         {
-            public int BufferSegCount { get; private set; }
             public int MinSegCount { get; private set; }
             public int MaxSegCount { get; private set; }
 
-            public Factory() : this(20, 5, 15) { }
+            public Factory() : this(5, 15) { }
 
-            public Factory(int bufferSegCount, int minSegCount, int maxSegCount)
+            public Factory(int minSegCount, int maxSegCount)
             {
-                BufferSegCount = bufferSegCount;
+
                 MinSegCount = minSegCount;
                 MaxSegCount = maxSegCount;
             }
 
-            public IAudioOutput Create(int samplingRate, int channelCount, int segmentLength)
+            public IAudioOutput Create(int samplingRate, int channelCount, int segmentLengthInSamples)
             {
                 var go = new GameObject($"UniVoiceAudioSourceOutput");
                 var output = go.AddComponent<UniVoiceAudioSourceOutput>();
-                output.Initialize(samplingRate, channelCount, segmentLength, MinSegCount, MaxSegCount);
+                output.Initialize(samplingRate, channelCount, segmentLengthInSamples, MinSegCount, MaxSegCount);
                 return output;
             }
         }

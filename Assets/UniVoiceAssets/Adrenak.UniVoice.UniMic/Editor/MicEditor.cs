@@ -42,7 +42,7 @@ namespace Adrenak.UniMic {
 
 				EditorGUILayout.Toggle("Is Recording", mic.IsRecording);
 				EditorGUILayout.IntField("Frequency", mic.Frequency);
-				EditorGUILayout.IntField("Sample Duration (ms)", mic.SampleDurationMS);
+				EditorGUILayout.IntField("Sample Duration (ms)", mic.SegmentDurationMS);
 
 				GUI.enabled = true;
 			}
