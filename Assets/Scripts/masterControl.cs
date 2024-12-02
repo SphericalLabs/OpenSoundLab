@@ -32,6 +32,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Net;
 using System.Linq;
+using Meta.XR.EnvironmentDepth;
 
 public class masterControl : MonoBehaviour {
 
@@ -81,16 +82,18 @@ public class masterControl : MonoBehaviour {
 
     public float glowVal = 1;
 
-  public string SaveDir;
+    public string SaveDir;
 
-  public bool handlesEnabled = true;
-  public bool jacksEnabled = true;
+    public bool handlesEnabled = true;
+    public bool jacksEnabled = true;
 
-  public masterBusRecorder recorder;
-  public metronome metro;
-  public GameObject CameraRig;
+    public masterBusRecorder recorder;
+    public metronome metro;
+    public GameObject CameraRig;
+    public EnvironmentDepthManager depthManager;
+    public manipulator leftManip, rightManip;
 
-  void Awake() {
+    void Awake() {
 
     if (!Application.isEditor && !Debug.isDebugBuild){ 
         Debug.unityLogger.logEnabled = false; 
@@ -168,15 +171,16 @@ public class masterControl : MonoBehaviour {
       }
     #endif
 
-    beatUpdateEvent += beatUpdateEventLocal;
-    beatResetEvent += beatResetEventLocal;
+        beatUpdateEvent += beatUpdateEventLocal;
+        beatResetEvent += beatResetEventLocal;
 
-    GetComponent<sampleManager>().Init();
+        GetComponent<sampleManager>().Init();
 
-    recorder = GetComponentInChildren<masterBusRecorder>();
+        recorder = GetComponentInChildren<masterBusRecorder>();
 
+        depthManager = CameraRig.GetComponent<EnvironmentDepthManager>();
 
-    SceneManager.activeSceneChanged += findMetronome;
+        SceneManager.activeSceneChanged += findMetronome;
 
   }
 
@@ -194,6 +198,8 @@ public class masterControl : MonoBehaviour {
             metro.bpmDial.onPercentChangedEventLocal.AddListener(metro.readBpmDialAndBroadcast);
         }
     }
+
+    
 
     private void Start()
     {
@@ -236,6 +242,14 @@ public class masterControl : MonoBehaviour {
             lastBeat = Mathf.FloorToInt(curCycle * 8f);
         }
 
+        if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
+        if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
+
+        if (depthManager != null && OSLInput.getInstance().areBothSidesPressed() && !leftManip.isGrabbing() && !rightManip.isGrabbing()){
+            depthManager.OcclusionShadersMode = OcclusionShadersMode.None;
+        } else {
+            depthManager.OcclusionShadersMode = OcclusionShadersMode.SoftOcclusion;
+        }
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch))
         {
