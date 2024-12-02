@@ -74,7 +74,7 @@ public class microphoneSignalGenerator : signalGenerator {
     sharedBuffer = new float[MAX_BUFFER_LENGTH];
 
     AudioSettings.GetDSPBufferSize(out bufferSize, out numBuffers);
-    targetBuffering = bufferSize * 8;
+    targetBuffering = bufferSize * 2;
 
     //int minFreq = 0, maxFreq = 0;
     //Microphone.GetDeviceCaps(Microphone.devices[micID], out minFreq, out maxFreq);
