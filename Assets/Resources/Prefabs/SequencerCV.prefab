@@ -1129,7 +1129,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 1
   toggleKey: 0
   buttonID: 0
   button2DID: 0000000000000000
@@ -2668,7 +2668,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000011182095266}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}

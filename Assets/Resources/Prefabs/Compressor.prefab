@@ -419,6 +419,8 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
+  firstSample: 0
+  prevFirstSample: 0
   input: {fileID: 0}
   sidechain: {fileID: 0}
   attenuation: 0
@@ -1142,7 +1144,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000013101032572}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -1296,7 +1297,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000012180182938}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -2268,6 +2268,8 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
+  firstSample: 0
+  prevFirstSample: 0
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
@@ -6280,7 +6282,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 4159464169007596691}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -7253,7 +7254,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 6096513155007806913}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -8611,7 +8611,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 1
   toggleKey: 0
   buttonID: 1
   button2DID: 

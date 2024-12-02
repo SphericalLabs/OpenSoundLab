@@ -626,6 +626,8 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
+  firstSample: 0
+  prevFirstSample: 0
   amp: 1
   active: 1
 --- !u!114 &114000010411770154
@@ -1436,7 +1438,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 1
   toggleKey: 0
   buttonID: -2
   button2DID: 
@@ -1811,7 +1813,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000010056577768}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -2026,6 +2027,8 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
+  firstSample: 0
+  prevFirstSample: 0
   volume: 1
   incoming: {fileID: 114000012155544596}
   monoMode: 0
