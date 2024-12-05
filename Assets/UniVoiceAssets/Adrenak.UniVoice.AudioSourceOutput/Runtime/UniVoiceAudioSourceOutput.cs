@@ -234,8 +234,8 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                     totalAvailableSamples += segment.Length * UpsampleFactor;
                 }
 
-                // Fill playbackQueue with enough segments to fill data, up to MaxSegCount
-                while (totalAvailableSamples < samplesPerChannel && playbackQueue.Count < MaxSegCount && !segments.IsEmpty)
+                // Fill playbackQueue with enough segments to fill data
+                while (totalAvailableSamples < samplesPerChannel && !segments.IsEmpty)
                 {
                     // Find the smallest available segment index
                     int minKey = segments.Keys.Min();
