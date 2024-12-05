@@ -592,7 +592,7 @@ MonoBehaviour:
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   bufferResetMultiplier: 3
   changedDetection: 1
-  positionSensitivity: 0.01
+  positionSensitivity: 0.002
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
 --- !u!114 &8327847279384020432
@@ -627,7 +627,7 @@ MonoBehaviour:
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   bufferResetMultiplier: 3
   changedDetection: 1
-  positionSensitivity: 0.01
+  positionSensitivity: 0.002
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
 --- !u!114 &4976870144117666932
@@ -662,7 +662,7 @@ MonoBehaviour:
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   bufferResetMultiplier: 3
   changedDetection: 1
-  positionSensitivity: 0.01
+  positionSensitivity: 0.002
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
 --- !u!114 &7616963587376705829
@@ -697,7 +697,7 @@ MonoBehaviour:
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   bufferResetMultiplier: 3
   changedDetection: 1
-  positionSensitivity: 0.01
+  positionSensitivity: 0.002
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
 --- !u!1 &3834834239668693041
