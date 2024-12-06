@@ -20,11 +20,11 @@ public class PerformanceSettings : MonoBehaviour
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.2f },
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.3f },
       //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.4f },
-      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.5f },
-      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.6f },
-      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.7f },
-      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.8f },
-      new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.9f },
+      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.5f },
+      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.6f },
+      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.7f },
+      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.8f },
+      //new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 0.9f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.HighTop, renderScale = 1f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.High, renderScale = 1f },
       new QualityStep { fovLevel = OVRManager.FoveatedRenderingLevel.Medium, renderScale = 1f },
@@ -105,7 +105,7 @@ public class PerformanceSettings : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
-    //return;
+    
 
     if (Application.platform != RuntimePlatform.Android) return;
 

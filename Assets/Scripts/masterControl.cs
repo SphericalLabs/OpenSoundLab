@@ -179,10 +179,13 @@ public class masterControl : MonoBehaviour {
         recorder = GetComponentInChildren<masterBusRecorder>();
 
         depthManager = CameraRig.GetComponent<EnvironmentDepthManager>();
+        depthIsSupported = EnvironmentDepthManager.IsSupported;
 
         SceneManager.activeSceneChanged += findMetronome;
 
-  }
+    }
+
+    bool depthIsSupported = false;
 
     public void findMetronome(Scene prev, Scene next)
     {
@@ -266,28 +269,37 @@ public class masterControl : MonoBehaviour {
         {
             Camera.main.backgroundColor = new Color(0f, 0f, 0f, 0f);
         }
+        
 
-        if (leftStick.y > 0.5f && rightStick.y > 0.5f)
-        {
-            defaultOcclusionMode = OcclusionShadersMode.None;
+        if(depthIsSupported){ 
+
+            if (leftStick.y > 0.5f && rightStick.y > 0.5f)
+            {
+                defaultOcclusionMode = OcclusionShadersMode.None;
+                 depthManager.enabled = false;
+            }
+
+            if (leftStick.y < -0.5f && rightStick.y < -0.5f)
+            {
+                defaultOcclusionMode = OcclusionShadersMode.SoftOcclusion;
+                depthManager.enabled = true;
+            }
+
+            if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
+            if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
+
+            if (depthManager != null && OSLInput.getInstance().areBothSidesPressed() && !leftManip.isGrabbing() && !rightManip.isGrabbing())
+            {
+                depthManager.OcclusionShadersMode = OcclusionShadersMode.None;
+                depthManager.enabled = false;
+            }
+            else
+            {
+                depthManager.OcclusionShadersMode = defaultOcclusionMode;
+                depthManager.enabled = true;
+            }
         }
 
-        if (leftStick.y < -0.5f && rightStick.y < -0.5f)
-        {
-            defaultOcclusionMode = OcclusionShadersMode.SoftOcclusion;
-        }
-
-        if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
-        if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
-
-        if (depthManager != null && OSLInput.getInstance().areBothSidesPressed() && !leftManip.isGrabbing() && !rightManip.isGrabbing())
-        {
-            depthManager.OcclusionShadersMode = OcclusionShadersMode.None;
-        }
-        else
-        {
-            depthManager.OcclusionShadersMode = defaultOcclusionMode;
-        }
 
         if (metro != null)
         {
