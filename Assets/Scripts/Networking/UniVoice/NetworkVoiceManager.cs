@@ -66,7 +66,7 @@ public class NetworkVoiceManager : MonoBehaviour
         agent = new ChatroomAgent(
             new UniVoiceMirrorNetwork(),
             new UniVoiceUniMicInput(0, 16000, 10), // last parameter sets segment length in milliseconds
-            new UniVoiceAudioSourceOutput.Factory(20, 30) // sets min and max segment buffer count
+            new UniVoiceAudioSourceOutput.Factory(15, 40) // minSegCount: target fill up when buffer ran empty, maxSegCount: threshold when skipping occurs, skip target will be center of minSegCount and maxSegCount in order to debounce that threshold
         );
         agent.Network.OnCreatedChatroom += () => {            
             ShowMessage(agent.Network.OwnID != -1 ? $"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}" : "");

@@ -96,13 +96,6 @@ namespace Adrenak.UniVoice.AudioSourceOutput
             this.channelCount = channelCount;
             this.segmentLengthInSamples = segmentLengthInSamples;
 
-            // Ensure channelCount is 2 (stereo)
-            if (this.channelCount != 2)
-            {
-                Debug.unityLogger.LogWarning(TAG, $"Channel count set to {channelCount}. This implementation expects stereo AudioSource. Proceeding with stereo.");
-                this.channelCount = 2;
-            }
-
             MinSegCount = Mathf.Clamp(minSegCount, 0, maxSegCount);
             MaxSegCount = Mathf.Clamp(maxSegCount, MinSegCount + 1, maxSegCount);
 
@@ -208,13 +201,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 // Determine buffer state
                 readyCount = segments.Count;
 
-                if (fillingUp && readyCount >= MinSegCount + (MaxSegCount - MinSegCount) / 2)
-                {
-                    fillingUp = false; // enough segments gathered
-                    return;
-                }
-
-                if (readyCount < MinSegCount)
+                if (readyCount <= 0)
                 {
                     // Insufficient buffer, log and wait until enough segments are ready
                     EnqueueMainThreadAction(() =>
@@ -224,6 +211,18 @@ namespace Adrenak.UniVoice.AudioSourceOutput
 
                     fillingUp = true;
                     return;
+                }
+
+                if (fillingUp)
+                {
+                    if (readyCount >= MinSegCount)
+                    {
+                        fillingUp = false; // enough segments gathered
+                    }
+                    else
+                    {
+                        return; // wait longer
+                    }
                 }
 
                 // Remove segments that are too old
