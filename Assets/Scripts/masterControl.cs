@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright ? 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ? 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ? 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ? 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -242,14 +242,7 @@ public class masterControl : MonoBehaviour {
             lastBeat = Mathf.FloorToInt(curCycle * 8f);
         }
 
-        if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
-        if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
 
-        if (depthManager != null && OSLInput.getInstance().areBothSidesPressed() && !leftManip.isGrabbing() && !rightManip.isGrabbing()){
-            depthManager.OcclusionShadersMode = OcclusionShadersMode.None;
-        } else {
-            depthManager.OcclusionShadersMode = OcclusionShadersMode.SoftOcclusion;
-        }
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch))
         {
@@ -274,6 +267,28 @@ public class masterControl : MonoBehaviour {
             Camera.main.backgroundColor = new Color(0f, 0f, 0f, 0f);
         }
 
+        if (leftStick.y > 0.5f && rightStick.y > 0.5f)
+        {
+            defaultOcclusionMode = OcclusionShadersMode.None;
+        }
+
+        if (leftStick.y < -0.5f && rightStick.y < -0.5f)
+        {
+            defaultOcclusionMode = OcclusionShadersMode.SoftOcclusion;
+        }
+
+        if (leftManip == null) leftManip = GameObject.Find("LeftHandAnchor").GetComponentInChildren<manipulator>();
+        if (rightManip == null) rightManip = GameObject.Find("RightHandAnchor").GetComponentInChildren<manipulator>();
+
+        if (depthManager != null && OSLInput.getInstance().areBothSidesPressed() && !leftManip.isGrabbing() && !rightManip.isGrabbing())
+        {
+            depthManager.OcclusionShadersMode = OcclusionShadersMode.None;
+        }
+        else
+        {
+            depthManager.OcclusionShadersMode = defaultOcclusionMode;
+        }
+
         if (metro != null)
         {
             if (metro.volumepercent != metro.volumeDial.percent)
@@ -285,6 +300,8 @@ public class masterControl : MonoBehaviour {
         }
 
     }
+
+    OcclusionShadersMode defaultOcclusionMode = OcclusionShadersMode.SoftOcclusion;
 
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
@@ -420,9 +437,9 @@ public class masterControl : MonoBehaviour {
   public Transform patchAnchor;
 
   Vector2 leftStick, rightStick;
-   
+  
 
-  public void openRecordings() {
+    public void openRecordings() {
 //    System.Diagnostics.Process.Start("explorer.exe", "/root," + SaveDir + Path.DirectorySeparatorChar + "Samples" + Path.DirectorySeparatorChar + "Recordings" + Path.DirectorySeparatorChar);
   }
 
