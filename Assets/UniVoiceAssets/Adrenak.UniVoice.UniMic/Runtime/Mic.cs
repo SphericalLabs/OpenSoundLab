@@ -4,10 +4,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 
 namespace Adrenak.UniMic {
     //[ExecuteAlways]
+
+    
+
     public class Mic : MonoBehaviour {
+
+
+        [DllImport("OSLNative")]
+        public static extern void MultiplyArrayBySingleValue(float[] a, int length, float val);
+        [DllImport("OSLNative")]
+        public static extern void SetArrayToSingleValue(float[] a, int length, float val);
+
+
         // ================================================
         #region MEMBERS
         // ================================================
@@ -24,18 +36,18 @@ namespace Adrenak.UniMic {
         /// <summary>
         /// Last populated audio sample
         /// </summary>
-        public float[] Sample { get; private set; }
+        public float[] Segment { get; private set; }
 
         /// <summary>
         /// Sample duration/length in milliseconds
         /// </summary>
-        public int SampleDurationMS { get; private set; }
+        public int SegmentDurationMS { get; private set; }
 
         /// <summary>
         /// The length of the sample float array
         /// </summary>
         public int SampleLength {
-            get { return Frequency * SampleDurationMS / 1000; }
+            get { return Frequency * SegmentDurationMS / 1000; }
         }
 
         /// <summary>
@@ -121,11 +133,30 @@ namespace Adrenak.UniMic {
             return Instance;
         }
 
+        float gaindB = 0f;
+        float gainMult = 1f;
+
         void Awake() {
             //if(Application.isPlaying)
             //    DontDestroyOnLoad(gameObject);
             if (Devices.Count > 0)
                 CurrentDeviceIndex = 0;
+
+            gaindB = 12;
+
+            if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Quest_2 ||
+            Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Oculus_Link_Quest_2)
+            {
+                gaindB = 14;
+            }
+
+            if (Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Quest_3 ||
+            Unity.XR.Oculus.Utils.GetSystemHeadsetType() == Unity.XR.Oculus.SystemHeadset.Meta_Link_Quest_3)
+            {
+                gaindB = 12;
+            }
+
+            gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
         }
 
         /// <summary>
@@ -136,7 +167,7 @@ namespace Adrenak.UniMic {
             Microphone.End(CurrentDeviceName);
             CurrentDeviceIndex = index;
             if (IsRecording)
-                StartRecording(Frequency, SampleDurationMS);
+                StartRecording(Frequency, SegmentDurationMS);
         }
 
         /// <summary>
@@ -144,22 +175,23 @@ namespace Adrenak.UniMic {
         /// previously being used.
         /// </summary>
         public void ResumeRecording() {
-            StartRecording(Frequency, SampleDurationMS);
+            StartRecording(Frequency, SegmentDurationMS);
         }
 
         /// <summary>
         /// Starts to stream the input of the current Mic device
         /// </summary>
-        public void StartRecording(int frequency = 16000, int sampleDurationMS = 10) {
+        public void StartRecording(int frequency = 16000, int segmentLengthInMilliSec = 10) {
             StopRecording();
             IsRecording = true;
 
             Frequency = frequency;
-            SampleDurationMS = sampleDurationMS;
+            SegmentDurationMS = segmentLengthInMilliSec;
 
             AudioClip = Microphone.Start(CurrentDeviceName, true, 1, Frequency);
-            Sample = new float[Frequency / 1000 * SampleDurationMS * AudioClip.channels];
-            temp = new float[Sample.Length]; // Allocate temp here
+
+            Segment = new float[Frequency / 1000 * SegmentDurationMS * AudioClip.channels];
+
             Debug.Log("UniVoice audio channels: " + AudioClip.channels);
 
             readRawAudioCoroutine = StartCoroutine(ReadRawAudio());
@@ -191,66 +223,103 @@ namespace Adrenak.UniMic {
             OnStopRecording?.Invoke();
         }
 
-        private float[] temp;
+
         IEnumerator ReadRawAudio()
         {
             int loops = 0;
             int readAbsPos = 0;
             int prevPos = 0;
 
-            // Set the gain for the mic input in dB
-            float gaindB = 18;
-            float gainMult = Mathf.Pow(10.0f, gaindB / 20.0f);
-
-            // Accessing CurrentDevicename each frame is expensive, apparently it queries the OS each time. Cache it.
+            // Cache the device name to avoid repeated expensive calls
             string currDevName = CurrentDeviceName;
+
+            // Define buffer sizes
+            int bufferSize = Segment.Length; // Original buffer size (e.g., 160 samples)
+            int requiredBufferSize = 2 * bufferSize; // 2x buffer size (e.g., 320 samples)
+
+            // State flag to control processing
+            bool canProcess = false;
 
             while (IsRecording && AudioClip != null && Microphone.IsRecording(currDevName))
             {
+                // Get the current microphone position
                 int currPos = Microphone.GetPosition(currDevName);
-                if (currPos < prevPos) loops++;
+
+                // Handle looping of the AudioClip buffer
+                if (currPos < prevPos)
+                    loops++;
                 prevPos = currPos;
 
-                var currAbsPos = loops * AudioClip.samples + currPos;
-                var nextReadAbsPos = readAbsPos + Sample.Length;
+                // Calculate absolute positions to handle looping
+                long currAbsPos = (long)loops * AudioClip.samples + currPos;
+                long availableSamples = currAbsPos - readAbsPos;
 
-                if ((currAbsPos - nextReadAbsPos) > 0)
+                // Check if we have enough samples to start processing
+                if (!canProcess && availableSamples >= requiredBufferSize)
                 {
-                    float[] availableSamples = new float[(int)(currAbsPos - nextReadAbsPos)];
-                    AudioClip.GetData(availableSamples, (int)(readAbsPos % AudioClip.samples));
+                    canProcess = true; // Ready to process
+                }
 
-                    for (int i = 0; i < availableSamples.Length; i++)
+                // If in processing state
+                if (canProcess)
+                {
+                    // Recalculate available samples after potential state change
+                    availableSamples = currAbsPos - readAbsPos;
+
+                    // Process as long as we have enough samples
+                    while (availableSamples >= bufferSize)
                     {
-                        availableSamples[i] *= gainMult;
-                    }
+                        // If buffer is getting too empty, pause processing
+                        if (availableSamples < requiredBufferSize)
+                        {
+                            canProcess = false;
+                            break; // Exit the processing loop to wait for buffer refill
+                        }
 
-                    int tempPos = 0;
+                        // Ensure we don't read beyond the available samples
+                        int samplesToRead = (int)Mathf.Min(bufferSize, availableSamples);
 
-                    while (tempPos + Sample.Length < availableSamples.Length)
-                    {
-                        //Debug.Log($"availableSamples.Length: {availableSamples.Length}, tempPos: {tempPos}, Sample.Length: {Sample.Length}");
+                        // Allocate array to hold the samples
+                        float[] availableSamplesArray = new float[samplesToRead];
 
-                        Array.Copy(availableSamples, tempPos, Sample, 0, Sample.Length);
+                        // Get the samples from the AudioClip
+                        bool dataObtained = AudioClip.GetData(availableSamplesArray, (int)(readAbsPos % AudioClip.samples));
 
+                        if (!dataObtained)
+                        {
+                            Debug.LogWarning("Failed to get audio data from AudioClip.");
+                            break;
+                        }
+
+                        // Apply gain adjustment using the native method
+                        MultiplyArrayBySingleValue(availableSamplesArray, availableSamplesArray.Length, gainMult);
+
+                        // Remove possible residues
+                        SetArrayToSingleValue(Segment, Segment.Length, 0f);
+
+                        // Copy the processed samples into the Segment
+                        Array.Copy(availableSamplesArray, 0, Segment, 0, samplesToRead);
+
+                        // Invoke the events with the processed segment
                         m_SampleCount++;
-                        OnSampleReady?.Invoke(m_SampleCount, Sample);
+                        OnSampleReady?.Invoke(m_SampleCount, Segment);
 
                         long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                        OnTimestampedSampleReady?.Invoke(timestamp, Sample);
+                        OnTimestampedSampleReady?.Invoke(timestamp, Segment);
 
-                        tempPos += Sample.Length;
-                        readAbsPos += Sample.Length;
+                        // Update the read position
+                        readAbsPos += samplesToRead;
+
+                        // Update available samples
+                        availableSamples -= samplesToRead;
                     }
                 }
-                else
-                {
-                    Debug.Log($"Skipping frame: currAbsPos={currAbsPos}, nextReadAbsPos={nextReadAbsPos}");
-                }
 
-                // Wait for the next frame before continuing the loop
+                // Yield execution until the next frame
                 yield return null;
             }
         }
+
 
         #endregion
 
