@@ -294,6 +294,9 @@ namespace Adrenak.UniMic {
                         // Apply gain adjustment using the native method
                         MultiplyArrayBySingleValue(availableSamplesArray, availableSamplesArray.Length, gainMult);
 
+                        // Remove possible residues
+                        SetArrayToSingleValue(Segment, Segment.Length, 0f);
+
                         // Copy the processed samples into the Segment
                         Array.Copy(availableSamplesArray, 0, Segment, 0, samplesToRead);
 

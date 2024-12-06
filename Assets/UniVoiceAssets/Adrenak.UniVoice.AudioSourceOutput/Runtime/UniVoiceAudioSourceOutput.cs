@@ -201,7 +201,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 // Determine buffer state
                 readyCount = segments.Count;
 
-                if (readyCount <= 0)
+                if (readyCount <= 1)
                 {
                     // Insufficient buffer, log and wait until enough segments are ready
                     EnqueueMainThreadAction(() =>
@@ -362,7 +362,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput
 
                 for (int ch = 0; ch < channels; ch++)
                 {
-                    outputData[outputSampleIndex * channels + ch] += interpolatedSample;
+                    outputData[outputSampleIndex * channels + ch] = interpolatedSample;
                 }
                 outputSampleIndex++;
             }
