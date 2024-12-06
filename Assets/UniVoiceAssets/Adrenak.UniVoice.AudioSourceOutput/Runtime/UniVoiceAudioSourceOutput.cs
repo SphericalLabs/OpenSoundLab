@@ -163,6 +163,12 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 Debug.unityLogger.LogWarning(TAG, $"Channel count for segments is {channelCount}. Expected: 1 (mono). Proceeding by treating as mono.");
             }
 
+            if (index < nextSegmentIndex)
+            {
+                Debug.unityLogger.Log(TAG, $"Discarding old segment {index} as it is older than the acceptable threshold.");
+                return;
+            }
+
             // Avoid overwriting existing segments
             if (segments.TryAdd(index, audioSamples))
             {
@@ -218,6 +224,53 @@ namespace Adrenak.UniVoice.AudioSourceOutput
 
                     fillingUp = true;
                     return;
+                }
+
+                // Remove segments that are too old
+                var keysToRemove = segments.Keys.Where(k => k < nextSegmentIndex).OrderBy(k => k).ToList();
+
+                foreach (var key in keysToRemove)
+                {
+                    if (segments.TryRemove(key, out _))
+                    {
+                        Debug.unityLogger.Log(TAG, $"Disposed old segment {key} to maintain latency constraints.");
+                    }
+                    else
+                    {
+                        Debug.unityLogger.LogWarning(TAG, $"Failed to dispose old segment {key}.");
+                    }
+                }
+
+                // Dispose segments so that segments count is going down to MinSegCount + (MaxSegCount - MinSegCount) / 2
+                if (readyCount > MaxSegCount)
+                {
+                    // Calculate the target number of segments
+                    int targetCount = MinSegCount + (MaxSegCount - MinSegCount) / 2;
+                    int segmentsToRemove = readyCount - targetCount;
+
+                    if (segmentsToRemove > 0)
+                    {
+                        // Order the keys to identify the oldest segments
+                        keysToRemove = segments.Keys.OrderBy(k => k).Take(segmentsToRemove).ToList();
+
+                        foreach (var key in keysToRemove)
+                        {
+                            if (segments.TryRemove(key, out _))
+                            {
+                                Debug.unityLogger.Log(TAG, $"Disposed segment {key} to reduce buffer.");
+                            }
+                            else
+                            {
+                                Debug.unityLogger.LogWarning(TAG, $"Failed to dispose segment {key}.");
+                            }
+                        }
+
+                        // Optionally, log the new segment count
+                        EnqueueMainThreadAction(() =>
+                        {
+                            Debug.unityLogger.Log(TAG, $"Disposed {segmentsToRemove} segments. New segment count: {segments.Count}");
+                        });
+                    }
                 }
 
                 // Compute total available samples in playbackQueue
