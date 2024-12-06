@@ -48,8 +48,8 @@ namespace Adrenak.UniVoice.AudioSourceOutput
         /// <summary>
         /// Buffer thresholds.
         /// </summary>
-        public int MinSegCount { get; private set; }
-        public int MaxSegCount { get; private set; }
+        public int MinSegCount { get; set; }
+        public int MaxSegCount { get; set; }
 
         /// <summary>
         /// Synchronization lock for thread safety.
