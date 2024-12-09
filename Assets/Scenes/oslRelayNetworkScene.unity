@@ -1174,7 +1174,6 @@ GameObject:
   - component: {fileID: 207291386}
   - component: {fileID: 207291388}
   - component: {fileID: 207291389}
-  - component: {fileID: 207291390}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -1219,7 +1218,7 @@ MonoBehaviour:
   autoConnectClientBuild: 0
   offlineScene: 
   onlineScene: 
-  transport: {fileID: 207291390}
+  transport: {fileID: 207291379}
   networkAddress: localhost
   maxConnections: 8
   disconnectInactiveConnections: 0
@@ -1330,7 +1329,7 @@ MonoBehaviour:
   BroadcastAddress: 
   serverBroadcastListenPort: 47777
   ActiveDiscoveryInterval: 3
-  transport: {fileID: 207291390}
+  transport: {fileID: 207291379}
   OnServerFound:
     m_PersistentCalls:
       m_Calls:
@@ -1399,24 +1398,6 @@ MonoBehaviour:
     type: 3}
   muteSelfToggle: {fileID: 647632743}
   muteOthersToggle: {fileID: 2011236143}
---- !u!114 &207291390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 207291378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96b149f511061407fb54895c057b7736, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wrap: {fileID: 207291379}
-  latency: 0
-  jitter: 0
-  jitterSpeed: 1
-  unreliableLoss: 0
-  unreliableScramble: 0
 --- !u!1 &240851297
 GameObject:
   m_ObjectHideFlags: 0
