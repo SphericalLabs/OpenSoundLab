@@ -189,7 +189,12 @@ public class dial : manipObject
 
         percent = Utils.map(realRot, -150f, 150f, 0f, 1f);
 
-        // viz
+        // This fixed bad loading via relay, since apparently sometimes this function is called before Awake() in higher latency scenarios
+        if (dialFeedback == null)
+        {
+            dialFeedback = transform.parent.Find("glowDisk").GetComponent<glowDisk>();
+        }
+
         dialFeedback.percent = percent * 0.85f; // why that multiplier?
         dialFeedback.PercentUpdate();
 
