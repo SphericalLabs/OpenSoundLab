@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq; // Added for LINQ operations
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -11,7 +10,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput
     /// This class feeds incoming mono audio segments directly to a stereo AudioSource via OnAudioFilterRead.
     /// It manages playback synchronization, handles missing segments, and implements smooth crossfades during catchup.
     /// </summary>
-    
+
     public class UniVoiceAudioSourceOutput : MonoBehaviour, IAudioOutput
     {
         private const string TAG = "UniVoiceAudioSourceOutput";
@@ -120,7 +119,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput
 
             // Configure AudioSource settings
             audioSource.playOnAwake = false;
-            audioSource.loop = false;            
+            audioSource.loop = false;
             audioSource.spatialize = true; // Please note that the AudioSource must be after this script in order for the spatialization to work
             audioSource.spatialBlend = 1f;
             audioSource.mute = false;
@@ -185,18 +184,21 @@ namespace Adrenak.UniVoice.AudioSourceOutput
         public int readyCount = 0;
         public bool fillingUp = false;
 
-        /// <summary>
-        /// OnAudioFilterRead is called on a separate audio thread to supply audio data.
-        /// This implementation expects stereo output and mono input segments.
-        /// Mono segments are duplicated to both left and right channels.
-        /// </summary>
-        /// <param name="outputBuffer">The buffer to fill with audio data.</param>
-        /// <param name="channels">Number of audio channels (expected to be 2 for stereo).</param>
+        // bringing all local variables of OnAudioFilterRead to class scope in order to avoid garbage collection
+        int samplesPerChannel;
+        List<int> keysToRemove;
+        int targetCount;
+        int segmentsToRemove;
+        int totalAvailableSamples;
+        float[] currentSegment;
+        int minKey;
+        int outputBufferSampleIndex;
+
         private void OnAudioFilterRead(float[] outputBuffer, int channels)
         {
             lock (playLock)
             {
-                int samplesPerChannel = outputBuffer.Length / channels;
+                samplesPerChannel = outputBuffer.Length / channels;
 
                 // Determine buffer state
                 readyCount = segments.Count;
@@ -226,9 +228,15 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 }
 
                 // Remove segments that are too old
-                var keysToRemove = segments.Keys.Where(k => k < nextSegmentIndex).OrderBy(k => k).ToList();
+                keysToRemove = new List<int>();
+                foreach (var k in segments.Keys)
+                {
+                    if (k < nextSegmentIndex)
+                        keysToRemove.Add(k);
+                }
+                keysToRemove.Sort();
 
-                foreach (var key in keysToRemove)
+                foreach (int key in keysToRemove)
                 {
                     if (segments.TryRemove(key, out _))
                     {
@@ -244,13 +252,14 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 if (readyCount > MaxSegCount)
                 {
                     // Calculate the target number of segments
-                    int targetCount = MinSegCount + (MaxSegCount - MinSegCount) / 2;
-                    int segmentsToRemove = readyCount - targetCount;
+                    targetCount = MinSegCount + (MaxSegCount - MinSegCount) / 2;
+                    segmentsToRemove = readyCount - targetCount;
 
                     if (segmentsToRemove > 0)
                     {
-                        // Order the keys to identify the oldest segments
-                        keysToRemove = segments.Keys.OrderBy(k => k).Take(segmentsToRemove).ToList();
+                        var allKeys = new List<int>(segments.Keys);
+                        allKeys.Sort();
+                        keysToRemove = allKeys.GetRange(0, segmentsToRemove);
 
                         foreach (var key in keysToRemove)
                         {
@@ -273,24 +282,38 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 }
 
                 // Compute total available samples in playbackQueue
-                int totalAvailableSamples = 0;
+                totalAvailableSamples = 0;
 
                 if (playbackQueue.Count > 0)
                 {
-                    float[] currentSegment = playbackQueue.Peek();
+                    currentSegment = playbackQueue.Peek();
                     totalAvailableSamples += (currentSegment.Length - playbackSegmentSampleIndex) * UpsampleFactor;
                 }
 
-                foreach (var segment in playbackQueue.Skip(1))
+                if (playbackQueue.Count > 1)
                 {
-                    totalAvailableSamples += segment.Length * UpsampleFactor;
+                    // We need to sum samples of all segments except the first one already accounted above
+                    // Convert playbackQueue to array to access beyond the first element
+                    float[][] queueArray = playbackQueue.ToArray();
+                    for (int i = 1; i < queueArray.Length; i++)
+                    {
+                        totalAvailableSamples += queueArray[i].Length * UpsampleFactor;
+                    }
                 }
 
                 // Fill playbackQueue with enough segments to fill data
                 while (totalAvailableSamples < samplesPerChannel && !segments.IsEmpty)
                 {
                     // Find the smallest available segment index
-                    int minKey = segments.Keys.Min();
+                    minKey = int.MaxValue;
+                    foreach (var k in segments.Keys)
+                    {
+                        if (k < minKey)
+                            minKey = k;
+                    }
+
+                    if (minKey == int.MaxValue) // no segments
+                        break;
 
                     if (segments.TryRemove(minKey, out float[] segment))
                     {
@@ -308,10 +331,11 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                 }
 
                 // Initialize output sample index
-                int outputBufferSampleIndex = 0;
+                outputBufferSampleIndex = 0;
 
                 // Finish upsample run if not finished during last buffer run
-                if(up != 0){ 
+                if (up != 0)
+                {
                     // currentSample and nextSample stay the same from the last buffer run
                     UpsampleSegmentLinear(currentSample, nextSample, UpsampleFactor, outputBuffer, ref outputBufferSampleIndex, samplesPerChannel, channels);
                 }
@@ -344,10 +368,10 @@ namespace Adrenak.UniVoice.AudioSourceOutput
                         // At the end of current segment, try to get the first sample of the next segment
                         if (playbackQueue.Count > 1)
                         {
-                            float[] nextSegment = playbackQueue.ElementAt(1);
-                            if (nextSegment.Length > 0)
+                            float[][] queueArray = playbackQueue.ToArray();
+                            if (queueArray.Length > 1 && queueArray[1].Length > 0)
                             {
-                                nextSample = nextSegment[0];
+                                nextSample = queueArray[1][0];
                             }
                         }
                     }
@@ -381,27 +405,6 @@ namespace Adrenak.UniVoice.AudioSourceOutput
         }
 
 
-        /// <summary>
-        /// Skips a specified number of segments to catch up with the playback.
-        /// Implements smooth crossfading to minimize audio artifacts.
-        /// </summary>
-        /// <param name="segmentsToSkip">Number of segments to skip.</param>
-        private void SkipSegments(int segmentsToSkip)
-        {
-            lock (playLock)
-            {
-                for (int i = 0; i < segmentsToSkip; i++)
-                {
-                    if (playbackQueue.Count > 0)
-                    {
-                        playbackQueue.Dequeue();
-                        nextSegmentIndex++;
-                    }
-                }
-
-            }
-
-        }
 
         /// <summary>
         /// Disposes the instance by deleting the GameObject of the component.
