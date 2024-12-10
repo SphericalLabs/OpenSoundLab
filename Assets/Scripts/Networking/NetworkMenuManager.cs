@@ -473,7 +473,7 @@ public class NetworkMenuManager : MonoBehaviour
         if(info.userName.Length > 0)
         {
             objText2[0].text = info.userName;
-            objText2[1].text = info.EndPoint.Address.ToString();
+            objText2[1].text = "";
         }
         else
         {
