@@ -122,7 +122,7 @@ namespace Adrenak.UniVoice.MirrorNetwork {
                 NetworkServer.SendToAll(new UniVoiceMessage { 
                     recipient = peerID,
                     data = bytes
-                }, Channels.Reliable);
+                }, Channels.Unreliable);
             }
         }
 
@@ -131,7 +131,7 @@ namespace Adrenak.UniVoice.MirrorNetwork {
                 NetworkClient.Send(new UniVoiceMessage { 
                     recipient = -1,
                     data = bytes
-                }, Channels.Reliable);
+                }, Channels.Unreliable);
         }
 
         void Client_OnConnected() {
