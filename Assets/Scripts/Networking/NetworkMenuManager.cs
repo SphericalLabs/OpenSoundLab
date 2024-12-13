@@ -454,8 +454,8 @@ public class NetworkMenuManager : MonoBehaviour
         {
             GameObject obj = Instantiate(discoveryButtonPrefab, discoveryButtonParent);
             TMP_Text[] objText = obj.GetComponentsInChildren<TMP_Text>();
-            objText[0].text = $"{info.userName}";
-            objText[1].text = $"different version: {info.version} (your {Application.version})";
+            objText[0].text = $"{info.userName} \r\n You: {Application.version} / Them: {info.version}";
+            objText[1].text = $"";
             
             Debug.Log($"Host {info.userName} and ip {info.EndPoint.Address} has a different verion number {info.version}, so you can't connect to it");
             return;
