@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using UnityEngine.SceneManagement;
+using UnityEngine.Android;
 
 namespace Adrenak.UniMic {
     //[ExecuteAlways]
@@ -137,8 +139,10 @@ namespace Adrenak.UniMic {
         float gainMult = 1f;
 
         void Awake() {
-            //if(Application.isPlaying)
-            //    DontDestroyOnLoad(gameObject);
+            
+            // Return immediately since any call to Unity microphone will fry the app
+            if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) return;
+
             if (Devices.Count > 0)
                 CurrentDeviceIndex = 0;
 
@@ -182,6 +186,11 @@ namespace Adrenak.UniMic {
         /// Starts to stream the input of the current Mic device
         /// </summary>
         public void StartRecording(int frequency = 16000, int segmentLengthInMilliSec = 10) {
+            
+            // Just don't start Microphone but keep this class alive in order to keep univoice alive, so at least the client can listen to what the others are saying
+            // todo: show a note that permissions are missing
+            if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) return;
+
             StopRecording();
             IsRecording = true;
 

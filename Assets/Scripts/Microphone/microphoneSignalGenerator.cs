@@ -30,6 +30,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
+using UnityEngine.Android;
+using Adrenak.UniVoice.Samples;
 
 public class microphoneSignalGenerator : signalGenerator {
 
@@ -64,11 +66,8 @@ public class microphoneSignalGenerator : signalGenerator {
   int targetBuffering;
 
   public override void Awake() {
-    if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Relay)
-    {
-        Destroy(gameObject);
-    }
 
+  
     base.Awake();
 
     sharedBuffer = new float[MAX_BUFFER_LENGTH];
@@ -88,12 +87,19 @@ public class microphoneSignalGenerator : signalGenerator {
     OVRManager.TrackingAcquired += trackingAcquired;
     OVRManager.TrackingAcquired += trackingLost;
 
-    SelectMic(0);
+    // todo: visualize that microphone is disabled
+    if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Relay
+        || !Permission.HasUserAuthorizedPermission(Permission.Microphone)) return;
 
+    SelectMic(0);
   }
 
   void Update()
   {
+    // todo: visualize that microphone is disabled
+    if (SceneManager.GetActiveScene().buildIndex == (int)masterControl.Scenes.Relay
+      || !Permission.HasUserAuthorizedPermission(Permission.Microphone)) return;
+
     if (!activated) return;
     CheckAndCompensateDrift();
   }

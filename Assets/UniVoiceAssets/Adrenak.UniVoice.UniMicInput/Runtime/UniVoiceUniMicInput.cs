@@ -3,6 +3,7 @@
 using Adrenak.UniMic;
 
 using UnityEngine;
+using UnityEngine.Android;
 
 namespace Adrenak.UniVoice.UniMicInput {
     /// <summary>
@@ -22,6 +23,10 @@ namespace Adrenak.UniVoice.UniMicInput {
         public int SegmentRate => 1000 / Mic.Instance.SegmentDurationMS;
 
         public UniVoiceUniMicInput(int deviceIndex = 0, int frequency = 16000, int segmentLengthInMilliSec = 100) {
+            
+            // Return immediately since any call to Unity microphone will fry the app
+            if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) return;
+
             if (Mic.Instance.Devices.Count == 0)
                 throw new Exception("Must have recording devices for Microphone input");
 

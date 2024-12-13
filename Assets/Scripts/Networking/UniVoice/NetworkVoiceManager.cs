@@ -31,6 +31,11 @@ public class NetworkVoiceManager : MonoBehaviour
 
     Dictionary<short, PeerView> peerViews = new Dictionary<short, PeerView>();
 
+    private void Awake()
+    {
+        // Quit univoice immediately since any call to Unity microphone will fry the app
+        if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Destroy(this);
+    }
 
     IEnumerator Start()
     {
