@@ -54,7 +54,7 @@ public class looperDeviceInterface : deviceInterface {
   }
 
   void Start() {
-    _beatManager.setTrigger(onBeatEvent);
+    _beatManager.setTriggers(onBeatEvent, onResetEvent);
     _beatManager.updateBeatNoTriplets(2);
   }
 
@@ -130,6 +130,10 @@ public class looperDeviceInterface : deviceInterface {
     }
   }
 
+  void onResetEvent(){
+    transcriber.Back();
+  }
+
   void StartRecord(bool on) {
     if (on) buttons[1].keyHit(true);
     transcriber.recording = false;
@@ -138,6 +142,8 @@ public class looperDeviceInterface : deviceInterface {
   public override void hit(bool on, int ID = -1) {
     if (ID == 3 && on) transcriber.Save();
     if (ID == 4 && on) transcriber.Flush();
+    if (ID == 5) transcriber.cueLive = on;
+    if (ID == 6) transcriber.overwrite = on;
 
     if (ID == 0) {
       if (on) {
@@ -171,6 +177,8 @@ public class looperDeviceInterface : deviceInterface {
     data.recordTriggerID = recordTrigger.transform.GetInstanceID();
     data.playTriggerID = playTrigger.transform.GetInstanceID();
     data.dur = durSlider.switchVal;
+    data.cueLive = buttons[4].isHit;
+    data.overwrite = buttons[5].isHit;
     return data;
   }
 
@@ -182,6 +190,8 @@ public class looperDeviceInterface : deviceInterface {
     recordTrigger.SetID(data.recordTriggerID, copyMode);
     playTrigger.SetID(data.playTriggerID, copyMode);
     durSlider.setVal(data.dur);
+    buttons[4].setOnAtStart(data.cueLive);
+    buttons[5].setOnAtStart(data.overwrite);
   }
 }
 public class LooperData : InstrumentData {
@@ -190,4 +200,6 @@ public class LooperData : InstrumentData {
   public int recordTriggerID;
   public int playTriggerID;
   public int dur;
+  public bool overwrite;
+  public bool cueLive;
 }

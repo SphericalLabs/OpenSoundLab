@@ -36,6 +36,8 @@ public class waveTranscribeLooper : signalGenerator {
   public tape curTape;
   public bool recording = false;
   public bool playing = false;
+  public bool overwrite = false;
+  public bool cueLive = false;
 
   public TextMesh saveText;
 
@@ -82,6 +84,7 @@ public class waveTranscribeLooper : signalGenerator {
     lastbeatperiod = _deviceInterface.period;
     virtualBufferLength = Mathf.RoundToInt((float)(_deviceInterface.period * .25f * AudioSettings.outputSampleRate));
     sampleBuffer = new float[virtualBufferLength];
+    incomingBuffer = new float[1];
 
     _sampleRateOverride = AudioSettings.outputSampleRate;
     tex = new Texture2D(wavewidth, waveheight, TextureFormat.RGBA32, false);
@@ -226,6 +229,7 @@ public class waveTranscribeLooper : signalGenerator {
 
   double lastIncomingDspTime = -1;
   float[] oldBuffer;
+  float[] incomingBuffer;
   bool playingLastFrame = false;
   public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
     int tempColumnMult = columnMult;
@@ -238,14 +242,16 @@ public class waveTranscribeLooper : signalGenerator {
     }
     lastIncomingDspTime = dspTime;
 
+    // todo: avoid new keyword, otherwise garbage collection 
     oldBuffer = new float[buffer.Length];
+    incomingBuffer = new float[buffer.Length];
     float[] recBuffer = new float[buffer.Length];
     float[] playBuffer = new float[buffer.Length];
 
     if (_deviceInterface.recordTrigger.signal != null) _deviceInterface.recordTrigger.signal.processBuffer(recBuffer, dspTime, channels);
     if (_deviceInterface.playTrigger.signal != null) _deviceInterface.playTrigger.signal.processBuffer(playBuffer, dspTime, channels);
 
-    if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
+    if (incoming != null) incoming.processBuffer(incomingBuffer, dspTime, channels);
 
     Color curWaveLine = waveLine;
     Color curWaveBG = waveBG;
@@ -262,9 +268,11 @@ public class waveTranscribeLooper : signalGenerator {
       }
 
       if (_deviceInterface.recordTrigger.signal != null) {
-        if (recBuffer[i] > lastRecSig[1] && lastRecSig[1] <= lastRecSig[0]) {
-          recording = !recording;
-          _deviceInterface.buttons[0].phantomHit(recording);
+      
+        // detect rec start via rec trigger
+        if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
+            recording = true;
+            _deviceInterface.buttons[0].phantomHit(recording);
 
           if (recording && !playing) {
             playing = true;
@@ -272,19 +280,42 @@ public class waveTranscribeLooper : signalGenerator {
             _deviceInterface.buttons[1].phantomHit(playing);
           }
         }
+        // detect rec stop via rec trigger
+        if (recBuffer[i] <= 0f && lastRecSig[0] > 0f)
+        {
+            recording = false; 
+            _deviceInterface.buttons[0].phantomHit(recording);
+        }
 
-        lastRecSig[0] = lastRecSig[1];
-        lastRecSig[1] = recBuffer[i];
+        //lastRecSig[0] = lastRecSig[1];
+        lastRecSig[0] = recBuffer[i];
       }
 
       if (playing) {
-        oldBuffer[i] = buffer[i] += sampleBuffer[curBufferIndex];
-        oldBuffer[i + 1] = buffer[i + 1] += sampleBuffer[curBufferIndex + 1];
+        if(cueLive || recording){ // always cue live during recording
+          oldBuffer[i] = buffer[i] = incomingBuffer[i] + sampleBuffer[curBufferIndex];
+          oldBuffer[i + 1] = buffer[i + 1] = incomingBuffer[i] + sampleBuffer[curBufferIndex + 1];
+        } else {
+          oldBuffer[i] = buffer[i] = sampleBuffer[curBufferIndex];
+          oldBuffer[i + 1] = buffer[i + 1] = sampleBuffer[curBufferIndex + 1];
+        }
+      } else if (cueLive) { // not playing but live cueing
+        buffer[i] = incomingBuffer[i];
+        buffer[i+1] = incomingBuffer[i+1];
       }
 
       if (recording) {
-        sampleBuffer[curBufferIndex] = buffer[i];
-        sampleBuffer[curBufferIndex + 1] = buffer[i + 1];
+        if (overwrite)
+        {
+            sampleBuffer[curBufferIndex] = incomingBuffer[i];
+            sampleBuffer[curBufferIndex + 1] = incomingBuffer[i + 1];
+        }
+        else // by default dubbing
+        {
+            sampleBuffer[curBufferIndex] += incomingBuffer[i];
+            sampleBuffer[curBufferIndex + 1] += incomingBuffer[i + 1];
+        }
+        
         curWaveLine = waveLineRec;
         curWaveBG = waveBGRec;
       } else {
@@ -315,6 +346,7 @@ public class waveTranscribeLooper : signalGenerator {
           }
           curBufferIndex = 0;
 
+          // this stops playing instead of looping when play trigger signal is patched
           if (_deviceInterface.playTrigger.signal != null) Stop();
 
           if (recordRequested) {
