@@ -315,7 +315,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 0
+  isSwitch: 0
   toggleKey: 0
   buttonID: 3
   button2DID: 
@@ -469,7 +469,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 0
+  isSwitch: 0
   toggleKey: 0
   buttonID: 4
   button2DID: 
@@ -7707,7 +7707,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 0
+  isSwitch: 0
   toggleKey: 0
   buttonID: 1
   button2DID: 
@@ -8817,7 +8817,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 1
   toggleKey: 0
   buttonID: 0
   button2DID: 
@@ -10605,7 +10605,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 1
   toggleKey: 0
   buttonID: 5
   button2DID: 
