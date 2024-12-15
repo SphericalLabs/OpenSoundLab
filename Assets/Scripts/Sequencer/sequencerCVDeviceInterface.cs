@@ -640,10 +640,10 @@ public class sequencerCVDeviceInterface : deviceInterface
             for (int row = 0; row < curDimensions[0]; row++)
             {
                 stepButtons[row, curDimensions[1] - 1].Highlight(false);
-                stepButtons[row, curDimensions[1] - 1].keyHit(false); // reset
+                //stepButtons[row, curDimensions[1] - 1].keyHit(false); // reset
                 stepButtonTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
 
-                stepDials[row, curDimensions[1] - 1].setPercent(0.5f); // reset               
+                //stepDials[row, curDimensions[1] - 1].setPercent(0.5f); // reset               
                 stepDialTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
             }
             curDimensions[1]--;
