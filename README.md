@@ -1,7 +1,6 @@
 # OpenSoundLab
 
-[[Trailer](https://youtu.be/HYn9THRtBvs)] [[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)] [[Releases](https://github.com/ludzeller/OpenSoundLab/releases/)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.gg/Jrmg5na3Ru)]
-[[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)]
+[[Trailer](https://youtu.be/HYn9THRtBvs)] [[Paper](https://dl.acm.org/doi/abs/10.1145/3561212.3561249)] [[Releases](https://github.com/ludzeller/OpenSoundLab/releases/)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.gg/Jrmg5na3Ru)] [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)] [[Developer](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM)]
 
 OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
 
@@ -43,6 +42,8 @@ git checkout DESIRED_TAG
 * If you already had OpenSoundLab installed from the App Store you might have to deinstall the app first
 * Please note that the Tutorial videos are not included in the repository and thus your build
 
+### Developer Notes
+See the [Developer Notes](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM) for instructions on how to add new devices and more. These instructions are still work in progress.
 
 ### Mailing list
 Please subscribe to our [newsletter](http://eepurl.com/h-9PsD) in order to get updates about new releases.
