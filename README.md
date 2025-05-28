@@ -14,8 +14,7 @@ This repository is work-in-progress. Please always link to this repository if yo
 OpenSoundLab will be available at Meta Quest's Early Access soon. We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub. 
 
 ### Build instructions
-* Download the latest tagged version from the releases https://github.com/SphericalLabs/OpenSoundLab/releases and unzip it
-* Alternatively, you can clone the repository and checkout the desired tag manually
+* Clone the repository and checkout the desired tag manually. Please note that the Releases page is outdated.
 ```
 git clone https://github.com/SphericalLabs/OpenSoundLab
 cd OpenSoundLab
