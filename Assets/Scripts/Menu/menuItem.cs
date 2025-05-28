@@ -849,12 +849,13 @@ public class DeviceType
     public static readonly DeviceType MultiSplit = new DeviceType("MultiSplit", DeviceCategory.Mixing, 1);
 
     // Interface
-    public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.Interface, 7);
-    public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.Interface, 6);
-    public static readonly DeviceType XyloRoll = new DeviceType("XyloRoll", DeviceCategory.Interface, 5);
-    public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 4);
-    public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 3);
-    public static readonly DeviceType ControlCube = new DeviceType("ControlCube", DeviceCategory.Interface, 2);
+    public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.Interface, 8);
+    public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.Interface, 7);
+    public static readonly DeviceType XyloRoll = new DeviceType("XyloRoll", DeviceCategory.Interface, 6);
+    public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 5);
+    public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 4);
+    public static readonly DeviceType ControlCube = new DeviceType("ControlCube", DeviceCategory.Interface, 3);
+    public static readonly DeviceType Distance = new DeviceType("Distance", DeviceCategory.Interface, 2);
     public static readonly DeviceType TouchPad = new DeviceType("TouchPad", DeviceCategory.Interface, 1);
 
     // Various
