@@ -1,5 +1,7 @@
 # OpenSoundLab
 
+![OSL Logo](https://github.com/SphericalLabs/OpenSoundLab/blob/master/Assets/Textures/SplashScreens/CoverArt-Landscape-3-OSL.png?raw=true)
+
 [[Trailer](https://youtu.be/HYn9THRtBvs)] [[Research](https://zenodo.org/records/15304366)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.gg/Jrmg5na3Ru)] [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)] [[Developer](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM)]
 
 OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
