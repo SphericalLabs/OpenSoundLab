@@ -203,9 +203,8 @@ public class sampleManager : MonoBehaviour
         Directory.CreateDirectory(dir);
 
         //if Samples directory doesn't exist, extract default data...
-        if (Directory.Exists(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples") == false)
+        if (Directory.Exists(dir) == false)
         {
-            //Directory.CreateDirectory(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples");
             //copy tgz to directory where we can extract it
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             WWW www = new WWW("file://" + Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
