@@ -37,6 +37,7 @@ public class libraryDeviceInterface : deviceInterface {
   public TextMesh note;
 
   panelRingComponentInterface _panelRingPrimary, _panelRingSecondary;
+  bool _subscribedToSamples;
 
   public bool[] spinLocks = new bool[2];
 
@@ -58,9 +59,49 @@ public class libraryDeviceInterface : deviceInterface {
 
 
   void Start() {
+    TryPopulateFromSamples();
+  }
+
+  void TryPopulateFromSamples() {
+    if (sampleManager.instance == null) {
+      return;
+    }
+
+    if (sampleManager.instance.IsReady) {
+      PopulatePanels();
+    } else if (!_subscribedToSamples) {
+      sampleManager.instance.SamplesLoaded += HandleSamplesLoaded;
+      _subscribedToSamples = true;
+    }
+  }
+
+  void HandleSamplesLoaded() {
+    if (sampleManager.instance != null) {
+      sampleManager.instance.SamplesLoaded -= HandleSamplesLoaded;
+    }
+    _subscribedToSamples = false;
+    PopulatePanels();
+  }
+
+  void PopulatePanels() {
+    if (sampleManager.instance == null || sampleManager.instance.sampleDictionary == null) {
+      return;
+    }
+
     _panelRingPrimary.labels = sampleManager.instance.sampleDictionary.Keys.ToList();
     _panelRingPrimary.loadPanels(sprocketRadius * .95f);
     _panelRingSecondary.loadPanels(sprocketRadius * .85f);
+
+    if (_panelRingPrimary.labels.Count > 0) {
+      updateSecondaryPanels(_panelRingPrimary.labels[0]);
+    }
+  }
+
+  void OnDestroy() {
+    if (_subscribedToSamples && sampleManager.instance != null) {
+      sampleManager.instance.SamplesLoaded -= HandleSamplesLoaded;
+    }
+    _subscribedToSamples = false;
   }
 
 

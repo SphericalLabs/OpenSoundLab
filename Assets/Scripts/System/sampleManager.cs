@@ -26,10 +26,12 @@
 // limitations under the License.
 
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.GZip;
 
@@ -39,10 +41,39 @@ public class sampleManager : MonoBehaviour
 
     public Dictionary<string, Dictionary<string, string>> sampleDictionary;
 
+    public event Action SamplesLoaded;
+    public bool IsReady { get; private set; }
+
     List<string> customSamples = new List<string>();
+    bool _initializationStarted;
+
+    void EnsureCategory(string key)
+    {
+        if (sampleDictionary == null)
+        {
+            return;
+        }
+
+        if (!sampleDictionary.ContainsKey(key))
+        {
+            sampleDictionary[key] = new Dictionary<string, string>();
+        }
+    }
+
+    void EnsureDefaultCategories()
+    {
+        EnsureCategory("Custom");
+        EnsureCategory("Recordings");
+        EnsureCategory("Sessions");
+    }
 
     public void ClearCustomSamples()
     {
+        if (!sampleDictionary.ContainsKey("Custom"))
+        {
+            return;
+        }
+
         for (int i = 0; i < customSamples.Count; i++)
         {
             samplerLoad[] samplers = FindObjectsOfType<samplerLoad>();
@@ -90,6 +121,8 @@ public class sampleManager : MonoBehaviour
 
     public void AddSample(string newsample)
     {
+        EnsureCategory("Custom");
+
         if (sampleDictionary["Custom"].ContainsKey(Path.GetFileNameWithoutExtension(newsample))) return;
 
         if (!File.Exists(newsample))
@@ -117,6 +150,8 @@ public class sampleManager : MonoBehaviour
 
     public void AddRecording(string newsample)
     {
+        EnsureCategory("Recordings");
+
         if (sampleDictionary["Recordings"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
         {
             return;
@@ -133,6 +168,8 @@ public class sampleManager : MonoBehaviour
 
     public void AddSession(string newsample)
     {
+        EnsureCategory("Sessions");
+
         if (sampleDictionary["Sessions"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
         {
             return;
@@ -152,6 +189,8 @@ public class sampleManager : MonoBehaviour
     void AddCustomSamples()
     {
         inStartup = true;
+
+        EnsureCategory("Custom");
 
         if (!PlayerPrefs.HasKey("sampCount")) PlayerPrefs.SetInt("sampCount", 0);
 
@@ -199,6 +238,21 @@ public class sampleManager : MonoBehaviour
 
     public void Init()
     {
+        if (_initializationStarted)
+        {
+            return;
+        }
+
+        _initializationStarted = true;
+        instance = this;
+        sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
+        EnsureDefaultCategories();
+
+        StartCoroutine(InitRoutine());
+    }
+
+    IEnumerator InitRoutine()
+    {
         string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
         bool directoryExists = Directory.Exists(dir);
         bool needsExtraction = !directoryExists;
@@ -210,38 +264,91 @@ public class sampleManager : MonoBehaviour
 
         Directory.CreateDirectory(dir);
 
-        //if Samples directory doesn't exist or is empty, extract default data...
+        SampleInstallOverlay overlay = null;
+
         if (needsExtraction)
         {
-            //copy tgz to directory where we can extract it
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-            WWW www = new WWW("file://" + Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+            overlay = SampleInstallOverlay.CreateAndAttach();
+            if (overlay != null)
+            {
+                overlay.BeginFakeProgress(30f);
+            }
+
+            yield return null;
+
+            string compressedPath = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz";
+            string sourcePath;
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+            sourcePath = "file://" + Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz";
 #else
-            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+            sourcePath = Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz";
 #endif
-            while (!www.isDone) { }
-            System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
-            //extract it
-            Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", dir);
-            //delete tgz
-            File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
+
+            Exception extractionError = null;
+
+            using (WWW www = new WWW(sourcePath))
+            {
+                yield return www;
+
+                if (!string.IsNullOrEmpty(www.error))
+                {
+                    Debug.LogError($"sampleManager: failed to download Samples.tgz from streaming assets. {www.error}");
+                }
+                else
+                {
+                    File.WriteAllBytes(compressedPath, www.bytes);
+
+                    var extractTask = Task.Run(() =>
+                    {
+                        try
+                        {
+                            Utility_SharpZipCommands.ExtractTGZ(compressedPath, dir);
+                        }
+                        catch (Exception ex)
+                        {
+                            extractionError = ex;
+                        }
+                    });
+
+                    while (!extractTask.IsCompleted)
+                    {
+                        yield return null;
+                    }
+                }
+            }
+
+            try
+            {
+                if (File.Exists(compressedPath))
+                {
+                    File.Delete(compressedPath);
+                }
+            }
+            catch (IOException ex)
+            {
+                Debug.LogWarning($"sampleManager: could not delete temporary archive. {ex.Message}");
+            }
+
+            if (extractionError != null)
+            {
+                Debug.LogError($"sampleManager: error extracting Samples.tgz: {extractionError.Message}");
+            }
         }
-        
 
-        instance = this;
-        sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
-
-        // used for bundled default samples
-        //string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";
-        //loadSampleDictionary(dir, "APP");
-
-        //string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
-        //Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Custom");
         Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Recordings");
         Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Sessions");
+
         loadSampleDictionary(dir, "DOC");
+        EnsureDefaultCategories();
         AddCustomSamples();
 
+        IsReady = true;
+        SamplesLoaded?.Invoke();
+
+        if (overlay != null)
+        {
+            overlay.CompleteAndHide();
+        }
     }
 
     public static string GetFileName(string path)
