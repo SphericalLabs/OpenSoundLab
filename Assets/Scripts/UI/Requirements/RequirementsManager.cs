@@ -3,9 +3,12 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.XR;
 
 /// <summary>
 /// Runtime-only requirements flow for Meta Quest: documents (EULA, safety, notices) followed by storage permission.
@@ -114,17 +117,21 @@ public class RequirementsManager : MonoBehaviour
     [Header("Permission Step")]
     [SerializeField] string permissionTitle = "Storage Permission";
     [SerializeField, TextArea(6, 20)] string permissionBody = "OpenSoundLab needs file access to load and record patches. The next step opens the Android settings where you can grant the permission.";
-    [SerializeField] string nextLabel = "Next";
+    [SerializeField] string nextLabel = "Agree";
     [SerializeField] string agreeLabel = "Agree";
     [SerializeField] string openSettingsLabel = "Open Settings";
     [SerializeField] string backLabel = "Back";
 
     [Header("Layout")] 
     [SerializeField] float panelDistance = 1.8f;
-    [SerializeField] float verticalOffset = 0.0f;
+    [SerializeField] float verticalOffset = 0.15f;
     [SerializeField] Vector2 panelSizeMeters = new Vector2(1.2f, 0.75f);
-    [SerializeField] float joystickScrollSpeed = 1.5f;
-    [SerializeField] float mouseScrollMultiplier = 200f;
+    [SerializeField] float joystickScrollSpeed = 0.5f;
+    [SerializeField] float mouseScrollMultiplier = 65f;
+
+    [Header("Controller Hints")]
+    [SerializeField] string nextButtonHint = " (X/A)";
+    [SerializeField] string backButtonHint = " (Y/B)";
 
     [Header("Events")]
     [SerializeField] UnityEvent onRequirementsAccepted;
@@ -139,6 +146,10 @@ public class RequirementsManager : MonoBehaviour
     const float SidePadding = 50f;
     const float BodyPadding = 40f;
     const float ScrollBottomThreshold = 0.01f;
+    const float PanelSizeScale = 0.9f;
+    const float HintAreaHeight = 70f;
+    const float PanelHeightPixels = 900f;
+    const float TargetRenderScale = 1.4f;
 
     Canvas _canvas;
     RectTransform _panelRect;
@@ -150,6 +161,7 @@ public class RequirementsManager : MonoBehaviour
     TextMeshProUGUI _backButtonLabel;
     ScrollRect _scrollRect;
     RectTransform _contentRect;
+    Coroutine _postLayoutRoutine;
 
     bool _flowActive;
     int _currentStepIndex;
@@ -160,6 +172,7 @@ public class RequirementsManager : MonoBehaviour
 
     IEnumerator Start()
     {
+        ApplyRenderResolutionScaling();
         EnsureDefaultDocuments();
 
         bool consentPresent = PlayerPrefs.GetInt(consentKey, 0) == 1;
@@ -190,6 +203,34 @@ public class RequirementsManager : MonoBehaviour
         _flowActive = true;
 
         ShowStep(consentPresent ? (documents != null ? documents.Length : 0) : 0);
+    }
+
+    void ApplyRenderResolutionScaling()
+    {
+        float clampedTarget = Mathf.Clamp(TargetRenderScale, 1f, 2f);
+
+        if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urpAsset)
+        {
+            if (urpAsset.renderScale < clampedTarget - 0.001f)
+            {
+                urpAsset.renderScale = clampedTarget;
+            }
+        }
+
+        if (XRSettings.enabled)
+        {
+            if (XRSettings.eyeTextureResolutionScale < clampedTarget - 0.001f)
+            {
+                XRSettings.eyeTextureResolutionScale = clampedTarget;
+            }
+
+            float viewportTarget = Mathf.Clamp(clampedTarget, 0.5f, 1f);
+            if (XRSettings.renderViewportScale < viewportTarget - 0.001f)
+            {
+                XRSettings.renderViewportScale = viewportTarget;
+            }
+        }
+
     }
 
     IEnumerator LoadDocumentBodies()
@@ -443,6 +484,21 @@ public class RequirementsManager : MonoBehaviour
 
         _bodyLabel.text = body ?? string.Empty;
         _bodyLabel.margin = new Vector4(BodyPadding, BodyPadding, BodyPadding, BodyPadding);
+
+        ApplyBodyLayout();
+
+        if (isActiveAndEnabled)
+        {
+            if (_postLayoutRoutine != null)
+            {
+                StopCoroutine(_postLayoutRoutine);
+            }
+            _postLayoutRoutine = StartCoroutine(DeferredBodyLayout());
+        }
+    }
+
+    void ApplyBodyLayout()
+    {
         Canvas.ForceUpdateCanvases();
         _bodyLabel.ForceMeshUpdate();
 
@@ -452,8 +508,8 @@ public class RequirementsManager : MonoBehaviour
         {
             viewportHeight = preferredHeight;
         }
-
         float targetHeight = Mathf.Max(preferredHeight, viewportHeight);
+
         _contentRect.sizeDelta = new Vector2(_contentRect.sizeDelta.x, targetHeight);
         RectTransform textRect = _bodyLabel.rectTransform;
         textRect.anchorMin = new Vector2(0f, 1f);
@@ -466,6 +522,15 @@ public class RequirementsManager : MonoBehaviour
         _scrollRect.velocity = Vector2.zero;
         _hasScrolledToEnd = targetHeight <= viewportHeight + 0.5f;
         UpdateNavigationState();
+    }
+
+    IEnumerator DeferredBodyLayout()
+    {
+        yield return null;
+        ApplyBodyLayout();
+        TryMarkScrolledToEnd();
+        UpdateNavigationState();
+        _postLayoutRoutine = null;
     }
 
     void TryMarkScrolledToEnd()
@@ -515,8 +580,18 @@ public class RequirementsManager : MonoBehaviour
     {
         if (_nextButtonLabel != null)
         {
-            _nextButtonLabel.text = label;
+            _nextButtonLabel.text = AppendHint(label, nextButtonHint);
         }
+    }
+
+    static string AppendHint(string label, string hint)
+    {
+        if (string.IsNullOrEmpty(hint))
+        {
+            return label;
+        }
+
+        return string.Concat(label, hint);
     }
 
     Transform ResolveAnchor()
@@ -552,11 +627,11 @@ public class RequirementsManager : MonoBehaviour
         _canvas.renderMode = RenderMode.WorldSpace;
         _canvas.sortingOrder = 5000;
         _canvas.worldCamera = ResolveCamera(parent);
-        canvasGo.AddComponent<CanvasScaler>().dynamicPixelsPerUnit = 1000f;
+        canvasGo.AddComponent<CanvasScaler>().dynamicPixelsPerUnit = 12000f;
         canvasGo.AddComponent<GraphicRaycaster>();
 
         RectTransform canvasRect = _canvas.transform as RectTransform;
-        canvasRect.sizeDelta = panelSizeMeters * (1f / CanvasScale);
+        canvasRect.sizeDelta = panelSizeMeters * (PanelSizeScale / CanvasScale);
 
         GameObject panelGo = new GameObject("Panel");
         panelGo.transform.SetParent(canvasRect, false);
@@ -564,14 +639,36 @@ public class RequirementsManager : MonoBehaviour
         _panelRect.anchorMin = new Vector2(0.5f, 0.5f);
         _panelRect.anchorMax = new Vector2(0.5f, 0.5f);
         _panelRect.pivot = new Vector2(0.5f, 0.5f);
-        _panelRect.sizeDelta = panelSizeMeters * (1f / CanvasScale);
+        Vector2 panelPixelSize = panelSizeMeters * (PanelSizeScale / CanvasScale);
+        panelPixelSize.y = PanelHeightPixels;
+        _panelRect.sizeDelta = panelPixelSize;
+        _panelRect.anchoredPosition = new Vector2(0f, -150f);
 
         Image panelImage = panelGo.AddComponent<Image>();
-        panelImage.color = new Color(0f, 0f, 0f, 0.85f);
+        panelImage.color = new Color(0.02f, 0.02f, 0.02f, 1f);
 
         BuildTitle(_panelRect);
         BuildScrollArea(_panelRect);
         BuildButtons(_panelRect);
+        BuildScrollHint(_panelRect);
+    }
+
+    void BuildScrollHint(RectTransform parent)
+    {
+        GameObject hintGo = new GameObject("ScrollHint");
+        hintGo.transform.SetParent(parent, false);
+        RectTransform rect = hintGo.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0f, 0f);
+        rect.anchorMax = new Vector2(1f, 0f);
+        rect.pivot = new Vector2(0.5f, 0f);
+        rect.anchoredPosition = new Vector2(0f, SidePadding * 0.35f);
+        rect.sizeDelta = new Vector2(0f, HintAreaHeight);
+
+        TextMeshProUGUI hintLabel = hintGo.AddComponent<TextMeshProUGUI>();
+        hintLabel.fontSize = 28f;
+        hintLabel.alignment = TextAlignmentOptions.Center;
+        hintLabel.color = new Color(0.8f, 0.8f, 0.8f, 0.95f);
+        hintLabel.text = "Scroll to the end via joystick before agreeing";
     }
 
     void BuildTitle(RectTransform parent)
@@ -600,7 +697,7 @@ public class RequirementsManager : MonoBehaviour
         rect.anchorMin = new Vector2(0f, 0f);
         rect.anchorMax = new Vector2(1f, 1f);
         rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.offsetMin = new Vector2(SidePadding, SidePadding + ButtonAreaHeight);
+        rect.offsetMin = new Vector2(SidePadding, SidePadding + ButtonAreaHeight + HintAreaHeight);
         rect.offsetMax = new Vector2(-SidePadding, -SidePadding - TitleHeight);
 
         Image background = scrollRoot.AddComponent<Image>();
@@ -649,25 +746,42 @@ public class RequirementsManager : MonoBehaviour
 
     void BuildButtons(RectTransform parent)
     {
-        _backButton = CreateButton(parent, "BackButton", new Vector2(SidePadding, SidePadding), TextAlignmentOptions.Center, false);
+        Color backNormal = new Color(0.25f, 0.25f, 0.28f, 1f);
+        Color backHighlight = new Color(0.35f, 0.35f, 0.38f, 1f);
+        Color nextNormal = new Color(0.1f, 0.6f, 0.18f, 1f);
+        Color nextHighlight = new Color(0.18f, 0.72f, 0.28f, 1f);
+        Color nextPressed = new Color(0.08f, 0.45f, 0.14f, 1f);
+        Color disabledGray = new Color(0.32f, 0.32f, 0.34f, 1f);
+
+        float buttonBaseY = SidePadding + HintAreaHeight;
+
+        _backButton = CreateButton(parent, "BackButton", new Vector2(SidePadding, buttonBaseY), TextAlignmentOptions.Center, false, backNormal, backHighlight, backHighlight, backNormal);
         _backButton.onClick.AddListener(HandleBack);
         _backButtonLabel = _backButton.GetComponentInChildren<TextMeshProUGUI>();
         if (_backButtonLabel != null)
         {
-            _backButtonLabel.text = backLabel;
+            _backButtonLabel.text = AppendHint(backLabel, backButtonHint);
         }
         _backButton.interactable = false;
 
-        _nextButton = CreateButton(parent, "NextButton", new Vector2(-SidePadding, SidePadding), TextAlignmentOptions.Center, true);
+        _nextButton = CreateButton(parent, "NextButton", new Vector2(-SidePadding, buttonBaseY), TextAlignmentOptions.Center, true, nextNormal, nextHighlight, nextPressed, disabledGray);
         _nextButton.onClick.AddListener(HandleNext);
         _nextButtonLabel = _nextButton.GetComponentInChildren<TextMeshProUGUI>();
         if (_nextButtonLabel != null)
         {
-            _nextButtonLabel.text = nextLabel;
+            _nextButtonLabel.text = AppendHint(nextLabel, nextButtonHint);
         }
+
+        var colors = _nextButton.colors;
+        colors.disabledColor = disabledGray;
+        colors.normalColor = nextNormal;
+        colors.highlightedColor = nextHighlight;
+        colors.pressedColor = nextPressed;
+        colors.colorMultiplier = 1f;
+        _nextButton.colors = colors;
     }
 
-    Button CreateButton(RectTransform parent, string name, Vector2 anchoredPosition, TextAlignmentOptions alignment, bool anchorRight)
+    Button CreateButton(RectTransform parent, string name, Vector2 anchoredPosition, TextAlignmentOptions alignment, bool anchorRight, Color normalColor, Color highlightColor, Color pressedColor, Color disabledColor)
     {
         GameObject buttonGo = new GameObject(name);
         buttonGo.transform.SetParent(parent, false);
@@ -679,14 +793,15 @@ public class RequirementsManager : MonoBehaviour
         rect.anchoredPosition = anchoredPosition;
 
         Image image = buttonGo.AddComponent<Image>();
-        image.color = new Color(0.2f, 0.45f, 0.9f, 0.9f);
+        image.color = normalColor;
 
         Button button = buttonGo.AddComponent<Button>();
         ColorBlock colors = button.colors;
-        colors.normalColor = image.color;
-        colors.highlightedColor = new Color(0.3f, 0.55f, 1f, 0.95f);
-        colors.pressedColor = new Color(0.1f, 0.35f, 0.8f, 1f);
-        colors.disabledColor = new Color(0.2f, 0.45f, 0.9f, 0.35f);
+        colors.normalColor = normalColor;
+        colors.highlightedColor = highlightColor;
+        colors.pressedColor = pressedColor;
+        colors.disabledColor = disabledColor;
+        colors.selectedColor = highlightColor;
         colors.colorMultiplier = 1f;
         button.colors = colors;
 
@@ -752,6 +867,15 @@ public class RequirementsManager : MonoBehaviour
 
         _flowActive = false;
         enabled = false;
+    }
+
+    void OnDisable()
+    {
+        if (_postLayoutRoutine != null)
+        {
+            StopCoroutine(_postLayoutRoutine);
+            _postLayoutRoutine = null;
+        }
     }
 
     void EnsureMasterControl()
