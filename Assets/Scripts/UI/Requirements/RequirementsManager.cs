@@ -9,6 +9,10 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR;
+#if UNITY_ANDROID
+using AndroidPermission = UnityEngine.Android.Permission;
+using AndroidPermissionCallbacks = UnityEngine.Android.PermissionCallbacks;
+#endif
 
 /// <summary>
 /// Runtime-only requirements flow for Meta Quest: documents (EULA, safety, notices) followed by storage permission.
@@ -114,9 +118,14 @@ public class RequirementsManager : MonoBehaviour
     [SerializeField] bool autoPopulateDefaultDocuments = true;
     [SerializeField, TextArea(2, 4)] string missingDocumentFallback = "Document unavailable.";
 
-    [Header("Permission Step")]
+    [Header("Microphone Step")]
+    [SerializeField] string microphoneTitle = "Microphone Permission";
+    [SerializeField, TextArea(6, 20)] string microphoneBody = "OpenSoundLab lets you record audio input. Please allow microphone access so recordings work.";
+    [SerializeField, TextArea(6, 20)] string microphoneDeniedBody = "Microphone access is still blocked. Select Agree to continue without it, or enable it later in the Meta Quest settings.";
+
+    [Header("Storage Step")]
     [SerializeField] string permissionTitle = "Storage Permission";
-    [SerializeField, TextArea(6, 20)] string permissionBody = "OpenSoundLab needs file access to load and record patches. The next step opens the Android settings where you can grant the permission.";
+    [SerializeField, TextArea(6, 20)] string permissionBody = "OpenSoundLab needs file access to load and record patches and samples. The next step opens the Meta Quest settings where you can grant the permission.";
     [SerializeField] string agreeLabel = "Agree";
     [SerializeField] string openSettingsLabel = "Open Settings";
     [SerializeField] string backLabel = "Back";
@@ -149,6 +158,7 @@ public class RequirementsManager : MonoBehaviour
     const float HintAreaHeight = 70f;
     const float PanelHeightPixels = 900f;
     const float TargetRenderScale = 1.4f;
+    const string MicrophonePermissionName = "android.permission.RECORD_AUDIO";
 
     Canvas _canvas;
     RectTransform _panelRect;
@@ -166,8 +176,112 @@ public class RequirementsManager : MonoBehaviour
     int _currentStepIndex;
     bool _hasScrolledToEnd;
     bool _waitingForPermissionFocus;
+    bool _waitingForMicrophoneResponse;
+    bool _microphoneDenied;
 
     Transform _anchorTransform;
+
+#if UNITY_ANDROID
+    AndroidPermissionCallbacks _microphoneCallbacks;
+#endif
+
+    enum StepType
+    {
+        Document,
+        Microphone,
+        Storage
+    }
+
+    int GetDocumentCount()
+    {
+        return documents != null ? documents.Length : 0;
+    }
+
+    StepType GetStepType(int index)
+    {
+        int docCount = GetDocumentCount();
+        if (index < docCount)
+        {
+            return StepType.Document;
+        }
+
+        return index == docCount ? StepType.Microphone : StepType.Storage;
+    }
+
+    bool HasMicrophonePermission()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        return AndroidPermission.HasUserAuthorizedPermission(MicrophonePermissionName);
+#else
+        return true;
+#endif
+    }
+
+    void RequestMicrophonePermission()
+    {
+        _waitingForMicrophoneResponse = true;
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (HasMicrophonePermission())
+        {
+            _waitingForMicrophoneResponse = false;
+            OnMicrophonePermissionGranted(MicrophonePermissionName);
+            return;
+        }
+
+        if (_microphoneCallbacks == null)
+        {
+            _microphoneCallbacks = new AndroidPermissionCallbacks();
+            _microphoneCallbacks.PermissionGranted += OnMicrophonePermissionGranted;
+            _microphoneCallbacks.PermissionDenied += OnMicrophonePermissionDenied;
+            _microphoneCallbacks.PermissionDeniedAndDontAskAgain += OnMicrophonePermissionDontAskAgain;
+        }
+
+        _waitingForMicrophoneResponse = true;
+        AndroidPermission.RequestUserPermission(MicrophonePermissionName, _microphoneCallbacks);
+#else
+        OnMicrophonePermissionGranted(MicrophonePermissionName);
+#endif
+    }
+
+    void OnMicrophonePermissionGranted(string permission)
+    {
+        if (permission != MicrophonePermissionName)
+        {
+            return;
+        }
+
+        _waitingForMicrophoneResponse = false;
+        _microphoneDenied = false;
+
+        if (GetStepType(_currentStepIndex) == StepType.Microphone)
+        {
+            AdvanceStep();
+        }
+    }
+
+    void OnMicrophonePermissionDenied(string permission)
+    {
+        if (permission != MicrophonePermissionName)
+        {
+            return;
+        }
+
+        _waitingForMicrophoneResponse = false;
+        _microphoneDenied = true;
+        ShowStep(_currentStepIndex);
+    }
+
+    void OnMicrophonePermissionDontAskAgain(string permission)
+    {
+        if (permission != MicrophonePermissionName)
+        {
+            return;
+        }
+
+        _waitingForMicrophoneResponse = false;
+        _microphoneDenied = true;
+        ShowStep(_currentStepIndex);
+    }
 
     IEnumerator Start()
     {
@@ -201,7 +315,13 @@ public class RequirementsManager : MonoBehaviour
 
         _flowActive = true;
 
-        ShowStep(consentPresent ? (documents != null ? documents.Length : 0) : 0);
+        int startIndex = consentPresent ? GetDocumentCount() : 0;
+        if (HasMicrophonePermission())
+        {
+            startIndex += 1;
+        }
+
+        ShowStep(startIndex);
     }
 
     void ApplyRenderResolutionScaling()
@@ -318,15 +438,24 @@ public class RequirementsManager : MonoBehaviour
 
     void OnApplicationFocus(bool hasFocus)
     {
-        if (!_flowActive || !hasFocus || !_waitingForPermissionFocus)
+        if (!_flowActive || !hasFocus)
         {
             return;
         }
 
-        if (IsPermissionStep(_currentStepIndex) && AndroidStorageAccess.HasManageAllFilesAccess())
+        if (_waitingForPermissionFocus && GetStepType(_currentStepIndex) == StepType.Storage)
         {
-            CompleteFlow();
+            if (AndroidStorageAccess.HasManageAllFilesAccess())
+            {
+                CompleteFlow();
+            }
+            else
+            {
+                _waitingForPermissionFocus = false;
+                UpdateNavigationState();
+            }
         }
+
     }
 
     void HandleButtonShortcuts()
@@ -360,7 +489,7 @@ public class RequirementsManager : MonoBehaviour
 
     void HandleScrollInput()
     {
-        if (IsPermissionStep(_currentStepIndex) || _scrollRect == null)
+        if (_scrollRect == null || GetStepType(_currentStepIndex) != StepType.Document)
         {
             return;
         }
@@ -396,24 +525,41 @@ public class RequirementsManager : MonoBehaviour
 
     void HandleNext()
     {
-        if (IsPermissionStep(_currentStepIndex))
+        switch (GetStepType(_currentStepIndex))
         {
-            if (AndroidStorageAccess.HasManageAllFilesAccess())
-            {
-                CompleteFlow();
-                return;
-            }
+            case StepType.Document:
+                AdvanceStep();
+                break;
+            case StepType.Microphone:
+                if (HasMicrophonePermission())
+                {
+                    AdvanceStep();
+                }
+                else if (_microphoneDenied && !_waitingForMicrophoneResponse)
+                {
+                    AdvanceStep();
+                }
+                else
+                {
+                    RequestMicrophonePermission();
+                    UpdateNavigationState();
+                }
+                break;
+            case StepType.Storage:
+                if (AndroidStorageAccess.HasManageAllFilesAccess())
+                {
+                    CompleteFlow();
+                    return;
+                }
 
-            bool launched = AndroidStorageAccess.TryOpenManageAllFilesSettings();
-            if (!launched)
-            {
-                Debug.LogWarning("RequirementsManager: could not open Manage All Files settings.");
-            }
-            _waitingForPermissionFocus = true;
-            return;
+                bool launched = AndroidStorageAccess.TryOpenManageAllFilesSettings();
+                if (!launched)
+                {
+                    Debug.LogWarning("RequirementsManager: could not open Manage All Files settings.");
+                }
+                _waitingForPermissionFocus = true;
+                break;
         }
-
-        AdvanceStep();
     }
 
     void HandleBack()
@@ -435,31 +581,58 @@ public class RequirementsManager : MonoBehaviour
 
     void ShowStep(int index)
     {
-        int maxIndex = (documents != null ? documents.Length : 0);
-        bool permissionStep = index >= maxIndex;
-        _currentStepIndex = permissionStep ? maxIndex : index;
+        int maxIndex = GetDocumentCount() + 1;
+        _currentStepIndex = Mathf.Clamp(index, 0, maxIndex);
 
         _waitingForPermissionFocus = false;
+        _waitingForMicrophoneResponse = false;
 
-        if (permissionStep)
+        switch (GetStepType(_currentStepIndex))
         {
-            ShowPermissionStep();
-            return;
+            case StepType.Document:
+                ShowDocumentStep(_currentStepIndex);
+                break;
+            case StepType.Microphone:
+                ShowMicrophoneStep();
+                break;
+            case StepType.Storage:
+                ShowStorageStep();
+                break;
         }
+    }
 
+    void ShowDocumentStep(int index)
+    {
         RequirementDocument doc = documents[index];
         if (doc == null)
         {
             doc = new RequirementDocument();
             Debug.LogWarning($"RequirementsManager: document at index {index} is null.");
         }
+
+        _hasScrolledToEnd = false;
         _titleLabel.text = doc.title;
         SetBodyText(doc.ResolveBody());
         SetNextLabel(agreeLabel);
         UpdateNavigationState();
     }
 
-    void ShowPermissionStep()
+    void ShowMicrophoneStep()
+    {
+        if (HasMicrophonePermission())
+        {
+            AdvanceStep();
+            return;
+        }
+
+        _titleLabel.text = microphoneTitle;
+        SetBodyText(_microphoneDenied ? microphoneDeniedBody : microphoneBody);
+        _hasScrolledToEnd = true;
+        SetNextLabel(agreeLabel);
+        UpdateNavigationState();
+    }
+
+    void ShowStorageStep()
     {
         if (AndroidStorageAccess.HasManageAllFilesAccess())
         {
@@ -565,14 +738,19 @@ public class RequirementsManager : MonoBehaviour
 
         if (_nextButton != null)
         {
-            bool permissionStep = IsPermissionStep(_currentStepIndex);
-            _nextButton.interactable = permissionStep || _hasScrolledToEnd;
+            switch (GetStepType(_currentStepIndex))
+            {
+                case StepType.Document:
+                    _nextButton.interactable = _hasScrolledToEnd;
+                    break;
+                case StepType.Microphone:
+                    _nextButton.interactable = !_waitingForMicrophoneResponse;
+                    break;
+                case StepType.Storage:
+                    _nextButton.interactable = true;
+                    break;
+            }
         }
-    }
-
-    bool IsPermissionStep(int index)
-    {
-        return documents == null ? index >= 0 : index >= documents.Length;
     }
 
     void SetNextLabel(string label)
@@ -904,4 +1082,16 @@ public class RequirementsManager : MonoBehaviour
 
         SceneManager.LoadScene(localIndex);
     }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+    void OnDestroy()
+    {
+        if (_microphoneCallbacks != null)
+        {
+            _microphoneCallbacks.PermissionGranted -= OnMicrophonePermissionGranted;
+            _microphoneCallbacks.PermissionDenied -= OnMicrophonePermissionDenied;
+            _microphoneCallbacks.PermissionDeniedAndDontAskAgain -= OnMicrophonePermissionDontAskAgain;
+        }
+    }
+#endif
 }
