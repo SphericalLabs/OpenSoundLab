@@ -27,4 +27,5 @@
   <uses-permission android:name="com.oculus.permission.BOUNDARY_VISIBILITY" />
   <uses-permission android:name="com.oculus.permission.USE_ANCHOR_API" />
   <uses-permission android:name="com.oculus.permission.USE_SCENE" />
+  <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
 </manifest>

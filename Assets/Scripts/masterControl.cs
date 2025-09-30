@@ -86,6 +86,7 @@ public class masterControl : MonoBehaviour {
 
     public bool handlesEnabled = true;
     public bool jacksEnabled = true;
+    [SerializeField] bool autoLoadLocalScene;
 
     public masterBusRecorder recorder;
     public metronome metro;
@@ -225,7 +226,10 @@ public class masterControl : MonoBehaviour {
 
         }
 
-        SceneManager.LoadScene((int)Scenes.Local);
+        if (autoLoadLocalScene)
+        {
+            SceneManager.LoadScene((int)Scenes.Local);
+        }
 
     }
 

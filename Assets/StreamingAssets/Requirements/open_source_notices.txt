@@ -1,0 +1,46 @@
+Open-Source Notices & Attributions
+
+The following third-party components ship with OpenSoundLab. Each retains its own license. Full texts and additional notices are bundled under LICENSE-Libs.md and in the referenced paths.
+
+RuntimeAudioClipLoader
+- Copyright © 2017 Neitri Industries
+- Included with creator permission; contact the author before reusing in other projects.
+
+NLayer (MIT License)
+- Copyright © 2018 Mark Heath, Andrew Ward & Contributors
+- Source: https://github.com/naudio/NLayer
+
+Oculus XR Plugin & Oculus Integration
+- © Facebook Technologies, LLC. Subject to the Oculus SDK License: https://developer.oculus.com/licenses/oculussdk/
+- Additional notices: see Assets/Oculus/** license files packaged with this build.
+
+Source Sans Pro (SIL Open Font License 1.1)
+- © Paul D. Hunt. Details: http://scripts.sil.org/OFL
+
+midi-dot-net (BSD-style License)
+- © 2009 Tom Lokovi
+- Conditions require reproducing copyright and disclaimer.
+
+SharpZipLib (MIT License)
+- © 2000-2018 SharpZipLib Contributors
+- Source: https://github.com/icsharpcode/SharpZipLib
+
+TextMesh Pro (Unity Companion License)
+- © 2021 Unity Technologies ApS. License bundled with Unity-dependent projects.
+
+SE-Natural-Bloom-Dirty-Lens (MIT License)
+- © 2019 sonicether
+- Source: https://github.com/sonicether/SE-Natural-Bloom-Dirty-Lens
+
+Freeverb
+- © 2000 “Jezar at Dreampoint”
+- Freely distributed; keep original notice intact.
+
+Unity NativeAudioPlugins (MIT License)
+- © 2014 Unity Technologies
+- Source: https://github.com/Unity-Technologies/NativeAudioPlugin
+
+Additional notices
+- Mirror Networking, UniVoice, and other bundled packages carry their own license files in Assets/ and Packages/. See LICENSE-Libs.md for the complete list and locations.
+
+If you ship derivatives, you must keep these notices accessible and include source links or archives where required.

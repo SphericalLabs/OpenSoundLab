@@ -129,6 +129,75 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1425685551}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &787362343
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 787362345}
+  - component: {fileID: 787362344}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &787362344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787362343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e3568c5891047268d167245e35e1414, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  consentKey: requirements_consent_v1
+  documents:
+  - title: End-User License Agreement
+    streamingAssetRelativePath: Requirements/eula.txt
+  - title: Health & Safety
+    streamingAssetRelativePath: Requirements/health_and_safety.txt
+  - title: Open-Source Notices
+    streamingAssetRelativePath: Requirements/open_source_notices.txt
+  autoPopulateDefaultDocuments: 1
+  missingDocumentFallback: Document unavailable.
+  permissionTitle: Storage Permission
+  permissionBody: OpenSoundLab needs file access to load and record patches. The
+    next step opens the Android settings where you can grant the permission.
+  nextLabel: Next
+  agreeLabel: Agree
+  openSettingsLabel: Open Settings
+  backLabel: Back
+  panelDistance: 1.8
+  verticalOffset: 0
+  panelSizeMeters: {x: 1.2, y: 0.75}
+  joystickScrollSpeed: 1.5
+  mouseScrollMultiplier: 200
+  onRequirementsAccepted:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &787362345
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787362343}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 47.840324, y: -25.379025, z: -80.34799}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1425685551
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -308,3 +377,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 1670915411}
   - {fileID: 1425685551}
+  - {fileID: 787362345}
