@@ -147,7 +147,7 @@ public class SampleInstallOverlay : MonoBehaviour
         bodyRect.anchorMax = new Vector2(0.88f, 1f);
         bodyRect.pivot = new Vector2(0.5f, 1f);
         bodyRect.sizeDelta = new Vector2(0f, 120f);
-        bodyRect.anchoredPosition = new Vector2(0f, -170f);
+        bodyRect.anchoredPosition = new Vector2(0f, -120f);
 
         var bodyLabel = bodyGo.AddComponent<TextMeshProUGUI>();
         bodyLabel.text = "We are installing the bundled samples. Please keep the headset on.";
@@ -162,11 +162,11 @@ public class SampleInstallOverlay : MonoBehaviour
         GameObject barRoot = new GameObject("ProgressBar", typeof(RectTransform));
         barRoot.transform.SetParent(parent, false);
         var barRect = barRoot.GetComponent<RectTransform>();
-        barRect.anchorMin = new Vector2(0.12f, 0f);
-        barRect.anchorMax = new Vector2(0.88f, 0f);
-        barRect.pivot = new Vector2(0.5f, 0f);
+        barRect.anchorMin = new Vector2(0.12f, 1f);
+        barRect.anchorMax = new Vector2(0.88f, 1f);
+        barRect.pivot = new Vector2(0.5f, 1f);
         barRect.sizeDelta = new Vector2(0f, 70f);
-        barRect.anchoredPosition = new Vector2(0f, 35f);
+        barRect.anchoredPosition = new Vector2(0f, -240f);
 
         var barBackground = barRoot.AddComponent<Image>();
         barBackground.sprite = GetSolidSprite();
