@@ -117,7 +117,6 @@ public class RequirementsManager : MonoBehaviour
     [Header("Permission Step")]
     [SerializeField] string permissionTitle = "Storage Permission";
     [SerializeField, TextArea(6, 20)] string permissionBody = "OpenSoundLab needs file access to load and record patches. The next step opens the Android settings where you can grant the permission.";
-    [SerializeField] string nextLabel = "Agree";
     [SerializeField] string agreeLabel = "Agree";
     [SerializeField] string openSettingsLabel = "Open Settings";
     [SerializeField] string backLabel = "Back";
@@ -456,7 +455,7 @@ public class RequirementsManager : MonoBehaviour
         }
         _titleLabel.text = doc.title;
         SetBodyText(doc.ResolveBody());
-        SetNextLabel(index == maxIndex - 1 ? agreeLabel : nextLabel);
+        SetNextLabel(agreeLabel);
         UpdateNavigationState();
     }
 
@@ -769,7 +768,7 @@ public class RequirementsManager : MonoBehaviour
         _nextButtonLabel = _nextButton.GetComponentInChildren<TextMeshProUGUI>();
         if (_nextButtonLabel != null)
         {
-            _nextButtonLabel.text = AppendHint(nextLabel, nextButtonHint);
+            _nextButtonLabel.text = AppendHint(agreeLabel, nextButtonHint);
         }
 
         var colors = _nextButton.colors;
