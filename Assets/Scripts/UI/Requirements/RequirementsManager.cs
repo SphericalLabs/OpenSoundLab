@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Runtime-only requirements flow for Meta Quest: documents (EULA, safety, notices) followed by storage permission.
@@ -128,6 +129,10 @@ public class RequirementsManager : MonoBehaviour
     [Header("Events")]
     [SerializeField] UnityEvent onRequirementsAccepted;
 
+    [Header("Startup")]
+    [SerializeField] masterControl masterControlPrefab;
+    [SerializeField] bool loadLocalSceneOnCompletion = true;
+
     const float CanvasScale = 0.001f;
     const float TitleHeight = 140f;
     const float ButtonAreaHeight = 140f;
@@ -155,14 +160,23 @@ public class RequirementsManager : MonoBehaviour
 
     IEnumerator Start()
     {
-        if (PlayerPrefs.GetInt(consentKey, 0) == 1)
+        EnsureDefaultDocuments();
+
+        bool consentPresent = PlayerPrefs.GetInt(consentKey, 0) == 1;
+        bool storageGranted = AndroidStorageAccess.HasManageAllFilesAccess();
+
+        if (consentPresent && storageGranted)
         {
+            EnsureMasterControl();
+            if (loadLocalSceneOnCompletion)
+            {
+                TryLoadLocalScene();
+            }
             onRequirementsAccepted?.Invoke();
             enabled = false;
             yield break;
         }
 
-        EnsureDefaultDocuments();
         _anchorTransform = ResolveAnchor();
         BuildUi();
 
@@ -174,7 +188,8 @@ public class RequirementsManager : MonoBehaviour
         }
 
         _flowActive = true;
-        ShowStep(0);
+
+        ShowStep(consentPresent ? (documents != null ? documents.Length : 0) : 0);
     }
 
     IEnumerator LoadDocumentBodies()
@@ -724,6 +739,12 @@ public class RequirementsManager : MonoBehaviour
         PlayerPrefs.Save();
         onRequirementsAccepted?.Invoke();
 
+        EnsureMasterControl();
+        if (loadLocalSceneOnCompletion)
+        {
+            TryLoadLocalScene();
+        }
+
         if (_canvas != null)
         {
             Destroy(_canvas.gameObject);
@@ -731,5 +752,33 @@ public class RequirementsManager : MonoBehaviour
 
         _flowActive = false;
         enabled = false;
+    }
+
+    void EnsureMasterControl()
+    {
+        if (masterControl.instance != null)
+        {
+            return;
+        }
+
+        if (masterControlPrefab == null)
+        {
+            Debug.LogWarning("RequirementsManager: MasterControl prefab not assigned; cannot instantiate.");
+            return;
+        }
+
+        Instantiate(masterControlPrefab);
+    }
+
+    void TryLoadLocalScene()
+    {
+        int localIndex = (int)masterControl.Scenes.Local;
+        Scene activeScene = SceneManager.GetActiveScene();
+        if (activeScene.buildIndex == localIndex)
+        {
+            return;
+        }
+
+        SceneManager.LoadScene(localIndex);
     }
 }
