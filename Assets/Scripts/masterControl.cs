@@ -152,10 +152,9 @@ public class masterControl : MonoBehaviour {
       muteEnvToggle.isOn = true;
     }
 
-    SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "OpenSoundLab";
+    SaveDir = Path.DirectorySeparatorChar + "sdcard" + Path.DirectorySeparatorChar + "Documents" + Path.DirectorySeparatorChar + "OpenSoundLab";
     ReadFileLocConfig();
-    //Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");
-
+    
     #if UNITY_ANDROID
       //if Saves doesn't exist, extract example data... 
       if (Directory.Exists(SaveDir + Path.DirectorySeparatorChar + "Saves") == false)
