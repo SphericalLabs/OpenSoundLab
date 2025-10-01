@@ -154,6 +154,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   consentKey: requirements_consent_v1
   documents:
+  - title: Welcome
+    streamingAssetRelativePath: Requirements/welcome.txt
   - title: End-User License Agreement
     streamingAssetRelativePath: Requirements/eula.txt
   - title: Health & Safety
@@ -162,10 +164,14 @@ MonoBehaviour:
     streamingAssetRelativePath: Requirements/open_source_notices.txt
   autoPopulateDefaultDocuments: 1
   missingDocumentFallback: Document unavailable.
+  microphoneTitle: Microphone Permission
+  microphoneBody: OpenSoundLab lets you record audio input. Please allow microphone
+    access so recordings work.
+  microphoneDeniedBody: Microphone access is still blocked. Select Agree to continue
+    without it, or enable it later in the Meta Quest settings.
   permissionTitle: Storage Permission
   permissionBody: OpenSoundLab needs file access to load and record patches. The
     next step opens the Android settings where you can grant the permission.
-  nextLabel: Next
   agreeLabel: Agree
   openSettingsLabel: Open Settings
   backLabel: Back
@@ -174,6 +180,8 @@ MonoBehaviour:
   panelSizeMeters: {x: 1.2, y: 0.75}
   joystickScrollSpeed: 1.5
   mouseScrollMultiplier: 200
+  nextButtonHint: ' (X/A)'
+  backButtonHint: ' (Y/B)'
   onRequirementsAccepted:
     m_PersistentCalls:
       m_Calls: []

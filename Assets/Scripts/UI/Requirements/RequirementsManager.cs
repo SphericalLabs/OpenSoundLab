@@ -318,7 +318,7 @@ public class RequirementsManager : MonoBehaviour
         _flowActive = true;
 
         int startIndex = consentPresent ? GetDocumentCount() : 0;
-        if (HasMicrophonePermission())
+        if (consentPresent && HasMicrophonePermission())
         {
             startIndex += 1;
         }
@@ -399,6 +399,11 @@ public class RequirementsManager : MonoBehaviour
 
         documents = new RequirementDocument[]
         {
+            new RequirementDocument
+            {
+                title = "Welcome",
+                streamingAssetRelativePath = "Requirements/welcome.txt"
+            },
             new RequirementDocument
             {
                 title = "End-User License Agreement",
