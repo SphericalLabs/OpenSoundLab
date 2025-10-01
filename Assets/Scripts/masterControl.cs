@@ -32,6 +32,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Net;
 using System.Linq;
+using UnityEngine.Networking;
 using Meta.XR.EnvironmentDepth;
 
 public class masterControl : MonoBehaviour
@@ -160,22 +161,40 @@ public class masterControl : MonoBehaviour
             muteEnvToggle.isOn = true;
         }
 
-        SaveDir = Path.DirectorySeparatorChar + "sdcard" + Path.DirectorySeparatorChar + "Documents" + Path.DirectorySeparatorChar + "OpenSoundLab";
+        SaveDir = ResolveDefaultSaveDir();
+        EnsureDirectoryExists(SaveDir);
         ReadFileLocConfig();
+        EnsureDirectoryExists(SaveDir);
+        Debug.Log($"masterControl: SaveDir resolved to {SaveDir}");
 
 #if UNITY_ANDROID
-        //if Saves doesn't exist, extract example data... 
-        if (Directory.Exists(SaveDir + Path.DirectorySeparatorChar + "Saves") == false)
+        string savesPath = Path.Combine(SaveDir, "Saves");
+        if (!Directory.Exists(savesPath))
         {
-            Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
-            //copy tgz to directory where we can extract it
-            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Examples.tgz");
-            while (!www.isDone) { }
-            System.IO.File.WriteAllBytes(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz", www.bytes);
-            //extract it
-            Utility_SharpZipCommands.ExtractTGZ(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz", SaveDir + Path.DirectorySeparatorChar + "Saves");
-            //delete tgz
-            File.Delete(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz");
+            Directory.CreateDirectory(savesPath);
+
+            string archivePath = Path.Combine(SaveDir, "Examples.tgz");
+            bool copySucceeded = TryCopyStreamingAsset("Examples.tgz", archivePath, out string copyError);
+
+            if (!copySucceeded)
+            {
+                Debug.LogError($"masterControl: failed to stage Examples.tgz. {copyError}");
+            }
+            else
+            {
+                try
+                {
+                    Utility_SharpZipCommands.ExtractTGZ(archivePath, savesPath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"masterControl: failed to extract Examples.tgz. {ex.Message}\n{ex.StackTrace}");
+                }
+                finally
+                {
+                    TryDeleteFile(archivePath);
+                }
+            }
         }
 #endif
 
@@ -349,6 +368,182 @@ public class masterControl : MonoBehaviour
     public void toggleInstrumentVolume(bool on)
     {
         masterMixer.SetFloat("instrumentVolume", on ? 0 : -18);
+    }
+
+
+    public static string ResolveDefaultSaveDir()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        return Path.Combine("/sdcard", "Documents", "OpenSoundLab");
+#else
+        string documents = TryGetDocumentsPath();
+        return Path.Combine(documents, "OpenSoundLab");
+#endif
+    }
+
+    static void EnsureDirectoryExists(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return;
+        }
+
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+    }
+
+
+#if UNITY_ANDROID
+    static bool TryCopyStreamingAsset(string fileName, string destinationPath, out string error)
+    {
+        error = null;
+
+#if UNITY_EDITOR
+        string sourcePath = Path.Combine(Application.streamingAssetsPath, fileName);
+        if (!File.Exists(sourcePath))
+        {
+            error = $"Source asset not found at {sourcePath}.";
+            return false;
+        }
+
+        try
+        {
+            File.Copy(sourcePath, destinationPath, true);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            return false;
+        }
+#else
+        string sourceUri = string.Format("{0}/{1}", Application.streamingAssetsPath, fileName);
+
+        using (UnityWebRequest request = UnityWebRequest.Get(sourceUri))
+        {
+            var downloadHandler = new DownloadHandlerFile(destinationPath)
+            {
+                removeFileOnAbort = true
+            };
+            request.downloadHandler = downloadHandler;
+
+            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+            }
+
+#if UNITY_2020_1_OR_NEWER
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                error = request.error;
+                return false;
+            }
+#else
+            if (request.isHttpError || request.isNetworkError)
+            {
+                error = request.error;
+                return false;
+            }
+#endif
+        }
+
+        return true;
+#endif
+    }
+#endif
+
+    static void TryDeleteFile(string path)
+    {
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        {
+            return;
+        }
+
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"masterControl: unable to delete temporary file at {path}. {ex.Message}");
+        }
+    }
+
+
+    static string TryGetDocumentsPath()
+    {
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+        string homePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        if (!string.IsNullOrEmpty(homePath))
+        {
+            string macDocuments = Path.Combine(homePath, "Documents");
+            if (!Directory.Exists(macDocuments))
+            {
+                try
+                {
+                    Directory.CreateDirectory(macDocuments);
+                }
+                catch (Exception)
+                {
+                    // Ignore; fall back to other candidates below.
+                }
+            }
+
+            if (Directory.Exists(macDocuments))
+            {
+                return macDocuments;
+            }
+        }
+#endif
+
+        string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (!string.IsNullOrEmpty(documents))
+        {
+            if (!Directory.Exists(documents))
+            {
+                try
+                {
+                    Directory.CreateDirectory(documents);
+                }
+                catch (Exception)
+                {
+                    // Ignore and continue with fallbacks.
+                }
+            }
+
+            if (Directory.Exists(documents))
+            {
+                return documents;
+            }
+        }
+
+        string personal = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        if (!string.IsNullOrEmpty(personal))
+        {
+            return personal;
+        }
+
+        try
+        {
+            string parentPath = Directory.GetParent(Application.persistentDataPath)?.FullName;
+            if (!string.IsNullOrEmpty(parentPath) && Directory.Exists(parentPath))
+            {
+                return parentPath;
+            }
+        }
+        catch (Exception)
+        {
+            // ignore; fall back below
+        }
+
+        if (!string.IsNullOrEmpty(Application.persistentDataPath))
+        {
+            return Application.persistentDataPath;
+        }
+
+        return Environment.CurrentDirectory;
     }
 
 

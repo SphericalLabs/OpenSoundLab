@@ -6,7 +6,7 @@ public static class RequirementsTestingUtility
 {
     const string ConsentKey = "requirements_consent_v1";
 
-    [MenuItem("Tools/OpenSoundLab/Clear Requirements Consent", priority = 200)]
+    [MenuItem("Tools/OpenSoundLab/PlayerPrefs/Clear Requirements Consent", priority = 100)]
     static void ClearRequirementsPrefs()
     {
         PlayerPrefs.DeleteKey(ConsentKey);
@@ -14,7 +14,7 @@ public static class RequirementsTestingUtility
         Debug.Log("RequirementsTestingUtility: cleared requirements consent PlayerPrefs key.");
     }
 
-    [MenuItem("Tools/OpenSoundLab/Clear All Player Prefs", priority = 201)]
+    [MenuItem("Tools/OpenSoundLab/PlayerPrefs/Clear All PlayerPrefs", priority = 101)]
     static void ClearAllPrefs()
     {
         PlayerPrefs.DeleteAll();
