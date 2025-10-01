@@ -179,8 +179,6 @@ public class RequirementsManager : MonoBehaviour
     bool _waitingForMicrophoneResponse;
     bool _microphoneDenied;
 
-    Transform _anchorTransform;
-
     static bool s_MouseScrollAxisUnavailable;
     static bool s_HasLoggedMissingMouseAxis;
 
@@ -308,7 +306,6 @@ public class RequirementsManager : MonoBehaviour
             yield break;
         }
 
-        _anchorTransform = ResolveAnchor();
         BuildUi();
 
         yield return LoadDocumentBodies();
@@ -809,44 +806,30 @@ public class RequirementsManager : MonoBehaviour
         return string.Concat(label, hint);
     }
 
-    Transform ResolveAnchor()
-    {
-        OVRCameraRig rig = FindAnyObjectByType<OVRCameraRig>();
-        if (rig != null)
-        {
-            if (rig.centerEyeAnchor != null)
-            {
-                return rig.centerEyeAnchor;
-            }
-            return rig.transform;
-        }
-
-        if (Camera.main != null)
-        {
-            return Camera.main.transform;
-        }
-
-        return transform;
-    }
-
     void BuildUi()
     {
-        Transform parent = _anchorTransform != null ? _anchorTransform : transform;
+        Transform parent = transform;
         GameObject canvasGo = new GameObject("RequirementsCanvas");
         canvasGo.transform.SetParent(parent, false);
-        canvasGo.transform.localPosition = new Vector3(0f, verticalOffset, panelDistance);
-        canvasGo.transform.localRotation = Quaternion.identity;
-        canvasGo.transform.localScale = Vector3.one * CanvasScale;
 
         _canvas = canvasGo.AddComponent<Canvas>();
-        _canvas.renderMode = RenderMode.WorldSpace;
+        _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         _canvas.sortingOrder = 5000;
-        _canvas.worldCamera = ResolveCamera(parent);
-        canvasGo.AddComponent<CanvasScaler>().dynamicPixelsPerUnit = 12000f;
+
+        CanvasScaler scaler = canvasGo.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
         canvasGo.AddComponent<GraphicRaycaster>();
 
         RectTransform canvasRect = _canvas.transform as RectTransform;
-        canvasRect.sizeDelta = panelSizeMeters * (PanelSizeScale / CanvasScale);
+        canvasRect.anchorMin = Vector2.zero;
+        canvasRect.anchorMax = Vector2.one;
+        canvasRect.pivot = new Vector2(0.5f, 0.5f);
+        canvasRect.offsetMin = Vector2.zero;
+        canvasRect.offsetMax = Vector2.zero;
 
         GameObject panelGo = new GameObject("Panel");
         panelGo.transform.SetParent(canvasRect, false);
@@ -857,7 +840,8 @@ public class RequirementsManager : MonoBehaviour
         Vector2 panelPixelSize = panelSizeMeters * (PanelSizeScale / CanvasScale);
         panelPixelSize.y = PanelHeightPixels;
         _panelRect.sizeDelta = panelPixelSize;
-        _panelRect.anchoredPosition = new Vector2(0f, -150f);
+        float verticalPixels = -verticalOffset * 1000f;
+        _panelRect.anchoredPosition = new Vector2(0f, verticalPixels);
 
         Image panelImage = panelGo.AddComponent<Image>();
         panelImage.color = new Color(0.02f, 0.02f, 0.02f, 1f);
@@ -1066,26 +1050,6 @@ public class RequirementsManager : MonoBehaviour
         }
 
         return _uiFont;
-    }
-
-    Camera ResolveCamera(Transform anchor)
-    {
-        if (anchor != null)
-        {
-            Camera childCamera = anchor.GetComponentInChildren<Camera>();
-            if (childCamera != null)
-            {
-                return childCamera;
-            }
-
-            Camera ownCamera = anchor.GetComponent<Camera>();
-            if (ownCamera != null)
-            {
-                return ownCamera;
-            }
-        }
-
-        return Camera.main;
     }
 
     void CompleteFlow()
