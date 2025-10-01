@@ -168,6 +168,7 @@ public class RequirementsManager : MonoBehaviour
     Button _backButton;
     TextMeshProUGUI _nextButtonLabel;
     TextMeshProUGUI _backButtonLabel;
+    GameObject _scrollHintRoot;
     ScrollRect _scrollRect;
     RectTransform _contentRect;
     Coroutine _postLayoutRoutine;
@@ -791,6 +792,22 @@ public class RequirementsManager : MonoBehaviour
                     break;
             }
         }
+
+        UpdateScrollHintVisibility();
+    }
+
+    void UpdateScrollHintVisibility()
+    {
+        if (_scrollHintRoot == null)
+        {
+            return;
+        }
+
+        bool shouldShow = GetStepType(_currentStepIndex) == StepType.Document && !_hasScrolledToEnd;
+        if (_scrollHintRoot.activeSelf != shouldShow)
+        {
+            _scrollHintRoot.SetActive(shouldShow);
+        }
     }
 
     void SetNextLabel(string label)
@@ -874,6 +891,8 @@ public class RequirementsManager : MonoBehaviour
         hintLabel.color = new Color(0.8f, 0.8f, 0.8f, 0.95f);
         hintLabel.text = "Scroll to the end via joystick before agreeing";
         ApplyUiFont(hintLabel);
+        _scrollHintRoot = hintGo;
+        _scrollHintRoot.SetActive(false);
     }
 
     void BuildTitle(RectTransform parent)
