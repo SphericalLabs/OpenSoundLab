@@ -9,6 +9,7 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR;
+using Nobi.UiRoundedCorners;
 #if UNITY_ANDROID
 using AndroidPermission = UnityEngine.Android.Permission;
 using AndroidPermissionCallbacks = UnityEngine.Android.PermissionCallbacks;
@@ -158,6 +159,9 @@ public class RequirementsManager : MonoBehaviour
     const float HintAreaHeight = 70f;
     const float PanelHeightPixels = 900f;
     const float TargetRenderScale = 1.4f;
+    const float PanelCornerRadius = 36f;
+    const float ButtonCornerRadius = 24f;
+    const float ScrollAreaCornerRadius = 28f;
     const string MicrophonePermissionName = "android.permission.RECORD_AUDIO";
 
     Canvas _canvas;
@@ -867,6 +871,9 @@ public class RequirementsManager : MonoBehaviour
 
         Image panelImage = panelGo.AddComponent<Image>();
         panelImage.color = new Color(0.02f, 0.02f, 0.02f, 1f);
+        var panelRounded = panelGo.AddComponent<ImageWithRoundedCorners>();
+        panelRounded.radius = PanelCornerRadius;
+        panelRounded.Refresh();
 
         BuildTitle(_panelRect);
         BuildScrollArea(_panelRect);
@@ -927,6 +934,9 @@ public class RequirementsManager : MonoBehaviour
 
         Image background = scrollRoot.AddComponent<Image>();
         background.color = new Color(1f, 1f, 1f, 0.05f);
+        var scrollRounded = scrollRoot.AddComponent<ImageWithRoundedCorners>();
+        scrollRounded.radius = ScrollAreaCornerRadius;
+        scrollRounded.Refresh();
 
         _scrollRect = scrollRoot.AddComponent<ScrollRect>();
         _scrollRect.horizontal = false;
@@ -1022,6 +1032,9 @@ public class RequirementsManager : MonoBehaviour
 
         Image image = buttonGo.AddComponent<Image>();
         image.color = normalColor;
+        var rounded = buttonGo.AddComponent<ImageWithRoundedCorners>();
+        rounded.radius = ButtonCornerRadius;
+        rounded.Refresh();
 
         Button button = buttonGo.AddComponent<Button>();
         ColorBlock colors = button.colors;
