@@ -15,7 +15,6 @@ public class SampleInstallOverlay : MonoBehaviour
     Canvas _canvas;
     CanvasGroup _canvasGroup;
     Image _progressFill;
-    Coroutine _progressRoutine;
     Coroutine _fadeRoutine;
     static Sprite _solidSprite;
 
@@ -40,28 +39,8 @@ public class SampleInstallOverlay : MonoBehaviour
         return overlay;
     }
 
-    public void BeginFakeProgress(float durationSeconds)
-    {
-        if (!gameObject.activeInHierarchy)
-        {
-            return;
-        }
-
-        if (_progressRoutine != null)
-        {
-            StopCoroutine(_progressRoutine);
-        }
-        _progressRoutine = StartCoroutine(AnimateProgress(durationSeconds));
-    }
-
     public void CompleteAndHide()
     {
-        if (_progressRoutine != null)
-        {
-            StopCoroutine(_progressRoutine);
-            _progressRoutine = null;
-        }
-
         if (_progressFill != null)
         {
             _progressFill.fillAmount = 1f;
@@ -157,6 +136,16 @@ public class SampleInstallOverlay : MonoBehaviour
         bodyLabel.enableWordWrapping = true;
     }
 
+    public void SetProgress(float normalized)
+    {
+        if (_progressFill == null)
+        {
+            return;
+        }
+
+        _progressFill.fillAmount = Mathf.Clamp01(normalized);
+    }
+
     void BuildProgressBar(RectTransform parent)
     {
         GameObject barRoot = new GameObject("ProgressBar", typeof(RectTransform));
@@ -188,27 +177,6 @@ public class SampleInstallOverlay : MonoBehaviour
         _progressFill.fillOrigin = 0;
         _progressFill.fillAmount = 0f;
         _progressFill.color = new Color(0.1f, 0.6f, 0.18f, 1f);
-    }
-
-    IEnumerator AnimateProgress(float durationSeconds)
-    {
-        float elapsed = 0f;
-        while (elapsed < durationSeconds)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / durationSeconds);
-            float eased = Mathf.SmoothStep(0f, 1f, t);
-            if (_progressFill != null)
-            {
-                _progressFill.fillAmount = eased;
-            }
-            yield return null;
-        }
-
-        if (_progressFill != null)
-        {
-            _progressFill.fillAmount = 1f;
-        }
     }
 
     IEnumerator FadeCanvas(float targetAlpha, float duration)
@@ -284,12 +252,6 @@ public class SampleInstallOverlay : MonoBehaviour
 
     void OnDestroy()
     {
-        if (_progressRoutine != null)
-        {
-            StopCoroutine(_progressRoutine);
-            _progressRoutine = null;
-        }
-
         if (_fadeRoutine != null)
         {
             StopCoroutine(_fadeRoutine);

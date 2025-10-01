@@ -1,114 +1,196 @@
-    using System;
-    using System.IO;
-    using ICSharpCode.SharpZipLib.GZip;
-    using ICSharpCode.SharpZipLib.Tar;
-     
-    public class Utility_SharpZipCommands {
-     
-            //// Calling example
-            //CreateTarGZ(@"c:\temp\gzip-test.tar.gz", @"c:\data");
-     
-            //USE THIS:
-            public static void CreateTarGZ_FromDirectory(string tgzFilename, string sourceDirectory) {
+using System;
+using System.IO;
+using ICSharpCode.SharpZipLib.GZip;
+using ICSharpCode.SharpZipLib.Tar;
 
-                string sourceFullPath = Path.GetFullPath(sourceDirectory);
+public static class Utility_SharpZipCommands
+{
+    //// Calling example
+    //CreateTarGZ(@"c:\temp\gzip-test.tar.gz", @"c:\data");
 
-                Stream outStream = File.Create(tgzFilename);
-                Stream gzoStream = new GZipOutputStream(outStream);
-                TarArchive tarArchive = TarArchive.CreateOutputTarArchive(gzoStream);
+    //USE THIS:
+    public static void CreateTarGZ_FromDirectory(string tgzFilename, string sourceDirectory)
+    {
+        string sourceFullPath = Path.GetFullPath(sourceDirectory);
 
-                string normalizedRoot = NormalizePath(sourceFullPath);
-                tarArchive.RootPath = normalizedRoot;
-                AddDirectoryFilesToTar(tarArchive, sourceFullPath, normalizedRoot, true);
+        using (Stream outStream = File.Create(tgzFilename))
+        using (Stream gzoStream = new GZipOutputStream(outStream))
+        using (TarArchive tarArchive = TarArchive.CreateOutputTarArchive(gzoStream))
+        {
+            string normalizedRoot = NormalizePath(sourceFullPath);
+            tarArchive.RootPath = normalizedRoot;
+            AddDirectoryFilesToTar(tarArchive, sourceFullPath, normalizedRoot, true);
+        }
+    }
 
-                tarArchive.Close();
+    public static void AddDirectoryFilesToTar(TarArchive tarArchive, string sourceDirectory, string rootPath, bool recurse)
+    {
+        string directoryName = GetRelativeEntryName(sourceDirectory, rootPath, true);
+        if (!string.IsNullOrEmpty(directoryName))
+        {
+            TarEntry directoryEntry = TarEntry.CreateEntryFromFile(sourceDirectory);
+            directoryEntry.Name = directoryName;
+            tarArchive.WriteEntry(directoryEntry, false);
+        }
+
+        string[] filenames = Directory.GetFiles(sourceDirectory);
+        foreach (string filename in filenames)
+        {
+            string nameOnly = Path.GetFileName(filename);
+            if (nameOnly.StartsWith("."))
+            {
+                continue;
             }
 
-            public static void AddDirectoryFilesToTar(TarArchive tarArchive, string sourceDirectory, string rootPath, bool recurse) {
+            if (filename.EndsWith(".meta"))
+            {
+                continue;
+            }
 
-                string directoryName = GetRelativeEntryName(sourceDirectory, rootPath, true);
+            string fileName = GetRelativeEntryName(filename, rootPath, false);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                continue;
+            }
+
+            TarEntry fileEntry = TarEntry.CreateEntryFromFile(filename);
+            fileEntry.Name = fileName;
+            tarArchive.WriteEntry(fileEntry, true);
+        }
+
+        if (recurse)
+        {
+            string[] directories = Directory.GetDirectories(sourceDirectory);
+            foreach (string directory in directories)
+            {
+                string dirNameOnly = Path.GetFileName(directory);
+                if (dirNameOnly.StartsWith("."))
+                {
+                    continue;
+                }
+
+                AddDirectoryFilesToTar(tarArchive, directory, rootPath, recurse);
+            }
+        }
+    }
+
+    static string GetRelativeEntryName(string path, string rootPath, bool isDirectory)
+    {
+        string normalizedPath = NormalizePath(path);
+        string trimmed = normalizedPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase)
+            ? normalizedPath.Substring(rootPath.Length).TrimStart('/')
+            : normalizedPath;
+
+        if (string.IsNullOrEmpty(trimmed))
+        {
+            return string.Empty;
+        }
+
+        return isDirectory ? trimmed + "/" : trimmed;
+    }
+
+    static string NormalizePath(string path)
+    {
+        string normalized = path.Replace('\\', '/');
+        if (normalized.EndsWith("/"))
+        {
+            normalized = normalized.Substring(0, normalized.Length - 1);
+        }
+        return normalized;
+    }
+
+    public static void ExtractTGZ(string gzArchiveName, string destFolder, Action<long, long> progressCallback = null)
+    {
+        if (string.IsNullOrEmpty(gzArchiveName))
+        {
+            throw new ArgumentException("Archive path must be provided.", nameof(gzArchiveName));
+        }
+
+        if (string.IsNullOrEmpty(destFolder))
+        {
+            throw new ArgumentException("Destination folder must be provided.", nameof(destFolder));
+        }
+
+        long totalBytes = CalculateTotalBytes(gzArchiveName);
+        long processedBytes = 0;
+        byte[] buffer = new byte[128 * 1024];
+
+        using (Stream inStream = File.OpenRead(gzArchiveName))
+        using (Stream gzipStream = new GZipInputStream(inStream))
+        using (TarInputStream tarInput = new TarInputStream(gzipStream))
+        {
+            TarEntry entry;
+            while ((entry = tarInput.GetNextEntry()) != null)
+            {
+                string entryPath = Path.Combine(destFolder, entry.Name.Replace('/', Path.DirectorySeparatorChar));
+
+                if (entry.IsDirectory)
+                {
+                    Directory.CreateDirectory(entryPath);
+                    continue;
+                }
+
+                string directoryName = Path.GetDirectoryName(entryPath);
                 if (!string.IsNullOrEmpty(directoryName))
                 {
-                    TarEntry directoryEntry = TarEntry.CreateEntryFromFile(sourceDirectory);
-                    directoryEntry.Name = directoryName;
-                    tarArchive.WriteEntry(directoryEntry, false);
+                    Directory.CreateDirectory(directoryName);
                 }
 
-                string[] filenames = Directory.GetFiles(sourceDirectory);
-                foreach (string filename in filenames) {
-                    string nameOnly = Path.GetFileName(filename);
-                    if (nameOnly.StartsWith("."))
+                long remaining = entry.Size;
+                using (FileStream outStream = File.Create(entryPath))
+                {
+                    while (remaining > 0)
                     {
-                        continue;
-                    }
-
-                    if (filename.EndsWith(".meta"))
-                    {
-                        continue;
-                    }
-
-                    string fileName = GetRelativeEntryName(filename, rootPath, false);
-                    if (string.IsNullOrEmpty(fileName))
-                    {
-                        continue;
-                    }
-
-                    TarEntry fileEntry = TarEntry.CreateEntryFromFile(filename);
-                    fileEntry.Name = fileName;
-                    tarArchive.WriteEntry(fileEntry, true);
-                }
-
-                if (recurse) {
-                    string[] directories = Directory.GetDirectories(sourceDirectory);
-                    foreach (string directory in directories)
-                    {
-                        string dirNameOnly = Path.GetFileName(directory);
-                        if (dirNameOnly.StartsWith("."))
+                        int toRead = remaining > buffer.Length ? buffer.Length : (int)remaining;
+                        int read = tarInput.Read(buffer, 0, toRead);
+                        if (read <= 0)
                         {
-                            continue;
+                            break;
                         }
 
-                        AddDirectoryFilesToTar(tarArchive, directory, rootPath, recurse);
+                        outStream.Write(buffer, 0, read);
+                        remaining -= read;
+                        processedBytes += read;
+                        progressCallback?.Invoke(processedBytes, totalBytes);
                     }
                 }
-            }
 
-            static string GetRelativeEntryName(string path, string rootPath, bool isDirectory)
-            {
-                string normalizedPath = NormalizePath(path);
-                string trimmed = normalizedPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase)
-                    ? normalizedPath.Substring(rootPath.Length).TrimStart('/')
-                    : normalizedPath;
-
-                if (string.IsNullOrEmpty(trimmed))
+                try
                 {
-                    return string.Empty;
+                    File.SetLastWriteTimeUtc(entryPath, entry.ModTime.ToUniversalTime());
                 }
-
-                return isDirectory ? trimmed + "/" : trimmed;
-            }
-
-            static string NormalizePath(string path)
-            {
-                string normalized = path.Replace('\\', '/');
-                if (normalized.EndsWith("/"))
+                catch (IOException)
                 {
-                    normalized = normalized.Substring(0, normalized.Length - 1);
+                    // Ignore timestamp failures; not critical for extraction.
                 }
-                return normalized;
+                catch (ArgumentOutOfRangeException)
+                {
+                    // Ignore invalid timestamps in the archive.
+                }
             }
-     
-        public static void ExtractTGZ(string gzArchiveName, string destFolder) {
-            Stream inStream = File.OpenRead (gzArchiveName);
-            Stream gzipStream = new GZipInputStream (inStream);
-     
-            TarArchive tarArchive = TarArchive.CreateInputTarArchive (gzipStream);
-            tarArchive.ExtractContents (destFolder);
-            tarArchive.Close ();
-     
-            gzipStream.Close ();
-            inStream.Close ();
-     
         }
-       
-    }    // Calling example
+
+        progressCallback?.Invoke(totalBytes, totalBytes);
+    }
+
+    static long CalculateTotalBytes(string gzArchiveName)
+    {
+        long total = 0;
+
+        using (Stream inStream = File.OpenRead(gzArchiveName))
+        using (Stream gzipStream = new GZipInputStream(inStream))
+        using (TarInputStream tarInput = new TarInputStream(gzipStream))
+        {
+            TarEntry entry;
+            while ((entry = tarInput.GetNextEntry()) != null)
+            {
+                if (!entry.IsDirectory)
+                {
+                    total += entry.Size;
+                }
+            }
+        }
+
+        return total;
+    }
+}

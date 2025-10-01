@@ -181,6 +181,11 @@ public class RequirementsManager : MonoBehaviour
 
     Transform _anchorTransform;
 
+    static bool s_MouseScrollAxisUnavailable;
+    static bool s_HasLoggedMissingMouseAxis;
+
+    TMP_FontAsset _uiFont;
+
 #if UNITY_ANDROID
     AndroidPermissionCallbacks _microphoneCallbacks;
 #endif
@@ -471,9 +476,17 @@ public class RequirementsManager : MonoBehaviour
         {
             nextPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space);
         }
+        if (!nextPressed)
+        {
+            nextPressed = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.X);
+        }
         if (!backPressed)
         {
             backPressed = Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Backspace);
+        }
+        if (!backPressed)
+        {
+            backPressed = Input.GetKeyDown(KeyCode.B) || Input.GetKeyDown(KeyCode.Y);
         }
 
         if (nextPressed && _nextButton != null && _nextButton.interactable)
@@ -506,10 +519,35 @@ public class RequirementsManager : MonoBehaviour
 #endif
         if (Mathf.Approximately(axis, 0f))
         {
-            float mouseScroll = Input.GetAxis("Mouse ScrollWheel");
+            float mouseScroll = 0f;
+            if (!s_MouseScrollAxisUnavailable)
+            {
+                try
+                {
+                    mouseScroll = Input.GetAxis("Mouse ScrollWheel");
+                }
+                catch (System.ArgumentException)
+                {
+                    s_MouseScrollAxisUnavailable = true;
+                    if (!s_HasLoggedMissingMouseAxis)
+                    {
+                        Debug.LogWarning("RequirementsManager: legacy Input axis 'Mouse ScrollWheel' is not configured; falling back to Input.mouseScrollDelta.");
+                        s_HasLoggedMissingMouseAxis = true;
+                    }
+                }
+            }
+
             if (Mathf.Abs(mouseScroll) > 0.01f)
             {
                 axis = mouseScroll * mouseScrollMultiplier;
+            }
+            else
+            {
+                float rawMouseScroll = Input.mouseScrollDelta.y;
+                if (Mathf.Abs(rawMouseScroll) > 0.01f)
+                {
+                    axis = rawMouseScroll * mouseScrollMultiplier;
+                }
             }
         }
 
@@ -846,6 +884,7 @@ public class RequirementsManager : MonoBehaviour
         hintLabel.alignment = TextAlignmentOptions.Center;
         hintLabel.color = new Color(0.8f, 0.8f, 0.8f, 0.95f);
         hintLabel.text = "Scroll to the end via joystick before agreeing";
+        ApplyUiFont(hintLabel);
     }
 
     void BuildTitle(RectTransform parent)
@@ -864,6 +903,7 @@ public class RequirementsManager : MonoBehaviour
         _titleLabel.alignment = TextAlignmentOptions.Center;
         _titleLabel.enableWordWrapping = false;
         _titleLabel.color = Color.white;
+        ApplyUiFont(_titleLabel);
     }
 
     void BuildScrollArea(RectTransform parent)
@@ -916,6 +956,7 @@ public class RequirementsManager : MonoBehaviour
         _bodyLabel.alignment = TextAlignmentOptions.TopLeft;
         _bodyLabel.enableWordWrapping = true;
         _bodyLabel.color = Color.white;
+        ApplyUiFont(_bodyLabel);
 
         _scrollRect.viewport = viewportRect;
         _scrollRect.content = _contentRect;
@@ -937,6 +978,7 @@ public class RequirementsManager : MonoBehaviour
         _backButtonLabel = _backButton.GetComponentInChildren<TextMeshProUGUI>();
         if (_backButtonLabel != null)
         {
+            ApplyUiFont(_backButtonLabel);
             _backButtonLabel.text = AppendHint(backLabel, backButtonHint);
         }
         _backButton.interactable = false;
@@ -946,6 +988,7 @@ public class RequirementsManager : MonoBehaviour
         _nextButtonLabel = _nextButton.GetComponentInChildren<TextMeshProUGUI>();
         if (_nextButtonLabel != null)
         {
+            ApplyUiFont(_nextButtonLabel);
             _nextButtonLabel.text = AppendHint(agreeLabel, nextButtonHint);
         }
 
@@ -996,8 +1039,33 @@ public class RequirementsManager : MonoBehaviour
         label.alignment = alignment;
         label.color = Color.white;
         label.text = name;
+        ApplyUiFont(label);
 
         return button;
+    }
+
+    void ApplyUiFont(TextMeshProUGUI label)
+    {
+        if (label == null)
+        {
+            return;
+        }
+
+        TMP_FontAsset font = ResolveUiFont();
+        if (font != null)
+        {
+            label.font = font;
+        }
+    }
+
+    TMP_FontAsset ResolveUiFont()
+    {
+        if (_uiFont == null)
+        {
+            _uiFont = UIFontProvider.GetFont();
+        }
+
+        return _uiFont;
     }
 
     Camera ResolveCamera(Transform anchor)
