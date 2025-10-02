@@ -231,11 +231,11 @@ function Launch-Scrcpy {
 
 function MaybeEnsureCommandsPresent {
     if (-not (Get-Command adb -ErrorAction SilentlyContinue)) {
-        Write-Error 'adb not found. Install Android Platform Tools and ensure they are on your PATH.'
+        Write-Error 'adb not found. Install Android Platform Tools (e.g. via choco install adb or winget install --id=Google.AndroidStudio -e) and ensure they are on your PATH.'
         exit 1
     }
     if (-not (Get-Command scrcpy -ErrorAction SilentlyContinue)) {
-        Write-Error 'scrcpy not found. Install it (e.g. via winget install scrcpy or choco install scrcpy) and ensure it is on your PATH.'
+        Write-Error 'scrcpy not found. Install it (e.g. via choco install scrcpy or winget install --id=Genymobile.scrcpy -e) and ensure it is on your PATH.'
         exit 1
     }
 }
