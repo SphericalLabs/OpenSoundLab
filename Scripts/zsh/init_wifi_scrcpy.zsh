@@ -8,10 +8,12 @@ CROP="2064:2208:0:0"
 ANGLE="19"
 MODE="wait-unplug"   # default; override with --immediate
 STEP_DELAY=0.5
+MAX_FPS=""
+DISPLAY_BUFFER=""
 
 usage() {
   cat <<'EOF'
-Usage: init_wifi_scrcpy.zsh [--immediate | --wait-unplug] [--port N] [--bitrate Bps] [--crop WxH:x:y] [--angle deg] [--] [extra scrcpy args]
+Usage: init_wifi_scrcpy.zsh [--immediate | --wait-unplug] [--port N] [--bitrate Bps] [--crop WxH:x:y] [--angle deg] [--max-fps FPS] [--video-buffer MS] [--] [extra scrcpy args]
 
 Examples:
   ./init_wifi_scrcpy.zsh
@@ -20,6 +22,10 @@ Examples:
 Notes:
   --immediate   Start scrcpy over TCP/IP right away (after enabling TCP).
   --wait-unplug Enable TCP/IP, ask you to unplug USB, then connect + launch scrcpy. (default)
+  --max-fps FPS        Forward max FPS limit to scrcpy (requires value).
+  --video-buffer MS  Forward display buffer duration (ms) to scrcpy.
+  Unknown options that are not handled above are forwarded to scrcpy.
+  Common scrcpy flags: --always-on-top --fullscreen --window-borderless.
 EOF
 }
 
@@ -34,6 +40,8 @@ while [[ $# -gt 0 ]]; do
     --bitrate) BITRATE="$2"; shift 2 ;;
     --crop) CROP="$2"; shift 2 ;;
     --angle) ANGLE="$2"; shift 2 ;;
+    --max-fps) MAX_FPS="$2"; shift 2 ;;
+    --video-buffer) DISPLAY_BUFFER="$2"; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     --) shift; EXTRA_ARGS=("$@"); break ;;
     *) EXTRA_ARGS+=("$1"); shift ;;
@@ -154,6 +162,8 @@ launch_scrcpy() {
   typeset -a args
   args=(-s "$serial" -b "$BITRATE" "--crop=$CROP")
   [[ -n "$ANGLE" ]] && args+=("--angle=$ANGLE")
+  [[ -n "$MAX_FPS" ]] && args+=("--max-fps=$MAX_FPS")
+  [[ -n "$DISPLAY_BUFFER" ]] && args+=("--video-buffer=$DISPLAY_BUFFER")
   if [[ ${#EXTRA_ARGS[@]} -gt 0 ]]; then args+=("${EXTRA_ARGS[@]}"); fi
   log "Starting scrcpy on $serial"
   exec scrcpy "${args[@]}"
