@@ -1,0 +1,364 @@
+#!/usr/bin/env pwsh
+#requires -Version 7.0
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+$script:Port = '5555'
+$script:Bitrate = '16M'
+$script:Crop = '2064:2208:0:0'
+$script:Angle = '19'
+$script:Mode = 'wait-unplug'
+$script:StepDelay = 0.5
+$script:MaxFps = $null
+$script:DisplayBuffer = $null
+$script:ExtraArgs = @()
+
+function Show-Usage {
+    @'
+Usage: init_wifi_scrcpy.pwsh [--immediate | --wait-unplug] [--port N] [--bitrate Bps] [--crop WxH:x:y] [--angle deg] [--max-fps FPS] [--video-buffer MS] [--] [extra scrcpy args]
+
+Examples:
+  ./init_wifi_scrcpy.pwsh
+  ./init_wifi_scrcpy.pwsh --immediate --port 5555 --bitrate 12M --crop 2064:2208:0:0 -- --turn-screen-off
+
+Notes:
+  --immediate       Start scrcpy over TCP/IP right away (after enabling TCP).
+  --wait-unplug     Enable TCP/IP, ask you to unplug USB, then connect + launch scrcpy. (default)
+  --max-fps FPS     Forward max FPS limit to scrcpy (requires value).
+  --video-buffer MS Forward display buffer duration (ms) to scrcpy.
+  Unknown options not handled above are forwarded to scrcpy.
+  Common scrcpy flags: --always-on-top --fullscreen --window-borderless.
+'@ | Write-Output
+}
+
+function Pop-NextValue {
+    param(
+        [Parameter(Mandatory)][System.Collections.Generic.List[string]]$List,
+        [Parameter(Mandatory)][string]$OptionName
+    )
+    if ($List.Count -eq 0) {
+        throw "Option $OptionName requires a value."
+    }
+    $value = $List[0]
+    $List.RemoveAt(0)
+    return $value
+}
+
+function Write-Log {
+    param(
+        [Parameter(Mandatory)][string]$Message
+    )
+    $timestamp = (Get-Date).ToString('HH:mm:ss')
+    Write-Output "[$timestamp] $Message"
+}
+
+function Pause-BetweenSteps {
+    Start-Sleep -Seconds $script:StepDelay
+}
+
+function Invoke-Adb {
+    param(
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [switch]$AllowFailure
+    )
+    $output = & adb @Arguments 2>&1
+    $exitCode = $LASTEXITCODE
+    $global:LASTEXITCODE = $exitCode
+    if (-not $AllowFailure -and $exitCode -ne 0) {
+        $joined = $Arguments -join ' '
+        throw "adb $joined failed with exit code $exitCode. Output: $output"
+    }
+    return $output
+}
+
+function Get-AdbDevices {
+    param(
+        [switch]$IncludeOffline
+    )
+    $output = Invoke-Adb -Arguments @('devices')
+    $devices = [System.Collections.Generic.List[psobject]]::new()
+    foreach ($line in $output) {
+        if ($null -eq $line) { continue }
+        $trimmed = $line.Trim()
+        if ($trimmed.Length -eq 0) { continue }
+        if ($trimmed -like 'List of devices attached*') { continue }
+        $parts = $trimmed -split '\s+'
+        if ($parts.Length -ge 2) {
+            $entry = [pscustomobject]@{
+                Serial = $parts[0]
+                Status = $parts[1]
+            }
+            $devices.Add($entry)
+        }
+    }
+    if (-not $IncludeOffline) {
+        return $devices | Where-Object { $_.Status -eq 'device' }
+    }
+    return $devices
+}
+
+function Get-UsbSerial {
+    $devices = @(Get-AdbDevices | Where-Object { $_.Serial -match '^[^:]+$' })
+    if ($devices.Count -gt 0) {
+        return $devices[0].Serial
+    }
+    return $null
+}
+
+function Get-SingleTcpSerial {
+    $devices = @(Get-AdbDevices | Where-Object { $_.Serial -match ':[0-9]+$' })
+    if ($devices.Count -eq 1) {
+        return $devices[0].Serial
+    }
+    return $null
+}
+
+function List-UsbSerials {
+    return @(Get-AdbDevices | Where-Object { $_.Serial -match '^[^:]+$' } | ForEach-Object { $_.Serial })
+}
+
+function List-TcpSerials {
+    return @(Get-AdbDevices | Where-Object { $_.Serial -match ':[0-9]+$' } | ForEach-Object { $_.Serial })
+}
+
+function Get-DeviceIp {
+    param(
+        [string]$Serial
+    )
+    $adbArgs = @()
+    if ($Serial) { $adbArgs += @('-s', $Serial) }
+    $privatePattern = '^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.)'
+
+    foreach ($iface in @('wlan0', 'wlan1', 'wifi0')) {
+        $output = Invoke-Adb -Arguments ($adbArgs + @('shell', "ip -o -4 addr show $iface")) -AllowFailure
+        foreach ($line in $output) {
+            if ($null -eq $line) { continue }
+            $clean = $line.Replace("\r", '').Trim()
+            if ($clean.Length -eq 0) { continue }
+            $parts = $clean -split '\s+'
+            if ($parts.Length -ge 4) {
+                $ip = $parts[3].Split('/')[0]
+                if ($ip -match $privatePattern) { return $ip }
+            }
+        }
+    }
+
+    $fallback = Invoke-Adb -Arguments ($adbArgs + @('shell', 'ip -o -4 addr show up')) -AllowFailure
+    foreach ($line in $fallback) {
+        if ($null -eq $line) { continue }
+        $clean = $line.Replace("\r", '').Trim()
+        if ($clean.Length -eq 0) { continue }
+        $parts = $clean -split '\s+'
+        if ($parts.Length -ge 4) {
+            $ip = $parts[3].Split('/')[0]
+            if ($ip -match $privatePattern) { return $ip }
+        }
+    }
+
+    foreach ($prop in @('dhcp.wlan0.ipaddress', 'dhcp.wlan1.ipaddress', 'dhcp.wifi.ipaddress')) {
+        $output = Invoke-Adb -Arguments ($adbArgs + @('shell', "getprop $prop")) -AllowFailure
+        $value = (($output | Where-Object { $_ }) -join '').Replace("\r", '').Trim()
+        if ($value -match $privatePattern) { return $value }
+    }
+
+    return $null
+}
+
+function Test-UsbSerialAttached {
+    param(
+        [string]$Serial
+    )
+    if (-not $Serial) { return $false }
+    $match = Get-AdbDevices -IncludeOffline | Where-Object { $_.Serial -eq $Serial }
+    return $null -ne $match
+}
+
+function Wait-ForUsbDetach {
+    param(
+        [string]$Serial
+    )
+    $tries = 120
+    $missingStreak = 0
+    while ($tries -gt 0) {
+        if (-not (Test-UsbSerialAttached -Serial $Serial)) {
+            $missingStreak++
+            if ($missingStreak -ge 4) {
+                return $true
+            }
+        } else {
+            $missingStreak = 0
+        }
+        Start-Sleep -Milliseconds 500
+        $tries--
+    }
+    return $false
+}
+
+function Ensure-OnlyTcpActive {
+    param(
+        [string]$Target
+    )
+    Invoke-Adb -Arguments @('disconnect') -AllowFailure | Out-Null
+    Pause-BetweenSteps
+    Invoke-Adb -Arguments @('connect', $Target) | Out-Null
+    Pause-BetweenSteps
+}
+
+function Maybe-ResetAdbState {
+    $usbSerials = @(List-UsbSerials)
+    $tcpSerials = @(List-TcpSerials)
+    if ($usbSerials.Count -eq 1 -and $tcpSerials.Count -eq 1) {
+        Write-Log 'Detected one USB and one TCP/IP device; resetting adb daemon'
+        Invoke-Adb -Arguments @('kill-server') -AllowFailure | Out-Null
+        Pause-BetweenSteps
+    }
+}
+
+function Launch-Scrcpy {
+    param(
+        [string]$Serial
+    )
+    $args = @('-s', $Serial, '-b', $script:Bitrate, "--crop=$($script:Crop)")
+    if ($script:Angle) { $args += "--angle=$($script:Angle)" }
+    if ($script:MaxFps) { $args += "--max-fps=$($script:MaxFps)" }
+    if ($script:DisplayBuffer) { $args += "--video-buffer=$($script:DisplayBuffer)" }
+    if ($script:ExtraArgs.Count -gt 0) { $args += $script:ExtraArgs }
+    Write-Log "Starting scrcpy on $Serial"
+    & scrcpy @args
+    exit $LASTEXITCODE
+}
+
+function MaybeEnsureCommandsPresent {
+    if (-not (Get-Command adb -ErrorAction SilentlyContinue)) {
+        Write-Error 'adb not found. Install Android Platform Tools and ensure they are on your PATH.'
+        exit 1
+    }
+    if (-not (Get-Command scrcpy -ErrorAction SilentlyContinue)) {
+        Write-Error 'scrcpy not found. Install it (e.g. via winget install scrcpy or choco install scrcpy) and ensure it is on your PATH.'
+        exit 1
+    }
+}
+
+function Main {
+    MaybeEnsureCommandsPresent
+    Maybe-ResetAdbState
+
+    $tcp = Get-SingleTcpSerial
+    if ($tcp) {
+        Write-Log "Reusing existing TCP/IP device: $tcp"
+        Pause-BetweenSteps
+        Ensure-OnlyTcpActive -Target $tcp
+        Launch-Scrcpy -Serial $tcp
+        return
+    }
+
+    $usb = Get-UsbSerial
+    if (-not $usb) {
+        Write-Log 'No USB device found and no reusable TCP/IP connection. Plug in via USB or ensure Wireless debugging is paired.'
+        exit 1
+    }
+    Write-Log "Found USB device: $usb"
+    Pause-BetweenSteps
+
+    $ip = Get-DeviceIp -Serial $usb
+    if (-not $ip) {
+        Write-Log 'Could not determine device IP. Ensure Wi-Fi is on the same LAN.'
+        exit 1
+    }
+    $target = "$ip:$($script:Port)"
+    Write-Log "Device LAN IP: $ip (target $target)"
+    Pause-BetweenSteps
+
+    Write-Log "Enabling TCP/IP on port $($script:Port)"
+    Invoke-Adb -Arguments @('-s', $usb, 'tcpip', $script:Port) | Out-Null
+    Pause-BetweenSteps
+
+    if ($script:Mode -eq 'immediate') {
+        Write-Log 'Connecting over TCP/IP immediately'
+        Pause-BetweenSteps
+        Ensure-OnlyTcpActive -Target $target
+        Launch-Scrcpy -Serial $target
+    } else {
+        Write-Log 'Please unplug the USB cable when ready...'
+        Write-Log 'Press Enter once the cable is unplugged (Ctrl+C to abort).'
+        [void](Read-Host)
+        Pause-BetweenSteps
+        if (-not (Wait-ForUsbDetach -Serial $usb)) {
+            Write-Log 'Timed out waiting for USB to be unplugged.'
+            exit 1
+        }
+        Write-Log "USB detached. Connecting to $target"
+        Pause-BetweenSteps
+        $connected = $false
+        foreach ($attempt in 1..20) {
+            $output = Invoke-Adb -Arguments @('connect', $target) -AllowFailure
+            if ($LASTEXITCODE -eq 0 -and (($output -join '\n') -match 'connected to')) {
+                Write-Log "Connected to $target"
+                Pause-BetweenSteps
+                $connected = $true
+                break
+            }
+            Start-Sleep -Milliseconds 500
+        }
+        if (-not $connected) {
+            Write-Log "Failed to connect to $target over TCP/IP."
+            exit 1
+        }
+        Ensure-OnlyTcpActive -Target $target
+        Pause-BetweenSteps
+        Launch-Scrcpy -Serial $target
+    }
+}
+
+$argList = [System.Collections.Generic.List[string]]::new()
+$null = $argList.AddRange($args)
+
+while ($argList.Count -gt 0) {
+    $current = $argList[0]
+    $argList.RemoveAt(0)
+    switch ($current) {
+        '--immediate' { $script:Mode = 'immediate' }
+        '--wait-unplug' { $script:Mode = 'wait-unplug' }
+        '--port' {
+            $script:Port = Pop-NextValue -List $argList -OptionName '--port'
+        }
+        '--bitrate' {
+            $script:Bitrate = Pop-NextValue -List $argList -OptionName '--bitrate'
+        }
+        '--crop' {
+            $script:Crop = Pop-NextValue -List $argList -OptionName '--crop'
+        }
+        '--angle' {
+            $script:Angle = Pop-NextValue -List $argList -OptionName '--angle'
+        }
+        '--max-fps' {
+            $script:MaxFps = Pop-NextValue -List $argList -OptionName '--max-fps'
+        }
+        '--video-buffer' {
+            $script:DisplayBuffer = Pop-NextValue -List $argList -OptionName '--video-buffer'
+        }
+        '--help' { Show-Usage; exit 0 }
+        '-h' { Show-Usage; exit 0 }
+        '--' {
+            if ($argList.Count -gt 0) {
+                $script:ExtraArgs += $argList.ToArray()
+            }
+            break
+        }
+        default {
+            $script:ExtraArgs += $current
+        }
+    }
+}
+
+try {
+    Main
+} catch {
+    if ($_.Exception) {
+        Write-Error $_.Exception.Message
+    } else {
+        Write-Error $_
+    }
+    exit 1
+}
