@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright ? 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ? 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ? 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ? 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public class waveTranscribeLooper : signalGenerator {
   float biggestBeats = 1;
   double biggestPeriod = 0.0625;
 
-  const int RecordBlendFrameCount = 128;
+  const int RecordBlendFrameCount = 64;
   int _recordEffectiveFadeFrames = 0;
   bool _recordSegmentActive = false;
   int _recordFramesWritten = 0;
@@ -85,7 +85,7 @@ public class waveTranscribeLooper : signalGenerator {
   float[] _recordTailOriginal;
   int[] _recordTailIndices;
 
-  const int CueFadeFrameCount = 128;
+  const int CueFadeFrameCount = 64;
   float _cueLiveGain = 0f;
   float _cueFadeStep = 0f;
 
@@ -403,25 +403,18 @@ public class waveTranscribeLooper : signalGenerator {
         if (!_recordSegmentActive) {
           BeginRecordingSegment();
         }
-        _cueLiveGain = 1f;
+        _cueLiveGain = Mathf.MoveTowards(_cueLiveGain, 1f, _cueFadeStep);
       } else {
         float targetCue = cueLive ? 1f : 0f;
-        if (!Mathf.Approximately(_cueLiveGain, targetCue)) {
-          float delta = targetCue - _cueLiveGain;
-          float step = Mathf.Sign(delta) * _cueFadeStep;
-          if (Mathf.Abs(delta) <= _cueFadeStep) _cueLiveGain = targetCue;
-          else _cueLiveGain += step;
-        } else {
-          _cueLiveGain = targetCue;
-        }
-        _cueLiveGain = Mathf.Clamp01(_cueLiveGain);
+        _cueLiveGain = Mathf.MoveTowards(_cueLiveGain, targetCue, _cueFadeStep);
 
         if (_recordSegmentActive) {
           FinalizeRecordingSegment();
         }
       }
 
-      float monitoringGain = recordingFrame ? 1f : _cueLiveGain;
+      _cueLiveGain = Mathf.Clamp01(_cueLiveGain);
+      float monitoringGain = _cueLiveGain;
       float playbackIncomingL = incomingBuffer[i] * monitoringGain;
       float playbackIncomingR = incomingBuffer[i + 1] * monitoringGain;
 
