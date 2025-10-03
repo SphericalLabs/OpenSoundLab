@@ -271,28 +271,33 @@ public class waveTranscribeLooper : signalGenerator {
       }
 
       if (_deviceInterface.recordTrigger.signal != null) {
-      
-        // detect rec start via rec trigger
-        if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
+        bool gateMode = _deviceInterface.RecordCvIsGate();
+
+        if (gateMode) {
+          if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
             recording = true;
             recordingTriggeredByCv = true;
             _deviceInterface.buttons[0].phantomHit(recording);
 
-          if (recording && !playing) {
-            playing = true;
-            curBufferIndex = 0;
-            _deviceInterface.buttons[1].phantomHit(playing);
+            if (recording && !playing) {
+              playing = true;
+              curBufferIndex = 0;
+              _deviceInterface.buttons[1].phantomHit(playing);
+            }
           }
-        }
-        // detect rec stop via rec trigger
-        if (recBuffer[i] <= 0f && lastRecSig[0] > 0f)
-        {
-            recording = false; 
+
+          if (recBuffer[i] <= 0f && lastRecSig[0] > 0f) {
+            recording = false;
             recordingTriggeredByCv = false;
             _deviceInterface.buttons[0].phantomHit(recording);
+          }
+        } else {
+          if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
+            recordingTriggeredByCv = false;
+            _deviceInterface.HandleCvTriggerPulse();
+          }
         }
 
-        //lastRecSig[0] = lastRecSig[1];
         lastRecSig[0] = recBuffer[i];
       }
 
