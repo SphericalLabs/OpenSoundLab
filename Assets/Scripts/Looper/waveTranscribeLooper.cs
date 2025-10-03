@@ -38,6 +38,7 @@ public class waveTranscribeLooper : signalGenerator {
   public bool playing = false;
   public bool overwrite = false;
   public bool cueLive = false;
+  bool recordingTriggeredByCv = false;
 
   public TextMesh saveText;
 
@@ -214,6 +215,7 @@ public class waveTranscribeLooper : signalGenerator {
   public void Record() {
     playing = true;
     recording = true;
+    recordingTriggeredByCv = false;
   }
 
   public void Stop() {
@@ -225,6 +227,7 @@ public class waveTranscribeLooper : signalGenerator {
       recording = false;
       _deviceInterface.buttons[0].phantomHit(recording);
     }
+    recordingTriggeredByCv = false;
   }
 
   double lastIncomingDspTime = -1;
@@ -272,6 +275,7 @@ public class waveTranscribeLooper : signalGenerator {
         // detect rec start via rec trigger
         if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
             recording = true;
+            recordingTriggeredByCv = true;
             _deviceInterface.buttons[0].phantomHit(recording);
 
           if (recording && !playing) {
@@ -284,6 +288,7 @@ public class waveTranscribeLooper : signalGenerator {
         if (recBuffer[i] <= 0f && lastRecSig[0] > 0f)
         {
             recording = false; 
+            recordingTriggeredByCv = false;
             _deviceInterface.buttons[0].phantomHit(recording);
         }
 
@@ -341,8 +346,10 @@ public class waveTranscribeLooper : signalGenerator {
         curBufferIndex = (curBufferIndex + 2);
         if (curBufferIndex >= virtualBufferLength) {
           if (recording) {
-            recording = !recording;
-            _deviceInterface.buttons[0].phantomHit(recording);
+            if (!recordingTriggeredByCv) {
+              recording = false;
+              _deviceInterface.buttons[0].phantomHit(recording);
+            }
           }
           curBufferIndex = 0;
 
@@ -351,6 +358,7 @@ public class waveTranscribeLooper : signalGenerator {
 
           if (recordRequested) {
             recording = true;
+            recordingTriggeredByCv = false;
             _deviceInterface.playClick = true;
             _deviceInterface.buttons[0].phantomHit(recording);
             recordRequested = false;
