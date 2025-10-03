@@ -133,28 +133,41 @@ public class cubeZone : manipObject
 
     public override void onTouch(bool on, manipulator m)
     {
-        if (!on || m == null) return;
+        if (m == null) return;
 
-        if (!m.triggerDown || !m.emptyGrab) return;
+        if (on)
+        {
+            if (!m.triggerDown || !m.emptyGrab) return;
 
-        if (m.SelectedObject != null && m.SelectedObject != this) return;
+            if (m.SelectedObject != null && m.SelectedObject != this) return;
 
-        m.selectedTransform = transform;
-        m.SelectedObject = this;
-        setSelect(true, m.transform);
-        m.emptyGrab = false;
+            m.selectedTransform = transform;
+            m.SelectedObject = this;
+            setSelect(true, m.transform);
+            m.emptyGrab = false;
 
-        setGrab(true, m.transform);
+            setGrab(true, m.transform);
 
-        if (tip == null) return;
+            if (tip == null) return;
 
-        Vector3 localTip = transform.InverseTransformPoint(tip.position);
-        p = new Vector3(
-            Mathf.Clamp(localTip.x, -0.5f, 0.5f),
-            Mathf.Clamp(localTip.y, -0.5f, 0.5f),
-            Mathf.Clamp(localTip.z, -0.5f, 0.5f));
-        pAtBeginDragging = p;
-        controllerPosAtBeginDragging = tip.position;
-        updatePercent(p, true);
+            Vector3 localTip = transform.InverseTransformPoint(tip.position);
+            p = new Vector3(
+                Mathf.Clamp(localTip.x, -0.5f, 0.5f),
+                Mathf.Clamp(localTip.y, -0.5f, 0.5f),
+                Mathf.Clamp(localTip.z, -0.5f, 0.5f));
+            pAtBeginDragging = p;
+            controllerPosAtBeginDragging = tip.position;
+            updatePercent(p, true);
+        }
+        else if (m.SelectedObject == this)
+        {
+            setGrab(false, m.transform);
+            setSelect(false, m.transform);
+            m.selectedTransform = null;
+            m.SelectedObject = null;
+            m.emptyGrab = true;
+            m.wasGazeBased = false;
+            tip = null;
+        }
     }
 }
