@@ -73,7 +73,12 @@ public class key : manipObject
     public void keyHitCheck()
     {
         if (!initialized) return;
-        bool on = touching || curState == manipState.grabbed || toggled;
+
+        bool on = curState == manipState.grabbed || toggled;
+        if (!isKeyboard || !sticky)
+        {
+            on = touching || on;
+        }
 
         if (on != isHit)
         {
@@ -105,6 +110,7 @@ public class key : manipObject
     {
         phantomHitUpdate = true;
         isHit = on;
+        toggled = on;
         if (triggerDeviceInterface)
         {
             _deviceInterface.hit(on, keyValue);
@@ -175,9 +181,21 @@ public class key : manipObject
     public override void onTouch(bool on, manipulator m)
     {
         touching = on;
+
+        if (isKeyboard && sticky)
+        {
+            if (m != null && m.emptyGrab && on)
+            {
+                m.hapticPulse(700);
+                toggled = !toggled;
+                keyHitCheck();
+            }
+            return;
+        }
+
         if (m != null)
         {
-            if (on) m.hapticPulse(700);            
+            if (on) m.hapticPulse(700);
         }
 
         keyHitCheck();
