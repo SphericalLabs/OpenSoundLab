@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright ? 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ? 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ? 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ? 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ public class waveTranscribeLooper : signalGenerator {
   public bool playing = false;
   public bool overwrite = false;
   public bool cueLive = false;
+  bool recordingTriggeredByCv = false;
 
   public TextMesh saveText;
 
@@ -75,6 +76,19 @@ public class waveTranscribeLooper : signalGenerator {
   float biggestBeats = 1;
   double biggestPeriod = 0.0625;
 
+  const int RecordBlendFrameCount = 64;
+  int _recordEffectiveFadeFrames = 0;
+  bool _recordSegmentActive = false;
+  int _recordFramesWritten = 0;
+  int _recordTailWritePos = 0;
+  int _recordTailSize = 0;
+  float[] _recordTailOriginal;
+  int[] _recordTailIndices;
+
+  const int CueFadeFrameCount = 64;
+  float _cueLiveGain = 0f;
+  float _cueFadeStep = 0f;
+
 
   public override void Awake() {
     base.Awake();
@@ -93,6 +107,11 @@ public class waveTranscribeLooper : signalGenerator {
 
     lastRecSig = new float[] { 0, 0 };
     lastPlaySig = new float[] { 0, 0 };
+    _recordTailOriginal = new float[RecordBlendFrameCount * 2];
+    _recordTailIndices = new int[RecordBlendFrameCount];
+    ResetRecordingBlendState();
+    _cueFadeStep = 1f / Mathf.Max(1, CueFadeFrameCount);
+    _cueLiveGain = cueLive ? 1f : 0f;
   }
 
   double lastbeatperiod = 0;
@@ -173,8 +192,86 @@ public class waveTranscribeLooper : signalGenerator {
     sampleBuffer = new float[Mathf.RoundToInt((float)(biggestBeats * biggestPeriod * .25f * AudioSettings.outputSampleRate))];
     tex.SetPixels32(wavepixels);
     tex.Apply(false);
+    ResetRecordingBlendState();
   }
 
+
+  void ResetRecordingBlendState() {
+    _recordSegmentActive = false;
+    _recordFramesWritten = 0;
+    _recordTailWritePos = 0;
+    _recordTailSize = 0;
+    _recordEffectiveFadeFrames = Mathf.Min(RecordBlendFrameCount, Mathf.Max(1, virtualBufferLength / 2));
+    _cueLiveGain = cueLive ? 1f : 0f;
+  }
+
+  void BeginRecordingSegment() {
+    _recordSegmentActive = true;
+    _recordFramesWritten = 0;
+    _recordTailWritePos = 0;
+    _recordTailSize = 0;
+    _recordEffectiveFadeFrames = Mathf.Min(RecordBlendFrameCount, Mathf.Max(1, virtualBufferLength / 2));
+  }
+
+  void FinalizeRecordingSegment() {
+    if (!_recordSegmentActive) return;
+
+    int framesToProcess = Mathf.Min(_recordTailSize, _recordFramesWritten);
+    if (framesToProcess > 0 && _recordEffectiveFadeFrames > 0) {
+      int start = _recordTailWritePos - framesToProcess;
+      if (start < 0) start += _recordEffectiveFadeFrames;
+      for (int i = 0; i < framesToProcess; i++) {
+        int idx = (start + i) % _recordEffectiveFadeFrames;
+        int bufferIndex = _recordTailIndices[idx];
+        float originalL = _recordTailOriginal[idx * 2];
+        float originalR = _recordTailOriginal[idx * 2 + 1];
+        float currentL = sampleBuffer[bufferIndex];
+        float currentR = sampleBuffer[bufferIndex + 1];
+        float t = framesToProcess <= 1 ? 1f : (float)i / (framesToProcess - 1);
+        sampleBuffer[bufferIndex] = Mathf.Lerp(currentL, originalL, t);
+        sampleBuffer[bufferIndex + 1] = Mathf.Lerp(currentR, originalR, t);
+      }
+    }
+
+    _recordSegmentActive = false;
+    _recordFramesWritten = 0;
+    _recordTailWritePos = 0;
+    _recordTailSize = 0;
+  }
+
+  void ApplyRecordingSample(int bufferIndex, float incomingL, float incomingR, bool overwriteMode) {
+    float existingL = sampleBuffer[bufferIndex];
+    float existingR = sampleBuffer[bufferIndex + 1];
+
+    if (_recordEffectiveFadeFrames > 0) {
+      int tailIndex = _recordTailWritePos;
+      _recordTailOriginal[tailIndex * 2] = existingL;
+      _recordTailOriginal[tailIndex * 2 + 1] = existingR;
+      _recordTailIndices[tailIndex] = bufferIndex;
+      _recordTailWritePos = (_recordTailWritePos + 1) % _recordEffectiveFadeFrames;
+      if (_recordTailSize < _recordEffectiveFadeFrames) _recordTailSize++;
+    }
+
+    float targetL = overwriteMode ? incomingL : existingL + incomingL;
+    float targetR = overwriteMode ? incomingR : existingR + incomingR;
+
+    float newL = targetL;
+    float newR = targetR;
+
+    if (_recordEffectiveFadeFrames > 1 && _recordFramesWritten < _recordEffectiveFadeFrames) {
+      float t = Mathf.Clamp01((_recordFramesWritten + 1f) / _recordEffectiveFadeFrames);
+      newL = Mathf.Lerp(existingL, targetL, t);
+      newR = Mathf.Lerp(existingR, targetR, t);
+    } else if (_recordEffectiveFadeFrames == 1 && _recordFramesWritten == 0) {
+      newL = 0.5f * (existingL + targetL);
+      newR = 0.5f * (existingR + targetR);
+    }
+
+    sampleBuffer[bufferIndex] = newL;
+    sampleBuffer[bufferIndex + 1] = newR;
+
+    _recordFramesWritten++;
+  }
 
   public void Save() {
     if (bufferToWav.instance.savingInProgress) return;
@@ -214,6 +311,7 @@ public class waveTranscribeLooper : signalGenerator {
   public void Record() {
     playing = true;
     recording = true;
+    recordingTriggeredByCv = false;
   }
 
   public void Stop() {
@@ -225,6 +323,7 @@ public class waveTranscribeLooper : signalGenerator {
       recording = false;
       _deviceInterface.buttons[0].phantomHit(recording);
     }
+    recordingTriggeredByCv = false;
   }
 
   double lastIncomingDspTime = -1;
@@ -268,61 +367,84 @@ public class waveTranscribeLooper : signalGenerator {
       }
 
       if (_deviceInterface.recordTrigger.signal != null) {
-      
-        // detect rec start via rec trigger
-        if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
+        bool gateMode = _deviceInterface.RecordCvIsGate();
+
+        if (gateMode) {
+          if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
             recording = true;
+            recordingTriggeredByCv = true;
             _deviceInterface.buttons[0].phantomHit(recording);
 
-          if (recording && !playing) {
-            playing = true;
-            curBufferIndex = 0;
-            _deviceInterface.buttons[1].phantomHit(playing);
+            if (recording && !playing) {
+              playing = true;
+              curBufferIndex = 0;
+              _deviceInterface.buttons[1].phantomHit(playing);
+            }
+          }
+
+          if (recBuffer[i] <= 0f && lastRecSig[0] > 0f) {
+            recording = false;
+            recordingTriggeredByCv = false;
+            _deviceInterface.buttons[0].phantomHit(recording);
+          }
+        } else {
+          if (recBuffer[i] > 0f && lastRecSig[0] <= 0f) {
+            recordingTriggeredByCv = false;
+            _deviceInterface.HandleCvTriggerPulse();
           }
         }
-        // detect rec stop via rec trigger
-        if (recBuffer[i] <= 0f && lastRecSig[0] > 0f)
-        {
-            recording = false; 
-            _deviceInterface.buttons[0].phantomHit(recording);
-        }
 
-        //lastRecSig[0] = lastRecSig[1];
         lastRecSig[0] = recBuffer[i];
       }
 
-      if (playing) {
-        if(cueLive || recording){ // always cue live during recording
-          oldBuffer[i] = buffer[i] = incomingBuffer[i] + sampleBuffer[curBufferIndex];
-          oldBuffer[i + 1] = buffer[i + 1] = incomingBuffer[i] + sampleBuffer[curBufferIndex + 1];
-        } else {
-          oldBuffer[i] = buffer[i] = sampleBuffer[curBufferIndex];
-          oldBuffer[i + 1] = buffer[i + 1] = sampleBuffer[curBufferIndex + 1];
+      bool recordingFrame = recording;
+
+      if (recordingFrame) {
+        if (!_recordSegmentActive) {
+          BeginRecordingSegment();
         }
-      } else if (cueLive) { // not playing but live cueing
-        buffer[i] = incomingBuffer[i];
-        buffer[i+1] = incomingBuffer[i+1];
+        _cueLiveGain = Mathf.MoveTowards(_cueLiveGain, 1f, _cueFadeStep);
+      } else {
+        float targetCue = cueLive ? 1f : 0f;
+        _cueLiveGain = Mathf.MoveTowards(_cueLiveGain, targetCue, _cueFadeStep);
+
+        if (_recordSegmentActive) {
+          FinalizeRecordingSegment();
+        }
       }
 
-      if (recording) {
-        if (overwrite)
-        {
-            sampleBuffer[curBufferIndex] = incomingBuffer[i];
-            sampleBuffer[curBufferIndex + 1] = incomingBuffer[i + 1];
+      _cueLiveGain = Mathf.Clamp01(_cueLiveGain);
+      float monitoringGain = _cueLiveGain;
+      float playbackIncomingL = incomingBuffer[i] * monitoringGain;
+      float playbackIncomingR = incomingBuffer[i + 1] * monitoringGain;
+
+      float outL = 0f;
+      float outR = 0f;
+
+      if (playing) {
+        if (monitoringGain > 0f) {
+          outL = playbackIncomingL + sampleBuffer[curBufferIndex];
+          outR = playbackIncomingR + sampleBuffer[curBufferIndex + 1];
+        } else {
+          outL = sampleBuffer[curBufferIndex];
+          outR = sampleBuffer[curBufferIndex + 1];
         }
-        else // by default dubbing
-        {
-            sampleBuffer[curBufferIndex] += incomingBuffer[i];
-            sampleBuffer[curBufferIndex + 1] += incomingBuffer[i + 1];
-        }
-        
+      } else if (monitoringGain > 0f) {
+        outL = playbackIncomingL;
+        outR = playbackIncomingR;
+      }
+
+      buffer[i] = oldBuffer[i] = outL;
+      buffer[i + 1] = oldBuffer[i + 1] = outR;
+
+      if (recordingFrame) {
+        ApplyRecordingSample(curBufferIndex, incomingBuffer[i], incomingBuffer[i + 1], overwrite);
         curWaveLine = waveLineRec;
         curWaveBG = waveBGRec;
       } else {
         curWaveLine = waveLine;
         curWaveBG = waveBG;
       }
-
       if (playing) {
         int centerH = waveheight / 2;
         if (curBufferIndex % tempColumnMult == 0) {
@@ -341,8 +463,10 @@ public class waveTranscribeLooper : signalGenerator {
         curBufferIndex = (curBufferIndex + 2);
         if (curBufferIndex >= virtualBufferLength) {
           if (recording) {
-            recording = !recording;
-            _deviceInterface.buttons[0].phantomHit(recording);
+            if (!recordingTriggeredByCv) {
+              recording = false;
+              _deviceInterface.buttons[0].phantomHit(recording);
+            }
           }
           curBufferIndex = 0;
 
@@ -351,6 +475,7 @@ public class waveTranscribeLooper : signalGenerator {
 
           if (recordRequested) {
             recording = true;
+            recordingTriggeredByCv = false;
             _deviceInterface.playClick = true;
             _deviceInterface.buttons[0].phantomHit(recording);
             recordRequested = false;
@@ -366,6 +491,10 @@ public class waveTranscribeLooper : signalGenerator {
           }
         }
       }
+    }
+
+    if (_recordSegmentActive && !recording) {
+      FinalizeRecordingSegment();
     }
 
     samplePos = (float)curBufferIndex / virtualBufferLength;

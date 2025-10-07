@@ -100,12 +100,24 @@ public class keyboardDeviceInterface : deviceInterface
             keys[i] = g.GetComponent<key>();
             keys[i].keyValue = i;
             keys[i].isKeyboard = true;
-            keys[i].sticky = false;
+            keys[i].sticky = true;
         }
 
         if (TryGetComponent<NetworkKey>(out NetworkKey networkKey))
         {
             networkKey.keys = keys;
+        }
+    }
+
+    void DeactivateOtherTouchKeys(int activeID)
+    {
+        for (int i = 0; i < keyCount; i++)
+        {
+            if (i == activeID) continue;
+            if (keyStates[i].touchState)
+            {
+                asynchKeyHit(false, i, keyInput.touch);
+            }
         }
     }
 
@@ -140,6 +152,11 @@ public class keyboardDeviceInterface : deviceInterface
         if (k == keyInput.midi) keyStates[ID].midiState = on;
         else if (k == keyInput.seq) keyStates[ID].seqState = on;
         else if (k == keyInput.touch) keyStates[ID].touchState = on;
+
+        if (on && k == keyInput.touch)
+        {
+            DeactivateOtherTouchKeys(ID);
+        }
 
         if (keyStates[ID].nonSeqStateChange())
         {

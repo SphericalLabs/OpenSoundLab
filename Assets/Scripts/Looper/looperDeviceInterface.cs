@@ -34,6 +34,7 @@ public class looperDeviceInterface : deviceInterface {
   public sliderNotched durSlider;
   waveTranscribeLooper transcriber;
   public button[] buttons;
+  public basicSwitch recordCvModeSwitch;
 
   public TextMesh countdownText;
 
@@ -63,6 +64,15 @@ public class looperDeviceInterface : deviceInterface {
   }
 
   public bool playClick = false;
+  public bool RecordCvIsGate() {
+    return recordCvModeSwitch == null || !recordCvModeSwitch.switchVal;
+  }
+
+  public void HandleCvTriggerPulse() {
+    if (recordCountdown || transcriber.recording) return;
+    RecordCountdown();
+  }
+
   void Update() {
     if (input.signal != transcriber.incoming) transcriber.incoming = input.signal;
 
@@ -85,7 +95,7 @@ public class looperDeviceInterface : deviceInterface {
     }
   }
 
-  void RecordCountdown() {
+  public void RecordCountdown() {
     recordCountdown = true;
     if (!transcriber.playing) {
       if (playCountdown) recCountdownRemaining = playCountdownRemaining;
@@ -179,6 +189,7 @@ public class looperDeviceInterface : deviceInterface {
     data.dur = durSlider.switchVal;
     data.cueLive = buttons[4].isHit;
     data.overwrite = buttons[5].isHit;
+    data.recordCvTriggerMode = recordCvModeSwitch != null && recordCvModeSwitch.switchVal;
     return data;
   }
 
@@ -192,6 +203,7 @@ public class looperDeviceInterface : deviceInterface {
     durSlider.setVal(data.dur);
     buttons[4].setOnAtStart(data.cueLive);
     buttons[5].setOnAtStart(data.overwrite);
+    if (recordCvModeSwitch != null) recordCvModeSwitch.setSwitch(data.recordCvTriggerMode, true);
   }
 }
 public class LooperData : InstrumentData {
@@ -202,4 +214,5 @@ public class LooperData : InstrumentData {
   public int dur;
   public bool overwrite;
   public bool cueLive;
+  public bool recordCvTriggerMode;
 }
