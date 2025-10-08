@@ -14,12 +14,30 @@ public static class Utility_SharpZipCommands
         string sourceFullPath = Path.GetFullPath(sourceDirectory);
 
         using (Stream outStream = File.Create(tgzFilename))
-        using (Stream gzoStream = new GZipOutputStream(outStream))
-        using (TarArchive tarArchive = TarArchive.CreateOutputTarArchive(gzoStream))
         {
-            string normalizedRoot = NormalizePath(sourceFullPath);
-            tarArchive.RootPath = normalizedRoot;
-            AddDirectoryFilesToTar(tarArchive, sourceFullPath, normalizedRoot, true);
+            Stream gzoStream = null;
+            TarArchive tarArchive = null;
+
+            try
+            {
+                gzoStream = new GZipOutputStream(outStream);
+                tarArchive = TarArchive.CreateOutputTarArchive(gzoStream);
+                string normalizedRoot = NormalizePath(sourceFullPath);
+                tarArchive.RootPath = normalizedRoot;
+                AddDirectoryFilesToTar(tarArchive, sourceFullPath, normalizedRoot, true);
+            }
+            finally
+            {
+                // TarArchive owns the gzip stream; closing it here prevents double-dispose errors during Unity builds.
+                if (tarArchive != null)
+                {
+                    tarArchive.Close();
+                }
+                else
+                {
+                    gzoStream?.Dispose();
+                }
+            }
         }
     }
 
