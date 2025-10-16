@@ -46,6 +46,7 @@ public class keyboardDeviceInterface : deviceInterface
     int keyCount = 12 * 2 + 1;
     key[] keys;
     readonly List<int> recentKeyHistory = new List<int>();
+    bool loggedMissingRecentHighlightMaterials;
 
     adsrInterface _adsrInterface;
 
@@ -326,9 +327,9 @@ public class keyboardDeviceInterface : deviceInterface
         return Mathf.Min(clampedSize, materialCount);
     }
 
-    void RegisterRecentKeyPress(int keyIndex)
+    public void RegisterRecentKeyPress(int keyIndex)
     {
-        if (keys == null || keyIndex < 0 || keyIndex >= keys.Length)
+        if (keyIndex < 0 || keyIndex >= keyCount)
         {
             return;
         }
@@ -342,7 +343,18 @@ public class keyboardDeviceInterface : deviceInterface
             recentKeyHistory.RemoveRange(limit, recentKeyHistory.Count - limit);
         }
 
-        ApplyRecentKeyHighlights();
+        if (keys != null && keys.Length > 0)
+        {
+            ApplyRecentKeyHighlights();
+        }
+    }
+
+    public void RefreshRecentKeyHighlights()
+    {
+        if (keys != null && keys.Length > 0)
+        {
+            ApplyRecentKeyHighlights();
+        }
     }
 
     void ApplyRecentKeyHighlights()
@@ -355,6 +367,16 @@ public class keyboardDeviceInterface : deviceInterface
         int limit = GetRecentKeyLimit();
         if (limit <= 0)
         {
+            if (Application.isPlaying && !loggedMissingRecentHighlightMaterials)
+            {
+                if (recentKeyMaterials == null || recentKeyMaterials.Count == 0)
+                {
+                    Debug.LogWarning($"{name}: recent key highlights are disabled because no highlight materials are assigned.", this);
+                }
+            }
+
+            loggedMissingRecentHighlightMaterials = true;
+
             for (int i = 0; i < keys.Length; i++)
             {
                 if (keys[i] != null)
@@ -364,6 +386,8 @@ public class keyboardDeviceInterface : deviceInterface
             }
             return;
         }
+
+        loggedMissingRecentHighlightMaterials = false;
 
         bool[] highlighted = new bool[keys.Length];
         int highlightCount = Mathf.Min(limit, recentKeyHistory.Count);
@@ -377,6 +401,11 @@ public class keyboardDeviceInterface : deviceInterface
             }
 
             Material highlightMat = recentKeyMaterials.Count > i ? recentKeyMaterials[i] : recentKeyMaterials[recentKeyMaterials.Count - 1];
+            if (highlightMat == null)
+            {
+                continue;
+            }
+
             keys[keyIndex].SetRecentHighlight(highlightMat);
             highlighted[keyIndex] = true;
         }
@@ -393,6 +422,7 @@ public class keyboardDeviceInterface : deviceInterface
     void ResetRecentKeyHighlightState()
     {
         recentKeyHistory.Clear();
+        loggedMissingRecentHighlightMaterials = false;
         ApplyRecentKeyHighlights();
     }
 
