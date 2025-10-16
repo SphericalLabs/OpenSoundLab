@@ -39,6 +39,7 @@ public class key : manipObject
     Material offMat;
     Material glowMat;
     deviceInterface _deviceInterface;
+    Material recentHighlightMaterial;
 
     public bool sticky = true;
 
@@ -66,6 +67,10 @@ public class key : manipObject
     {
         rend.sharedMaterial = m;
         offMat = rend.sharedMaterial;
+        if (!isHit)
+        {
+            ApplyOffVisual();
+        }
     }
 
     public bool isHit = false;
@@ -108,6 +113,10 @@ public class key : manipObject
         if (triggerDeviceInterface)
         {
             _deviceInterface.hit(on, keyValue);
+        }
+        if (!isHit)
+        {
+            ApplyOffVisual();
         }
     }
 
@@ -210,7 +219,7 @@ public class key : manipObject
         switch (s)
         {
             case keyState.off:
-                rend.sharedMaterial = offMat;
+                ApplyOffVisual();
                 break;
             case keyState.touched:
                 rend.sharedMaterial = glowMat;
@@ -229,6 +238,33 @@ public class key : manipObject
                 break;
             default:
                 break;
+        }
+    }
+
+    void ApplyOffVisual()
+    {
+        Material target = recentHighlightMaterial != null ? recentHighlightMaterial : offMat;
+        if (rend.sharedMaterial != target)
+        {
+            rend.sharedMaterial = target;
+        }
+    }
+
+    public void SetRecentHighlight(Material material)
+    {
+        recentHighlightMaterial = material;
+        if (!isHit)
+        {
+            ApplyOffVisual();
+        }
+    }
+
+    public void ClearRecentHighlight()
+    {
+        recentHighlightMaterial = null;
+        if (!isHit)
+        {
+            ApplyOffVisual();
         }
     }
 

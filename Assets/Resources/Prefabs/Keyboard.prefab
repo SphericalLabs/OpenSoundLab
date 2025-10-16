@@ -136,7 +136,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000011962480574}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -1233,6 +1232,12 @@ MonoBehaviour:
   sequenceButton: {fileID: 114354287083071102}
   midiLow: {fileID: 114593384622477814}
   midiHigh: {fileID: 114005396977000910}
+  recentKeyHistorySize: 4
+  recentKeyMaterials:
+  - {fileID: 2100000, guid: 8850a3155ce44c140a4f98bd56d1d8e8, type: 2}
+  - {fileID: 2100000, guid: cb97a16c001ea424881f2b2a6a6c905c, type: 2}
+  - {fileID: 2100000, guid: 754f9bda2ed88f443a2f21fce65ede37, type: 2}
+  - {fileID: 2100000, guid: ade122c4fd25f504f878f3a82f07ed2b, type: 2}
 --- !u!114 &114000011191938902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1248,6 +1253,8 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
+  firstSample: 0
+  prevFirstSample: 0
   octave: 0
 --- !u!114 &8649691281717568503
 MonoBehaviour:
@@ -1264,6 +1271,8 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
+  firstSample: 0
+  prevFirstSample: 0
   isHigh: 0
   newKeyWasPressed: 0
 --- !u!114 &-6617596432156421487
@@ -1900,7 +1909,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 0
+  isSwitch: 0
   toggleKey: 0
   buttonID: 2
   button2DID: 
@@ -3997,7 +4006,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1182675173597550}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -4550,7 +4558,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 0
   toggleKey: 0
   buttonID: 1
   button2DID: 
@@ -4810,7 +4818,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 0
   toggleKey: 0
   buttonID: -3
   button2DID: 0000000000000000
@@ -6182,7 +6190,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 0
+  isSwitch: 0
   toggleKey: 0
   buttonID: 3
   button2DID: 
@@ -8424,7 +8432,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 0
   toggleKey: 0
   buttonID: -2
   button2DID: 0000000000000000
@@ -10272,7 +10280,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 0
   toggleKey: 0
   buttonID: -4
   button2DID: 0000000000000000
@@ -12738,7 +12746,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1382784709087814}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -13208,7 +13215,7 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  isToggle: 1
+  isSwitch: 0
   toggleKey: 0
   buttonID: 0
   button2DID: 
@@ -14029,7 +14036,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1732024521900968}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}

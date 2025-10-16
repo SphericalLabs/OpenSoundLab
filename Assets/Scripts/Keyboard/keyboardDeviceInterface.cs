@@ -39,8 +39,13 @@ public class keyboardDeviceInterface : deviceInterface
 
     public midiOutOfRange midiLow, midiHigh;
 
+    [Range(1, 8)]
+    public int recentKeyHistorySize = 4;
+    public List<Material> recentKeyMaterials = new List<Material>();
+
     int keyCount = 12 * 2 + 1;
     key[] keys;
+    readonly List<int> recentKeyHistory = new List<int>();
 
     adsrInterface _adsrInterface;
 
@@ -69,6 +74,7 @@ public class keyboardDeviceInterface : deviceInterface
 
         keys = new key[keyCount];
         SpawnKeys();
+        ResetRecentKeyHighlightState();
 
         for (int i = 0; i < keyCount; i++) keyStates[i] = new keyState(false);
 
@@ -159,6 +165,7 @@ public class keyboardDeviceInterface : deviceInterface
     {
         if (on)
         {
+            RegisterRecentKeyPress(ID);
             if (curKey != ID)
             {
                 int prev = curKey;
@@ -307,6 +314,101 @@ public class keyboardDeviceInterface : deviceInterface
             }
         }
     }
+    int GetRecentKeyLimit()
+    {
+        int materialCount = recentKeyMaterials != null ? recentKeyMaterials.Count : 0;
+        if (materialCount == 0)
+        {
+            return 0;
+        }
+
+        int clampedSize = recentKeyHistorySize < 1 ? 1 : recentKeyHistorySize;
+        return Mathf.Min(clampedSize, materialCount);
+    }
+
+    void RegisterRecentKeyPress(int keyIndex)
+    {
+        if (keys == null || keyIndex < 0 || keyIndex >= keys.Length)
+        {
+            return;
+        }
+
+        recentKeyHistory.Remove(keyIndex);
+        recentKeyHistory.Insert(0, keyIndex);
+
+        int limit = GetRecentKeyLimit();
+        if (limit > 0 && recentKeyHistory.Count > limit)
+        {
+            recentKeyHistory.RemoveRange(limit, recentKeyHistory.Count - limit);
+        }
+
+        ApplyRecentKeyHighlights();
+    }
+
+    void ApplyRecentKeyHighlights()
+    {
+        if (keys == null || keys.Length == 0)
+        {
+            return;
+        }
+
+        int limit = GetRecentKeyLimit();
+        if (limit <= 0)
+        {
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (keys[i] != null)
+                {
+                    keys[i].ClearRecentHighlight();
+                }
+            }
+            return;
+        }
+
+        bool[] highlighted = new bool[keys.Length];
+        int highlightCount = Mathf.Min(limit, recentKeyHistory.Count);
+
+        for (int i = 0; i < highlightCount; i++)
+        {
+            int keyIndex = recentKeyHistory[i];
+            if (keyIndex < 0 || keyIndex >= keys.Length)
+            {
+                continue;
+            }
+
+            Material highlightMat = recentKeyMaterials.Count > i ? recentKeyMaterials[i] : recentKeyMaterials[recentKeyMaterials.Count - 1];
+            keys[keyIndex].SetRecentHighlight(highlightMat);
+            highlighted[keyIndex] = true;
+        }
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            if (keys[i] != null && !highlighted[i])
+            {
+                keys[i].ClearRecentHighlight();
+            }
+        }
+    }
+
+    void ResetRecentKeyHighlightState()
+    {
+        recentKeyHistory.Clear();
+        ApplyRecentKeyHighlights();
+    }
+
+    void OnValidate()
+    {
+        if (recentKeyHistorySize < 1)
+        {
+            recentKeyHistorySize = 1;
+        }
+
+        if (Application.isPlaying && keys != null)
+        {
+            ApplyRecentKeyHighlights();
+        }
+    }
+
 
     public enum keyInput
     {
