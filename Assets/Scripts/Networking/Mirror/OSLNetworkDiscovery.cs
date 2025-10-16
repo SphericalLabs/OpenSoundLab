@@ -14,6 +14,11 @@ namespace Mirror.Discovery
     {
         public bool isDiscoverable = true;
 
+
+        public void Awake(){
+            if(Application.isEditor) isDiscoverable = true; 
+        }
+
         public bool ToggleIsDiscoverable()
         {
             return isDiscoverable = !isDiscoverable;
