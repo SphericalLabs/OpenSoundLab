@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright Â© 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright Â© 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright Â© 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright Â© 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public class keyboardDeviceInterface : deviceInterface
     public GameObject whiteKeyPrefab, blackKeyPrefab;
     public omniJack freqOutput, gateOutput;
     public button midiInButton, midiOutButton, sequenceButton;
+    public dial historyDial;
 
     public midiOutOfRange midiLow, midiHigh;
 
@@ -47,6 +48,7 @@ public class keyboardDeviceInterface : deviceInterface
     key[] keys;
     readonly List<int> recentKeyHistory = new List<int>();
     bool loggedMissingRecentHighlightMaterials;
+    bool suppressHistoryDialEvent;
 
     adsrInterface _adsrInterface;
 
@@ -76,6 +78,7 @@ public class keyboardDeviceInterface : deviceInterface
         keys = new key[keyCount];
         SpawnKeys();
         ResetRecentKeyHighlightState();
+        InitializeHistoryDial();
 
         for (int i = 0; i < keyCount; i++) keyStates[i] = new keyState(false);
 
@@ -274,6 +277,8 @@ public class keyboardDeviceInterface : deviceInterface
             if (_timeline._tlEvents[i] != null) tempevents.Add(_timeline._tlEvents[i].getEventInfo());
         }
         data.timelineEvents = tempevents.ToArray();
+        data.recentKeyHistorySize = recentKeyHistorySize;
+        data.historyDialPercent = historyDial != null ? historyDial.percent : -1f;
 
         return data;
     }
@@ -313,6 +318,34 @@ public class keyboardDeviceInterface : deviceInterface
             {
                 _timeline.SpawnTimelineEvent(data.timelineEvents[i].track, data.timelineEvents[i].in_out);
             }
+        }
+
+        if (data.recentKeyHistorySize > 0)
+        {
+            SetRecentKeyHistorySize(data.recentKeyHistorySize, false);
+        }
+        else
+        {
+            SetRecentKeyHistorySize(recentKeyHistorySize, false);
+        }
+
+        if (historyDial != null)
+        {
+            float savedPercent = data.historyDialPercent;
+            suppressHistoryDialEvent = true;
+            if (!float.IsNaN(savedPercent) && savedPercent >= 0f)
+            {
+                historyDial.setPercent(savedPercent);
+            }
+            else
+            {
+                SyncHistoryDialToCurrentSize();
+            }
+            suppressHistoryDialEvent = false;
+        }
+        else
+        {
+            ApplyRecentKeyHighlights();
         }
     }
     int GetRecentKeyLimit()
@@ -426,6 +459,118 @@ public class keyboardDeviceInterface : deviceInterface
         ApplyRecentKeyHighlights();
     }
 
+    void InitializeHistoryDial()
+    {
+        if (historyDial == null)
+        {
+            return;
+        }
+
+        ConfigureHistoryDialNotches();
+        historyDial.onPercentChangedEventLocal.AddListener(OnHistoryDialPercentChanged);
+        SyncHistoryDialToCurrentSize();
+    }
+
+    void ConfigureHistoryDialNotches()
+    {
+        if (historyDial == null)
+        {
+            return;
+        }
+
+        historyDial.isNotched = true;
+        int steps = Mathf.Max(1, GetHistoryDialMaxSteps());
+        historyDial.notchSteps = steps;
+    }
+
+    void SyncHistoryDialToCurrentSize()
+    {
+        if (historyDial == null)
+        {
+            return;
+        }
+
+        suppressHistoryDialEvent = true;
+        float percent = GetPercentForHistorySize(recentKeyHistorySize);
+        historyDial.setPercent(percent);
+        suppressHistoryDialEvent = false;
+    }
+
+    void OnHistoryDialPercentChanged()
+    {
+        if (historyDial == null || suppressHistoryDialEvent)
+        {
+            return;
+        }
+
+        int targetSize = CalculateHistoryStepsFromPercent(historyDial.percent);
+        SetRecentKeyHistorySize(targetSize, false);
+    }
+
+    void SetRecentKeyHistorySize(int newSize, bool syncDial)
+    {
+        int clampedSize = Mathf.Clamp(newSize, 1, GetHistoryDialMaxSteps());
+        if (recentKeyHistorySize != clampedSize)
+        {
+            recentKeyHistorySize = clampedSize;
+        }
+
+        TrimRecentKeyHistory();
+        ApplyRecentKeyHighlights();
+
+        if (syncDial)
+        {
+            SyncHistoryDialToCurrentSize();
+        }
+    }
+
+    void TrimRecentKeyHistory()
+    {
+        int limit = GetRecentKeyLimit();
+        if (limit <= 0 || recentKeyHistory.Count <= limit)
+        {
+            return;
+        }
+
+        recentKeyHistory.RemoveRange(limit, recentKeyHistory.Count - limit);
+    }
+
+    int GetHistoryDialMaxSteps()
+    {
+        int materialCount = recentKeyMaterials != null ? recentKeyMaterials.Count : 0;
+        if (materialCount > 0)
+        {
+            return materialCount;
+        }
+
+        return Mathf.Max(1, recentKeyHistorySize);
+    }
+
+    int CalculateHistoryStepsFromPercent(float percent)
+    {
+        int maxSteps = Mathf.Max(1, GetHistoryDialMaxSteps());
+        if (maxSteps == 1)
+        {
+            return 1;
+        }
+
+        int stepIndex = Mathf.RoundToInt(Mathf.Clamp01(percent) * (maxSteps - 1));
+        return Mathf.Clamp(stepIndex + 1, 1, maxSteps);
+    }
+
+    float GetPercentForHistorySize(int size)
+    {
+        int maxSteps = Mathf.Max(1, GetHistoryDialMaxSteps());
+        if (maxSteps == 1)
+        {
+            return 0f;
+        }
+
+        int boundedSize = Mathf.Clamp(size, 1, maxSteps);
+        int stepIndex = boundedSize - 1;
+        return (float)stepIndex / (maxSteps - 1);
+    }
+
     void OnValidate()
     {
         if (recentKeyHistorySize < 1)
@@ -433,12 +578,22 @@ public class keyboardDeviceInterface : deviceInterface
             recentKeyHistorySize = 1;
         }
 
-        if (Application.isPlaying && keys != null)
+        SetRecentKeyHistorySize(recentKeyHistorySize, false);
+
+        if (historyDial != null)
         {
-            ApplyRecentKeyHighlights();
+            ConfigureHistoryDialNotches();
+            SyncHistoryDialToCurrentSize();
         }
     }
 
+    void OnDestroy()
+    {
+        if (historyDial != null)
+        {
+            historyDial.onPercentChangedEventLocal.RemoveListener(OnHistoryDialPercentChanged);
+        }
+    }
 
     public enum keyInput
     {
@@ -497,4 +652,6 @@ public class KeyboardData : InstrumentData
     public TimelineComponentData timelineData;
     public timelineEvent.eventData[] timelineEvents;
     public float timelineHeight;
+    public int recentKeyHistorySize;
+    public float historyDialPercent;
 }
