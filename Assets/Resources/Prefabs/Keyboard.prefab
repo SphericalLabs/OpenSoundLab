@@ -1231,7 +1231,7 @@ MonoBehaviour:
   midiInButton: {fileID: 114436795501083008}
   midiOutButton: {fileID: 114158096237176802}
   sequenceButton: {fileID: 114354287083071102}
-  historyDial: {fileID: 0}
+  historyDial: {fileID: 1700730585975962389}
   midiLow: {fileID: 114593384622477814}
   midiHigh: {fileID: 114005396977000910}
   recentKeyHistorySize: 4
@@ -1244,6 +1244,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 7a0608803eae5423fa5f873be0a5ac67, type: 2}
   - {fileID: 2100000, guid: 6dd2bfe2e94d64bc79976974839e5baa, type: 2}
   - {fileID: 2100000, guid: c43250b4d76734d87a5c7e7aa9874ebc, type: 2}
+  latchedKeyMaterial: {fileID: 2100000, guid: 7417c55eab298448ab282323d9bf1de2, type: 2}
 --- !u!114 &114000011191938902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14559,7 +14560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd568182d5979784fa46b2fac915c333, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  percent: 0
+  percent: 0.36428574
 --- !u!1 &7282575513622619435
 GameObject:
   m_ObjectHideFlags: 0
@@ -14586,7 +14587,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7282575513622619435}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.18591161, z: 0, w: 0.9825665}
   m_LocalPosition: {x: -0, y: -0.0091, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -14642,19 +14643,19 @@ MonoBehaviour:
   onEndGrabEvents:
     m_PersistentCalls:
       m_Calls: []
-  percent: 0
+  percent: 0.42857143
   defaultPercent: 0
   currentDialColor: 1
   controllerRot: 0
   lastControllerRot: 0
   rotAtBeginningOfGrab: 0
-  curRot: 0
-  realRot: 0
+  curRot: -21.428572
+  realRot: -21.428572
   prevShakeRot: 0
   fineMult: 5
   isNotched: 1
   isBipolar: 0
-  notchSteps: 9
+  notchSteps: 8
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []

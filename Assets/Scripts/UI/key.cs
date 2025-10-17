@@ -40,6 +40,21 @@ public class key : manipObject
     Material glowMat;
     deviceInterface _deviceInterface;
     Material recentHighlightMaterial;
+    keyboardDeviceInterface keyboardInterface;
+
+    readonly HashSet<manipulator> insideManipulators = new HashSet<manipulator>();
+    readonly HashSet<manipulator> activeManipulators = new HashSet<manipulator>();
+
+    class ManipulatorEventSubscription
+    {
+        public UnityAction triggerAction;
+        public UnityAction releaseAction;
+    }
+
+    readonly Dictionary<manipulator, ManipulatorEventSubscription> manipulatorSubscriptions = new Dictionary<manipulator, ManipulatorEventSubscription>();
+
+    Material latchedVisualMaterial;
+    bool latchedActive;
 
     public bool sticky = true;
 
@@ -52,6 +67,7 @@ public class key : manipObject
     {
         base.Awake();
         _deviceInterface = transform.parent.GetComponent<deviceInterface>();
+        keyboardInterface = _deviceInterface as keyboardDeviceInterface;
         rend = GetComponent<Renderer>();
         offMat = rend.sharedMaterial;
         glowMat = new Material(onMat);
@@ -78,7 +94,8 @@ public class key : manipObject
     public void keyHitCheck()
     {
         if (!initialized) return;
-        bool on = touching || curState == manipState.grabbed || toggled;
+        bool latched = keyboardInterface != null && keyboardInterface.IsKeyLatched(keyValue);
+        bool on = latched || touching || curState == manipState.grabbed || toggled;
 
         if (on != isHit)
         {
@@ -118,6 +135,10 @@ public class key : manipObject
         {
             ApplyOffVisual();
         }
+        else if (latchedActive)
+        {
+            ApplyLatchedVisualIfNeeded();
+        }
     }
 
     bool prevToggle = false;
@@ -140,6 +161,11 @@ public class key : manipObject
             {
                 setKeyFeedbackState(keyState.off);
             }
+        }
+
+        if (latchedActive)
+        {
+            ApplyLatchedVisualIfNeeded();
         }
 
         if (!sticky || !isHit) return;
@@ -177,16 +203,43 @@ public class key : manipObject
         }
 
     }
-
     int curSelect = 0;
 
     bool touching = false;
     public override void onTouch(bool on, manipulator m)
     {
-        touching = on;
-        if (m != null)
+        if (m == null)
         {
-            if (on) m.hapticPulse(700);            
+            touching = false;
+            keyHitCheck();
+            return;
+        }
+
+        if (on)
+        {
+            insideManipulators.Add(m);
+            RegisterManipulator(m);
+
+            if (m.triggerDown)
+            {
+                activeManipulators.Add(m);
+                if (keyboardInterface != null && keyboardInterface.IsKeyLatched(keyValue))
+                {
+                    keyboardInterface.OnLatchedKeyTouchedWithActiveTrigger(keyValue);
+                }
+            }
+
+            UpdateTouchingState();
+
+            m.hapticPulse(700);
+        }
+        else
+        {
+            insideManipulators.Remove(m);
+            activeManipulators.Remove(m);
+            UnregisterManipulator(m);
+
+            UpdateTouchingState();
         }
 
         keyHitCheck();
@@ -250,6 +303,24 @@ public class key : manipObject
         }
     }
 
+    void ApplyLatchedVisualIfNeeded()
+    {
+        if (!latchedActive)
+        {
+            return;
+        }
+
+        if (activeManipulators.Count > 0)
+        {
+            return;
+        }
+
+        if (latchedVisualMaterial != null && rend.sharedMaterial != latchedVisualMaterial)
+        {
+            rend.sharedMaterial = latchedVisualMaterial;
+        }
+    }
+
     public void SetRecentHighlight(Material material)
     {
         recentHighlightMaterial = material;
@@ -266,6 +337,130 @@ public class key : manipObject
         {
             ApplyOffVisual();
         }
+    }
+
+    public void SetLatchedVisual(Material material, bool latched)
+    {
+        latchedVisualMaterial = material;
+        latchedActive = latched && material != null;
+
+        if (!latchedActive)
+        {
+            if (!isHit)
+            {
+                ApplyOffVisual();
+            }
+            else if (activeManipulators.Count > 0)
+            {
+                rend.sharedMaterial = glowMat;
+            }
+            return;
+        }
+
+        ApplyLatchedVisualIfNeeded();
+    }
+
+    void UpdateTouchingState()
+    {
+        touching = activeManipulators.Count > 0;
+
+        if (touching)
+        {
+            rend.sharedMaterial = glowMat;
+        }
+        else if (!isHit)
+        {
+            ApplyOffVisual();
+        }
+        else
+        {
+            ApplyLatchedVisualIfNeeded();
+        }
+    }
+
+    void RegisterManipulator(manipulator manip)
+    {
+        if (manipulatorSubscriptions.ContainsKey(manip))
+        {
+            return;
+        }
+
+        var subscription = new ManipulatorEventSubscription();
+        subscription.triggerAction = () => OnManipulatorTriggerPressed(manip);
+        subscription.releaseAction = () => OnManipulatorTriggerReleased(manip);
+
+        manip.onInputTriggerdEvent.AddListener(subscription.triggerAction);
+        manip.onInputReleasedEvent.AddListener(subscription.releaseAction);
+
+        manipulatorSubscriptions[manip] = subscription;
+    }
+
+    void UnregisterManipulator(manipulator manip)
+    {
+        if (!manipulatorSubscriptions.TryGetValue(manip, out var subscription))
+        {
+            return;
+        }
+
+        if (subscription.triggerAction != null)
+        {
+            manip.onInputTriggerdEvent.RemoveListener(subscription.triggerAction);
+        }
+
+        if (subscription.releaseAction != null)
+        {
+            manip.onInputReleasedEvent.RemoveListener(subscription.releaseAction);
+        }
+
+        manipulatorSubscriptions.Remove(manip);
+    }
+
+    void OnManipulatorTriggerPressed(manipulator manip)
+    {
+        if (!insideManipulators.Contains(manip))
+        {
+            return;
+        }
+
+        if (keyboardInterface != null)
+        {
+            keyboardInterface.ToggleLatchState(keyValue);
+        }
+    }
+
+    void OnManipulatorTriggerReleased(manipulator manip)
+    {
+        if (activeManipulators.Remove(manip))
+        {
+            UpdateTouchingState();
+            keyHitCheck();
+        }
+    }
+
+    void OnDestroy()
+    {
+        foreach (var kvp in manipulatorSubscriptions)
+        {
+            var manip = kvp.Key;
+            var subscription = kvp.Value;
+
+            if (manip != null)
+            {
+                if (subscription.triggerAction != null)
+                {
+                    manip.onInputTriggerdEvent.RemoveListener(subscription.triggerAction);
+                }
+
+                if (subscription.releaseAction != null)
+                {
+                    manip.onInputReleasedEvent.RemoveListener(subscription.releaseAction);
+                }
+            }
+        }
+
+        manipulatorSubscriptions.Clear();
+        insideManipulators.Clear();
+        activeManipulators.Clear();
     }
 
 }

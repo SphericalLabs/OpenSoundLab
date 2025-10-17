@@ -43,6 +43,7 @@ public class keyboardDeviceInterface : deviceInterface
     [Range(1, 8)]
     public int recentKeyHistorySize = 4;
     public List<Material> recentKeyMaterials = new List<Material>();
+    public Material latchedKeyMaterial;
 
     int keyCount = 12 * 2 + 1;
     key[] keys;
@@ -56,6 +57,7 @@ public class keyboardDeviceInterface : deviceInterface
     keyGateSignalGenerator gateSignal;
 
     int curKey;
+    int latchedKeyIndex = -1;
 
     keyState[] keyStates;
 
@@ -66,6 +68,7 @@ public class keyboardDeviceInterface : deviceInterface
         keyStates = new keyState[keyCount];
 
         curKey = -1;
+        latchedKeyIndex = -1;
 
         _adsrInterface = GetComponentInChildren<adsrInterface>();
 
@@ -147,9 +150,31 @@ public class keyboardDeviceInterface : deviceInterface
 
     public void asynchKeyHit(bool on, int ID, keyInput k)
     {
-        if (k == keyInput.midi) keyStates[ID].midiState = on;
-        else if (k == keyInput.seq) keyStates[ID].seqState = on;
-        else if (k == keyInput.touch) keyStates[ID].touchState = on;
+        switch (k)
+        {
+            case keyInput.midi:
+                keyStates[ID].midiState = on;
+                break;
+            case keyInput.seq:
+                keyStates[ID].seqState = on;
+                break;
+            case keyInput.touch:
+                keyStates[ID].touchState = on;
+                break;
+            case keyInput.latch:
+                keyStates[ID].latchState = on;
+                break;
+        }
+
+        ProcessKeyStateChange(ID);
+    }
+
+    void ProcessKeyStateChange(int ID)
+    {
+        if (ID < 0 || ID >= keyStates.Length)
+        {
+            return;
+        }
 
         if (keyStates[ID].nonSeqStateChange())
         {
@@ -159,9 +184,95 @@ public class keyboardDeviceInterface : deviceInterface
 
         if (keyStates[ID].stateChange())
         {
-            on = keyStates[ID].currentState = keyStates[ID].getState();
-            keys[ID].phantomHit(on);
+            bool on = keyStates[ID].currentState = keyStates[ID].getState();
+            if (keys != null && ID >= 0 && ID < keys.Length && keys[ID] != null)
+            {
+                keys[ID].phantomHit(on);
+            }
             keyHitEvent(on, ID);
+        }
+    }
+
+    public void ToggleLatchState(int keyIndex)
+    {
+        if (latchedKeyIndex == keyIndex)
+        {
+            SetLatchState(keyIndex, false);
+        }
+        else
+        {
+            SetLatchState(keyIndex, true);
+        }
+    }
+
+    public bool IsKeyLatched(int keyIndex)
+    {
+        if (keyIndex < 0 || keyIndex >= keyStates.Length)
+        {
+            return false;
+        }
+
+        return keyStates[keyIndex].latchState;
+    }
+
+    public void SetLatchState(int keyIndex, bool on)
+    {
+        if (keyIndex < 0 || keyIndex >= keyStates.Length)
+        {
+            return;
+        }
+
+        if (on)
+        {
+            if (latchedKeyIndex != -1 && latchedKeyIndex != keyIndex)
+            {
+                int previousLatchedKey = latchedKeyIndex;
+                latchedKeyIndex = -1;
+                keyStates[previousLatchedKey].latchState = false;
+                UpdateLatchVisual(previousLatchedKey, false);
+                ProcessKeyStateChange(previousLatchedKey);
+            }
+
+            latchedKeyIndex = keyIndex;
+            keyStates[keyIndex].latchState = true;
+            UpdateLatchVisual(keyIndex, true);
+            ProcessKeyStateChange(keyIndex);
+        }
+        else
+        {
+            if (IsKeyLatched(keyIndex))
+            {
+                if (latchedKeyIndex == keyIndex)
+                {
+                    latchedKeyIndex = -1;
+                }
+
+                keyStates[keyIndex].latchState = false;
+                UpdateLatchVisual(keyIndex, false);
+                ProcessKeyStateChange(keyIndex);
+            }
+        }
+    }
+
+    void UpdateLatchVisual(int keyIndex, bool isLatched)
+    {
+        if (keys == null || keyIndex < 0 || keyIndex >= keys.Length)
+        {
+            return;
+        }
+
+        key targetKey = keys[keyIndex];
+        if (targetKey != null)
+        {
+            targetKey.SetLatchedVisual(isLatched ? latchedKeyMaterial : null, isLatched);
+        }
+    }
+
+    public void OnLatchedKeyTouchedWithActiveTrigger(int keyIndex)
+    {
+        if (latchedKeyIndex == keyIndex && gateSignal != null)
+        {
+            gateSignal.TriggerRetriggerPulse();
         }
     }
 
@@ -175,7 +286,7 @@ public class keyboardDeviceInterface : deviceInterface
                 int prev = curKey;
                 curKey = ID;
 
-                if (prev != -1)
+                if (prev != -1 && prev != curKey)
                 {
                     gateSignal.isHigh = false;
                     if (_midiOut != null) _midiOut.OutputNote(false, prev);
@@ -191,11 +302,59 @@ public class keyboardDeviceInterface : deviceInterface
         {
             if (curKey == ID)
             {
-                _midiOut.OutputNote(false, ID);
-                gateSignal.isHigh = false;
-                curKey = -1;
+                if (_midiOut != null) _midiOut.OutputNote(false, ID);
+
+                int replacementKey = FindNextActiveKey(ID);
+                if (replacementKey != -1)
+                {
+                    curKey = replacementKey;
+                    freqSignal.UpdateKey(curKey);
+                    gateSignal.isHigh = true;
+                    gateSignal.newKeyWasPressed = true;
+                    if (_midiOut != null) _midiOut.OutputNote(true, curKey);
+                    keys[curKey].phantomHit(true);
+                    RegisterRecentKeyPress(curKey);
+                }
+                else
+                {
+                    gateSignal.isHigh = false;
+                    curKey = -1;
+                }
             }
         }
+    }
+
+    int FindNextActiveKey(int excludedKey)
+    {
+        int selectedKey = -1;
+        int selectedScore = int.MinValue;
+
+        for (int i = 0; i < keyStates.Length; i++)
+        {
+            if (i == excludedKey)
+            {
+                continue;
+            }
+
+            if (!keyStates[i].getState())
+            {
+                continue;
+            }
+
+            int score = 0;
+            if (keyStates[i].latchState) score += 400;
+            if (keyStates[i].midiState) score += 300;
+            if (keyStates[i].touchState) score += 200;
+            if (keyStates[i].seqState) score += 100;
+
+            if (score > selectedScore)
+            {
+                selectedScore = score;
+                selectedKey = i;
+            }
+        }
+
+        return selectedKey;
     }
 
     void toggleMIDIin(bool on)
@@ -599,7 +758,8 @@ public class keyboardDeviceInterface : deviceInterface
     {
         seq,
         midi,
-        touch
+        touch,
+        latch
     }
 
     struct keyState
@@ -607,23 +767,24 @@ public class keyboardDeviceInterface : deviceInterface
         public bool seqState;
         public bool midiState;
         public bool touchState;
+        public bool latchState;
 
         public bool currentState;
         public bool currentNonSeqState;
 
         public keyState(bool on)
         {
-            currentNonSeqState = currentState = seqState = midiState = touchState = on;
+            currentNonSeqState = currentState = seqState = midiState = touchState = latchState = on;
         }
 
         public bool getState()
         {
-            return seqState || midiState || touchState;
+            return seqState || midiState || touchState || latchState;
         }
 
         public bool getNonSeqState()
         {
-            return midiState || touchState;
+            return midiState || touchState || latchState;
         }
 
         public bool stateChange()
