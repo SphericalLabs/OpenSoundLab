@@ -200,14 +200,21 @@ public class sampleManager : MonoBehaviour
     public void Init()
     {
         string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
-        
-        //if Samples directory doesn't exist, extract default data...
-        if (Directory.Exists(dir) == false)
-        {
-            Directory.CreateDirectory(dir);
+        bool directoryExists = Directory.Exists(dir);
+        bool needsExtraction = !directoryExists;
 
+        if (!needsExtraction && Directory.GetFileSystemEntries(dir).Length == 0)
+        {
+            needsExtraction = true;
+        }
+
+        Directory.CreateDirectory(dir);
+
+        //if Samples directory doesn't exist or is empty, extract default data...
+        if (needsExtraction)
+        {
             //copy tgz to directory where we can extract it
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             WWW www = new WWW("file://" + Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
 #else
             WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
