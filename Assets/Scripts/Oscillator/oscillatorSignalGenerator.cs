@@ -57,7 +57,13 @@ public class oscillatorSignalGenerator : signalGenerator
 
   [DllImport("OSLNative")]
   public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
-                              float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer, bool bFreqExpGen, bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen, double _sampleDuration, ref double dspTime);
+                              float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer,
+                              [MarshalAs(UnmanagedType.I1)] bool bFreqExpGen,
+                              [MarshalAs(UnmanagedType.I1)] bool bFreqLinGen,
+                              [MarshalAs(UnmanagedType.I1)] bool bAmpGen,
+                              [MarshalAs(UnmanagedType.I1)] bool bSyncGen,
+                              [MarshalAs(UnmanagedType.I1)] bool bPwmGen,
+                              double _sampleDuration, ref double dspTime);
   
   [DllImport("OSLNative")] 
   public static extern void SetArrayToSingleValue(float[] a, int length, float val);
