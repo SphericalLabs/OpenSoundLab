@@ -60,6 +60,7 @@ public class oscillatorSignalGenerator : signalGenerator
   // That mismatch shifted subsequent arguments and caused crashes when calling into OSLNative.
   // We explicitly marshal each boolean flag as I1 to match the native layout, keeping the ABI consistent cross-platform.
   // This verbose fix is meant as a cautionary measure in order to emphasize the delicacy of cross-language interop.
+  // Using int instead of bool would be an easy fix, but less verbose and clear.
   [DllImport("OSLNative")]
   public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
                               float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer,
