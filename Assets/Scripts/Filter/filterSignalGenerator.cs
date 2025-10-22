@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ public class filterSignalGenerator : signalGenerator
   public static extern void AddArrays(float[] a, float[] b, int length);
 
   [DllImport("OSLNative")]
-  public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, bool freqGen, float[] frequencyBuffer, float resonance/*, IntPtr logger*/);
+  public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, [MarshalAs(UnmanagedType.I1)] bool freqGen, float[] frequencyBuffer, float resonance/*, IntPtr logger*/);
    
     // create structs for passing to native code
   mfValues mf1L = new mfValues();
