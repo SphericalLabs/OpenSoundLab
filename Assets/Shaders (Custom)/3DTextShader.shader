@@ -42,10 +42,12 @@
             struct Attributes {
                 float4 position : POSITION;
                 float2 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             // Vertex output structure with occlusion
             struct Varyings {
+                UNITY_VERTEX_INPUT_INSTANCE_ID
                 float4 position : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 META_DEPTH_VERTEX_OUTPUT(1) // Adds necessary fields for occlusion
@@ -55,17 +57,19 @@
             // Vertex shader
             Varyings vert (Attributes IN) {
                 Varyings OUT;
+                UNITY_SETUP_INSTANCE_ID(IN);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
+                UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
                 // Transform object space position to clip space
                 OUT.position = TransformObjectToHClip(IN.position.xyz);
                 OUT.uv = IN.uv;
-                UNITY_SETUP_INSTANCE_ID(IN);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
                 META_DEPTH_INITIALIZE_VERTEX_OUTPUT(OUT, IN.position.xyz); // Initializes occlusion data
                 return OUT;
             }
 
             // Fragment shader
             half4 frag (Varyings IN) : SV_Target {
+                UNITY_SETUP_INSTANCE_ID(IN);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN); // Supports stereo rendering
 
                 // Sample the main texture
