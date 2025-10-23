@@ -6,16 +6,10 @@ using UnityEngine;
 public class NetworkKey : NetworkBehaviour
 {
     public key[] keys;
-    private keyboardDeviceInterface keyboardInterface;
 
     public readonly SyncList<bool> keyValues = new SyncList<bool>();
 
     private float[] lastKeyHitTimes;
-
-    private void Awake()
-    {
-        keyboardInterface = GetComponent<keyboardDeviceInterface>();
-    }
 
     public override void OnStartServer()
     {
@@ -54,19 +48,10 @@ public class NetworkKey : NetworkBehaviour
 
     void OnKeyUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
     {
-        if (keys == null || index < 0 || index >= keys.Length)
-        {
-            return;
-        }
-
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
                 keys[index].phantomHit(newValue);
-                if (newValue)
-                {
-                    NotifyRecentKeyHighlight(index);
-                }
                 break;
             case SyncList<bool>.Operation.OP_INSERT:
                 break;
@@ -76,14 +61,6 @@ public class NetworkKey : NetworkBehaviour
                 if (IsKeyHitCooldownOver(index))
                 {
                     keys[index].phantomHit(newValue, true);
-                }
-                if (newValue)
-                {
-                    NotifyRecentKeyHighlight(index);
-                }
-                else
-                {
-                    RefreshRecentKeyHighlights();
                 }
                 break;
             case SyncList<bool>.Operation.OP_CLEAR:
@@ -128,20 +105,5 @@ public class NetworkKey : NetworkBehaviour
         }
         return false;
     }
-
-    void NotifyRecentKeyHighlight(int index)
-    {
-        if (keyboardInterface != null)
-        {
-            keyboardInterface.RegisterRecentKeyPress(index);
-        }
-    }
-
-    void RefreshRecentKeyHighlights()
-    {
-        if (keyboardInterface != null)
-        {
-            keyboardInterface.RefreshRecentKeyHighlights();
-        }
-    }
 }
+

@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright Â© 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright Â© 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright Â© 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright Â© 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,13 +29,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/*
- * Overview:
- *  - Spawns the keyboard layout and funnels note data from touch, MIDI, latch, and sequencer sources.
- *  - Sends frequency/gate signals, mirrors active notes to the timeline component, and handles MIDI I/O toggles.
- *  - Keeps a short recent-note history for UI highlights and manages single-key latch visuals/states.
- */
-
 public class keyboardDeviceInterface : deviceInterface
 {
     public timelineComponentInterface _timeline;
@@ -43,18 +36,11 @@ public class keyboardDeviceInterface : deviceInterface
     public GameObject whiteKeyPrefab, blackKeyPrefab;
     public omniJack freqOutput, gateOutput;
     public button midiInButton, midiOutButton, sequenceButton;
-    public dial historyDial;
 
     public midiOutOfRange midiLow, midiHigh;
 
-    [Range(0, 8)]
-    public int recentKeyHistorySize = 4;
-    public List<Material> recentKeyMaterials = new List<Material>();
-    public Material latchedKeyMaterial;
-
     int keyCount = 12 * 2 + 1;
     key[] keys;
-    // recent key history state is managed by KeyboardRecentHighlightManager
 
     adsrInterface _adsrInterface;
 
@@ -62,19 +48,8 @@ public class keyboardDeviceInterface : deviceInterface
     keyGateSignalGenerator gateSignal;
 
     int curKey;
-    // Latch and highlight controllers 
-    KeyboardLatchController _latchController;
-    KeyboardRecentHighlightManager _highlightManager;
 
     keyState[] keyStates;
-
-    static readonly System.Func<keyState, bool>[] KeyPriorityOrder = new System.Func<keyState, bool>[]
-    {
-        state => state.latchState,
-        state => state.midiState,
-        state => state.touchState,
-        state => state.seqState
-    };
 
     public override void Awake()
     {
@@ -83,12 +58,6 @@ public class keyboardDeviceInterface : deviceInterface
         keyStates = new keyState[keyCount];
 
         curKey = -1;
-        _latchController = new KeyboardLatchController(
-            index => IsValidKeyIndex(index),
-            (idx, isLatched) => UpdateLatchVisual(idx, isLatched),
-            (on, id, ki) => asynchKeyHit(on, id, ki),
-            () => { if (gateSignal != null) gateSignal.TriggerRetriggerPulse(); }
-        );
 
         _adsrInterface = GetComponentInChildren<adsrInterface>();
 
@@ -100,15 +69,6 @@ public class keyboardDeviceInterface : deviceInterface
 
         keys = new key[keyCount];
         SpawnKeys();
-        _highlightManager = new KeyboardRecentHighlightManager(
-            () => keys,
-            () => recentKeyMaterials,
-            () => recentKeyHistorySize,
-            v => recentKeyHistorySize = v,
-            historyDial,
-            this
-        );
-        _highlightManager.Initialize();
 
         for (int i = 0; i < keyCount; i++) keyStates[i] = new keyState(false);
 
@@ -140,12 +100,24 @@ public class keyboardDeviceInterface : deviceInterface
             keys[i] = g.GetComponent<key>();
             keys[i].keyValue = i;
             keys[i].isKeyboard = true;
-            keys[i].sticky = false;
+            keys[i].sticky = true;
         }
 
         if (TryGetComponent<NetworkKey>(out NetworkKey networkKey))
         {
             networkKey.keys = keys;
+        }
+    }
+
+    void DeactivateOtherTouchKeys(int activeID)
+    {
+        for (int i = 0; i < keyCount; i++)
+        {
+            if (i == activeID) continue;
+            if (keyStates[i].touchState)
+            {
+                asynchKeyHit(false, i, keyInput.touch);
+            }
         }
     }
 
@@ -177,30 +149,13 @@ public class keyboardDeviceInterface : deviceInterface
 
     public void asynchKeyHit(bool on, int ID, keyInput k)
     {
-        switch (k)
-        {
-            case keyInput.midi:
-                keyStates[ID].midiState = on;
-                break;
-            case keyInput.seq:
-                keyStates[ID].seqState = on;
-                break;
-            case keyInput.touch:
-                keyStates[ID].touchState = on;
-                break;
-            case keyInput.latch:
-                keyStates[ID].latchState = on;
-                break;
-        }
+        if (k == keyInput.midi) keyStates[ID].midiState = on;
+        else if (k == keyInput.seq) keyStates[ID].seqState = on;
+        else if (k == keyInput.touch) keyStates[ID].touchState = on;
 
-        ProcessKeyStateChange(ID);
-    }
-
-    void ProcessKeyStateChange(int ID)
-    {
-        if (ID < 0 || ID >= keyStates.Length)
+        if (on && k == keyInput.touch)
         {
-            return;
+            DeactivateOtherTouchKeys(ID);
         }
 
         if (keyStates[ID].nonSeqStateChange())
@@ -211,57 +166,22 @@ public class keyboardDeviceInterface : deviceInterface
 
         if (keyStates[ID].stateChange())
         {
-            bool on = keyStates[ID].currentState = keyStates[ID].getState();
-            if (keys != null && ID >= 0 && ID < keys.Length && keys[ID] != null)
-            {
-                keys[ID].phantomHit(on);
-            }
+            on = keyStates[ID].currentState = keyStates[ID].getState();
+            keys[ID].phantomHit(on);
             keyHitEvent(on, ID);
         }
     }
-
-    bool IsValidKeyIndex(int index) => index >= 0 && index < keyStates.Length;
-
-    public void ToggleLatchState(int keyIndex) => _latchController.ToggleLatchState(keyIndex);
-
-    public bool IsKeyLatched(int keyIndex) => _latchController.IsKeyLatched(keyIndex);
-
-    public void SetLatchState(int keyIndex, bool on) => _latchController.SetLatchState(keyIndex, on);
-
-    void ApplyLatchState(int keyIndex, bool isLatched)
-    {
-        keyStates[keyIndex].latchState = isLatched;
-        UpdateLatchVisual(keyIndex, isLatched);
-        ProcessKeyStateChange(keyIndex);
-    }
-
-    void UpdateLatchVisual(int keyIndex, bool isLatched)
-    {
-        if (keys == null || keyIndex < 0 || keyIndex >= keys.Length)
-        {
-            return;
-        }
-
-        key targetKey = keys[keyIndex];
-        if (targetKey != null)
-        {
-            targetKey.SetLatchedVisual(isLatched ? latchedKeyMaterial : null, isLatched);
-        }
-    }
-
-    public void OnLatchedKeyTouchedWithActiveTrigger(int keyIndex) => _latchController.OnLatchedKeyTouchedWithActiveTrigger(keyIndex);
 
     void keyHitEvent(bool on, int ID)
     {
         if (on)
         {
-            RegisterRecentKeyPress(ID);
             if (curKey != ID)
             {
                 int prev = curKey;
                 curKey = ID;
 
-                if (prev != -1 && prev != curKey)
+                if (prev != -1)
                 {
                     gateSignal.isHigh = false;
                     if (_midiOut != null) _midiOut.OutputNote(false, prev);
@@ -277,47 +197,11 @@ public class keyboardDeviceInterface : deviceInterface
         {
             if (curKey == ID)
             {
-                if (_midiOut != null) _midiOut.OutputNote(false, ID);
-
-                int replacementKey = FindNextActiveKey(ID);
-                if (replacementKey != -1)
-                {
-                    curKey = replacementKey;
-                    freqSignal.UpdateKey(curKey);
-                    gateSignal.isHigh = true;
-                    gateSignal.newKeyWasPressed = true;
-                    if (_midiOut != null) _midiOut.OutputNote(true, curKey);
-                    keys[curKey].phantomHit(true);
-                    RegisterRecentKeyPress(curKey);
-                }
-                else
-                {
-                    gateSignal.isHigh = false;
-                    curKey = -1;
-                }
+                _midiOut.OutputNote(false, ID);
+                gateSignal.isHigh = false;
+                curKey = -1;
             }
         }
-    }
-
-    int FindNextActiveKey(int excludedKey)
-    {
-        foreach (var selector in KeyPriorityOrder)
-        {
-            for (int i = 0; i < keyStates.Length; i++)
-            {
-                if (i == excludedKey || !keyStates[i].getState())
-                {
-                    continue;
-                }
-
-                if (selector(keyStates[i]))
-                {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
     }
 
     void toggleMIDIin(bool on)
@@ -399,8 +283,6 @@ public class keyboardDeviceInterface : deviceInterface
             if (_timeline._tlEvents[i] != null) tempevents.Add(_timeline._tlEvents[i].getEventInfo());
         }
         data.timelineEvents = tempevents.ToArray();
-        data.recentKeyHistorySize = recentKeyHistorySize;
-        data.historyDialPercent = historyDial != null ? historyDial.percent : -1f;
 
         return data;
     }
@@ -414,12 +296,12 @@ public class keyboardDeviceInterface : deviceInterface
         gateOutput.SetID(data.gateOutID, copyMode);
 
 
-        if (data.midiInConnection != null && data.midiInConnection != "")
+        if (data.midiInConnection != null & data.midiInConnection != "")
         {
             midiInButton.startToggled = true;
             _midiIn.ConnectByName(data.midiInConnection);
         }
-        if (data.midiOutConnection != null && data.midiOutConnection != "")
+        if (data.midiOutConnection != null & data.midiOutConnection != "")
         {
             midiOutButton.startToggled = true;
             _midiOut.ConnectByName(data.midiOutConnection);
@@ -441,29 +323,13 @@ public class keyboardDeviceInterface : deviceInterface
                 _timeline.SpawnTimelineEvent(data.timelineEvents[i].track, data.timelineEvents[i].in_out);
             }
         }
-
-        _highlightManager.LoadSettings(Mathf.Max(0, data.recentKeyHistorySize), data.historyDialPercent);
-    }
-    public void RegisterRecentKeyPress(int keyIndex) => _highlightManager.RegisterRecentKeyPress(keyIndex);
-
-    public void RefreshRecentKeyHighlights() => _highlightManager.Refresh();
-
-    void OnValidate()
-    {
-        _highlightManager?.OnValidate();
-    }
-
-    void OnDestroy()
-    {
-        _highlightManager?.OnDestroy();
     }
 
     public enum keyInput
     {
         seq,
         midi,
-        touch,
-        latch
+        touch
     }
 
     struct keyState
@@ -471,24 +337,23 @@ public class keyboardDeviceInterface : deviceInterface
         public bool seqState;
         public bool midiState;
         public bool touchState;
-        public bool latchState;
 
         public bool currentState;
         public bool currentNonSeqState;
 
         public keyState(bool on)
         {
-            currentNonSeqState = currentState = seqState = midiState = touchState = latchState = on;
+            currentNonSeqState = currentState = seqState = midiState = touchState = on;
         }
 
         public bool getState()
         {
-            return seqState || midiState || touchState || latchState;
+            return seqState || midiState || touchState;
         }
 
         public bool getNonSeqState()
         {
-            return midiState || touchState || latchState;
+            return midiState || touchState;
         }
 
         public bool stateChange()
@@ -517,6 +382,4 @@ public class KeyboardData : InstrumentData
     public TimelineComponentData timelineData;
     public timelineEvent.eventData[] timelineEvents;
     public float timelineHeight;
-    public int recentKeyHistorySize;
-    public float historyDialPercent;
 }

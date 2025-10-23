@@ -26,15 +26,9 @@
 // limitations under the License.
 
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
-
-/*
- * Overview:
- *  - Represents a single keyboard key mesh and forwards its state to the parent keyboard device.
- *  - Tracks touch/trigger manipulator presence, latch visuals, and recent-note highlight material.
- *  - Resolves the appropriate material each frame so visuals stay in sync with key and latch states.
- */
 
 public class key : manipObject
 {
@@ -45,27 +39,10 @@ public class key : manipObject
     Material offMat;
     Material glowMat;
     deviceInterface _deviceInterface;
-    Material recentHighlightMaterial;
-    keyboardDeviceInterface keyboardInterface;
-
-    bool visualDirty = true;
-    bool selectionHighlight;
-
-    readonly HashSet<manipulator> insideManipulators = new HashSet<manipulator>();
-    readonly HashSet<manipulator> activeManipulators = new HashSet<manipulator>();
-
-    struct ManipulatorSubscription
-    {
-        public UnityAction triggerAction;
-        public UnityAction releaseAction;
-    }
-
-    readonly Dictionary<manipulator, ManipulatorSubscription> manipulatorSubscriptions = new Dictionary<manipulator, ManipulatorSubscription>();
-
-    Material latchedVisualMaterial;
-    bool latchedActive;
 
     public bool sticky = true;
+
+
     public bool isKeyboard = false;
 
     public UnityEvent onKeyChangedEvent;
@@ -74,49 +51,9 @@ public class key : manipObject
     {
         base.Awake();
         _deviceInterface = transform.parent.GetComponent<deviceInterface>();
-        keyboardInterface = _deviceInterface as keyboardDeviceInterface;
         rend = GetComponent<Renderer>();
         offMat = rend.sharedMaterial;
         glowMat = new Material(onMat);
-    }
-
-    bool HasActiveManipulator => activeManipulators.Count > 0;
-
-    void MarkVisualDirty()
-    {
-        visualDirty = true;
-    }
-
-    Material BaseMaterial => recentHighlightMaterial != null ? recentHighlightMaterial : offMat;
-
-    Material ResolveTargetMaterial()
-    {
-        if (latchedActive && isHit && !HasActiveManipulator && latchedVisualMaterial != null)
-        {
-            return latchedVisualMaterial;
-        }
-
-        if (isHit || HasActiveManipulator || selectionHighlight)
-        {
-            return glowMat;
-        }
-
-        return BaseMaterial;
-    }
-
-    void UpdateVisualState()
-    {
-        if (!visualDirty)
-        {
-            return;
-        }
-
-        visualDirty = false;
-        Material target = ResolveTargetMaterial();
-        if (rend.sharedMaterial != target)
-        {
-            rend.sharedMaterial = target;
-        }
     }
 
     bool initialized = false;
@@ -127,8 +64,8 @@ public class key : manipObject
 
     public void setOffMat(Material m)
     {
-        offMat = m;
-        MarkVisualDirty();
+        rend.sharedMaterial = m;
+        offMat = rend.sharedMaterial;
     }
 
     public bool isHit = false;
@@ -136,75 +73,131 @@ public class key : manipObject
     public void keyHitCheck()
     {
         if (!initialized) return;
-        bool latched = keyboardInterface != null && keyboardInterface.IsKeyLatched(keyValue);
-        bool on = latched || HasActiveManipulator || curState == manipState.grabbed || toggled;
+
+        bool on = curState == manipState.grabbed || toggled;
+        if (!isKeyboard || !sticky)
+        {
+            on = touching || on;
+        }
 
         if (on != isHit)
         {
             isHit = on;
             _deviceInterface.hit(on, keyValue);
             onKeyChangedEvent.Invoke();
-            MarkVisualDirty();
         }
     }
 
+    enum keyState
+    {
+        off,
+        touched,
+        grabbedOn,
+        grabbedOff,
+        selectedOff,
+        selectedOn
+    };
+
+    int desireSetSelect = 0;
     public void setSelectAsynch(bool on)
     {
-        selectionHighlight = on;
-        MarkVisualDirty();
+        desireSetSelect = on ? 1 : 2;
     }
 
+    bool phantomHitUpdate = false;
+    Queue<bool> hits = new Queue<bool>();
     public void phantomHit(bool on, bool triggerDeviceInterface = false)
     {
+        phantomHitUpdate = true;
         isHit = on;
+        toggled = on;
         if (triggerDeviceInterface)
         {
             _deviceInterface.hit(on, keyValue);
         }
-        MarkVisualDirty();
     }
 
+    bool prevToggle = false;
     void Update()
     {
-        UpdateVisualState();
+        if (phantomHitUpdate)
+        {
+            curSelect = 0;
+            phantomHitUpdate = false;
+            if (isHit)
+            {
+                if (isKeyboard) setKeyFeedbackState(keyState.selectedOn);
+                else
+                {
+                    if (toggled) setKeyFeedbackState(keyState.touched);
+                    else setKeyFeedbackState(keyState.selectedOff);
+                }
+            }
+            else
+            {
+                setKeyFeedbackState(keyState.off);
+            }
+        }
+
+        if (!sticky || !isHit) return;
+
+        if (desireSetSelect != 0)
+        {
+            curSelect = desireSetSelect;
+            if (desireSetSelect == 1)
+            {
+                if (toggled) setKeyFeedbackState(keyState.grabbedOn);
+                else setKeyFeedbackState(keyState.selectedOn);
+            }
+            else
+            {
+                if (toggled) setKeyFeedbackState(keyState.touched);
+                else setKeyFeedbackState(keyState.selectedOff);
+            }
+
+            desireSetSelect = 0;
+        }
+
+        if (prevToggle != toggled && isHit)
+        {
+            prevToggle = toggled;
+            if (curSelect == 1)
+            {
+                if (toggled) setKeyFeedbackState(keyState.grabbedOn);
+                else setKeyFeedbackState(keyState.selectedOn);
+            }
+            else
+            {
+                if (toggled) setKeyFeedbackState(keyState.touched);
+                else setKeyFeedbackState(keyState.selectedOff);
+            }
+        }
+
     }
 
+    int curSelect = 0;
+
+    bool touching = false;
     public override void onTouch(bool on, manipulator m)
     {
-        if (m == null)
+        touching = on;
+
+        if (isKeyboard && sticky)
         {
-            insideManipulators.Clear();
-            activeManipulators.Clear();
-            MarkVisualDirty();
-            keyHitCheck();
+            if (m != null && m.emptyGrab && on)
+            {
+                m.hapticPulse(700);
+                toggled = !toggled;
+                keyHitCheck();
+            }
             return;
         }
 
-        if (on)
+        if (m != null)
         {
-            insideManipulators.Add(m);
-            RegisterManipulator(m);
-
-            if (m.triggerDown)
-            {
-                activeManipulators.Add(m);
-                if (keyboardInterface != null && keyboardInterface.IsKeyLatched(keyValue))
-                {
-                    keyboardInterface.OnLatchedKeyTouchedWithActiveTrigger(keyValue);
-                }
-            }
-
-            m.hapticPulse(700);
-        }
-        else
-        {
-            insideManipulators.Remove(m);
-            activeManipulators.Remove(m);
-            UnregisterManipulator(m);
-
+            if (on) m.hapticPulse(700);
         }
 
-        MarkVisualDirty();
         keyHitCheck();
     }
 
@@ -228,118 +221,33 @@ public class key : manipObject
             keyHitCheck();
         }
         else if (lateHitCheck) keyHitCheck();
-
-        MarkVisualDirty();
     }
 
-    public void SetRecentHighlight(Material material)
+    void setKeyFeedbackState(keyState s)
     {
-        recentHighlightMaterial = material;
-        MarkVisualDirty();
-    }
-
-    public void ClearRecentHighlight()
-    {
-        recentHighlightMaterial = null;
-        MarkVisualDirty();
-    }
-
-    public void SetLatchedVisual(Material material, bool latched)
-    {
-        latchedVisualMaterial = material;
-        latchedActive = latched && material != null;
-
-        MarkVisualDirty();
-    }
-
-    void RegisterManipulator(manipulator manip)
-    {
-        if (manipulatorSubscriptions.ContainsKey(manip))
+        switch (s)
         {
-            return;
+            case keyState.off:
+                rend.sharedMaterial = offMat;
+                break;
+            case keyState.touched:
+                rend.sharedMaterial = glowMat;
+                break;
+            case keyState.grabbedOn:
+                rend.sharedMaterial = glowMat;
+                break;
+            case keyState.grabbedOff:
+                rend.sharedMaterial = glowMat;
+                break;
+            case keyState.selectedOff:
+                rend.sharedMaterial = glowMat;
+                break;
+            case keyState.selectedOn:
+                rend.sharedMaterial = glowMat;
+                break;
+            default:
+                break;
         }
-
-        var subscription = new ManipulatorSubscription
-        {
-            triggerAction = () => OnManipulatorTriggerPressed(manip),
-            releaseAction = () => OnManipulatorTriggerReleased(manip)
-        };
-
-        manip.onInputTriggerdEvent.AddListener(subscription.triggerAction);
-        manip.onInputReleasedEvent.AddListener(subscription.releaseAction);
-
-        manipulatorSubscriptions[manip] = subscription;
-    }
-
-    void UnregisterManipulator(manipulator manip)
-    {
-        if (!manipulatorSubscriptions.TryGetValue(manip, out ManipulatorSubscription subscription))
-        {
-            return;
-        }
-
-        if (subscription.triggerAction != null)
-        {
-            manip.onInputTriggerdEvent.RemoveListener(subscription.triggerAction);
-        }
-
-        if (subscription.releaseAction != null)
-        {
-            manip.onInputReleasedEvent.RemoveListener(subscription.releaseAction);
-        }
-
-        manipulatorSubscriptions.Remove(manip);
-    }
-
-    void OnManipulatorTriggerPressed(manipulator manip)
-    {
-        if (!insideManipulators.Contains(manip))
-        {
-            return;
-        }
-
-        if (activeManipulators.Add(manip))
-        {
-            MarkVisualDirty();
-            keyHitCheck();
-        }
-
-        keyboardInterface?.ToggleLatchState(keyValue);
-    }
-
-    void OnManipulatorTriggerReleased(manipulator manip)
-    {
-        if (activeManipulators.Remove(manip))
-        {
-            MarkVisualDirty();
-            keyHitCheck();
-        }
-    }
-
-    void OnDestroy()
-    {
-        foreach (var kvp in manipulatorSubscriptions)
-        {
-            var manip = kvp.Key;
-            var subscription = kvp.Value;
-
-            if (manip != null)
-            {
-                if (subscription.triggerAction != null)
-                {
-                    manip.onInputTriggerdEvent.RemoveListener(subscription.triggerAction);
-                }
-
-                if (subscription.releaseAction != null)
-                {
-                    manip.onInputReleasedEvent.RemoveListener(subscription.releaseAction);
-                }
-            }
-        }
-
-        manipulatorSubscriptions.Clear();
-        insideManipulators.Clear();
-        activeManipulators.Clear();
     }
 
 }

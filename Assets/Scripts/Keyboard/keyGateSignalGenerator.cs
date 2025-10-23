@@ -33,7 +33,6 @@ public class keyGateSignalGenerator : signalGenerator {
 
   public bool isHigh = false;
   public bool newKeyWasPressed = false;
-  bool retriggerRequested = false;
 
   [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
@@ -46,25 +45,7 @@ public class keyGateSignalGenerator : signalGenerator {
       buffer[buffer.Length - 1] = buffer[buffer.Length - 2] = 0f;
       newKeyWasPressed = false;
     }
-
-    if (retriggerRequested)
-    {
-      if (isHigh && buffer.Length > 0)
-      {
-        buffer[0] = 0f;
-        if (buffer.Length > 1)
-        {
-          buffer[1] = 1f;
-        }
-      }
-      retriggerRequested = false;
-    }
     recursionCheckPost();
-  }
-
-  public void TriggerRetriggerPulse()
-  {
-    retriggerRequested = true;
   }
 
 }
