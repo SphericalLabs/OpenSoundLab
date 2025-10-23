@@ -29,6 +29,13 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+/*
+ * Overview:
+ *  - Spawns the keyboard layout and funnels note data from touch, MIDI, latch, and sequencer sources.
+ *  - Sends frequency/gate signals, mirrors active notes to the timeline component, and handles MIDI I/O toggles.
+ *  - Keeps a short recent-note history for UI highlights and manages single-key latch visuals/states.
+ */
+
 public class keyboardDeviceInterface : deviceInterface
 {
     public timelineComponentInterface _timeline;
@@ -40,16 +47,14 @@ public class keyboardDeviceInterface : deviceInterface
 
     public midiOutOfRange midiLow, midiHigh;
 
-    [Range(1, 8)]
+    [Range(0, 8)]
     public int recentKeyHistorySize = 4;
     public List<Material> recentKeyMaterials = new List<Material>();
     public Material latchedKeyMaterial;
 
     int keyCount = 12 * 2 + 1;
     key[] keys;
-    readonly List<int> recentKeyHistory = new List<int>();
-    bool loggedMissingRecentHighlightMaterials;
-    bool suppressHistoryDialEvent;
+    // recent key history state is managed by KeyboardRecentHighlightManager
 
     adsrInterface _adsrInterface;
 
@@ -57,9 +62,19 @@ public class keyboardDeviceInterface : deviceInterface
     keyGateSignalGenerator gateSignal;
 
     int curKey;
-    int latchedKeyIndex = -1;
+    // Latch and highlight controllers 
+    KeyboardLatchController _latchController;
+    KeyboardRecentHighlightManager _highlightManager;
 
     keyState[] keyStates;
+
+    static readonly System.Func<keyState, bool>[] KeyPriorityOrder = new System.Func<keyState, bool>[]
+    {
+        state => state.latchState,
+        state => state.midiState,
+        state => state.touchState,
+        state => state.seqState
+    };
 
     public override void Awake()
     {
@@ -68,7 +83,12 @@ public class keyboardDeviceInterface : deviceInterface
         keyStates = new keyState[keyCount];
 
         curKey = -1;
-        latchedKeyIndex = -1;
+        _latchController = new KeyboardLatchController(
+            index => IsValidKeyIndex(index),
+            (idx, isLatched) => UpdateLatchVisual(idx, isLatched),
+            (on, id, ki) => asynchKeyHit(on, id, ki),
+            () => { if (gateSignal != null) gateSignal.TriggerRetriggerPulse(); }
+        );
 
         _adsrInterface = GetComponentInChildren<adsrInterface>();
 
@@ -80,8 +100,15 @@ public class keyboardDeviceInterface : deviceInterface
 
         keys = new key[keyCount];
         SpawnKeys();
-        ResetRecentKeyHighlightState();
-        InitializeHistoryDial();
+        _highlightManager = new KeyboardRecentHighlightManager(
+            () => keys,
+            () => recentKeyMaterials,
+            () => recentKeyHistorySize,
+            v => recentKeyHistorySize = v,
+            historyDial,
+            this
+        );
+        _highlightManager.Initialize();
 
         for (int i = 0; i < keyCount; i++) keyStates[i] = new keyState(false);
 
@@ -193,65 +220,19 @@ public class keyboardDeviceInterface : deviceInterface
         }
     }
 
-    public void ToggleLatchState(int keyIndex)
+    bool IsValidKeyIndex(int index) => index >= 0 && index < keyStates.Length;
+
+    public void ToggleLatchState(int keyIndex) => _latchController.ToggleLatchState(keyIndex);
+
+    public bool IsKeyLatched(int keyIndex) => _latchController.IsKeyLatched(keyIndex);
+
+    public void SetLatchState(int keyIndex, bool on) => _latchController.SetLatchState(keyIndex, on);
+
+    void ApplyLatchState(int keyIndex, bool isLatched)
     {
-        if (latchedKeyIndex == keyIndex)
-        {
-            SetLatchState(keyIndex, false);
-        }
-        else
-        {
-            SetLatchState(keyIndex, true);
-        }
-    }
-
-    public bool IsKeyLatched(int keyIndex)
-    {
-        if (keyIndex < 0 || keyIndex >= keyStates.Length)
-        {
-            return false;
-        }
-
-        return keyStates[keyIndex].latchState;
-    }
-
-    public void SetLatchState(int keyIndex, bool on)
-    {
-        if (keyIndex < 0 || keyIndex >= keyStates.Length)
-        {
-            return;
-        }
-
-        if (on)
-        {
-            if (latchedKeyIndex != -1 && latchedKeyIndex != keyIndex)
-            {
-                int previousLatchedKey = latchedKeyIndex;
-                latchedKeyIndex = -1;
-                keyStates[previousLatchedKey].latchState = false;
-                UpdateLatchVisual(previousLatchedKey, false);
-                ProcessKeyStateChange(previousLatchedKey);
-            }
-
-            latchedKeyIndex = keyIndex;
-            keyStates[keyIndex].latchState = true;
-            UpdateLatchVisual(keyIndex, true);
-            ProcessKeyStateChange(keyIndex);
-        }
-        else
-        {
-            if (IsKeyLatched(keyIndex))
-            {
-                if (latchedKeyIndex == keyIndex)
-                {
-                    latchedKeyIndex = -1;
-                }
-
-                keyStates[keyIndex].latchState = false;
-                UpdateLatchVisual(keyIndex, false);
-                ProcessKeyStateChange(keyIndex);
-            }
-        }
+        keyStates[keyIndex].latchState = isLatched;
+        UpdateLatchVisual(keyIndex, isLatched);
+        ProcessKeyStateChange(keyIndex);
     }
 
     void UpdateLatchVisual(int keyIndex, bool isLatched)
@@ -268,13 +249,7 @@ public class keyboardDeviceInterface : deviceInterface
         }
     }
 
-    public void OnLatchedKeyTouchedWithActiveTrigger(int keyIndex)
-    {
-        if (latchedKeyIndex == keyIndex && gateSignal != null)
-        {
-            gateSignal.TriggerRetriggerPulse();
-        }
-    }
+    public void OnLatchedKeyTouchedWithActiveTrigger(int keyIndex) => _latchController.OnLatchedKeyTouchedWithActiveTrigger(keyIndex);
 
     void keyHitEvent(bool on, int ID)
     {
@@ -326,35 +301,23 @@ public class keyboardDeviceInterface : deviceInterface
 
     int FindNextActiveKey(int excludedKey)
     {
-        int selectedKey = -1;
-        int selectedScore = int.MinValue;
-
-        for (int i = 0; i < keyStates.Length; i++)
+        foreach (var selector in KeyPriorityOrder)
         {
-            if (i == excludedKey)
+            for (int i = 0; i < keyStates.Length; i++)
             {
-                continue;
-            }
+                if (i == excludedKey || !keyStates[i].getState())
+                {
+                    continue;
+                }
 
-            if (!keyStates[i].getState())
-            {
-                continue;
-            }
-
-            int score = 0;
-            if (keyStates[i].latchState) score += 400;
-            if (keyStates[i].midiState) score += 300;
-            if (keyStates[i].touchState) score += 200;
-            if (keyStates[i].seqState) score += 100;
-
-            if (score > selectedScore)
-            {
-                selectedScore = score;
-                selectedKey = i;
+                if (selector(keyStates[i]))
+                {
+                    return i;
+                }
             }
         }
 
-        return selectedKey;
+        return -1;
     }
 
     void toggleMIDIin(bool on)
@@ -451,12 +414,12 @@ public class keyboardDeviceInterface : deviceInterface
         gateOutput.SetID(data.gateOutID, copyMode);
 
 
-        if (data.midiInConnection != null & data.midiInConnection != "")
+        if (data.midiInConnection != null && data.midiInConnection != "")
         {
             midiInButton.startToggled = true;
             _midiIn.ConnectByName(data.midiInConnection);
         }
-        if (data.midiOutConnection != null & data.midiOutConnection != "")
+        if (data.midiOutConnection != null && data.midiOutConnection != "")
         {
             midiOutButton.startToggled = true;
             _midiOut.ConnectByName(data.midiOutConnection);
@@ -479,279 +442,20 @@ public class keyboardDeviceInterface : deviceInterface
             }
         }
 
-        if (data.recentKeyHistorySize > 0)
-        {
-            SetRecentKeyHistorySize(data.recentKeyHistorySize, false);
-        }
-        else
-        {
-            SetRecentKeyHistorySize(recentKeyHistorySize, false);
-        }
-
-        if (historyDial != null)
-        {
-            float savedPercent = data.historyDialPercent;
-            suppressHistoryDialEvent = true;
-            if (!float.IsNaN(savedPercent) && savedPercent >= 0f)
-            {
-                historyDial.setPercent(savedPercent);
-            }
-            else
-            {
-                SyncHistoryDialToCurrentSize();
-            }
-            suppressHistoryDialEvent = false;
-        }
-        else
-        {
-            ApplyRecentKeyHighlights();
-        }
+        _highlightManager.LoadSettings(Mathf.Max(0, data.recentKeyHistorySize), data.historyDialPercent);
     }
-    int GetRecentKeyLimit()
-    {
-        int materialCount = recentKeyMaterials != null ? recentKeyMaterials.Count : 0;
-        if (materialCount == 0)
-        {
-            return 0;
-        }
+    public void RegisterRecentKeyPress(int keyIndex) => _highlightManager.RegisterRecentKeyPress(keyIndex);
 
-        int clampedSize = recentKeyHistorySize < 1 ? 1 : recentKeyHistorySize;
-        return Mathf.Min(clampedSize, materialCount);
-    }
-
-    public void RegisterRecentKeyPress(int keyIndex)
-    {
-        if (keyIndex < 0 || keyIndex >= keyCount)
-        {
-            return;
-        }
-
-        recentKeyHistory.Remove(keyIndex);
-        recentKeyHistory.Insert(0, keyIndex);
-
-        int limit = GetRecentKeyLimit();
-        if (limit > 0 && recentKeyHistory.Count > limit)
-        {
-            recentKeyHistory.RemoveRange(limit, recentKeyHistory.Count - limit);
-        }
-
-        if (keys != null && keys.Length > 0)
-        {
-            ApplyRecentKeyHighlights();
-        }
-    }
-
-    public void RefreshRecentKeyHighlights()
-    {
-        if (keys != null && keys.Length > 0)
-        {
-            ApplyRecentKeyHighlights();
-        }
-    }
-
-    void ApplyRecentKeyHighlights()
-    {
-        if (keys == null || keys.Length == 0)
-        {
-            return;
-        }
-
-        int limit = GetRecentKeyLimit();
-        if (limit <= 0)
-        {
-            if (Application.isPlaying && !loggedMissingRecentHighlightMaterials)
-            {
-                if (recentKeyMaterials == null || recentKeyMaterials.Count == 0)
-                {
-                    Debug.LogWarning($"{name}: recent key highlights are disabled because no highlight materials are assigned.", this);
-                }
-            }
-
-            loggedMissingRecentHighlightMaterials = true;
-
-            for (int i = 0; i < keys.Length; i++)
-            {
-                if (keys[i] != null)
-                {
-                    keys[i].ClearRecentHighlight();
-                }
-            }
-            return;
-        }
-
-        loggedMissingRecentHighlightMaterials = false;
-
-        bool[] highlighted = new bool[keys.Length];
-        int highlightCount = Mathf.Min(limit, recentKeyHistory.Count);
-
-        for (int i = 0; i < highlightCount; i++)
-        {
-            int keyIndex = recentKeyHistory[i];
-            if (keyIndex < 0 || keyIndex >= keys.Length)
-            {
-                continue;
-            }
-
-            Material highlightMat = recentKeyMaterials.Count > i ? recentKeyMaterials[i] : recentKeyMaterials[recentKeyMaterials.Count - 1];
-            if (highlightMat == null)
-            {
-                continue;
-            }
-
-            keys[keyIndex].SetRecentHighlight(highlightMat);
-            highlighted[keyIndex] = true;
-        }
-
-        for (int i = 0; i < keys.Length; i++)
-        {
-            if (keys[i] != null && !highlighted[i])
-            {
-                keys[i].ClearRecentHighlight();
-            }
-        }
-    }
-
-    void ResetRecentKeyHighlightState()
-    {
-        recentKeyHistory.Clear();
-        loggedMissingRecentHighlightMaterials = false;
-        ApplyRecentKeyHighlights();
-    }
-
-    void InitializeHistoryDial()
-    {
-        if (historyDial == null)
-        {
-            return;
-        }
-
-        ConfigureHistoryDialNotches();
-        historyDial.onPercentChangedEventLocal.AddListener(OnHistoryDialPercentChanged);
-        SyncHistoryDialToCurrentSize();
-    }
-
-    void ConfigureHistoryDialNotches()
-    {
-        if (historyDial == null)
-        {
-            return;
-        }
-
-        historyDial.isNotched = true;
-        int steps = Mathf.Max(1, GetHistoryDialMaxSteps());
-        historyDial.notchSteps = steps;
-    }
-
-    void SyncHistoryDialToCurrentSize()
-    {
-        if (historyDial == null)
-        {
-            return;
-        }
-
-        suppressHistoryDialEvent = true;
-        float percent = GetPercentForHistorySize(recentKeyHistorySize);
-        historyDial.setPercent(percent);
-        suppressHistoryDialEvent = false;
-    }
-
-    void OnHistoryDialPercentChanged()
-    {
-        if (historyDial == null || suppressHistoryDialEvent)
-        {
-            return;
-        }
-
-        int targetSize = CalculateHistoryStepsFromPercent(historyDial.percent);
-        SetRecentKeyHistorySize(targetSize, false);
-    }
-
-    void SetRecentKeyHistorySize(int newSize, bool syncDial)
-    {
-        int clampedSize = Mathf.Clamp(newSize, 1, GetHistoryDialMaxSteps());
-        if (recentKeyHistorySize != clampedSize)
-        {
-            recentKeyHistorySize = clampedSize;
-        }
-
-        TrimRecentKeyHistory();
-        ApplyRecentKeyHighlights();
-
-        if (syncDial)
-        {
-            SyncHistoryDialToCurrentSize();
-        }
-    }
-
-    void TrimRecentKeyHistory()
-    {
-        int limit = GetRecentKeyLimit();
-        if (limit <= 0 || recentKeyHistory.Count <= limit)
-        {
-            return;
-        }
-
-        recentKeyHistory.RemoveRange(limit, recentKeyHistory.Count - limit);
-    }
-
-    int GetHistoryDialMaxSteps()
-    {
-        int materialCount = recentKeyMaterials != null ? recentKeyMaterials.Count : 0;
-        if (materialCount > 0)
-        {
-            return materialCount;
-        }
-
-        return Mathf.Max(1, recentKeyHistorySize);
-    }
-
-    int CalculateHistoryStepsFromPercent(float percent)
-    {
-        int maxSteps = Mathf.Max(1, GetHistoryDialMaxSteps());
-        if (maxSteps == 1)
-        {
-            return 1;
-        }
-
-        int stepIndex = Mathf.RoundToInt(Mathf.Clamp01(percent) * (maxSteps - 1));
-        return Mathf.Clamp(stepIndex + 1, 1, maxSteps);
-    }
-
-    float GetPercentForHistorySize(int size)
-    {
-        int maxSteps = Mathf.Max(1, GetHistoryDialMaxSteps());
-        if (maxSteps == 1)
-        {
-            return 0f;
-        }
-
-        int boundedSize = Mathf.Clamp(size, 1, maxSteps);
-        int stepIndex = boundedSize - 1;
-        return (float)stepIndex / (maxSteps - 1);
-    }
+    public void RefreshRecentKeyHighlights() => _highlightManager.Refresh();
 
     void OnValidate()
     {
-        if (recentKeyHistorySize < 1)
-        {
-            recentKeyHistorySize = 1;
-        }
-
-        SetRecentKeyHistorySize(recentKeyHistorySize, false);
-
-        if (historyDial != null)
-        {
-            ConfigureHistoryDialNotches();
-            SyncHistoryDialToCurrentSize();
-        }
+        _highlightManager?.OnValidate();
     }
 
     void OnDestroy()
     {
-        if (historyDial != null)
-        {
-            historyDial.onPercentChangedEventLocal.RemoveListener(OnHistoryDialPercentChanged);
-        }
+        _highlightManager?.OnDestroy();
     }
 
     public enum keyInput
