@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 // 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at 
@@ -9,9 +9,9 @@
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
 // 
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class fader : signalGenerator {
   float[] bufferB;
 
   [DllImport("OSLNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-  [DllImport("OSLNative")] public static extern void processFader(float[] buffer, int length, int channels, float[] bufferB, int lengthB, bool aSig, bool bSig, bool samePercent, float lastpercent, float sliderPercent);
+  [DllImport("OSLNative")] public static extern void processFader(float[] buffer, int length, int channels, float[] bufferB, int lengthB, [MarshalAs(UnmanagedType.I1)] bool aSig, [MarshalAs(UnmanagedType.I1)] bool bSig, [MarshalAs(UnmanagedType.I1)] bool samePercent, float lastpercent, float sliderPercent);
 
   public override void Awake() {
     fadeSlider = GetComponentInChildren<slider>();
