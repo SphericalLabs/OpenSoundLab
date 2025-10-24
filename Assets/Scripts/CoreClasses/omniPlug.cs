@@ -394,7 +394,6 @@ public class omniPlug : manipObject
 
         connected = j;
         //connected.beginConnection(this, true);
-        signal = connected.homesignal;
 
         plugTrans.position = connected.transform.position;
         plugTrans.rotation = connected.transform.rotation;
@@ -452,6 +451,7 @@ public class omniPlug : manipObject
 
             calmTime = 0;
             connected.beginConnection(this, true);
+            signal = connected.homesignal;
 
             collCandidates.Clear();
         }
