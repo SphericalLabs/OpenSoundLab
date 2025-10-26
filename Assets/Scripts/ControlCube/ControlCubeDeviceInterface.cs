@@ -25,6 +25,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Mirror;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
@@ -46,23 +47,59 @@ public class ControlCubeDeviceInterface : deviceInterface
     [SerializeField] private float minPathPointDistance = 0.005f;
     [SerializeField] private float maxJumpDistance = 0.05f;
 
+    [Header("Networking")]
+    [SerializeField] private NetworkControlCubeManager networkManager;
+    [SerializeField] private NetworkButtons buttonSync;
+
     private const string PathsRootName = "paths";
 
     private Transform pathsRoot;
-    private LineRenderer activeLineRenderer;
-    private List<Vector3> activePathPoints;
-    private Material activeMaterialInstance;
     private bool isCubeGrabbed;
     private bool isRecordingEnabled;
     private bool hasWarnedMissingMaterial;
 
     private static Material fallbackPathTemplate;
 
+    private readonly Dictionary<int, PathRendererState> pathRenderers = new Dictionary<int, PathRendererState>();
+    private readonly Dictionary<byte, PendingPathRequest> pendingPathRequests = new Dictionary<byte, PendingPathRequest>();
+    private byte nextRequestId;
+    private byte? activeRequestId;
+    private bool suppressRecordButtonEvent;
+    private int nextLocalPathId = -1;
+
+    private class PathRendererState
+    {
+        public readonly List<Vector3> points = new List<Vector3>();
+        public LineRenderer lineRenderer;
+        public bool isComplete;
+    }
+
+    private class PendingPathRequest
+    {
+        public int pathId = -1;
+        public readonly List<Vector3> queuedPoints = new List<Vector3>();
+        public bool endRequested;
+        public Vector3 lastRecordedPoint;
+    }
+
     public UnityEvent onPercentChangedEvent;
 
     public override void Awake()
     {
         base.Awake();
+        if (networkManager == null)
+        {
+            networkManager = GetComponent<NetworkControlCubeManager>();
+        }
+        if (buttonSync == null)
+        {
+            buttonSync = GetComponent<NetworkButtons>();
+            if (buttonSync == null)
+            {
+                Debug.LogWarning($"{nameof(ControlCubeDeviceInterface)} on {name} is missing a {nameof(NetworkButtons)} component for button syncing.", this);
+            }
+        }
+
         EnsurePathsRoot();
         Setup(percent);
     }
@@ -79,7 +116,7 @@ public class ControlCubeDeviceInterface : deviceInterface
     {
         UnsubscribeButtonEvents();
         UnsubscribeCubeEvents();
-        StopActivePath();
+        StopActiveRecording();
     }
 
     public void Setup(Vector3 p)
@@ -92,6 +129,114 @@ public class ControlCubeDeviceInterface : deviceInterface
 
     public override void hit(bool on, int ID = -1)
     {
+    }
+
+    public void AssignNetworkManager(NetworkControlCubeManager manager)
+    {
+        networkManager = manager;
+    }
+
+    public void InitializeNetworkedPaths(IList<ControlCubeRecordedPathPoint> points)
+    {
+        EnsurePathsRoot();
+        DestroyAllPaths();
+        nextLocalPathId = -1;
+        pendingPathRequests.Clear();
+        activeRequestId = null;
+
+        if (points == null)
+        {
+            return;
+        }
+
+        foreach (ControlCubeRecordedPathPoint point in points)
+        {
+            ProcessRecordedPoint(point);
+        }
+    }
+
+    public void HandleNetworkPathListChanged(SyncList<ControlCubeRecordedPathPoint>.Operation op, int index, ControlCubeRecordedPathPoint oldValue, ControlCubeRecordedPathPoint newValue)
+    {
+        switch (op)
+        {
+            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_ADD:
+            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_INSERT:
+            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_SET:
+                ProcessRecordedPoint(newValue);
+                break;
+            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_REMOVEAT:
+                RebuildAllPaths();
+                break;
+            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_CLEAR:
+                DestroyAllPaths();
+                break;
+        }
+    }
+
+    public void ApplyNetworkRecordingState(bool newValue)
+    {
+        SetRecordingEnabled(newValue, fromNetwork: true, force: true);
+    }
+
+    public void HandleLocalPathConfirmed(byte requestId, int pathId)
+    {
+        OnPathConfirmed(requestId, pathId);
+    }
+
+    public void HandleRemotePathConfirmed(byte requestId, int pathId)
+    {
+        OnPathConfirmed(requestId, pathId);
+    }
+
+    private void OnPathConfirmed(byte requestId, int pathId)
+    {
+        if (!pendingPathRequests.TryGetValue(requestId, out PendingPathRequest request))
+        {
+            return;
+        }
+
+        request.pathId = pathId;
+
+        if (request.queuedPoints.Count > 0 && networkManager != null)
+        {
+            foreach (Vector3 queuedPoint in request.queuedPoints)
+            {
+                networkManager.RequestAppendPathPoint(pathId, queuedPoint);
+            }
+
+            request.queuedPoints.Clear();
+        }
+
+        if (request.endRequested)
+        {
+            if (networkManager != null)
+            {
+                networkManager.RequestEndPath(pathId, request.lastRecordedPoint);
+            }
+
+            pendingPathRequests.Remove(requestId);
+
+            if (activeRequestId.HasValue && activeRequestId.Value == requestId)
+            {
+                activeRequestId = null;
+            }
+        }
+    }
+
+    private void RebuildAllPaths()
+    {
+        DestroyAllPaths();
+        nextLocalPathId = -1;
+
+        if (networkManager == null)
+        {
+            return;
+        }
+
+        foreach (ControlCubeRecordedPathPoint point in networkManager.recordedPathPoints)
+        {
+            ProcessRecordedPoint(point);
+        }
     }
 
     private void SubscribeButtonEvents()
@@ -159,12 +304,17 @@ public class ControlCubeDeviceInterface : deviceInterface
     private void OnCubeReleased()
     {
         isCubeGrabbed = false;
-        StopActivePath();
+        StopActiveRecording();
     }
 
     private void OnRecordButtonToggleChanged()
     {
-        RefreshRecordState(force: true);
+        if (suppressRecordButtonEvent)
+        {
+            return;
+        }
+
+        RequestRecordingToggle(recordButton != null && recordButton.isHit);
     }
 
     private void OnDeleteButtonPressed()
@@ -178,21 +328,7 @@ public class ControlCubeDeviceInterface : deviceInterface
     private void RefreshRecordState(bool force = false)
     {
         bool nextState = recordButton != null && recordButton.isHit;
-        if (!force && isRecordingEnabled == nextState)
-        {
-            return;
-        }
-
-        isRecordingEnabled = nextState;
-
-        if (!isRecordingEnabled)
-        {
-            StopActivePath();
-        }
-        else if (isCubeGrabbed)
-        {
-            TryRecordPoint(force: true);
-        }
+        SetRecordingEnabled(nextState, fromNetwork: false, force: force);
     }
 
     void Update()
@@ -225,22 +361,29 @@ public class ControlCubeDeviceInterface : deviceInterface
 
         Vector3 localPoint = ConvertPercentToLocal(percent);
 
-        if (force || activePathPoints == null)
+        if (!TryGetActiveRequest(out byte activeId, out PendingPathRequest activeRequest))
         {
-            BeginNewPath(localPoint);
+            BeginNetworkedPath(localPoint);
             return;
         }
 
-        Vector3 lastPoint = activePathPoints[activePathPoints.Count - 1];
+        if (force)
+        {
+            StopActiveRecording(activeId, activeRequest);
+            BeginNetworkedPath(localPoint);
+            return;
+        }
+
         float minDistance = Mathf.Max(0.0001f, minPathPointDistance);
         float minDistanceSquared = minDistance * minDistance;
         bool jumpEnabled = maxJumpDistance > minDistance;
         float maxJumpSquared = jumpEnabled ? maxJumpDistance * maxJumpDistance : 0f;
-        float segmentDistanceSquared = Vector3.SqrMagnitude(lastPoint - localPoint);
+        float segmentDistanceSquared = Vector3.SqrMagnitude(activeRequest.lastRecordedPoint - localPoint);
 
         if (jumpEnabled && segmentDistanceSquared >= maxJumpSquared)
         {
-            BeginNewPath(localPoint);
+            StopActiveRecording(activeId, activeRequest);
+            BeginNetworkedPath(localPoint);
             return;
         }
 
@@ -249,65 +392,148 @@ public class ControlCubeDeviceInterface : deviceInterface
             return;
         }
 
-        AppendPoint(localPoint);
+        AppendPointToNetwork(activeId, activeRequest, localPoint);
     }
 
-    private void BeginNewPath(Vector3 startPoint)
+    private bool TryGetActiveRequest(out byte requestId, out PendingPathRequest request)
+    {
+        requestId = default;
+        request = null;
+
+        if (activeRequestId.HasValue && pendingPathRequests.TryGetValue(activeRequestId.Value, out request))
+        {
+            requestId = activeRequestId.Value;
+            return true;
+        }
+
+        return false;
+    }
+
+    private void BeginNetworkedPath(Vector3 startPoint)
     {
         EnsurePathsRoot();
-
         if (pathsRoot == null)
         {
             return;
         }
 
-        StopActivePath();
-        if (pathBaseMaterial != null)
+        Color pathColor = GeneratePathColor();
+        Color32 color32 = (Color32)pathColor;
+
+        byte requestId = nextRequestId++;
+        PendingPathRequest request = new PendingPathRequest
         {
-            hasWarnedMissingMaterial = false;
+            lastRecordedPoint = startPoint
+        };
+
+        pendingPathRequests[requestId] = request;
+        activeRequestId = requestId;
+
+        if (networkManager == null)
+        {
+            int localPathId = nextLocalPathId--;
+            request.pathId = localPathId;
+            CreatePathRenderer(localPathId, pathColor, startPoint);
+            return;
         }
 
-        GameObject pathObject = new GameObject($"path_{pathsRoot.childCount}");
-        pathObject.transform.SetParent(pathsRoot, false);
-
-        activeLineRenderer = pathObject.AddComponent<LineRenderer>();
-        activeLineRenderer.useWorldSpace = false;
-        activeLineRenderer.loop = false;
-        activeLineRenderer.widthMultiplier = 0.0025f;
-        activeLineRenderer.numCapVertices = 2;
-        activeLineRenderer.numCornerVertices = 2;
-        activeLineRenderer.textureMode = LineTextureMode.Stretch;
-        activeLineRenderer.alignment = LineAlignment.View;
-        activeLineRenderer.shadowCastingMode = ShadowCastingMode.Off;
-        activeLineRenderer.receiveShadows = false;
-        activeLineRenderer.allowOcclusionWhenDynamic = false;
-        activeLineRenderer.positionCount = 0;
-
-        Material template = GetPathTemplateMaterial();
-        activeMaterialInstance = new Material(template);
-        Color pathColor = Random.ColorHSV(0f, 1f, 0.55f, 1f, 0.8f, 1f);
-        ApplyColorToMaterial(activeMaterialInstance, pathColor);
-        activeLineRenderer.material = activeMaterialInstance;
-        activeLineRenderer.startColor = pathColor;
-        activeLineRenderer.endColor = pathColor;
-
-        ControlCubeRecordedPath pathLifecycle = pathObject.AddComponent<ControlCubeRecordedPath>();
-        pathLifecycle.materialInstance = activeMaterialInstance;
-
-        activePathPoints = new List<Vector3>();
-        AppendPoint(startPoint);
+        networkManager.CmdBeginPath(requestId, startPoint, color32);
     }
 
-    private void AppendPoint(Vector3 point)
+    private void AppendPointToNetwork(byte requestId, PendingPathRequest request, Vector3 point)
     {
-        if (activeLineRenderer == null || activePathPoints == null)
+        request.lastRecordedPoint = point;
+
+        if (networkManager == null)
+        {
+            if (pathRenderers.TryGetValue(request.pathId, out PathRendererState state))
+            {
+                AppendPointToRenderer(state, point);
+            }
+            return;
+        }
+
+        if (request.pathId >= 0)
+        {
+            networkManager.RequestAppendPathPoint(request.pathId, point);
+        }
+        else
+        {
+            request.queuedPoints.Add(point);
+        }
+    }
+
+    private void RequestRecordingToggle(bool desiredState)
+    {
+        SetRecordingEnabled(desiredState, fromNetwork: false);
+
+        if (networkManager != null)
+        {
+            networkManager.CmdSetRecordingState(desiredState);
+        }
+    }
+
+    private void SetRecordingEnabled(bool enabled, bool fromNetwork, bool force = false)
+    {
+        if (!force && isRecordingEnabled == enabled)
         {
             return;
         }
 
-        activePathPoints.Add(point);
-        activeLineRenderer.positionCount = activePathPoints.Count;
-        activeLineRenderer.SetPosition(activePathPoints.Count - 1, point);
+        isRecordingEnabled = enabled;
+
+        if (fromNetwork && recordButton != null)
+        {
+            suppressRecordButtonEvent = true;
+            recordButton.keyHit(enabled, false);
+            suppressRecordButtonEvent = false;
+        }
+
+        if (!isRecordingEnabled)
+        {
+            StopActiveRecording();
+        }
+        else if (isCubeGrabbed)
+        {
+            TryRecordPoint(force: true);
+        }
+    }
+
+    private void StopActiveRecording()
+    {
+        if (TryGetActiveRequest(out byte requestId, out PendingPathRequest request))
+        {
+            StopActiveRecording(requestId, request);
+        }
+    }
+
+    private void StopActiveRecording(byte requestId, PendingPathRequest request)
+    {
+        if (networkManager != null)
+        {
+            if (request.pathId >= 0)
+            {
+                networkManager.RequestEndPath(request.pathId, request.lastRecordedPoint);
+                pendingPathRequests.Remove(requestId);
+            }
+            else
+            {
+                request.endRequested = true;
+            }
+        }
+        else
+        {
+            if (pathRenderers.TryGetValue(request.pathId, out PathRendererState state))
+            {
+                CompletePathRenderer(state, request.lastRecordedPoint);
+            }
+            pendingPathRequests.Remove(requestId);
+        }
+
+        if (activeRequestId.HasValue && activeRequestId.Value == requestId)
+        {
+            activeRequestId = null;
+        }
     }
 
     private Vector3 ConvertPercentToLocal(Vector3 value)
@@ -323,26 +549,157 @@ public class ControlCubeDeviceInterface : deviceInterface
         return new Vector3(x, y, z);
     }
 
-    private void StopActivePath()
-    {
-        activeLineRenderer = null;
-        activePathPoints = null;
-        activeMaterialInstance = null;
-    }
-
     private void ClearPaths()
     {
-        StopActivePath();
+        StopActiveRecording();
+        DestroyAllPaths();
+        pendingPathRequests.Clear();
+        activeRequestId = null;
 
+        if (networkManager != null)
+        {
+            networkManager.CmdClearPaths();
+        }
+    }
+
+    private void DestroyAllPaths()
+    {
+        if (pathsRoot != null)
+        {
+            for (int i = pathsRoot.childCount - 1; i >= 0; i--)
+            {
+                Destroy(pathsRoot.GetChild(i).gameObject);
+            }
+        }
+
+        pathRenderers.Clear();
+        nextLocalPathId = -1;
+    }
+
+    private void ProcessRecordedPoint(ControlCubeRecordedPathPoint point)
+    {
+        switch (point.marker)
+        {
+            case ControlCubePathPointMarker.Start:
+                {
+                    Color pathColor = IsColorUninitialized(point.color) ? GeneratePathColor() : (Color)point.color;
+                    CreatePathRenderer(point.pathId, pathColor, point.position);
+                    break;
+                }
+            case ControlCubePathPointMarker.Continue:
+                {
+                    if (!pathRenderers.TryGetValue(point.pathId, out PathRendererState state))
+                    {
+                        Color fallbackColor = GeneratePathColor();
+                        state = CreatePathRenderer(point.pathId, fallbackColor, point.position);
+                    }
+
+                    AppendPointToRenderer(state, point.position);
+                    break;
+                }
+            case ControlCubePathPointMarker.End:
+                {
+                    if (pathRenderers.TryGetValue(point.pathId, out PathRendererState state))
+                    {
+                        CompletePathRenderer(state, point.position);
+                    }
+                    break;
+                }
+        }
+    }
+
+    private PathRendererState CreatePathRenderer(int pathId, Color pathColor, Vector3 startPoint)
+    {
+        EnsurePathsRoot();
         if (pathsRoot == null)
+        {
+            return null;
+        }
+
+        if (pathRenderers.TryGetValue(pathId, out PathRendererState existing) && existing?.lineRenderer != null)
+        {
+            Destroy(existing.lineRenderer.gameObject);
+            pathRenderers.Remove(pathId);
+        }
+
+        if (pathBaseMaterial != null)
+        {
+            hasWarnedMissingMaterial = false;
+        }
+
+        GameObject pathObject = new GameObject($"path_{pathId}");
+        pathObject.transform.SetParent(pathsRoot, false);
+
+        LineRenderer lineRenderer = pathObject.AddComponent<LineRenderer>();
+        lineRenderer.useWorldSpace = false;
+        lineRenderer.loop = false;
+        lineRenderer.widthMultiplier = 0.0025f;
+        lineRenderer.numCapVertices = 2;
+        lineRenderer.numCornerVertices = 2;
+        lineRenderer.textureMode = LineTextureMode.Stretch;
+        lineRenderer.alignment = LineAlignment.View;
+        lineRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        lineRenderer.receiveShadows = false;
+        lineRenderer.allowOcclusionWhenDynamic = false;
+
+        Material template = GetPathTemplateMaterial();
+        Material materialInstance = new Material(template);
+        ApplyColorToMaterial(materialInstance, pathColor);
+        lineRenderer.material = materialInstance;
+        lineRenderer.startColor = pathColor;
+        lineRenderer.endColor = pathColor;
+
+        ControlCubeRecordedPath lifecycle = pathObject.AddComponent<ControlCubeRecordedPath>();
+        lifecycle.materialInstance = materialInstance;
+
+        PathRendererState state = new PathRendererState
+        {
+            lineRenderer = lineRenderer
+        };
+
+        state.points.Add(startPoint);
+        lineRenderer.positionCount = 1;
+        lineRenderer.SetPosition(0, startPoint);
+
+        pathRenderers[pathId] = state;
+        return state;
+    }
+
+    private void AppendPointToRenderer(PathRendererState state, Vector3 point)
+    {
+        if (state == null || state.lineRenderer == null)
         {
             return;
         }
 
-        for (int i = pathsRoot.childCount - 1; i >= 0; i--)
+        state.points.Add(point);
+        state.lineRenderer.positionCount = state.points.Count;
+        state.lineRenderer.SetPosition(state.points.Count - 1, point);
+    }
+
+    private void CompletePathRenderer(PathRendererState state, Vector3 point)
+    {
+        if (state == null || state.isComplete)
         {
-            Destroy(pathsRoot.GetChild(i).gameObject);
+            return;
         }
+
+        if (state.points.Count == 0 || Vector3.SqrMagnitude(state.points[state.points.Count - 1] - point) > 1e-8f)
+        {
+            AppendPointToRenderer(state, point);
+        }
+
+        state.isComplete = true;
+    }
+
+    private Color GeneratePathColor()
+    {
+        return Random.ColorHSV(0f, 1f, 0.55f, 1f, 0.8f, 1f);
+    }
+
+    private static bool IsColorUninitialized(Color32 color)
+    {
+        return color.a == 0 && color.r == 0 && color.g == 0 && color.b == 0;
     }
 
     private void EnsurePathsRoot()
