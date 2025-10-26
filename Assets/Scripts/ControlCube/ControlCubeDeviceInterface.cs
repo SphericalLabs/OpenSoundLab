@@ -44,6 +44,7 @@ public class ControlCubeDeviceInterface : deviceInterface
     [SerializeField] private Material pathBaseMaterial;
     [SerializeField] private Vector3 pathExtents = new Vector3(0.3f, 0.3f, 0.3f);
     [SerializeField] private float minPathPointDistance = 0.005f;
+    [SerializeField] private float maxJumpDistance = 0.05f;
 
     private const string PathsRootName = "paths";
 
@@ -54,6 +55,8 @@ public class ControlCubeDeviceInterface : deviceInterface
     private bool isCubeGrabbed;
     private bool isRecordingEnabled;
     private bool hasWarnedMissingMaterial;
+
+    private static Material fallbackPathTemplate;
 
     public UnityEvent onPercentChangedEvent;
 
@@ -69,6 +72,7 @@ public class ControlCubeDeviceInterface : deviceInterface
         EnsurePathsRoot();
         SubscribeButtonEvents();
         SubscribeCubeEvents();
+        RefreshRecordState(force: true);
     }
 
     private void OnDisable()
@@ -94,12 +98,13 @@ public class ControlCubeDeviceInterface : deviceInterface
     {
         if (recordButton != null)
         {
-            recordButton.onToggleChangedEvent.AddListener(OnRecordButtonToggled);
+            recordButton.onStartGrabEvents.AddListener(OnRecordButtonPressed);
+            recordButton.onEndGrabEvents.AddListener(OnRecordButtonReleased);
         }
 
         if (deleteButton != null)
         {
-            deleteButton.onToggleChangedEvent.AddListener(OnDeleteButtonToggled);
+            deleteButton.onStartGrabEvents.AddListener(OnDeleteButtonPressed);
         }
     }
 
@@ -107,12 +112,13 @@ public class ControlCubeDeviceInterface : deviceInterface
     {
         if (recordButton != null)
         {
-            recordButton.onToggleChangedEvent.RemoveListener(OnRecordButtonToggled);
+            recordButton.onStartGrabEvents.RemoveListener(OnRecordButtonPressed);
+            recordButton.onEndGrabEvents.RemoveListener(OnRecordButtonReleased);
         }
 
         if (deleteButton != null)
         {
-            deleteButton.onToggleChangedEvent.RemoveListener(OnDeleteButtonToggled);
+            deleteButton.onStartGrabEvents.RemoveListener(OnDeleteButtonPressed);
         }
     }
 
@@ -137,7 +143,7 @@ public class ControlCubeDeviceInterface : deviceInterface
     private void OnCubeGrabbed()
     {
         isCubeGrabbed = true;
-        TryRecordPoint(true);
+        TryRecordPoint(force: true);
     }
 
     private void OnCubeReleased()
@@ -146,10 +152,28 @@ public class ControlCubeDeviceInterface : deviceInterface
         StopActivePath();
     }
 
-    private void OnRecordButtonToggled()
+    private void OnRecordButtonPressed()
+    {
+        RefreshRecordState();
+    }
+
+    private void OnRecordButtonReleased()
+    {
+        RefreshRecordState();
+    }
+
+    private void OnDeleteButtonPressed()
+    {
+        if (deleteButton != null && deleteButton.isHit)
+        {
+            ClearPaths();
+        }
+    }
+
+    private void RefreshRecordState(bool force = false)
     {
         bool nextState = recordButton != null && recordButton.isHit;
-        if (isRecordingEnabled == nextState)
+        if (!force && isRecordingEnabled == nextState)
         {
             return;
         }
@@ -160,17 +184,9 @@ public class ControlCubeDeviceInterface : deviceInterface
         {
             StopActivePath();
         }
-        else
+        else if (isCubeGrabbed)
         {
-            TryRecordPoint(true);
-        }
-    }
-
-    private void OnDeleteButtonToggled()
-    {
-        if (deleteButton != null && deleteButton.isHit)
-        {
-            ClearPaths();
+            TryRecordPoint(force: true);
         }
     }
 
@@ -202,15 +218,9 @@ public class ControlCubeDeviceInterface : deviceInterface
             return;
         }
 
-        if (pathBaseMaterial == null)
-        {
-            WarnMissingMaterial();
-            return;
-        }
-
         Vector3 localPoint = ConvertPercentToLocal(percent);
 
-        if (activePathPoints == null)
+        if (force || activePathPoints == null)
         {
             BeginNewPath(localPoint);
             return;
@@ -219,11 +229,22 @@ public class ControlCubeDeviceInterface : deviceInterface
         Vector3 lastPoint = activePathPoints[activePathPoints.Count - 1];
         float minDistance = Mathf.Max(0.0001f, minPathPointDistance);
         float minDistanceSquared = minDistance * minDistance;
+        bool jumpEnabled = maxJumpDistance > minDistance;
+        float maxJumpSquared = jumpEnabled ? maxJumpDistance * maxJumpDistance : 0f;
+        float segmentDistanceSquared = Vector3.SqrMagnitude(lastPoint - localPoint);
 
-        if (force || Vector3.SqrMagnitude(lastPoint - localPoint) >= minDistanceSquared)
+        if (jumpEnabled && segmentDistanceSquared >= maxJumpSquared)
         {
-            AppendPoint(localPoint);
+            BeginNewPath(localPoint);
+            return;
         }
+
+        if (segmentDistanceSquared < minDistanceSquared)
+        {
+            return;
+        }
+
+        AppendPoint(localPoint);
     }
 
     private void BeginNewPath(Vector3 startPoint)
@@ -235,7 +256,11 @@ public class ControlCubeDeviceInterface : deviceInterface
             return;
         }
 
-        hasWarnedMissingMaterial = false;
+        StopActivePath();
+        if (pathBaseMaterial != null)
+        {
+            hasWarnedMissingMaterial = false;
+        }
 
         GameObject pathObject = new GameObject($"path_{pathsRoot.childCount}");
         pathObject.transform.SetParent(pathsRoot, false);
@@ -253,7 +278,8 @@ public class ControlCubeDeviceInterface : deviceInterface
         activeLineRenderer.allowOcclusionWhenDynamic = false;
         activeLineRenderer.positionCount = 0;
 
-        activeMaterialInstance = new Material(pathBaseMaterial);
+        Material template = GetPathTemplateMaterial();
+        activeMaterialInstance = new Material(template);
         Color pathColor = Random.ColorHSV(0f, 1f, 0.55f, 1f, 0.8f, 1f);
         ApplyColorToMaterial(activeMaterialInstance, pathColor);
         activeLineRenderer.material = activeMaterialInstance;
@@ -279,13 +305,17 @@ public class ControlCubeDeviceInterface : deviceInterface
         activeLineRenderer.SetPosition(activePathPoints.Count - 1, point);
     }
 
-    private Vector3 ConvertPercentToLocal(Vector3 p)
+    private Vector3 ConvertPercentToLocal(Vector3 value)
     {
-        return new Vector3(
-            (p.x - 0.5f) * pathExtents.x,
-            (p.y - 0.5f) * pathExtents.y,
-            (p.z - 0.5f) * pathExtents.z
-        );
+        float xPercent = Mathf.Clamp01(value.x);
+        float yPercent = Mathf.Clamp01(value.y);
+        float zPercent = Mathf.Clamp01(value.z);
+
+        float x = (0.5f - xPercent) * pathExtents.x;
+        float y = yPercent * pathExtents.y;
+        float z = (0.5f - zPercent) * pathExtents.z;
+
+        return new Vector3(x, y, z);
     }
 
     private void StopActivePath()
@@ -328,6 +358,36 @@ public class ControlCubeDeviceInterface : deviceInterface
             container.transform.SetParent(transform, false);
             pathsRoot = container.transform;
         }
+    }
+
+    private Material GetPathTemplateMaterial()
+    {
+        if (pathBaseMaterial != null)
+        {
+            return pathBaseMaterial;
+        }
+
+        WarnMissingMaterial();
+
+        if (fallbackPathTemplate == null)
+        {
+            Shader shader = Shader.Find("Sprites/Default");
+            if (shader == null)
+            {
+                shader = Shader.Find("Unlit/Color");
+            }
+
+            if (shader == null)
+            {
+                shader = Shader.Find("Hidden/Internal-Colored");
+            }
+
+            fallbackPathTemplate = shader != null ? new Material(shader) : new Material(Shader.Find("Sprites/Default"));
+            fallbackPathTemplate.name = "ControlCubePathFallbackTemplate";
+            fallbackPathTemplate.hideFlags = HideFlags.HideAndDontSave;
+        }
+
+        return fallbackPathTemplate;
     }
 
     private void WarnMissingMaterial()
