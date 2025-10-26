@@ -98,8 +98,8 @@ public class ControlCubeDeviceInterface : deviceInterface
     {
         if (recordButton != null)
         {
-            recordButton.onStartGrabEvents.AddListener(OnRecordButtonPressed);
-            recordButton.onEndGrabEvents.AddListener(OnRecordButtonReleased);
+            ConfigureRecordButton(recordButton);
+            recordButton.onToggleChangedEvent.AddListener(OnRecordButtonToggleChanged);
         }
 
         if (deleteButton != null)
@@ -110,15 +110,25 @@ public class ControlCubeDeviceInterface : deviceInterface
 
     private void UnsubscribeButtonEvents()
     {
-        if (recordButton != null)
+        if (recordButton != null && recordButton.onToggleChangedEvent != null)
         {
-            recordButton.onStartGrabEvents.RemoveListener(OnRecordButtonPressed);
-            recordButton.onEndGrabEvents.RemoveListener(OnRecordButtonReleased);
+            recordButton.onToggleChangedEvent.RemoveListener(OnRecordButtonToggleChanged);
         }
 
         if (deleteButton != null)
         {
             deleteButton.onStartGrabEvents.RemoveListener(OnDeleteButtonPressed);
+        }
+    }
+
+    private void ConfigureRecordButton(button target)
+    {
+        target.isSwitch = true;
+        target.onlyOn = false;
+
+        if (target.onToggleChangedEvent == null)
+        {
+            target.onToggleChangedEvent = new UnityEvent();
         }
     }
 
@@ -152,14 +162,9 @@ public class ControlCubeDeviceInterface : deviceInterface
         StopActivePath();
     }
 
-    private void OnRecordButtonPressed()
+    private void OnRecordButtonToggleChanged()
     {
-        RefreshRecordState();
-    }
-
-    private void OnRecordButtonReleased()
-    {
-        RefreshRecordState();
+        RefreshRecordState(force: true);
     }
 
     private void OnDeleteButtonPressed()
