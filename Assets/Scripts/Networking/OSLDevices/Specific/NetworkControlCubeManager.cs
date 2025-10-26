@@ -160,14 +160,16 @@ public class NetworkControlCubeManager : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdBeginPath(byte requestId, Vector3 startPoint, Color32 color)
+    public void CmdBeginPath(byte requestId, Vector3 startPoint, Color32 color, NetworkConnectionToClient sender = null)
     {
         int pathId = nextPathId++;
-        NetworkConnectionToClient sender = connectionToClient;
+        // Mirror only populates connectionToClient when the object has client authority,
+        // so fall back to the provided sender reference to acknowledge non-authoritative clients.
+        NetworkConnectionToClient targetConnection = sender ?? connectionToClient;
 
-        if (sender != null)
+        if (targetConnection != null)
         {
-            TargetConfirmPath(sender, requestId, pathId);
+            TargetConfirmPath(targetConnection, requestId, pathId);
         }
         else
         {
