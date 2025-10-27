@@ -44,7 +44,7 @@ public class ControlCubeDeviceInterface : deviceInterface
     [SerializeField] private button deleteButton;
     [SerializeField] private Material pathBaseMaterial;
     [SerializeField] private Vector3 pathExtents = new Vector3(0.3f, 0.3f, 0.3f);
-    [SerializeField] private float minPathPointDistance = 0.005f;
+    [SerializeField] private float minPathPointDistance = 0.003f;
     [SerializeField] private float maxJumpDistance = 0.05f;
 
     [Header("Networking")]
@@ -648,7 +648,7 @@ public class ControlCubeDeviceInterface : deviceInterface
         LineRenderer lineRenderer = pathObject.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
         lineRenderer.loop = false;
-        lineRenderer.widthMultiplier = 0.0025f;
+        lineRenderer.widthMultiplier = 0.002f;
         lineRenderer.numCapVertices = 2;
         lineRenderer.numCornerVertices = 2;
         lineRenderer.textureMode = LineTextureMode.Stretch;
