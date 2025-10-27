@@ -383,11 +383,14 @@ public class ControlCubeDeviceInterface : deviceInterface
             return;
         }
 
-        float minDistance = Mathf.Max(0.0001f, minPathPointDistance);
-        float minDistanceSquared = minDistance * minDistance;
-        bool jumpEnabled = maxJumpDistance > minDistance;
+        float minDistanceWorld = Mathf.Max(0.0001f, minPathPointDistance);
+        float minDistanceSquared = minDistanceWorld * minDistanceWorld;
+        bool jumpEnabled = maxJumpDistance > minDistanceWorld;
         float maxJumpSquared = jumpEnabled ? maxJumpDistance * maxJumpDistance : 0f;
-        float segmentDistanceSquared = Vector3.SqrMagnitude(activeRequest.lastRecordedPoint - localPoint);
+
+        Vector3 lastWorldPoint = pathsRoot.TransformPoint(activeRequest.lastRecordedPoint);
+        Vector3 currentWorldPoint = pathsRoot.TransformPoint(localPoint);
+        float segmentDistanceSquared = Vector3.SqrMagnitude(lastWorldPoint - currentWorldPoint);
 
         if (jumpEnabled && segmentDistanceSquared >= maxJumpSquared)
         {
@@ -653,7 +656,7 @@ public class ControlCubeDeviceInterface : deviceInterface
         LineRenderer lineRenderer = pathObject.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
         lineRenderer.loop = false;
-        lineRenderer.widthMultiplier = 0.002f;
+        lineRenderer.widthMultiplier = 0.00225f;
         lineRenderer.numCapVertices = 2;
         lineRenderer.numCornerVertices = 2;
         lineRenderer.textureMode = LineTextureMode.Stretch;
