@@ -79,6 +79,26 @@ MonoBehaviour:
   pathBaseMaterial: {fileID: 2100000, guid: 7d6adf8a9ef714f26843468c35eec922, type: 2}
   pathExtents: {x: 0.3, y: 0.3, z: 0.3}
   minPathPointDistance: 0.005
+  maxJumpDistance: 0.05
+  networkManager: {fileID: 0}
+  buttonSync: {fileID: 0}
+  pathColorPalette:
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 1, g: 0.42223793, b: 0, a: 0}
+  - {r: 1, g: 0.69451284, b: 0, a: 0}
+  - {r: 1, g: 0.889333, b: 0, a: 0}
+  - {r: 0.79416883, g: 1, b: 0, a: 0}
+  - {r: 0.36515355, g: 1, b: 0, a: 0}
+  - {r: 0, g: 1, b: 0.52166533, a: 0}
+  - {r: 0, g: 1, b: 0.84943056, a: 0}
+  - {r: 0, g: 0.8249755, b: 1, a: 0}
+  - {r: 0, g: 0.57883954, b: 1, a: 0}
+  - {r: 0, g: 0.36917162, b: 1, a: 0}
+  - {r: 0, g: 0.13454676, b: 1, a: 0}
+  - {r: 0.3388934, g: 0, b: 1, a: 0}
+  - {r: 0.48492336, g: 0, b: 1, a: 0}
+  - {r: 0.6577053, g: 0, b: 1, a: 0}
+  - {r: 0.956295, g: 0, b: 1, a: 0}
   onPercentChangedEvent:
     m_PersistentCalls:
       m_Calls: []

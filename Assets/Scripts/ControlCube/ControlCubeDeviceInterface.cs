@@ -51,6 +51,9 @@ public class ControlCubeDeviceInterface : deviceInterface
     [SerializeField] private NetworkControlCubeManager networkManager;
     [SerializeField] private NetworkButtons buttonSync;
 
+    [Header("Path Colors")]
+    [SerializeField] private List<Color> pathColorPalette = new List<Color>();
+
     private const string PathsRootName = "paths";
 
     private Transform pathsRoot;
@@ -70,6 +73,8 @@ public class ControlCubeDeviceInterface : deviceInterface
     private const float PathColorHueStep = 1f / PathColorCycleLength;
     private const float PathColorAlignmentThreshold = 0.95f;
     private int nextPathColorIndex;
+
+    private bool HasCustomPathPalette => pathColorPalette != null && pathColorPalette.Count > 0;
 
     private class PathRendererState
     {
@@ -709,6 +714,18 @@ public class ControlCubeDeviceInterface : deviceInterface
 
     private Color GeneratePathColor()
     {
+        if (HasCustomPathPalette)
+        {
+            if (nextPathColorIndex >= pathColorPalette.Count)
+            {
+                nextPathColorIndex = 0;
+            }
+
+            Color paletteColor = pathColorPalette[nextPathColorIndex];
+            nextPathColorIndex = (nextPathColorIndex + 1) % pathColorPalette.Count;
+            return paletteColor;
+        }
+
         float hue = nextPathColorIndex * PathColorHueStep;
         nextPathColorIndex = (nextPathColorIndex + 1) % PathColorCycleLength;
         return Color.HSVToRGB(hue, 1f, 1f);
@@ -716,6 +733,16 @@ public class ControlCubeDeviceInterface : deviceInterface
 
     private void AlignNextPathColorIndex(Color color)
     {
+        if (HasCustomPathPalette)
+        {
+            int paletteIndex = FindPaletteIndex((Color32)color);
+            if (paletteIndex >= 0)
+            {
+                nextPathColorIndex = (paletteIndex + 1) % pathColorPalette.Count;
+            }
+            return;
+        }
+
         Color.RGBToHSV(color, out float hue, out float saturation, out float value);
 
         if (saturation < PathColorAlignmentThreshold || value < PathColorAlignmentThreshold)
@@ -726,6 +753,28 @@ public class ControlCubeDeviceInterface : deviceInterface
         float normalizedHue = Mathf.Repeat(hue, 1f);
         int derivedIndex = Mathf.RoundToInt(normalizedHue / PathColorHueStep) % PathColorCycleLength;
         nextPathColorIndex = (derivedIndex + 1) % PathColorCycleLength;
+    }
+
+    private int FindPaletteIndex(Color32 color)
+    {
+        if (!HasCustomPathPalette)
+        {
+            return -1;
+        }
+
+        for (int i = 0; i < pathColorPalette.Count; i++)
+        {
+            Color32 paletteColor = (Color32)pathColorPalette[i];
+            if (paletteColor.r == color.r &&
+                paletteColor.g == color.g &&
+                paletteColor.b == color.b &&
+                paletteColor.a == color.a)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private static bool IsColorUninitialized(Color32 color)
