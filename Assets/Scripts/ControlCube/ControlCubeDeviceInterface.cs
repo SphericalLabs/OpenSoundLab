@@ -66,6 +66,10 @@ public class ControlCubeDeviceInterface : deviceInterface
     private byte? activeRequestId;
     private bool suppressRecordButtonEvent;
     private int nextLocalPathId = -1;
+    private const int PathColorCycleLength = 20;
+    private const float PathColorHueStep = 1f / PathColorCycleLength;
+    private const float PathColorAlignmentThreshold = 0.95f;
+    private int nextPathColorIndex;
 
     private class PathRendererState
     {
@@ -574,6 +578,7 @@ public class ControlCubeDeviceInterface : deviceInterface
 
         pathRenderers.Clear();
         nextLocalPathId = -1;
+        nextPathColorIndex = 0;
     }
 
     private void ProcessRecordedPoint(ControlCubeRecordedPathPoint point)
@@ -582,7 +587,17 @@ public class ControlCubeDeviceInterface : deviceInterface
         {
             case ControlCubePathPointMarker.Start:
                 {
-                    Color pathColor = IsColorUninitialized(point.color) ? GeneratePathColor() : (Color)point.color;
+                    Color pathColor;
+                    if (IsColorUninitialized(point.color))
+                    {
+                        pathColor = GeneratePathColor();
+                    }
+                    else
+                    {
+                        pathColor = point.color;
+                        AlignNextPathColorIndex(pathColor);
+                    }
+
                     CreatePathRenderer(point.pathId, pathColor, point.position);
                     break;
                 }
@@ -694,7 +709,23 @@ public class ControlCubeDeviceInterface : deviceInterface
 
     private Color GeneratePathColor()
     {
-        return Random.ColorHSV(0f, 1f, 0.55f, 1f, 0.8f, 1f);
+        float hue = nextPathColorIndex * PathColorHueStep;
+        nextPathColorIndex = (nextPathColorIndex + 1) % PathColorCycleLength;
+        return Color.HSVToRGB(hue, 1f, 1f);
+    }
+
+    private void AlignNextPathColorIndex(Color color)
+    {
+        Color.RGBToHSV(color, out float hue, out float saturation, out float value);
+
+        if (saturation < PathColorAlignmentThreshold || value < PathColorAlignmentThreshold)
+        {
+            return;
+        }
+
+        float normalizedHue = Mathf.Repeat(hue, 1f);
+        int derivedIndex = Mathf.RoundToInt(normalizedHue / PathColorHueStep) % PathColorCycleLength;
+        nextPathColorIndex = (derivedIndex + 1) % PathColorCycleLength;
     }
 
     private static bool IsColorUninitialized(Color32 color)
