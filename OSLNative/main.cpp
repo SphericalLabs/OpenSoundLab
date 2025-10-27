@@ -644,13 +644,14 @@ extern "C" {
             //update phase for next sample
             _phase += _clamp(endFrequency, -24000.f, 24000.f) * _sampleDuration; // clamp to +/- 24kHz
 
-            // wrap around, also for negative thru-zero phases and frequencies higher than nyquist
-            if (_phase >= 0.0) { 
-              _phase = fmod(_phase, 1);
+            // wrap into [0,1) for both positive and through-zero frequencies without distorting phase
+            double wrappedPhase = _phase - floor(_phase);
+            if (wrappedPhase < 0.0) {
+              wrappedPhase += 1.0;
+            } else if (wrappedPhase >= 1.0) {
+              wrappedPhase -= 1.0;
             }
-            else {
-              _phase = 1.0 - fmod(_phase, 1);
-            }
+            _phase = wrappedPhase;
 
             //final buffer
             buffer[i] = buffer[i + 1] = buffer[i] * endAmplitude;
