@@ -74,6 +74,8 @@ public class ControlCubeDeviceInterface : deviceInterface
     private const float PathColorAlignmentThreshold = 0.95f;
     private int nextPathColorIndex;
 
+    private manipulator currentCubeManipulator;
+
     private bool HasCustomPathPalette => pathColorPalette != null && pathColorPalette.Count > 0;
 
     private class PathRendererState
@@ -162,6 +164,7 @@ public class ControlCubeDeviceInterface : deviceInterface
         {
             ProcessRecordedPoint(point);
         }
+        
     }
 
     public void HandleNetworkPathListChanged(SyncList<ControlCubeRecordedPathPoint>.Operation op, int index, ControlCubeRecordedPathPoint oldValue, ControlCubeRecordedPathPoint newValue)
@@ -307,12 +310,14 @@ public class ControlCubeDeviceInterface : deviceInterface
     private void OnCubeGrabbed()
     {
         isCubeGrabbed = true;
+        ResolveCubeManipulator();
         TryRecordPoint(force: true);
     }
 
     private void OnCubeReleased()
     {
         isCubeGrabbed = false;
+        currentCubeManipulator = null;
         StopActiveRecording();
     }
 
@@ -359,7 +364,7 @@ public class ControlCubeDeviceInterface : deviceInterface
         }
     }
 
-    private bool CanRecord => isRecordingEnabled && isCubeGrabbed && pathsRoot != null;
+    private bool CanRecord => isRecordingEnabled && isCubeGrabbed && pathsRoot != null && IsGrabbingManipulatorSidePressed();
 
     private void TryRecordPoint(bool force = false)
     {
@@ -405,6 +410,43 @@ public class ControlCubeDeviceInterface : deviceInterface
         }
 
         AppendPointToNetwork(activeId, activeRequest, localPoint);
+    }
+
+    private bool IsGrabbingManipulatorSidePressed()
+    {
+        manipulator manip = ResolveCubeManipulator();
+        if (manip == null)
+        {
+            return false;
+        }
+
+        return OSLInput.getInstance().isSidePressed(manip.controllerIndex);
+    }
+
+    private manipulator ResolveCubeManipulator()
+    {
+        if (cubeManip == null)
+        {
+            currentCubeManipulator = null;
+            return null;
+        }
+
+        if (currentCubeManipulator != null && currentCubeManipulator.SelectedObject == cubeManip)
+        {
+            return currentCubeManipulator;
+        }
+
+        foreach (manipulator candidate in manipulator.GetInstances())
+        {
+            if (candidate != null && candidate.SelectedObject == cubeManip)
+            {
+                currentCubeManipulator = candidate;
+                return currentCubeManipulator;
+            }
+        }
+
+        currentCubeManipulator = null;
+        return null;
     }
 
     private bool TryGetActiveRequest(out byte requestId, out PendingPathRequest request)
