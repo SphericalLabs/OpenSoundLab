@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright (c) 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright (c) 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright (c) 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright (c) 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -35,8 +35,6 @@ public class cubeZone : manipObject
     public Transform[] lines;
     Material mat;
 
-    //Color onColor = new Color(0.1346236f + 0.1f, 0.1921309f + 0.1f, 0.2205881f + 0.1f, 0.3333333f + 0.1f);
-    //Color offColor = new Color(0.1346236f, 0.1921309f, 0.2205881f, 0.3333333f);
     Color untouchedColor;
     Color touchedColor;
 
@@ -67,9 +65,16 @@ public class cubeZone : manipObject
     public override void setGrab(bool on, Transform t)
     {
         base.setGrab(on, t);
-        tip = t.Find("manipCollViz").transform;
-        controllerPosAtBeginDragging = tip.position;
-        pAtBeginDragging = p;
+        if (on)
+        {
+            tip = t.Find("manipCollViz");
+            if (tip == null)
+            {
+                tip = t;
+            }
+            controllerPosAtBeginDragging = tip.position;
+            pAtBeginDragging = p;
+        }
     }
 
     Vector3 p, pAtBeginDragging = Vector3.zero;
@@ -77,13 +82,18 @@ public class cubeZone : manipObject
 
     public override void grabUpdate(Transform t)
     {
+        if (tip == null) return;
+
         p = pAtBeginDragging + transform.InverseTransformPoint(tip.position) - transform.InverseTransformPoint(controllerPosAtBeginDragging);
         p.x = Mathf.Clamp(p.x, -0.5f, 0.5f);
         p.y = Mathf.Clamp(p.y, -0.5f, 0.5f);
         p.z = Mathf.Clamp(p.z, -0.5f, 0.5f);
         updatePercent(p, true);
 
-        if (manipulatorObjScript != null) manipulatorObjScript.hapticPulse((ushort)(700f * (_deviceInterface.percent.x + _deviceInterface.percent.y + _deviceInterface.percent.z) / 3 + 50f));
+        if (manipulatorObjScript != null)
+        {
+            manipulatorObjScript.hapticPulse((ushort)(700f * (_deviceInterface.percent.x + _deviceInterface.percent.y + _deviceInterface.percent.z) / 3 + 50f));
+        }
     }
 
     void updatePercent(Vector3 tmp, bool invokeChange = false)
@@ -99,7 +109,7 @@ public class cubeZone : manipObject
     float lineMargin = 0.0015f;
     public void updateLines(Vector3 p)
     {
-        p = p * (.3f - lineMargin * 2) + Vector3.one * lineMargin; // margin to align with inside borders
+        p = p * (.3f - lineMargin * 2) + Vector3.one * lineMargin;
         lines[0].localPosition = new Vector3(-p.x + .15f, p.y, 0);
         lines[1].localPosition = new Vector3(-p.x + .15f, .15f, -p.z + .15f);
         lines[2].localPosition = new Vector3(0, p.y, -p.z + .15f);
@@ -161,6 +171,12 @@ public class cubeZone : manipObject
         }
         else if (m.SelectedObject == this)
         {
+            if (m.triggerDown)
+            {
+                // keep updating while the trigger stays pressed
+                return;
+            }
+
             setGrab(false, m.transform);
             setSelect(false, m.transform);
             m.selectedTransform = null;
