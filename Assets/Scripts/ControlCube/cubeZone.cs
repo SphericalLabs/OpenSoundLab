@@ -26,8 +26,6 @@
 // limitations under the License.
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class cubeZone : manipObject
 {
@@ -37,6 +35,12 @@ public class cubeZone : manipObject
 
     Color untouchedColor;
     Color touchedColor;
+
+    Vector3 controllerPosAtBeginDragging;
+    Transform tip;
+    Vector3 p, pAtBeginDragging = Vector3.zero;
+    float lineWidth = 0f;
+    float lineMargin = 0.0015f;
 
     public override void Awake()
     {
@@ -48,10 +52,13 @@ public class cubeZone : manipObject
         _deviceInterface = GetComponentInParent<ControlCubeDeviceInterface>();
         updatePercent(p, false);
 
-        if (lines[0] != null) lineWidth = lines[0].localScale.x;
+        if (lines != null && lines.Length > 0 && lines[0] != null)
+        {
+            lineWidth = lines[0].localScale.x;
+        }
     }
 
-    private Color incrementColor(Color color, float increment)
+    Color incrementColor(Color color, float increment)
     {
         float r = Mathf.Min(color.r + increment, 1.0f);
         float g = Mathf.Min(color.g + increment, 1.0f);
@@ -60,29 +67,36 @@ public class cubeZone : manipObject
         return new Color(r, g, b, a);
     }
 
-    Vector3 controllerPosAtBeginDragging;
-    Transform tip;
     public override void setGrab(bool on, Transform t)
     {
         base.setGrab(on, t);
-        if (on)
+        if (!on)
         {
-            tip = t.Find("manipCollViz");
-            if (tip == null)
-            {
-                tip = t;
-            }
-            controllerPosAtBeginDragging = tip.position;
-            pAtBeginDragging = p;
+            tip = null;
+            return;
         }
-    }
 
-    Vector3 p, pAtBeginDragging = Vector3.zero;
-    float lineWidth = 0f;
+        tip = t != null ? t.Find("manipCollViz") : null;
+        if (tip == null)
+        {
+            tip = t;
+        }
+
+        if (tip == null)
+        {
+            return;
+        }
+
+        controllerPosAtBeginDragging = tip.position;
+        pAtBeginDragging = p;
+    }
 
     public override void grabUpdate(Transform t)
     {
-        if (tip == null) return;
+        if (tip == null)
+        {
+            return;
+        }
 
         p = pAtBeginDragging + transform.InverseTransformPoint(tip.position) - transform.InverseTransformPoint(controllerPosAtBeginDragging);
         p.x = Mathf.Clamp(p.x, -0.5f, 0.5f);
@@ -106,19 +120,17 @@ public class cubeZone : manipObject
         updateLines(tmp);
     }
 
-    float lineMargin = 0.0015f;
-    public void updateLines(Vector3 p)
+    public void updateLines(Vector3 value)
     {
-        p = p * (.3f - lineMargin * 2) + Vector3.one * lineMargin;
-        lines[0].localPosition = new Vector3(-p.x + .15f, p.y, 0);
-        lines[1].localPosition = new Vector3(-p.x + .15f, .15f, -p.z + .15f);
-        lines[2].localPosition = new Vector3(0, p.y, -p.z + .15f);
+        Vector3 pLine = value * (.3f - lineMargin * 2) + Vector3.one * lineMargin;
+        lines[0].localPosition = new Vector3(-pLine.x + .15f, pLine.y, 0);
+        lines[1].localPosition = new Vector3(-pLine.x + .15f, .15f, -pLine.z + .15f);
+        lines[2].localPosition = new Vector3(0, pLine.y, -pLine.z + .15f);
     }
 
     void colorChange(bool on)
     {
-        if (on) mat.SetColor("_BaseColor", touchedColor);
-        else mat.SetColor("_BaseColor", untouchedColor);
+        mat.SetColor("_BaseColor", on ? touchedColor : untouchedColor);
     }
 
     public override void setState(manipState state)
@@ -173,7 +185,6 @@ public class cubeZone : manipObject
         {
             if (m.triggerDown)
             {
-                // keep updating while the trigger stays pressed
                 return;
             }
 

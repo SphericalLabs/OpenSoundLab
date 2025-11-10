@@ -30,97 +30,73 @@ public class NetworkControlCubeManager : NetworkBehaviour
 {
     public ControlCubeDeviceInterface controlCube;
 
-    [SyncVar(hook = nameof(OnUpdateCubePercent))]
+    [SyncVar(hook = nameof(OnSyncPercentChanged))]
     public Vector3 syncPercent;
 
-    [SyncVar(hook = nameof(OnRecordingStateChanged))]
-    private bool isRecordingActive;
-
-    public readonly SyncList<Vector2> xyValues = new SyncList<Vector2>();
     public readonly SyncList<ControlCubeRecordedPathPoint> recordedPathPoints = new SyncList<ControlCubeRecordedPathPoint>();
-    private readonly HashSet<int> activePathIds = new HashSet<int>();
 
-    private bool callbacksRegistered;
-    private int nextPathId = 1;
+    readonly HashSet<int> activePathIds = new HashSet<int>();
+    int nextPathId = 1;
+    bool callbackRegistered;
 
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        RegisterCallbacks();
-
-        if (controlCube != null)
-        {
-            syncPercent = controlCube.percent;
-            controlCube.InitializeNetworkedPaths(recordedPathPoints);
-            controlCube.ApplyNetworkRecordingState(isRecordingActive);
-        }
-    }
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        RegisterCallbacks();
-
-        if (!isServer && controlCube != null)
-        {
-            controlCube.Setup(syncPercent);
-        }
-
-        controlCube?.InitializeNetworkedPaths(recordedPathPoints);
-        controlCube?.ApplyNetworkRecordingState(isRecordingActive);
-    }
-
-    private void Awake()
+    void Awake()
     {
         if (controlCube != null)
         {
-            controlCube.onPercentChangedEvent.AddListener(UpdateHandleValue);
+            controlCube.onPercentChangedEvent.AddListener(OnLocalPercentChanged);
             controlCube.AssignNetworkManager(this);
         }
 
         RegisterCallbacks();
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         if (controlCube != null)
         {
-            controlCube.onPercentChangedEvent.RemoveListener(UpdateHandleValue);
+            controlCube.onPercentChangedEvent.RemoveListener(OnLocalPercentChanged);
             controlCube.AssignNetworkManager(null);
         }
 
-        if (callbacksRegistered)
+        if (callbackRegistered)
         {
-            recordedPathPoints.Callback -= OnRecordedPathPointChanged;
-            callbacksRegistered = false;
+            recordedPathPoints.Callback -= OnRecordedPathChanged;
+            callbackRegistered = false;
         }
     }
 
-    private void RegisterCallbacks()
+    void RegisterCallbacks()
     {
-        if (callbacksRegistered)
+        if (callbackRegistered)
         {
             return;
         }
 
-        recordedPathPoints.Callback += OnRecordedPathPointChanged;
-        callbacksRegistered = true;
+        recordedPathPoints.Callback += OnRecordedPathChanged;
+        callbackRegistered = true;
     }
 
-    public void OnUpdateCubePercent(Vector3 oldValue, Vector3 newValue)
+    public override void OnStartServer()
     {
-        if (controlCube == null)
+        base.OnStartServer();
+        if (controlCube != null)
         {
-            return;
-        }
-
-        if (controlCube.cubeManip.curState != manipObject.manipState.grabbed)
-        {
-            controlCube.Setup(newValue);
+            syncPercent = controlCube.percent;
+            controlCube.InitializeNetworkedPaths(recordedPathPoints);
         }
     }
 
-    public void UpdateHandleValue()
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (controlCube != null)
+        {
+            controlCube.Setup(syncPercent);
+            controlCube.InitializeNetworkedPaths(recordedPathPoints);
+        }
+    }
+
+    void OnLocalPercentChanged()
     {
         if (controlCube == null)
         {
@@ -133,62 +109,69 @@ public class NetworkControlCubeManager : NetworkBehaviour
         }
         else
         {
-            CmdUpdateHandleValue(controlCube.percent);
+            CmdUpdateHandle(controlCube.percent);
         }
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdUpdateHandleValue(Vector3 value)
+    void OnSyncPercentChanged(Vector3 oldValue, Vector3 newValue)
     {
-        syncPercent = value;
-    }
-
-    [Command(requiresAuthority = false)]
-    public void CmdSetRecordingState(bool shouldRecord)
-    {
-        if (isRecordingActive == shouldRecord)
+        if (controlCube == null)
         {
             return;
         }
 
-        isRecordingActive = shouldRecord;
+        if (controlCube.cubeManip != null && controlCube.cubeManip.curState == manipObject.manipState.grabbed)
+        {
+            return;
+        }
+
+        controlCube.Setup(newValue);
     }
 
-    private void OnRecordingStateChanged(bool oldValue, bool newValue)
+    [Command(requiresAuthority = false)]
+    void CmdUpdateHandle(Vector3 value)
     {
-        controlCube?.ApplyNetworkRecordingState(newValue);
+        syncPercent = value;
     }
 
     [Command(requiresAuthority = false)]
     public void CmdBeginPath(byte requestId, Vector3 startPoint, Color32 color, NetworkConnectionToClient sender = null)
     {
         int pathId = nextPathId++;
-        // Mirror only populates connectionToClient when the object has client authority,
-        // so fall back to the provided sender reference to acknowledge non-authoritative clients.
-        NetworkConnectionToClient targetConnection = sender ?? connectionToClient;
+        activePathIds.Add(pathId);
+        recordedPathPoints.Add(new ControlCubeRecordedPathPoint(pathId, startPoint, ControlCubePathPointMarker.Start, color));
 
-        if (targetConnection != null)
+        if (sender != null)
         {
-            TargetConfirmPath(targetConnection, requestId, pathId);
+            TargetConfirmPath(sender, requestId, pathId);
         }
         else
         {
-            controlCube?.HandleLocalPathConfirmed(requestId, pathId);
+            controlCube?.HandlePathConfirmed(requestId, pathId);
         }
-
-        AddRecordedPoint(new ControlCubeRecordedPathPoint(pathId, startPoint, ControlCubePathPointMarker.Start, color));
     }
 
     [Command(requiresAuthority = false)]
     public void CmdAppendPathPoint(int pathId, Vector3 point)
     {
-        ServerAppendPathPoint(pathId, point);
+        if (!activePathIds.Contains(pathId))
+        {
+            return;
+        }
+
+        recordedPathPoints.Add(new ControlCubeRecordedPathPoint(pathId, point, ControlCubePathPointMarker.Continue, default));
     }
 
     [Command(requiresAuthority = false)]
     public void CmdEndPath(int pathId, Vector3 lastPoint)
     {
-        ServerEndPath(pathId, lastPoint);
+        if (!activePathIds.Contains(pathId))
+        {
+            return;
+        }
+
+        recordedPathPoints.Add(new ControlCubeRecordedPathPoint(pathId, lastPoint, ControlCubePathPointMarker.End, default));
+        activePathIds.Remove(pathId);
     }
 
     [Command(requiresAuthority = false)]
@@ -200,70 +183,27 @@ public class NetworkControlCubeManager : NetworkBehaviour
     }
 
     [TargetRpc]
-    private void TargetConfirmPath(NetworkConnection target, byte requestId, int pathId)
+    void TargetConfirmPath(NetworkConnection target, byte requestId, int pathId)
     {
-        controlCube?.HandleRemotePathConfirmed(requestId, pathId);
+        controlCube?.HandlePathConfirmed(requestId, pathId);
     }
 
-    private void AddRecordedPoint(ControlCubeRecordedPathPoint point)
+    void OnRecordedPathChanged(SyncList<ControlCubeRecordedPathPoint>.Operation op, int index, ControlCubeRecordedPathPoint oldItem, ControlCubeRecordedPathPoint newItem)
     {
-        if (point.marker == ControlCubePathPointMarker.Start)
-        {
-            activePathIds.Add(point.pathId);
-        }
-
-        recordedPathPoints.Add(point);
-    }
-
-    private void OnRecordedPathPointChanged(SyncList<ControlCubeRecordedPathPoint>.Operation op, int index, ControlCubeRecordedPathPoint oldItem, ControlCubeRecordedPathPoint newItem)
-    {
-        controlCube?.HandleNetworkPathListChanged(op, index, oldItem, newItem);
-    }
-
-    [Server]
-    private void ServerAppendPathPoint(int pathId, Vector3 point)
-    {
-        if (!activePathIds.Contains(pathId))
+        if (controlCube == null)
         {
             return;
         }
 
-        AddRecordedPoint(new ControlCubeRecordedPathPoint(pathId, point, ControlCubePathPointMarker.Continue, default));
-    }
-
-    [Server]
-    private void ServerEndPath(int pathId, Vector3 lastPoint)
-    {
-        if (!activePathIds.Contains(pathId))
+        switch (op)
         {
-            return;
-        }
-
-        AddRecordedPoint(new ControlCubeRecordedPathPoint(pathId, lastPoint, ControlCubePathPointMarker.End, default));
-        activePathIds.Remove(pathId);
-    }
-
-    public void RequestAppendPathPoint(int pathId, Vector3 point)
-    {
-        if (isServer)
-        {
-            ServerAppendPathPoint(pathId, point);
-        }
-        else
-        {
-            CmdAppendPathPoint(pathId, point);
-        }
-    }
-
-    public void RequestEndPath(int pathId, Vector3 lastPoint)
-    {
-        if (isServer)
-        {
-            ServerEndPath(pathId, lastPoint);
-        }
-        else
-        {
-            CmdEndPath(pathId, lastPoint);
+            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_CLEAR:
+            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_REMOVEAT:
+                controlCube.InitializeNetworkedPaths(recordedPathPoints);
+                break;
+            default:
+                controlCube.ApplyNetworkPoint(newItem);
+                break;
         }
     }
 }
