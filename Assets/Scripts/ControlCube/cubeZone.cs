@@ -192,7 +192,7 @@ public class cubeZone : manipObject
             setSelect(false, m.transform);
             m.selectedTransform = null;
             m.SelectedObject = null;
-            m.emptyGrab = true;
+            m.emptyGrab = false;
             m.wasGazeBased = false;
             tip = null;
         }
