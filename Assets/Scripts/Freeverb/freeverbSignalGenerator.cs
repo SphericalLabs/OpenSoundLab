@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -30,7 +30,8 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System;
 
-public class freeverbSignalGenerator : signalGenerator {
+public class freeverbSignalGenerator : signalGenerator
+{
 
     public enum Param : int
     {
@@ -43,7 +44,7 @@ public class freeverbSignalGenerator : signalGenerator {
         P_N
     };
 
-    /* These mirror some of the Freeverb parameters, therefore the C++ style naming. 
+    /* These mirror some of the Freeverb parameters, therefore the C++ style naming.
      If you change these, please also make the corresponding change in tuning.h of freeverb sources.
     Otherwise behavior is undefined.
      */
@@ -76,7 +77,8 @@ public class freeverbSignalGenerator : signalGenerator {
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-    public override void Awake() {
+    public override void Awake()
+    {
         base.Awake();
         x = Freeverb_New(AudioSettings.outputSampleRate);
     }
@@ -86,8 +88,9 @@ public class freeverbSignalGenerator : signalGenerator {
         Freeverb_Free(x);
     }
 
-    void Update() {
-    
+    void Update()
+    {
+
     }
 
     public void SetParam(float value, int param)
@@ -118,15 +121,16 @@ public class freeverbSignalGenerator : signalGenerator {
         //Debug.Log("Set param " + param + " to value " + p[param]);
     }
 
-    public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
+    {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
         if (modSizeBuffer.Length != buffer.Length)
-          System.Array.Resize(ref modSizeBuffer, buffer.Length);
+            System.Array.Resize(ref modSizeBuffer, buffer.Length);
         if (modFreezeBuffer.Length != buffer.Length)
-          System.Array.Resize(ref modFreezeBuffer, buffer.Length);
+            System.Array.Resize(ref modFreezeBuffer, buffer.Length);
         if (modMixBuffer.Length != buffer.Length)
-          System.Array.Resize(ref modMixBuffer, buffer.Length);
+            System.Array.Resize(ref modMixBuffer, buffer.Length);
 
         SetArrayToSingleValue(modSizeBuffer, modSizeBuffer.Length, 0f);
         SetArrayToSingleValue(modFreezeBuffer, modFreezeBuffer.Length, 0f);
@@ -137,7 +141,7 @@ public class freeverbSignalGenerator : signalGenerator {
         {
             if (modSizeBuffer == null)
                 modSizeBuffer = new float[buffer.Length];
-            
+
             sigModSize.processBuffer(modSizeBuffer, dspTime, channels);
             p[(int)Param.P_ROOMSIZE] += modSizeBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
             p[(int)Param.P_ROOMSIZE] = Mathf.Clamp01(p[(int)Param.P_ROOMSIZE]);
@@ -147,7 +151,7 @@ public class freeverbSignalGenerator : signalGenerator {
         {
             if (modFreezeBuffer == null)
                 modFreezeBuffer = new float[buffer.Length];
-            
+
             sigModFreeze.processBuffer(modFreezeBuffer, dspTime, channels);
             p[(int)Param.P_FREEZE] = modFreezeBuffer[0] > 0 ? 1 : 0;
         }
@@ -156,7 +160,7 @@ public class freeverbSignalGenerator : signalGenerator {
         {
             if (modMixBuffer == null)
                 modMixBuffer = new float[buffer.Length];
-            
+
             sigModMix.processBuffer(modMixBuffer, dspTime, channels);
             float tmp = Mathf.Pow(p[(int)Param.P_WET], 2) + modMixBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
             tmp = Mathf.Clamp01(tmp);

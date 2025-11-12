@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -163,7 +163,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             jackOutCVGenerators[i].setRange(lastRangeLow ? cvSignalGenerator.lowRange : cvSignalGenerator.highRange);
         }
 
-        
+
 
         dimensionDisplays[1].text = "";
         dimensionDisplays[1].gameObject.SetActive(false);
@@ -316,15 +316,17 @@ public class sequencerCVDeviceInterface : deviceInterface
         }
     }
 
-    public void doModeSwitch(int row){
+    public void doModeSwitch(int row)
+    {
 
-        if (row > curDimensions[0] - 1) return; // this might happen during initialisation when mode switch is synced    
+        if (row > curDimensions[0] - 1) return; // this might happen during initialisation when mode switch is synced
 
         if (controlPanelModes[row].switchVal) // trigger mode
         {
             // enable trig
             jackOutTrigTrans[row].gameObject.SetActive(true);
-            for(int step = 0; step < curDimensions[1]; step++){
+            for (int step = 0; step < curDimensions[1]; step++)
+            {
                 stepButtonTrans[row, step].gameObject.SetActive(true);
             }
 
@@ -352,7 +354,7 @@ public class sequencerCVDeviceInterface : deviceInterface
             {
                 stepDialTrans[row, step].gameObject.SetActive(true);
             }
-        }     
+        }
 
     }
 
@@ -401,11 +403,11 @@ public class sequencerCVDeviceInterface : deviceInterface
     // called from Update loop
     public void UpdateStepSelect(bool forced = false)
     {
-        // bugfix for randomly skipped / missed steps in sequencer. 
-        // this routine would fire even if the step selector handle was not touched or grabbed. 
+        // bugfix for randomly skipped / missed steps in sequencer.
+        // this routine would fire even if the step selector handle was not touched or grabbed.
         // this could be due to an multithread issue between main and audio thread, which is still unsolved.
         if (!forced && stepSelect.curState != manipObject.manipState.grabbed) return;
-        
+
         int s = (int)Mathf.Round(stepSelect.transform.localPosition.x / -cubeConst);
         if (s == selectedStep) return;
         stepSelect.pulse();
@@ -417,7 +419,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     public void togglePlay(bool on)
     {
         _beatManager.toggle(on);
-        if(on) runningUpdated = true;
+        if (on) runningUpdated = true;
     }
 
     public override void hit(bool on, int ID = -1)
@@ -484,9 +486,9 @@ public class sequencerCVDeviceInterface : deviceInterface
 
             for (int step = 0; step < maxSteps; step++)
             {
-                // alternate between trigger and cv rows    
+                // alternate between trigger and cv rows
                 setupStepPrefabRow(stepButtonPrefab, row, step, even);
-                setupStepPrefabRow(stepDialPrefab, row, step, !even); 
+                setupStepPrefabRow(stepDialPrefab, row, step, !even);
             }
 
             // jacks for triggers
@@ -521,13 +523,13 @@ public class sequencerCVDeviceInterface : deviceInterface
             controlPanelTrans[row] = ctrl;
             controlPanelMutes[row] = ctrl.GetComponentInChildren<button>();
             controlPanelModes[row] = ctrl.GetComponentInChildren<basicSwitch>();
-            controlPanelModes[row].setSwitch(even); 
+            controlPanelModes[row].setSwitch(even);
         }
 
         // shrink to start size
         curDimensions[0] = maxRows;
         curDimensions[1] = maxSteps;
-        
+
         // please note: don't set the default dimensions here, but position the stretchHandle in the prefab instead
         // still, the following two lines are necessary for shrinking down from maxDimensions
         // depending on your strechHandle settings you might have to update these dimensions here, too
@@ -617,7 +619,7 @@ public class sequencerCVDeviceInterface : deviceInterface
                     stepDialTrans[row, curDimensions[1]].gameObject.SetActive(true);
                 }
 
-                
+
             }
             curDimensions[1]++;
         }
@@ -643,7 +645,7 @@ public class sequencerCVDeviceInterface : deviceInterface
                 //stepButtons[row, curDimensions[1] - 1].keyHit(false); // reset
                 stepButtonTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
 
-                //stepDials[row, curDimensions[1] - 1].setPercent(0.5f); // reset               
+                //stepDials[row, curDimensions[1] - 1].setPercent(0.5f); // reset
                 stepDialTrans[row, curDimensions[1] - 1].gameObject.SetActive(false);
             }
             curDimensions[1]--;
@@ -709,7 +711,7 @@ public class sequencerCVDeviceInterface : deviceInterface
                 jackOutTrigTrans[curDimensions[0] - 1].GetComponentInChildren<omniJack>().endConnection(true, true);
                 jackOutTrigTrans[curDimensions[0] - 1].gameObject.SetActive(false);
                 jackOutCVTrans[curDimensions[0] - 1].GetComponentInChildren<omniJack>().endConnection(true, true);
-                jackOutCVTrans[curDimensions[0] - 1].gameObject.SetActive(false);                
+                jackOutCVTrans[curDimensions[0] - 1].gameObject.SetActive(false);
                 controlPanelTrans[curDimensions[0] - 1].gameObject.SetActive(false);
             }
             curDimensions[0]--;

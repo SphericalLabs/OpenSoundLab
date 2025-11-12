@@ -20,7 +20,8 @@ public class LookAtPlayerHead : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(playerParent != null){
+        if (playerParent != null)
+        {
             transform.position = playerParent.position + Vector3.up * 0.012f;
         }
         transform.LookAt(lookAtTarget);

@@ -79,7 +79,7 @@ public class Utils
 
     public static T[] AddElementToArray<T>(T[] original, T elementToAdd)
     {
-        if(elementToAdd == null) return original;
+        if (elementToAdd == null) return original;
 
         T[] newArray = new T[original.Length + 1];
         for (int i = 0; i < original.Length; i++)
@@ -95,7 +95,7 @@ public class Utils
     // For array sizes lower than 10^3 these methods should not be a problem for the render budget
     public static T[] RemoveElementFromArray<T>(T[] original, T elementToRemove)
     {
-        if(elementToRemove == null) return original;
+        if (elementToRemove == null) return original;
 
         int index = System.Array.IndexOf(original, elementToRemove);
         if (index < 0)

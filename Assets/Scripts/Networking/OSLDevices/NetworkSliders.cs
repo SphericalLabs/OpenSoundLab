@@ -57,7 +57,7 @@ public class NetworkSliders : NetworkBehaviour
 
             for (int i = 0; i < sliderValues.Count; i++) // Process initial SyncList payload
             {
-                OnSlidersUpdated(SyncList<float>.Operation.OP_ADD, i, sliders[i].percent, sliderValues[i]); 
+                OnSlidersUpdated(SyncList<float>.Operation.OP_ADD, i, sliders[i].percent, sliderValues[i]);
             }
         }
     }

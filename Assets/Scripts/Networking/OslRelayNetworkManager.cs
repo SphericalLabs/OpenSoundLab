@@ -7,7 +7,7 @@ using Unity.Services.Core;
 
 using Utp;
 
-namespace Network 
+namespace Network
 {
     public class OslRelayNetworkManager : RelayNetworkManager
     {
@@ -38,24 +38,24 @@ namespace Network
         }
 
         public async void UnityLogin()
-		{
-			try
-			{
-				await UnityServices.InitializeAsync();
-				await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        {
+            try
+            {
+                await UnityServices.InitializeAsync();
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
                 Debug.Log("Logged into Unity, player ID: " + AuthenticationService.Instance.PlayerId);
                 isLoggedIn = true;
             }
-			catch (Exception e)
-			{
+            catch (Exception e)
+            {
                 isLoggedIn = false;
                 Debug.Log(e);
                 if (NetworkMenuManager.Instance != null)
                 {
                     NetworkMenuManager.Instance.GoBackToLocalScene();
                 }
-			}
-		}
+            }
+        }
 
         public override void Update()
         {
@@ -133,7 +133,7 @@ namespace Network
             base.OnServerDisconnect(conn);
 
             Dictionary<uint, NetworkIdentity> spawnedPlayers = NetworkServer.spawned;
-            
+
             // Update players list on client disconnect
             foreach (Player player in m_Players)
             {

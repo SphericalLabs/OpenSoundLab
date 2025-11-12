@@ -83,7 +83,7 @@ public class NetworkDrumsticks : NetworkBehaviour
     void SetDrumstickHandTarget(int index, NetworkIdentity targetPlayer, bool leftHand)
     {
         Debug.Log("Try to set stick hand");
-        if (drumsticks[index].curState != manipObject.manipState.grabbed && IsEndHoldCooldownOver(index)) 
+        if (drumsticks[index].curState != manipObject.manipState.grabbed && IsEndHoldCooldownOver(index))
         {
             Debug.Log($"Set stick hand target {index}, {targetPlayer}, {leftHand}");
             if (targetPlayer == null)
@@ -148,7 +148,7 @@ public class NetworkDrumsticks : NetworkBehaviour
         }
     }
 
-    private void GetLocalPlayerHand(int index,bool isGrabbed, out NetworkIdentity networkIdentity, out bool leftHand)
+    private void GetLocalPlayerHand(int index, bool isGrabbed, out NetworkIdentity networkIdentity, out bool leftHand)
     {
         networkIdentity = null;
         leftHand = false;

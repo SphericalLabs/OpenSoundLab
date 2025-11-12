@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
 // Copyright � 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
+//
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
+// You may obtain a copy of the License at
 // https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
+//
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+//
 //
 // Copyright � 2020 Apache 2.0 Maximilian Maroe SoundStage VR
 // Copyright � 2019-2020 Apache 2.0 James Surine SoundStage VR
 // Copyright � 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -42,16 +42,16 @@ public class clipPlayerSimple : clipPlayer
     public samplerOneDeviceInterface devInterface;
 
     bool active = false;
-    
+
     //double _lastBuffer = 0;
     float[] lastSeqGen;
 
     float lastPlaybackSpeed = 0f;
     float lastAmplitude = 0f;
 
-  [DllImport("OSLNative")]
+    [DllImport("OSLNative")]
     public static extern double ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, [MarshalAs(UnmanagedType.I1)] bool freqExpGen, [MarshalAs(UnmanagedType.I1)] bool freqLinGen, [MarshalAs(UnmanagedType.I1)] bool ampGen, [MarshalAs(UnmanagedType.I1)] bool seqGen, double floatingBufferCount
-, int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, [MarshalAs(UnmanagedType.I1)] bool playdirection, [MarshalAs(UnmanagedType.I1)] bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
+  , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, [MarshalAs(UnmanagedType.I1)] bool playdirection, [MarshalAs(UnmanagedType.I1)] bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
 
 
     [DllImport("OSLNative")]
@@ -80,7 +80,8 @@ public class clipPlayerSimple : clipPlayer
         }
     }
 
-    public void Play(float speed){
+    public void Play(float speed)
+    {
         playbackSpeed = speed;
         Play();
     }
@@ -111,7 +112,7 @@ public class clipPlayerSimple : clipPlayer
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        
+
         lock (lockObject)
         {
             if (!loaded) return;
@@ -167,5 +168,5 @@ public class clipPlayerSimple : clipPlayer
             lastPlaybackSpeed = playbackSpeed;
         }
         recursionCheckPost();
-  }
+    }
 }

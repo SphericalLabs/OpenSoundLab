@@ -148,9 +148,9 @@ public class NetworkAuthorityHandle : NetworkBehaviour
 
     bool AllHandlesGrabbed()
     {
-        foreach(handle h in _handles)
+        foreach (handle h in _handles)
         {
-            if(h.curState != manipObject.manipState.grabbed)
+            if (h.curState != manipObject.manipState.grabbed)
             {
                 return false;
             }

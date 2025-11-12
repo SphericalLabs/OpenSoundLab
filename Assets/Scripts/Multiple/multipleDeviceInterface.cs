@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -69,7 +69,7 @@ public class multipleDeviceInterface : deviceInterface
 
         stretchSlider.onPosSetEvent.AddListener(CalculateAndUpdateNodeCount);
 
-        CalculateAndUpdateNodeCount();                 
+        CalculateAndUpdateNodeCount();
 
         setFlow(); // reads in default value from the prefab to enable MultiMix and MultiSplit
     }
@@ -119,7 +119,7 @@ public class multipleDeviceInterface : deviceInterface
 
     void updateNodeCount(bool updateByGrab = false)
     {
- 
+
         if (count == lastCount)
             return;
 
@@ -203,10 +203,10 @@ public class multipleDeviceInterface : deviceInterface
         OnIsSplitterChanged.Invoke();
     }
 
-    
+
     void Update()
     {
-        linkJackandGenerator();    
+        linkJackandGenerator();
 
         if (stretchSlider.curState == manipObject.manipState.grabbed)
         {
@@ -216,7 +216,8 @@ public class multipleDeviceInterface : deviceInterface
         }
     }
 
-    void linkJackandGenerator(){
+    void linkJackandGenerator()
+    {
         if (isSplitter)
         {
             if (signal.incoming != input.signal) signal.incoming = input.signal;
@@ -227,7 +228,7 @@ public class multipleDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         MultipleData data = new MultipleData();
-        
+
         data.deviceType = isSplitter ? DeviceType.MultiSplit : DeviceType.MultiMix; // this defines which prefab is loaded, even though both share the same deviceInterface. isSplitter is set in the prefabs.
         GetTransformData(data);
 
@@ -262,7 +263,7 @@ public class multipleDeviceInterface : deviceInterface
             stretchSlider.transform.localPosition = pos;
             updateNodeCount();
 
-            output.SetID(data.jackOutAID, copyMode)         ;
+            output.SetID(data.jackOutAID, copyMode);
             signal.nodes[0].jack.SetID(data.jackOutBID, copyMode);
         }
         else

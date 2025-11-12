@@ -8,7 +8,8 @@ public class ServerAudioPlayer : NetworkBehaviour
 
     public void Update()
     {
-        if(Input.GetMouseButtonDown(0)){
+        if (Input.GetMouseButtonDown(0))
+        {
             GetComponent<AudioSource>().Play();
         }
     }

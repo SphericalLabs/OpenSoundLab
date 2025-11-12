@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -66,7 +66,7 @@ public class pauseMenu : MonoBehaviour
 
     List<pauseMenuItem> menuItems;
 
-    
+
     void Awake()
     {
         menuItems = new List<pauseMenuItem>();
@@ -88,7 +88,8 @@ public class pauseMenu : MonoBehaviour
     }
 
     uiPanelComponentInterface saveLoadPanel;
-    void connectionChanged(){
+    void connectionChanged()
+    {
         //Debug.Log("adaptSaveLoadMenu");
         saveLoadPanel.cancel();
         cancelFileMenu();
@@ -104,7 +105,7 @@ public class pauseMenu : MonoBehaviour
 
         // if in main menu, then run this update continously, since the server client state could change at any time
         // it is a bit brute force and could be improved by a more elegant rewrite
-        if (curItem == itemType.main) 
+        if (curItem == itemType.main)
         {
             if (!NetworkServer.active) // Now check if Client
             {
@@ -117,7 +118,7 @@ public class pauseMenu : MonoBehaviour
                 newItem.gameObject.SetActive(true);
                 loadItem.gameObject.SetActive(true);
             }
-        }        
+        }
     }
 
     public void endFlash()

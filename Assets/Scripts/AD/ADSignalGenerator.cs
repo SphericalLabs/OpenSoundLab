@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -52,15 +52,15 @@ public class ADSignalGenerator : signalGenerator
     int counter = 0;
     float glidedVal = 0f;
     public bool IsRunning { get => isRunning; set => isRunning = value; }
-    public int Stage{ get => stage; set => stage = value; }
+    public int Stage { get => stage; set => stage = value; }
     public int Counter { get => counter; set => counter = value; }
     public float GlidedVal { get => glidedVal; set => glidedVal = value; }
-    
+
 
     float[] pulseBuffer = new float[] { -1, -1 };
     float[] attackBuffer = new float[] { -1, -1 };
     float[] releaseBuffer = new float[] { -1, -1 };
-    
+
     float lastPulseFloat = -1f;
 
     public void Awake()
@@ -69,7 +69,7 @@ public class ADSignalGenerator : signalGenerator
         maxAttack = Mathf.RoundToInt(20.000f * AudioSettings.outputSampleRate);
         minRelease = Mathf.RoundToInt(0.010f * AudioSettings.outputSampleRate);
         maxRelease = Mathf.RoundToInt(20.000f * AudioSettings.outputSampleRate);
-  }
+    }
 
     public void setAttack(float val)
     {
@@ -79,22 +79,22 @@ public class ADSignalGenerator : signalGenerator
     public void setRelease(float val)
     {
         releaseLength = Mathf.RoundToInt(Utils.map(val, 0f, 1f, minRelease, maxRelease));
-  }
+    }
 
     // c.f. https://www.reddit.com/r/modular/comments/ovh1b2/log_lin_exp_envelopes_and_which_is_correct/
     public void setLinearity(float val)
-      {
-          if (val >= 0.5)
-          {
-              linearityA = Utils.map(val, 0.5f, 1f, 1f, 20f);
-              linearityD = Utils.map(val, 0.5f, 1f, 1f, 0.05f);
-      }
-          else
-          {
-              linearityD = Utils.map(val, 0f, 0.5f, 20f, 1f); 
-              linearityA = Utils.map(val, 0f, 0.5f, 0.05f, 1f); 
-          }
-      }
+    {
+        if (val >= 0.5)
+        {
+            linearityA = Utils.map(val, 0.5f, 1f, 1f, 20f);
+            linearityD = Utils.map(val, 0.5f, 1f, 1f, 0.05f);
+        }
+        else
+        {
+            linearityD = Utils.map(val, 0f, 0.5f, 20f, 1f);
+            linearityA = Utils.map(val, 0f, 0.5f, 0.05f, 1f);
+        }
+    }
 
     [DllImport("OSLNative")]
     public static extern bool GetBinaryState(float[] buffer, int length, int channels, ref float lastBuf);
@@ -107,7 +107,7 @@ public class ADSignalGenerator : signalGenerator
 
     float prevLinearityA = 1f;
     float prevLinearityD = 1f;
-    int prevAttackLengthFinal = 0; 
+    int prevAttackLengthFinal = 0;
     int prevReleaseLengthFinal = 0;
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
@@ -142,7 +142,7 @@ public class ADSignalGenerator : signalGenerator
             if (releaseBuffer.Length != buffer.Length)
                 System.Array.Resize(ref releaseBuffer, buffer.Length);
 
-            SetArrayToSingleValue(releaseBuffer, releaseBuffer.Length, 0f); 
+            SetArrayToSingleValue(releaseBuffer, releaseBuffer.Length, 0f);
             releaseInput.processBuffer(releaseBuffer, dspTime, channels);
             releaseLengthFinal = Mathf.RoundToInt(Mathf.Clamp(releaseLength + Mathf.Pow(releaseBuffer[0], 3) * maxRelease, minRelease, maxRelease)); // left only
         }
@@ -156,15 +156,17 @@ public class ADSignalGenerator : signalGenerator
         {
 
             // SHOULD BE NATIVE
-            if (incoming != null){
+            if (incoming != null)
+            {
                 // this trigger implementation is good practice, carry over to other modules
-                if (pulseBuffer[n] > 0f && lastPulseFloat <= 0f){ // left only
+                if (pulseBuffer[n] > 0f && lastPulseFloat <= 0f)
+                { // left only
                     counter = 0;
                     stage = 0;
                     isRunning = true;
                 }
                 lastPulseFloat = pulseBuffer[n];
-            } 
+            }
 
             // SHOULD BE NATIVE
             if (isRunning)
@@ -174,9 +176,9 @@ public class ADSignalGenerator : signalGenerator
                 {
                     // need speed up with pre-calculated lookups at some point?
                     // PLEASE NOTE: this lerp interpolation here is also smoothing A and D changes that come via the CV inputs. Additionally, these inputs are only sampled on the first sample of the buffer, see above. But then again, audio rate modulation probably doesn't make much sense here anyways.
-                    buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / ( prevAttackLengthFinal == attackLengthFinal ? (float)attackLengthFinal : Mathf.Lerp(prevAttackLengthFinal, attackLengthFinal, (float)n / buffer.Length) ), 
-                    prevLinearityA == linearityA ? linearityA : Mathf.Lerp(prevLinearityA, linearityA, (float) n / buffer.Length));
-                    
+                    buffer[n] = buffer[n + 1] = Mathf.Pow((float)counter / (prevAttackLengthFinal == attackLengthFinal ? (float)attackLengthFinal : Mathf.Lerp(prevAttackLengthFinal, attackLengthFinal, (float)n / buffer.Length)),
+                    prevLinearityA == linearityA ? linearityA : Mathf.Lerp(prevLinearityA, linearityA, (float)n / buffer.Length));
+
                     counter++;
                     if (counter > attackLengthFinal)
                     {
@@ -186,8 +188,8 @@ public class ADSignalGenerator : signalGenerator
                 }
                 else if (stage == 1)
                 {
-                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / ( prevReleaseLengthFinal == releaseLengthFinal ? (float)releaseLengthFinal : Mathf.Lerp(prevReleaseLengthFinal, releaseLengthFinal, (float)n / buffer.Length) ), 
-                    prevLinearityD == linearityD ? linearityD : Mathf.Lerp(prevLinearityD, linearityD, (float) n / buffer.Length));
+                    buffer[n] = buffer[n + 1] = Mathf.Pow(1f - (float)counter / (prevReleaseLengthFinal == releaseLengthFinal ? (float)releaseLengthFinal : Mathf.Lerp(prevReleaseLengthFinal, releaseLengthFinal, (float)n / buffer.Length)),
+                    prevLinearityD == linearityD ? linearityD : Mathf.Lerp(prevLinearityD, linearityD, (float)n / buffer.Length));
                     counter++;
                     if (counter > releaseLengthFinal)
                     {
@@ -212,7 +214,7 @@ public class ADSignalGenerator : signalGenerator
             // hotfix for when attack is modulated and glidedVal is stalled as NaN
             if (System.Single.IsNaN(glidedVal))
             {
-              glidedVal = 0f;
+                glidedVal = 0f;
             }
 
             glidedVal += (buffer[n] - glidedVal) * 1f; // seems to smooth via float rounding error

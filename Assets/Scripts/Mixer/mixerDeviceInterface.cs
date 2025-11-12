@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -79,15 +79,15 @@ public class mixerDeviceInterface : deviceInterface
         for (int i = 0; i < maxCount; i++)
         {
             signalGenerator s = (Instantiate(mixerPrefab, transform, false) as GameObject).GetComponent<signalGenerator>();
-            
+
             s.transform.localPosition = new Vector3(-.03f - .04f * i, 0, 0);
-            
+
             allFaders[i] = s.GetComponent<fader>();
 
             updateFader(allFaders[i]);
 
             s.gameObject.SetActive(false);
-            
+
 
             foreach (omniJack j in s.GetComponentsInChildren<omniJack>())
             { // add the two jacks per fader to a temp list
@@ -102,7 +102,8 @@ public class mixerDeviceInterface : deviceInterface
         networkSliders.sliders = Utils.AddElementsToArray(newSliders.ToArray(), networkSliders.sliders);
     }
 
-    void updateFader(fader f){
+    void updateFader(fader f)
+    {
         float fL = 1 + faderLength * 4f;
         f.updateFaderLength(fL);
         Vector3 pos = f.transform.localPosition;
@@ -118,13 +119,13 @@ public class mixerDeviceInterface : deviceInterface
         if (cur == count) return;
 
         if (count > cur) // increase
-        { 
+        {
 
             for (int i = cur; i < count; i++)
             {
 
-                if(!faderList.Contains(allFaders[i])) // still needed?
-                { 
+                if (!faderList.Contains(allFaders[i])) // still needed?
+                {
                     faderList.Add(allFaders[i]);
                 }
 

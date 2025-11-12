@@ -6,7 +6,7 @@ using UnityEngine;
 public class NetworkPlayerPlugHand : NetworkBehaviour
 {
     public GameObject handParent;
-    
+
     [SyncVar(hook = nameof(OnSetConnectedJackIndex))]
     public int connectedJackIndex;
     [SyncVar(hook = nameof(OnChangeOffset))]

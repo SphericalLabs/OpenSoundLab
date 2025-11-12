@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -29,93 +29,111 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class scrubQuad : MonoBehaviour {
-  Dictionary<manipulator, scrubber> manips = new Dictionary<manipulator, scrubber>();
-  public Transform scrubBar;
-  public Transform scrubIndicator;
-  clipPlayerComplex player;
+public class scrubQuad : MonoBehaviour
+{
+    Dictionary<manipulator, scrubber> manips = new Dictionary<manipulator, scrubber>();
+    public Transform scrubBar;
+    public Transform scrubIndicator;
+    clipPlayerComplex player;
 
-  scrubber scrubberActive = null;
-  scrubber scrubberCandidate = null;
-  Vector2 scrubrange = new Vector2(.2f, -.2f);
-  class scrubber {
-    public Transform trans { get; set; }
-    public bool trigger { get; set; }
-    public bool colliding { get; set; }
-
-    public scrubber(Transform t, bool g, bool c) {
-      trans = t;
-      trigger = g;
-      colliding = c;
-    }
-  }
-
-  void Awake() {
-    player = transform.parent.GetComponent<clipPlayerComplex>();
-    Color c = Color.HSVToRGB(298 / 400f, 84 / 255f, .01f);
-    scrubIndicator.GetComponent<Renderer>().material.SetColor("_TintColor", c);
-  }
-
-  void OnCollisionEnter(Collision coll) {
-    return; // workaround for turning off broken scrubbing
-    manipulator m = coll.transform.GetComponent<manipulator>();
-    if (m == null) return;
-    if (manips.ContainsKey(m)) manips[m].colliding = true;
-    else manips[m] = new scrubber(m.transform, m.triggerDown, true);
-    m.hapticPulse();
+    scrubber scrubberActive = null;
+    scrubber scrubberCandidate = null;
+    Vector2 scrubrange = new Vector2(.2f, -.2f);
+    class scrubber
     {
-      scrubberCandidate = manips[m];
-      scrubIndicator.gameObject.SetActive(true);
-    }
-  }
+        public Transform trans { get; set; }
+        public bool trigger { get; set; }
+        public bool colliding { get; set; }
 
-
-  void OnCollisionExit(Collision coll) {
-    return; // workaround for turning off broken scrubbing
-    manipulator m = coll.transform.GetComponent<manipulator>();
-    if (m == null) return;
-    if (manips.ContainsKey(m)) {
-      manips[m].colliding = false;
-      if (scrubberCandidate == manips[m]) {
-        scrubberCandidate = null;
-        scrubIndicator.gameObject.SetActive(false);
-      }
-    }
-  }
-
-
-  void updateScrubbers(manipulator m) {
-    if (manips[m].trigger && manips[m].colliding && m.emptyGrab) {
-      scrubberCandidate = scrubberActive = manips[m];
-      player.grabScrub(true);
-    } else {
-      player.grabScrub(false);
-    }
-  }
-
-  void Update() {
-    foreach (manipulator m in manips.Keys) {
-      if (m == null) manips.Remove(m);
-      else {
-        if (manips[m].trigger != m.triggerDown) {
-          manips[m].trigger = m.triggerDown;
-          updateScrubbers(m);
+        public scrubber(Transform t, bool g, bool c)
+        {
+            trans = t;
+            trigger = g;
+            colliding = c;
         }
-      }
     }
 
-    if (scrubberCandidate != null) {
-      Vector3 pos = transform.parent.InverseTransformPoint(scrubberCandidate.trans.position);
-      Vector3 posB = scrubIndicator.localPosition;
-      posB.x = Mathf.Clamp(pos.x, .2f - .4f * player.trackBounds.y, .2f - .4f * player.trackBounds.x);
-      scrubIndicator.localPosition = posB;
+    void Awake()
+    {
+        player = transform.parent.GetComponent<clipPlayerComplex>();
+        Color c = Color.HSVToRGB(298 / 400f, 84 / 255f, .01f);
+        scrubIndicator.GetComponent<Renderer>().material.SetColor("_TintColor", c);
     }
 
-    if (scrubberActive != null) {
-      Vector3 pos = transform.parent.InverseTransformPoint(scrubberActive.trans.position);
-      Vector3 posB = scrubBar.localPosition;
-      posB.x = Mathf.Clamp(pos.x, .2f - .4f * player.trackBounds.y, .2f - .4f * player.trackBounds.x);
-      scrubBar.localPosition = posB;
+    void OnCollisionEnter(Collision coll)
+    {
+        return; // workaround for turning off broken scrubbing
+        manipulator m = coll.transform.GetComponent<manipulator>();
+        if (m == null) return;
+        if (manips.ContainsKey(m)) manips[m].colliding = true;
+        else manips[m] = new scrubber(m.transform, m.triggerDown, true);
+        m.hapticPulse();
+        {
+            scrubberCandidate = manips[m];
+            scrubIndicator.gameObject.SetActive(true);
+        }
     }
-  }
+
+
+    void OnCollisionExit(Collision coll)
+    {
+        return; // workaround for turning off broken scrubbing
+        manipulator m = coll.transform.GetComponent<manipulator>();
+        if (m == null) return;
+        if (manips.ContainsKey(m))
+        {
+            manips[m].colliding = false;
+            if (scrubberCandidate == manips[m])
+            {
+                scrubberCandidate = null;
+                scrubIndicator.gameObject.SetActive(false);
+            }
+        }
+    }
+
+
+    void updateScrubbers(manipulator m)
+    {
+        if (manips[m].trigger && manips[m].colliding && m.emptyGrab)
+        {
+            scrubberCandidate = scrubberActive = manips[m];
+            player.grabScrub(true);
+        }
+        else
+        {
+            player.grabScrub(false);
+        }
+    }
+
+    void Update()
+    {
+        foreach (manipulator m in manips.Keys)
+        {
+            if (m == null) manips.Remove(m);
+            else
+            {
+                if (manips[m].trigger != m.triggerDown)
+                {
+                    manips[m].trigger = m.triggerDown;
+                    updateScrubbers(m);
+                }
+            }
+        }
+
+        if (scrubberCandidate != null)
+        {
+            Vector3 pos = transform.parent.InverseTransformPoint(scrubberCandidate.trans.position);
+            Vector3 posB = scrubIndicator.localPosition;
+            posB.x = Mathf.Clamp(pos.x, .2f - .4f * player.trackBounds.y, .2f - .4f * player.trackBounds.x);
+            scrubIndicator.localPosition = posB;
+        }
+
+        if (scrubberActive != null)
+        {
+            Vector3 pos = transform.parent.InverseTransformPoint(scrubberActive.trans.position);
+            Vector3 posB = scrubBar.localPosition;
+            posB.x = Mathf.Clamp(pos.x, .2f - .4f * player.trackBounds.y, .2f - .4f * player.trackBounds.x);
+            scrubBar.localPosition = posB;
+        }
+    }
 }

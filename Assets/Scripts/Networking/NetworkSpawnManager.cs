@@ -61,7 +61,7 @@ public class NetworkSpawnManager : NetworkBehaviour
         }
     }
 
-    [Command (requiresAuthority = false)]
+    [Command(requiresAuthority = false)]
     public void CmdCreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, NetworkIdentity player, bool isLeftHand)
     {
         var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);

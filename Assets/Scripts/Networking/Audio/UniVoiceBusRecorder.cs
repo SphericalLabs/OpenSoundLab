@@ -59,30 +59,30 @@ public class UniVoiceBusRecorder : MonoBehaviour
     }
     /*  I'm yet to try out the OnAudioFilterRead approach, but pretty much the only requirement here is to implement the IAudioInput interface properly.
      *  Make sure that each interface property returns the right values: Frequency, ChannelCount and SegmentRate
-     *  Ensure that you're firing the OnSegmentReady event with the correct values. 
+     *  Ensure that you're firing the OnSegmentReady event with the correct values.
      *  The length of the float array you provide in the OnSegmentReady event should align with the values of the property.
      *  The formula is Length = Frequency * ChannelCount / SegmentRate
-     *  So if you're capturing at 48000Hz with one audio channel 10 times every second, it would be 48000 * 1 / 10 = 4800. 
+     *  So if you're capturing at 48000Hz with one audio channel 10 times every second, it would be 48000 * 1 / 10 = 4800.
      *  UniVoice then expects the float array in the OnSegmentReady event to have a length of 4800
-     *  The int is basically a count of how many times you've fired the event. You need to keep track of it internally. 
+     *  The int is basically a count of how many times you've fired the event. You need to keep track of it internally.
      *  Univoice uses it for caching audio during playback as well as reordering them if they arrive in the wrong order.
-     *  OnAudioFilterRead need not be called with data being the length you need. 
+     *  OnAudioFilterRead need not be called with data being the length you need.
      *  So you need to maintain an array internally and fire it when it reaches 4800. Some reference on how UniMic does it is here
      *  Refer to this line: https://github.com/adrenak/univoice-sample/blob/0fea95dd2d747886afd89bc1682f8957c9b51784/Assets/Scripts/GroupVoiceCallSample.cs#L76
      *  Here:
      *  - 0 is the device index (the sample app assumes there is atleast one mic available on the device)
      *  - 16000 is the frequency of the mic input audio stream
      *  - 100 is the time (in milliseconds) that determines how often the audio is gathered and sent
-     *  
-     *  This means assuming there is one channel, every 100 milliseconds we expect a float of length 1600 to be prepared for UniVoice to send. 
+     *
+     *  This means assuming there is one channel, every 100 milliseconds we expect a float of length 1600 to be prepared for UniVoice to send.
      *  If there were 2 channels, that would be 3200
-     *  
+     *
      *  So, UniVoiceUniMicInput is able to call the OnSegmentReady event every 100ms with a float array that is of consistent length.
-     *  One more thing to consider when it comes to this is the length of the array itself. 
-     *  If you're capturing at 48KHz every 100ms with a single channel, you'll end up with 4800 floats going out in every packet, which is 19200 bytes. 
-     *  That's usually very large for a single packet especially on UDP, which is the recommended protocol. 
+     *  One more thing to consider when it comes to this is the length of the array itself.
+     *  If you're capturing at 48KHz every 100ms with a single channel, you'll end up with 4800 floats going out in every packet, which is 19200 bytes.
+     *  That's usually very large for a single packet especially on UDP, which is the recommended protocol.
      *  I mention this because in Unity settings the frequency is usually set at 48000 or 44100 which is what you'll receive in OnAudioFilterReady
-     *  Instead 16KHz single channel every 10ms would be 640 bytes which is much more suitable size wise. 
+     *  Instead 16KHz single channel every 10ms would be 640 bytes which is much more suitable size wise.
      *  For example using KcpTransport in Mirror networking has a limit of around 1500 bytes for a single packet.
      */
 
@@ -123,7 +123,7 @@ public class UniVoiceBusRecorder : MonoBehaviour
         //StopCoroutine(ReadRawAudio());
     }
 
-    
+
 
     // This method can be called from any thread to enqueue actions for the main thread
     public static void EnqueueMainThreadAction(Action action)
@@ -151,9 +151,9 @@ public class UniVoiceBusRecorder : MonoBehaviour
 
     void Start()
     {
-      // Get the sample rate of the audio
-      sampleRate = AudioSettings.outputSampleRate;
-      increment = 2.0 * Mathf.PI * frequency / sampleRate;
+        // Get the sample rate of the audio
+        sampleRate = AudioSettings.outputSampleRate;
+        increment = 2.0 * Mathf.PI * frequency / sampleRate;
     }
 
     private readonly object lockObject = new object(); // Lock object for thread safety
@@ -161,72 +161,72 @@ public class UniVoiceBusRecorder : MonoBehaviour
     private void Update()
     {
         if (!IsRecording)
-          return;
+            return;
         bufferPointer = 0;
 
 
         int localBufferSamplesDue;
         lock (lockObject)
         {
-          localBufferSamplesDue = bufferSamplesdue;
-          bufferSamplesdue = 0; // Reset samplesDue within the lock
+            localBufferSamplesDue = bufferSamplesdue;
+            bufferSamplesdue = 0; // Reset samplesDue within the lock
         }
 
         while (bufferPointer < localBufferSamplesDue)
         {
-        if (BridgingSegmentPointer > SegmentData.Length - 1)
-        {
-          m_SampleCount++;
-          BridgingSegmentPointer = 0;
-          //Debug.Log("<color=red>OnSegmentReady</color>"); // try not to use debug.log in the audio thread!
-          OnSampleReady?.Invoke(m_SampleCount, SegmentData);
+            if (BridgingSegmentPointer > SegmentData.Length - 1)
+            {
+                m_SampleCount++;
+                BridgingSegmentPointer = 0;
+                //Debug.Log("<color=red>OnSegmentReady</color>"); // try not to use debug.log in the audio thread!
+                OnSampleReady?.Invoke(m_SampleCount, SegmentData);
+            }
+
+            // sine wave
+            SegmentData[BridgingSegmentPointer] = amplitude * Mathf.Sin((float)phase);
+            SegmentData[BridgingSegmentPointer + 1] = SegmentData[BridgingSegmentPointer];
+
+            // noise
+            //SegmentData[BridgingSegmentPointer] = UnityEngine.Random.Range(-1f, 1f);
+            //SegmentData[BridgingSegmentPointer + 1] = UnityEngine.Random.Range(-1f, 1f);
+
+            // Increment the phase
+            phase += increment;
+
+            // Keep the phase in the range [0, 2π]
+            if (phase > 2.0 * Mathf.PI)
+            {
+                phase -= 2.0 * Mathf.PI;
+            }
+
+            BridgingSegmentPointer += 2;
+            bufferPointer += 2;
         }
-
-        // sine wave
-        SegmentData[BridgingSegmentPointer] = amplitude * Mathf.Sin((float)phase);
-        SegmentData[BridgingSegmentPointer + 1] = SegmentData[BridgingSegmentPointer];
-
-        // noise
-        //SegmentData[BridgingSegmentPointer] = UnityEngine.Random.Range(-1f, 1f);
-        //SegmentData[BridgingSegmentPointer + 1] = UnityEngine.Random.Range(-1f, 1f);
-
-        // Increment the phase
-        phase += increment;
-
-        // Keep the phase in the range [0, 2π]
-        if (phase > 2.0 * Mathf.PI)
-        {
-          phase -= 2.0 * Mathf.PI;
-        }
-
-        BridgingSegmentPointer += 2;
-        bufferPointer += 2;
-      }
 
     }
 
     void OnAudioFilterRead(float[] data, int channels)
     {
-         lock (lockObject)
-          {
+        lock (lockObject)
+        {
             bufferSamplesdue += data.Length;
-          }
-          /*
-          Debug.Log("<color=red>Data Lenght: " + data.Length + "</color>");
-          temp[currPos] = data[readAbsPos];
-          Debug.Log("Current Position = " + currPos + " / Current Data Pos: " + readAbsPos);
-          readAbsPos++;
-          if (currPos == Sample.Length -1)
-          {
-              Debug.Log("<color=red>OnSegmentReady</color>");
-              Sample = temp;
-              m_SampleCount++;
-              currPos = 0;
-              OnSampleReady?.Invoke(m_SampleCount, Sample);
-              return;
-          }
-          currPos++;
-          */
+        }
+        /*
+        Debug.Log("<color=red>Data Lenght: " + data.Length + "</color>");
+        temp[currPos] = data[readAbsPos];
+        Debug.Log("Current Position = " + currPos + " / Current Data Pos: " + readAbsPos);
+        readAbsPos++;
+        if (currPos == Sample.Length -1)
+        {
+            Debug.Log("<color=red>OnSegmentReady</color>");
+            Sample = temp;
+            m_SampleCount++;
+            currPos = 0;
+            OnSampleReady?.Invoke(m_SampleCount, Sample);
+            return;
+        }
+        currPos++;
+        */
 
     }
 
@@ -347,5 +347,5 @@ public class UniVoiceBusRecorder : MonoBehaviour
     //}
 
 
-  #endregion
+    #endregion
 }

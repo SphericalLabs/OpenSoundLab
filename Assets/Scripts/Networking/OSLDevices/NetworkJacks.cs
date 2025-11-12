@@ -10,7 +10,7 @@ public class NetworkJacks : NetworkBehaviour
     public omniJack[] omniJacks;
 
     public static int idCounter = 99;
-    public static int GetNextId {  get { return idCounter++; } }
+    public static int GetNextId { get { return idCounter++; } }
 
     public readonly SyncList<int> jackIds = new SyncList<int>();
     public readonly SyncList<int> connectedJackIds = new SyncList<int>();
@@ -196,7 +196,7 @@ public class NetworkJacks : NetworkBehaviour
                 o2.outputPlug = !otherJack.outgoing;
                 Vector3[] tempPath = new Vector3[] {
                     o1.wireTrans.position,
-                    o2.wireTrans.position                    
+                    o2.wireTrans.position
                 };
 
                 Color tempColor = Color.HSVToRGB(0, .8f, .5f);

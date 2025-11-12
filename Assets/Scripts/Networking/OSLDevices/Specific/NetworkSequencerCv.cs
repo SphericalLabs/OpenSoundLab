@@ -44,7 +44,7 @@ public class NetworkSequencerCv : NetworkSyncListener
     {
         switch (op)
         {
-            case SyncList<float>.Operation.OP_ADD:                
+            case SyncList<float>.Operation.OP_ADD:
                 break;
             case SyncList<float>.Operation.OP_INSERT:
                 break;

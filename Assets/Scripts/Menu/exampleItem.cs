@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -28,88 +28,108 @@
 using UnityEngine;
 using System.Collections;
 
-public class exampleItem : manipObject {
+public class exampleItem : manipObject
+{
 
-  string filename = "example";
-  public Transform Display;
-  public Renderer label;
-  public bool toggleState = false;
+    string filename = "example";
+    public Transform Display;
+    public Renderer label;
+    public bool toggleState = false;
 
-  DeviceType DeviceRep;
-  public Material menuMat;
+    DeviceType DeviceRep;
+    public Material menuMat;
 
-  float rotateSpeed = 5f;
+    float rotateSpeed = 5f;
 
-  exampleManager manager;
+    exampleManager manager;
 
-  public override void Awake() {
-    base.Awake();
-  }
-
-  void Start() {
-    label.material.SetFloat("_EmissionGain", .15f);
-  }
-
-  public void Setup(exampleManager mgr, DeviceType rep, string filestring, string labelcopy) {
-    manager = mgr;
-    filename = filestring;
-    DeviceRep = rep;
-    label.GetComponent<TextMesh>().text = labelcopy;
-    MeshSetup();
-  }
-
-  void Update() {
-    Display.Rotate(0, 0, Time.deltaTime * rotateSpeed);
-  }
-
-  public void toggleSelect(bool on) {
-    toggleState = on;
-    label.material.SetFloat("_EmissionGain", toggleState ? .3f : .15f);
-    if (on) {
-      exampleItem[] items = FindObjectsOfType<exampleItem>();
-      for (int i = 0; i < items.Length; i++) {
-        if (items[i] != this) items[i].toggleSelect(false);
-      }
+    public override void Awake()
+    {
+        base.Awake();
     }
-  }
 
-  Coroutine spinRoutine;
-  IEnumerator spinAnim() {
-    float t = 0;
-    while (t < 1) {
-      t = Mathf.Clamp01(t + Time.deltaTime * 3);
-      rotateSpeed = Mathf.Lerp(720, 5, t);
-      yield return null;
+    void Start()
+    {
+        label.material.SetFloat("_EmissionGain", .15f);
     }
-  }
 
-  public void confirmSelection() {
-    if (manager != null) {
-      manager.LoadExample(filename);
+    public void Setup(exampleManager mgr, DeviceType rep, string filestring, string labelcopy)
+    {
+        manager = mgr;
+        filename = filestring;
+        DeviceRep = rep;
+        label.GetComponent<TextMesh>().text = labelcopy;
+        MeshSetup();
     }
-  }
 
-  public override void setState(manipState state) {
-    manipState prevState = curState;
-    curState = state;
-
-    if (curState == manipState.none) {
-      Display.localScale = Vector3.one;
-    } else if (curState == manipState.selected) {
-      if (prevState != manipState.grabbed) {
-        if (spinRoutine != null) StopCoroutine(spinRoutine);
-        spinRoutine = StartCoroutine(spinAnim());
-      }
-      Display.localScale = Vector3.one * 1.1f;
-    } else if (curState == manipState.grabbed) {
-      confirmSelection();
+    void Update()
+    {
+        Display.Rotate(0, 0, Time.deltaTime * rotateSpeed);
     }
-  }
 
-  void MeshSetup() {
-    GameObject g = Instantiate(menuManager.instance.refObjects[DeviceRep], Display.position, Display.rotation) as GameObject;
-    g.transform.parent = Display;
-    g.transform.Rotate(90, 0, 0, Space.Self);
-    g.transform.localScale = g.transform.localScale * Display.localScale.x * 1.5f;
-  }
+    public void toggleSelect(bool on)
+    {
+        toggleState = on;
+        label.material.SetFloat("_EmissionGain", toggleState ? .3f : .15f);
+        if (on)
+        {
+            exampleItem[] items = FindObjectsOfType<exampleItem>();
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i] != this) items[i].toggleSelect(false);
+            }
+        }
+    }
+
+    Coroutine spinRoutine;
+    IEnumerator spinAnim()
+    {
+        float t = 0;
+        while (t < 1)
+        {
+            t = Mathf.Clamp01(t + Time.deltaTime * 3);
+            rotateSpeed = Mathf.Lerp(720, 5, t);
+            yield return null;
+        }
+    }
+
+    public void confirmSelection()
+    {
+        if (manager != null)
+        {
+            manager.LoadExample(filename);
+        }
+    }
+
+    public override void setState(manipState state)
+    {
+        manipState prevState = curState;
+        curState = state;
+
+        if (curState == manipState.none)
+        {
+            Display.localScale = Vector3.one;
+        }
+        else if (curState == manipState.selected)
+        {
+            if (prevState != manipState.grabbed)
+            {
+                if (spinRoutine != null) StopCoroutine(spinRoutine);
+                spinRoutine = StartCoroutine(spinAnim());
+            }
+            Display.localScale = Vector3.one * 1.1f;
+        }
+        else if (curState == manipState.grabbed)
+        {
+            confirmSelection();
+        }
+    }
+
+    void MeshSetup()
+    {
+        GameObject g = Instantiate(menuManager.instance.refObjects[DeviceRep], Display.position, Display.rotation) as GameObject;
+        g.transform.parent = Display;
+        g.transform.Rotate(90, 0, 0, Space.Self);
+        g.transform.localScale = g.transform.localScale * Display.localScale.x * 1.5f;
+    }
 }

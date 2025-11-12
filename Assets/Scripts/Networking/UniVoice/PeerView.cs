@@ -5,9 +5,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-namespace Adrenak.UniVoice.Samples {
-    public static class ToggleExtension{
-        public static void SetIsOnWithoutNotify(this Toggle instance, bool value) {
+namespace Adrenak.UniVoice.Samples
+{
+    public static class ToggleExtension
+    {
+        public static void SetIsOnWithoutNotify(this Toggle instance, bool value)
+        {
             var originalEvent = instance.onValueChanged;
             instance.onValueChanged = new Toggle.ToggleEvent();
             instance.isOn = value;
@@ -15,7 +18,8 @@ namespace Adrenak.UniVoice.Samples {
         }
     }
 
-    public class PeerView : MonoBehaviour {
+    public class PeerView : MonoBehaviour
+    {
         public event Action<bool> OnIncomingModified;
         public event Action<bool> OnOutgoingModified;
 
@@ -25,19 +29,22 @@ namespace Adrenak.UniVoice.Samples {
         [SerializeField] Toggle speakerToggle;
         [SerializeField] Toggle micToggle;
 
-        public bool IncomingAudio {
+        public bool IncomingAudio
+        {
             get => speakerToggle.isOn;
             set => speakerToggle.SetIsOnWithoutNotify(value);
         }
 
-        public bool OutgoingAudio {
+        public bool OutgoingAudio
+        {
             get => micToggle.isOn;
             set => micToggle.SetIsOnWithoutNotify(value);
         }
 
         List<Transform> bars = new List<Transform>();
 
-        void Start() {
+        void Start()
+        {
             speakerToggle.onValueChanged.AddListener(value =>
                 OnIncomingModified?.Invoke(value));
 
@@ -45,11 +52,13 @@ namespace Adrenak.UniVoice.Samples {
                 OnOutgoingModified?.Invoke(value));
         }
 
-        public void SetPeerID(short id) {
+        public void SetPeerID(short id)
+        {
             idText.text = id.ToString();
         }
 
-        public void DisplaySpectrum(float[] spectrum) {
+        public void DisplaySpectrum(float[] spectrum)
+        {
             InitBars(spectrum.Length);
 
             if (spectrum.Length != bars.Count) return;
@@ -58,14 +67,16 @@ namespace Adrenak.UniVoice.Samples {
                 bars[i].localScale = new Vector3(1, Mathf.Clamp01(spectrum[i]), 1);
         }
 
-        void InitBars(int count) {
+        void InitBars(int count)
+        {
             if (bars.Count == count) return;
 
             foreach (var bar in bars)
                 Destroy(bar.gameObject);
             bars.Clear();
 
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; i++)
+            {
                 var instance = Instantiate(barTemplate, barContainer);
                 instance.gameObject.SetActive(true);
                 bars.Add(instance);

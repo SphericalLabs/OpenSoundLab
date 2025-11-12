@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -32,7 +32,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Video;
 
-public class VideoPlayerDeviceInterface : componentInterface {
+public class VideoPlayerDeviceInterface : componentInterface
+{
 
     public string vidFilename;
     public Renderer videoSurface;
@@ -46,14 +47,16 @@ public class VideoPlayerDeviceInterface : componentInterface {
     bool loaded = false;
     public bool playing = false;
 
-    void Awake() {
+    void Awake()
+    {
         //source = GetComponent<AudioSource>();
         vidUI = GetComponentInChildren<VideoPlayerUI>();
         vidPlayer = GetComponentInChildren<VideoPlayer>();
     }
 
     tooltips _tooltip;
-    public void Autoplay(string file, tooltips _t) {
+    public void Autoplay(string file, tooltips _t)
+    {
         videoSurface.material.SetColor("_TintColor", new Color32(0x9A, 0x9A, 0x9A, 0x80));
         _tooltip = _t;
         vidFilename = file;
@@ -63,16 +66,20 @@ public class VideoPlayerDeviceInterface : componentInterface {
         vidUI.controlRends[0].material.SetFloat("_EmissionGain", 0f);
     }
 
-    void Update() {
-        if (loaded && playing) {
+    void Update()
+    {
+        if (loaded && playing)
+        {
             //if (!movieTexture.isPlaying) {
-            if (!vidPlayer.isPlaying) {
+            if (!vidPlayer.isPlaying)
+            {
                 endPlayback();
             }
         }
     }
 
-    void endPlayback() {
+    void endPlayback()
+    {
         playing = false;
         loading = false;
         loaded = false;
@@ -84,24 +91,31 @@ public class VideoPlayerDeviceInterface : componentInterface {
         if (_tooltip != null) _tooltip.ToggleVideo(false);
     }
 
-    public void togglePlay() {
+    public void togglePlay()
+    {
         playing = !playing;
-        if (playing) {
-            if (loaded) {
+        if (playing)
+        {
+            if (loaded)
+            {
                 vidQuad.SetActive(true);
                 //movieTexture.Play();
                 //source.Play();
                 vidPlayer.Play();
                 masterControl.instance.toggleInstrumentVolume(false);
-            } else if (!loading) StartCoroutine(movieRoutine());
-        } else if (loaded) {
+            }
+            else if (!loading) StartCoroutine(movieRoutine());
+        }
+        else if (loaded)
+        {
             //movieTexture.Pause();
             vidPlayer.Pause();
             masterControl.instance.toggleInstrumentVolume(true);
         }
     }
 
-    void OnDisable() {
+    void OnDisable()
+    {
         //   if (movieTexture != null) {
         endPlayback();
         //videoSurface.material.mainTexture = null;
@@ -112,8 +126,9 @@ public class VideoPlayerDeviceInterface : componentInterface {
         playing = false;
         masterControl.instance.toggleInstrumentVolume(true);
     }
-    
-    IEnumerator movieRoutine() {
+
+    IEnumerator movieRoutine()
+    {
         loading = true;
         //WWW www = new WWW("file:///" + Application.streamingAssetsPath + System.IO.Path.DirectorySeparatorChar + vidFilename);
         //movieTexture = www.movie;
@@ -122,8 +137,9 @@ public class VideoPlayerDeviceInterface : componentInterface {
         vidPlayer.Prepare();
 
         //while (!movieTexture.isReadyToPlay) {
-        while (!vidPlayer.isPrepared) {
-                yield return new WaitForSeconds(.1f); ;
+        while (!vidPlayer.isPrepared)
+        {
+            yield return new WaitForSeconds(.1f); ;
         }
 
         vidPlayer.renderMode = UnityEngine.Video.VideoRenderMode.MaterialOverride;
@@ -131,17 +147,20 @@ public class VideoPlayerDeviceInterface : componentInterface {
         vidPlayer.targetMaterialProperty = "_MainTex";
         //videoSurface.material.mainTexture = movieTexture;.GetComponent<Renderer>();
         //source.clip = movieTexture.audioClip;
-        if (playing) {
+        if (playing)
+        {
             vidQuad.SetActive(true);
 
             //movieTexture.Play();
             //source.Play();
             vidPlayer.Play();
             masterControl.instance.toggleInstrumentVolume(false);
-        } else {
+        }
+        else
+        {
             vidQuad.SetActive(false);
         }
         loading = false;
         loaded = true;
-}
+    }
 }

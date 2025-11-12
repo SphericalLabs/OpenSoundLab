@@ -69,8 +69,8 @@ public class RemoveDeviceComponents : MonoBehaviour
                     }
                 }
             }
-            
+
         }
-        
+
     }
 }

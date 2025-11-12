@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
 // Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
+//
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
+// You may obtain a copy of the License at
 // https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
+//
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+//
 //
 // Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
 // Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -25,7 +25,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -33,7 +33,8 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 
-public class bufferToWav : MonoBehaviour {
+public class bufferToWav : MonoBehaviour
+{
     public static bufferToWav instance; // singleton
     public bool applyNormalization = false;
 
@@ -59,7 +60,7 @@ public class bufferToWav : MonoBehaviour {
     {
         int _samplerate = AudioSettings.outputSampleRate;
         int _channels = 2;
-       
+
         b.Write(Encoding.ASCII.GetBytes("RIFF")); // chunkid
         b.Write(36 + length * _samplelength); // chunksize = (length * _samplelength) + 36???
         b.Write(Encoding.ASCII.GetBytes("WAVE")); // format
@@ -71,7 +72,7 @@ public class bufferToWav : MonoBehaviour {
         b.Write(_samplerate * _samplelength * _channels);    //byterate
         b.Write((short)(_samplelength * _channels)); // block align
         b.Write((short)(8 * _samplelength)); // bits per sample
-        b.Write(Encoding.ASCII.GetBytes("data"));  // subchunk2 ID (data)    
+        b.Write(Encoding.ASCII.GetBytes("data"));  // subchunk2 ID (data)
         b.Write(length * _samplelength); // subchunk 2 size
     }
 
@@ -81,13 +82,13 @@ public class bufferToWav : MonoBehaviour {
     {
         txt.gameObject.SetActive(true);
         txt.text = "Saving...";
-        
+
         FileStream _filestream = new FileStream(filename, FileMode.Create);
         BinaryWriter _binarystream = new BinaryWriter(_filestream);
         WavHeader(_binarystream, length);
 
-        if(applyNormalization) 
-          NormalizeClip(clip, clip.Length);
+        if (applyNormalization)
+            NormalizeClip(clip, clip.Length);
 
         int counter = 0;
         for (int i = 0; i < length; i++)
@@ -102,7 +103,7 @@ public class bufferToWav : MonoBehaviour {
 
             counter++;
 
-            if (counter > 10000) 
+            if (counter > 10000)
             {
                 counter = 0;
                 txt.text = "Saving... " + (int)(100 * (float)i / length) + "% Complete";
@@ -113,17 +114,17 @@ public class bufferToWav : MonoBehaviour {
         _binarystream.Close();
         _filestream.Close();
         txt.text = "Saved";
-        
+
         sampleManager.instance.AddRecording(filename);
         txt.text = "Saved";
         savingInProgress = false;
         txt.gameObject.SetActive(false);
-        
+
         // flush after saving, good for quick flow and otherwise we would have to update display. buffer was altered if normalization was on. more clean to simply flush away the old data.
         if (sig is waveTranscribeRecorder)
         {
-          waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
-          rec.Flush();
+            waveTranscribeRecorder rec = (waveTranscribeRecorder)sig;
+            rec.Flush();
         }
 
         sig.updateTape(filename);

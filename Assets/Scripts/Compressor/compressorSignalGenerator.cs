@@ -46,7 +46,7 @@ public class compressorSignalGenerator : signalGenerator
 
     public void SetParam(float value, int param)
     {
-        switch(param)
+        switch (param)
         {
             case (int)Param.P_ATTACK:
                 p[param] = Utils.map(value, 0, 1, 0.01f, 1000.0f, 0.2f);
@@ -105,12 +105,12 @@ public class compressorSignalGenerator : signalGenerator
 
     [DllImport("OSLNative")]
     private static extern bool Compressor_IsClipping(IntPtr x);
-    
+
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-   public override void processBufferImpl(float[] buffer, double dspTime, int channels)
-   {
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
+    {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
         if (sidechainBuffer.Length != buffer.Length)
@@ -141,6 +141,6 @@ public class compressorSignalGenerator : signalGenerator
         attenuation = Compressor_GetAttenuation(x);
         //isClipping = Compressor_IsClipping(x);
         recursionCheckPost();
-   }
+    }
 }
 

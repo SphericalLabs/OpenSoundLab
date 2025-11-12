@@ -15,7 +15,7 @@ public class Switch360 : MonoBehaviour
     Vector2 leftStick, rightStick;
     Vector3 rotation;
     float srcVolume = 0.2f;
-    
+
     void Start()
     {
         mat = GetComponent<Renderer>().materials[0];
@@ -38,7 +38,7 @@ public class Switch360 : MonoBehaviour
         }
 
         // shuttle through 360 panos, allows for hi-speed fun...
-        //if (leftStick.y != 0f) { 
+        //if (leftStick.y != 0f) {
         //newPointer += Mathf.Sign(leftStick.y) * Mathf.Abs(Mathf.Pow(leftStick.y, 3) * 0.3f);
         //if (newPointer > environments.Count - 1)
         //{

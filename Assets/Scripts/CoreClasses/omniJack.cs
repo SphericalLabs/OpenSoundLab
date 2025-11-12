@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
 // Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
+//
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
+// You may obtain a copy of the License at
 // https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
+//
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+//
 //
 // Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
 // Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -51,10 +51,11 @@ public class omniJack : manipObject
     /// </summary>
     /// <param name="newID">The new identifier to assign.</param>
     /// <param name="copyMode">
-    /// Indicates if the operation is a copy. 
+    /// Indicates if the operation is a copy.
     /// When <c>true</c>, the ID is not updated to prevent duplicate assignments.
     /// </param>
-    public void SetID(int newID, bool copyMode){
+    public void SetID(int newID, bool copyMode)
+    {
         if (!copyMode) ID = newID; // only set when loading, not when copying devices, otherwise multiple plugs in one jack can occur
     }
 
@@ -117,7 +118,7 @@ public class omniJack : manipObject
                 near = j.GetComponent<omniPlug>();
                 //near.transform.localScale = transform.localScale;
                 //near.transform.parent = transform;
-                //near.transform.localPosition = new Vector3(0, -.0175f, 0);   
+                //near.transform.localPosition = new Vector3(0, -.0175f, 0);
                 near.transform.localRotation = Quaternion.Euler(-90, 0, 0); // consider burning this rotation into the prefab already
                 //near.transform.Translate(0, 0, 0.02f);
                 near.connected = this;
@@ -132,7 +133,7 @@ public class omniJack : manipObject
                 near.Setup(jackTargetHue, !outgoing, far);
                 manipulatorObj.GetComponent<manipulator>().ForceGrab(far);
 
-                // bubble up to get the scale of the device this will be attached to and apply it to the far plug 
+                // bubble up to get the scale of the device this will be attached to and apply it to the far plug
                 deviceInterface device = gameObject.FindComponentInParentAndAbove<deviceInterface>();
                 if (device != null)
                     far.transform.localScale = device.transform.localScale;
@@ -184,7 +185,7 @@ public class omniJack : manipObject
         if (near.otherPlug.connected == null) signal = null;
         else if (signal != near.otherPlug.signal) signal = near.otherPlug.signal;
     }
-        
+
 
     public void beginConnection(omniPlug plug, bool invokeEvents)
     {
@@ -209,9 +210,10 @@ public class omniJack : manipObject
 
     public void endConnection(bool invokeEvents = false, bool destroyBothPlugs = false)
     {
-        if(destroyBothPlugs){ 
-            if(near != null && near.gameObject != null)  Destroy(near.gameObject);
-            if(far  != null && far.gameObject  != null)  Destroy(far.gameObject);
+        if (destroyBothPlugs)
+        {
+            if (near != null && near.gameObject != null) Destroy(near.gameObject);
+            if (far != null && far.gameObject != null) Destroy(far.gameObject);
         }
 
         if (invokeEvents)

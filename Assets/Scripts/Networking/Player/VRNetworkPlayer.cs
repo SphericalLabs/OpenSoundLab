@@ -37,16 +37,16 @@ public class VRNetworkPlayer : NetworkBehaviour
     public TMPro.TMP_Text userNameText;
 
     [Header("Manipulators")]
-    [SyncVar (hook = nameof(OnLeftHandManipulatorTriggerd))]
+    [SyncVar(hook = nameof(OnLeftHandManipulatorTriggerd))]
     public bool leftHandManipulatorTriggerd;
-    [SyncVar (hook = nameof(OnRightHandManipulatorTriggerd))]
+    [SyncVar(hook = nameof(OnRightHandManipulatorTriggerd))]
     public bool rightHandManipulatorTriggerd;
 
     public ManipulatorVisual leftManipulatorVisual;
     public ManipulatorVisual rightManipulatorVisual;
 
     [Header("Voice Chat")]
-    [SyncVar (hook = nameof(OnVoiceChatIDChanged))]
+    [SyncVar(hook = nameof(OnVoiceChatIDChanged))]
     public int voiceChatAgentID;
     private bool moveVoiceChatObject = false;
     private NetworkVoiceManager networkVoiceManager;
@@ -160,7 +160,7 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
     }
 
-    [Command (requiresAuthority = false)]
+    [Command(requiresAuthority = false)]
     public void CmdChangeUserName(string newUserName)
     {
         userName = newUserName;
@@ -224,11 +224,12 @@ public class VRNetworkPlayer : NetworkBehaviour
         try
         { // hotfix for session killing null reference exception
             handle h = item.GetComponentInChildren<handle>();
-            if(h != null) TargetManipulator(isLeftHand).ForceGrab(h);
+            if (h != null) TargetManipulator(isLeftHand).ForceGrab(h);
         }
-        catch (System.Exception e) { 
-            Debug.LogWarning("An exception was caught during spawning that would have killed the session:"); 
-            Debug.LogWarning(e); 
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("An exception was caught during spawning that would have killed the session:");
+            Debug.LogWarning(e);
             // todo: cleanup grab on new object
         }
     }

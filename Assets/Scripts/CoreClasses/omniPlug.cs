@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
 // Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
+//
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
+// You may obtain a copy of the License at
 // https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
+//
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+//
 //
 // Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
 // Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -85,20 +85,24 @@ public class omniPlug : manipObject
 
         omniCableViz = new Material(omniCableMat); // copy the base material
         vizColor = new Color(0f, 0f, 0f);
-        
+
     }
 
-    public void activateWireMode(WireMode mode){
+    public void activateWireMode(WireMode mode)
+    {
         if (outputPlug)
         {
             updateLineType();
-            if (mode == WireMode.Visualized){
+            if (mode == WireMode.Visualized)
+            {
                 lr.material = omniCableViz;
-            } else {
+            }
+            else
+            {
                 lr.material = omniCableMat;
             }
         }
-        
+
     }
 
     public void Setup(float c, bool outputting, omniPlug other)
@@ -115,7 +119,7 @@ public class omniPlug : manipObject
             lastOtherPlugPos = otherPlug.transform.position;
         }
     }
-    
+
 
     public PlugData GetData()
     {
@@ -150,7 +154,7 @@ public class omniPlug : manipObject
             return;
         }
 
-        
+
         if (curState == manipState.grabbed)
         {
             if (collCandidates.Contains(closestJack))
@@ -158,7 +162,7 @@ public class omniPlug : manipObject
                 if (connected == null) previewConnection(closestJack.GetComponent<omniJack>());
                 else if (closestJack != connected.transform)
                 {
-                    previewConnection(closestJack.GetComponent<omniJack>());                    
+                    previewConnection(closestJack.GetComponent<omniJack>());
                 }
                 updateLineNeeded = true;
             }
@@ -167,7 +171,7 @@ public class omniPlug : manipObject
                 if (!collCandidates.Contains(connected.transform))
                 {
                     endConnection();
-                }   
+                }
             }
         }
 
@@ -200,7 +204,7 @@ public class omniPlug : manipObject
                     "_BaseColor",
                     mapValueToColor(
                         // look at two previous buffers, since otherwise single triggers might not be visualized correctly, ca. 90hz for audio network and 72hz for graphics can lead to missed trigs
-                        Mathf.Clamp( connected.signal.firstSample != 0f ? connected.signal.firstSample : connected.signal.prevFirstSample, 
+                        Mathf.Clamp(connected.signal.firstSample != 0f ? connected.signal.firstSample : connected.signal.prevFirstSample,
                             -1f, 1f)
                         )
                     );
@@ -272,10 +276,10 @@ public class omniPlug : manipObject
 
     float calmingConstant = .5f;
 
-   
+
     public void OnDestroy() { }
 
-    
+
     public void updateLineType()
     {
         updateLineVerts();
@@ -293,7 +297,7 @@ public class omniPlug : manipObject
             if (justLast) lr.SetPosition(plugPath.Count - 1, plugPath.Last());
             else lr.SetPositions(plugPath.ToArray());
         }
-        else if ( (masterControl.instance.WireSetting == WireMode.Straight || masterControl.instance.WireSetting == WireMode.Visualized))
+        else if ((masterControl.instance.WireSetting == WireMode.Straight || masterControl.instance.WireSetting == WireMode.Visualized))
         {
             lr.positionCount = 2;
             lr.SetPosition(0, wireTrans.position);
@@ -362,7 +366,7 @@ public class omniPlug : manipObject
             else
             {
                 plugTrans.localScale = Vector3.one; // reset plugTrans adjustments from preview
-                transform.localScale = Vector3.one; // reset localScale after parenting adjusted scale 
+                transform.localScale = Vector3.one; // reset localScale after parenting adjusted scale
             }
 
         }
@@ -399,10 +403,10 @@ public class omniPlug : manipObject
         plugTrans.rotation = connected.transform.rotation;
         plugTrans.parent = connected.transform; // plugMesh set as child of connected jack
         plugTrans.Rotate(-90, 0, 0);
-        
+
         plugTrans.parent = transform; // needs the right parents for this
-        matchPlugtoJackScale(connected, true);        
-        
+        matchPlugtoJackScale(connected, true);
+
 
         plugTrans.parent = connected.transform; // but put back immediately
 
@@ -442,7 +446,7 @@ public class omniPlug : manipObject
                 //plugTrans.Translate(0, 0, -0.03f);
             }
             plugTrans.Translate(0, 0, 0.01f * plugTrans.lossyScale.x); // undo preview position from previewConnection
-            transform.parent = plugTrans.parent; // omniPlug set as child of connected jack 
+            transform.parent = plugTrans.parent; // omniPlug set as child of connected jack
             transform.position = plugTrans.position;
             transform.rotation = plugTrans.rotation;
             plugTrans.parent = transform; // plugMesh set as child of omniPlug
@@ -456,7 +460,7 @@ public class omniPlug : manipObject
             collCandidates.Clear();
         }
 
-        matchPlugtoJackScale(connected, false); 
+        matchPlugtoJackScale(connected, false);
 
     }
 
@@ -587,7 +591,7 @@ public class omniPlug : manipObject
                 // grabbing a freshly spawned far plug or a plug that was already connected
                 Transform grabReference = connected == null ? gazedObjectTracker.Instance.gazedAtManipObject.transform : connected.transform;
 
-                // translate based on reference, in this case for gaze-based remote patching          
+                // translate based on reference, in this case for gaze-based remote patching
                 transform.position = grabReference.transform.position + grabReference.transform.up * -0.075f;
                 gazeBasedPosRotStart();
 

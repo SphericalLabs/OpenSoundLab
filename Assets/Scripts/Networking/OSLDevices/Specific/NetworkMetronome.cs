@@ -13,9 +13,9 @@ public class NetworkMetronome : NetworkSyncListener
     {
         startButton.onStartGrabEvents.AddListener(OnButtonPress);
         rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
-        
+
         GetComponent<NetworkDials>().dialValues.Callback += OnBpmDialUpdated;
-        
+
     }
 
     void OnBpmDialUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
@@ -29,7 +29,7 @@ public class NetworkMetronome : NetworkSyncListener
             case SyncList<float>.Operation.OP_REMOVEAT:
                 break;
             case SyncList<float>.Operation.OP_SET:
-                // careful, this is hardwiring index 0.                
+                // careful, this is hardwiring index 0.
                 if (index == 0) metro.readBpmDialAndBroadcast();
                 break;
             case SyncList<float>.Operation.OP_CLEAR:
@@ -93,7 +93,7 @@ public class NetworkMetronome : NetworkSyncListener
     {
         if (isClient && !isServer)
         {
-            Debug.Log($"{gameObject.name} old _measurePhase: { masterControl.instance.MeasurePhase}, new _measurePhase {measurePhase}");
+            Debug.Log($"{gameObject.name} old _measurePhase: {masterControl.instance.MeasurePhase}, new _measurePhase {measurePhase}");
 
             masterControl.instance.MeasurePhase = measurePhase;
         }

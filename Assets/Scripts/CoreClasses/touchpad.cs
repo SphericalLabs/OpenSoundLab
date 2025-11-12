@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
 // Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
+//
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
+// You may obtain a copy of the License at
 // https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
+//
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+//
 //
 // Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
 // Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -25,10 +25,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
-public class touchpad : MonoBehaviour {
+public class touchpad : MonoBehaviour
+{
     public GameObject[] halfOutlines;
     public Transform padTouchFeedback;
     public Renderer[] halfSprites;
@@ -38,14 +39,15 @@ public class touchpad : MonoBehaviour {
 
     public Color onColor = Color.HSVToRGB(208 / 359f, 234 / 255f, 93 / 255f);
 
-    public Color offColor = Color.HSVToRGB(0,0,40 / 255f);
+    public Color offColor = Color.HSVToRGB(0, 0, 40 / 255f);
 
     bool[] halfSelected = new bool[] { false, false };
 
     bool copyOn = false;
     bool deleteOn = false;
     bool multiselectOn = false;
-    void Awake () {
+    void Awake()
+    {
         padTouchFeedback.gameObject.SetActive(false);
         Material temp = padTouchFeedback.GetComponent<Renderer>().material;
         padTouchFeedback.GetComponent<Renderer>().material.SetColor("_TintColor", onColor);
@@ -71,15 +73,15 @@ public class touchpad : MonoBehaviour {
         }
 
         buttonContainers[1].SetActive(false);
-        if(masterControl.instance != null) buttonContainers[0].SetActive(masterControl.instance.tooltipsOn);
+        if (masterControl.instance != null) buttonContainers[0].SetActive(masterControl.instance.tooltipsOn);
     }
-   
-    void onSelect(int n, bool on) 
+
+    void onSelect(int n, bool on)
     {
         halfSelected[n] = on;
         halfOutlines[n].SetActive(on);
     }
-    
+
     public void toggleCopy(bool on)
     {
         if (copyOn == on) return;
@@ -127,11 +129,11 @@ public class touchpad : MonoBehaviour {
     public void updateTouchPos(Vector2 p)
     {
         padTouchFeedback.localPosition = new Vector3(p.x * .004f, .0008f, p.y * .004f);
-        if(halfSelected[0] != (p.y < -0.1f))
+        if (halfSelected[0] != (p.y < -0.1f))
         {
             onSelect(0, (p.y < -0.1f));
         }
-        if(copyOn || deleteOn || multiselectOn)
+        if (copyOn || deleteOn || multiselectOn)
         {
             if (halfSelected[1] != (p.y > 0.1f))
             {
@@ -140,7 +142,7 @@ public class touchpad : MonoBehaviour {
         }
     }
 
-    public  void setTouch(bool on)
+    public void setTouch(bool on)
     {
         padTouchFeedback.gameObject.SetActive(on);
         if (!on)
@@ -178,7 +180,7 @@ public class touchpad : MonoBehaviour {
                 halfSprites[1].material.SetColor("_TintColor", on ? onColor : offColor);
                 halfSprites[1].material.SetFloat("_EmissionGain", on ? .5f : 0);
             }
-          
+
         }
     }
 

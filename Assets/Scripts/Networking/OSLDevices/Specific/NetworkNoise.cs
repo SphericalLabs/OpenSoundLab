@@ -7,7 +7,7 @@ using Mirror;
 public class NetworkNoise : NetworkSyncListener
 {
     private NoiseSignalGenerator noiseSignalGenerator;
-    [SyncVar]//(hook = nameof(OnUpdateSeed))] 
+    [SyncVar]//(hook = nameof(OnUpdateSeed))]
     private int syncSeed = 0; // select a specific noise pattern
     //private bool initialSeedSet = false;
     protected virtual void Awake()

@@ -138,7 +138,7 @@ public class NetworkSampleLoad : NetworkBehaviour
                 //Debug.Log("Set tape on host");
                 sampleLoaders[index].SetSample(sampleManager.GetFileName(path), sampleManager.CorrectPathSeparators(path));
             }
-            else if(samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
+            else if (samplePaths[index].Length <= 0 && sampleLoaders[index].hasTape())
             {
                 //Debug.Log("Remove tape on host");
                 sampleLoaders[index].ForceEject(false);

@@ -245,7 +245,9 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
                     segIndex = 0;
                     segCounter++;
                 }
-            } else {
+            }
+            else
+            {
                 yield return null;
             }
         }
@@ -255,7 +257,7 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
         {
             onEnded();
         }
-        else // 2) We consumed all samples that are currently available, but new samples may be available in the future bc we are still streaming: 
+        else // 2) We consumed all samples that are currently available, but new samples may be available in the future bc we are still streaming:
         {
             yield return null;
         }

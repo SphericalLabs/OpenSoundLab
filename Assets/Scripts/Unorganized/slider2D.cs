@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -28,70 +28,83 @@
 using UnityEngine;
 using System.Collections;
 
-public class slider2D : manipObject {
-  public Vector2 percent = Vector2.zero;
-  float xBound = 0.125f;
-  float yBound = 0.05f;
-  Material mat;
-  Color customColor;
+public class slider2D : manipObject
+{
+    public Vector2 percent = Vector2.zero;
+    float xBound = 0.125f;
+    float yBound = 0.05f;
+    Material mat;
+    Color customColor;
 
-  public override void Awake() {
-    base.Awake();
-    mat = GetComponent<Renderer>().material;
-    customColor = new Color(Random.value, Random.value, Random.value);
-    mat.SetColor("_EmissionColor", customColor * 0.25f);
-  }
-
-  void Start() {
-    setPercent(percent);
-  }
-
-  public void forceChange(float value, bool Xaxis) // x axis false if it forces Y
-  {
-
-    setPercent(new Vector2(value, value), Xaxis, !Xaxis);
-
-    if (curState == manipState.grabbed) {
-      offset.x = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
-      offset.y = transform.localPosition.y - transform.parent.InverseTransformPoint(manipulatorObj.position).y;
+    public override void Awake()
+    {
+        base.Awake();
+        mat = GetComponent<Renderer>().material;
+        customColor = new Color(Random.value, Random.value, Random.value);
+        mat.SetColor("_EmissionColor", customColor * 0.25f);
     }
 
-    updatePercent();
-  }
-
-  public override void grabUpdate(Transform t) {
-    Vector3 p = transform.localPosition;
-    p.x = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset.x, -xBound, xBound);
-    p.y = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).y + offset.y, -yBound, yBound);
-    transform.localPosition = p;
-    updatePercent();
-  }
-
-  public void setPercent(Vector2 p, bool doX = true, bool doY = true) {
-    Vector3 pos = transform.localPosition;
-    if (doX) pos.x = Mathf.Lerp(-xBound, xBound, p.x);
-    if (doY) pos.y = Mathf.Lerp(-yBound, yBound, p.y);
-    transform.localPosition = pos;
-    updatePercent();
-  }
-
-  void updatePercent() {
-    percent.x = .5f + transform.localPosition.x / (2 * xBound);
-    percent.y = .5f + transform.localPosition.y / (2 * yBound);
-  }
-
-  Vector2 offset = Vector2.zero;
-
-  public override void setState(manipState state) {
-    curState = state;
-    if (curState == manipState.none) {
-      mat.SetColor("_EmissionColor", customColor * 0.25f);
-    } else if (curState == manipState.selected) {
-      mat.SetColor("_EmissionColor", customColor * 0.5f);
-    } else if (curState == manipState.grabbed) {
-      mat.SetColor("_EmissionColor", customColor);
-      offset.x = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
-      offset.y = transform.localPosition.y - transform.parent.InverseTransformPoint(manipulatorObj.position).y;
+    void Start()
+    {
+        setPercent(percent);
     }
-  }
+
+    public void forceChange(float value, bool Xaxis) // x axis false if it forces Y
+    {
+
+        setPercent(new Vector2(value, value), Xaxis, !Xaxis);
+
+        if (curState == manipState.grabbed)
+        {
+            offset.x = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
+            offset.y = transform.localPosition.y - transform.parent.InverseTransformPoint(manipulatorObj.position).y;
+        }
+
+        updatePercent();
+    }
+
+    public override void grabUpdate(Transform t)
+    {
+        Vector3 p = transform.localPosition;
+        p.x = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset.x, -xBound, xBound);
+        p.y = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).y + offset.y, -yBound, yBound);
+        transform.localPosition = p;
+        updatePercent();
+    }
+
+    public void setPercent(Vector2 p, bool doX = true, bool doY = true)
+    {
+        Vector3 pos = transform.localPosition;
+        if (doX) pos.x = Mathf.Lerp(-xBound, xBound, p.x);
+        if (doY) pos.y = Mathf.Lerp(-yBound, yBound, p.y);
+        transform.localPosition = pos;
+        updatePercent();
+    }
+
+    void updatePercent()
+    {
+        percent.x = .5f + transform.localPosition.x / (2 * xBound);
+        percent.y = .5f + transform.localPosition.y / (2 * yBound);
+    }
+
+    Vector2 offset = Vector2.zero;
+
+    public override void setState(manipState state)
+    {
+        curState = state;
+        if (curState == manipState.none)
+        {
+            mat.SetColor("_EmissionColor", customColor * 0.25f);
+        }
+        else if (curState == manipState.selected)
+        {
+            mat.SetColor("_EmissionColor", customColor * 0.5f);
+        }
+        else if (curState == manipState.grabbed)
+        {
+            mat.SetColor("_EmissionColor", customColor);
+            offset.x = transform.localPosition.x - transform.parent.InverseTransformPoint(manipulatorObj.position).x;
+            offset.y = transform.localPosition.y - transform.parent.InverseTransformPoint(manipulatorObj.position).y;
+        }
+    }
 }

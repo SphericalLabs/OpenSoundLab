@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -41,7 +41,7 @@ public class metronome : componentInterface
     public float PitchBendMult { get => pitchBendMult; set => pitchBendMult = value; }
     public delegate void PitchBendChangeHandler(float pitchBendMult);
     public event PitchBendChangeHandler PitchBendChange;
-    
+
     public float bpmpercent = .1f;
     public float volumepercent = 0;
 
@@ -115,7 +115,7 @@ public class metronome : componentInterface
 
     public void updateBpm()
     {
-        bpm = (float) Math.Round(Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm), 1) * pitchBendMult;
+        bpm = (float)Math.Round(Utils.map(bpmpercent, 0f, 1f, minBpm, maxBpm), 1) * pitchBendMult;
         masterControl.instance?.setBPM(bpm);
         txt.text = bpm.ToString("N1");
     }
@@ -139,8 +139,8 @@ public class metronome : componentInterface
 
         if (ID == 3 && on) pitchBendMult = 1 / 1.03f;
         if (ID == 3 && !on) pitchBendMult = 1;
-        if (ID == 4 && on) pitchBendMult = 1 * 1.03f; 
-        if (ID == 4 && !on) pitchBendMult = 1; 
+        if (ID == 4 && on) pitchBendMult = 1 * 1.03f;
+        if (ID == 4 && !on) pitchBendMult = 1;
 
         if (ID == 5) masterControl.instance.recorder.ToggleRec(on);
 

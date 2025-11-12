@@ -73,32 +73,39 @@ public class NetworkVoiceManager : MonoBehaviour
             new UniVoiceUniMicInput(0, 16000, 10), // last parameter sets segment length in milliseconds
             new UniVoiceAudioSourceOutput.Factory(25, 50) // minSegCount: target fill up when buffer ran empty, maxSegCount: threshold when skipping occurs, skip target will be center of minSegCount and maxSegCount in order to debounce that threshold
         );
-        agent.Network.OnCreatedChatroom += () => {            
+        agent.Network.OnCreatedChatroom += () =>
+        {
             ShowMessage(agent.Network.OwnID != -1 ? $"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}" : "");
         };
 
-        agent.Network.OnChatroomCreationFailed += ex => {
+        agent.Network.OnChatroomCreationFailed += ex =>
+        {
             ShowMessage("Chatroom creation failed");
         };
 
-        agent.Network.OnClosedChatroom += () => {
+        agent.Network.OnClosedChatroom += () =>
+        {
             ShowMessage("You closed the chatroom! All peers have been kicked");
         };
 
-        agent.Network.OnJoinedChatroom += id => {
+        agent.Network.OnJoinedChatroom += id =>
+        {
             ShowMessage("Joined chatroom ");
             ShowMessage("You are Peer ID " + id);
         };
 
-        agent.Network.OnChatroomJoinFailed += ex => {
+        agent.Network.OnChatroomJoinFailed += ex =>
+        {
             ShowMessage(ex);
         };
 
-        agent.Network.OnLeftChatroom += () => {
+        agent.Network.OnLeftChatroom += () =>
+        {
             ShowMessage("You left the chatroom");
         };
 
-        agent.Network.OnPeerJoinedChatroom += id => {
+        agent.Network.OnPeerJoinedChatroom += id =>
+        {
             var view = Instantiate(peerViewTemplate, peerViewContainer);
             view.IncomingAudio = !agent.PeerSettings[id].muteThem;
             view.OutgoingAudio = !agent.PeerSettings[id].muteSelf;
@@ -113,7 +120,8 @@ public class NetworkVoiceManager : MonoBehaviour
             view.SetPeerID(id);
         };
 
-        agent.Network.OnPeerLeftChatroom += id => {
+        agent.Network.OnPeerLeftChatroom += id =>
+        {
             var peerViewInstance = peerViews[id];
             Destroy(peerViewInstance.gameObject);
             peerViews.Remove(id);
@@ -151,15 +159,15 @@ public class NetworkVoiceManager : MonoBehaviour
             if (peerViews.ContainsKey(output.Key))
             {
                 /*
-                 * This is an inefficient way of showing a part of the 
+                 * This is an inefficient way of showing a part of the
                  * audio source spectrum. AudioSource.GetSpectrumData returns
                  * frequency values up to 24000 Hz in some cases. Most human
                  * speech is no more than 5000 Hz. Showing the entire spectrum
                  * will therefore lead to a spectrum where much of it doesn't
                  * change. So we take only the spectrum frequencies between
                  * the average human vocal range.
-                 * 
-                 * Great source of information here: 
+                 *
+                 * Great source of information here:
                  * http://answers.unity.com/answers/158800/view.html
                  */
                 var size = 512;

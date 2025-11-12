@@ -37,5 +37,5 @@ public class artefactSignalGenerator : signalGenerator
             Artefact_Process(buffer, noise, dwnmpl, jitter, bitrdx, channels, buffer.Length);
         }
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-  }
+    }
 }

@@ -383,8 +383,8 @@ public class NetworkMenuManager : MonoBehaviour
             backButtonObject.SetActive(false);
         }
     }
-    
-    
+
+
     public void SetIsDiscoverable(bool b)
     {
         networkDiscovery.isDiscoverable = b;
@@ -456,21 +456,21 @@ public class NetworkMenuManager : MonoBehaviour
             TMP_Text[] objText = obj.GetComponentsInChildren<TMP_Text>();
             objText[0].text = $"{info.userName} \r\n You: {Application.version} / Them: {info.version}";
             objText[1].text = $"";
-            
+
             Debug.Log($"Host {info.userName} and ip {info.EndPoint.Address} has a different verion number {info.version}, so you can't connect to it");
             return;
         }
-        
+
         Debug.Log(($"Auto connect {autoConnectToLastServer} last ip {lastServerAddress}, new ip {info.EndPoint.Address}"));
         if (autoConnectToLastServer && lastServerAddress == info.EndPoint.Address.ToString())
         {
             JoinLocalHost(info);
             return;
         }
-        
+
         GameObject obj2 = Instantiate(discoveryButtonPrefab, discoveryButtonParent);
         TMP_Text[] objText2 = obj2.GetComponentsInChildren<TMP_Text>();
-        if(info.userName.Length > 0)
+        if (info.userName.Length > 0)
         {
             objText2[0].text = info.userName;
             objText2[1].text = "";

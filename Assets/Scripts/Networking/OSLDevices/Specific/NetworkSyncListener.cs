@@ -25,7 +25,7 @@ public class NetworkSyncListener : NetworkBehaviour
         var jacks = GetComponentsInChildren<omniJack>();
         if (jacks != null)
         {
-            foreach(omniJack jack in jacks)
+            foreach (omniJack jack in jacks)
             {
                 jack.onBeginnConnectionEvent.AddListener(OnSync);
                 jack.onEndConnectionEvent.AddListener(OnSync);

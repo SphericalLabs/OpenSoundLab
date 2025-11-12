@@ -21,7 +21,7 @@ public class NetworkPlugCopy : manipObject
 
         otherEnd.transform.parent = targetJack.gameObject.transform;
         otherEnd.transform.localScale = Vector3.one;
-        otherEnd.localPosition = new Vector3(0, -0.03f, 0);        
+        otherEnd.localPosition = new Vector3(0, -0.03f, 0);
         otherEnd.localRotation = Quaternion.Euler(-90, 0, 0);
 
         onStartGrabEvents.AddListener(OnGrabbedByOther);

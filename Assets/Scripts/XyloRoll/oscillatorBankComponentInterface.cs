@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -28,55 +28,62 @@
 using UnityEngine;
 using System.Collections;
 
-public class oscillatorBankComponentInterface : componentInterface {
+public class oscillatorBankComponentInterface : componentInterface
+{
 
-  public xylorollSignalGenerator signal;
+    public xylorollSignalGenerator signal;
 
-  public dial[] ampDials;
-  public dial[] freqDials;
-  public slider[] waveSliders;
+    public dial[] ampDials;
+    public dial[] freqDials;
+    public slider[] waveSliders;
 
-  public float[] ampPercent;
-  public float[] freqPercent;
-  public float[] wavePercent;
+    public float[] ampPercent;
+    public float[] freqPercent;
+    public float[] wavePercent;
 
-  void Start() {
-    ampPercent = new float[2];
-    freqPercent = new float[2];
-    wavePercent = new float[2];
+    void Start()
+    {
+        ampPercent = new float[2];
+        freqPercent = new float[2];
+        wavePercent = new float[2];
 
-    updateOscillators();
-  }
-
-  public void setValues(float oscAamp, float oscAfreq, float oscAwave, float oscBamp, float oscBfreq, float oscBwave) {
-    ampDials[0].setPercent(oscAamp);
-    ampDials[1].setPercent(oscBamp);
-
-    freqDials[0].setPercent(oscAfreq);
-    freqDials[1].setPercent(oscBfreq);
-
-    waveSliders[0].setPercent(oscAwave);
-    waveSliders[1].setPercent(oscBwave);
-  }
-
-  void updateOscillators() {
-    for (int i = 0; i < 2; i++) {
-      ampPercent[i] = ampDials[i].percent;
-      freqPercent[i] = freqDials[i].percent;
-      wavePercent[i] = waveSliders[i].percent;
+        updateOscillators();
     }
 
-    signal.updateOscAmp(ampPercent, freqPercent, wavePercent);
-  }
+    public void setValues(float oscAamp, float oscAfreq, float oscAwave, float oscBamp, float oscBfreq, float oscBwave)
+    {
+        ampDials[0].setPercent(oscAamp);
+        ampDials[1].setPercent(oscBamp);
 
-  void Update() {
+        freqDials[0].setPercent(oscAfreq);
+        freqDials[1].setPercent(oscBfreq);
 
-    bool needUpdate = false;
-    for (int i = 0; i < 2; i++) {
-      if (ampDials[i].percent != ampPercent[i]) needUpdate = true;
-      else if (freqDials[i].percent != freqPercent[i]) needUpdate = true;
-      else if (waveSliders[i].percent != wavePercent[i]) needUpdate = true;
+        waveSliders[0].setPercent(oscAwave);
+        waveSliders[1].setPercent(oscBwave);
     }
-    if (needUpdate) updateOscillators();
-  }
+
+    void updateOscillators()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            ampPercent[i] = ampDials[i].percent;
+            freqPercent[i] = freqDials[i].percent;
+            wavePercent[i] = waveSliders[i].percent;
+        }
+
+        signal.updateOscAmp(ampPercent, freqPercent, wavePercent);
+    }
+
+    void Update()
+    {
+
+        bool needUpdate = false;
+        for (int i = 0; i < 2; i++)
+        {
+            if (ampDials[i].percent != ampPercent[i]) needUpdate = true;
+            else if (freqDials[i].percent != freqPercent[i]) needUpdate = true;
+            else if (waveSliders[i].percent != wavePercent[i]) needUpdate = true;
+        }
+        if (needUpdate) updateOscillators();
+    }
 }

@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -100,7 +100,7 @@ public class delaySignalGenerator : signalGenerator
 
     public void SetParam(float value, int param)
     {
-        switch(param)
+        switch (param)
         {
             case (int)Param.P_TIME:
                 p[param] = value; //this is finally set in process method
@@ -118,7 +118,7 @@ public class delaySignalGenerator : signalGenerator
                 if (value != 0)
                     shouldClear = true;
                 break;
-            
+
         }
     }
 
@@ -131,12 +131,12 @@ public class delaySignalGenerator : signalGenerator
     const int maxPower = 21;
 
 
-  public void SetTimeRange(int mode)
+    public void SetTimeRange(int mode)
     {
         switch (mode)
         {
             case 0: // full range
-                timeCenter = Mathf.Pow(2f, minPower + (maxPower - minPower) / 2); 
+                timeCenter = Mathf.Pow(2f, minPower + (maxPower - minPower) / 2);
                 timeRange = (maxPower - minPower) / 2;
                 break;
             case 1: // low third range
@@ -152,13 +152,13 @@ public class delaySignalGenerator : signalGenerator
                 timeRange = (maxPower - minPower) / 6;
                 break;
         }
-        
+
         Delay_SetParam(Mathf.Pow(2f, minPower), (int)Param.P_MIN_SAMPLES, x);
         Delay_SetParam(Mathf.Pow(2f, maxPower), (int)Param.P_MAX_SAMPLES, x);
 
-  }
+    }
 
-  [DllImport("OSLNative")]
+    [DllImport("OSLNative")]
     //private static extern void Delay_Process(float[] buffer, int length, int channels, IntPtr x);
     private static extern void Delay_Process(float[] buffer, float[] timeBuffer, float[] feedbackBuffer, float[] mixBuffer, int n, int channels, IntPtr x);
 
@@ -180,11 +180,12 @@ public class delaySignalGenerator : signalGenerator
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-    private bool containsTrigger(float[] buffer){
+    private bool containsTrigger(float[] buffer)
+    {
         for (int i = 0; i < buffer.Length; i++)
         {
             if (buffer[i] > 0f && lastTriggerFloat <= 0f)
-            { 
+            {
                 return true;
             }
             lastTriggerFloat = buffer[i];
@@ -192,39 +193,39 @@ public class delaySignalGenerator : signalGenerator
         return false;
     }
 
-  public override void processBufferImpl(float[] buffer, double dspTime, int channels)
+    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
-    if (modTimeBuffer.Length != buffer.Length)
-      System.Array.Resize(ref modTimeBuffer, buffer.Length);
-    if (modFeedbackBuffer.Length != buffer.Length)
-      System.Array.Resize(ref modFeedbackBuffer, buffer.Length);
-    if (modTriggerBuffer.Length != buffer.Length)
-      System.Array.Resize(ref modTriggerBuffer, buffer.Length);
-    if (modMixBuffer.Length != buffer.Length)
-      System.Array.Resize(ref modMixBuffer, buffer.Length);
+        if (modTimeBuffer.Length != buffer.Length)
+            System.Array.Resize(ref modTimeBuffer, buffer.Length);
+        if (modFeedbackBuffer.Length != buffer.Length)
+            System.Array.Resize(ref modFeedbackBuffer, buffer.Length);
+        if (modTriggerBuffer.Length != buffer.Length)
+            System.Array.Resize(ref modTriggerBuffer, buffer.Length);
+        if (modMixBuffer.Length != buffer.Length)
+            System.Array.Resize(ref modMixBuffer, buffer.Length);
 
-    // we don't know if these will be overwritten upstream, so better make them fresh, see previous mixer bug.
-    SetArrayToSingleValue(modTimeBuffer, modTimeBuffer.Length, 0f);
-    SetArrayToSingleValue(modFeedbackBuffer, modFeedbackBuffer.Length, 0f);
-    SetArrayToSingleValue(modTriggerBuffer, modTriggerBuffer.Length, 0f);
-    SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
+        // we don't know if these will be overwritten upstream, so better make them fresh, see previous mixer bug.
+        SetArrayToSingleValue(modTimeBuffer, modTimeBuffer.Length, 0f);
+        SetArrayToSingleValue(modFeedbackBuffer, modFeedbackBuffer.Length, 0f);
+        SetArrayToSingleValue(modTriggerBuffer, modTriggerBuffer.Length, 0f);
+        SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
 
-    //Process mod inputs if plugged in:
-    if (sigModTrigger != null)
+        //Process mod inputs if plugged in:
+        if (sigModTrigger != null)
         {
-          sigModTrigger.processBuffer(modTriggerBuffer, dspTime, channels);
+            sigModTrigger.processBuffer(modTriggerBuffer, dspTime, channels);
 
-          if (containsTrigger(modTriggerBuffer))
-          {
-            modTriggerState = true;
-            shouldClear = true;
-          }
-          else
-          {
-            modTriggerState = false;
-          }
+            if (containsTrigger(modTriggerBuffer))
+            {
+                modTriggerState = true;
+                shouldClear = true;
+            }
+            else
+            {
+                modTriggerState = false;
+            }
         }
 
         modFeedbackVal = 0;
@@ -266,8 +267,8 @@ public class delaySignalGenerator : signalGenerator
             sigIn.processBuffer(buffer, dspTime, channels);
         }
 
-    //Set all delay params:
-        Delay_SetParam(timeCenter * Mathf.Pow(2, Utils.map(Mathf.Clamp01(p[(int)Param.P_TIME]), 0f, 1f, -timeRange, timeRange)), (int)Param.P_TIME, x); 
+        //Set all delay params:
+        Delay_SetParam(timeCenter * Mathf.Pow(2, Utils.map(Mathf.Clamp01(p[(int)Param.P_TIME]), 0f, 1f, -timeRange, timeRange)), (int)Param.P_TIME, x);
         //Delay_SetParam(Utils.map(Mathf.Pow(Mathf.Clamp01(p[(int)Param.P_TIME]), 3), 0, 1, modeMinTime, modeMaxTime), (int)Param.P_TIME, x);
         Delay_SetParam(Utils.map(Mathf.Clamp01(p[(int)Param.P_FEEDBACK] + modFeedbackVal), 0, 1, MIN_FEEDBACK, MAX_FEEDBACK), (int)Param.P_FEEDBACK, x);
         Delay_SetParam(wet, (int)Param.P_WET, x);
@@ -277,7 +278,7 @@ public class delaySignalGenerator : signalGenerator
         //We need to process the delay even if there is currently no input,
         //bc there could be unconsumed samples from a previous input left in the delay line.
         //To optimize, we could store the timestamp when the last input connection was removed.
-        //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed. 
+        //Then we only have to process if P_TIME is larger then the elapsed time since the connection was removed.
         //Delay_Process(buffer, buffer.Length, channels, x);
         Delay_Process(buffer, modTimeBuffer, null, modMixBuffer, buffer.Length, channels, x);
 

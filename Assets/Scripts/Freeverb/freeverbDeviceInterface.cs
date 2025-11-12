@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+// Copyright ï¿½ 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
 //
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright ï¿½ 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright ï¿½ 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright ï¿½ 2017 Apache 2.0 Google LLC SoundStage VR
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -28,7 +28,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class freeverbDeviceInterface : deviceInterface {
+public class freeverbDeviceInterface : deviceInterface
+{
     freeverbSignalGenerator signal;
     public dial size, damping, width, mix;
     public basicSwitch freeze;
@@ -37,13 +38,15 @@ public class freeverbDeviceInterface : deviceInterface {
 
     private dial[] dials;
 
-    public override void Awake() {
+    public override void Awake()
+    {
         base.Awake();
         signal = GetComponent<freeverbSignalGenerator>();
         dials = new dial[3] { size, damping, width };
     }
 
-    void Update() {
+    void Update()
+    {
         if (omniJackIn.signal != signal.sigIn) signal.sigIn = omniJackIn.signal;
         if (omniJackModSize.signal != signal.sigModSize) signal.sigModSize = omniJackModSize.signal;
         if (omniJackModFreeze.signal != signal.sigModFreeze) signal.sigModFreeze = omniJackModFreeze.signal;
@@ -57,7 +60,8 @@ public class freeverbDeviceInterface : deviceInterface {
         signal.SetParam(Utils.equalPowerCrossfadeGain(1 - mix.percent), (int)freeverbSignalGenerator.Param.P_DRY);
     }
 
-    public override InstrumentData GetData() {
+    public override InstrumentData GetData()
+    {
         FreeverbData data = new FreeverbData();
         data.deviceType = DeviceType.Freeverb;
         GetTransformData(data);
@@ -77,7 +81,8 @@ public class freeverbDeviceInterface : deviceInterface {
         return data;
     }
 
-    public override void Load(InstrumentData d, bool copyMode) {
+    public override void Load(InstrumentData d, bool copyMode)
+    {
         FreeverbData data = d as FreeverbData;
         base.Load(data, true);
         omniJackIn.SetID(data.jackInID, copyMode);
@@ -94,7 +99,8 @@ public class freeverbDeviceInterface : deviceInterface {
     }
 }
 
-public class FreeverbData : InstrumentData {
+public class FreeverbData : InstrumentData
+{
     public float size, damping, mix, width;
     public bool freeze;
     public int jackOutID, jackInID;

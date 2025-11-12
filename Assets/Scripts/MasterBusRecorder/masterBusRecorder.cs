@@ -96,7 +96,7 @@ public class masterBusRecorder : MonoBehaviour
             StopRec();
         }
         ///In case there is an unfinished recording session, we stop the coroutines and force the session to be finished:
-        if(_state != State.Idle)
+        if (_state != State.Idle)
         {
             StopAllCoroutines();
             OnRecordingFinished();
@@ -147,7 +147,7 @@ public class masterBusRecorder : MonoBehaviour
         if (!Directory.Exists(dir))
         {
             Directory.CreateDirectory(dir);
-        }        
+        }
         filename = dir + System.IO.Path.DirectorySeparatorChar +
 string.Format("{0:yyyy-MM-dd_HH-mm-ss}.wav",
 DateTime.Now);
@@ -193,7 +193,7 @@ DateTime.Now);
 
         // show it in Tapes->Sessions
         sampleManager.instance.AddSession(filename);
-        
+
         //Reset state so a new recording session can be started:
         _state = State.Idle;
     }
@@ -222,10 +222,10 @@ DateTime.Now);
                 //* Why don't we just call phantomHit, which will in turn trigger the call to onEnded()?
                 //=> Because we need to guarantee here that the coroutine stops IMMEDIATELY.
                 var metronome = FindObjectOfType<metronome>();
-                if(metronome != null)
+                if (metronome != null)
                 {
                     metronome.recButton.phantomHit(false);
-                }    
+                }
             }
             ///If we can get a new sample, we convert it to the desired number format and write it to the file
             else if (MasterBusRecorder_ReadRecordedSample(ref sample) == true)
@@ -239,7 +239,7 @@ DateTime.Now);
                     int n = MasterBusRecorder_GetBufferPointer(buf, ref offset);
                     Debug.Log("instance " + instanceId + ": " + n + " samples in queue.");
                 }*/
-                if(recInterface.bitDepth == 16)
+                if (recInterface.bitDepth == 16)
                 {
                     convertedSample = (((int)(Mathf.Clamp(sample, -1f, 1f) * 32760f + 32768.5)) - 32768);
                     recInterface.bw.Write((short)convertedSample);

@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
 // Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-// 
+//
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at 
+// You may obtain a copy of the License at
 // https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-// 
+//
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-// 
+//
 //
 // Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
 // Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -37,13 +37,13 @@ public class manipulator : MonoBehaviour
 
     private static List<manipulator> instances = new List<manipulator>();
 
-  public int controllerIndex = -1; // 0 => left, 1 => right
-  public GameObject activeTip;
-  public Transform tipL, tipR;
-  
-  List<Transform> hitTransforms = new List<Transform>();
-  public Transform selectedTransform;
-  public manipObject selectedObject;
+    public int controllerIndex = -1; // 0 => left, 1 => right
+    public GameObject activeTip;
+    public Transform tipL, tipR;
+
+    List<Transform> hitTransforms = new List<Transform>();
+    public Transform selectedTransform;
+    public manipObject selectedObject;
 
     menuspawn _menuspawn;
 
@@ -433,7 +433,7 @@ public class manipulator : MonoBehaviour
                     }
 
 
-                } 
+                }
             }
             else if (selectedObject.GetComponent<handle>() != null && !triggerDown) Grab(false);
         }
@@ -684,7 +684,8 @@ public class manipulator : MonoBehaviour
             }
         }
 
-        if(gazedObjectTracker.Instance != null){ 
+        if (gazedObjectTracker.Instance != null)
+        {
             if (gazedObjectTracker.Instance.gazedAtManipObject != null && !wasGazeBased)
             {
                 if (OSLInput.getInstance().areBothSidesPressed()) return; // no gaze interaction when dragging the world

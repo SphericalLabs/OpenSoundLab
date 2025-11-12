@@ -15,12 +15,12 @@ public class NetworkMasterControl : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnBinauralSettingChanged))]
     public BinauralMode BinauralSetting;
-    
+
 
     void OnWireSettingChanged(WireMode oldValue, WireMode newValue)
     {
         //if(IsWireCooldownOver()){
-            masterControl.instance.updateWireSetting((int)newValue);
+        masterControl.instance.updateWireSetting((int)newValue);
         //}
     }
 
@@ -28,7 +28,7 @@ public class NetworkMasterControl : NetworkBehaviour
     {
         //if (IsDisplayCooldownOver())
         //{
-            masterControl.instance.updateDisplaySetting((int)newValue);
+        masterControl.instance.updateDisplaySetting((int)newValue);
         //}
     }
 
@@ -36,7 +36,7 @@ public class NetworkMasterControl : NetworkBehaviour
     {
         //if (IsBinauralCooldownOver())
         //{
-            masterControl.instance.updateBinauralSetting((int)newValue);
+        masterControl.instance.updateBinauralSetting((int)newValue);
         //}
     }
 
@@ -54,8 +54,8 @@ public class NetworkMasterControl : NetworkBehaviour
 
     private void OnDestroy()
     {
-        masterControl.instance.onBinauralChangedEvent.RemoveListener(UpdateBinaural); 
-        masterControl.instance.onWireChangedEvent.RemoveListener(UpdateWire); 
+        masterControl.instance.onBinauralChangedEvent.RemoveListener(UpdateBinaural);
+        masterControl.instance.onWireChangedEvent.RemoveListener(UpdateWire);
         masterControl.instance.onDisplayChangedEvent.RemoveListener(UpdateDisplay);
     }
 
@@ -71,10 +71,11 @@ public class NetworkMasterControl : NetworkBehaviour
 
     void Update()
     {
-        
+
     }
 
-    void UpdateBinaural(){
+    void UpdateBinaural()
+    {
         Debug.Log($"Update BinauralSetting: {masterControl.instance.BinauralSetting}");
         if (isServer)
         {
@@ -95,7 +96,8 @@ public class NetworkMasterControl : NetworkBehaviour
 
 
 
-    void UpdateWire(){
+    void UpdateWire()
+    {
         Debug.Log($"Update WireSetting: {masterControl.instance.WireSetting}");
         if (isServer)
         {
@@ -116,7 +118,8 @@ public class NetworkMasterControl : NetworkBehaviour
 
 
 
-    void UpdateDisplay(){
+    void UpdateDisplay()
+    {
         Debug.Log($"Update DisplaySetting: {masterControl.instance.DisplaySetting}");
         if (isServer)
         {
