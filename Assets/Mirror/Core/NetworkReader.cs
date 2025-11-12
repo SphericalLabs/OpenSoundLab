@@ -40,7 +40,7 @@ namespace Mirror
         //
         // throwOnInvalidBytes is true.
         // if false, it would silently ignore the invalid bytes but continue
-        // with the valid ones, creating strings like "a�������".
+        // with the valid ones, creating strings like "a©©©©©©©".
         // instead, we want to catch it manually and return String.Empty.
         // this is safer. see test: ReadString_InvalidUTF8().
         internal readonly UTF8Encoding encoding = new UTF8Encoding(false, true);
