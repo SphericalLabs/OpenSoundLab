@@ -1,0 +1,18 @@
+# .clang-format
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+BreakBeforeBraces: Attach        # K&R / same-line braces
+PointerAlignment: Left           # 'float *buf'
+ColumnLimit: 120
+IncludeBlocks: Preserve
+IncludeCategories:
+  - Regex: '^"'
+    Priority: 1                  # project headers first
+  - Regex: '^<'
+    Priority: 2                  # system headers after
+SortIncludes: false
+SpaceAfterCStyleCast: true
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None

@@ -1,7 +1,9 @@
 {
+    "editor.formatOnSave": true,
+    "files.showHiddenFiles": true,
     "files.exclude": {
         "**/.DS_Store": true,
-        "**/.git": true,
+        "**/.git": false,
         "**/.vs": true,
         "**/.gitmodules": true,
         "**/.vsconfig": true,
@@ -56,5 +58,8 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "OpenSoundLab.sln"
+    "dotnet.defaultSolution": "OpenSoundLab.sln",
+    "files.associations": {
+        "*.gitattribues": "cpp"
+    }
 }
