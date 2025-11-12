@@ -1,5 +1,7 @@
 {
-    "recommendations": [
-      "visualstudiotoolsforunity.vstuc"
-    ]
+  "recommendations": [
+    "visualstudiotoolsforunity.vstuc",
+    "jbockle.jbockle-format-files",
+    "EditorConfig.EditorConfig" // For enforcing .editorconfig rules
+  ]
 }
