@@ -131,7 +131,7 @@ public class RequirementsManager : MonoBehaviour
     [SerializeField] string openSettingsLabel = "Open Settings";
     [SerializeField] string backLabel = "Back";
 
-    [Header("Layout")] 
+    [Header("Layout")]
     [SerializeField] float panelDistance = 1.8f;
     [SerializeField] float verticalOffset = 0.15f;
     [SerializeField] Vector2 panelSizeMeters = new Vector2(1.2f, 0.75f);
@@ -847,7 +847,7 @@ public class RequirementsManager : MonoBehaviour
 
         CanvasScaler scaler = canvasGo.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.referenceResolution = new Vector2(6000f, 3000f);
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         scaler.matchWidthOrHeight = 0.5f;
 
