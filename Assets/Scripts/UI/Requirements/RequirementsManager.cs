@@ -138,6 +138,9 @@ public class RequirementsManager : MonoBehaviour
     [SerializeField] float joystickScrollSpeed = 0.5f;
     [SerializeField] float mouseScrollMultiplier = 65f;
 
+    [Header("Rounded Corners")]
+    [SerializeField] Shader roundedCornersShader;
+
     [Header("Controller Hints")]
     [SerializeField] string nextButtonHint = " (X/A)";
     [SerializeField] string backButtonHint = " (Y/B)";
@@ -873,7 +876,7 @@ public class RequirementsManager : MonoBehaviour
         panelImage.color = new Color(0.02f, 0.02f, 0.02f, 1f);
         var panelRounded = panelGo.AddComponent<ImageWithRoundedCorners>();
         panelRounded.radius = PanelCornerRadius;
-        panelRounded.Refresh();
+        ConfigureRoundedCorners(panelRounded);
 
         BuildTitle(_panelRect);
         BuildScrollArea(_panelRect);
@@ -936,7 +939,7 @@ public class RequirementsManager : MonoBehaviour
         background.color = new Color(1f, 1f, 1f, 0.05f);
         var scrollRounded = scrollRoot.AddComponent<ImageWithRoundedCorners>();
         scrollRounded.radius = ScrollAreaCornerRadius;
-        scrollRounded.Refresh();
+        ConfigureRoundedCorners(scrollRounded);
 
         _scrollRect = scrollRoot.AddComponent<ScrollRect>();
         _scrollRect.horizontal = false;
@@ -1034,7 +1037,7 @@ public class RequirementsManager : MonoBehaviour
         image.color = normalColor;
         var rounded = buttonGo.AddComponent<ImageWithRoundedCorners>();
         rounded.radius = ButtonCornerRadius;
-        rounded.Refresh();
+        ConfigureRoundedCorners(rounded);
 
         Button button = buttonGo.AddComponent<Button>();
         ColorBlock colors = button.colors;
@@ -1077,6 +1080,21 @@ public class RequirementsManager : MonoBehaviour
         {
             label.font = font;
         }
+    }
+
+    void ConfigureRoundedCorners(ImageWithRoundedCorners rounded)
+    {
+        if (rounded == null)
+        {
+            return;
+        }
+
+        if (roundedCornersShader != null)
+        {
+            rounded.SetShaderOverride(roundedCornersShader);
+        }
+
+        rounded.Refresh();
     }
 
     TMP_FontAsset ResolveUiFont()
