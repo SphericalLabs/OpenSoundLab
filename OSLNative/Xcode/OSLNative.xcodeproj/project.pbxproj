@@ -256,6 +256,7 @@
 				02D44CB92C33F9ED006D8C29 /* Sources */,
 				02D44CBA2C33F9ED006D8C29 /* Frameworks */,
 				02D93F1D2C353F5800F2F319 /* CopyFiles */,
+				02F8CB1A2C4271F5001F4AE7 /* Sign libOSLNative.dylib */,
 			);
 			buildRules = (
 			);
@@ -297,6 +298,27 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		02F8CB1A2C4271F5001F4AE7 /* Sign libOSLNative.dylib */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sign libOSLNative.dylib";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "set -euo pipefail\nCODESIGN_BIN=\"/usr/bin/codesign\"\nTARGET_FILE=\"$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH\"\nif [ -f \"$TARGET_FILE\" ]; then\n  \"$CODESIGN_BIN\" --force --timestamp=none --sign - \"$TARGET_FILE\"\nfi\nASSET_PATH=\"${PROJECT_DIR}/../../Assets/OSLNative/macos/Release/libOSLNative.dylib\"\nif [ -f \"$ASSET_PATH\" ]; then\n  \"$CODESIGN_BIN\" --force --timestamp=none --sign - \"$ASSET_PATH\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		02D44CB92C33F9ED006D8C29 /* Sources */ = {
@@ -370,7 +392,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -440,7 +462,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
