@@ -144,7 +144,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.79
+  bundleVersion: 0.78
   preloadedAssets:
   - {fileID: 0}
   - {fileID: 11400000, guid: c363b5179947cbb40899ebae53ad2c59, type: 2}
@@ -180,7 +180,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 79
+  AndroidBundleVersionCode: 78
   AndroidMinSdkVersion: 32
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 0
@@ -952,7 +952,7 @@ PlayerSettings:
   syncCapabilities: 0
   platformCapabilities:
     WindowsStoreApps:
-      EnterpriseAuthentication: False
+      CodeGeneration: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -985,8 +985,8 @@ PlayerSettings:
       Contacts: False
       InternetClient: False
       Proximity: False
-      CodeGeneration: False
       BackgroundMediaPlayback: False
+      EnterpriseAuthentication: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
