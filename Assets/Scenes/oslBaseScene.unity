@@ -164,13 +164,13 @@ MonoBehaviour:
   autoPopulateDefaultDocuments: 1
   missingDocumentFallback: Document unavailable.
   depthPermissionTitle: Spatial Depth Permission
-  depthPermissionBody: 'Optional: OpenSoundLab is a mixed-reality experience. Grant
-    access to spatial data so depth occlusion can function.'
+  depthPermissionBody: 'Recommended: OpenSoundLab is a mixed-reality experience.
+    Grant access to spatial data so depth occlusion can function.'
   depthPermissionDeniedBody: Spatial depth access is still blocked. You can enable
     the Spatial Scene permission later in the Meta Quest settings for this app. Press
     Agree to continue.
   microphoneTitle: Microphone Permission
-  microphoneBody: 'Optional: OpenSoundLab lets you sample and process your audio
+  microphoneBody: 'Recommended: OpenSoundLab lets you sample and process your audio
     input. Please allow microphone access to make this work.'
   microphoneDeniedBody: Microphone access is still blocked. Press Agree to continue
     without it. You can enable it later in the Meta Quest settings for this app.
