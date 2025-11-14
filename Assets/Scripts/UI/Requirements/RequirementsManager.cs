@@ -1657,6 +1657,7 @@ public class RequirementsManager : MonoBehaviour
             rounded.SetShaderOverride(roundedCornersShader);
         }
 
+        rounded.Validate();
         rounded.Refresh();
     }
 
