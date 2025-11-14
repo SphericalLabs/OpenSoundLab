@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR;
 using Nobi.UiRoundedCorners;
+using Meta.XR.EnvironmentDepth;
 #if UNITY_ANDROID
 using AndroidPermission = UnityEngine.Android.Permission;
 using AndroidPermissionCallbacks = UnityEngine.Android.PermissionCallbacks;
@@ -119,6 +120,12 @@ public class RequirementsManager : MonoBehaviour
     [SerializeField] bool autoPopulateDefaultDocuments = true;
     [SerializeField, TextArea(2, 4)] string missingDocumentFallback = "Document unavailable.";
 
+    [Header("Environment Depth Step")]
+    [SerializeField] string depthPermissionTitle = "Spatial Depth Permission";
+    [SerializeField, TextArea(6, 20)] string depthPermissionBody = "OpenSoundLab is a mixed-reality experience. Grant access to spatial depth data so occlusion and scene-aware devices can function.";
+    [SerializeField, TextArea(6, 20)] string depthPermissionDeniedBody = "Spatial depth access is still blocked. Enable the Spatial Scene permission in the Meta Quest settings, then choose Agree again.";
+
+
     [Header("Microphone Step")]
     [SerializeField] string microphoneTitle = "Microphone Permission";
     [SerializeField, TextArea(6, 20)] string microphoneBody = "OpenSoundLab lets you record audio input. Please allow microphone access so recordings work.";
@@ -170,6 +177,7 @@ public class RequirementsManager : MonoBehaviour
     const float ScrollAreaCornerRadius = 28f;
     const float PanelTopAlignmentRatio = 0.25f;
     const string MicrophonePermissionName = "android.permission.RECORD_AUDIO";
+    const string ScenePermissionName = OVRPermissionsRequester.ScenePermission;
 
     Canvas _canvas;
     Transform _canvasTransform;
@@ -198,19 +206,29 @@ public class RequirementsManager : MonoBehaviour
     bool _waitingForPermissionFocus;
     bool _waitingForMicrophoneResponse;
     bool _microphoneDenied;
+    bool _waitingForScenePermissionResponse;
+    bool _scenePermissionDenied;
 
     static bool s_MouseScrollAxisUnavailable;
     static bool s_HasLoggedMissingMouseAxis;
 
     TMP_FontAsset _uiFont;
 
+    EnvironmentDepthManager _environmentDepthManager;
+    bool _depthStateCached;
+    bool _depthManagerInitiallyEnabled = true;
+    bool _depthManagerSuppressed;
+    bool _occlusionModeForcedNone;
+
 #if UNITY_ANDROID
     AndroidPermissionCallbacks _microphoneCallbacks;
+    AndroidPermissionCallbacks _scenePermissionCallbacks;
 #endif
 
     enum StepType
     {
         Document,
+        ScenePermission,
         Microphone,
         Storage
     }
@@ -228,7 +246,17 @@ public class RequirementsManager : MonoBehaviour
             return StepType.Document;
         }
 
-        return index == docCount ? StepType.Microphone : StepType.Storage;
+        if (index == docCount)
+        {
+            return StepType.ScenePermission;
+        }
+
+        if (index == docCount + 1)
+        {
+            return StepType.Microphone;
+        }
+
+        return StepType.Storage;
     }
 
     bool HasMicrophonePermission()
@@ -306,6 +334,156 @@ public class RequirementsManager : MonoBehaviour
         ShowStep(_currentStepIndex);
     }
 
+    bool HasScenePermission()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        return AndroidPermission.HasUserAuthorizedPermission(ScenePermissionName);
+#else
+        return true;
+#endif
+    }
+
+    void RequestScenePermission()
+    {
+        _waitingForScenePermissionResponse = true;
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (HasScenePermission())
+        {
+            _waitingForScenePermissionResponse = false;
+            OnScenePermissionGranted(ScenePermissionName);
+            return;
+        }
+
+        if (_scenePermissionCallbacks == null)
+        {
+            _scenePermissionCallbacks = new AndroidPermissionCallbacks();
+            _scenePermissionCallbacks.PermissionGranted += OnScenePermissionGranted;
+            _scenePermissionCallbacks.PermissionDenied += OnScenePermissionDenied;
+            _scenePermissionCallbacks.PermissionDeniedAndDontAskAgain += OnScenePermissionDontAskAgain;
+        }
+
+        AndroidPermission.RequestUserPermission(ScenePermissionName, _scenePermissionCallbacks);
+#else
+        OnScenePermissionGranted(ScenePermissionName);
+#endif
+    }
+
+    void OnScenePermissionGranted(string permission)
+    {
+        if (permission != ScenePermissionName)
+        {
+            return;
+        }
+
+        _waitingForScenePermissionResponse = false;
+        _scenePermissionDenied = false;
+        ActivateEnvironmentDepthManager();
+
+        if (GetStepType(_currentStepIndex) == StepType.ScenePermission)
+        {
+            AdvanceStep();
+        }
+    }
+
+    void OnScenePermissionDenied(string permission)
+    {
+        if (permission != ScenePermissionName)
+        {
+            return;
+        }
+
+        _waitingForScenePermissionResponse = false;
+        _scenePermissionDenied = true;
+        ShowStep(_currentStepIndex);
+    }
+
+    void OnScenePermissionDontAskAgain(string permission)
+    {
+        if (permission != ScenePermissionName)
+        {
+            return;
+        }
+
+        _waitingForScenePermissionResponse = false;
+        _scenePermissionDenied = true;
+        ShowStep(_currentStepIndex);
+    }
+
+    void Awake()
+    {
+        PrepareEnvironmentDepthSuppression();
+    }
+
+    void PrepareEnvironmentDepthSuppression()
+    {
+        if (HasScenePermission())
+        {
+            return;
+        }
+
+        var depthManager = ResolveEnvironmentDepthManager();
+        if (depthManager == null)
+        {
+            return;
+        }
+
+        if (depthManager.enabled)
+        {
+            _depthManagerSuppressed = true;
+            depthManager.enabled = false;
+        }
+
+        if (depthManager.OcclusionShadersMode != OcclusionShadersMode.None)
+        {
+            _occlusionModeForcedNone = true;
+            depthManager.OcclusionShadersMode = OcclusionShadersMode.None;
+        }
+    }
+
+    EnvironmentDepthManager ResolveEnvironmentDepthManager()
+    {
+        if (_environmentDepthManager == null)
+        {
+            _environmentDepthManager = FindObjectOfType<EnvironmentDepthManager>(true);
+            CacheDepthManagerState();
+        }
+
+        return _environmentDepthManager;
+    }
+
+    void CacheDepthManagerState()
+    {
+        if (_environmentDepthManager == null || _depthStateCached)
+        {
+            return;
+        }
+
+        _depthManagerInitiallyEnabled = _environmentDepthManager.enabled;
+        _depthStateCached = true;
+    }
+
+    void ActivateEnvironmentDepthManager()
+    {
+        var depthManager = ResolveEnvironmentDepthManager();
+        if (depthManager == null)
+        {
+            return;
+        }
+
+        if (_occlusionModeForcedNone)
+        {
+            depthManager.OcclusionShadersMode = OcclusionShadersMode.SoftOcclusion;
+            _occlusionModeForcedNone = false;
+        }
+
+        if (_depthManagerSuppressed && _depthManagerInitiallyEnabled)
+        {
+            depthManager.enabled = true;
+            _depthManagerSuppressed = false;
+        }
+    }
+
+
     void OnEnable()
     {
         SubscribeToRecenterEvent(true);
@@ -317,9 +495,12 @@ public class RequirementsManager : MonoBehaviour
         EnsureDefaultDocuments();
 
         bool consentPresent = PlayerPrefs.GetInt(consentKey, 0) == 1;
+        bool hasScenePermission = HasScenePermission();
         bool storageGranted = AndroidStorageAccess.HasManageAllFilesAccess();
 
-        if (consentPresent && storageGranted)
+        PrepareEnvironmentDepthSuppression();
+
+        if (consentPresent && storageGranted && hasScenePermission)
         {
             EnsureMasterControl();
             if (loadLocalSceneOnCompletion)
@@ -332,6 +513,7 @@ public class RequirementsManager : MonoBehaviour
         }
 
         ResolveUserReference();
+        PrepareEnvironmentDepthSuppression();
         SubscribeToRecenterEvent(true);
         ApplyWizardTrackingOrigin();
         BuildUi();
@@ -347,9 +529,17 @@ public class RequirementsManager : MonoBehaviour
         _flowActive = true;
 
         int startIndex = consentPresent ? GetDocumentCount() : 0;
-        if (consentPresent && HasMicrophonePermission())
+        if (consentPresent)
         {
-            startIndex += 1;
+            if (hasScenePermission)
+            {
+                startIndex += 1;
+            }
+
+            if (HasMicrophonePermission())
+            {
+                startIndex += 1;
+            }
         }
 
         ShowStep(startIndex);
@@ -490,6 +680,13 @@ public class RequirementsManager : MonoBehaviour
             return;
         }
 
+        if (GetStepType(_currentStepIndex) == StepType.ScenePermission && HasScenePermission())
+        {
+            ActivateEnvironmentDepthManager();
+            AdvanceStep();
+            return;
+        }
+
         if (_waitingForPermissionFocus && GetStepType(_currentStepIndex) == StepType.Storage)
         {
             if (AndroidStorageAccess.HasManageAllFilesAccess())
@@ -610,6 +807,22 @@ public class RequirementsManager : MonoBehaviour
             case StepType.Document:
                 AdvanceStep();
                 break;
+            case StepType.ScenePermission:
+                if (HasScenePermission())
+                {
+                    ActivateEnvironmentDepthManager();
+                    AdvanceStep();
+                }
+                else if (_scenePermissionDenied && !_waitingForScenePermissionResponse)
+                {
+                    AdvanceStep();
+                }
+                else
+                {
+                    RequestScenePermission();
+                    UpdateNavigationState();
+                }
+                break;
             case StepType.Microphone:
                 if (HasMicrophonePermission())
                 {
@@ -661,16 +874,20 @@ public class RequirementsManager : MonoBehaviour
 
     void ShowStep(int index)
     {
-        int maxIndex = GetDocumentCount() + 1;
+        int maxIndex = GetDocumentCount() + 2;
         _currentStepIndex = Mathf.Clamp(index, 0, maxIndex);
 
         _waitingForPermissionFocus = false;
         _waitingForMicrophoneResponse = false;
+        _waitingForScenePermissionResponse = false;
 
         switch (GetStepType(_currentStepIndex))
         {
             case StepType.Document:
                 ShowDocumentStep(_currentStepIndex);
+                break;
+            case StepType.ScenePermission:
+                ShowScenePermissionStep();
                 break;
             case StepType.Microphone:
                 ShowMicrophoneStep();
@@ -693,6 +910,22 @@ public class RequirementsManager : MonoBehaviour
         _hasScrolledToEnd = false;
         _titleLabel.text = doc.title;
         SetBodyText(doc.ResolveBody());
+        SetNextLabel(agreeLabel);
+        UpdateNavigationState();
+    }
+
+    void ShowScenePermissionStep()
+    {
+        if (HasScenePermission())
+        {
+            ActivateEnvironmentDepthManager();
+            AdvanceStep();
+            return;
+        }
+
+        _titleLabel.text = depthPermissionTitle;
+        SetBodyText(_scenePermissionDenied ? depthPermissionDeniedBody : depthPermissionBody);
+        _hasScrolledToEnd = true;
         SetNextLabel(agreeLabel);
         UpdateNavigationState();
     }
@@ -822,6 +1055,9 @@ public class RequirementsManager : MonoBehaviour
             {
                 case StepType.Document:
                     _nextButton.interactable = _hasScrolledToEnd;
+                    break;
+                case StepType.ScenePermission:
+                    _nextButton.interactable = !_waitingForScenePermissionResponse;
                     break;
                 case StepType.Microphone:
                     _nextButton.interactable = !_waitingForMicrophoneResponse;
@@ -1021,6 +1257,12 @@ public class RequirementsManager : MonoBehaviour
     void ResolveUserReference()
     {
         OVRCameraRig ovrCameraRig = FindObjectOfType<OVRCameraRig>();
+
+        if (_environmentDepthManager == null && ovrCameraRig != null)
+        {
+            _environmentDepthManager = ovrCameraRig.GetComponent<EnvironmentDepthManager>();
+            CacheDepthManagerState();
+        }
 
         if (_headAnchor == null && ovrCameraRig != null && ovrCameraRig.centerEyeAnchor != null)
         {
@@ -1438,6 +1680,10 @@ public class RequirementsManager : MonoBehaviour
         PlayerPrefs.Save();
         onRequirementsAccepted?.Invoke();
         RestoreTrackingOrigin();
+        if (HasScenePermission())
+        {
+            ActivateEnvironmentDepthManager();
+        }
 
         EnsureMasterControl();
         if (loadLocalSceneOnCompletion)
@@ -1506,6 +1752,13 @@ public class RequirementsManager : MonoBehaviour
             _microphoneCallbacks.PermissionGranted -= OnMicrophonePermissionGranted;
             _microphoneCallbacks.PermissionDenied -= OnMicrophonePermissionDenied;
             _microphoneCallbacks.PermissionDeniedAndDontAskAgain -= OnMicrophonePermissionDontAskAgain;
+        }
+
+        if (_scenePermissionCallbacks != null)
+        {
+            _scenePermissionCallbacks.PermissionGranted -= OnScenePermissionGranted;
+            _scenePermissionCallbacks.PermissionDenied -= OnScenePermissionDenied;
+            _scenePermissionCallbacks.PermissionDeniedAndDontAskAgain -= OnScenePermissionDontAskAgain;
         }
     }
 #endif
