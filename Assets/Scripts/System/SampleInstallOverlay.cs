@@ -2,18 +2,22 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Nobi.UiRoundedCorners;
 
 public class SampleInstallOverlay : MonoBehaviour
 {
     const float CanvasScale = 0.001f;
     const float PanelWidthPixels = 900f;
-    const float PanelHeightPixels = 320f;
+    const float PanelHeightPixels = 350f;
     const float PanelDistanceMeters = 1.55f;
     const float VerticalOffsetMeters = -0.15f;
     const float OrientationFollowSpeed = 2.75f;
     const float VerticalFollowSpeed = 2.25f;
     const float FadeDuration = 0.35f;
     const float MinimumVisibleProgress = 0.04f;
+    const float PanelCornerRadius = 36f;
+    const float ProgressCornerRadius = 24f;
+    const string RoundedShaderName = "UI/RoundedCorners/RoundedCorners";
 
     Canvas _canvas;
     CanvasGroup _canvasGroup;
@@ -24,6 +28,8 @@ public class SampleInstallOverlay : MonoBehaviour
     bool _hasPositionedPanel;
     bool _hasShownActualProgress;
     int _panelLayer;
+    static Shader s_RoundedShader;
+    [SerializeField] Shader roundedCornersShader;
     static Sprite _solidSprite;
 
     public static SampleInstallOverlay CreateAndAttach()
@@ -130,7 +136,10 @@ public class SampleInstallOverlay : MonoBehaviour
         var panelImage = panel.AddComponent<Image>();
         panelImage.sprite = GetSolidSprite();
         panelImage.type = Image.Type.Sliced;
-        panelImage.color = new Color(0.02f, 0.02f, 0.02f, 0.96f);
+        panelImage.color = new Color(0.02f, 0.02f, 0.02f, 1f);
+        var panelRounded = panel.AddComponent<ImageWithRoundedCorners>();
+        panelRounded.radius = PanelCornerRadius;
+        ApplyRoundedCorners(panelRounded);
 
         BuildTitle(panelRect);
         BuildProgressBar(panelRect);
@@ -170,7 +179,7 @@ public class SampleInstallOverlay : MonoBehaviour
         bodyRect.anchoredPosition = new Vector2(0f, -120f);
 
         var bodyLabel = bodyGo.AddComponent<TextMeshProUGUI>();
-        bodyLabel.text = "Installing the bundled samples... Please keep the headset on.";
+        bodyLabel.text = "We are installing the bundled samples. Please keep the headset on.";
         bodyLabel.fontSize = 34f;
         bodyLabel.alignment = TextAlignmentOptions.Center;
         bodyLabel.color = new Color(0.8f, 0.8f, 0.8f, 0.95f);
@@ -215,6 +224,9 @@ public class SampleInstallOverlay : MonoBehaviour
         barBackground.sprite = GetSolidSprite();
         barBackground.type = Image.Type.Sliced;
         barBackground.color = new Color(1f, 1f, 1f, 0.05f);
+        var barRounded = barRoot.AddComponent<ImageWithRoundedCorners>();
+        barRounded.radius = ProgressCornerRadius;
+        ApplyRoundedCorners(barRounded);
 
         GameObject fillGo = new GameObject("Fill", typeof(RectTransform));
         fillGo.transform.SetParent(barRoot.transform, false);
@@ -231,6 +243,9 @@ public class SampleInstallOverlay : MonoBehaviour
         _progressFill.fillOrigin = 0;
         _progressFill.fillAmount = 0f;
         _progressFill.color = new Color(0.1f, 0.6f, 0.18f, 1f);
+        var fillRounded = fillGo.AddComponent<ImageWithRoundedCorners>();
+        fillRounded.radius = ProgressCornerRadius;
+        ApplyRoundedCorners(fillRounded);
     }
 
     IEnumerator FadeCanvas(float targetAlpha, float duration)
@@ -320,6 +335,42 @@ public class SampleInstallOverlay : MonoBehaviour
         }
 
         return Quaternion.LookRotation(-lookDirection, Vector3.up);
+    }
+
+    void ApplyRoundedCorners(ImageWithRoundedCorners rounded)
+    {
+        if (rounded == null)
+        {
+            return;
+        }
+
+        Shader shader = ResolveRoundedCornersShader();
+        if (shader != null)
+        {
+            rounded.SetShaderOverride(shader);
+        }
+
+        rounded.Validate();
+        rounded.Refresh();
+    }
+
+    Shader ResolveRoundedCornersShader()
+    {
+        if (roundedCornersShader != null)
+        {
+            return roundedCornersShader;
+        }
+
+        if (s_RoundedShader == null)
+        {
+            s_RoundedShader = Shader.Find(RoundedShaderName);
+            if (s_RoundedShader == null)
+            {
+                Debug.LogWarning($"SampleInstallOverlay: could not locate shader '{RoundedShaderName}' for rounded corners.");
+            }
+        }
+
+        return s_RoundedShader;
     }
 
     static void SetLayerRecursively(Transform root, int layer)
