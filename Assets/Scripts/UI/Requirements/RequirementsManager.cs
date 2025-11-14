@@ -139,6 +139,7 @@ public class RequirementsManager : MonoBehaviour
     [SerializeField] float mouseScrollMultiplier = 65f;
     [SerializeField] float orientationFollowSpeed = 2.5f;
     [SerializeField] int startupPositionDelayFrames = 10;
+    [SerializeField] float verticalFollowSpeed = 2f;
 
     [Header("Rounded Corners")]
     [SerializeField] Shader roundedCornersShader;
@@ -167,6 +168,7 @@ public class RequirementsManager : MonoBehaviour
     const float PanelCornerRadius = 36f;
     const float ButtonCornerRadius = 24f;
     const float ScrollAreaCornerRadius = 28f;
+    const float PanelTopAlignmentRatio = 0.25f;
     const string MicrophonePermissionName = "android.permission.RECORD_AUDIO";
 
     Canvas _canvas;
@@ -185,6 +187,10 @@ public class RequirementsManager : MonoBehaviour
     RectTransform _contentRect;
     Coroutine _postLayoutRoutine;
     Coroutine _initialPositionRoutine;
+    bool _hasPositionedPanel;
+    bool _hasTrackingOriginOverride;
+    bool _recenterSubscribed;
+    OVRManager.TrackingOrigin _cachedTrackingOrigin = OVRManager.TrackingOrigin.Stage;
 
     bool _flowActive;
     int _currentStepIndex;
@@ -300,11 +306,15 @@ public class RequirementsManager : MonoBehaviour
         ShowStep(_currentStepIndex);
     }
 
+    void OnEnable()
+    {
+        SubscribeToRecenterEvent(true);
+    }
+
     IEnumerator Start()
     {
         ApplyRenderResolutionScaling();
         EnsureDefaultDocuments();
-        ResolveUserReference();
 
         bool consentPresent = PlayerPrefs.GetInt(consentKey, 0) == 1;
         bool storageGranted = AndroidStorageAccess.HasManageAllFilesAccess();
@@ -321,6 +331,9 @@ public class RequirementsManager : MonoBehaviour
             yield break;
         }
 
+        ResolveUserReference();
+        SubscribeToRecenterEvent(true);
+        ApplyWizardTrackingOrigin();
         BuildUi();
         InitializeStartupPosition();
 
@@ -466,6 +479,7 @@ public class RequirementsManager : MonoBehaviour
             return;
         }
 
+        UpdatePanelVerticalAlignment(Time.deltaTime);
         OrientCanvasTowardsUser(Time.deltaTime);
     }
 
@@ -914,6 +928,7 @@ public class RequirementsManager : MonoBehaviour
         if (startupPositionDelayFrames <= 0)
         {
             ResolveUserReference();
+            ApplyWizardTrackingOrigin();
             PositionUiInFrontOfUser();
             return;
         }
@@ -936,8 +951,50 @@ public class RequirementsManager : MonoBehaviour
         }
 
         ResolveUserReference();
+        ApplyWizardTrackingOrigin();
         PositionUiInFrontOfUser();
         _initialPositionRoutine = null;
+    }
+
+    void ApplyWizardTrackingOrigin()
+    {
+#if UNITY_ANDROID || UNITY_EDITOR
+        OVRManager manager = OVRManager.instance;
+        if (manager == null)
+        {
+            return;
+        }
+
+        if (!_hasTrackingOriginOverride)
+        {
+            _cachedTrackingOrigin = manager.trackingOriginType;
+            _hasTrackingOriginOverride = true;
+        }
+
+        if (manager.trackingOriginType != OVRManager.TrackingOrigin.EyeLevel)
+        {
+            manager.trackingOriginType = OVRManager.TrackingOrigin.EyeLevel;
+        }
+#endif
+    }
+
+    void RestoreTrackingOrigin()
+    {
+#if UNITY_ANDROID || UNITY_EDITOR
+        if (!_hasTrackingOriginOverride)
+        {
+            return;
+        }
+
+        OVRManager manager = OVRManager.instance;
+        if (manager == null)
+        {
+            return;
+        }
+
+        manager.trackingOriginType = _cachedTrackingOrigin;
+        _hasTrackingOriginOverride = false;
+#endif
     }
 
     void BuildScrollHint(RectTransform parent)
@@ -999,6 +1056,42 @@ public class RequirementsManager : MonoBehaviour
         }
     }
 
+    void SubscribeToRecenterEvent(bool subscribe)
+    {
+#if UNITY_ANDROID || UNITY_EDITOR
+        OVRDisplay display = OVRManager.display;
+        if (display == null)
+        {
+            return;
+        }
+
+        if (subscribe && !_recenterSubscribed)
+        {
+            display.RecenteredPose += OnDisplayRecenteredPose;
+            _recenterSubscribed = true;
+        }
+        else if (!subscribe && _recenterSubscribed)
+        {
+            display.RecenteredPose -= OnDisplayRecenteredPose;
+            _recenterSubscribed = false;
+        }
+#endif
+    }
+
+#if UNITY_ANDROID || UNITY_EDITOR
+    void OnDisplayRecenteredPose()
+    {
+        if (_canvasTransform == null || !isActiveAndEnabled)
+        {
+            return;
+        }
+
+        ResolveUserReference();
+        PositionUiInFrontOfUser();
+        ForceVerticalAlignmentToTarget();
+    }
+#endif
+
     void PositionUiInFrontOfUser()
     {
         if (_canvasTransform == null)
@@ -1010,11 +1103,15 @@ public class RequirementsManager : MonoBehaviour
         {
             _canvasTransform.position = Vector3.forward * panelDistance;
             _canvasTransform.rotation = Quaternion.identity;
+            _hasPositionedPanel = false;
             return;
         }
 
-        Vector3 targetPosition = _headAnchor.position + _headAnchor.forward * panelDistance + -_headAnchor.up * verticalOffset;
+        float verticalShift = GetVerticalAlignmentOffset();
+        Vector3 targetPosition = _headAnchor.position + _headAnchor.forward * panelDistance;
+        targetPosition.y -= verticalShift;
         _canvasTransform.position = targetPosition;
+        _hasPositionedPanel = true;
 
         Vector3 lookDirection = _headAnchor.position - _canvasTransform.position;
         lookDirection.y = 0f;
@@ -1024,25 +1121,65 @@ public class RequirementsManager : MonoBehaviour
         }
         else
         {
-            _canvasTransform.rotation = _headAnchor.rotation * Quaternion.Euler(0f, 180f, 0f);
+            Vector3 fallbackForward = -_headAnchor.forward;
+            fallbackForward.y = 0f;
+            if (fallbackForward.sqrMagnitude < 0.0001f)
+            {
+                fallbackForward = Vector3.forward;
+            }
+            _canvasTransform.rotation = Quaternion.LookRotation(fallbackForward, Vector3.up);
         }
     }
 
-    void OrientCanvasTowardsUser(float deltaTime)
+    void UpdatePanelVerticalAlignment(float deltaTime)
+    {
+        if (!_hasPositionedPanel || _canvasTransform == null || _headAnchor == null)
+        {
+            return;
+        }
+
+        float targetY = _headAnchor.position.y - GetVerticalAlignmentOffset();
+        Vector3 current = _canvasTransform.position;
+
+        if (verticalFollowSpeed <= 0f || deltaTime <= Mathf.Epsilon)
+        {
+            current.y = targetY;
+        }
+        else
+        {
+            float t = 1f - Mathf.Exp(-verticalFollowSpeed * deltaTime);
+            current.y = Mathf.Lerp(current.y, targetY, t);
+        }
+
+        _canvasTransform.position = current;
+    }
+
+    float GetVerticalAlignmentOffset()
+    {
+        return verticalOffset + GetPanelWorldHeight() * PanelTopAlignmentRatio;
+    }
+
+    float GetPanelWorldHeight()
+    {
+        return PanelHeightPixels * CanvasScale;
+    }
+
+    void ForceVerticalAlignmentToTarget()
     {
         if (_canvasTransform == null || _headAnchor == null)
         {
             return;
         }
 
-        if (orientationFollowSpeed <= 0f)
+        Vector3 snapped = _canvasTransform.position;
+        snapped.y = _headAnchor.position.y - GetVerticalAlignmentOffset();
+        _canvasTransform.position = snapped;
+    }
+
+    void OrientCanvasTowardsUser(float deltaTime)
+    {
+        if (_canvasTransform == null || _headAnchor == null)
         {
-            Vector3 immediateDirection = _headAnchor.position - _canvasTransform.position;
-            immediateDirection.y = 0f;
-            if (immediateDirection.sqrMagnitude > 0.0001f)
-            {
-                _canvasTransform.rotation = Quaternion.LookRotation(-immediateDirection, Vector3.up);
-            }
             return;
         }
 
@@ -1054,8 +1191,24 @@ public class RequirementsManager : MonoBehaviour
         }
 
         Quaternion target = Quaternion.LookRotation(-flatDirection, Vector3.up);
+
+        if (!_hasPositionedPanel || orientationFollowSpeed <= 0f || deltaTime <= Mathf.Epsilon)
+        {
+            _canvasTransform.rotation = target;
+            return;
+        }
+
+        float angle = Quaternion.Angle(_canvasTransform.rotation, target);
         float t = Mathf.Clamp01(orientationFollowSpeed * deltaTime);
-        _canvasTransform.rotation = Quaternion.Slerp(_canvasTransform.rotation, target, t);
+
+        if (angle > 135f)
+        {
+            _canvasTransform.rotation = target;
+        }
+        else
+        {
+            _canvasTransform.rotation = Quaternion.Slerp(_canvasTransform.rotation, target, t);
+        }
     }
 
     static void SetLayerRecursively(Transform root, int layer)
@@ -1284,6 +1437,7 @@ public class RequirementsManager : MonoBehaviour
         PlayerPrefs.SetInt(consentKey, 1);
         PlayerPrefs.Save();
         onRequirementsAccepted?.Invoke();
+        RestoreTrackingOrigin();
 
         EnsureMasterControl();
         if (loadLocalSceneOnCompletion)
@@ -1312,6 +1466,8 @@ public class RequirementsManager : MonoBehaviour
             StopCoroutine(_initialPositionRoutine);
             _initialPositionRoutine = null;
         }
+        SubscribeToRecenterEvent(false);
+        RestoreTrackingOrigin();
     }
 
     void EnsureMasterControl()
