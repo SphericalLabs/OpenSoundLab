@@ -163,14 +163,21 @@ MonoBehaviour:
     streamingAssetRelativePath: Requirements/open_source_notices.txt
   autoPopulateDefaultDocuments: 1
   missingDocumentFallback: Document unavailable.
+  depthPermissionTitle: Spatial Depth Permission
+  depthPermissionBody: 'Optional: OpenSoundLab is a mixed-reality experience. Grant
+    access to spatial data so depth occlusion can function.'
+  depthPermissionDeniedBody: Spatial depth access is still blocked. You can enable
+    the Spatial Scene permission later in the Meta Quest settings for this app. Press
+    Agree to continue.
   microphoneTitle: Microphone Permission
-  microphoneBody: OpenSoundLab lets you record audio input. Please allow microphone
-    access so recordings work.
-  microphoneDeniedBody: Microphone access is still blocked. Select Agree to continue
-    without it, or enable it later in the Meta Quest settings.
+  microphoneBody: 'Optional: OpenSoundLab lets you sample and process your audio
+    input. Please allow microphone access to make this work.'
+  microphoneDeniedBody: Microphone access is still blocked. Press Agree to continue
+    without it. You can enable it later in the Meta Quest settings for this app.
   permissionTitle: Storage Permission
-  permissionBody: OpenSoundLab needs file access to load and record patches. The
-    next step opens the Android settings where you can grant the permission.
+  permissionBody: 'Required: OpenSoundLab needs file access to load and record patches
+    in your Documents folder. The next step opens the Android settings where you
+    can grant the permission.'
   agreeLabel: Agree
   openSettingsLabel: Open Settings
   backLabel: Back
@@ -215,6 +222,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6331181938598924803, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+        type: 3}
+      propertyPath: _occlusionShadersMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6393751841341310333, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+        type: 3}
+      propertyPath: requestScenePermissionOnStartup
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6393751841341310333, guid: 50afd51f2d9d3574d98e902dc51c7e90,
+        type: 3}
+      propertyPath: requestEyeTrackingPermissionOnStartup
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6393751841347891353, guid: 50afd51f2d9d3574d98e902dc51c7e90,
         type: 3}
       propertyPath: m_Name

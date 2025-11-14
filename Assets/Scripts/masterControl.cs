@@ -26,6 +26,7 @@
 // limitations under the License.
 
 using UnityEngine;
+using System.Collections;
 using System.IO;
 using System;
 using UnityEngine.SceneManagement;
@@ -233,6 +234,29 @@ public class masterControl : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(CompleteStartupAfterSamplesReady());
+    }
+
+    IEnumerator CompleteStartupAfterSamplesReady()
+    {
+        sampleManager manager = GetComponent<sampleManager>();
+        while (manager != null && !manager.IsReady)
+        {
+            yield return null;
+        }
+
+        RunStartupSequence();
+    }
+
+    void RunStartupSequence()
+    {
+        if (_startupSequenceExecuted)
+        {
+            return;
+        }
+
+        _startupSequenceExecuted = true;
+
         if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
         {
             PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
@@ -251,9 +275,12 @@ public class masterControl : MonoBehaviour
 
         if (autoLoadLocalScene)
         {
-            SceneManager.LoadScene((int)Scenes.Local);
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (activeScene.buildIndex != (int)Scenes.Local)
+            {
+                SceneManager.LoadScene((int)Scenes.Local);
+            }
         }
-
     }
 
 
@@ -673,6 +700,7 @@ public class masterControl : MonoBehaviour
     }
 
     bool tutorialSpawnPending;
+    bool _startupSequenceExecuted;
 
     bool TrySpawnTutorials()
     {

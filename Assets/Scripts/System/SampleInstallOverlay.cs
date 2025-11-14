@@ -10,12 +10,20 @@ public class SampleInstallOverlay : MonoBehaviour
     const float PanelHeightPixels = 320f;
     const float PanelDistanceMeters = 1.55f;
     const float VerticalOffsetMeters = -0.15f;
+    const float OrientationFollowSpeed = 2.75f;
+    const float VerticalFollowSpeed = 2.25f;
     const float FadeDuration = 0.35f;
+    const float MinimumVisibleProgress = 0.04f;
 
     Canvas _canvas;
     CanvasGroup _canvasGroup;
     Image _progressFill;
     Coroutine _fadeRoutine;
+    Transform _headAnchor;
+    Camera _headCamera;
+    bool _hasPositionedPanel;
+    bool _hasShownActualProgress;
+    int _panelLayer;
     static Sprite _solidSprite;
 
     public static SampleInstallOverlay CreateAndAttach()
@@ -29,14 +37,23 @@ public class SampleInstallOverlay : MonoBehaviour
 
         GameObject root = new GameObject("SampleInstallOverlay", typeof(RectTransform));
         root.layer = anchor.gameObject.layer;
-        root.transform.SetParent(anchor, false);
-        root.transform.localPosition = new Vector3(0f, VerticalOffsetMeters, PanelDistanceMeters);
-        root.transform.localRotation = Quaternion.identity;
-        root.transform.localScale = Vector3.one * CanvasScale;
 
         var overlay = root.AddComponent<SampleInstallOverlay>();
-        overlay.BuildUi(anchor);
+        overlay.Initialize(anchor);
         return overlay;
+    }
+
+    void Initialize(Transform anchor)
+    {
+        _headAnchor = anchor;
+        _headCamera = ResolveCamera(anchor);
+        _panelLayer = anchor != null ? anchor.gameObject.layer : gameObject.layer;
+
+        transform.localScale = Vector3.one * CanvasScale;
+
+        BuildUi();
+        SetLayerRecursively(transform, _panelLayer);
+        UpdateFollower(0f, true);
     }
 
     public void CompleteAndHide()
@@ -59,12 +76,36 @@ public class SampleInstallOverlay : MonoBehaviour
         _fadeRoutine = StartCoroutine(FadeAndDestroy());
     }
 
-    void BuildUi(Transform anchor)
+    void Update()
+    {
+        if (_headAnchor == null)
+        {
+            _headAnchor = ResolveAnchor();
+            if (_headAnchor != null)
+            {
+                _panelLayer = _headAnchor.gameObject.layer;
+                SetLayerRecursively(transform, _panelLayer);
+            }
+        }
+
+        if (_headCamera == null && _headAnchor != null)
+        {
+            _headCamera = ResolveCamera(_headAnchor);
+            if (_canvas != null)
+            {
+                _canvas.worldCamera = _headCamera;
+            }
+        }
+
+        UpdateFollower(Time.deltaTime, false);
+    }
+
+    void BuildUi()
     {
         _canvas = gameObject.AddComponent<Canvas>();
         _canvas.renderMode = RenderMode.WorldSpace;
         _canvas.sortingOrder = 5200;
-        _canvas.worldCamera = ResolveCamera(anchor);
+        _canvas.worldCamera = _headCamera;
 
         var scaler = gameObject.AddComponent<CanvasScaler>();
         scaler.dynamicPixelsPerUnit = 12000f;
@@ -129,7 +170,7 @@ public class SampleInstallOverlay : MonoBehaviour
         bodyRect.anchoredPosition = new Vector2(0f, -120f);
 
         var bodyLabel = bodyGo.AddComponent<TextMeshProUGUI>();
-        bodyLabel.text = "We are installing the bundled samples. Please keep the headset on.";
+        bodyLabel.text = "Installing the bundled samples... Please keep the headset on.";
         bodyLabel.fontSize = 34f;
         bodyLabel.alignment = TextAlignmentOptions.Center;
         bodyLabel.color = new Color(0.8f, 0.8f, 0.8f, 0.95f);
@@ -143,7 +184,20 @@ public class SampleInstallOverlay : MonoBehaviour
             return;
         }
 
-        _progressFill.fillAmount = Mathf.Clamp01(normalized);
+        float clamped = Mathf.Clamp01(normalized);
+        if (!_hasShownActualProgress)
+        {
+            if (clamped >= MinimumVisibleProgress || Mathf.Approximately(clamped, 1f))
+            {
+                _hasShownActualProgress = true;
+            }
+            else
+            {
+                clamped = Mathf.Max(clamped, MinimumVisibleProgress);
+            }
+        }
+
+        _progressFill.fillAmount = clamped;
     }
 
     void BuildProgressBar(RectTransform parent)
@@ -200,6 +254,86 @@ public class SampleInstallOverlay : MonoBehaviour
     {
         yield return FadeCanvas(0f, FadeDuration);
         Destroy(gameObject);
+    }
+
+    void UpdateFollower(float deltaTime, bool forceSnap)
+    {
+        Vector3 targetPosition = CalculateTargetPosition();
+        bool snapTranslation = forceSnap || !_hasPositionedPanel || VerticalFollowSpeed <= Mathf.Epsilon || deltaTime <= Mathf.Epsilon;
+
+        if (snapTranslation)
+        {
+            transform.position = targetPosition;
+        }
+        else
+        {
+            float t = 1f - Mathf.Exp(-VerticalFollowSpeed * deltaTime);
+            transform.position = Vector3.Lerp(transform.position, targetPosition, t);
+        }
+
+        Quaternion targetRotation = CalculateTargetRotation(transform.position);
+        bool snapRotation = forceSnap || !_hasPositionedPanel || OrientationFollowSpeed <= Mathf.Epsilon || deltaTime <= Mathf.Epsilon;
+        if (snapRotation)
+        {
+            transform.rotation = targetRotation;
+        }
+        else
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Mathf.Clamp01(OrientationFollowSpeed * deltaTime));
+        }
+
+        _hasPositionedPanel = true;
+    }
+
+    Vector3 CalculateTargetPosition()
+    {
+        if (_headAnchor == null)
+        {
+            return new Vector3(0f, VerticalOffsetMeters, PanelDistanceMeters);
+        }
+
+        Vector3 forward = _headAnchor.forward;
+        forward.y = 0f;
+        if (forward.sqrMagnitude < 0.0001f)
+        {
+            forward = Vector3.forward;
+        }
+        forward.Normalize();
+
+        Vector3 target = _headAnchor.position + forward * PanelDistanceMeters;
+        target.y += VerticalOffsetMeters;
+        return target;
+    }
+
+    Quaternion CalculateTargetRotation(Vector3 panelPosition)
+    {
+        if (_headAnchor == null)
+        {
+            return Quaternion.LookRotation(Vector3.forward, Vector3.up);
+        }
+
+        Vector3 lookDirection = _headAnchor.position - panelPosition;
+        lookDirection.y = 0f;
+        if (lookDirection.sqrMagnitude <= 0.0001f)
+        {
+            return Quaternion.LookRotation(Vector3.forward, Vector3.up);
+        }
+
+        return Quaternion.LookRotation(-lookDirection, Vector3.up);
+    }
+
+    static void SetLayerRecursively(Transform root, int layer)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        root.gameObject.layer = layer;
+        foreach (Transform child in root)
+        {
+            SetLayerRecursively(child, layer);
+        }
     }
 
     static Transform ResolveAnchor()

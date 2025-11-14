@@ -195,6 +195,7 @@ public class RequirementsManager : MonoBehaviour
     RectTransform _contentRect;
     Coroutine _postLayoutRoutine;
     Coroutine _initialPositionRoutine;
+    Coroutine _sceneLoadRoutine;
     bool _hasPositionedPanel;
     bool _hasTrackingOriginOverride;
     bool _recenterSubscribed;
@@ -505,7 +506,7 @@ public class RequirementsManager : MonoBehaviour
             EnsureMasterControl();
             if (loadLocalSceneOnCompletion)
             {
-                TryLoadLocalScene();
+                yield return LoadLocalSceneAfterSamplesReady();
             }
             onRequirementsAccepted?.Invoke();
             enabled = false;
@@ -1676,6 +1677,8 @@ public class RequirementsManager : MonoBehaviour
             return;
         }
 
+        _flowActive = false;
+
         PlayerPrefs.SetInt(consentKey, 1);
         PlayerPrefs.Save();
         onRequirementsAccepted?.Invoke();
@@ -1685,17 +1688,79 @@ public class RequirementsManager : MonoBehaviour
             ActivateEnvironmentDepthManager();
         }
 
+        TearDownWizardUi();
         EnsureMasterControl();
         if (loadLocalSceneOnCompletion)
         {
-            TryLoadLocalScene();
+            BeginSceneLoadAfterSamplesReady();
+            return;
         }
 
+        FinalizeFlow();
+    }
+
+    void BeginSceneLoadAfterSamplesReady()
+    {
+        if (_sceneLoadRoutine != null)
+        {
+            StopCoroutine(_sceneLoadRoutine);
+        }
+
+        _sceneLoadRoutine = StartCoroutine(LoadLocalSceneAfterSamplesReadyAndFinalize());
+    }
+
+    IEnumerator LoadLocalSceneAfterSamplesReadyAndFinalize()
+    {
+        yield return LoadLocalSceneAfterSamplesReady();
+        FinalizeFlow();
+    }
+
+    IEnumerator LoadLocalSceneAfterSamplesReady()
+    {
+        sampleManager manager = ResolveSampleManager();
+        while (manager != null && !manager.IsReady)
+        {
+            yield return null;
+        }
+
+        TryLoadLocalScene();
+    }
+
+    sampleManager ResolveSampleManager()
+    {
+        if (masterControl.instance == null)
+        {
+            return null;
+        }
+
+        return masterControl.instance.GetComponent<sampleManager>();
+    }
+
+    void TearDownWizardUi()
+    {
         if (_canvas != null)
         {
             Destroy(_canvas.gameObject);
         }
 
+        _canvas = null;
+        _canvasTransform = null;
+        _panelRect = null;
+        _titleLabel = null;
+        _bodyLabel = null;
+        _nextButton = null;
+        _backButton = null;
+        _nextButtonLabel = null;
+        _backButtonLabel = null;
+        _scrollRect = null;
+        _contentRect = null;
+        _scrollHintRoot = null;
+    }
+
+    void FinalizeFlow()
+    {
+        TearDownWizardUi();
+        _sceneLoadRoutine = null;
         _flowActive = false;
         enabled = false;
     }
@@ -1711,6 +1776,11 @@ public class RequirementsManager : MonoBehaviour
         {
             StopCoroutine(_initialPositionRoutine);
             _initialPositionRoutine = null;
+        }
+        if (_sceneLoadRoutine != null)
+        {
+            StopCoroutine(_sceneLoadRoutine);
+            _sceneLoadRoutine = null;
         }
         SubscribeToRecenterEvent(false);
         RestoreTrackingOrigin();
