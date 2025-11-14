@@ -41,6 +41,11 @@ public class platformSetup : MonoBehaviour
     manipulator[] manips = new manipulator[2];
     void Awake()
     {
+
+        hmdTargetOculus = GameObject.Find("CenterEyeAnchor").transform;
+        controllerLTargetOculus = GameObject.Find("LeftControllerAnchor").transform;
+        controllerRTargetOculus = GameObject.Find("RightControllerAnchor").transform;
+
         masterControl MC = GetComponent<masterControl>();
 
         if (MC.currentPlatform == masterControl.platform.Oculus)

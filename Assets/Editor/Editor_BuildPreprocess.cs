@@ -47,6 +47,19 @@ class CustomBuildPreProcess : IPreprocessBuild
     public int callbackOrder { get { return 0; } }
     public void OnPreprocessBuild(BuildTarget target, string path)
     {
+        prepareStreamingAssetBundles();
+    }
+
+    [MenuItem("Tools/OpenSoundLab/Factory Presets/Prepare Bundle", false, 1000)]
+    public static void PrepareStreamingAssetBundlesMenu()
+    {
+        prepareStreamingAssetBundles();
+        Debug.Log("OpenSoundLab: Prepared Factory Preset bundles.");
+    }
+
+    private static void prepareStreamingAssetBundles()
+    {
+        Directory.CreateDirectory(Application.streamingAssetsPath);
 
         string dataDirectory = Application.dataPath + "/StreamingAssetsPreZip/Examples/";
         string fileToCreate = Application.streamingAssetsPath + "/Examples.tgz";
@@ -55,9 +68,7 @@ class CustomBuildPreProcess : IPreprocessBuild
 
         dataDirectory = Application.dataPath + "/StreamingAssetsPreZip/Samples/";
         fileToCreate = Application.streamingAssetsPath + "/Samples.tgz";
-
         Utility_SharpZipCommands.CreateTarGZ_FromDirectory(fileToCreate, dataDirectory);
-
     }
 }
 

@@ -26,10 +26,14 @@
 // limitations under the License.
 
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
+using UnityEngine.Networking;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.GZip;
 
@@ -39,10 +43,39 @@ public class sampleManager : MonoBehaviour
 
     public Dictionary<string, Dictionary<string, string>> sampleDictionary;
 
+    public event Action SamplesLoaded;
+    public bool IsReady { get; private set; }
+
     List<string> customSamples = new List<string>();
+    bool _initializationStarted;
+
+    void EnsureCategory(string key)
+    {
+        if (sampleDictionary == null)
+        {
+            return;
+        }
+
+        if (!sampleDictionary.ContainsKey(key))
+        {
+            sampleDictionary[key] = new Dictionary<string, string>();
+        }
+    }
+
+    void EnsureDefaultCategories()
+    {
+        EnsureCategory("Custom");
+        EnsureCategory("Recordings");
+        EnsureCategory("Sessions");
+    }
 
     public void ClearCustomSamples()
     {
+        if (!sampleDictionary.ContainsKey("Custom"))
+        {
+            return;
+        }
+
         for (int i = 0; i < customSamples.Count; i++)
         {
             samplerLoad[] samplers = FindObjectsOfType<samplerLoad>();
@@ -90,6 +123,8 @@ public class sampleManager : MonoBehaviour
 
     public void AddSample(string newsample)
     {
+        EnsureCategory("Custom");
+
         if (sampleDictionary["Custom"].ContainsKey(Path.GetFileNameWithoutExtension(newsample))) return;
 
         if (!File.Exists(newsample))
@@ -117,6 +152,8 @@ public class sampleManager : MonoBehaviour
 
     public void AddRecording(string newsample)
     {
+        EnsureCategory("Recordings");
+
         if (sampleDictionary["Recordings"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
         {
             return;
@@ -133,6 +170,8 @@ public class sampleManager : MonoBehaviour
 
     public void AddSession(string newsample)
     {
+        EnsureCategory("Sessions");
+
         if (sampleDictionary["Sessions"].ContainsKey(Path.GetFileNameWithoutExtension(newsample)))
         {
             return;
@@ -152,6 +191,8 @@ public class sampleManager : MonoBehaviour
     void AddCustomSamples()
     {
         inStartup = true;
+
+        EnsureCategory("Custom");
 
         if (!PlayerPrefs.HasKey("sampCount")) PlayerPrefs.SetInt("sampCount", 0);
 
@@ -199,6 +240,21 @@ public class sampleManager : MonoBehaviour
 
     public void Init()
     {
+        if (_initializationStarted)
+        {
+            return;
+        }
+
+        _initializationStarted = true;
+        instance = this;
+        sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
+        EnsureDefaultCategories();
+
+        StartCoroutine(InitRoutine());
+    }
+
+    IEnumerator InitRoutine()
+    {
         string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
         bool directoryExists = Directory.Exists(dir);
         bool needsExtraction = !directoryExists;
@@ -210,38 +266,268 @@ public class sampleManager : MonoBehaviour
 
         Directory.CreateDirectory(dir);
 
-        //if Samples directory doesn't exist or is empty, extract default data...
+        SampleInstallOverlay overlay = null;
+
         if (needsExtraction)
         {
-            //copy tgz to directory where we can extract it
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-            WWW www = new WWW("file://" + Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+            overlay = SampleInstallOverlay.CreateAndAttach();
+            if (overlay != null)
+            {
+                overlay.SetProgress(0f);
+            }
+
+            string compressedPath = Path.Combine(Directory.GetParent(Application.persistentDataPath).FullName, "Samples.tgz");
+            string sourceUri = BuildStreamingAssetUri("Samples.tgz");
+
+            bool copySucceeded = false;
+            string copyError = null;
+
+            string fileSystemSource = TryGetFileSystemPath(sourceUri);
+            if (!string.IsNullOrEmpty(fileSystemSource) && File.Exists(fileSystemSource))
+            {
+                const int BufferSize = 128 * 1024;
+                long totalBytes = 0;
+                long copiedBytes = 0;
+                Exception copyException = null;
+
+                try
+                {
+                    totalBytes = new FileInfo(fileSystemSource).Length;
+                }
+                catch (Exception ex)
+                {
+                    copyError = ex.Message;
+                }
+
+                if (copyError == null)
+                {
+                    Task copyTask = Task.Run(() =>
+                    {
+                        try
+                        {
+                            byte[] buffer = new byte[BufferSize];
+                            using (FileStream sourceStream = File.OpenRead(fileSystemSource))
+                            using (FileStream destinationStream = File.Create(compressedPath))
+                            {
+                                int read;
+                                while ((read = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+                                {
+                                    destinationStream.Write(buffer, 0, read);
+                                    Interlocked.Add(ref copiedBytes, read);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            copyException = ex;
+                        }
+                    });
+
+                    while (!copyTask.IsCompleted)
+                    {
+                        yield return null;
+                    }
+
+                    if (copyException == null)
+                    {
+                        copySucceeded = true;
+                    }
+                    else
+                    {
+                        copyError = copyException.Message;
+                    }
+                }
+            }
+            else
+            {
+                using (UnityWebRequest request = UnityWebRequest.Get(sourceUri))
+                {
+                    var downloadHandler = new DownloadHandlerFile(compressedPath)
+                    {
+                        removeFileOnAbort = true
+                    };
+                    request.downloadHandler = downloadHandler;
+
+                    UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+                    long contentLength = -1;
+
+                    while (!operation.isDone)
+                    {
+                        if (contentLength <= 0)
+                        {
+                            string header = request.GetResponseHeader("Content-Length");
+                            if (!string.IsNullOrEmpty(header) && long.TryParse(header, out long parsedLength))
+                            {
+                                contentLength = parsedLength;
+                            }
+                        }
+
+                        yield return null;
+                    }
+
+#if UNITY_2020_1_OR_NEWER
+                    if (request.result == UnityWebRequest.Result.Success)
 #else
-            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Samples.tgz");
+                    if (!request.isHttpError && !request.isNetworkError)
 #endif
-            while (!www.isDone) { }
-            System.IO.File.WriteAllBytes(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", www.bytes);
-            //extract it
-            Utility_SharpZipCommands.ExtractTGZ(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz", dir);
-            //delete tgz
-            File.Delete(Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples.tgz");
+                    {
+                        copySucceeded = true;
+                    }
+                    else
+                    {
+                        copyError = request.error;
+                    }
+                }
+            }
+
+            if (!copySucceeded)
+            {
+                if (!string.IsNullOrEmpty(copyError))
+                {
+                    Debug.LogError($"sampleManager: failed to copy Samples.tgz from streaming assets. {copyError}");
+                }
+                else
+                {
+                    Debug.LogError("sampleManager: failed to copy Samples.tgz from streaming assets.");
+                }
+            }
+            else
+            {
+                Exception extractionError = null;
+                float extractionProgress = 0f;
+
+                if (overlay != null)
+                {
+                    overlay.SetProgress(0f);
+                }
+
+                Task extractTask = Task.Run(() =>
+                {
+                    try
+                    {
+                        Utility_SharpZipCommands.ExtractTGZ(compressedPath, dir, (processed, total) =>
+                        {
+                            float normalized = total > 0 ? (float)(processed / (double)total) : 1f;
+                            Volatile.Write(ref extractionProgress, Mathf.Clamp01(normalized));
+                        });
+                        Volatile.Write(ref extractionProgress, 1f);
+                    }
+                    catch (Exception ex)
+                    {
+                        extractionError = ex;
+                    }
+                });
+
+                while (!extractTask.IsCompleted)
+                {
+                    if (overlay != null)
+                    {
+                        float current = Volatile.Read(ref extractionProgress);
+                        overlay.SetProgress(current);
+                    }
+
+                    yield return null;
+                }
+
+                if (overlay != null)
+                {
+                    float final = Volatile.Read(ref extractionProgress);
+                    overlay.SetProgress(final);
+                }
+
+                if (extractionError != null)
+                {
+                    Debug.LogError($"sampleManager: error extracting Samples.tgz: {extractionError.Message}");
+                }
+            }
+
+            try
+            {
+                if (File.Exists(compressedPath))
+                {
+                    File.Delete(compressedPath);
+                }
+            }
+            catch (IOException ex)
+            {
+                Debug.LogWarning($"sampleManager: could not delete temporary archive. {ex.Message}");
+            }
         }
 
-
-        instance = this;
-        sampleDictionary = new Dictionary<string, Dictionary<string, string>>();
-
-        // used for bundled default samples
-        //string dir = Directory.GetParent(Application.persistentDataPath).FullName + Path.DirectorySeparatorChar + "Samples";
-        //loadSampleDictionary(dir, "APP");
-
-        //string dir = masterControl.instance.SaveDir + Path.DirectorySeparatorChar + "Samples";
-        //Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Custom");
         Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Recordings");
         Directory.CreateDirectory(dir + Path.DirectorySeparatorChar + "Sessions");
+
         loadSampleDictionary(dir, "DOC");
+        EnsureDefaultCategories();
         AddCustomSamples();
 
+        IsReady = true;
+        SamplesLoaded?.Invoke();
+
+        if (overlay != null)
+        {
+            overlay.CompleteAndHide();
+        }
+    }
+
+    static string BuildStreamingAssetUri(string fileName)
+    {
+        string combinedPath = Path.Combine(Application.streamingAssetsPath, fileName);
+        if (string.IsNullOrEmpty(combinedPath))
+        {
+            return string.Empty;
+        }
+
+        if (combinedPath.Contains("://"))
+        {
+            return combinedPath;
+        }
+
+        try
+        {
+            return new Uri(combinedPath).AbsoluteUri;
+        }
+        catch (UriFormatException)
+        {
+            string normalized = combinedPath.Replace('\\', '/');
+            if (!normalized.StartsWith("/", StringComparison.Ordinal))
+            {
+                normalized = "/" + normalized;
+            }
+            return "file://" + normalized;
+        }
+    }
+
+    static string TryGetFileSystemPath(string uri)
+    {
+        if (string.IsNullOrEmpty(uri))
+        {
+            return string.Empty;
+        }
+
+        if (!uri.Contains("://"))
+        {
+            return uri;
+        }
+
+        if (uri.StartsWith("jar:", StringComparison.OrdinalIgnoreCase))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            Uri parsed = new Uri(uri);
+            if (parsed.IsFile)
+            {
+                return parsed.LocalPath;
+            }
+        }
+        catch (UriFormatException)
+        {
+        }
+
+        return string.Empty;
     }
 
     public static string GetFileName(string path)

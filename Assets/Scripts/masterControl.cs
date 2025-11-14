@@ -26,12 +26,14 @@
 // limitations under the License.
 
 using UnityEngine;
+using System.Collections;
 using System.IO;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Net;
 using System.Linq;
+using UnityEngine.Networking;
 using Meta.XR.EnvironmentDepth;
 
 public class masterControl : MonoBehaviour
@@ -89,6 +91,7 @@ public class masterControl : MonoBehaviour
 
     public bool handlesEnabled = true;
     public bool jacksEnabled = true;
+    [SerializeField] bool autoLoadLocalScene;
 
     public masterBusRecorder recorder;
     public metronome metro;
@@ -103,6 +106,8 @@ public class masterControl : MonoBehaviour
         {
             Debug.unityLogger.logEnabled = false;
         }
+
+        CameraRig = GameObject.Find("OVRCameraRig-Variant");
 
         DontDestroyOnLoad(this);
         DontDestroyOnLoad(CameraRig);
@@ -157,23 +162,40 @@ public class masterControl : MonoBehaviour
             muteEnvToggle.isOn = true;
         }
 
-        SaveDir = Application.persistentDataPath + Path.DirectorySeparatorChar + "OpenSoundLab";
+        SaveDir = ResolveDefaultSaveDir();
+        EnsureDirectoryExists(SaveDir);
         ReadFileLocConfig();
-        //Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "MySamples");
+        EnsureDirectoryExists(SaveDir);
+        Debug.Log($"masterControl: SaveDir resolved to {SaveDir}");
 
 #if UNITY_ANDROID
-        //if Saves doesn't exist, extract example data...
-        if (Directory.Exists(SaveDir + Path.DirectorySeparatorChar + "Saves") == false)
+        string savesPath = Path.Combine(SaveDir, "Saves");
+        if (!Directory.Exists(savesPath))
         {
-            Directory.CreateDirectory(SaveDir + Path.DirectorySeparatorChar + "Saves");
-            //copy tgz to directory where we can extract it
-            WWW www = new WWW(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Examples.tgz");
-            while (!www.isDone) { }
-            System.IO.File.WriteAllBytes(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz", www.bytes);
-            //extract it
-            Utility_SharpZipCommands.ExtractTGZ(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz", SaveDir + Path.DirectorySeparatorChar + "Saves");
-            //delete tgz
-            File.Delete(SaveDir + Path.DirectorySeparatorChar + "Examples.tgz");
+            Directory.CreateDirectory(savesPath);
+
+            string archivePath = Path.Combine(SaveDir, "Examples.tgz");
+            bool copySucceeded = TryCopyStreamingAsset("Examples.tgz", archivePath, out string copyError);
+
+            if (!copySucceeded)
+            {
+                Debug.LogError($"masterControl: failed to stage Examples.tgz. {copyError}");
+            }
+            else
+            {
+                try
+                {
+                    Utility_SharpZipCommands.ExtractTGZ(archivePath, savesPath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"masterControl: failed to extract Examples.tgz. {ex.Message}\n{ex.StackTrace}");
+                }
+                finally
+                {
+                    TryDeleteFile(archivePath);
+                }
+            }
         }
 #endif
 
@@ -212,27 +234,53 @@ public class masterControl : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(CompleteStartupAfterSamplesReady());
+    }
+
+    IEnumerator CompleteStartupAfterSamplesReady()
+    {
+        sampleManager manager = GetComponent<sampleManager>();
+        while (manager != null && !manager.IsReady)
+        {
+            yield return null;
+        }
+
+        RunStartupSequence();
+    }
+
+    void RunStartupSequence()
+    {
+        if (_startupSequenceExecuted)
+        {
+            return;
+        }
+
+        _startupSequenceExecuted = true;
+
         if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
         {
             PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
             PlayerPrefs.Save();
         }
 
-        if (PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null)
+        bool shouldSpawnTutorials = PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null;
+        if (shouldSpawnTutorials)
         {
-
-            GameObject g = Instantiate(tutorialsPrefab, GameObject.Find("PatchAnchor").transform, false) as GameObject;
-
-            //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
-            g.transform.position = new Vector3(0f, 1.3f, 0.75f);
-            g.transform.Rotate(0f, -180f, 0f);
-
-            //g.GetComponent<tutorialsDeviceInterface>().forcePlay(); // not working
-
+            if (!TrySpawnTutorials())
+            {
+                tutorialSpawnPending = true;
+                SceneManager.sceneLoaded += HandleSceneLoadedForTutorials;
+            }
         }
 
-        SceneManager.LoadScene((int)Scenes.Local);
-
+        if (autoLoadLocalScene)
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (activeScene.buildIndex != (int)Scenes.Local)
+            {
+                SceneManager.LoadScene((int)Scenes.Local);
+            }
+        }
     }
 
 
@@ -344,6 +392,182 @@ public class masterControl : MonoBehaviour
     public void toggleInstrumentVolume(bool on)
     {
         masterMixer.SetFloat("instrumentVolume", on ? 0 : -18);
+    }
+
+
+    public static string ResolveDefaultSaveDir()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        return Path.Combine("/sdcard", "Documents", "OpenSoundLab");
+#else
+        string documents = TryGetDocumentsPath();
+        return Path.Combine(documents, "OpenSoundLab");
+#endif
+    }
+
+    static void EnsureDirectoryExists(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return;
+        }
+
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+    }
+
+
+#if UNITY_ANDROID
+    static bool TryCopyStreamingAsset(string fileName, string destinationPath, out string error)
+    {
+        error = null;
+
+#if UNITY_EDITOR
+        string sourcePath = Path.Combine(Application.streamingAssetsPath, fileName);
+        if (!File.Exists(sourcePath))
+        {
+            error = $"Source asset not found at {sourcePath}.";
+            return false;
+        }
+
+        try
+        {
+            File.Copy(sourcePath, destinationPath, true);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            return false;
+        }
+#else
+        string sourceUri = string.Format("{0}/{1}", Application.streamingAssetsPath, fileName);
+
+        using (UnityWebRequest request = UnityWebRequest.Get(sourceUri))
+        {
+            var downloadHandler = new DownloadHandlerFile(destinationPath)
+            {
+                removeFileOnAbort = true
+            };
+            request.downloadHandler = downloadHandler;
+
+            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+            }
+
+#if UNITY_2020_1_OR_NEWER
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                error = request.error;
+                return false;
+            }
+#else
+            if (request.isHttpError || request.isNetworkError)
+            {
+                error = request.error;
+                return false;
+            }
+#endif
+        }
+
+        return true;
+#endif
+    }
+#endif
+
+    static void TryDeleteFile(string path)
+    {
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        {
+            return;
+        }
+
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"masterControl: unable to delete temporary file at {path}. {ex.Message}");
+        }
+    }
+
+
+    static string TryGetDocumentsPath()
+    {
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+        string homePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        if (!string.IsNullOrEmpty(homePath))
+        {
+            string macDocuments = Path.Combine(homePath, "Documents");
+            if (!Directory.Exists(macDocuments))
+            {
+                try
+                {
+                    Directory.CreateDirectory(macDocuments);
+                }
+                catch (Exception)
+                {
+                    // Ignore; fall back to other candidates below.
+                }
+            }
+
+            if (Directory.Exists(macDocuments))
+            {
+                return macDocuments;
+            }
+        }
+#endif
+
+        string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (!string.IsNullOrEmpty(documents))
+        {
+            if (!Directory.Exists(documents))
+            {
+                try
+                {
+                    Directory.CreateDirectory(documents);
+                }
+                catch (Exception)
+                {
+                    // Ignore and continue with fallbacks.
+                }
+            }
+
+            if (Directory.Exists(documents))
+            {
+                return documents;
+            }
+        }
+
+        string personal = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        if (!string.IsNullOrEmpty(personal))
+        {
+            return personal;
+        }
+
+        try
+        {
+            string parentPath = Directory.GetParent(Application.persistentDataPath)?.FullName;
+            if (!string.IsNullOrEmpty(parentPath) && Directory.Exists(parentPath))
+            {
+                return parentPath;
+            }
+        }
+        catch (Exception)
+        {
+            // ignore; fall back below
+        }
+
+        if (!string.IsNullOrEmpty(Application.persistentDataPath))
+        {
+            return Application.persistentDataPath;
+        }
+
+        return Environment.CurrentDirectory;
     }
 
 
@@ -473,6 +697,46 @@ public class masterControl : MonoBehaviour
     public void toggleBeatUpdate(bool on)
     {
         beatUpdateRunning = on;
+    }
+
+    bool tutorialSpawnPending;
+    bool _startupSequenceExecuted;
+
+    bool TrySpawnTutorials()
+    {
+        Transform anchor = patchAnchor != null ? patchAnchor : GameObject.Find("PatchAnchor")?.transform;
+        if (anchor == null)
+        {
+            Debug.LogWarning("masterControl: PatchAnchor not found yet; tutorials will spawn once the scene finishes loading.");
+            return false;
+        }
+
+        GameObject g = Instantiate(tutorialsPrefab, anchor, false);
+
+        //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
+        g.transform.position = new Vector3(0f, 1.3f, 0.75f);
+        g.transform.Rotate(0f, -180f, 0f);
+        tutorialSpawnPending = false;
+        return true;
+    }
+
+    void HandleSceneLoadedForTutorials(Scene scene, LoadSceneMode mode)
+    {
+        if (!tutorialSpawnPending)
+        {
+            SceneManager.sceneLoaded -= HandleSceneLoadedForTutorials;
+            return;
+        }
+
+        if (TrySpawnTutorials())
+        {
+            SceneManager.sceneLoaded -= HandleSceneLoadedForTutorials;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= HandleSceneLoadedForTutorials;
     }
 
     public GameObject tutorialsPrefab;

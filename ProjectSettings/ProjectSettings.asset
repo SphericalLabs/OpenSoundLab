@@ -20,9 +20,9 @@ PlayerSettings:
   m_ShowUnitySplashScreen: 1
   m_ShowUnitySplashLogo: 1
   m_SplashScreenOverlayOpacity: 1
-  m_SplashScreenAnimation: 0
+  m_SplashScreenAnimation: 1
   m_SplashScreenLogoStyle: 1
-  m_SplashScreenDrawMode: 0
+  m_SplashScreenDrawMode: 1
   m_SplashScreenBackgroundAnimationZoom: 1
   m_SplashScreenLogoAnimationZoom: 1
   m_SplashScreenBackgroundLandscapeAspect: 1
@@ -39,8 +39,11 @@ PlayerSettings:
     y: 0
     width: 1
     height: 1
-  m_SplashScreenLogos: []
-  m_VirtualRealitySplashScreen: {fileID: 0}
+  m_SplashScreenLogos:
+  - logo: {fileID: 10404, guid: 0000000000000000f000000000000000, type: 0}
+    duration: 2
+  m_VirtualRealitySplashScreen: {fileID: 2800000, guid: ccdea8b31fa554227954f654fe9c4f24,
+    type: 3}
   m_HolographicTrackingLossScreen: {fileID: 0}
   defaultScreenWidth: 1024
   defaultScreenHeight: 768
@@ -147,9 +150,6 @@ PlayerSettings:
   - {fileID: 11400000, guid: c363b5179947cbb40899ebae53ad2c59, type: 2}
   - {fileID: 0}
   - {fileID: 11400000, guid: 3099c588a3391ca4a8bb43f81f2d3b89, type: 2}
-  - {fileID: 11400000, guid: 4111133830c7bbe45a449ccd73094916, type: 2}
-  - {fileID: 6607199958307399662, guid: 888fd814a99cacd4091ef31088347959, type: 2}
-  - {fileID: 8207365043489784020, guid: 93c4f4428c8e3814dbf9d469c39e85d4, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -952,6 +952,7 @@ PlayerSettings:
   syncCapabilities: 0
   platformCapabilities:
     WindowsStoreApps:
+      CodeGeneration: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -961,8 +962,6 @@ PlayerSettings:
       MusicLibrary: False
       LowLevelDevices: False
       PrivateNetworkClientServer: False
-      InternetClientServer: False
-      BackgroundMediaPlayback: False
       Objects3D: False
       RemoteSystem: False
       BlockedChatMessages: False
@@ -986,7 +985,7 @@ PlayerSettings:
       Contacts: False
       InternetClient: False
       Proximity: False
-      CodeGeneration: False
+      BackgroundMediaPlayback: False
       EnterpriseAuthentication: False
   metroTargetDeviceFamilies:
     Desktop: False

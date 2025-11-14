@@ -11,13 +11,9 @@
     </activity>
     <meta-data android:name="unityplayer.SkipPermissionsDialog" android:value="false" />
     <meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only" />
-    <meta-data android:name="com.oculus.ossplash.background" android:value="passthrough-contextual" />
     <meta-data android:name="com.oculus.trade_cpu_for_gpu_amount" android:value="1" />
     <meta-data android:name="com.oculus.supportedDevices" android:value="quest2|questpro|eureka" tools:replace="android:value" />
     <meta-data android:name="com.oculus.telemetry.project_guid" android:value="e2e46f3c-3846-4605-a4c9-10b7b791bff4" />
-    <meta-data android:name="com.oculus.ossplash" android:value="true" />
-    <meta-data android:name="com.oculus.ossplash.type" android:value="mono" />
-    <meta-data android:name="com.oculus.ossplash.colorspace" android:value="P3" />
   </application>
   <uses-feature android:name="android.hardware.vr.headtracking" android:version="1" android:required="true" />
   <uses-feature android:name="com.oculus.feature.PASSTHROUGH" android:required="true" />
@@ -25,6 +21,5 @@
   <uses-permission android:name="com.oculus.permission.EYE_TRACKING" />
   <uses-feature android:name="com.oculus.feature.BOUNDARYLESS_APP" android:required="true" />
   <uses-permission android:name="com.oculus.permission.BOUNDARY_VISIBILITY" />
-  <uses-permission android:name="com.oculus.permission.USE_ANCHOR_API" />
-  <uses-permission android:name="com.oculus.permission.USE_SCENE" />
+  <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
 </manifest>
