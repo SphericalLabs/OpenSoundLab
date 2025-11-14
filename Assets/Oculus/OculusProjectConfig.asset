@@ -23,10 +23,10 @@ MonoBehaviour:
   trackedKeyboardSupport: 0
   bodyTrackingSupport: 0
   faceTrackingSupport: 0
-  eyeTrackingSupport: 1
+  eyeTrackingSupport: 0
   virtualKeyboardSupport: 0
   colocationSessionSupport: 0
-  sceneSupport: 2
+  sceneSupport: 1
   boundaryVisibilitySupport: 1
   disableBackups: 1
   enableNSCConfig: 1
