@@ -263,16 +263,6 @@ public class masterControl : MonoBehaviour
             PlayerPrefs.Save();
         }
 
-        bool shouldSpawnTutorials = PlayerPrefs.GetInt("showTutorialsOnStartup") == 1 && tutorialsPrefab != null;
-        if (shouldSpawnTutorials)
-        {
-            if (!TrySpawnTutorials())
-            {
-                tutorialSpawnPending = true;
-                SceneManager.sceneLoaded += HandleSceneLoadedForTutorials;
-            }
-        }
-
         if (autoLoadLocalScene)
         {
             Scene activeScene = SceneManager.GetActiveScene();
@@ -699,45 +689,7 @@ public class masterControl : MonoBehaviour
         beatUpdateRunning = on;
     }
 
-    bool tutorialSpawnPending;
     bool _startupSequenceExecuted;
-
-    bool TrySpawnTutorials()
-    {
-        Transform anchor = patchAnchor != null ? patchAnchor : GameObject.Find("PatchAnchor")?.transform;
-        if (anchor == null)
-        {
-            Debug.LogWarning("masterControl: PatchAnchor not found yet; tutorials will spawn once the scene finishes loading.");
-            return false;
-        }
-
-        GameObject g = Instantiate(tutorialsPrefab, anchor, false);
-
-        //float height = Mathf.Clamp(Camera.main.transform.position.y, 1, 2);
-        g.transform.position = new Vector3(0f, 1.3f, 0.75f);
-        g.transform.Rotate(0f, -180f, 0f);
-        tutorialSpawnPending = false;
-        return true;
-    }
-
-    void HandleSceneLoadedForTutorials(Scene scene, LoadSceneMode mode)
-    {
-        if (!tutorialSpawnPending)
-        {
-            SceneManager.sceneLoaded -= HandleSceneLoadedForTutorials;
-            return;
-        }
-
-        if (TrySpawnTutorials())
-        {
-            SceneManager.sceneLoaded -= HandleSceneLoadedForTutorials;
-        }
-    }
-
-    private void OnDestroy()
-    {
-        SceneManager.sceneLoaded -= HandleSceneLoadedForTutorials;
-    }
 
     public GameObject tutorialsPrefab;
     public Transform patchAnchor;
