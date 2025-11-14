@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05d394ae2a81edd4cbc3c51917e766e3, type: 3}
   m_Name: OculusProjectConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   targetDeviceTypes: 04000000030000000200000005000000
   allowOptional3DofHeadTracking: 0
   handTrackingSupport: 0
@@ -25,19 +25,25 @@ MonoBehaviour:
   faceTrackingSupport: 0
   eyeTrackingSupport: 1
   virtualKeyboardSupport: 0
+  colocationSessionSupport: 0
   sceneSupport: 2
   boundaryVisibilitySupport: 1
   disableBackups: 1
   enableNSCConfig: 1
-  securityXmlPath:
+  securityXmlPath: 
+  horizonOsSdkEnabled: 0
+  minHorizonOsSdkVersion: 60
+  targetHorizonOsSdkVersion: 81
   skipUnneededShaders: 0
   enableIL2CPPLTO: 0
+  removeGradleManifest: 1
   focusAware: 1
   requiresSystemKeyboard: 0
   experimentalFeaturesEnabled: 0
   insightPassthroughEnabled: 0
   _insightPassthroughSupport: 2
+  isPassthroughCameraAccessEnabled: 0
   _processorFavor: 1
-  systemSplashScreen: {fileID: 2800000, guid: 5542b34de23114c25ab958e5bebc1dcc, type: 3}
+  systemSplashScreen: {fileID: 2800000, guid: e5d556d717e3e409888ebcd6a87cc093, type: 3}
   systemSplashScreenType: 0
   _systemLoadingScreenBackground: 1
