@@ -132,11 +132,13 @@ public class RequirementsManager : MonoBehaviour
     [SerializeField] string backLabel = "Back";
 
     [Header("Layout")]
-    [SerializeField] float panelDistance = 1.8f;
+    [SerializeField] float panelDistance = 1.35f;
     [SerializeField] float verticalOffset = 0.15f;
-    [SerializeField] Vector2 panelSizeMeters = new Vector2(1.2f, 0.75f);
+    [SerializeField] Vector2 panelSizeMeters = new Vector2(1.5f, 0.94f);
     [SerializeField] float joystickScrollSpeed = 0.5f;
     [SerializeField] float mouseScrollMultiplier = 65f;
+    [SerializeField] float orientationFollowSpeed = 2.5f;
+    [SerializeField] int startupPositionDelayFrames = 10;
 
     [Header("Rounded Corners")]
     [SerializeField] Shader roundedCornersShader;
@@ -168,7 +170,10 @@ public class RequirementsManager : MonoBehaviour
     const string MicrophonePermissionName = "android.permission.RECORD_AUDIO";
 
     Canvas _canvas;
+    Transform _canvasTransform;
     RectTransform _panelRect;
+    Transform _headAnchor;
+    Camera _headCamera;
     TextMeshProUGUI _titleLabel;
     TextMeshProUGUI _bodyLabel;
     Button _nextButton;
@@ -179,6 +184,7 @@ public class RequirementsManager : MonoBehaviour
     ScrollRect _scrollRect;
     RectTransform _contentRect;
     Coroutine _postLayoutRoutine;
+    Coroutine _initialPositionRoutine;
 
     bool _flowActive;
     int _currentStepIndex;
@@ -298,6 +304,7 @@ public class RequirementsManager : MonoBehaviour
     {
         ApplyRenderResolutionScaling();
         EnsureDefaultDocuments();
+        ResolveUserReference();
 
         bool consentPresent = PlayerPrefs.GetInt(consentKey, 0) == 1;
         bool storageGranted = AndroidStorageAccess.HasManageAllFilesAccess();
@@ -315,6 +322,7 @@ public class RequirementsManager : MonoBehaviour
         }
 
         BuildUi();
+        InitializeStartupPosition();
 
         yield return LoadDocumentBodies();
 
@@ -449,6 +457,16 @@ public class RequirementsManager : MonoBehaviour
 
         HandleScrollInput();
         HandleButtonShortcuts();
+    }
+
+    void LateUpdate()
+    {
+        if (_canvasTransform == null || _headAnchor == null)
+        {
+            return;
+        }
+
+        OrientCanvasTowardsUser(Time.deltaTime);
     }
 
     void OnApplicationFocus(bool hasFocus)
@@ -838,18 +856,24 @@ public class RequirementsManager : MonoBehaviour
     void BuildUi()
     {
         Transform parent = transform;
-        GameObject canvasGo = new GameObject("RequirementsCanvas");
+        GameObject canvasGo = new GameObject("RequirementsCanvas", typeof(RectTransform));
+        canvasGo.layer = _headAnchor != null ? _headAnchor.gameObject.layer : parent.gameObject.layer;
         canvasGo.transform.SetParent(parent, false);
 
+        _canvasTransform = canvasGo.transform;
+        _canvasTransform.localScale = Vector3.one * CanvasScale;
+
         _canvas = canvasGo.AddComponent<Canvas>();
-        _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        _canvas.renderMode = RenderMode.WorldSpace;
         _canvas.sortingOrder = 5000;
+        _canvas.worldCamera = _headCamera;
+        _canvas.pixelPerfect = true;
 
         CanvasScaler scaler = canvasGo.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(6000f, 3000f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+        scaler.scaleFactor = 1f;
+        scaler.referencePixelsPerUnit = 100f;
+        scaler.dynamicPixelsPerUnit = 8000f;
 
         canvasGo.AddComponent<GraphicRaycaster>();
 
@@ -869,8 +893,7 @@ public class RequirementsManager : MonoBehaviour
         Vector2 panelPixelSize = panelSizeMeters * (PanelSizeScale / CanvasScale);
         panelPixelSize.y = PanelHeightPixels;
         _panelRect.sizeDelta = panelPixelSize;
-        float verticalPixels = -verticalOffset * 1000f;
-        _panelRect.anchoredPosition = new Vector2(0f, verticalPixels);
+        _panelRect.anchoredPosition = Vector2.zero;
 
         Image panelImage = panelGo.AddComponent<Image>();
         panelImage.color = new Color(0.02f, 0.02f, 0.02f, 1f);
@@ -882,6 +905,39 @@ public class RequirementsManager : MonoBehaviour
         BuildScrollArea(_panelRect);
         BuildButtons(_panelRect);
         BuildScrollHint(_panelRect);
+
+        SetLayerRecursively(canvasGo.transform, canvasGo.layer);
+    }
+
+    void InitializeStartupPosition()
+    {
+        if (startupPositionDelayFrames <= 0)
+        {
+            ResolveUserReference();
+            PositionUiInFrontOfUser();
+            return;
+        }
+
+        if (_initialPositionRoutine != null)
+        {
+            StopCoroutine(_initialPositionRoutine);
+        }
+
+        _initialPositionRoutine = StartCoroutine(DelayInitialPosition());
+    }
+
+    IEnumerator DelayInitialPosition()
+    {
+        int remaining = Mathf.Max(0, startupPositionDelayFrames);
+        while (remaining > 0)
+        {
+            remaining--;
+            yield return null;
+        }
+
+        ResolveUserReference();
+        PositionUiInFrontOfUser();
+        _initialPositionRoutine = null;
     }
 
     void BuildScrollHint(RectTransform parent)
@@ -903,6 +959,117 @@ public class RequirementsManager : MonoBehaviour
         ApplyUiFont(hintLabel);
         _scrollHintRoot = hintGo;
         _scrollHintRoot.SetActive(false);
+    }
+
+    void ResolveUserReference()
+    {
+        OVRCameraRig ovrCameraRig = FindObjectOfType<OVRCameraRig>();
+
+        if (_headAnchor == null && ovrCameraRig != null && ovrCameraRig.centerEyeAnchor != null)
+        {
+            _headAnchor = ovrCameraRig.centerEyeAnchor;
+        }
+
+        if (_headCamera == null)
+        {
+            if (ovrCameraRig != null)
+            {
+                _headCamera = ovrCameraRig.GetComponentInChildren<Camera>();
+            }
+
+            if (_headCamera == null)
+            {
+                _headCamera = Camera.main;
+            }
+
+            if (_headCamera == null)
+            {
+                _headCamera = FindObjectOfType<Camera>();
+            }
+        }
+
+        if (_headAnchor == null && _headCamera != null)
+        {
+            _headAnchor = _headCamera.transform;
+        }
+
+        if (_headAnchor == null)
+        {
+            Debug.LogWarning("RequirementsManager: Cannot locate a head anchor; world-space UI will spawn at the origin.", this);
+        }
+    }
+
+    void PositionUiInFrontOfUser()
+    {
+        if (_canvasTransform == null)
+        {
+            return;
+        }
+
+        if (_headAnchor == null)
+        {
+            _canvasTransform.position = Vector3.forward * panelDistance;
+            _canvasTransform.rotation = Quaternion.identity;
+            return;
+        }
+
+        Vector3 targetPosition = _headAnchor.position + _headAnchor.forward * panelDistance + -_headAnchor.up * verticalOffset;
+        _canvasTransform.position = targetPosition;
+
+        Vector3 lookDirection = _headAnchor.position - _canvasTransform.position;
+        lookDirection.y = 0f;
+        if (lookDirection.sqrMagnitude > 0.0001f)
+        {
+            _canvasTransform.rotation = Quaternion.LookRotation(-lookDirection, Vector3.up);
+        }
+        else
+        {
+            _canvasTransform.rotation = _headAnchor.rotation * Quaternion.Euler(0f, 180f, 0f);
+        }
+    }
+
+    void OrientCanvasTowardsUser(float deltaTime)
+    {
+        if (_canvasTransform == null || _headAnchor == null)
+        {
+            return;
+        }
+
+        if (orientationFollowSpeed <= 0f)
+        {
+            Vector3 immediateDirection = _headAnchor.position - _canvasTransform.position;
+            immediateDirection.y = 0f;
+            if (immediateDirection.sqrMagnitude > 0.0001f)
+            {
+                _canvasTransform.rotation = Quaternion.LookRotation(-immediateDirection, Vector3.up);
+            }
+            return;
+        }
+
+        Vector3 flatDirection = _headAnchor.position - _canvasTransform.position;
+        flatDirection.y = 0f;
+        if (flatDirection.sqrMagnitude <= 0.0001f)
+        {
+            return;
+        }
+
+        Quaternion target = Quaternion.LookRotation(-flatDirection, Vector3.up);
+        float t = Mathf.Clamp01(orientationFollowSpeed * deltaTime);
+        _canvasTransform.rotation = Quaternion.Slerp(_canvasTransform.rotation, target, t);
+    }
+
+    static void SetLayerRecursively(Transform root, int layer)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        root.gameObject.layer = layer;
+        foreach (Transform child in root)
+        {
+            SetLayerRecursively(child, layer);
+        }
     }
 
     void BuildTitle(RectTransform parent)
@@ -1139,6 +1306,11 @@ public class RequirementsManager : MonoBehaviour
         {
             StopCoroutine(_postLayoutRoutine);
             _postLayoutRoutine = null;
+        }
+        if (_initialPositionRoutine != null)
+        {
+            StopCoroutine(_initialPositionRoutine);
+            _initialPositionRoutine = null;
         }
     }
 
