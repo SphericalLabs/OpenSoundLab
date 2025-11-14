@@ -325,37 +325,12 @@ public class sampleManager : MonoBehaviour
 
                     while (!copyTask.IsCompleted)
                     {
-                        if (overlay != null && totalBytes > 0)
-                        {
-                            long progressBytes = Interlocked.Read(ref copiedBytes);
-                            float progress = Mathf.Clamp01((float)progressBytes / totalBytes);
-                            overlay.SetProgress(0.5f * progress);
-                        }
-
                         yield return null;
-                    }
-
-                    if (overlay != null)
-                    {
-                        if (totalBytes > 0)
-                        {
-                            long progressBytes = Interlocked.Read(ref copiedBytes);
-                            float progress = Mathf.Clamp01((float)progressBytes / totalBytes);
-                            overlay.SetProgress(0.5f * progress);
-                        }
-                        else
-                        {
-                            overlay.SetProgress(0.5f);
-                        }
                     }
 
                     if (copyException == null)
                     {
                         copySucceeded = true;
-                        if (overlay != null)
-                        {
-                            overlay.SetProgress(0.5f);
-                        }
                     }
                     else
                     {
@@ -387,26 +362,6 @@ public class sampleManager : MonoBehaviour
                             }
                         }
 
-                        if (overlay != null)
-                        {
-                            float progress;
-                            if (contentLength > 0)
-                            {
-                                progress = (float)(request.downloadedBytes / (double)contentLength);
-                            }
-                            else
-                            {
-                                progress = request.downloadProgress;
-                            }
-
-                            if (float.IsNaN(progress) || progress < 0f)
-                            {
-                                progress = 0f;
-                            }
-
-                            overlay.SetProgress(0.5f * Mathf.Clamp01(progress));
-                        }
-
                         yield return null;
                     }
 
@@ -417,10 +372,6 @@ public class sampleManager : MonoBehaviour
 #endif
                     {
                         copySucceeded = true;
-                        if (overlay != null)
-                        {
-                            overlay.SetProgress(0.5f);
-                        }
                     }
                     else
                     {
@@ -445,6 +396,11 @@ public class sampleManager : MonoBehaviour
                 Exception extractionError = null;
                 float extractionProgress = 0f;
 
+                if (overlay != null)
+                {
+                    overlay.SetProgress(0f);
+                }
+
                 Task extractTask = Task.Run(() =>
                 {
                     try
@@ -467,7 +423,7 @@ public class sampleManager : MonoBehaviour
                     if (overlay != null)
                     {
                         float current = Volatile.Read(ref extractionProgress);
-                        overlay.SetProgress(0.5f + 0.5f * current);
+                        overlay.SetProgress(current);
                     }
 
                     yield return null;
@@ -476,7 +432,7 @@ public class sampleManager : MonoBehaviour
                 if (overlay != null)
                 {
                     float final = Volatile.Read(ref extractionProgress);
-                    overlay.SetProgress(0.5f + 0.5f * final);
+                    overlay.SetProgress(final);
                 }
 
                 if (extractionError != null)
