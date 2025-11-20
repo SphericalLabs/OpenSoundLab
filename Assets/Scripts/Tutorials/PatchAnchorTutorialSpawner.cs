@@ -27,6 +27,7 @@
 
 using Mirror;
 using UnityEngine;
+using System.Collections;
 
 public class PatchAnchorTutorialSpawner : MonoBehaviour
 {
@@ -37,17 +38,35 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
 
     bool tutorialsSpawned;
 
-    void Start()
+    IEnumerator Start()
     {
-        if (spawnOnStart)
+        if (!spawnOnStart)
         {
-            spawnTutorials();
+            yield break;
         }
+
+        if (isNetworkSessionActive())
+        {
+            yield return waitForNetworkSpawner();
+
+            // Let the server/host perform the spawn; clients will receive it over the network.
+            if (!NetworkServer.active)
+            {
+                yield break;
+            }
+        }
+
+        spawnTutorials();
     }
 
     public void spawnTutorials()
     {
         if (tutorialsSpawned)
+        {
+            return;
+        }
+
+        if (isNetworkSessionActive() && !NetworkServer.active)
         {
             return;
         }
@@ -66,13 +85,8 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
         Vector3 worldPosition = transform.TransformPoint(tutorialLocalPosition);
         Quaternion worldRotation = transform.rotation * Quaternion.Euler(tutorialLocalEuler);
 
-        if (shouldUseNetworkSpawner())
+        if (isNetworkSessionActive())
         {
-            if (!NetworkServer.active)
-            {
-                return;
-            }
-
             if (trySpawnNetworked(worldPosition, worldRotation))
             {
                 tutorialsSpawned = true;
@@ -99,27 +113,40 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
 
     bool trySpawnNetworked(Vector3 worldPosition, Quaternion worldRotation)
     {
-        if (NetworkSpawnManager.Instance == null)
+        if (NetworkSpawnManager.Instance == null || NetworkSpawnManager.Instance.netId == 0)
         {
             return false;
         }
 
-        NetworkSpawnManager.Instance.CreateItem(tutorialsPrefab.name, worldPosition, worldRotation, Vector3.zero, Vector3.zero);
-        return true;
+        if (NetworkServer.active)
+        {
+            NetworkSpawnManager.Instance.CreateItem(tutorialsPrefab.name, worldPosition, worldRotation, Vector3.zero, Vector3.zero);
+            return true;
+        }
+
+        return false;
     }
 
-    bool shouldUseNetworkSpawner()
+    bool isNetworkSessionActive()
     {
-        if (NetworkSpawnManager.Instance == null)
-        {
-            return false;
-        }
-
         if (NetworkManager.singleton == null)
         {
             return false;
         }
 
         return NetworkManager.singleton.isNetworkActive;
+    }
+
+    IEnumerator waitForNetworkSpawner()
+    {
+        while (isNetworkSessionActive())
+        {
+            if (NetworkSpawnManager.Instance != null && NetworkSpawnManager.Instance.netId != 0)
+            {
+                yield break;
+            }
+
+            yield return null;
+        }
     }
 }
