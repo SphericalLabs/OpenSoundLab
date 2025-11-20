@@ -47,13 +47,7 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
 
         if (isNetworkSessionActive())
         {
-            yield return waitForNetworkSpawner();
-
-            // Let the server/host perform the spawn; clients will receive it over the network.
-            if (!NetworkServer.active)
-            {
-                yield break;
-            }
+            yield return waitForServerActive();
         }
 
         spawnTutorials();
@@ -82,12 +76,14 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
             return;
         }
 
-        Vector3 worldPosition = transform.TransformPoint(tutorialLocalPosition);
-        Quaternion worldRotation = transform.rotation * Quaternion.Euler(tutorialLocalEuler);
-
         if (isNetworkSessionActive())
         {
-            if (trySpawnNetworked(worldPosition, worldRotation))
+            if (!NetworkServer.active)
+            {
+                return;
+            }
+
+            if (trySpawnNetworked())
             {
                 tutorialsSpawned = true;
             }
@@ -111,20 +107,22 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
         return FindObjectOfType<tutorialsDeviceInterface>() == null;
     }
 
-    bool trySpawnNetworked(Vector3 worldPosition, Quaternion worldRotation)
+    bool trySpawnNetworked()
     {
-        if (NetworkSpawnManager.Instance == null || NetworkSpawnManager.Instance.netId == 0)
+        Transform patchAnchor = GameObject.Find("PatchAnchor")?.transform;
+        if (patchAnchor == null)
         {
-            return false;
+            Debug.LogWarning("PatchAnchorTutorialSpawner: PatchAnchor not found; cannot parent tutorials.");
         }
 
-        if (NetworkServer.active)
-        {
-            NetworkSpawnManager.Instance.CreateItem(tutorialsPrefab.name, worldPosition, worldRotation, Vector3.zero, Vector3.zero);
-            return true;
-        }
+        Vector3 worldPosition = transform.TransformPoint(tutorialLocalPosition);
+        Quaternion worldRotation = transform.rotation * Quaternion.Euler(tutorialLocalEuler);
 
-        return false;
+        GameObject tutorialsRoot = Instantiate(tutorialsPrefab, worldPosition, worldRotation, patchAnchor);
+        NetworkServer.Spawn(tutorialsRoot);
+        tutorialsRoot.transform.localPosition = tutorialLocalPosition;
+        tutorialsRoot.transform.localRotation = Quaternion.Euler(tutorialLocalEuler);
+        return true;
     }
 
     bool isNetworkSessionActive()
@@ -137,15 +135,10 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
         return NetworkManager.singleton.isNetworkActive;
     }
 
-    IEnumerator waitForNetworkSpawner()
+    IEnumerator waitForServerActive()
     {
-        while (isNetworkSessionActive())
+        while (isNetworkSessionActive() && !NetworkServer.active)
         {
-            if (NetworkSpawnManager.Instance != null && NetworkSpawnManager.Instance.netId != 0)
-            {
-                yield break;
-            }
-
             yield return null;
         }
     }
