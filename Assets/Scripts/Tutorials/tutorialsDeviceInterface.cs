@@ -55,7 +55,7 @@ public class tutorialsDeviceInterface : deviceInterface
     private float pendingSeekTime;
     private bool desiredPlayState;
 
-    public event Action<tutorialPanel, bool> OnTriggerOpenTutorial;
+    public event Func<tutorialPanel, bool, bool> OnTriggerOpenTutorial;
     public bool IsReady => clipReady && videoPlayer != null && videoPlayer.isPrepared;
 
     [System.Serializable]
@@ -127,15 +127,21 @@ public class tutorialsDeviceInterface : deviceInterface
             case 2:
                 // -10s
                 if (!on) return; // only on enter events
-                if (videoPlayer.frame - 10 * videoPlayer.frameRate >= 0)
                 {
-                    videoPlayer.frame = Mathf.RoundToInt(videoPlayer.frame - 10 * videoPlayer.frameRate);
+                    long targetFrame = 0;
+                    if (videoPlayer.frame - 10 * videoPlayer.frameRate >= 0)
+                    {
+                        targetFrame = Mathf.RoundToInt(videoPlayer.frame - 10 * videoPlayer.frameRate);
+                    }
+                    else
+                    {
+                        targetFrame = 0;
+                    }
+                    videoPlayer.frame = targetFrame;
+                    // Calculate time from frame to avoid stale videoPlayer.time
+                    float targetTime = (float)targetFrame / videoPlayer.frameRate;
+                    OnSeek?.Invoke(targetTime);
                 }
-                else
-                {
-                    videoPlayer.frame = 0;
-                }
-                OnSeek?.Invoke((float)videoPlayer.time);
                 break;
             case 3:
                 // play
@@ -144,17 +150,24 @@ public class tutorialsDeviceInterface : deviceInterface
             case 4:
                 // +10s
                 if (!on) return; // only on enter events
-                if (videoPlayer.frame + 10 * videoPlayer.frameRate >= videoPlayer.frameCount)
                 {
-                    videoPlayer.frame = 0;
-                    videoPlayer.Pause();
-                    playButton.isHit = false;
-                    OnPause?.Invoke();
-                }
-                else
-                {
-                    videoPlayer.frame = (int)(videoPlayer.frame + 10 * videoPlayer.frameRate);
-                    OnSeek?.Invoke((float)videoPlayer.time);
+                    long targetFrame = 0;
+                    if (videoPlayer.frame + 10 * videoPlayer.frameRate >= videoPlayer.frameCount)
+                    {
+                        targetFrame = 0;
+                        videoPlayer.frame = 0;
+                        videoPlayer.Pause();
+                        playButton.isHit = false;
+                        OnPause?.Invoke();
+                    }
+                    else
+                    {
+                        targetFrame = (long)(videoPlayer.frame + 10 * videoPlayer.frameRate);
+                        videoPlayer.frame = targetFrame;
+                        // Calculate time from frame to avoid stale videoPlayer.time
+                        float targetTime = (float)targetFrame / videoPlayer.frameRate;
+                        OnSeek?.Invoke(targetTime);
+                    }
                 }
                 break;
             case 5:
@@ -170,8 +183,23 @@ public class tutorialsDeviceInterface : deviceInterface
     public void triggerOpenTutorial(tutorialPanel tut, bool startPaused = false)
     {
         playButton.keyHit(false);
-        OnTriggerOpenTutorial?.Invoke(tut, startPaused);
-        InternalOpenTutorial(tut, startPaused);
+
+        bool handledByNetwork = false;
+        if (OnTriggerOpenTutorial != null)
+        {
+            foreach (Func<tutorialPanel, bool, bool> handler in OnTriggerOpenTutorial.GetInvocationList())
+            {
+                if (handler(tut, startPaused))
+                {
+                    handledByNetwork = true;
+                }
+            }
+        }
+
+        if (!handledByNetwork)
+        {
+            InternalOpenTutorial(tut, startPaused);
+        }
     }
 
     // New method to be called directly without triggering the event

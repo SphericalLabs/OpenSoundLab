@@ -144,12 +144,12 @@ public class NetworkTutorials : NetworkBehaviour
 
     #region Event Handlers
 
-    private void HandleTriggerOpenTutorial(tutorialPanel tut, bool startPaused)
+    private bool HandleTriggerOpenTutorial(tutorialPanel tut, bool startPaused)
     {
         int tutorialIndex = Array.IndexOf(tutorialsDevice.tutorials, tut);
         if (tutorialIndex < 0)
         {
-            return;
+            return false;
         }
 
         activeTutorialIndex = tutorialIndex;
@@ -163,11 +163,20 @@ public class NetworkTutorials : NetworkBehaviour
                 RpcSyncTime(serverTime, tutorialsDevice.videoPlayer.isPlaying);
                 lastTimeSync = Time.time;
             }
+            return true; // Suppress local execution, let RPC handle it or we already did?
+                         // Actually, if we are server, we might want to let local run?
+                         // But RpcTriggerOpenTutorial will call InternalOpenTutorial on clients.
+                         // Does Rpc execute locally? Yes if we are host.
+                         // So if we are host, RpcTriggerOpenTutorial executes on us too.
+                         // So we should return true to suppress the immediate local call in tutorialsDeviceInterface.
         }
-        else
+        else if (NetworkClient.active)
         {
             CmdTriggerOpenTutorial(tutorialIndex, startPaused);
+            return true; // Suppress local execution, wait for Rpc from server (or just let Cmd handle it if we want optimistic? No, let's stick to authoritative)
         }
+
+        return false;
     }
 
     private void HandlePlay()
