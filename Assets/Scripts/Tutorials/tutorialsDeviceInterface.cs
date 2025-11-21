@@ -43,14 +43,20 @@ public class tutorialsDeviceInterface : deviceInterface
     public tutorialPanel selectedTutorial;
     public tutorialPanel[] tutorials;
     public TutorialRecord[] tutorialRecords;
+    public bool openOnStartup = true;
 
     public VideoPlayer videoPlayer;
 
     public Transform progressTransform;
     private Vector3 maxProgressScale;
     //private float minProgressScale;
+    private bool clipReady;
+    private bool hasPendingSeek;
+    private float pendingSeekTime;
+    private bool desiredPlayState;
 
     public event Action<tutorialPanel, bool> OnTriggerOpenTutorial;
+    public bool IsReady => clipReady && videoPlayer != null && videoPlayer.isPrepared;
 
     [System.Serializable]
     public class TutorialRecord
@@ -82,7 +88,10 @@ public class tutorialsDeviceInterface : deviceInterface
         }
 
 
-        triggerOpenTutorial(tutorials[0], true);
+        if (openOnStartup && tutorials.Length > 0)
+        {
+            InternalOpenTutorial(tutorials[0], false);
+        }
 
     }
     Vector3 scaleVector = new Vector3(0f, 1f, 1f);
@@ -101,6 +110,9 @@ public class tutorialsDeviceInterface : deviceInterface
         progressTransform.localScale = Vector3.Scale(maxProgressScale, scaleVector);
     }
 
+    public event Action OnPlay;
+    public event Action OnPause;
+    public event Action<float> OnSeek;
 
     public override void hit(bool on, int ID = -1)
     {
@@ -110,6 +122,7 @@ public class tutorialsDeviceInterface : deviceInterface
                 // rewind
                 if (!on) return; // only on enter events
                 videoPlayer.frame = 0;
+                OnSeek?.Invoke(0f);
                 break;
             case 2:
                 // -10s
@@ -122,6 +135,7 @@ public class tutorialsDeviceInterface : deviceInterface
                 {
                     videoPlayer.frame = 0;
                 }
+                OnSeek?.Invoke((float)videoPlayer.time);
                 break;
             case 3:
                 // play
@@ -135,10 +149,12 @@ public class tutorialsDeviceInterface : deviceInterface
                     videoPlayer.frame = 0;
                     videoPlayer.Pause();
                     playButton.isHit = false;
+                    OnPause?.Invoke();
                 }
                 else
                 {
                     videoPlayer.frame = (int)(videoPlayer.frame + 10 * videoPlayer.frameRate);
+                    OnSeek?.Invoke((float)videoPlayer.time);
                 }
                 break;
             case 5:
@@ -161,6 +177,9 @@ public class tutorialsDeviceInterface : deviceInterface
     // New method to be called directly without triggering the event
     public void InternalOpenTutorial(tutorialPanel tut, bool startPaused = false)
     {
+        clipReady = false;
+        hasPendingSeek = false;
+        desiredPlayState = !startPaused;
         StartCoroutine(openTutorial(tut, startPaused));
     }
 
@@ -168,6 +187,10 @@ public class tutorialsDeviceInterface : deviceInterface
     {
 
         selectedTutorial = tut;
+        clipReady = false;
+        hasPendingSeek = false;
+        pendingSeekTime = 0f;
+        desiredPlayState = !startPaused;
 
         // disable all other tutorials
         for (int i = 0; i < tutorials.Length; i++)
@@ -178,6 +201,9 @@ public class tutorialsDeviceInterface : deviceInterface
 
         selectedTutorial.setActivated(true, false); // do not notify manager, otherwise stackoverflow
 
+        videoPlayer.Stop();
+        videoPlayer.time = 0f;
+        videoPlayer.frame = 0;
         videoPlayer.url = Application.streamingAssetsPath + "/" + selectedTutorial.videoString;
         videoPlayer.Prepare();
 
@@ -185,35 +211,103 @@ public class tutorialsDeviceInterface : deviceInterface
         {
             yield return new WaitForSeconds(.1f);
         }
-        videoPlayer.skipOnDrop = false;
+        videoPlayer.skipOnDrop = true;
+        clipReady = true;
 
-        if (!startPaused) forcePlay();
+        if (hasPendingSeek)
+        {
+            videoPlayer.time = pendingSeekTime;
+            hasPendingSeek = false;
+        }
+
+        videoPlayer.playbackSpeed = 1f;
+
+        if (desiredPlayState)
+        {
+            forcePlay();
+        }
+        else
+        {
+            InternalPause();
+        }
     }
 
     public void playPauseVideo()
     {
+        if (!clipReady) return;
+
         if (playButton.isHit)
         {
             videoPlayer.Play();
+            OnPlay?.Invoke();
         }
         else
         {
             videoPlayer.Pause();
+            OnPause?.Invoke();
         }
-
-        //if(videoPlayer.isPlaying){
-        //  videoPlayer.Pause();
-        //} else if (videoPlayer.isPaused) {
-        //  videoPlayer.Play();
-        //}
     }
 
     public void forcePlay()
     {
+        if (!clipReady)
+        {
+            desiredPlayState = true;
+            return;
+        }
+
         videoPlayer.frame = 0;
         videoPlayer.Play();
-        //playButton.isHit = true;
         playButton.keyHit(true);
+        OnPlay?.Invoke();
+    }
+
+    public void InternalPlay()
+    {
+        if (!clipReady)
+        {
+            desiredPlayState = true;
+            return;
+        }
+
+        if (!videoPlayer.isPlaying)
+        {
+            videoPlayer.Play();
+            playButton.keyHit(true);
+        }
+    }
+
+    public void InternalPause()
+    {
+        if (!clipReady)
+        {
+            desiredPlayState = false;
+            return;
+        }
+
+        if (videoPlayer.isPlaying)
+        {
+            videoPlayer.Pause();
+            playButton.keyHit(false);
+        }
+    }
+
+    public void InternalSeek(float time)
+    {
+        if (!clipReady)
+        {
+            pendingSeekTime = Mathf.Max(0f, time);
+            hasPendingSeek = true;
+            return;
+        }
+
+        float clampedTime = Mathf.Max(0f, time);
+        videoPlayer.time = clampedTime;
+    }
+
+    public void InternalSetSpeed(float speed)
+    {
+        videoPlayer.playbackSpeed = speed;
     }
 
     public override InstrumentData GetData()
