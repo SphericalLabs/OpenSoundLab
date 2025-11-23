@@ -32,7 +32,7 @@ using System.Collections;
 public class PatchAnchorTutorialSpawner : MonoBehaviour
 {
     public GameObject tutorialsPrefab;
-    public Vector3 tutorialLocalPosition = new Vector3(0f, 1.3f, 0.75f);
+    public Vector3 tutorialLocalPosition = new Vector3(0f, 1.3f, 0.5f);
     public Vector3 tutorialLocalEuler = new Vector3(0f, -180f, 0f);
     public bool spawnOnStart = true;
 

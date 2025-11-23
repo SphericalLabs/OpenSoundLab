@@ -58,6 +58,8 @@ public class tutorialsDeviceInterface : deviceInterface
     public event Func<tutorialPanel, bool, bool> OnTriggerOpenTutorial;
     public bool IsReady => clipReady && videoPlayer != null && videoPlayer.isPrepared;
 
+    public int skipSeconds = 15;
+
     [System.Serializable]
     public class TutorialRecord
     {
@@ -129,9 +131,9 @@ public class tutorialsDeviceInterface : deviceInterface
                 if (!on) return; // only on enter events
                 {
                     long targetFrame = 0;
-                    if (videoPlayer.frame - 10 * videoPlayer.frameRate >= 0)
+                    if (videoPlayer.frame - skipSeconds * videoPlayer.frameRate >= 0)
                     {
-                        targetFrame = Mathf.RoundToInt(videoPlayer.frame - 10 * videoPlayer.frameRate);
+                        targetFrame = Mathf.RoundToInt(videoPlayer.frame - skipSeconds * videoPlayer.frameRate);
                     }
                     else
                     {
@@ -152,7 +154,7 @@ public class tutorialsDeviceInterface : deviceInterface
                 if (!on) return; // only on enter events
                 {
                     long targetFrame = 0;
-                    if (videoPlayer.frame + 10 * videoPlayer.frameRate >= videoPlayer.frameCount)
+                    if (videoPlayer.frame + skipSeconds * videoPlayer.frameRate >= videoPlayer.frameCount)
                     {
                         targetFrame = 0;
                         videoPlayer.frame = 0;
@@ -162,7 +164,7 @@ public class tutorialsDeviceInterface : deviceInterface
                     }
                     else
                     {
-                        targetFrame = (long)(videoPlayer.frame + 10 * videoPlayer.frameRate);
+                        targetFrame = (long)(videoPlayer.frame + skipSeconds * videoPlayer.frameRate);
                         videoPlayer.frame = targetFrame;
                         // Calculate time from frame to avoid stale videoPlayer.time
                         float targetTime = (float)targetFrame / videoPlayer.frameRate;
@@ -230,8 +232,8 @@ public class tutorialsDeviceInterface : deviceInterface
         selectedTutorial.setActivated(true, false); // do not notify manager, otherwise stackoverflow
 
         videoPlayer.Stop();
-        videoPlayer.time = 0f;
-        videoPlayer.frame = 0;
+        // videoPlayer.time = 0f; // Removed to prevent Android crash (negative sample time)
+        // videoPlayer.frame = 0; // Removed to prevent Android crash
         videoPlayer.url = Application.streamingAssetsPath + "/" + selectedTutorial.videoString;
         videoPlayer.Prepare();
 
@@ -239,6 +241,7 @@ public class tutorialsDeviceInterface : deviceInterface
         {
             yield return new WaitForSeconds(.1f);
         }
+        yield return null; // Extra frame to ensure readiness
         videoPlayer.skipOnDrop = true;
         clipReady = true;
 
@@ -246,6 +249,12 @@ public class tutorialsDeviceInterface : deviceInterface
         {
             videoPlayer.time = pendingSeekTime;
             hasPendingSeek = false;
+        }
+        else
+        {
+            // Explicitly reset to start if no seek is pending, NOW that we are prepared.
+            videoPlayer.time = 0f;
+            videoPlayer.frame = 0;
         }
 
         videoPlayer.playbackSpeed = 1f;

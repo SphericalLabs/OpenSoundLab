@@ -186,6 +186,7 @@ MonoBehaviour:
     videoString: Tutorials/T09.mp4
   - labelString: T10 Generative Sweep Space
     videoString: Tutorials/T10.mp4
+  openOnStartup: 1
   videoPlayer: {fileID: 4995019661440197408}
   progressTransform: {fileID: 468380080905245851}
 --- !u!114 &-1646224440584684155
@@ -1160,7 +1161,7 @@ GameObject:
   - component: {fileID: 6565366017596227798}
   - component: {fileID: 6026249276660486304}
   m_Layer: 9
-  m_Name: +10
+  m_Name: SeekForward
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3108,7 +3109,7 @@ Transform:
   m_GameObject: {fileID: 8792150392906561027}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0465, y: -0.3702, z: -0.2309}
+  m_LocalPosition: {x: 0.0466, y: -0.3702, z: -0.2309}
   m_LocalScale: {x: 1, y: 2, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3129,7 +3130,7 @@ GameObject:
   - component: {fileID: 1770574597981547505}
   - component: {fileID: 7469982831543812946}
   m_Layer: 9
-  m_Name: -10
+  m_Name: SeekBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

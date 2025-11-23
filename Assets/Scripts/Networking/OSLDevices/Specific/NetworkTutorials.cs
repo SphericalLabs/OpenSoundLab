@@ -34,9 +34,9 @@ public class NetworkTutorials : NetworkBehaviour
 {
     private tutorialsDeviceInterface tutorialsDevice;
     private float lastTimeSync;
-    private const float syncInterval = 0.5f;
+    private const float syncInterval = 1f;
     private const float minorDriftThreshold = 0.04f;
-    private const float majorDriftThreshold = 0.15f;
+    private const float majorDriftThreshold = 0.150f;
     private const float maxRttCompensation = 0.075f; // cap RTT contribution so drift stays under ~150ms
     private const float speedAdjustScale = 0.5f;
     private const float maxSpeedAdjust = 0.05f;
@@ -154,26 +154,21 @@ public class NetworkTutorials : NetworkBehaviour
 
         activeTutorialIndex = tutorialIndex;
 
+        // Force startPaused to false to prevent "odd tutorial" hangs where UI might pass true.
+        // We always want the video to play when opened.
+        bool forcePlay = false;
+
         if (isServer)
         {
-            RpcTriggerOpenTutorial(tutorialIndex, startPaused);
-            if (tutorialsDevice.IsReady)
-            {
-                float serverTime = Mathf.Max(0f, (float)tutorialsDevice.videoPlayer.time);
-                RpcSyncTime(serverTime, tutorialsDevice.videoPlayer.isPlaying);
-                lastTimeSync = Time.time;
-            }
-            return true; // Suppress local execution, let RPC handle it or we already did?
-                         // Actually, if we are server, we might want to let local run?
-                         // But RpcTriggerOpenTutorial will call InternalOpenTutorial on clients.
-                         // Does Rpc execute locally? Yes if we are host.
-                         // So if we are host, RpcTriggerOpenTutorial executes on us too.
-                         // So we should return true to suppress the immediate local call in tutorialsDeviceInterface.
+            RpcTriggerOpenTutorial(tutorialIndex, forcePlay);
+            // Do NOT sync time here. We are opening a new video, so time should reset to 0.
+            // Syncing time here would send the OLD video's time, causing the new video to seek to that time.
+            return true;
         }
         else if (NetworkClient.active)
         {
-            CmdTriggerOpenTutorial(tutorialIndex, startPaused);
-            return true; // Suppress local execution, wait for Rpc from server (or just let Cmd handle it if we want optimistic? No, let's stick to authoritative)
+            CmdTriggerOpenTutorial(tutorialIndex, forcePlay);
+            return true; // Suppress local execution, wait for Rpc from server
         }
 
         return false;
@@ -324,7 +319,8 @@ public class NetworkTutorials : NetworkBehaviour
         }
 
         // Sync Time
-        if (isServerPlaying)
+        //if (isServerPlaying)
+        if (false)
         {
             float halfRtt = (float)Math.Max(0.0, NetworkTime.rtt * 0.5f);
             float targetServerTime = serverTime + Mathf.Min(halfRtt, maxRttCompensation);
@@ -339,17 +335,24 @@ public class NetworkTutorials : NetworkBehaviour
                 return;
             }
 
-            if (absDrift > minorDriftThreshold)
+            // Hysteresis: If we are already compensating, use a lower threshold to stop.
+            // This prevents rapid toggling when drift is near the threshold.
+            bool isCompensating = Math.Abs(tutorialsDevice.videoPlayer.playbackSpeed - 1f) > 0.001f;
+            float activeThreshold = isCompensating ? 0.01f : minorDriftThreshold;
+
+            if (absDrift > activeThreshold)
             {
                 float speedOffset = Mathf.Clamp(drift * speedAdjustScale, -maxSpeedAdjust, maxSpeedAdjust);
-                tutorialsDevice.InternalSetSpeed(1f + speedOffset);
+                //tutorialsDevice.InternalSetSpeed(1f + speedOffset);
+                tutorialsDevice.InternalSetSpeed(1f); // do not adjust speed for now because that
             }
-            else if (Math.Abs(tutorialsDevice.videoPlayer.playbackSpeed - 1f) > 0.001f)
+            else if (isCompensating)
             {
                 tutorialsDevice.InternalSetSpeed(1f);
             }
         }
-        else
+        //else
+        if (true)
         {
             float localTime = (float)tutorialsDevice.videoPlayer.time;
 
@@ -358,10 +361,10 @@ public class NetworkTutorials : NetworkBehaviour
                 tutorialsDevice.InternalSeek(serverTime);
             }
 
-            if (Math.Abs(tutorialsDevice.videoPlayer.playbackSpeed - 1f) > 0.001f)
-            {
-                tutorialsDevice.InternalSetSpeed(1f);
-            }
+            // if (Math.Abs(tutorialsDevice.videoPlayer.playbackSpeed - 1f) > 0.001f)
+            // {
+            //     tutorialsDevice.InternalSetSpeed(1f);
+            // }
         }
     }
 
