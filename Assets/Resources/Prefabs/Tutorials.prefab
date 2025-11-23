@@ -189,6 +189,7 @@ MonoBehaviour:
   openOnStartup: 1
   videoPlayer: {fileID: 4995019661440197408}
   progressTransform: {fileID: 468380080905245851}
+  skipSeconds: 15
 --- !u!114 &-1646224440584684155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,11 +223,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   buttons:
-  - {fileID: 6026249276660486304}
-  - {fileID: 7469982831543812946}
   - {fileID: 1823054050638368208}
-  - {fileID: 114824114186601482}
-  - {fileID: 114000014110554540}
   - {fileID: 6581840420953744023}
 --- !u!114 &-7159908804773025030
 MonoBehaviour:

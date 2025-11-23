@@ -186,22 +186,7 @@ public class tutorialsDeviceInterface : deviceInterface
     {
         playButton.keyHit(false);
 
-        bool handledByNetwork = false;
-        if (OnTriggerOpenTutorial != null)
-        {
-            foreach (Func<tutorialPanel, bool, bool> handler in OnTriggerOpenTutorial.GetInvocationList())
-            {
-                if (handler(tut, startPaused))
-                {
-                    handledByNetwork = true;
-                }
-            }
-        }
-
-        if (!handledByNetwork)
-        {
-            InternalOpenTutorial(tut, startPaused);
-        }
+        OnTriggerOpenTutorial?.Invoke(tut, startPaused);
     }
 
     // New method to be called directly without triggering the event
@@ -239,7 +224,7 @@ public class tutorialsDeviceInterface : deviceInterface
 
         while (!videoPlayer.isPrepared)
         {
-            yield return new WaitForSeconds(.1f);
+            yield return new WaitForSeconds(.01f);
         }
         yield return null; // Extra frame to ensure readiness
         videoPlayer.skipOnDrop = true;

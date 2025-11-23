@@ -56,26 +56,6 @@ public class NetworkTutorials : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-
-        // Position in front of the host's camera
-        if (Camera.main != null)
-        {
-            Transform camTransform = Camera.main.transform;
-            // Position 1.5m in front, keeping vertical position relative or fixed?
-            // User said "place itself in front of the users headset".
-            // Let's keep the device's Y but move X/Z to be in front.
-            // Or just place it directly in front.
-            // Usually tutorials are floating panels.
-
-            Vector3 targetPos = camTransform.position + camTransform.forward * 1.5f;
-            // Ensure it's not tilted weirdly, look at camera but keep upright
-            Vector3 lookPos = camTransform.position;
-            lookPos.y = targetPos.y; // Keep level
-
-            transform.position = targetPos;
-            transform.LookAt(lookPos);
-            //transform.Rotate(0, 180, 0); // Face the user
-        }
     }
 
     public override void OnStartClient()
@@ -230,6 +210,10 @@ public class NetworkTutorials : NetworkBehaviour
     [Command(requiresAuthority = false)]
     private void CmdSeek(float time)
     {
+        if (tutorialsDevice != null)
+        {
+            tutorialsDevice.InternalSeek(time);
+        }
         RpcSeek(time);
     }
 
@@ -315,56 +299,13 @@ public class NetworkTutorials : NetworkBehaviour
         else if (!isServerPlaying && isLocalPlaying)
         {
             tutorialsDevice.InternalPause();
-            tutorialsDevice.InternalSetSpeed(1f); // Reset speed when paused
         }
 
-        // Sync Time
-        //if (isServerPlaying)
-        if (false)
+        float localTime = (float)tutorialsDevice.videoPlayer.time;
+
+        if (Math.Abs(localTime - serverTime) > majorDriftThreshold)
         {
-            float halfRtt = (float)Math.Max(0.0, NetworkTime.rtt * 0.5f);
-            float targetServerTime = serverTime + Mathf.Min(halfRtt, maxRttCompensation);
-            float localTime = (float)tutorialsDevice.videoPlayer.time;
-            float drift = targetServerTime - localTime;
-            float absDrift = Math.Abs(drift);
-
-            if (absDrift > majorDriftThreshold)
-            {
-                tutorialsDevice.InternalSeek(targetServerTime);
-                tutorialsDevice.InternalSetSpeed(1f);
-                return;
-            }
-
-            // Hysteresis: If we are already compensating, use a lower threshold to stop.
-            // This prevents rapid toggling when drift is near the threshold.
-            bool isCompensating = Math.Abs(tutorialsDevice.videoPlayer.playbackSpeed - 1f) > 0.001f;
-            float activeThreshold = isCompensating ? 0.01f : minorDriftThreshold;
-
-            if (absDrift > activeThreshold)
-            {
-                float speedOffset = Mathf.Clamp(drift * speedAdjustScale, -maxSpeedAdjust, maxSpeedAdjust);
-                //tutorialsDevice.InternalSetSpeed(1f + speedOffset);
-                tutorialsDevice.InternalSetSpeed(1f); // do not adjust speed for now because that
-            }
-            else if (isCompensating)
-            {
-                tutorialsDevice.InternalSetSpeed(1f);
-            }
-        }
-        //else
-        if (true)
-        {
-            float localTime = (float)tutorialsDevice.videoPlayer.time;
-
-            if (Math.Abs(localTime - serverTime) > majorDriftThreshold)
-            {
-                tutorialsDevice.InternalSeek(serverTime);
-            }
-
-            // if (Math.Abs(tutorialsDevice.videoPlayer.playbackSpeed - 1f) > 0.001f)
-            // {
-            //     tutorialsDevice.InternalSetSpeed(1f);
-            // }
+            tutorialsDevice.InternalSeek(serverTime);
         }
     }
 
