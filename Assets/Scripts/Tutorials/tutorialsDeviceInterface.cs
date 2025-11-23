@@ -184,7 +184,7 @@ public class tutorialsDeviceInterface : deviceInterface
     }
     public void triggerOpenTutorial(tutorialPanel tut, bool startPaused = false)
     {
-        playButton.keyHit(false);
+        // playButton.keyHit(false); // Removed to prevent visual flicker and potential state confusion
 
         OnTriggerOpenTutorial?.Invoke(tut, startPaused);
     }
@@ -219,6 +219,7 @@ public class tutorialsDeviceInterface : deviceInterface
         videoPlayer.Stop();
         // videoPlayer.time = 0f; // Removed to prevent Android crash (negative sample time)
         // videoPlayer.frame = 0; // Removed to prevent Android crash
+        videoPlayer.url = ""; // Reset URL to ensure Prepare triggers correctly even if URL is same
         videoPlayer.url = Application.streamingAssetsPath + "/" + selectedTutorial.videoString;
         videoPlayer.Prepare();
 

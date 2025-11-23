@@ -35,8 +35,14 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
     public Vector3 tutorialLocalPosition = new Vector3(0f, 1.3f, 0.5f);
     public Vector3 tutorialLocalEuler = new Vector3(0f, -180f, 0f);
     public bool spawnOnStart = true;
+    public OVRCameraRig cameraRig;
+    public float headsetReadyTimeout = 4f;
+    public int trackedHeadsetFrames = 2;
+    public float spawnForwardDistance = 0.8f;
+    public float spawnHeightOffset = -0.45f;
 
     bool tutorialsSpawned;
+    Transform headAnchor;
 
     IEnumerator Start()
     {
@@ -49,6 +55,8 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
         {
             yield return waitForNetworkReady();
         }
+
+        yield return waitForHeadsetReady();
 
         spawnTutorials();
     }
@@ -103,22 +111,119 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
             return false;
         }
 
-        Vector3 worldPosition = transform.TransformPoint(tutorialLocalPosition);
-        Quaternion worldRotation = transform.rotation * Quaternion.Euler(tutorialLocalEuler);
+        updatePlacementFromHeadset();
 
         if (NetworkServer.active)
         {
-            NetworkSpawnManager.Instance.CreateItem(tutorialsPrefab.name, worldPosition, worldRotation, Vector3.zero, Vector3.zero);
+            NetworkSpawnManager.Instance.CreateItem(tutorialsPrefab.name, transform.position, transform.rotation, Vector3.zero, Vector3.zero);
             return true;
         }
 
         if (NetworkClient.active)
         {
-            NetworkSpawnManager.Instance.CmdCreateItem(tutorialsPrefab.name, worldPosition, worldRotation, Vector3.zero, Vector3.zero);
+            NetworkSpawnManager.Instance.CmdCreateItem(tutorialsPrefab.name, transform.position, transform.rotation, Vector3.zero, Vector3.zero);
             return true;
         }
 
         return false;
+    }
+
+    IEnumerator waitForHeadsetReady()
+    {
+        float elapsed = 0f;
+        headAnchor = resolveHeadAnchor();
+        while (headAnchor == null && elapsed < headsetReadyTimeout)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+            headAnchor = resolveHeadAnchor();
+        }
+
+        int trackedFrames = 0;
+        while (headAnchor != null && trackedFrames < trackedHeadsetFrames && elapsed < headsetReadyTimeout)
+        {
+            if (isHeadsetTracked())
+            {
+                trackedFrames++;
+            }
+            else
+            {
+                trackedFrames = 0;
+            }
+
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+    }
+
+    Transform resolveHeadAnchor()
+    {
+        if (headAnchor != null)
+        {
+            return headAnchor;
+        }
+
+        if (cameraRig != null && cameraRig.centerEyeAnchor != null)
+        {
+            headAnchor = cameraRig.centerEyeAnchor;
+            return headAnchor;
+        }
+
+        OVRCameraRig rig = FindObjectOfType<OVRCameraRig>();
+        if (rig != null)
+        {
+            cameraRig = rig;
+            if (rig.centerEyeAnchor != null)
+            {
+                headAnchor = rig.centerEyeAnchor;
+                return headAnchor;
+            }
+
+            headAnchor = rig.transform;
+            return headAnchor;
+        }
+
+        if (Camera.main != null)
+        {
+            headAnchor = Camera.main.transform;
+            return headAnchor;
+        }
+
+        return null;
+    }
+
+    bool isHeadsetTracked()
+    {
+        if (OVRManager.instance != null)
+        {
+            if (OVRManager.tracker != null)
+            {
+                return OVRManager.isHmdPresent && OVRManager.tracker.isPositionTracked;
+            }
+
+            return OVRManager.isHmdPresent;
+        }
+
+        return headAnchor != null;
+    }
+
+    bool updatePlacementFromHeadset()
+    {
+        Transform anchor = headAnchor != null ? headAnchor : resolveHeadAnchor();
+        if (anchor == null)
+        {
+            return false;
+        }
+
+        Vector3 targetPos = anchor.position + anchor.forward * spawnForwardDistance;
+        Vector3 lookPos = anchor.position;
+        lookPos.y = targetPos.y;
+        transform.position = targetPos;
+        transform.LookAt(lookPos);
+
+        transform.Translate(0f, spawnHeightOffset, 0f);
+
+        return true;
     }
 
     bool isNetworkSessionActive()

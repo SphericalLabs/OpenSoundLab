@@ -275,17 +275,8 @@ public class NetworkTutorials : NetworkBehaviour
             return;
         }
 
-        if (!tutorialsDevice.videoPlayer.isPrepared)
+        if (!tutorialsDevice.IsReady)
         {
-            tutorialsDevice.InternalSeek(serverTime);
-            if (isServerPlaying)
-            {
-                tutorialsDevice.InternalPlay();
-            }
-            else
-            {
-                tutorialsDevice.InternalPause();
-            }
             return;
         }
 
