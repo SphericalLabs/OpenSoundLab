@@ -26,6 +26,7 @@
 // limitations under the License.
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class NoiseSyncManager : MonoBehaviour
 {
@@ -34,7 +35,7 @@ public class NoiseSyncManager : MonoBehaviour
 
     void Update()
     {
-        if (!Input.GetKeyDown(KeyCode.Space)) return;
+        if (Keyboard.current?.spaceKey.wasPressedThisFrame != true) return;
 
         //if (Time.frameCount % 30 != 0) return; // do the global sync every n frames
 

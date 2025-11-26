@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using Mirror;
+using UnityEngine.InputSystem;
 
 public class PlayerNetworkedAudio : NetworkBehaviour
 {
@@ -45,7 +46,8 @@ public class PlayerNetworkedAudio : NetworkBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.spaceKey.wasReleasedThisFrame)
         {
             audioSource.Play();
         }
@@ -215,7 +217,7 @@ public class PlayerNetworkedAudio : NetworkBehaviour
     //// Example of how to trigger the audio data transfer
     //void Update()
     //{
-    //    if (Input.GetKeyDown(KeyCode.Space) && isLocalPlayer)
+    //    if (Keyboard.current?.spaceKey.wasPressedThisFrame == true && isLocalPlayer)
     //    {
     //        byte[] audioData = ConvertAudioToByteArray();
     //        CmdSendAudioDataToServer(audioData);
@@ -269,7 +271,7 @@ public class PlayerNetworkedAudio : NetworkBehaviour
     //// Example of how to trigger the audio data transfer
     //void Update()
     //{
-    //    if (Input.GetKeyDown(KeyCode.Space) && isLocalPlayer)
+    //    if (Keyboard.current?.spaceKey.wasPressedThisFrame == true && isLocalPlayer)
     //    {
     //        // Capture the audio from the AudioListener
     //        int bufferSize = 8192; // Adjust as needed

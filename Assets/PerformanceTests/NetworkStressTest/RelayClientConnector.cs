@@ -32,6 +32,7 @@ using System.Collections;
 using kcp2k;
 using UnityEngine.SceneManagement;
 using Network;
+using UnityEngine.InputSystem;
 
 
 // this is not working yet, Relay connection does not start when given a join code via command-line
@@ -74,7 +75,8 @@ public class RelayClientConnector : MonoBehaviour
     private void Update()
     {
 
-        if (Input.GetKeyDown("c"))
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.cKey.wasPressedThisFrame)
         {
             if (relayJoinCode != "")
             {

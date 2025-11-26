@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.XR;
 using Meta.XR.EnvironmentDepth;
@@ -95,9 +96,6 @@ public class RequirementsManager : MonoBehaviour
     bool depthManagerInitiallyEnabled = true;
     bool depthManagerSuppressed;
     bool occlusionModeForcedNone;
-
-    static bool mouseScrollAxisUnavailable;
-    static bool hasLoggedMissingMouseAxis;
 
     void Awake()
     {
@@ -353,21 +351,22 @@ public class RequirementsManager : MonoBehaviour
         nextPressed = OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Three);
         backPressed = OVRInput.GetDown(OVRInput.Button.Two) || OVRInput.GetDown(OVRInput.Button.Four);
 #endif
-        if (!nextPressed)
+        Keyboard keyboard = Keyboard.current;
+        if (!nextPressed && keyboard != null)
         {
-            nextPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space);
+            nextPressed = keyboard.enterKey.wasPressedThisFrame || keyboard.spaceKey.wasPressedThisFrame;
         }
-        if (!nextPressed)
+        if (!nextPressed && keyboard != null)
         {
-            nextPressed = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.X);
+            nextPressed = keyboard.aKey.wasPressedThisFrame || keyboard.xKey.wasPressedThisFrame;
         }
-        if (!backPressed)
+        if (!backPressed && keyboard != null)
         {
-            backPressed = Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Backspace);
+            backPressed = keyboard.escapeKey.wasPressedThisFrame || keyboard.backspaceKey.wasPressedThisFrame;
         }
-        if (!backPressed)
+        if (!backPressed && keyboard != null)
         {
-            backPressed = Input.GetKeyDown(KeyCode.B) || Input.GetKeyDown(KeyCode.Y);
+            backPressed = keyboard.bKey.wasPressedThisFrame || keyboard.yKey.wasPressedThisFrame;
         }
 
         var nextButton = view?.getNextButton();
@@ -403,33 +402,13 @@ public class RequirementsManager : MonoBehaviour
         if (Mathf.Approximately(axis, 0f))
         {
             float mouseScroll = 0f;
-            if (!mouseScrollAxisUnavailable)
+            Mouse mouse = Mouse.current;
+            if (mouse != null)
             {
-                try
+                mouseScroll = mouse.scroll.ReadValue().y;
+                if (Mathf.Abs(mouseScroll) > 0.01f)
                 {
-                    mouseScroll = Input.GetAxis("Mouse ScrollWheel");
-                }
-                catch (System.ArgumentException)
-                {
-                    mouseScrollAxisUnavailable = true;
-                    if (!hasLoggedMissingMouseAxis)
-                    {
-                        Debug.LogWarning("RequirementsManager: legacy Input axis 'Mouse ScrollWheel' is not configured; falling back to Input.mouseScrollDelta.");
-                        hasLoggedMissingMouseAxis = true;
-                    }
-                }
-            }
-
-            if (Mathf.Abs(mouseScroll) > 0.01f)
-            {
-                axis = mouseScroll * mouseScrollMultiplier;
-            }
-            else
-            {
-                float rawMouseScroll = Input.mouseScrollDelta.y;
-                if (Mathf.Abs(rawMouseScroll) > 0.01f)
-                {
-                    axis = rawMouseScroll * mouseScrollMultiplier;
+                    axis = mouseScroll * mouseScrollMultiplier;
                 }
             }
         }

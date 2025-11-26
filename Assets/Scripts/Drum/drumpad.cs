@@ -29,6 +29,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class drumpad : MonoBehaviour
 {
@@ -54,7 +55,8 @@ public class drumpad : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
         {
             keyHit(true);
         }

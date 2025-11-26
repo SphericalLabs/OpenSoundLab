@@ -952,7 +952,6 @@ PlayerSettings:
   syncCapabilities: 0
   platformCapabilities:
     WindowsStoreApps:
-      CodeGeneration: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -962,6 +961,7 @@ PlayerSettings:
       MusicLibrary: False
       LowLevelDevices: False
       PrivateNetworkClientServer: False
+      Proximity: False
       Objects3D: False
       RemoteSystem: False
       BlockedChatMessages: False
@@ -984,7 +984,7 @@ PlayerSettings:
       RecordedCallsFolder: False
       Contacts: False
       InternetClient: False
-      Proximity: False
+      CodeGeneration: False
       BackgroundMediaPlayback: False
       EnterpriseAuthentication: False
   metroTargetDeviceFamilies:
@@ -1054,7 +1054,7 @@ PlayerSettings:
   hmiLogStartupTiming: 0
   hmiCpuConfiguration: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 2
+  activeInputHandler: 1
   windowsGamepadBackendHint: 0
   cloudProjectId: 4f7e68e3-9b92-4f5b-850b-af3c33580bb8
   framebufferDepthMemorylessMode: 0

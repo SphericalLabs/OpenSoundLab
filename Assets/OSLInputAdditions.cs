@@ -28,6 +28,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public partial class OSLInput
 {
@@ -51,12 +52,18 @@ public partial class OSLInput
 
     public bool isTriggerStarted(int controllerIndex)
     {
-        return (Patcher.TriggerLeft.WasPressedThisFrame() && controllerIndex == 0) || (Patcher.TriggerRight.WasPressedThisFrame() && controllerIndex == 1 || Input.GetMouseButtonDown(0));
+        bool leftPressed = controllerIndex == 0 && Patcher.TriggerLeft.WasPressedThisFrame();
+        bool rightPressed = controllerIndex == 1 && Patcher.TriggerRight.WasPressedThisFrame();
+        bool mousePressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+        return leftPressed || rightPressed || mousePressed;
     }
 
     public bool isTriggerReleased(int controllerIndex)
     {
-        return (Patcher.TriggerLeft.WasReleasedThisFrame() && controllerIndex == 0) || (Patcher.TriggerRight.WasReleasedThisFrame() && controllerIndex == 1 || Input.GetMouseButtonUp(0));
+        bool leftReleased = controllerIndex == 0 && Patcher.TriggerLeft.WasReleasedThisFrame();
+        bool rightReleased = controllerIndex == 1 && Patcher.TriggerRight.WasReleasedThisFrame();
+        bool mouseReleased = Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame;
+        return leftReleased || rightReleased || mouseReleased;
     }
 
     public bool isCopyStarted(int controllerIndex)

@@ -29,13 +29,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.InputSystem;
 
 public class ServerAudioPlayer : NetworkBehaviour
 {
 
     public void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        Mouse mouse = Mouse.current;
+        if (mouse != null && mouse.leftButton.wasPressedThisFrame)
         {
             GetComponent<AudioSource>().Play();
         }

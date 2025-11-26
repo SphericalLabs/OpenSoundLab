@@ -27,6 +27,7 @@
 
 ﻿using Mirror;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : NetworkBehaviour
 {
@@ -53,13 +54,19 @@ public class Player : NetworkBehaviour
     /// </summary>
     void HandleMovement()
     {
-        if (isLocalPlayer)
+        if (!isLocalPlayer)
         {
-            float moveHorizontal = Input.GetAxis("Horizontal") * Time.deltaTime;
-            float moveVertical = Input.GetAxis("Vertical") * Time.deltaTime;
-            Vector3 movement = new Vector3(moveHorizontal * 3f, moveVertical * 3f, 0);
-            transform.position = transform.position + movement;
+            return;
         }
+
+        Vector2 moveInput = readMoveInput();
+        if (moveInput == Vector2.zero)
+        {
+            return;
+        }
+
+        Vector3 movement = new Vector3(moveInput.x * 3f, moveInput.y * 3f, 0f) * Time.deltaTime;
+        transform.position += movement;
     }
 
     private void Awake()
@@ -98,6 +105,28 @@ public class Player : NetworkBehaviour
             Vector3 movement = new Vector3(0f, value * 0.1f, 0);
             transform.position = transform.position + movement;
         }
+    }
+
+    Vector2 readMoveInput()
+    {
+        Vector2 move = Vector2.zero;
+
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null)
+        {
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) move.x -= 1f;
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) move.x += 1f;
+            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) move.y -= 1f;
+            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) move.y += 1f;
+        }
+
+        Gamepad gamepad = Gamepad.current;
+        if (gamepad != null)
+        {
+            move += gamepad.leftStick.ReadValue();
+        }
+
+        return Vector2.ClampMagnitude(move, 1f);
     }
 
     /// <summary>

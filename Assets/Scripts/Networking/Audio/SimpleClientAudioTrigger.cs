@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class SimpleClientAudioTrigger : NetworkBehaviour
 {
@@ -41,7 +42,8 @@ public class SimpleClientAudioTrigger : NetworkBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
         {
             TryPlayAudio();
         }

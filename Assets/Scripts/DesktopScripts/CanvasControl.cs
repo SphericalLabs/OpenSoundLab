@@ -25,8 +25,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CanvasControl : MonoBehaviour
 {
@@ -60,12 +61,19 @@ public class CanvasControl : MonoBehaviour
 
     float mouseTimer;
     float mouseThreshold = 2;
-    Vector3 lastMouse;
+    Vector2 lastMouse;
     void Update()
     {
-        if (lastMouse != Input.mousePosition)
+        Mouse mouse = Mouse.current;
+        if (mouse == null)
         {
-            lastMouse = Input.mousePosition;
+            return;
+        }
+
+        Vector2 currentMouse = mouse.position.ReadValue();
+        if (lastMouse != currentMouse)
+        {
+            lastMouse = currentMouse;
             if (!open) ToggleMenu();
             mouseTimer = 0;
         }

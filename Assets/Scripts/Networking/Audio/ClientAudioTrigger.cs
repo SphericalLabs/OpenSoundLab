@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.InputSystem;
 
 public class ClientAudioTrigger : NetworkBehaviour
 {
@@ -50,15 +51,21 @@ public class ClientAudioTrigger : NetworkBehaviour
     {
         if (isLocalPlayer /*&& !isPlaying*/ && isClientOnly)
         {
-            //if (Input.GetKeyDown(KeyCode.A)) PlayNote(440f);
-            //if (Input.GetKeyDown(KeyCode.S)) PlayNote(466.16f);
-            //if (Input.GetKeyDown(KeyCode.D)) PlayNote(493.88f);
-            if (Input.GetKeyDown(KeyCode.F)) PlayNote(523.25f);
-            if (Input.GetKeyDown(KeyCode.G)) PlayNote(554.37f);
-            if (Input.GetKeyDown(KeyCode.H)) PlayNote(587.33f);
-            if (Input.GetKeyDown(KeyCode.J)) PlayNote(622.25f);
-            if (Input.GetKeyDown(KeyCode.K)) PlayNote(659.26f);
-            if (Input.GetKeyDown(KeyCode.L)) PlayNote(698.46f);
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null)
+            {
+                return;
+            }
+
+            //if (keyboard.aKey.wasPressedThisFrame) PlayNote(440f);
+            //if (keyboard.sKey.wasPressedThisFrame) PlayNote(466.16f);
+            //if (keyboard.dKey.wasPressedThisFrame) PlayNote(493.88f);
+            if (keyboard.fKey.wasPressedThisFrame) PlayNote(523.25f);
+            if (keyboard.gKey.wasPressedThisFrame) PlayNote(554.37f);
+            if (keyboard.hKey.wasPressedThisFrame) PlayNote(587.33f);
+            if (keyboard.jKey.wasPressedThisFrame) PlayNote(622.25f);
+            if (keyboard.kKey.wasPressedThisFrame) PlayNote(659.26f);
+            if (keyboard.lKey.wasPressedThisFrame) PlayNote(698.46f);
         }
     }
 
@@ -89,5 +96,4 @@ public class ClientAudioTrigger : NetworkBehaviour
         position = newPosition;
     }
 }
-
 

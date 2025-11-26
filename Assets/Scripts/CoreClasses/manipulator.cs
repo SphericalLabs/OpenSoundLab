@@ -445,16 +445,13 @@ public class manipulator : MonoBehaviour
 
         if (controllerIndex == 0)
         {
-            val = Input.GetAxis("triggerL");
+            val = oslInput.Patcher.TriggerLeftAnalog.ReadValue<float>();
         }
         else if (controllerIndex == 1)
         {
-            val = Input.GetAxis("triggerR");
+            val = oslInput.Patcher.TriggerRightAnalog.ReadValue<float>();
         }
-        else
-        {
-            val = 0;
-        }
+        val = Mathf.Clamp01(val);
 
         tipL.localPosition = new Vector3(Mathf.Lerp(-.005f, 0, val), -.005f, -.018f);
         tipR.localPosition = new Vector3(Mathf.Lerp(.004f, -.001f, val), -.005f, -.018f);
@@ -717,5 +714,4 @@ public class manipulator : MonoBehaviour
     }
 
 }
-
 

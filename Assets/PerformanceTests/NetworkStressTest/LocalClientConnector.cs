@@ -29,6 +29,7 @@ using UnityEngine;
 using Mirror;
 using System;
 using kcp2k;
+using UnityEngine.InputSystem;
 
 public class LocalClientConnector : MonoBehaviour
 {
@@ -51,7 +52,8 @@ public class LocalClientConnector : MonoBehaviour
     public void Update()
     {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        if (Input.GetKeyDown("c"))
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.cKey.wasPressedThisFrame)
         {
             ConnectToServer();
             Debug.LogError("c pressed"); // error so that you can see it in dev build desktop
