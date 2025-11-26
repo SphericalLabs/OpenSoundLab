@@ -31,7 +31,7 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-# Visual Studio Configs 
+# Visual Studio Configs
 .vs/
 .vsconfig
 
@@ -177,7 +177,7 @@ Temporary Items
 .apdisk
 
 # Android keystore
-user.keystore
+*user.keystore
 /Assets/Textures/Environments
 /Assets/Textures/Environments.meta
 /Assets/Editor/Android_Code_Signing.cs
