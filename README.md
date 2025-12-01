@@ -4,11 +4,11 @@
 
 [[Trailer](https://youtu.be/HYn9THRtBvs)] [[Research](https://zenodo.org/records/15304366)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.gg/Jrmg5na3Ru)] [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)] [[Developer](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM)]
 
-OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
+OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed-reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
 
 OSL is a fork of Logan Olson's magnificent [SoundStage VR](https://github.com/googlearchive/soundstagevr). OSL enhances the original version so that it is better suited for performing in the context of experimental electronic sound and music, to make it feel less like a game and more like an actual sound laboratory. We recreate the experience of working in spatial setups, but without being bound to mimicking the physical past. Where are the limits of the digital realm, and where are its sweet spots?
 
-The project received generous funding by an educational grant of the University of Applied Sciences and Arts Northwestern Switzerland ([IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)) and is currently continued in the context of the SNSF Spark research project "Emerging Practices in Modular Synthesis: Towards a Virtual Ethnography for Mixed Realities".
+The project received generous funding by an educational grant of the University of Applied Sciences and Arts Northwestern Switzerland ([IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)) and was further developed in the context of the SNSF Spark research project "Emerging Practices in Modular Synthesis: Towards a Virtual Ethnography for Mixed Realities".
 
 This repository is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep other users in sync with our ongoing development. 
 
@@ -16,7 +16,7 @@ This repository is work-in-progress. Please always link to this repository if yo
 OpenSoundLab will be available at Meta Quest's Early Access soon. We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub. 
 
 ### Build instructions
-* Clone the repository and checkout the desired tag manually. Please note that the Releases page is outdated.
+* Clone the repository and check out the desired tag manually. Please note that the Releases page is outdated.
 ```
 git clone https://github.com/SphericalLabs/OpenSoundLab
 cd OpenSoundLab
@@ -27,9 +27,9 @@ git tags
 git checkout DESIRED_TAG
 ```
 * Install Unity Hub and register with Unity: https://unity.com/download
-* In Unity Hub click Installs > Install Editor > Archive > Download Archive and install Unity v2022.3.20f1
+* In Unity Hub click Installs > Install Editor > Archive > Download Archive and install Unity v2022.3.62f3
 * Add the downloaded repository (the folder containing Assets, OSLNative, etc.) to the Unity Hub: Projects > Add Project from Disk (click the triangle for that)
-* Click the editor version of the added repository and select Unity v2022.3.20f1 for Android
+* Click the editor version of the added repository and select Unity v2022.3.62f3 for Android
 * Open the project for the first time, this might take some time
 * Unity might ask you to restart when done importing, click Restart Editor
 * Make sure that the developer mode is activated on the headset
