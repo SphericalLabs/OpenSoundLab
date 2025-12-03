@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class Editor_OpenSoundLabCleanup
 {
-    [MenuItem("Tools/OpenSoundLab/User Files/Clear Samples", false, 200)]
+    [MenuItem("OpenSoundLab/User Files/Clear Samples", false, 200)]
     public static void ClearSamples()
     {
         if (!TryGetSaveRoot(out var root))
@@ -17,7 +17,7 @@ public static class Editor_OpenSoundLabCleanup
         DeleteFolderWithConfirm(samplesPath, "Samples");
     }
 
-    [MenuItem("Tools/OpenSoundLab/User Files/Clear Saves", false, 201)]
+    [MenuItem("OpenSoundLab/User Files/Clear Saves", false, 201)]
     public static void ClearSaves()
     {
         if (!TryGetSaveRoot(out var root))
@@ -29,7 +29,7 @@ public static class Editor_OpenSoundLabCleanup
         DeleteFolderWithConfirm(savesPath, "Saves");
     }
 
-    [MenuItem("Tools/OpenSoundLab/User Files/Clear OpenSoundLab Folder", false, 202)]
+    [MenuItem("OpenSoundLab/User Files/Clear OpenSoundLab Folder", false, 202)]
     public static void ClearOpenSoundLabFolder()
     {
         if (!TryGetSaveRoot(out var root))

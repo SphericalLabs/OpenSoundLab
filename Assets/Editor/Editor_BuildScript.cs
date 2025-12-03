@@ -30,7 +30,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-public class BuildScript
+public class Editor_BuildScript
 {
     [MenuItem("Build/Build All")]
     public static void BuildAll()

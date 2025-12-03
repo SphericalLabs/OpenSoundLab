@@ -50,7 +50,7 @@ class CustomBuildPreProcess : IPreprocessBuild
         prepareStreamingAssetBundles();
     }
 
-    [MenuItem("Tools/OpenSoundLab/Factory Presets/Prepare Bundle", false, 1000)]
+    [MenuItem("OpenSoundLab/Factory Presets/Prepare Bundle", false, 1000)]
     public static void PrepareStreamingAssetBundlesMenu()
     {
         prepareStreamingAssetBundles();

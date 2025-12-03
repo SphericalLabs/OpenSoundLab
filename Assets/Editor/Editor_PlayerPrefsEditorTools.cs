@@ -3,16 +3,16 @@ using UnityEngine;
 
 // Editor utilities for managing PlayerPrefs shortcuts used during testing and setup.
 #if UNITY_EDITOR
-public static class PlayerPrefsEditorTools
+public static class Editor_PlayerPrefsEditorTools
 {
-    private const string TutorialMenuPath = "Tools/OpenSoundLab/PlayerPrefs/Show Tutorials On Startup";
+    private const string TutorialMenuPath = "OpenSoundLab/PlayerPrefs/Show Tutorials On Startup";
     private const string TutorialPrefKey = "showTutorialsOnStartup";
     private const int TutorialDefaultValue = 1;
-    private const string ConsentToggleMenuPath = "Tools/OpenSoundLab/PlayerPrefs/Show Requirements Wizard";
+    private const string ConsentToggleMenuPath = "OpenSoundLab/PlayerPrefs/Show Requirements Wizard";
     const string ConsentKey = "requirements_consent_v1";
     private const int ConsentDefaultValue = 0;
 
-    [MenuItem("Tools/OpenSoundLab/PlayerPrefs/Clear All PlayerPrefs", priority = 101)]
+    [MenuItem("OpenSoundLab/PlayerPrefs/Clear All PlayerPrefs", priority = 101)]
     static void ClearAllPrefs()
     {
         PlayerPrefs.DeleteAll();
