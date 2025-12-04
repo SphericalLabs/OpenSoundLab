@@ -57,11 +57,12 @@ public class microphoneSignalGenerator : signalGenerator
     int micID = 0;
     string activeDeviceString;
 
-    private long driftThreshold = 0; // Sample threshold to consider a drift correction
-    private int lastWritePos = 0;
-    private int lastReadPos = 0;
-    private long totalWriteDistance = 0; // Total distance traveled by the mic recording
-    private long totalReadDistance = 0; // Total distance traveled by the playback
+    private long pitchAdjustThreshold = 0; // Sample threshold to consider a drift correction
+    private int lastMicHeadSamples = 0;
+    private int lastPlaybackHeadSamples = 0;
+    private long micTravelSamples = 0; // Total distance traveled by the mic recording
+    private long playbackTravelSamples = 0; // Total distance traveled by the playback
+    private int minPlaybackLagSamples = 0;
 
     int targetBuffering;
     const int fadeInSampleCount = 256;
@@ -78,7 +79,8 @@ public class microphoneSignalGenerator : signalGenerator
 
         AudioSettings.GetDSPBufferSize(out bufferSize, out numBuffers);
         targetBuffering = bufferSize * 2;
-        driftThreshold = Mathf.Max(bufferSize / 2, 128);
+        pitchAdjustThreshold = Mathf.Max(bufferSize / 2, 128);
+        minPlaybackLagSamples = bufferSize * 2;
 
         //int minFreq = 0, maxFreq = 0;
         //Microphone.GetDeviceCaps(Microphone.devices[micID], out minFreq, out maxFreq);
@@ -111,66 +113,100 @@ public class microphoneSignalGenerator : signalGenerator
     }
 
     int micClipLength;
-    int readPos, writePos;
-    long correctedPlaybackPosition, correctedMicPosition, drift;
+    int playbackHeadSamples, micHeadSamples;
+    long playbackPositionSamples, micPositionSamples, driftSamples;
     [SerializeField] private int hardResyncThreshold = 8000;
     [SerializeField] private int pitchCompensationDeadband = 2560;
+    [SerializeField] private int pitchCompensationResumeDelta = 512;
     public bool logDriftEvents = true;
+    int lastProducedBlockId = 0;
+    int lastConsumedBlockId = -1;
+    bool staleBlockLogged = false;
+    bool pitchFrozen = false;
     void CheckAndCompensateDrift()
     {
         if (activeDeviceString == null || micClip == null || audioSource.clip == null) return;
 
         micClipLength = audioSource.clip.samples; // Total samples in the mic clip
-        readPos = audioSource.timeSamples;
-        writePos = Microphone.GetPosition(activeDeviceString);
+        playbackHeadSamples = audioSource.timeSamples;
+        micHeadSamples = Microphone.GetPosition(activeDeviceString);
 
         if (!Microphone.IsRecording(activeDeviceString) || micClipLength <= 0) return;
-        if (writePos < 0 || writePos > micClipLength || readPos < 0 || readPos > micClipLength) return;
+        if (micHeadSamples < 0 || micHeadSamples > micClipLength || playbackHeadSamples < 0 || playbackHeadSamples > micClipLength) return;
 
         // Update total distances traveled, accounting for loops
-        if (readPos < lastReadPos) // wrap around
+        if (playbackHeadSamples < lastPlaybackHeadSamples) // wrap around
         {
-            totalReadDistance += micClipLength; // Assuming playback clip is the same length as the recording
+            playbackTravelSamples += micClipLength; // Assuming playback clip is the same length as the recording
         }
-        if (writePos < lastWritePos) // wrap around
+        if (micHeadSamples < lastMicHeadSamples) // wrap around
         {
-            totalWriteDistance += micClipLength;
+            micTravelSamples += micClipLength;
         }
 
-        lastReadPos = readPos;
-        lastWritePos = writePos;
+        lastPlaybackHeadSamples = playbackHeadSamples;
+        lastMicHeadSamples = micHeadSamples;
 
-        correctedPlaybackPosition = totalReadDistance + readPos;
-        correctedMicPosition = totalWriteDistance + writePos;
+        playbackPositionSamples = playbackTravelSamples + playbackHeadSamples;
+        micPositionSamples = micTravelSamples + micHeadSamples;
 
-        drift = correctedMicPosition - targetBuffering - correctedPlaybackPosition;
+        int desiredLag = Mathf.Max(targetBuffering, minPlaybackLagSamples);
+        driftSamples = micPositionSamples - desiredLag - playbackPositionSamples;
 
-        if (System.Math.Abs(drift) > hardResyncThreshold)
+        if (micPositionSamples - playbackPositionSamples < desiredLag)
         {
-            int targetReadPos = Mathf.Clamp(writePos - targetBuffering, 0, micClipLength - 1);
+            int targetReadPos = Mathf.Clamp(micHeadSamples - desiredLag, 0, micClipLength - 1);
             audioSource.timeSamples = targetReadPos;
-            totalReadDistance = totalWriteDistance;
-            lastReadPos = targetReadPos;
-            lastWritePos = writePos;
+            playbackTravelSamples = micTravelSamples;
+            lastPlaybackHeadSamples = targetReadPos;
+            lastMicHeadSamples = micHeadSamples;
             if (logDriftEvents)
             {
-                Debug.LogFormat("[MicDrift] Hard resync: writePos={0}, targetReadPos={1}, drift={2}", writePos, targetReadPos, drift);
+                Debug.LogFormat("[MicDrift] Enforced min lag: micHead={0}, targetReadPos={1}, desiredLag={2}", micHeadSamples, targetReadPos, desiredLag);
             }
             return;
         }
 
-        audioSource.pitch = 1.0f;
-        return;
-
-        if (System.Math.Abs(drift) <= pitchCompensationDeadband)
+        if (System.Math.Abs(driftSamples) > hardResyncThreshold)
         {
-            audioSource.pitch = 1.0f;
+            int targetReadPos = Mathf.Clamp(micHeadSamples - desiredLag, 0, micClipLength - 1);
+            audioSource.timeSamples = targetReadPos;
+            playbackTravelSamples = micTravelSamples;
+            lastPlaybackHeadSamples = targetReadPos;
+            lastMicHeadSamples = micHeadSamples;
+            if (logDriftEvents)
+            {
+                Debug.LogFormat("[MicDrift] Hard resync: micHead={0}, targetReadPos={1}, drift={2}", micHeadSamples, targetReadPos, driftSamples);
+            }
             return;
         }
 
-        if (System.Math.Abs(drift) > driftThreshold)
+        int freezeThreshold = pitchCompensationDeadband;
+        int resumeThreshold = pitchCompensationDeadband + pitchCompensationResumeDelta;
+
+        if (pitchFrozen)
         {
-            float targetPitch = Utils.map(Mathf.Clamp((float)drift, -2000f, 2000f), -2000f, 2000f, 0.97f, 1.03f);
+            if (System.Math.Abs(driftSamples) >= resumeThreshold)
+            {
+                pitchFrozen = false;
+            }
+            else
+            {
+                audioSource.pitch = 1.0f;
+                return;
+            }
+        }
+
+        if (System.Math.Abs(driftSamples) <= freezeThreshold)
+        {
+            audioSource.pitch = 1.0f;
+            pitchFrozen = true;
+            return;
+        }
+
+        if (System.Math.Abs(driftSamples) > pitchAdjustThreshold)
+        {
+            float targetPitch = Utils.map(Mathf.Clamp((float)driftSamples, -2000f, 2000f), -2000f, 2000f, 0.97f, 1.03f);
             audioSource.pitch = Mathf.MoveTowards(audioSource.pitch, targetPitch, pitchAdjustSpeed * Time.unscaledDeltaTime);
         }
         else
@@ -273,6 +309,7 @@ public class microphoneSignalGenerator : signalGenerator
     {
 
         activated = true;
+        lastProducedBlockId++;
         if (sharedBuffer.Length != buffer.Length)
             System.Array.Resize(ref sharedBuffer, buffer.Length);
 
@@ -285,6 +322,20 @@ public class microphoneSignalGenerator : signalGenerator
         if (!active || !activated)
         {
             return;
+        }
+
+        if (lastProducedBlockId == lastConsumedBlockId)
+        {
+            if (!staleBlockLogged && logDriftEvents)
+            {
+                Debug.Log("[MicOrder] Stale buffer reused (processBufferImpl called before new OnAudioFilterRead)");
+                staleBlockLogged = true;
+            }
+        }
+        else
+        {
+            lastConsumedBlockId = lastProducedBlockId;
+            staleBlockLogged = false;
         }
 
         MicFunction(buffer, sharedBuffer, buffer.Length, amp);
