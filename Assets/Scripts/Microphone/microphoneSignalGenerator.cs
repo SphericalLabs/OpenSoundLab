@@ -31,7 +31,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
 using UnityEngine.Android;
-using Adrenak.UniVoice.Samples;
 
 public class microphoneSignalGenerator : signalGenerator
 {
@@ -114,20 +113,26 @@ public class microphoneSignalGenerator : signalGenerator
     int micClipLength;
     int readPos, writePos;
     long correctedPlaybackPosition, correctedMicPosition, drift;
+    [SerializeField] private int hardResyncThreshold = 8000;
+    [SerializeField] private int pitchCompensationDeadband = 2560;
+    public bool logDriftEvents = true;
     void CheckAndCompensateDrift()
     {
-        if (activeDeviceString == null) return;
+        if (activeDeviceString == null || micClip == null || audioSource.clip == null) return;
 
         micClipLength = audioSource.clip.samples; // Total samples in the mic clip
         readPos = audioSource.timeSamples;
         writePos = Microphone.GetPosition(activeDeviceString);
 
+        if (!Microphone.IsRecording(activeDeviceString) || micClipLength <= 0) return;
+        if (writePos < 0 || writePos > micClipLength || readPos < 0 || readPos > micClipLength) return;
+
         // Update total distances traveled, accounting for loops
-        if (readPos < lastReadPos)
+        if (readPos < lastReadPos) // wrap around
         {
             totalReadDistance += micClipLength; // Assuming playback clip is the same length as the recording
         }
-        if (writePos < lastWritePos)
+        if (writePos < lastWritePos) // wrap around
         {
             totalWriteDistance += micClipLength;
         }
@@ -139,6 +144,29 @@ public class microphoneSignalGenerator : signalGenerator
         correctedMicPosition = totalWriteDistance + writePos;
 
         drift = correctedMicPosition - targetBuffering - correctedPlaybackPosition;
+
+        if (System.Math.Abs(drift) > hardResyncThreshold)
+        {
+            int targetReadPos = Mathf.Clamp(writePos - targetBuffering, 0, micClipLength - 1);
+            audioSource.timeSamples = targetReadPos;
+            totalReadDistance = totalWriteDistance;
+            lastReadPos = targetReadPos;
+            lastWritePos = writePos;
+            if (logDriftEvents)
+            {
+                Debug.LogFormat("[MicDrift] Hard resync: writePos={0}, targetReadPos={1}, drift={2}", writePos, targetReadPos, drift);
+            }
+            return;
+        }
+
+        audioSource.pitch = 1.0f;
+        return;
+
+        if (System.Math.Abs(drift) <= pitchCompensationDeadband)
+        {
+            audioSource.pitch = 1.0f;
+            return;
+        }
 
         if (System.Math.Abs(drift) > driftThreshold)
         {
@@ -206,6 +234,7 @@ public class microphoneSignalGenerator : signalGenerator
         int minFreq;
         int maxFreq;
         Microphone.GetDeviceCaps(activeDeviceString, out minFreq, out maxFreq);
+        Debug.Log("Selected Microphone: " + activeDeviceString + ", minFreq: " + minFreq + ", maxFreq: " + maxFreq);
 
         if (minFreq != 0 && requestedSampleRate < minFreq)
         {
@@ -216,11 +245,12 @@ public class microphoneSignalGenerator : signalGenerator
             requestedSampleRate = maxFreq;
         }
 
-        micClip = Microphone.Start(activeDeviceString, true, 5, requestedSampleRate);
+        micClip = Microphone.Start(activeDeviceString, true, 100, requestedSampleRate);
 
         yield return null;
         if (micClip != null)
         {
+            Debug.LogFormat("Microphone started: {0}, requested SR={1}, clip SR={2}, output SR={3}", activeDeviceString, requestedSampleRate, micClip.frequency, AudioSettings.outputSampleRate);
             audioSource.clip = micClip;
             audioSource.loop = true;
             while (Microphone.GetPosition(activeDeviceString) <= targetBuffering) { yield return null; }
