@@ -78,7 +78,7 @@ public class microphoneSignalGenerator : signalGenerator
         sharedBuffer = new float[MAX_BUFFER_LENGTH];
 
         AudioSettings.GetDSPBufferSize(out bufferSize, out numBuffers);
-        targetBuffering = bufferSize * 2;
+        targetBuffering = bufferSize / 2;
         pitchAdjustThreshold = Mathf.Max(bufferSize / 2, 128);
         minPlaybackLagSamples = bufferSize * 2;
 
