@@ -416,6 +416,7 @@ public class RequirementsManager : MonoBehaviour
         if (!Mathf.Approximately(axis, 0f))
         {
             float normalizedDelta = axis * joystickScrollSpeed * Time.unscaledDeltaTime;
+            normalizedDelta = Mathf.Clamp(normalizedDelta, -0.2f, 0.2f);
             ScrollRect scrollRect = view.ScrollRect;
             float newValue = Mathf.Clamp01(scrollRect.verticalNormalizedPosition + normalizedDelta);
             scrollRect.verticalNormalizedPosition = newValue;

@@ -22,7 +22,7 @@ public class RequirementsWizardView
     const float PanelCornerRadius = 36f;
     const float ButtonCornerRadius = 24f;
     const float ScrollAreaCornerRadius = 28f;
-    const float ScrollBottomThreshold = 0.01f;
+    const float ScrollBottomThreshold = 0.05f;
 
     readonly MonoBehaviour owner;
     readonly Vector2 panelSizeMeters;
@@ -295,7 +295,7 @@ public class RequirementsWizardView
         Canvas.ForceUpdateCanvases();
         bodyLabel.ForceMeshUpdate();
 
-        float preferredHeight = bodyLabel.preferredHeight + BodyPadding * 2f;
+        float preferredHeight = bodyLabel.preferredHeight;
         float viewportHeight = scrollRect.viewport.rect.height;
         if (viewportHeight <= 0f)
         {
