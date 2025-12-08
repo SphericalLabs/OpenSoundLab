@@ -108,6 +108,10 @@ public class masterControl : MonoBehaviour
         }
 
         CameraRig = GameObject.Find("OVRCameraRig-Variant");
+        if (CameraRig != null && CameraRig.GetComponent<HandInputAdapter>() == null)
+        {
+            CameraRig.AddComponent<HandInputAdapter>();
+        }
 
         DontDestroyOnLoad(this);
         DontDestroyOnLoad(CameraRig);

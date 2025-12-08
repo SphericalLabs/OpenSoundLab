@@ -102,6 +102,16 @@ public class manipulator : MonoBehaviour
     public void toggleController(bool on)
     {
         controllerVisible = on;
+        if (renderers == null || skinnedRenderers == null) return;
+        bool renderEnabled = controllerVisible && isTrackingWorking;
+        foreach (Renderer childRenderer in renderers)
+        {
+            childRenderer.enabled = renderEnabled;
+        }
+        foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers)
+        {
+            childRenderer.enabled = renderEnabled;
+        }
     }
 
     public void SetDeviceIndex(int index)
@@ -512,14 +522,15 @@ public class manipulator : MonoBehaviour
 
         isTrackingWorking = true;
 
+        bool renderEnabled = controllerVisible && isTrackingWorking;
         foreach (Renderer childRenderer in renderers)
         {
-            childRenderer.enabled = isTrackingWorking;
+            childRenderer.enabled = renderEnabled;
         }
 
         foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers)
         {
-            childRenderer.enabled = isTrackingWorking;
+            childRenderer.enabled = renderEnabled;
         }
 
         if (!isTrackingWorking) return;
@@ -714,4 +725,3 @@ public class manipulator : MonoBehaviour
     }
 
 }
-

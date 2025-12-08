@@ -33,18 +33,24 @@ public class platformSetup : MonoBehaviour
     public GameObject hmdPrefab, controllerPrefab;
 
     public Transform hmdTargetOculus, controllerLTargetOculus, controllerRTargetOculus;
+    public Transform handLTargetOculus, handRTargetOculus;
     public GameObject hiresCamSelect;
 
     public bool usePersonalizedHands = false;
     public string personalizedHandsPrefabStr;
+    public bool hideControllersInHandMode = true;
 
     manipulator[] manips = new manipulator[2];
+    GameObject[] manipRoots = new GameObject[2];
+    Transform[] activeParents = new Transform[2];
     void Awake()
     {
 
         hmdTargetOculus = GameObject.Find("CenterEyeAnchor").transform;
         controllerLTargetOculus = GameObject.Find("LeftControllerAnchor").transform;
         controllerRTargetOculus = GameObject.Find("RightControllerAnchor").transform;
+        handLTargetOculus = GameObject.Find("LeftHandAnchor")?.transform;
+        handRTargetOculus = GameObject.Find("RightHandAnchor")?.transform;
 
         masterControl MC = GetComponent<masterControl>();
 
@@ -52,11 +58,15 @@ public class platformSetup : MonoBehaviour
         {
 
             Instantiate(hmdPrefab, hmdTargetOculus, false);
-            manips[0] = (Instantiate(controllerPrefab, controllerLTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
-            manips[1] = (Instantiate(controllerPrefab, controllerRTargetOculus, false) as GameObject).GetComponentInChildren<manipulator>();
+            manipRoots[0] = Instantiate(controllerPrefab, controllerLTargetOculus, false) as GameObject;
+            manipRoots[1] = Instantiate(controllerPrefab, controllerRTargetOculus, false) as GameObject;
+            manips[0] = manipRoots[0].GetComponentInChildren<manipulator>();
+            manips[1] = manipRoots[1].GetComponentInChildren<manipulator>();
 
             manips[0].transform.parent.localPosition = Vector3.zero;
             manips[1].transform.parent.localPosition = Vector3.zero;
+            activeParents[0] = controllerLTargetOculus;
+            activeParents[1] = controllerRTargetOculus;
 
             /*if (UnityEngine.XR.XRSettings.loadedDeviceName == "Oculus")*/
             oculusSwitch();
@@ -70,16 +80,25 @@ public class platformSetup : MonoBehaviour
 
     void Update()
     {
+        if (manips[0] == null || manips[1] == null) return;
         OVRPlugin.Controller control = OVRPlugin.GetActiveController(); //get current controller scheme
-        if ((OVRPlugin.Controller.Hands == control) || (OVRPlugin.Controller.LHand == control) || (OVRPlugin.Controller.RHand == control))
-        { //if current controller is hands disable the controllers
-            manips[0].gameObject.SetActive(false);
-            manips[1].gameObject.SetActive(false);
+        bool usingHands = (OVRPlugin.Controller.Hands == control) || (OVRPlugin.Controller.LHand == control) || (OVRPlugin.Controller.RHand == control);
+        if (usingHands)
+        {
+            attachToHand(0, handLTargetOculus);
+            attachToHand(1, handRTargetOculus);
+            if (hideControllersInHandMode)
+            {
+                manips[0].toggleController(false);
+                manips[1].toggleController(false);
+            }
         }
         else
         {
-            manips[0].gameObject.SetActive(true);
-            manips[1].gameObject.SetActive(true);
+            attachToController(0, controllerLTargetOculus);
+            attachToController(1, controllerRTargetOculus);
+            manips[0].toggleController(true);
+            manips[1].toggleController(true);
         }
     }
 
@@ -124,6 +143,26 @@ public class platformSetup : MonoBehaviour
             }
         }
 
+    }
+
+    void attachToHand(int index, Transform target)
+    {
+        if (target == null || manipRoots[index] == null) return;
+        if (activeParents[index] == target) return;
+        manipRoots[index].transform.SetParent(target, false);
+        manipRoots[index].transform.localPosition = Vector3.zero;
+        manipRoots[index].transform.localRotation = Quaternion.identity;
+        activeParents[index] = target;
+    }
+
+    void attachToController(int index, Transform target)
+    {
+        if (target == null || manipRoots[index] == null) return;
+        if (activeParents[index] == target) return;
+        manipRoots[index].transform.SetParent(target, false);
+        manipRoots[index].transform.localPosition = Vector3.zero;
+        manipRoots[index].transform.localRotation = Quaternion.identity;
+        activeParents[index] = target;
     }
 
 }
