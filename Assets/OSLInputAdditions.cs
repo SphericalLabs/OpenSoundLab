@@ -110,7 +110,7 @@ public partial class OSLInput
 
         float pressThreshold = adapter.pinchThreshold;
         float fullThreshold = adapter.fullPinchThreshold;
-        float gripThreshold = adapter.fistThreshold;
+        float gripThreshold = fullThreshold; // require full pinky pinch for world drag
 
         for (int i = 0; i < 2; i++)
         {
@@ -121,11 +121,11 @@ public partial class OSLInput
             float middle = adapter.getMiddlePinchStrength(i);
             float ring = adapter.getRingPinchStrength(i);
             float pinky = adapter.getPinkyPinchStrength(i);
-            float fist = adapter.getFistStrength(i);
+            float fist = adapter.getPinkyPinchStrength(i); // treat pinky pinch as grip
 
             bool triggerPressed = trigger >= fullThreshold;
-            bool primaryPressed = primary >= pressThreshold;
-            bool secondaryPressed = secondary >= pressThreshold;
+            bool primaryPressed = primary >= fullThreshold;
+            bool secondaryPressed = secondary >= fullThreshold;
 
             handTriggerStarted[i] = !handTriggerPressed[i] && triggerPressed;
             handTriggerReleased[i] = handTriggerPressed[i] && !triggerPressed;

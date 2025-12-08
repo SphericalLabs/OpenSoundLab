@@ -27,7 +27,6 @@
 
 using UnityEngine;
 using System.Collections;
-using UnityEngine.InputSystem;
 
 public class menuspawn : MonoBehaviour
 {
@@ -68,23 +67,18 @@ public class menuspawn : MonoBehaviour
     {
         oslInput = new OSLInput();
         oslInput.Enable();
-        oslInput.Patcher.PrimaryLeft.started += togglePad;
-        oslInput.Patcher.PrimaryRight.started += togglePad;
-
     }
 
     private void OnDestroy()
     {
-        oslInput.Patcher.PrimaryLeft.started -= togglePad;
-        oslInput.Patcher.PrimaryRight.started -= togglePad;
+        if (oslInput != null) oslInput.Dispose();
     }
 
     void Start()
     {
     }
 
-
-    public void togglePad(InputAction.CallbackContext context)
+    void Update()
     {
         int controllerIndex = GetComponent<manipulator>().isLeftController() ? 0 : 1;
         if (oslInput.isMenuStarted(controllerIndex)) menu.buttonEvent(controllerIndex, transform);

@@ -34,7 +34,7 @@ public class HandInputAdapter : MonoBehaviour
     public Transform leftHandAnchor;
     public Transform rightHandAnchor;
     public bool hideHandMeshes = true;
-    public float pinchThreshold = 0.05f;
+    public float pinchThreshold = 0.25f;
     public float fullPinchThreshold = 0.7f;
     public float fistThreshold = 0.1f;
     public bool drawBoneGizmos = true;
@@ -422,7 +422,8 @@ public class HandInputAdapter : MonoBehaviour
                            (control == OVRPlugin.Controller.LHand) ||
                            (control == OVRPlugin.Controller.RHand);
         bool anyHandComponent = leftHand != null || rightHand != null;
-        handsActive = pluginHands && anyHandComponent;
+        bool trackedHands = (leftHand != null && leftHand.IsTracked) || (rightHand != null && rightHand.IsTracked);
+        handsActive = (pluginHands || trackedHands) && anyHandComponent;
 
         if (!handsActive)
         {
@@ -440,14 +441,14 @@ public class HandInputAdapter : MonoBehaviour
         middlePinch[0] = readPinch(leftHand, OVRHand.HandFinger.Middle);
         ringPinch[0] = readPinch(leftHand, OVRHand.HandFinger.Ring);
         pinkyPinch[0] = readPinch(leftHand, OVRHand.HandFinger.Pinky);
-        fistStrength[0] = Mathf.Min(middlePinch[0], Mathf.Min(ringPinch[0], pinkyPinch[0]));
+        fistStrength[0] = Mathf.Max(middlePinch[0], Mathf.Max(ringPinch[0], pinkyPinch[0]));
 
         indexPinch[1] = readPinch(rightHand, OVRHand.HandFinger.Index);
         thumbPinch[1] = readPinch(rightHand, OVRHand.HandFinger.Thumb);
         middlePinch[1] = readPinch(rightHand, OVRHand.HandFinger.Middle);
         ringPinch[1] = readPinch(rightHand, OVRHand.HandFinger.Ring);
         pinkyPinch[1] = readPinch(rightHand, OVRHand.HandFinger.Pinky);
-        fistStrength[1] = Mathf.Min(middlePinch[1], Mathf.Min(ringPinch[1], pinkyPinch[1]));
+        fistStrength[1] = Mathf.Max(middlePinch[1], Mathf.Max(ringPinch[1], pinkyPinch[1]));
     }
 
     float readPinch(OVRHand hand, OVRHand.HandFinger finger)

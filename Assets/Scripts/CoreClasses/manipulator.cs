@@ -658,7 +658,7 @@ public class manipulator : MonoBehaviour
 
 
         // manage copy
-        if (controllerVisible)
+        if (controllerVisible || handMode)
         {
             if (oslInput.isCopyStarted(controllerIndex))
             {
