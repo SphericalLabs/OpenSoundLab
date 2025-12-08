@@ -87,6 +87,8 @@ public class platformSetup : MonoBehaviour
         {
             attachToHand(0, handLTargetOculus);
             attachToHand(1, handRTargetOculus);
+            if (manips[0] != null) manips[0].SetHandMode(true);
+            if (manips[1] != null) manips[1].SetHandMode(true);
             if (hideControllersInHandMode)
             {
                 manips[0].toggleController(false);
@@ -97,6 +99,8 @@ public class platformSetup : MonoBehaviour
         {
             attachToController(0, controllerLTargetOculus);
             attachToController(1, controllerRTargetOculus);
+            if (manips[0] != null) manips[0].SetHandMode(false);
+            if (manips[1] != null) manips[1].SetHandMode(false);
             manips[0].toggleController(true);
             manips[1].toggleController(true);
         }

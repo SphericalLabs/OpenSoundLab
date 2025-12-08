@@ -123,7 +123,7 @@ public partial class OSLInput
             float pinky = adapter.getPinkyPinchStrength(i);
             float fist = adapter.getFistStrength(i);
 
-            bool triggerPressed = trigger >= pressThreshold;
+            bool triggerPressed = trigger >= fullThreshold;
             bool primaryPressed = primary >= pressThreshold;
             bool secondaryPressed = secondary >= pressThreshold;
 
@@ -270,7 +270,7 @@ public partial class OSLInput
         cacheHandState();
         if (handsActive && (controllerIndex == 0 || controllerIndex == 1))
         {
-            return handTriggerValues[controllerIndex] >= handPressThreshold;
+            return handTriggerValues[controllerIndex] >= handFullThreshold;
         }
         if (controllerIndex == 0)
         {

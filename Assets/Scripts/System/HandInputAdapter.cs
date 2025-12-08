@@ -50,6 +50,8 @@ public class HandInputAdapter : MonoBehaviour
     float[] ringPinch = new float[2];
     float[] pinkyPinch = new float[2];
     float[] fistStrength = new float[2];
+    OVRSkeleton leftSkeleton;
+    OVRSkeleton rightSkeleton;
 
     bool handsActive;
     int cachedFrame = -1;
@@ -116,6 +118,54 @@ public class HandInputAdapter : MonoBehaviour
         return controllerIndex == 0 ? fistStrength[0] : fistStrength[1];
     }
 
+    public Transform getPointerPose(int controllerIndex)
+    {
+        cacheState();
+        if (controllerIndex == 0) return leftHand != null ? leftHand.PointerPose : null;
+        if (controllerIndex == 1) return rightHand != null ? rightHand.PointerPose : null;
+        return null;
+    }
+
+    public bool isPointerPoseValid(int controllerIndex)
+    {
+        cacheState();
+        if (controllerIndex == 0) return leftHand != null && leftHand.IsPointerPoseValid;
+        if (controllerIndex == 1) return rightHand != null && rightHand.IsPointerPoseValid;
+        return false;
+    }
+
+    public bool tryGetThumbIndexMidpoint(int controllerIndex, out Vector3 position, out Quaternion rotation)
+    {
+        cacheState();
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+
+        OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
+        if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return false;
+
+        Transform thumbTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_ThumbTip);
+        if (thumbTip == null) thumbTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_ThumbTip);
+        Transform indexTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_IndexTip);
+        if (indexTip == null) indexTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_IndexTip);
+        if (thumbTip == null || indexTip == null) return false;
+
+        position = (thumbTip.position + indexTip.position) * 0.5f;
+        rotation = thumbTip.rotation;
+
+        return true;
+    }
+
+    Transform getBoneTransform(OVRSkeleton skeleton, OVRSkeleton.BoneId id)
+    {
+        if (skeleton == null || skeleton.Bones == null) return null;
+        var bones = skeleton.Bones;
+        for (int i = 0; i < bones.Count; i++)
+        {
+            if (bones[i] != null && bones[i].Id == id) return bones[i].Transform;
+        }
+        return null;
+    }
+
     void findAnchors()
     {
         Transform trackingSpace = transform.Find("TrackingSpace");
@@ -134,6 +184,7 @@ public class HandInputAdapter : MonoBehaviour
             if (leftHand == null) leftHand = leftHandAnchor.gameObject.AddComponent<OVRHand>();
             setHandType(leftHand, OVRHand.Hand.HandLeft);
             if (hideHandMeshes) disableRenderers(leftHandAnchor);
+            ensureSkeleton(leftHandAnchor, ref leftSkeleton, OVRHand.Hand.HandLeft, OVRSkeleton.SkeletonType.HandLeft);
         }
 
         if (rightHand == null && rightHandAnchor != null)
@@ -142,6 +193,7 @@ public class HandInputAdapter : MonoBehaviour
             if (rightHand == null) rightHand = rightHandAnchor.gameObject.AddComponent<OVRHand>();
             setHandType(rightHand, OVRHand.Hand.HandRight);
             if (hideHandMeshes) disableRenderers(rightHandAnchor);
+            ensureSkeleton(rightHandAnchor, ref rightSkeleton, OVRHand.Hand.HandRight, OVRSkeleton.SkeletonType.HandRight);
         }
     }
 
@@ -151,6 +203,24 @@ public class HandInputAdapter : MonoBehaviour
         FieldInfo field = typeof(OVRHand).GetField("HandType", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         if (field != null) field.SetValue(hand, type);
     }
+
+    void ensureSkeleton(Transform anchor, ref OVRSkeleton skeleton, OVRHand.Hand handType, OVRSkeleton.SkeletonType skeletonType)
+    {
+        if (anchor == null) return;
+        if (skeleton == null) skeleton = anchor.GetComponent<OVRSkeleton>();
+        if (skeleton == null) skeleton = anchor.gameObject.AddComponent<OVRSkeleton>();
+
+        setSkeletonType(skeleton, skeletonType);
+        skeleton.enabled = true;
+    }
+
+    void setSkeletonType(OVRSkeleton skeleton, OVRSkeleton.SkeletonType type)
+    {
+        if (skeleton == null) return;
+        FieldInfo field = typeof(OVRSkeleton).GetField("_skeletonType", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (field != null) field.SetValue(skeleton, type);
+    }
+
 
     void cacheState()
     {

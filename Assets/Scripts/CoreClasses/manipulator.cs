@@ -26,6 +26,7 @@
 // limitations under the License.
 
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using static manipObject;
@@ -40,6 +41,7 @@ public class manipulator : MonoBehaviour
     public int controllerIndex = -1; // 0 => left, 1 => right
     public GameObject activeTip;
     public Transform tipL, tipR;
+    public Transform manipCollViz;
 
     List<Transform> hitTransforms = new List<Transform>();
     public Transform selectedTransform;
@@ -51,6 +53,8 @@ public class manipulator : MonoBehaviour
     public Color onColor = Color.HSVToRGB(208 / 359f, 234 / 255f, 93 / 255f);
 
     OSLInput oslInput;
+    bool handMode = false;
+    Vector3 manipCollVizDefaultLocalPos;
 
     private Transform grabbedFollowPointTransform;
     public Transform GrabbedFollowPointTransform { get { return grabbedFollowPointTransform; } }
@@ -73,6 +77,24 @@ public class manipulator : MonoBehaviour
         grabbedFollowPointTransform = new GameObject().transform;
         grabbedFollowPointTransform.name = "ManipulatorFollowPoint";
         grabbedFollowPointTransform.parent = transform;
+
+        if (manipCollViz == null)
+        {
+            manipCollViz = transform.Find("manipCollViz");
+            if (manipCollViz == null)
+            {
+                Transform[] children = GetComponentsInChildren<Transform>(true);
+                foreach (Transform t in children)
+                {
+                    if (t.name == "manipCollViz")
+                    {
+                        manipCollViz = t;
+                        break;
+                    }
+                }
+            }
+        }
+        if (manipCollViz != null) manipCollVizDefaultLocalPos = manipCollViz.localPosition;
     }
 
     private void OnDestroy()
@@ -102,16 +124,54 @@ public class manipulator : MonoBehaviour
     public void toggleController(bool on)
     {
         controllerVisible = on;
-        if (renderers == null || skinnedRenderers == null) return;
-        bool renderEnabled = controllerVisible && isTrackingWorking;
-        foreach (Renderer childRenderer in renderers)
+        updateRendererVisibility();
+    }
+
+    public void SetHandMode(bool on)
+    {
+        handMode = on;
+        if (manipCollViz != null)
         {
-            childRenderer.enabled = renderEnabled;
+            if (!handMode)
+            {
+                manipCollViz.localPosition = manipCollVizDefaultLocalPos;
+            }
         }
-        foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers)
+        updateRendererVisibility();
+    }
+
+    void updateManipCollVizPlacement()
+    {
+        if (!handMode || manipCollViz == null) return;
+
+        if (handInputAdapter == null) handInputAdapter = HandInputAdapter.Instance ?? FindAnyObjectByType<HandInputAdapter>();
+
+        Vector3 midpointPos = Vector3.zero;
+        Quaternion midpointRot = Quaternion.identity;
+        bool midpointValid = handInputAdapter != null && handInputAdapter.tryGetThumbIndexMidpoint(controllerIndex, out midpointPos, out midpointRot);
+
+        if (midpointValid)
         {
-            childRenderer.enabled = renderEnabled;
+            manipCollViz.position = midpointPos;
+            // prefer pointer orientation if available to stabilize facing
+            bool pointerValid = handInputAdapter != null && handInputAdapter.isPointerPoseValid(controllerIndex);
+            Transform pointer = handInputAdapter != null ? handInputAdapter.getPointerPose(controllerIndex) : null;
+            if (pointerValid && pointer != null)
+            {
+                manipCollViz.rotation = pointer.rotation;
+            }
+            else
+            {
+                manipCollViz.rotation = midpointRot;
+            }
         }
+        else
+        {
+            if (manipCollViz.gameObject.activeSelf) manipCollViz.gameObject.SetActive(false);
+            return;
+        }
+
+        if (!manipCollViz.gameObject.activeSelf) manipCollViz.gameObject.SetActive(true);
     }
 
     public void SetDeviceIndex(int index)
@@ -122,6 +182,33 @@ public class manipulator : MonoBehaviour
     public bool isLeftController()
     {
         return controllerIndex == 0 ? true : false;
+    }
+
+    void updateRendererVisibility()
+    {
+        if (renderers == null || skinnedRenderers == null) return;
+        bool renderEnabled = controllerVisible && isTrackingWorking;
+        foreach (Renderer childRenderer in renderers)
+        {
+            bool isTip = false;
+            if (tipRenderers != null)
+            {
+                for (int i = 0; i < tipRenderers.Length; i++)
+                {
+                    if (tipRenderers[i] == childRenderer)
+                    {
+                        isTip = true;
+                        break;
+                    }
+                }
+            }
+            childRenderer.enabled = (renderEnabled || isTip) && isTrackingWorking;
+        }
+
+        foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers)
+        {
+            childRenderer.enabled = renderEnabled && isTrackingWorking;
+        }
     }
 
     bool grabbing;
@@ -484,11 +571,16 @@ public class manipulator : MonoBehaviour
 
     Renderer[] renderers;
     SkinnedMeshRenderer[] skinnedRenderers;
+    Renderer[] tipRenderers;
+    HandInputAdapter handInputAdapter;
 
     void Start()
     {
         renderers = gameObject.transform.parent.parent.parent.GetComponentsInChildren<Renderer>();
         skinnedRenderers = gameObject.transform.parent.parent.parent.GetComponentsInChildren<SkinnedMeshRenderer>();
+        if (manipCollViz == null) manipCollViz = transform.Find("manipCollViz");
+        if (manipCollViz != null) tipRenderers = manipCollViz.GetComponentsInChildren<Renderer>(true);
+        handInputAdapter = HandInputAdapter.Instance ?? FindAnyObjectByType<HandInputAdapter>();
 
         if (controllerIndex == 0)
         {
@@ -522,16 +614,7 @@ public class manipulator : MonoBehaviour
 
         isTrackingWorking = true;
 
-        bool renderEnabled = controllerVisible && isTrackingWorking;
-        foreach (Renderer childRenderer in renderers)
-        {
-            childRenderer.enabled = renderEnabled;
-        }
-
-        foreach (SkinnedMeshRenderer childRenderer in skinnedRenderers)
-        {
-            childRenderer.enabled = renderEnabled;
-        }
+        updateRendererVisibility();
 
         if (!isTrackingWorking) return;
 
@@ -549,6 +632,7 @@ public class manipulator : MonoBehaviour
         }*/
 
         updateProngs();
+        updateManipCollVizPlacement();
 
         bool currentControlHands = false;
         bool currentControlChanged = false;
