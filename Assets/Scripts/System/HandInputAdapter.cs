@@ -178,18 +178,24 @@ public class HandInputAdapter : MonoBehaviour
     Transform getThumbTipTransform(OVRSkeleton skeleton)
     {
         Transform thumb = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_ThumbTip);
+        if (!isThumbTransform(thumb)) thumb = null;
         if (thumb == null) thumb = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_ThumbTip);
-        if (thumb == null) thumb = getBoneTransformByName(skeleton, "thumbtip");
-        if (thumb == null) thumb = getBoneTransformByName(skeleton, "thumb_tip");
+        if (!isThumbTransform(thumb)) thumb = null;
+        if (thumb == null) thumb = getBoneTransformByName(skeleton, "thumb");
+        if (!isThumbTransform(thumb)) thumb = null;
+        if (thumb == null) thumb = getFurthestFingerBone(skeleton, "thumb");
         return thumb;
     }
 
     Transform getIndexTipTransform(OVRSkeleton skeleton)
     {
         Transform index = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_IndexTip);
+        if (!isIndexTransform(index)) index = null;
         if (index == null) index = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_IndexTip);
-        if (index == null) index = getBoneTransformByName(skeleton, "indextip");
-        if (index == null) index = getBoneTransformByName(skeleton, "index_tip");
+        if (!isIndexTransform(index)) index = null;
+        if (index == null) index = getBoneTransformByName(skeleton, "index");
+        if (!isIndexTransform(index)) index = null;
+        if (index == null) index = getFurthestFingerBone(skeleton, "index");
         return index;
     }
 
@@ -215,6 +221,48 @@ public class HandInputAdapter : MonoBehaviour
             if (n.Contains(containsLower)) return bone.Transform;
         }
         return null;
+    }
+
+    bool isThumbTransform(Transform t)
+    {
+        if (t == null) return false;
+        string n = t.name.ToLowerInvariant();
+        return n.Contains("thumb");
+    }
+
+    bool isIndexTransform(Transform t)
+    {
+        if (t == null) return false;
+        string n = t.name.ToLowerInvariant();
+        return n.Contains("index");
+    }
+
+    Transform getFurthestFingerBone(OVRSkeleton skeleton, string fingerKeyword)
+    {
+        if (skeleton == null || skeleton.Bones == null) return null;
+        Transform wrist = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_WristRoot);
+        if (wrist == null) wrist = getBoneTransformByName(skeleton, "wrist");
+        if (wrist == null) return null;
+
+        float maxDist = -1f;
+        Transform best = null;
+        string keyword = fingerKeyword.ToLowerInvariant();
+
+        for (int i = 0; i < skeleton.Bones.Count; i++)
+        {
+            var bone = skeleton.Bones[i];
+            if (bone == null || bone.Transform == null) continue;
+            string name = bone.Transform.name.ToLowerInvariant();
+            if (!name.Contains(keyword)) continue;
+            float dist = Vector3.Distance(wrist.position, bone.Transform.position);
+            if (dist > maxDist)
+            {
+                maxDist = dist;
+                best = bone.Transform;
+            }
+        }
+
+        return best;
     }
 
     void findAnchors()

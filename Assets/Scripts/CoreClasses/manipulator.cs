@@ -152,6 +152,11 @@ public class manipulator : MonoBehaviour
         if (!thumbValid)
         {
             thumbValid = handInputAdapter != null && handInputAdapter.tryGetThumbIndexMidpoint(controllerIndex, out targetPos, out targetRot);
+            if (thumbValid)
+            {
+                // push midpoint slightly forward to avoid sitting on the ring finger when tip data is missing
+                targetPos += targetRot * Vector3.forward * 0.12f;
+            }
         }
 
         if (!thumbValid)
