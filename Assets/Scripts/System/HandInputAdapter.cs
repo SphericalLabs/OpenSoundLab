@@ -148,16 +148,49 @@ public class HandInputAdapter : MonoBehaviour
         OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
         if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return false;
 
-        Transform thumbTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_ThumbTip);
-        if (thumbTip == null) thumbTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_ThumbTip);
-        Transform indexTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_IndexTip);
-        if (indexTip == null) indexTip = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_IndexTip);
+        Transform thumbTip = getThumbTipTransform(skeleton);
+        Transform indexTip = getIndexTipTransform(skeleton);
         if (thumbTip == null || indexTip == null) return false;
 
         position = (thumbTip.position + indexTip.position) * 0.5f;
         rotation = thumbTip.rotation;
 
         return true;
+    }
+
+    public bool tryGetThumbTipPose(int controllerIndex, out Vector3 position, out Quaternion rotation)
+    {
+        cacheState();
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+
+        OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
+        if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return false;
+
+        Transform thumbTip = getThumbTipTransform(skeleton);
+        if (thumbTip == null) return false;
+
+        position = thumbTip.position;
+        rotation = thumbTip.rotation;
+        return true;
+    }
+
+    Transform getThumbTipTransform(OVRSkeleton skeleton)
+    {
+        Transform thumb = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_ThumbTip);
+        if (thumb == null) thumb = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_ThumbTip);
+        if (thumb == null) thumb = getBoneTransformByName(skeleton, "thumbtip");
+        if (thumb == null) thumb = getBoneTransformByName(skeleton, "thumb_tip");
+        return thumb;
+    }
+
+    Transform getIndexTipTransform(OVRSkeleton skeleton)
+    {
+        Transform index = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_IndexTip);
+        if (index == null) index = getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_IndexTip);
+        if (index == null) index = getBoneTransformByName(skeleton, "indextip");
+        if (index == null) index = getBoneTransformByName(skeleton, "index_tip");
+        return index;
     }
 
     Transform getBoneTransform(OVRSkeleton skeleton, OVRSkeleton.BoneId id)
@@ -167,6 +200,19 @@ public class HandInputAdapter : MonoBehaviour
         for (int i = 0; i < bones.Count; i++)
         {
             if (bones[i] != null && bones[i].Id == id) return bones[i].Transform;
+        }
+        return null;
+    }
+
+    Transform getBoneTransformByName(OVRSkeleton skeleton, string containsLower)
+    {
+        if (skeleton == null || skeleton.Bones == null) return null;
+        for (int i = 0; i < skeleton.Bones.Count; i++)
+        {
+            var bone = skeleton.Bones[i];
+            if (bone == null || bone.Transform == null) continue;
+            string n = bone.Transform.name.ToLowerInvariant();
+            if (n.Contains(containsLower)) return bone.Transform;
         }
         return null;
     }

@@ -146,29 +146,31 @@ public class manipulator : MonoBehaviour
 
         if (handInputAdapter == null) handInputAdapter = HandInputAdapter.Instance ?? FindAnyObjectByType<HandInputAdapter>();
 
-        Vector3 midpointPos = Vector3.zero;
-        Quaternion midpointRot = Quaternion.identity;
-        bool midpointValid = handInputAdapter != null && handInputAdapter.tryGetThumbIndexMidpoint(controllerIndex, out midpointPos, out midpointRot);
-
-        if (midpointValid)
+        Vector3 targetPos = Vector3.zero;
+        Quaternion targetRot = Quaternion.identity;
+        bool thumbValid = handInputAdapter != null && handInputAdapter.tryGetThumbTipPose(controllerIndex, out targetPos, out targetRot);
+        if (!thumbValid)
         {
-            manipCollViz.position = midpointPos;
-            // prefer pointer orientation if available to stabilize facing
-            bool pointerValid = handInputAdapter != null && handInputAdapter.isPointerPoseValid(controllerIndex);
-            Transform pointer = handInputAdapter != null ? handInputAdapter.getPointerPose(controllerIndex) : null;
-            if (pointerValid && pointer != null)
-            {
-                manipCollViz.rotation = pointer.rotation;
-            }
-            else
-            {
-                manipCollViz.rotation = midpointRot;
-            }
+            thumbValid = handInputAdapter != null && handInputAdapter.tryGetThumbIndexMidpoint(controllerIndex, out targetPos, out targetRot);
         }
-        else
+
+        if (!thumbValid)
         {
             if (manipCollViz.gameObject.activeSelf) manipCollViz.gameObject.SetActive(false);
             return;
+        }
+
+        manipCollViz.position = targetPos;
+
+        bool pointerValid = handInputAdapter != null && handInputAdapter.isPointerPoseValid(controllerIndex);
+        Transform pointer = handInputAdapter != null ? handInputAdapter.getPointerPose(controllerIndex) : null;
+        if (pointerValid && pointer != null)
+        {
+            manipCollViz.rotation = pointer.rotation;
+        }
+        else
+        {
+            manipCollViz.rotation = targetRot;
         }
 
         if (!manipCollViz.gameObject.activeSelf) manipCollViz.gameObject.SetActive(true);

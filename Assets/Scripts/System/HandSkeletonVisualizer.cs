@@ -38,6 +38,7 @@ public class HandSkeletonVisualizer : MonoBehaviour
     readonly List<GameObject> gizmos = new List<GameObject>();
     Material gizmoMaterial;
     int lastSkeletonChangedCount = -1;
+    float lastReadyTime = -1f;
 
     void Start()
     {
@@ -48,6 +49,7 @@ public class HandSkeletonVisualizer : MonoBehaviour
 
     void Update()
     {
+        if (skeleton == null) skeleton = GetComponent<OVRSkeleton>();
         TryBuildGizmos();
         UpdateVisibility();
     }
@@ -95,7 +97,11 @@ public class HandSkeletonVisualizer : MonoBehaviour
 
     void UpdateVisibility()
     {
-        bool show = visibleByDefault && skeleton != null && skeleton.IsInitialized && skeleton.Bones != null;
+        bool ready = skeleton != null && skeleton.IsInitialized && skeleton.Bones != null && skeleton.Bones.Count > 0;
+        if (ready) lastReadyTime = Time.time;
+
+        // keep the gizmos alive briefly through small tracking gaps so they don't disappear after the first pinch
+        bool show = visibleByDefault && (ready || (lastReadyTime > 0f && Time.time - lastReadyTime < 0.4f));
         for (int i = 0; i < gizmos.Count; i++)
         {
             if (gizmos[i] != null && gizmos[i].activeSelf != show) gizmos[i].SetActive(show);
