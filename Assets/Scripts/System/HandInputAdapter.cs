@@ -37,6 +37,9 @@ public class HandInputAdapter : MonoBehaviour
     public float pinchThreshold = 0.05f;
     public float fullPinchThreshold = 0.7f;
     public float fistThreshold = 0.1f;
+    public bool drawBoneGizmos = true;
+    public float boneGizmoScale = 0.01f;
+    public Color boneGizmoColor = Color.cyan;
 
     static HandInputAdapter instance;
     public static HandInputAdapter Instance => instance;
@@ -212,6 +215,7 @@ public class HandInputAdapter : MonoBehaviour
 
         setSkeletonType(skeleton, skeletonType);
         skeleton.enabled = true;
+        ensureVisualizer(anchor, skeleton);
     }
 
     void setSkeletonType(OVRSkeleton skeleton, OVRSkeleton.SkeletonType type)
@@ -219,6 +223,17 @@ public class HandInputAdapter : MonoBehaviour
         if (skeleton == null) return;
         FieldInfo field = typeof(OVRSkeleton).GetField("_skeletonType", BindingFlags.Instance | BindingFlags.NonPublic);
         if (field != null) field.SetValue(skeleton, type);
+    }
+
+    void ensureVisualizer(Transform anchor, OVRSkeleton skeleton)
+    {
+        if (!drawBoneGizmos) return;
+        HandSkeletonVisualizer viz = anchor.GetComponent<HandSkeletonVisualizer>();
+        if (viz == null) viz = anchor.gameObject.AddComponent<HandSkeletonVisualizer>();
+        viz.skeleton = skeleton;
+        viz.visibleByDefault = true;
+        viz.gizmoScale = boneGizmoScale;
+        viz.gizmoColor = boneGizmoColor;
     }
 
 
