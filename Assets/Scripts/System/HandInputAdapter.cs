@@ -198,6 +198,40 @@ public class HandInputAdapter : MonoBehaviour
         return true;
     }
 
+    public bool tryGetWristPose(int controllerIndex, out Vector3 position, out Quaternion rotation)
+    {
+        cacheState();
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+
+        OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
+        if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return false;
+
+        Transform wrist = getWristTransform(skeleton);
+        if (wrist == null) return false;
+
+        position = wrist.position;
+        rotation = wrist.rotation;
+        return true;
+    }
+
+    public bool tryGetMiddleMetacarpalPose(int controllerIndex, out Vector3 position, out Quaternion rotation)
+    {
+        cacheState();
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+
+        OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
+        if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return false;
+
+        Transform meta = getMiddleMetacarpalTransform(skeleton);
+        if (meta == null) return false;
+
+        position = meta.position;
+        rotation = meta.rotation;
+        return true;
+    }
+
     Transform getThumbTipTransform(OVRSkeleton skeleton)
     {
         Transform thumb = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_ThumbTip);
@@ -286,6 +320,19 @@ public class HandInputAdapter : MonoBehaviour
         }
 
         return best;
+    }
+
+    Transform getWristTransform(OVRSkeleton skeleton)
+    {
+        Transform wrist = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_WristRoot);
+        if (wrist == null) wrist = getBoneTransformByName(skeleton, "wrist");
+        return wrist;
+    }
+
+    Transform getMiddleMetacarpalTransform(OVRSkeleton skeleton)
+    {
+        // Explicit metacarpal anchor; will surface a compile error if the enum is unavailable in this OVR version.
+        return getBoneTransform(skeleton, OVRSkeleton.BoneId.XRHand_MiddleMetacarpal);
     }
 
     void findAnchors()

@@ -148,19 +148,23 @@ public class manipulator : MonoBehaviour
 
         Vector3 targetPos = Vector3.zero;
         Quaternion targetRot = Quaternion.identity;
-        bool indexValid = handInputAdapter != null && handInputAdapter.tryGetIndexTipPose(controllerIndex, out targetPos, out targetRot);
-        if (!indexValid)
+        bool metaValid = handInputAdapter != null && handInputAdapter.tryGetMiddleMetacarpalPose(controllerIndex, out targetPos, out targetRot);
+        if (metaValid)
         {
-            indexValid = handInputAdapter != null && handInputAdapter.tryGetThumbIndexMidpoint(controllerIndex, out targetPos, out targetRot);
-            if (indexValid) targetPos += targetRot * Vector3.forward * 0.12f;
+            // offsets differ per hand
+            Vector3 localOffset;
+            if (controllerIndex == 0) // left hand
+            {
+                localOffset = new Vector3(0.03f, -0.07f, 0.11f); // right in local -> +x
+            }
+            else // right hand
+            {
+                localOffset = new Vector3(-0.03f, -0.07f, 0.11f); // left in local -> -x
+            }
+            targetPos += targetRot * localOffset;
         }
 
-        if (indexValid)
-        {
-            targetPos += targetRot * Vector3.forward * 0.04f;
-        }
-
-        if (!indexValid)
+        if (!metaValid)
         {
             if (manipCollViz.gameObject.activeSelf) manipCollViz.gameObject.SetActive(false);
             return;
