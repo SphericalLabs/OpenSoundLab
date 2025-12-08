@@ -148,18 +148,19 @@ public class manipulator : MonoBehaviour
 
         Vector3 targetPos = Vector3.zero;
         Quaternion targetRot = Quaternion.identity;
-        bool thumbValid = handInputAdapter != null && handInputAdapter.tryGetThumbTipPose(controllerIndex, out targetPos, out targetRot);
-        if (!thumbValid)
+        bool indexValid = handInputAdapter != null && handInputAdapter.tryGetIndexTipPose(controllerIndex, out targetPos, out targetRot);
+        if (!indexValid)
         {
-            thumbValid = handInputAdapter != null && handInputAdapter.tryGetThumbIndexMidpoint(controllerIndex, out targetPos, out targetRot);
-            if (thumbValid)
-            {
-                // push midpoint slightly forward to avoid sitting on the ring finger when tip data is missing
-                targetPos += targetRot * Vector3.forward * 0.12f;
-            }
+            indexValid = handInputAdapter != null && handInputAdapter.tryGetThumbIndexMidpoint(controllerIndex, out targetPos, out targetRot);
+            if (indexValid) targetPos += targetRot * Vector3.forward * 0.12f;
         }
 
-        if (!thumbValid)
+        if (indexValid)
+        {
+            targetPos += targetRot * Vector3.forward * 0.04f;
+        }
+
+        if (!indexValid)
         {
             if (manipCollViz.gameObject.activeSelf) manipCollViz.gameObject.SetActive(false);
             return;
@@ -622,6 +623,11 @@ public class manipulator : MonoBehaviour
         isTrackingWorking = true;
 
         updateRendererVisibility();
+
+        if (handInputAdapter == null) handInputAdapter = HandInputAdapter.Instance ?? FindAnyObjectByType<HandInputAdapter>();
+        // auto-toggle hand mode when skeleton is ready so coll viz aligns immediately
+        bool skeletonReady = handInputAdapter != null && handInputAdapter.isSkeletonReady(controllerIndex);
+        if (skeletonReady && !handMode) SetHandMode(true);
 
         if (!isTrackingWorking) return;
 

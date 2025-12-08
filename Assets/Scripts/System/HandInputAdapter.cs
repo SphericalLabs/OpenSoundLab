@@ -123,6 +123,12 @@ public class HandInputAdapter : MonoBehaviour
         return controllerIndex == 0 ? fistStrength[0] : fistStrength[1];
     }
 
+    public bool isSkeletonReady(int controllerIndex)
+    {
+        OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
+        return skeleton != null && skeleton.IsInitialized && skeleton.Bones != null && skeleton.Bones.Count > 0;
+    }
+
     public Transform getPointerPose(int controllerIndex)
     {
         cacheState();
@@ -172,6 +178,23 @@ public class HandInputAdapter : MonoBehaviour
 
         position = thumbTip.position;
         rotation = thumbTip.rotation;
+        return true;
+    }
+
+    public bool tryGetIndexTipPose(int controllerIndex, out Vector3 position, out Quaternion rotation)
+    {
+        cacheState();
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+
+        OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
+        if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return false;
+
+        Transform indexTip = getIndexTipTransform(skeleton);
+        if (indexTip == null) return false;
+
+        position = indexTip.position;
+        rotation = indexTip.rotation;
         return true;
     }
 
