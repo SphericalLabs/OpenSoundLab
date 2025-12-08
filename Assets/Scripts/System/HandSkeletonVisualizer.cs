@@ -32,7 +32,7 @@ public class HandSkeletonVisualizer : MonoBehaviour
 {
     public OVRSkeleton skeleton;
     public bool visibleByDefault = true;
-    public float gizmoScale = 0.01f;
+    public float gizmoScale = 0.0025f;
     public Color gizmoColor = Color.cyan;
 
     readonly List<GameObject> gizmos = new List<GameObject>();
