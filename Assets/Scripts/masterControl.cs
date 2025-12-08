@@ -108,9 +108,17 @@ public class masterControl : MonoBehaviour
         }
 
         CameraRig = GameObject.Find("OVRCameraRig-Variant");
-        if (CameraRig != null && CameraRig.GetComponent<HandInputAdapter>() == null)
+        if (CameraRig != null)
         {
-            CameraRig.AddComponent<HandInputAdapter>();
+            if (CameraRig.GetComponent<HandInputAdapter>() == null)
+            {
+                CameraRig.AddComponent<HandInputAdapter>();
+            }
+
+            if (CameraRig.GetComponent<HandTrackingDiagnostics>() == null)
+            {
+                CameraRig.AddComponent<HandTrackingDiagnostics>();
+            }
         }
 
         DontDestroyOnLoad(this);
