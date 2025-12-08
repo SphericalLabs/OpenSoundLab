@@ -58,10 +58,12 @@ public class HandInputAdapter : MonoBehaviour
 
     bool handsActive;
     int cachedFrame = -1;
+    bool skeletonVersionConfigured;
 
     void Awake()
     {
         instance = this;
+        ensureHandSkeletonVersion();
         if (leftHandAnchor == null || rightHandAnchor == null) findAnchors();
         ensureHands();
     }
@@ -213,9 +215,63 @@ public class HandInputAdapter : MonoBehaviour
         if (skeleton == null) skeleton = anchor.GetComponent<OVRSkeleton>();
         if (skeleton == null) skeleton = anchor.gameObject.AddComponent<OVRSkeleton>();
 
-        setSkeletonType(skeleton, skeletonType);
+        OVRSkeleton.SkeletonType configuredType = getConfiguredSkeletonType(handType, skeletonType);
+        setSkeletonType(skeleton, configuredType);
+        setSkeletonDataProvider(anchor, skeleton);
         skeleton.enabled = true;
         ensureVisualizer(anchor, skeleton);
+    }
+
+    OVRSkeleton.SkeletonType getConfiguredSkeletonType(OVRHand.Hand handType, OVRSkeleton.SkeletonType defaultType)
+    {
+        OVRHandSkeletonVersion version = OVRHandSkeletonVersion.OpenXR;
+        try
+        {
+            OVRRuntimeSettings settings = OVRRuntimeSettings.Instance;
+            if (settings != null) version = settings.HandSkeletonVersion;
+        }
+        catch (Exception) { }
+
+        if (version == OVRHandSkeletonVersion.OpenXR)
+        {
+            return handType == OVRHand.Hand.HandLeft ? OVRSkeleton.SkeletonType.XRHandLeft : OVRSkeleton.SkeletonType.XRHandRight;
+        }
+
+        return defaultType;
+    }
+
+    void setSkeletonDataProvider(Transform anchor, OVRSkeleton skeleton)
+    {
+        if (anchor == null || skeleton == null) return;
+        OVRSkeleton.IOVRSkeletonDataProvider provider = anchor.GetComponentInParent<OVRSkeleton.IOVRSkeletonDataProvider>(true);
+        if (provider == null) return;
+
+        try
+        {
+            FieldInfo field = typeof(OVRSkeleton).GetField("_dataProvider", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (field != null) field.SetValue(skeleton, provider);
+        }
+        catch (Exception) { }
+    }
+
+    void ensureHandSkeletonVersion()
+    {
+        if (skeletonVersionConfigured) return;
+
+        try
+        {
+            OVRHandSkeletonVersion version = OVRHandSkeletonVersion.OpenXR;
+            OVRRuntimeSettings settings = OVRRuntimeSettings.Instance;
+            if (settings != null) version = settings.HandSkeletonVersion;
+
+            if (OVRPlugin.HandSkeletonVersion != version)
+            {
+                OVRPlugin.SetHandSkeletonVersion(version);
+            }
+        }
+        catch (Exception) { }
+
+        skeletonVersionConfigured = true;
     }
 
     void setSkeletonType(OVRSkeleton skeleton, OVRSkeleton.SkeletonType type)

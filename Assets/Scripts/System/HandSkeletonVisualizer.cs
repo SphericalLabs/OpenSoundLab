@@ -37,6 +37,7 @@ public class HandSkeletonVisualizer : MonoBehaviour
 
     readonly List<GameObject> gizmos = new List<GameObject>();
     Material gizmoMaterial;
+    int lastSkeletonChangedCount = -1;
 
     void Start()
     {
@@ -66,9 +67,10 @@ public class HandSkeletonVisualizer : MonoBehaviour
     {
         if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return;
 
-        if (gizmos.Count == skeleton.Bones.Count) return;
+        if (gizmos.Count == skeleton.Bones.Count && skeleton.SkeletonChangedCount == lastSkeletonChangedCount) return;
 
         ClearGizmos();
+        lastSkeletonChangedCount = skeleton.SkeletonChangedCount;
 
         for (int i = 0; i < skeleton.Bones.Count; i++)
         {
