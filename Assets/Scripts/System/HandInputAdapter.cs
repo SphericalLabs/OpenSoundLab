@@ -440,7 +440,7 @@ public class HandInputAdapter : MonoBehaviour
         setSkeletonType(skeleton, configuredType);
         setSkeletonDataProvider(anchor, skeleton);
         skeleton.enabled = true;
-        ensureVisualizer(anchor, skeleton);
+        //ensureVisualizer(anchor, skeleton);
     }
 
     OVRSkeleton.SkeletonType getConfiguredSkeletonType(OVRHand.Hand handType, OVRSkeleton.SkeletonType defaultType)
