@@ -63,6 +63,8 @@ public class manipulator : MonoBehaviour
 
     public manipObject SelectedObject { get => selectedObject; set => selectedObject = value; }
 
+    public bool IsHandMode => handMode;
+
     public UnityEvent onInputTriggerdEvent;
     public UnityEvent onInputReleasedEvent;
 

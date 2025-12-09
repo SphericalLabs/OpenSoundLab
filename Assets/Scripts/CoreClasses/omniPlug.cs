@@ -598,10 +598,19 @@ public class omniPlug : manipObject
             }
             else // manual patching
             {
-                transform.parent = manipulatorObj.parent;
-                // fix position at hand
-                posDiff = new Vector3(0f, 0f, 0.06f);
-                transform.localPosition = posDiff;
+                if (manipulatorObjScript != null && manipulatorObjScript.IsHandMode && manipulatorObjScript.manipCollViz != null)
+                {
+                    transform.parent = manipulatorObjScript.manipCollViz;
+                    transform.localPosition = Vector3.zero;
+                    transform.localRotation = Quaternion.identity;
+                }
+                else
+                {
+                    transform.parent = manipulatorObj.parent;
+                    // fix position at hand
+                    posDiff = new Vector3(0f, 0f, 0.06f);
+                    transform.localPosition = posDiff;
+                }
             }
 
             AddPlugToHand(otherPlug.connected.ID);
