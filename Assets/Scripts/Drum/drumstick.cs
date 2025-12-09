@@ -295,7 +295,9 @@ public class drumstick : manipObject
             onStartFollowEvent.Invoke();
             glowTrans.gameObject.SetActive(true);
 
-            SetFollowTarget(manipulatorObj.parent);
+            Transform followTarget = manipulatorObj.parent;
+            if (manipulatorObjScript != null && manipulatorObjScript.IsHandMode && manipulatorObjScript.manipCollViz != null) followTarget = manipulatorObjScript.manipCollViz;
+            SetFollowTarget(followTarget);
             /*
             transform.parent = manipulatorObj.parent;
 
