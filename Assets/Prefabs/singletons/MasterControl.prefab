@@ -53,8 +53,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5239d3327497a7242a65ab73989d52d0, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114000013435907624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65,8 +65,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 690478fc5121f9640a2d1d711d465c30, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
 --- !u!114 &114000010410631886
 MonoBehaviour:
@@ -78,8 +78,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adf9e13cb425cb44d82a7bb9ea69f17d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   masterMixer: {fileID: 24100000, guid: 69a3764621178d84a968b8979649e7df, type: 2}
   currentPlatform: 0
   tipColor: {r: 0.34509805, g: 0.44705883, b: 0.68235296, a: 1}
@@ -90,10 +90,10 @@ MonoBehaviour:
   curCycle: 0
   measurePeriod: 4
   curMic: 0
-  currentScene:
+  currentScene: 
   showEnvironment: 1
   glowVal: 1
-  SaveDir:
+  SaveDir: 
   handlesEnabled: 1
   jacksEnabled: 1
   autoLoadLocalScene: 0
@@ -118,7 +118,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   BinauralSetting: 0
-  WireSetting: 1
+  WireSetting: 2
   DisplaySetting: 0
 --- !u!82 &82000010201573614
 AudioSource:
@@ -226,17 +226,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f7a969e9d07b8c428f7f9fd0ecc2e01, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   hmdPrefab: {fileID: 1000010370273460, guid: a088ff9398153d742b0ed890d1c5d328, type: 3}
   controllerPrefab: {fileID: 1000011093787898, guid: 30d7393a0032e72459b33001a37fc053,
     type: 3}
   hmdTargetOculus: {fileID: 0}
   controllerLTargetOculus: {fileID: 0}
   controllerRTargetOculus: {fileID: 0}
+  handLTargetOculus: {fileID: 0}
+  handRTargetOculus: {fileID: 0}
   hiresCamSelect: {fileID: 0}
   usePersonalizedHands: 0
   personalizedHandsPrefabStr: rubber-med-gloves/rubber-med-gloves
+  hideControllersInHandMode: 1
   OVRControllerPrefabL: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
   OVRControllerPrefabR: {fileID: 112276, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
 --- !u!114 &114465591553212382
@@ -249,8 +252,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 568498a9cfbe92648b683aadf2313b03, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   panoSphere: {fileID: 1109546034012396, guid: d47927aa7fef3cb43a6b73ba7b944525, type: 3}
   groundPlane: {fileID: 0}
 --- !u!114 &114625744848687504
@@ -263,8 +266,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c5673e2875a6c4348ae8bfb8d2f4e27f, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114568204637131020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,8 +278,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f879564415f34647ad437f618d8d5c8, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   applyNormalization: 0
   savingInProgress: 0
 --- !u!114 &835394206
@@ -289,8 +292,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7eb56fda7f7b14ccb8953a7ff29903f7, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7013683895444878039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,8 +304,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 908267b565c2f6f4984fb75f0966bf36, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   cpuDial: {fileID: 0}
   gpuDial: {fileID: 0}
   fovDial: {fileID: 0}
@@ -318,8 +321,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 52d81ffb71c8b5b489ee1d2c05a4180f,
     type: 3}
   m_NotificationBehavior: 3
@@ -353,15 +356,15 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName:
-        m_MethodName:
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName:
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument:
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: cfe2a8e1-0def-4b73-9835-7999d7775914
@@ -383,7 +386,7 @@ MonoBehaviour:
     m_ActionId: 0b5b3bc8-f9ea-460f-8591-9c0e32cce049
     m_ActionName: Patcher/Interact
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme:
+  m_DefaultControlScheme: 
   m_DefaultActionMap: Patcher
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
