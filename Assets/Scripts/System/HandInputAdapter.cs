@@ -38,8 +38,8 @@ public class HandInputAdapter : MonoBehaviour
     public float fullPinchThreshold = 0.7f;
     public float fistThreshold = 0.1f;
     public bool drawBoneGizmos = true;
-    public float boneGizmoScale = 0.01f;
-    public Color boneGizmoColor = Color.cyan;
+    public float boneGizmoScale = 0.003f;
+    public Color boneGizmoColor = Color.red;
 
     static HandInputAdapter instance;
     public static HandInputAdapter Instance => instance;
