@@ -41,6 +41,7 @@ public partial class OSLInput
     private float handPressThreshold = 0.05f;
     private float handFullThreshold = 0.7f;
     private float handGripThreshold = 0.1f;
+    private const float gestureHoldDuration = 0.2f;
     private bool[] handTriggerPressed = new bool[2];
     private bool[] handTriggerStarted = new bool[2];
     private bool[] handTriggerReleased = new bool[2];
@@ -56,6 +57,10 @@ public partial class OSLInput
     private float[] handMiddlePinch = new float[2];
     private float[] handRingPinch = new float[2];
     private float[] handPinkyPinch = new float[2];
+    private float[] menuGestureStartTime = new float[2];
+    private float[] copyGestureStartTime = new float[2];
+    private bool[] menuGestureReady = new bool[2];
+    private bool[] copyGestureReady = new bool[2];
 
     public static OSLInput getInstance()
     {
@@ -93,6 +98,10 @@ public partial class OSLInput
         Array.Clear(handMiddlePinch, 0, handMiddlePinch.Length);
         Array.Clear(handRingPinch, 0, handRingPinch.Length);
         Array.Clear(handPinkyPinch, 0, handPinkyPinch.Length);
+        Array.Clear(menuGestureStartTime, 0, menuGestureStartTime.Length);
+        Array.Clear(copyGestureStartTime, 0, copyGestureStartTime.Length);
+        Array.Clear(menuGestureReady, 0, menuGestureReady.Length);
+        Array.Clear(copyGestureReady, 0, copyGestureReady.Length);
     }
 
     private void cacheHandState()
@@ -145,6 +154,18 @@ public partial class OSLInput
             handMiddlePinch[i] = middle;
             handRingPinch[i] = ring;
             handPinkyPinch[i] = pinky;
+
+            // reset gesture timers if combo not held
+            if (!isMenuGestureActive(i))
+            {
+                menuGestureStartTime[i] = 0f;
+                menuGestureReady[i] = false;
+            }
+            if (!isCopyGestureActive(i))
+            {
+                copyGestureStartTime[i] = 0f;
+                copyGestureReady[i] = false;
+            }
         }
 
         handFullThreshold = fullThreshold;
@@ -161,9 +182,9 @@ public partial class OSLInput
     public bool isMenuStarted(int controllerIndex)
     {
         cacheHandState();
-        if (handsActive && (controllerIndex == 0 || controllerIndex == 1) && handPrimaryStarted[controllerIndex])
+        if (handsActive && (controllerIndex == 0 || controllerIndex == 1))
         {
-            return true;
+            if (isMenuGestureFired(controllerIndex)) return true;
         }
         return (Patcher.PrimaryLeft.WasPressedThisFrame() && controllerIndex == 0) || (Patcher.PrimaryRight.WasPressedThisFrame() && controllerIndex == 1);
     }
@@ -197,11 +218,83 @@ public partial class OSLInput
     public bool isCopyStarted(int controllerIndex)
     {
         cacheHandState();
-        if (handsActive && (controllerIndex == 0 || controllerIndex == 1) && handSecondaryStarted[controllerIndex])
+        if (handsActive && (controllerIndex == 0 || controllerIndex == 1))
         {
-            return true;
+            if (isCopyGestureFired(controllerIndex)) return true;
         }
         return (Patcher.SecondaryLeft.WasPressedThisFrame() && controllerIndex == 0) || (Patcher.SecondaryRight.WasPressedThisFrame() && controllerIndex == 1);
+    }
+
+    bool isMenuGestureActive(int controllerIndex)
+    {
+        if (!handsActive) return false;
+        float thumb = handThumbPinch[controllerIndex];
+        float middle = handMiddlePinch[controllerIndex];
+        bool otherClear = handIndexAndRingAndPinkyClear(controllerIndex);
+        return thumb >= handFullThreshold && middle >= handFullThreshold && otherClear;
+    }
+
+    bool isCopyGestureActive(int controllerIndex)
+    {
+        if (!handsActive) return false;
+        float thumb = handThumbPinch[controllerIndex];
+        float ring = handRingPinch[controllerIndex];
+        bool otherClear = handIndexMiddlePinkyClear(controllerIndex);
+        return thumb >= handFullThreshold && ring >= handFullThreshold && otherClear;
+    }
+
+    bool isMenuGestureFired(int controllerIndex)
+    {
+        if (!isMenuGestureActive(controllerIndex)) return false;
+
+        if (menuGestureStartTime[controllerIndex] <= 0f)
+        {
+            menuGestureStartTime[controllerIndex] = Time.unscaledTime;
+            return false;
+        }
+
+        if (menuGestureReady[controllerIndex]) return false;
+
+        if (Time.unscaledTime - menuGestureStartTime[controllerIndex] >= gestureHoldDuration)
+        {
+            menuGestureReady[controllerIndex] = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    bool isCopyGestureFired(int controllerIndex)
+    {
+        if (!isCopyGestureActive(controllerIndex)) return false;
+
+        if (copyGestureStartTime[controllerIndex] <= 0f)
+        {
+            copyGestureStartTime[controllerIndex] = Time.unscaledTime;
+            return false;
+        }
+
+        if (copyGestureReady[controllerIndex]) return false;
+
+        if (Time.unscaledTime - copyGestureStartTime[controllerIndex] >= gestureHoldDuration)
+        {
+            copyGestureReady[controllerIndex] = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    bool handIndexAndRingAndPinkyClear(int controllerIndex)
+    {
+        float pressThreshold = handPressThreshold;
+        return handTriggerValues[controllerIndex] < pressThreshold && handRingPinch[controllerIndex] < pressThreshold && handPinkyPinch[controllerIndex] < pressThreshold;
+    }
+
+    bool handIndexMiddlePinkyClear(int controllerIndex)
+    {
+        float pressThreshold = handPressThreshold;
+        return handTriggerValues[controllerIndex] < pressThreshold && handMiddlePinch[controllerIndex] < pressThreshold && handPinkyPinch[controllerIndex] < pressThreshold;
     }
 
     public bool isCopyReleased(int controllerIndex)
