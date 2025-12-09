@@ -35,7 +35,7 @@ public class HandSkeletonVisualizer : MonoBehaviour
     public float gizmoScale = 0.0025f;
     public Color gizmoColor = Color.cyan;
 
-    readonly List<GameObject> gizmos = new List<GameObject>();
+    readonly List<LineRenderer> boneLines = new List<LineRenderer>();
     Material gizmoMaterial;
     int lastSkeletonChangedCount = -1;
     float lastReadyTime = -1f;
@@ -51,6 +51,7 @@ public class HandSkeletonVisualizer : MonoBehaviour
     {
         if (skeleton == null) skeleton = GetComponent<OVRSkeleton>();
         TryBuildGizmos();
+        UpdateLinePositions();
         UpdateVisibility();
     }
 
@@ -69,29 +70,30 @@ public class HandSkeletonVisualizer : MonoBehaviour
     {
         if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return;
 
-        if (gizmos.Count == skeleton.Bones.Count && skeleton.SkeletonChangedCount == lastSkeletonChangedCount) return;
+        if (boneLines.Count == skeleton.Bones.Count && skeleton.SkeletonChangedCount == lastSkeletonChangedCount) return;
 
         ClearGizmos();
         lastSkeletonChangedCount = skeleton.SkeletonChangedCount;
 
-        for (int i = 0; i < skeleton.Bones.Count; i++)
+        IList<OVRBone> bones = skeleton.Bones;
+        boneLines.Capacity = bones.Count;
+        for (int i = 0; i < bones.Count; i++) boneLines.Add(null);
+
+        for (int i = 0; i < bones.Count; i++)
         {
-            var bone = skeleton.Bones[i];
+            OVRBone bone = bones[i];
             if (bone == null || bone.Transform == null) continue;
-            GameObject g = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            g.name = "BoneViz_" + bone.Id.ToString();
-            g.transform.SetParent(bone.Transform, false);
-            g.transform.localPosition = Vector3.zero;
-            g.transform.localRotation = Quaternion.identity;
-            g.transform.localScale = Vector3.one * gizmoScale;
-            var renderer = g.GetComponent<Renderer>();
-            if (renderer != null && gizmoMaterial != null)
-            {
-                renderer.sharedMaterial = gizmoMaterial;
-            }
-            var collider = g.GetComponent<Collider>();
-            if (collider != null) collider.enabled = false;
-            gizmos.Add(g);
+            int parentIndex = bone.ParentBoneIndex;
+            if (parentIndex < 0 || parentIndex >= bones.Count) continue;
+
+            OVRBone parent = bones[parentIndex];
+            if (parent == null || parent.Transform == null) continue;
+
+            GameObject lineObj = new GameObject("BoneLine_" + bone.Id);
+            lineObj.transform.SetParent(transform, false);
+            LineRenderer line = lineObj.AddComponent<LineRenderer>();
+            ConfigureLineRenderer(line);
+            boneLines[i] = line;
         }
     }
 
@@ -102,24 +104,61 @@ public class HandSkeletonVisualizer : MonoBehaviour
 
         // keep the gizmos alive briefly through small tracking gaps so they don't disappear after the first pinch
         bool show = visibleByDefault && (ready || (lastReadyTime > 0f && Time.time - lastReadyTime < 0.4f));
-        for (int i = 0; i < gizmos.Count; i++)
+        for (int i = 0; i < boneLines.Count; i++)
         {
-            if (gizmos[i] != null && gizmos[i].activeSelf != show) gizmos[i].SetActive(show);
+            if (boneLines[i] != null) boneLines[i].enabled = show;
         }
     }
 
     void ClearGizmos()
     {
-        for (int i = 0; i < gizmos.Count; i++)
+        for (int i = 0; i < boneLines.Count; i++)
         {
-            if (gizmos[i] != null) Destroy(gizmos[i]);
+            if (boneLines[i] != null) Destroy(boneLines[i].gameObject);
         }
-        gizmos.Clear();
+        boneLines.Clear();
     }
 
     void OnDestroy()
     {
         ClearGizmos();
         if (gizmoMaterial != null) Destroy(gizmoMaterial);
+    }
+
+    void UpdateLinePositions()
+    {
+        if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return;
+        IList<OVRBone> bones = skeleton.Bones;
+        for (int i = 0; i < bones.Count; i++)
+        {
+            LineRenderer line = boneLines.Count > i ? boneLines[i] : null;
+            if (line == null) continue;
+
+            int parentIndex = bones[i].ParentBoneIndex;
+            if (parentIndex < 0 || parentIndex >= bones.Count) continue;
+
+            OVRBone parent = bones[parentIndex];
+            if (parent == null || parent.Transform == null) continue;
+
+            Transform childTransform = bones[i].Transform;
+            if (childTransform == null) continue;
+
+            line.positionCount = 2;
+            line.SetPosition(0, parent.Transform.position);
+            line.SetPosition(1, childTransform.position);
+        }
+    }
+
+    void ConfigureLineRenderer(LineRenderer line)
+    {
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        line.receiveShadows = false;
+        line.useWorldSpace = true;
+        line.loop = false;
+        line.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
+        line.widthMultiplier = gizmoScale;
+        line.numCapVertices = 0;
+        line.numCornerVertices = 0;
+        line.material = gizmoMaterial;
     }
 }
