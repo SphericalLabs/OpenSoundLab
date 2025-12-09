@@ -239,6 +239,26 @@ public class HandInputAdapter : MonoBehaviour
         return true;
     }
 
+    public bool tryGetThumbIndexProximalMidpoint(int controllerIndex, out Vector3 position, out Quaternion rotation)
+    {
+        cacheState();
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+
+        OVRSkeleton skeleton = controllerIndex == 0 ? leftSkeleton : rightSkeleton;
+        if (skeleton == null || !skeleton.IsInitialized || skeleton.Bones == null) return false;
+
+        Transform thumb = getThumbProximalTransform(skeleton);
+        Transform index = getIndexProximalTransform(skeleton);
+        if (thumb == null || index == null) return false;
+
+        rotation = Quaternion.Slerp(thumb.rotation, index.rotation, 0.5f);
+        position = (thumb.position + index.position) * 0.5f;
+        position += rotation * Vector3.forward * 0.07f;
+
+        return true;
+    }
+
     Transform getThumbTipTransform(OVRSkeleton skeleton)
     {
         Transform thumb = getBoneTransform(skeleton, OVRSkeleton.BoneId.Hand_ThumbTip);
@@ -263,6 +283,28 @@ public class HandInputAdapter : MonoBehaviour
         return index;
     }
 
+    Transform getThumbProximalTransform(OVRSkeleton skeleton)
+    {
+        Transform thumb = getBoneTransformByIdName(skeleton, "XRHand_ThumbProximal");
+        if (!isThumbTransform(thumb)) thumb = null;
+        if (thumb == null) thumb = getBoneTransformByIdName(skeleton, "Hand_ThumbProximal");
+        if (!isThumbTransform(thumb)) thumb = null;
+        if (thumb == null) thumb = getBoneTransformByName(skeleton, "thumbprox");
+        if (!isThumbTransform(thumb)) thumb = null;
+        return thumb;
+    }
+
+    Transform getIndexProximalTransform(OVRSkeleton skeleton)
+    {
+        Transform index = getBoneTransformByIdName(skeleton, "XRHand_IndexProximal");
+        if (!isIndexTransform(index)) index = null;
+        if (index == null) index = getBoneTransformByIdName(skeleton, "Hand_IndexProximal");
+        if (!isIndexTransform(index)) index = null;
+        if (index == null) index = getBoneTransformByName(skeleton, "indexprox");
+        if (!isIndexTransform(index)) index = null;
+        return index;
+    }
+
     Transform getBoneTransform(OVRSkeleton skeleton, OVRSkeleton.BoneId id)
     {
         if (skeleton == null || skeleton.Bones == null) return null;
@@ -272,6 +314,14 @@ public class HandInputAdapter : MonoBehaviour
             if (bones[i] != null && bones[i].Id == id) return bones[i].Transform;
         }
         return null;
+    }
+
+    Transform getBoneTransformByIdName(OVRSkeleton skeleton, string boneIdName)
+    {
+        if (skeleton == null || string.IsNullOrEmpty(boneIdName)) return null;
+        OVRSkeleton.BoneId id;
+        if (!Enum.TryParse(boneIdName, out id)) return null;
+        return getBoneTransform(skeleton, id);
     }
 
     Transform getBoneTransformByName(OVRSkeleton skeleton, string containsLower)
