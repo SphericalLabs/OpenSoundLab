@@ -762,7 +762,7 @@ public class masterControl : MonoBehaviour
 
 
 
-    public WireMode WireSetting = WireMode.Straight;
+    public WireMode WireSetting = WireMode.Visualized;
 
 
     public void updateWireSetting(int num)
