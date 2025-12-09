@@ -115,10 +115,10 @@ public class masterControl : MonoBehaviour
                 CameraRig.AddComponent<HandInputAdapter>();
             }
 
-            if (CameraRig.GetComponent<HandTrackingDiagnostics>() == null)
-            {
-                CameraRig.AddComponent<HandTrackingDiagnostics>();
-            }
+            // if (CameraRig.GetComponent<HandTrackingDiagnostics>() == null)
+            // {
+            //     CameraRig.AddComponent<HandTrackingDiagnostics>();
+            // }
         }
 
         DontDestroyOnLoad(this);

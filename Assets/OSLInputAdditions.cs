@@ -41,7 +41,7 @@ public partial class OSLInput
     private float handPressThreshold = 0.05f;
     private float handFullThreshold = 0.7f;
     private float handGripThreshold = 0.1f;
-    private const float gestureHoldDuration = 0.2f;
+    private const float gestureHoldDuration = 0.05f;
     private bool[] handTriggerPressed = new bool[2];
     private bool[] handTriggerStarted = new bool[2];
     private bool[] handTriggerReleased = new bool[2];
