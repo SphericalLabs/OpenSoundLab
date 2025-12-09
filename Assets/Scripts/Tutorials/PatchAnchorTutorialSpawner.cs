@@ -27,7 +27,10 @@
 
 using Mirror;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System;
 using System.Collections;
+using System.IO;
 
 public class PatchAnchorTutorialSpawner : MonoBehaviour
 {
@@ -40,13 +43,19 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
     public int trackedHeadsetFrames = 2;
     public float spawnForwardDistance = 0.8f;
     public float spawnHeightOffset = -0.45f;
+    public bool autoLoadPatchOnStart = true;
+    public string autoLoadPatchFile;
+    public float patchLoadTimeout = 6f;
 
     bool tutorialsSpawned;
+    bool patchLoaded;
     Transform headAnchor;
 
     IEnumerator Start()
     {
-        if (!spawnOnStart)
+        bool wantsAutoLoad = shouldAutoLoadPatch();
+
+        if (!spawnOnStart && !wantsAutoLoad)
         {
             yield break;
         }
@@ -58,7 +67,15 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
 
         yield return waitForHeadsetReady();
 
-        spawnTutorials();
+        if (spawnOnStart)
+        {
+            spawnTutorials();
+        }
+
+        if (wantsAutoLoad)
+        {
+            yield return tryAutoLoadPatch();
+        }
     }
 
     public void spawnTutorials()
@@ -244,5 +261,134 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
         {
             yield return null;
         }
+    }
+
+    bool shouldAutoLoadPatch()
+    {
+        if (!autoLoadPatchOnStart)
+        {
+            return false;
+        }
+
+        return !string.IsNullOrEmpty(autoLoadPatchFile);
+    }
+
+    IEnumerator tryAutoLoadPatch()
+    {
+        if (patchLoaded)
+        {
+            yield break;
+        }
+
+        patchLoaded = true;
+
+        yield return waitForLocalSceneReady();
+
+        if (!isLocalSceneActive() || !isMenuReady())
+        {
+            yield break;
+        }
+
+        if (isNetworkSessionActive() && !NetworkServer.active)
+        {
+            Debug.LogWarning("PatchAnchorTutorialSpawner: auto-load skipped because only the server/host can spawn patches.", this);
+            yield break;
+        }
+
+        string resolvedPath = resolvePatchPath(autoLoadPatchFile);
+        if (string.IsNullOrEmpty(resolvedPath) || !File.Exists(resolvedPath))
+        {
+            Debug.LogWarning($"PatchAnchorTutorialSpawner: auto-load file not found at '{resolvedPath}'.", this);
+            yield break;
+        }
+
+        SaveLoadInterface loader = null;
+        float elapsed = 0f;
+        while (loader == null && elapsed < patchLoadTimeout)
+        {
+            loader = SaveLoadInterface.instance != null ? SaveLoadInterface.instance : FindObjectOfType<SaveLoadInterface>();
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        if (loader == null)
+        {
+            Debug.LogWarning("PatchAnchorTutorialSpawner: SaveLoadInterface not ready; skipping auto patch load.", this);
+            yield break;
+        }
+
+        try
+        {
+            loader.Load(resolvedPath);
+            Debug.Log($"PatchAnchorTutorialSpawner: auto-loaded patch '{resolvedPath}'.", this);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"PatchAnchorTutorialSpawner: failed to auto-load patch '{resolvedPath}'. {ex.Message}", this);
+        }
+    }
+
+    IEnumerator waitForLocalSceneReady()
+    {
+        float elapsed = 0f;
+        while (!isLocalSceneActive() && elapsed < patchLoadTimeout)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        while (!isMenuReady() && elapsed < patchLoadTimeout)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        if (!isLocalSceneActive())
+        {
+            Debug.LogWarning("PatchAnchorTutorialSpawner: local scene not ready; skipping auto patch load.", this);
+        }
+        else if (!isMenuReady())
+        {
+            Debug.LogWarning("PatchAnchorTutorialSpawner: menu not ready; skipping auto patch load.", this);
+        }
+    }
+
+    bool isLocalSceneActive()
+    {
+        Scene activeScene = SceneManager.GetActiveScene();
+        return activeScene.IsValid() && activeScene.isLoaded && activeScene.buildIndex == (int)masterControl.Scenes.Local;
+    }
+
+    bool isMenuReady()
+    {
+        if (menuManager.instance == null)
+        {
+            return false;
+        }
+
+        return menuManager.instance.loaded;
+    }
+
+    string resolvePatchPath(string file)
+    {
+        if (string.IsNullOrEmpty(file))
+        {
+            return string.Empty;
+        }
+
+        string value = file;
+        if (!Path.HasExtension(value))
+        {
+            value += ".xml";
+        }
+
+        if (Path.IsPathRooted(value))
+        {
+            return value;
+        }
+
+        string saveRoot = masterControl.instance != null ? masterControl.instance.SaveDir : masterControl.ResolveDefaultSaveDir();
+        string combined = Path.Combine(saveRoot, "Saves", value);
+        return combined;
     }
 }
