@@ -99,6 +99,13 @@ public class HandInputAdapter : MonoBehaviour
         return controllerIndex == 0 ? thumbPinch[0] : thumbPinch[1];
     }
 
+    public bool isThumbIndexPinched(int controllerIndex)
+    {
+        cacheState();
+        int idx = controllerIndex == 0 ? 0 : 1;
+        return handsActive && indexPinch[idx] >= pinchThreshold && thumbPinch[idx] >= pinchThreshold;
+    }
+
     public float getMiddlePinchStrength(int controllerIndex)
     {
         cacheState();

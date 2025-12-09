@@ -40,6 +40,8 @@ public class manipulator : MonoBehaviour
 
     public int controllerIndex = -1; // 0 => left, 1 => right
     public GameObject activeTip;
+    public GameObject handTip;
+    public GameObject handTipPressed;
     public Transform tipL, tipR;
     public Transform manipCollViz;
 
@@ -68,6 +70,8 @@ public class manipulator : MonoBehaviour
     {
         _menuspawn = GetComponent<menuspawn>();
         activeTip.SetActive(false);
+        if (handTip != null) handTip.SetActive(false);
+        if (handTipPressed != null) handTipPressed.SetActive(false);
 
         oslInput = new OSLInput();
         oslInput.Patcher.Enable();
@@ -125,6 +129,7 @@ public class manipulator : MonoBehaviour
     {
         controllerVisible = on;
         updateRendererVisibility();
+        updateTipVisibility();
     }
 
     public void SetHandMode(bool on)
@@ -138,6 +143,7 @@ public class manipulator : MonoBehaviour
             }
         }
         updateRendererVisibility();
+        updateTipVisibility();
     }
 
     void updateManipCollVizPlacement()
@@ -199,7 +205,7 @@ public class manipulator : MonoBehaviour
     void updateRendererVisibility()
     {
         if (renderers == null || skinnedRenderers == null) return;
-        bool renderEnabled = controllerVisible && isTrackingWorking;
+        bool renderEnabled = controllerVisible && isTrackingWorking && !handMode;
         foreach (Renderer childRenderer in renderers)
         {
             bool isTip = false;
@@ -221,6 +227,34 @@ public class manipulator : MonoBehaviour
         {
             childRenderer.enabled = renderEnabled && isTrackingWorking;
         }
+    }
+
+    bool isHandPinchActive()
+    {
+        if (!handMode || handInputAdapter == null) return false;
+        if (!handInputAdapter.handsActiveThisFrame) return false;
+        return handInputAdapter.isThumbIndexPinched(controllerIndex);
+    }
+
+    void updateTipVisibility()
+    {
+        bool pinchActive = isHandPinchActive();
+
+        if (handTip != null) handTip.SetActive(handMode && !pinchActive);
+        if (handTipPressed != null) handTipPressed.SetActive(handMode && pinchActive);
+
+        if (handMode || !controllerVisible)
+        {
+            if (activeTip != null) activeTip.SetActive(false);
+            if (tipL != null) tipL.gameObject.SetActive(false);
+            if (tipR != null) tipR.gameObject.SetActive(false);
+            return;
+        }
+
+        bool showProngs = !triggerDown;
+        if (activeTip != null) activeTip.SetActive(!showProngs);
+        if (tipL != null) tipL.gameObject.SetActive(showProngs);
+        if (tipR != null) tipR.gameObject.SetActive(showProngs);
     }
 
     bool grabbing;
@@ -471,6 +505,7 @@ public class manipulator : MonoBehaviour
             }
         }
         Grab(on);
+        updateTipVisibility();
     }
 
     bool multiselecting = false;
@@ -689,9 +724,12 @@ public class manipulator : MonoBehaviour
         // manage interaction
         if (oslInput.isTriggerStarted(controllerIndex))
         {
-            activeTip.SetActive(true);
-            tipL.gameObject.SetActive(false);
-            tipR.gameObject.SetActive(false);
+            if (!handMode)
+            {
+                activeTip.SetActive(true);
+                tipL.gameObject.SetActive(false);
+                tipR.gameObject.SetActive(false);
+            }
             SetTrigger(true);
             onInputTriggerdEvent.Invoke();
         }
@@ -711,12 +749,17 @@ public class manipulator : MonoBehaviour
                 }
             }
 
-            activeTip.SetActive(false);
-            tipL.gameObject.SetActive(true);
-            tipR.gameObject.SetActive(true);
+            if (!handMode)
+            {
+                activeTip.SetActive(false);
+                tipL.gameObject.SetActive(true);
+                tipR.gameObject.SetActive(true);
+            }
             SetTrigger(false);
             onInputReleasedEvent.Invoke();
         }
+
+        updateTipVisibility();
 
         // manage ongoing grabbing
         if (grabbing && selectedObject != null) selectedObject.grabUpdate(transform);
@@ -816,13 +859,18 @@ public class manipulator : MonoBehaviour
                     wasGazeBased = true;
 
                     // do we need this?
-                    activeTip.SetActive(false);
-                    tipL.gameObject.SetActive(true);
-                    tipR.gameObject.SetActive(true);
+                    if (!handMode)
+                    {
+                        activeTip.SetActive(false);
+                        tipL.gameObject.SetActive(true);
+                        tipR.gameObject.SetActive(true);
+                    }
                     onInputReleasedEvent.Invoke();
                 }
             }
         }
+
+        updateTipVisibility();
     }
 
 }
