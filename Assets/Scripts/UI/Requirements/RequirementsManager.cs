@@ -16,6 +16,9 @@ using Meta.XR.EnvironmentDepth;
 /// </summary>
 public class RequirementsManager : MonoBehaviour
 {
+    [Header("Mode")]
+    [SerializeField] bool headlessPermissionsOnly = true;
+
     [Header("Player Prefs")]
     [SerializeField] string consentKey = "requirements_consent_v1";
 
@@ -115,11 +118,12 @@ public class RequirementsManager : MonoBehaviour
 
         bool consentPresent = PlayerPrefs.GetInt(consentKey, 0) == 1;
         bool hasScenePermission = permissions.HasScenePermission();
+        bool hasMicrophonePermission = permissions.HasMicrophonePermission();
         bool storageGranted = AndroidStorageAccess.HasManageAllFilesAccess();
 
         prepareEnvironmentDepthSuppression();
 
-        if (consentPresent && storageGranted && hasScenePermission)
+        if (consentPresent && storageGranted && hasScenePermission && hasMicrophonePermission)
         {
             ensureMasterControl();
             if (loadLocalSceneOnCompletion)
@@ -128,6 +132,12 @@ public class RequirementsManager : MonoBehaviour
             }
             onRequirementsAccepted?.Invoke();
             enabled = false;
+            yield break;
+        }
+
+        if (headlessPermissionsOnly)
+        {
+            yield return runHeadlessPermissionFlow(hasScenePermission, hasMicrophonePermission, storageGranted);
             yield break;
         }
 
@@ -1162,5 +1172,71 @@ public class RequirementsManager : MonoBehaviour
         }
 
         SceneManager.LoadScene(localIndex);
+    }
+
+    IEnumerator runHeadlessPermissionFlow(bool hasScenePermission, bool hasMicrophonePermission, bool storageGranted)
+    {
+        flowActive = true;
+
+        if (!hasScenePermission)
+        {
+            bool sceneResolved = false;
+            permissions.RequestScenePermission(
+                () =>
+                {
+                    sceneResolved = true;
+                    activateEnvironmentDepthManager();
+                },
+                () => { sceneResolved = true; });
+
+            while (permissions.WaitingForScenePermissionResponse && !sceneResolved)
+            {
+                yield return null;
+            }
+        }
+        else
+        {
+            activateEnvironmentDepthManager();
+        }
+
+        if (!hasMicrophonePermission)
+        {
+            bool microphoneResolved = false;
+            permissions.RequestMicrophonePermission(
+                () => { microphoneResolved = true; },
+                () => { microphoneResolved = true; });
+
+            while (permissions.WaitingForMicrophoneResponse && !microphoneResolved)
+            {
+                yield return null;
+            }
+        }
+
+        if (!storageGranted)
+        {
+            yield return waitForStoragePermissionGrant();
+        }
+
+        completeFlow();
+    }
+
+    IEnumerator waitForStoragePermissionGrant()
+    {
+        bool launched = AndroidStorageAccess.TryOpenManageAllFilesSettings();
+        if (!launched)
+        {
+            Debug.LogWarning("RequirementsManager: could not open Manage All Files settings during headless flow.");
+        }
+
+        const float retryDelaySeconds = 0.5f;
+        while (!AndroidStorageAccess.HasManageAllFilesAccess())
+        {
+            if (!launched)
+            {
+                launched = AndroidStorageAccess.TryOpenManageAllFilesSettings();
+            }
+
+            yield return new WaitForSecondsRealtime(retryDelaySeconds);
+        }
     }
 }
