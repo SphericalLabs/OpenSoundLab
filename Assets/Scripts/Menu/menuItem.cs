@@ -151,7 +151,7 @@ public class menuItem : manipObject
         //if (item == deviceType.Freeverb) label.text = "Reverb";
         else if (item == DeviceType.DC) label.text = "DC";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
-        else if (item == DeviceType.SamplerOne) label.text = "Sampler I";
+        else if (item == DeviceType.Sampler) label.text = "Sampler";
         else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
 
 
@@ -247,7 +247,7 @@ public class menuItem : manipObject
 
         if (item == DeviceType.Maracas) g.transform.localPosition = new Vector3(0, -.02f, .02f);
 
-        else if (item == DeviceType.SamplerOne)
+        else if (item == DeviceType.Sampler)
         {
             g.transform.localPosition = new Vector3(-0.023f, 0f, 0.02f);
         }
@@ -302,7 +302,7 @@ public class menuItem : manipObject
             g.transform.localScale = Vector3.one * 0.47f;
         }
 
-        else if (item == DeviceType.SamplerOne)
+        else if (item == DeviceType.Sampler)
         {
             g.transform.localPosition = new Vector3(-0.0191f, 0.006f, 0.02f);
             g.transform.localScale = Vector3.one * 0.14f;
@@ -820,7 +820,8 @@ public class DeviceType
     public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 4);
     public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 3);
     public static readonly DeviceType SamplerTwo = new DeviceType("SamplerTwo", DeviceCategory.SampleGenerator, 2);
-    public static readonly DeviceType SamplerOne = new DeviceType("SamplerOne", DeviceCategory.SampleGenerator, 1);
+    public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.SampleGenerator, 1);
+    public static readonly DeviceType SamplerOne = Sampler; // legacy alias, remove when old SamplerOne saves are dropped
 
     // ModulationGenerator
     public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 6);

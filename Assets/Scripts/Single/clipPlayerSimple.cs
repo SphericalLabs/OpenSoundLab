@@ -39,7 +39,7 @@ public class clipPlayerSimple : clipPlayer
     public float sampleStart = 0;
 
     public signalGenerator seqGen, freqExpGen, ampGen, startGen;
-    public samplerOneDeviceInterface devInterface;
+    public samplerDeviceInterface devInterface;
 
     bool active = false;
 
@@ -65,7 +65,7 @@ public class clipPlayerSimple : clipPlayer
     void Start()
     {
         lastSeqGen = new float[] { 0, 0 };
-        devInterface = GetComponent<samplerOneDeviceInterface>();
+        devInterface = GetComponent<samplerDeviceInterface>();
     }
 
 
@@ -146,7 +146,7 @@ public class clipPlayerSimple : clipPlayer
                 {
                     if (trigBuffer[n] > 0f && lastTriggValue <= 0f)
                     {
-                        // careful, this is specific to SamplerOne but this code is also used on Drum:
+                        // careful, this is specific to the Sampler but this code is also used on Drum:
                         devInterface?.flashTriggerButton(); // was activated by trigger signal
 
                         lastTriggValue = trigBuffer[n]; // read in current sample in startGen

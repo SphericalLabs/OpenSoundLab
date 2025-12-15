@@ -160,7 +160,8 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(ArtifactData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "SamplerOnes":
-                            serializer = new XmlSerializer(typeof(SamplerOneData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Samplers":
+                            serializer = new XmlSerializer(typeof(SamplerData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "SamplerTwos":
                             serializer = new XmlSerializer(typeof(SamplerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -280,7 +281,8 @@ public class xmlUpdate
                             data[data.Count - 1].deviceType = DeviceType.Artifact;
                             break;
                         case "SamplerOnes":
-                            data[data.Count - 1].deviceType = DeviceType.SamplerOne;
+                        case "Samplers":
+                            data[data.Count - 1].deviceType = DeviceType.Sampler;
                             break;
                         case "SamplerTwos":
                             data[data.Count - 1].deviceType = DeviceType.SamplerTwo;

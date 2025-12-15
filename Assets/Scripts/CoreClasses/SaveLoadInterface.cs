@@ -52,6 +52,7 @@ public class SaveLoadInterface : MonoBehaviour
 
         instrumentPrefabs[DeviceType.TapeGroup] = Resources.Load("Prefabs/" + DeviceType.TapeGroup) as GameObject;
         instrumentPrefabs["Artefact"] = instrumentPrefabs[DeviceType.Artifact]; // legacy alias, remove when old Artefact saves are dropped
+        instrumentPrefabs["SamplerOne"] = instrumentPrefabs[DeviceType.Sampler]; // legacy alias, remove when old SamplerOne saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -117,6 +118,7 @@ public class SaveLoadInterface : MonoBehaviour
     string normalizeDeviceTypeName(string deviceType)
     {
         if (deviceType == "Artefact") return DeviceType.Artifact; // legacy alias, remove when old Artefact saves are dropped
+        if (deviceType == "SamplerOne") return DeviceType.Sampler; // legacy alias, remove when old SamplerOne saves are dropped
         return deviceType;
     }
 
@@ -295,7 +297,8 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(LooperData))]
 [XmlInclude(typeof(RecorderData))]
 [XmlInclude(typeof(SamplerTwoData))]
-[XmlInclude(typeof(SamplerOneData))]
+[XmlInclude(typeof(SamplerData))]
+[XmlInclude(typeof(SamplerOneData))] // legacy alias, remove when old SamplerOne saves are dropped
 [XmlInclude(typeof(KeyboardData))]
 [XmlInclude(typeof(SequencerData))] // update?
 [XmlInclude(typeof(XyloRollData))]

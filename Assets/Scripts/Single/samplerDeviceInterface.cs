@@ -27,10 +27,11 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.Android;
 
-public class samplerOneDeviceInterface : deviceInterface
+public class samplerDeviceInterface : deviceInterface
 {
 
     clipPlayerSimple player;
@@ -81,8 +82,8 @@ public class samplerOneDeviceInterface : deviceInterface
     public override InstrumentData GetData()
     {
         // TODO implement serialization for knobs, etc
-        SamplerOneData data = new SamplerOneData();
-        data.deviceType = DeviceType.SamplerOne;
+        SamplerData data = new SamplerData();
+        data.deviceType = DeviceType.Sampler;
         GetTransformData(data);
 
 
@@ -104,7 +105,7 @@ public class samplerOneDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        SamplerOneData data = d as SamplerOneData;
+        SamplerData data = d as SamplerData;
         base.Load(data, copyMode);
 
         GetComponent<samplerLoad>().SetSample(data.label, data.file);
@@ -124,7 +125,7 @@ public class samplerOneDeviceInterface : deviceInterface
 
 }
 
-public class SamplerOneData : InstrumentData
+public class SamplerData : InstrumentData
 {
 
     public string file;
@@ -149,4 +150,10 @@ public class SamplerOneData : InstrumentData
     //public float dialDecay;
     //public float dialLinearity;
 
+}
+
+[XmlType("SamplerOneData")]
+public class SamplerOneData : SamplerData
+{
+    // legacy alias, remove when old SamplerOne saves are dropped
 }
