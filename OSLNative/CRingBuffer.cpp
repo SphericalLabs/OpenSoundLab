@@ -34,7 +34,9 @@
 
 //  Created by hb on 19.01.22.
 
+#include <cstring>
 #include "CRingBuffer.hpp"
+#include <algorithm>
 #include "util.h"
 #include <assert.h>
 #include "resample.h"
