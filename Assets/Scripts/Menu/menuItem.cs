@@ -366,7 +366,6 @@ public class menuItem : manipObject
             g.transform.localScale = Vector3.one * .166f;
         }
         else if (item == DeviceType.ControlCube) g.transform.localPosition = new Vector3(0, -.01f, .024f);
-        else if (item == DeviceType.Reverb) g.transform.localPosition = new Vector3(0, -0.0175f, .02f);
         else if (item == DeviceType.Drum)
         {
             g.transform.localPosition = new Vector3(0, 0, .026f);

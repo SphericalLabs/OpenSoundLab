@@ -387,7 +387,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 161644}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b59fabb5a9afe04492ad6d326132e5b, type: 3}
+  m_Script: {fileID: 11500000, guid: 1e796cdd3ab5949bfa450ba5ee0d82b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   useNativeIfAvailable: 1
@@ -411,14 +411,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 161644}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a22ed70c60baa455f82481342855d577, type: 3}
+  m_Script: {fileID: 11500000, guid: 2322b5a65e2e145feb58517587d739f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
-  firstSample: 0
-  prevFirstSample: 0
   sigIn: {fileID: 0}
   sigModSize: {fileID: 0}
   sigModFreeze: {fileID: 0}
@@ -436,7 +434,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneId: 0
-  _assetId: 1758740290
+  _assetId: 3124141720
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
@@ -1143,6 +1141,7 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000013101032572}
+  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -1296,6 +1295,7 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000012180182938}
+  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -2936,6 +2936,7 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 7372458704375138249}
+  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -3190,6 +3191,7 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 7013167973330336730}
+  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -4070,6 +4072,7 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 5291386220224284143}
+  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
@@ -5620,7 +5623,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 2269
+  m_VersionIndex: 2254
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -5686,7 +5689,7 @@ MeshRenderer:
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
+  m_SelectedEditorRenderState: 2
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -6655,8 +6658,6 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
-  firstSample: 0
-  prevFirstSample: 0
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
