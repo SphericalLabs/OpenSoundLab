@@ -25,31 +25,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using UnityEngine;
 using System.Collections;
+using System.Xml.Serialization;
+using UnityEngine;
 
 public class reverbDeviceInterface : deviceInterface
 {
     reverbSignalGenerator signal;
-    dial level;
-    slider reverbControl;
-    public omniJack input, output;
-    int ID = -1;
+    public dial size, damping, width, mix;
+    public basicSwitch freeze;
+    public omniJack omniJackIn, omniJackOut, omniJackModSize, omniJackModFreeze, omniJackModMix;
+    public AudioSource speaker;
+
+    private dial[] dials;
 
     public override void Awake()
     {
         base.Awake();
         signal = GetComponent<reverbSignalGenerator>();
-        level = GetComponentInChildren<dial>();
-        reverbControl = GetComponentInChildren<slider>();
+        dials = new dial[3] { size, damping, width };
     }
 
     void Update()
     {
-        signal.sendLevel = level.percent;
-        signal.decayTime = Mathf.Lerp(signal.decayTime, Mathf.Lerp(0, 4, reverbControl.percent), .1f);
+        if (omniJackIn.signal != signal.sigIn) signal.sigIn = omniJackIn.signal;
+        if (omniJackModSize.signal != signal.sigModSize) signal.sigModSize = omniJackModSize.signal;
+        if (omniJackModFreeze.signal != signal.sigModFreeze) signal.sigModFreeze = omniJackModFreeze.signal;
+        if (omniJackModMix.signal != signal.sigModMix) signal.sigModMix = omniJackModMix.signal;
 
-        if (input.signal != signal.incoming) signal.incoming = input.signal;
+        signal.SetParam(size.percent, (int)reverbSignalGenerator.Param.P_ROOMSIZE);
+        signal.SetParam(damping.percent, (int)reverbSignalGenerator.Param.P_DAMPING);
+        signal.SetParam(width.percent, (int)reverbSignalGenerator.Param.P_WIDTH);
+        signal.SetParam(freeze.switchVal ? 1 : 0, (int)reverbSignalGenerator.Param.P_FREEZE);
+        signal.SetParam(Utils.equalPowerCrossfadeGain(mix.percent), (int)reverbSignalGenerator.Param.P_WET);
+        signal.SetParam(Utils.equalPowerCrossfadeGain(1 - mix.percent), (int)reverbSignalGenerator.Param.P_DRY);
     }
 
     public override InstrumentData GetData()
@@ -58,10 +67,17 @@ public class reverbDeviceInterface : deviceInterface
         data.deviceType = DeviceType.Reverb;
         GetTransformData(data);
 
-        data.dialState = level.percent;
-        data.reverbPercent = reverbControl.percent;
-        data.jackInID = input.transform.GetInstanceID();
-        data.jackOutID = output.transform.GetInstanceID();
+        data.jackInID = omniJackIn.transform.GetInstanceID();
+        data.jackOutID = omniJackOut.transform.GetInstanceID();
+        data.cSizeID = omniJackModSize.transform.GetInstanceID();
+        data.cFreezeID = omniJackModFreeze.transform.GetInstanceID();
+        data.cMixID = omniJackModMix.transform.GetInstanceID();
+
+        data.size = size.percent;
+        data.damping = damping.percent;
+        data.mix = mix.percent;
+        data.width = width.percent;
+        data.freeze = freeze.switchVal;
 
         return data;
     }
@@ -69,19 +85,31 @@ public class reverbDeviceInterface : deviceInterface
     public override void Load(InstrumentData d, bool copyMode)
     {
         ReverbData data = d as ReverbData;
-        base.Load(data, copyMode);
-        input.SetID(data.jackInID, copyMode);
-        output.SetID(data.jackOutID, copyMode);
+        base.Load(data, true);
+        omniJackIn.SetID(data.jackInID, copyMode);
+        omniJackOut.SetID(data.jackOutID, copyMode);
+        omniJackModSize.SetID(data.cSizeID, copyMode);
+        omniJackModFreeze.SetID(data.cFreezeID, copyMode);
+        omniJackModMix.SetID(data.cMixID, copyMode);
 
-        level.setPercent(data.dialState);
-        reverbControl.setPercent(data.reverbPercent);
+        size.setPercent(data.size);
+        damping.setPercent(data.damping);
+        mix.setPercent(data.mix);
+        width.setPercent(data.width);
+        freeze.setSwitch(data.freeze, true);
     }
 }
 
+[XmlInclude(typeof(FreeverbData))]
 public class ReverbData : InstrumentData
 {
-    public float dialState;
-    public float reverbPercent;
-    public int jackOutID;
-    public int jackInID;
+    public float size, damping, mix, width;
+    public bool freeze;
+    public int jackOutID, jackInID;
+    public int cSizeID, cFreezeID, cMixID;
+}
+
+[XmlType("FreeverbData")]
+public class FreeverbData : ReverbData
+{
 }

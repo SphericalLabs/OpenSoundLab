@@ -63,7 +63,8 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(CompressorData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Freeverbs":
-                            serializer = new XmlSerializer(typeof(FreeverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Reverbs":
+                            serializer = new XmlSerializer(typeof(ReverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Delays":
                             serializer = new XmlSerializer(typeof(DelayData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -138,9 +139,6 @@ public class xmlUpdate
                         case "VCAs":
                             serializer = new XmlSerializer(typeof(vcaData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
-                        case "Reverbs":
-                            serializer = new XmlSerializer(typeof(ReverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
                         case "Sequencers":
                             serializer = new XmlSerializer(typeof(SequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
@@ -187,9 +185,6 @@ public class xmlUpdate
                             break;
                         case "Compressors":
                             data[data.Count - 1].deviceType = DeviceType.Compressor;
-                            break;
-                        case "Freeverbs":
-                            data[data.Count - 1].deviceType = DeviceType.Freeverb;
                             break;
                         case "Delays":
                             data[data.Count - 1].deviceType = DeviceType.Delay;
@@ -259,6 +254,7 @@ public class xmlUpdate
                         case "VCAs":
                             data[data.Count - 1].deviceType = DeviceType.VCA;
                             break;
+                        case "Freeverbs":
                         case "Reverbs":
                             data[data.Count - 1].deviceType = DeviceType.Reverb;
                             break;

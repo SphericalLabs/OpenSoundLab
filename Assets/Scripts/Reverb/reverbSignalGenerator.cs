@@ -28,120 +28,157 @@
 using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System;
 
 public class reverbSignalGenerator : signalGenerator
 {
-    public signalGenerator incoming;
 
-    [DllImport("OSLNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-    [DllImport("OSLNative")] public static extern void DuplicateArrayAndReset(float[] from, float[] to, int length, float val);
-    [DllImport("OSLNative")] public static extern void lowpassSignal(float[] buffer, int length, ref float lowpassL, ref float lowpassR);
-    [DllImport("OSLNative")] public static extern void combineArrays(float[] buffer, float[] bufferB, int length, float levelA, float levelB);
-
-    public float decayTime = 1.0f;
-
-    public float sendLevel = 0.1f;
-
-    float prevDecayTime;
-
-    int[] delays = {
-
-          2465, 2755, 3211, 3531, 3871, 4131, //comb filter
-        597, 195, 63, 105, 91, 75 //all pass filter
+    public enum Param : int
+    {
+        P_ROOMSIZE,
+        P_DAMPING,
+        P_DRY,
+        P_WET,
+        P_WIDTH,
+        P_FREEZE,
+        P_N
     };
 
-    CombFilter[] cf;
+    /* These mirror some of the Freeverb parameters, therefore the C++ style naming.
+     If you change these, please also make the corresponding change in tuning.h of freeverb sources.
+    Otherwise behavior is undefined.
+     */
+    const float kRoomSizeMin = 0.7f;
+    const float kRoomSizeMax = kRoomSizeMin + 0.299f; //HB edit
 
-    float[] bufferCopy;
+    const float MIN_WET = 0;
+    const float MAX_WET = 1;
+    const float MIN_DRY = 0;
+    const float MAX_DRY = 1;
+
+    public signalGenerator sigIn, sigModSize, sigModFreeze, sigModMix;
+
+    private float[] modSizeBuffer = new float[0];
+    private float[] modFreezeBuffer = new float[0];
+    private float[] modMixBuffer = new float[0];
+
+    private IntPtr x;
+    private float[] p = new float[(int)Param.P_N];
+    [DllImport("OSLNative")]
+    private static extern void Freeverb_Process(float[] buffer, int length, int channels, IntPtr x);
+    [DllImport("OSLNative")]
+    private static extern IntPtr Freeverb_New(int sampleRate);
+    [DllImport("OSLNative")]
+    private static extern void Freeverb_Free(IntPtr x);
+    [DllImport("OSLNative")]
+    private static extern void Freeverb_SetParam(int param, float value, IntPtr x);
+    [DllImport("OSLNative")]
+    private static extern float Freeverb_GetParam(int param, IntPtr x);
+    [DllImport("OSLNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void Awake()
     {
         base.Awake();
-        prevDecayTime = decayTime;
+        x = Freeverb_New(AudioSettings.outputSampleRate);
+    }
 
-        cf = new CombFilter[11];
-        for (int i = 0; i < 6; i++) cf[i] = new CombFilter(delays[i], Mathf.Pow(10f, -3.0f / (decayTime * 44100) * delays[i]));
-        for (int i = 6; i < 11; i++) cf[i] = new CombFilter(delays[i], .7f);
-
-        bufferCopy = new float[MAX_BUFFER_LENGTH];
+    private void OnDestroy()
+    {
+        Freeverb_Free(x);
     }
 
     void Update()
     {
-        if (decayTime != prevDecayTime)
-        {
-            for (int i = 0; i < 6; i++) cf[i].updateGain(Mathf.Pow(10f, -3.0f / (decayTime * 44100) * delays[i]));
-            prevDecayTime = decayTime;
-        }
+
     }
 
-    float lowpassL = 0;
-    float lowpassR = 0;
+    public void SetParam(float value, int param)
+    {
+        switch (param)
+        {
+            case (int)Param.P_ROOMSIZE:
+                p[param] = Utils.map(value, 0, 1, kRoomSizeMin, kRoomSizeMax);
+                //Debug.Log("Set param " + param + " to value " + p[param]);
+                break;
+            case (int)Param.P_DAMPING:
+                p[param] = value;
+                break;
+            case (int)Param.P_WET:
+                p[param] = Utils.map(value, 0, 1, MIN_WET, MAX_WET, 0.3f);
+                break;
+            case (int)Param.P_DRY:
+                p[param] = Utils.map(value, 0, 1, MIN_DRY, MAX_DRY, 0.3f);
+                //Debug.Log("Set param " + param + " to value " + p[param]);
+                break;
+            case (int)Param.P_WIDTH:
+                p[param] = value;
+                break;
+            case (int)Param.P_FREEZE:
+                p[param] = value == 0 ? 1 : 0; //in this case, we want "on" to be "off" and vice versa :)
+                break;
+        }
+        //Debug.Log("Set param " + param + " to value " + p[param]);
+    }
+
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        if (!incoming)
+
+        if (modSizeBuffer.Length != buffer.Length)
+            System.Array.Resize(ref modSizeBuffer, buffer.Length);
+        if (modFreezeBuffer.Length != buffer.Length)
+            System.Array.Resize(ref modFreezeBuffer, buffer.Length);
+        if (modMixBuffer.Length != buffer.Length)
+            System.Array.Resize(ref modMixBuffer, buffer.Length);
+
+        SetArrayToSingleValue(modSizeBuffer, modSizeBuffer.Length, 0f);
+        SetArrayToSingleValue(modFreezeBuffer, modFreezeBuffer.Length, 0f);
+        SetArrayToSingleValue(modMixBuffer, modMixBuffer.Length, 0f);
+
+        //Process mod inputs
+        if (sigModSize != null)
         {
-            SetArrayToSingleValue(buffer, buffer.Length, 0);
-            return;
+            if (modSizeBuffer == null)
+                modSizeBuffer = new float[buffer.Length];
+
+            sigModSize.processBuffer(modSizeBuffer, dspTime, channels);
+            p[(int)Param.P_ROOMSIZE] += modSizeBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
+            p[(int)Param.P_ROOMSIZE] = Mathf.Clamp01(p[(int)Param.P_ROOMSIZE]);
         }
 
-        incoming.processBuffer(buffer, dspTime, channels);
+        if (sigModFreeze != null)
+        {
+            if (modFreezeBuffer == null)
+                modFreezeBuffer = new float[buffer.Length];
 
-        if (bufferCopy.Length != buffer.Length)
-            System.Array.Resize(ref bufferCopy, buffer.Length);
+            sigModFreeze.processBuffer(modFreezeBuffer, dspTime, channels);
+            p[(int)Param.P_FREEZE] = modFreezeBuffer[0] > 0 ? 1 : 0;
+        }
 
-        DuplicateArrayAndReset(buffer, bufferCopy, buffer.Length, .4f);
+        if (sigModMix != null)
+        {
+            if (modMixBuffer == null)
+                modMixBuffer = new float[buffer.Length];
 
+            sigModMix.processBuffer(modMixBuffer, dspTime, channels);
+            float tmp = Mathf.Pow(p[(int)Param.P_WET], 2) + modMixBuffer[0]; //Add mod value to dial value - mod value is in range [-1...1]
+            tmp = Mathf.Clamp01(tmp);
+            //TODO: not sure if sqrt crossfade is the best solution here; the signals obviously do have SOME correlation...
+            p[(int)Param.P_WET] = Utils.equalPowerCrossfadeGain(tmp);
+            p[(int)Param.P_DRY] = Utils.equalPowerCrossfadeGain(1 - tmp);
+        }
 
-        for (int i = 0; i < 6; i++) cf[i].addSignal(bufferCopy, buffer, buffer.Length);
-        for (int i = 6; i < 9; i++) cf[i].processSignal(buffer, buffer.Length);
+        //Set new parameters
+        for (int i = 0; i < (int)Param.P_N; i++)
+        {
+            Freeverb_SetParam(i, p[i], x);
+        }
 
-        lowpassSignal(buffer, buffer.Length, ref lowpassL, ref lowpassR);
-
-        for (int i = 9; i < 11; i++) cf[i].processSignal(buffer, buffer.Length);
-
-        combineArrays(buffer, bufferCopy, buffer.Length, sendLevel, 1);
+        if (sigIn != null)
+            sigIn.processBuffer(buffer, dspTime, channels);
+        //We process the reverb even if there is no input available, to make sure reverb tails decay to the end, and to enable spacy freeze pads.
+        Freeverb_Process(buffer, buffer.Length, channels, x);
         recursionCheckPost();
-    }
-}
-
-public class CombFilter
-{
-    float[] delayBufferL;
-    float[] delayBufferR;
-
-    float gain = 0;
-    int inPoint;
-    int outPoint;
-
-    [DllImport("OSLNative")]
-    public static extern void addCombFilterSignal(float[] inputbuffer, float[] addbuffer, int length, float[] delayBufferL, float[] delayBufferR, int delaylength, float gain, ref int inPoint, ref int outPoint);
-    [DllImport("OSLNative")]
-    public static extern void processCombFilterSignal(float[] buffer, int length, float[] delayBufferL, float[] delayBufferR, int delaylength, float gain, ref int inPoint, ref int outPoint);
-
-    public void updateGain(float g)
-    {
-        gain = g;
-    }
-
-    public CombFilter(int d, float g)
-    {
-        delayBufferL = new float[d + 1];
-        delayBufferR = new float[d + 1];
-        gain = g;
-
-        outPoint = inPoint - d;
-        if (outPoint < 0) outPoint += delayBufferL.Length;
-    }
-
-    public void addSignal(float[] inputbuffer, float[] addbuffer, int length)
-    {
-        addCombFilterSignal(inputbuffer, addbuffer, length, delayBufferL, delayBufferR, delayBufferR.Length, gain, ref inPoint, ref outPoint);
-    }
-
-    public void processSignal(float[] buffer, int length)
-    {
-        processCombFilterSignal(buffer, length, delayBufferL, delayBufferR, delayBufferR.Length, gain, ref inPoint, ref outPoint);
     }
 }

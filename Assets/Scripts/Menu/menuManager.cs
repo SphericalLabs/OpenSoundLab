@@ -148,7 +148,6 @@ public class menuManager : MonoBehaviour
 
                 if (devType == DeviceType.Maracas) continue;
                 if (devType == DeviceType.Timeline) continue;
-                if (devType == DeviceType.Reverb) continue;
 
                 if (devType == DeviceType.Camera) continue; // skip for windows, too, throws error otherwise
                 if (devType == DeviceType.Pano) continue;
@@ -180,6 +179,7 @@ public class menuManager : MonoBehaviour
 
 
         refObjects["XyloRoll"] = refObjects[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
+        refObjects["Freeverb"] = refObjects[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
 
         metronomeNode.transform.localPosition = new Vector3(0.345f, 0.012f + 0.10f, 0.107f);
         metronomeNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);

@@ -148,7 +148,6 @@ public class menuItem : manipObject
         else if (item == DeviceType.Microphone) label.text = "Mic";
         else if (item == DeviceType.SampleHold) label.text = "S&H";
         else if (item == DeviceType.Reverb) label.text = "Reverb";
-        //if (item == deviceType.Freeverb) label.text = "Reverb";
         else if (item == DeviceType.DC) label.text = "DC";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
         else if (item == DeviceType.Sampler) label.text = "Sampler";
@@ -407,7 +406,6 @@ public class menuItem : manipObject
         if (item == DeviceType.Microphone) label.text = "Mic";
         if (item == DeviceType.SampleHold) label.text = "S&H";
         if (item == DeviceType.Reverb) label.text = "Reverb";
-        //if (item == deviceType.Freeverb) label.text = "Reverb";
         if (item == DeviceType.DC) label.text = "DC";
         if (item == DeviceType.Polarizer) label.text = "Polarity";
 
@@ -832,13 +830,13 @@ public class DeviceType
     public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 1);
 
     // SoundProcessor
-    public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 6);
+    public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 1);
     public static readonly DeviceType Artifact = new DeviceType("Artifact", DeviceCategory.SoundProcessor, 5);
     public static readonly DeviceType Artefact = Artifact; // legacy alias, remove when old Artefact saves are dropped
     public static readonly DeviceType Compressor = new DeviceType("Compressor", DeviceCategory.SoundProcessor, 4);
     public static readonly DeviceType Filter = new DeviceType("Filter", DeviceCategory.SoundProcessor, 3);
     public static readonly DeviceType Delay = new DeviceType("Delay", DeviceCategory.SoundProcessor, 2);
-    public static readonly DeviceType Freeverb = new DeviceType("Freeverb", DeviceCategory.SoundProcessor, 1);
+    public static readonly DeviceType Freeverb = Reverb; // legacy alias, remove when old Freeverb saves are dropped
 
     // ModulationProcessor
     public static readonly DeviceType Polarizer = new DeviceType("Polarizer", DeviceCategory.ModulationProcessor, 5);
