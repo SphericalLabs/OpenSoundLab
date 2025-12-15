@@ -84,7 +84,7 @@ public class menuItem : manipObject
     //  SampleHold,
     //  Sampler,
     //  Scope,
-    //  SequencerCV,
+    //  Sequencer,
     //  Speaker,
     //  Tapes,
     //  Timeline,
@@ -140,7 +140,7 @@ public class menuItem : manipObject
         else if (item == DeviceType.Gain) label.text = "Gain / Mute";
         else if (item == DeviceType.MIDIIN) label.text = "MIDI In";
         else if (item == DeviceType.MIDIOUT) label.text = "MIDI Out";
-        else if (item == DeviceType.SequencerCV) label.text = "Sequencer";
+        else if (item == DeviceType.Sequencer) label.text = "Sequencer";
         else if (item == DeviceType.Timeline) label.text = "Sequencer III";
         else if (item == DeviceType.ControlCube) label.text = "ControlCube";
         else if (item == DeviceType.Microphone) label.text = "Mic";
@@ -241,7 +241,7 @@ public class menuItem : manipObject
             g.transform.localScale = Vector3.one * 0.14f;
         }
 
-        else if (item == DeviceType.SequencerCV)
+        else if (item == DeviceType.Sequencer)
         {
             g.transform.localPosition = new Vector3(0.0201f, 0.0057f, 0.0301f);
         }
@@ -541,7 +541,8 @@ public class DeviceType
     // ModulationGenerator
     public static readonly DeviceType Timeline = new DeviceType("Timeline", DeviceCategory.ModulationGenerator, 5);
     public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 4);
-    public static readonly DeviceType SequencerCV = new DeviceType("SequencerCV", DeviceCategory.ModulationGenerator, 3);
+    public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 3);
+    public static readonly DeviceType SequencerCV = Sequencer; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType DC = new DeviceType("DC", DeviceCategory.ModulationGenerator, 2);
     public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 1);
 

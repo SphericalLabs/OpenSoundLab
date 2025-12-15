@@ -30,8 +30,9 @@ using System.Collections;
 using static OVRPlugin;
 using static UnityEngine.Rendering.DebugUI.Table;
 using System;
+using System.Xml.Serialization;
 
-public class sequencerCVDeviceInterface : deviceInterface
+public class sequencerDeviceInterface : deviceInterface
 {
     #region fields
 
@@ -733,9 +734,9 @@ public class sequencerCVDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        SequencerCVData data = new SequencerCVData
+        SequencerData data = new SequencerData
         {
-            deviceType = DeviceType.SequencerCV
+            deviceType = DeviceType.Sequencer
         };
         GetTransformData(data);
         data.sliderSpeed = beatSlider.switchVal;
@@ -798,7 +799,7 @@ public class sequencerCVDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        SequencerCVData data = d as SequencerCVData;
+        SequencerData data = d as SequencerData;
         base.Load(data, copyMode);
 
         // Grow to max size initially
@@ -864,7 +865,7 @@ public class sequencerCVDeviceInterface : deviceInterface
     #endregion
 }
 
-public class SequencerCVData : InstrumentData
+public class SequencerData : InstrumentData
 {
     public bool switchPlay;
     public int jackTriggerInID;
@@ -886,3 +887,7 @@ public class SequencerCVData : InstrumentData
     public bool switchRange;
 }
 
+[XmlType("SequencerCVData")]
+public class SequencerCVData : SequencerData
+{
+} // legacy alias, remove when old saves are dropped.

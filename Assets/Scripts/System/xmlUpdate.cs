@@ -78,6 +78,9 @@ public class xmlUpdate
                         case "ADs":
                             serializer = new XmlSerializer(typeof(ADData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
+                        case "Sequencers":
+                            serializer = new XmlSerializer(typeof(SequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            break;
                         case "SequencerCVs":
                             serializer = new XmlSerializer(typeof(SequencerCVData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
@@ -195,8 +198,9 @@ public class xmlUpdate
                         case "ADs":
                             data[data.Count - 1].deviceType = DeviceType.AD;
                             break;
+                        case "Sequencers":
                         case "SequencerCVs":
-                            data[data.Count - 1].deviceType = DeviceType.SequencerCV;
+                            data[data.Count - 1].deviceType = DeviceType.Sequencer;
                             break;
                         case "SampleHolds":
                             data[data.Count - 1].deviceType = DeviceType.SampleHold;

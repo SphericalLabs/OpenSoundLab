@@ -29,11 +29,11 @@ using UnityEngine;
 using System.Collections;
 using System.Diagnostics;
 
-public class DisabledSequencerCVOverhead : MonoBehaviour
+public class DisabledSequencerOverhead : MonoBehaviour
 {
     private const int objectCount = 100; // Number of prefabs to instantiate
     private GameObject[] gameObjects;
-    public string prefabPath = "Prefabs/SequencerCV"; // Path to the prefab in Resources
+    public string prefabPath = "Prefabs/Sequencer"; // Path to the prefab in Resources
 
     void Start()
     {

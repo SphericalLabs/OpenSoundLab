@@ -55,6 +55,7 @@ public class SaveLoadInterface : MonoBehaviour
         instrumentPrefabs["SamplerOne"] = instrumentPrefabs[DeviceType.Sampler]; // legacy alias, remove when old SamplerOne saves are dropped
         instrumentPrefabs["XyloRoll"] = instrumentPrefabs[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
         instrumentPrefabs["Freeverb"] = instrumentPrefabs[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
+        instrumentPrefabs["SequencerCV"] = instrumentPrefabs[DeviceType.Sequencer]; // legacy alias, remove when old saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -123,6 +124,7 @@ public class SaveLoadInterface : MonoBehaviour
         if (deviceType == "SamplerOne") return DeviceType.Sampler; // legacy alias, remove when old SamplerOne saves are dropped
         if (deviceType == "XyloRoll") return DeviceType.Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
         if (deviceType == "Freeverb") return DeviceType.Reverb; // legacy alias, remove when old Freeverb saves are dropped
+        if (deviceType == "SequencerCV") return DeviceType.Sequencer; // legacy alias, remove when old saves are dropped
         return deviceType;
     }
 
@@ -221,7 +223,8 @@ public class SaveLoadInterface : MonoBehaviour
 
             InstrumentData data = g.GetComponent<deviceInterface>().GetData();
 
-            GameObject g2 = Instantiate(instrumentPrefabs[data.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
+            string normalizedType = normalizeDeviceTypeName(data.deviceType);
+            GameObject g2 = Instantiate(instrumentPrefabs[normalizedType], Vector3.zero, Quaternion.identity) as GameObject;
             deviceInterface device = g2.GetComponent<deviceInterface>();
             device.Load(data, true);
 
@@ -275,7 +278,8 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(QuantizerData))]
 
 [XmlInclude(typeof(ADData))]
-[XmlInclude(typeof(SequencerCVData))] // update?
+[XmlInclude(typeof(SequencerData))]
+[XmlInclude(typeof(SequencerCVData))] // legacy alias, remove when old saves are dropped
 [XmlInclude(typeof(SampleHoldData))]
 
 

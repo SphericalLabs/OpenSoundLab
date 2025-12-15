@@ -30,9 +30,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System;
-public class NetworkSequencerCv : NetworkSyncListener
+public class NetworkSequencer : NetworkSyncListener
 {
-    protected sequencerCVDeviceInterface sequencerCvDeviceInterface;
+    protected sequencerDeviceInterface sequencerDeviceInterface;
 
     NetworkButtons networkButtons;
     NetworkDials networkDials;
@@ -42,10 +42,10 @@ public class NetworkSequencerCv : NetworkSyncListener
 
     protected virtual void Awake()
     {
-        sequencerCvDeviceInterface = GetComponent<sequencerCVDeviceInterface>();
-        sequencerCvDeviceInterface.beatSlider.onEndGrabEvents.AddListener(OnSync);
-        sequencerCvDeviceInterface.stepSelect.onEndGrabEvents.AddListener(OnSync);
-        sequencerCvDeviceInterface.xyHandle.onEndGrabEvents.AddListener(OnSync);
+        sequencerDeviceInterface = GetComponent<sequencerDeviceInterface>();
+        sequencerDeviceInterface.beatSlider.onEndGrabEvents.AddListener(OnSync);
+        sequencerDeviceInterface.stepSelect.onEndGrabEvents.AddListener(OnSync);
+        sequencerDeviceInterface.xyHandle.onEndGrabEvents.AddListener(OnSync);
 
         networkButtons = GetComponent<NetworkButtons>();
         networkDials = GetComponent<NetworkDials>();
@@ -54,10 +54,10 @@ public class NetworkSequencerCv : NetworkSyncListener
 
         // make sure that nothing is added manually to these scripts, since otherwise it probably would end up doubled after these GetComponentsInChildren calls
         // todo: get rid of GetComponentsInChildren, this would save about 0.5ms of the init time according to profiler on Windows, so Quest savings will be higher
-        networkButtons.buttons = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<button>(true), networkButtons.buttons);
-        networkDials.dials = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<dial>(true), networkDials.dials);
-        networkSwitchs.switchs = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<basicSwitch>(true), networkSwitchs.switchs);
-        networkJacks.omniJacks = Utils.AddElementsToArray(sequencerCvDeviceInterface.GetComponentsInChildren<omniJack>(true), networkJacks.omniJacks);
+        networkButtons.buttons = Utils.AddElementsToArray(sequencerDeviceInterface.GetComponentsInChildren<button>(true), networkButtons.buttons);
+        networkDials.dials = Utils.AddElementsToArray(sequencerDeviceInterface.GetComponentsInChildren<dial>(true), networkDials.dials);
+        networkSwitchs.switchs = Utils.AddElementsToArray(sequencerDeviceInterface.GetComponentsInChildren<basicSwitch>(true), networkSwitchs.switchs);
+        networkJacks.omniJacks = Utils.AddElementsToArray(sequencerDeviceInterface.GetComponentsInChildren<omniJack>(true), networkJacks.omniJacks);
 
     }
     #region Mirror
@@ -79,9 +79,9 @@ public class NetworkSequencerCv : NetworkSyncListener
                 break;
             case SyncList<float>.Operation.OP_SET:
                 // careful, this is hardwiring index 0.
-                // this will break if there will be more xHandles on SequencerCV in the future
+                // this will break if there will be more xHandles on Sequencer in the future
                 // and the stepSelect handle would have another index because of that.
-                if (index == 0) sequencerCvDeviceInterface.UpdateStepSelect(true);
+                if (index == 0) sequencerDeviceInterface.UpdateStepSelect(true);
                 break;
             case SyncList<float>.Operation.OP_CLEAR:
                 break;
@@ -102,7 +102,7 @@ public class NetworkSequencerCv : NetworkSyncListener
 
         if (isServer)
         {
-            RpcUpdateCurStep(sequencerCvDeviceInterface.TargetStep);
+            RpcUpdateCurStep(sequencerDeviceInterface.TargetStep);
         }
         else
         {
@@ -115,15 +115,15 @@ public class NetworkSequencerCv : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateCurStep(sequencerCvDeviceInterface.TargetStep);
+            RpcUpdateCurStep(sequencerDeviceInterface.TargetStep);
         }
     }
 
     [Command(requiresAuthority = false)]
     protected virtual void CmdRequestSync()
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync curStep {sequencerCvDeviceInterface.TargetStep}");
-        RpcUpdateCurStep(sequencerCvDeviceInterface.TargetStep);
+        Debug.Log($"{gameObject.name} CmdRequestSync curStep {sequencerDeviceInterface.TargetStep}");
+        RpcUpdateCurStep(sequencerDeviceInterface.TargetStep);
     }
 
     [ClientRpc]
@@ -131,8 +131,8 @@ public class NetworkSequencerCv : NetworkSyncListener
     {
         if (isClient && !isServer)
         {
-            Debug.Log($"{gameObject.name} old curStep: {sequencerCvDeviceInterface.TargetStep}, new curStep {targetStep}");
-            sequencerCvDeviceInterface.TargetStep = targetStep;
+            Debug.Log($"{gameObject.name} old curStep: {sequencerDeviceInterface.TargetStep}, new curStep {targetStep}");
+            sequencerDeviceInterface.TargetStep = targetStep;
         }
     }
     #endregion
