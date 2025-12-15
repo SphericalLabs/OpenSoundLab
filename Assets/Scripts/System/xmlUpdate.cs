@@ -63,7 +63,8 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(CompressorData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Freeverbs":
-                            serializer = new XmlSerializer(typeof(FreeverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Reverbs":
+                            serializer = new XmlSerializer(typeof(ReverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Delays":
                             serializer = new XmlSerializer(typeof(DelayData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -76,6 +77,9 @@ public class xmlUpdate
                             break;
                         case "ADs":
                             serializer = new XmlSerializer(typeof(ADData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            break;
+                        case "Sequencers":
+                            serializer = new XmlSerializer(typeof(SequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "SequencerCVs":
                             serializer = new XmlSerializer(typeof(SequencerCVData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -119,8 +123,9 @@ public class xmlUpdate
                         case "Maracas":
                             serializer = new XmlSerializer(typeof(MaracaData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
+                        case "Xylophones":
                         case "XyloRolls":
-                            serializer = new XmlSerializer(typeof(XyloRollData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            serializer = new XmlSerializer(typeof(XylophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "TouchPads":
                             serializer = new XmlSerializer(typeof(TouchPadData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -131,17 +136,14 @@ public class xmlUpdate
                         case "Cameras":
                             serializer = new XmlSerializer(typeof(CameraData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
+                        case "Controllers":
+                            serializer = new XmlSerializer(typeof(ControllerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            break;
                         case "ControlCubes":
                             serializer = new XmlSerializer(typeof(ControlCubeData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "VCAs":
                             serializer = new XmlSerializer(typeof(vcaData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Reverbs":
-                            serializer = new XmlSerializer(typeof(ReverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Sequencers":
-                            serializer = new XmlSerializer(typeof(SequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Keyboards":
                             serializer = new XmlSerializer(typeof(KeyboardData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -155,11 +157,13 @@ public class xmlUpdate
                         case "Filters":
                             serializer = new XmlSerializer(typeof(FilterData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
-                        case "Artefacts":
-                            serializer = new XmlSerializer(typeof(ArtefactData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Artefacts": // legacy alias, remove when old Artefact saves are dropped
+                        case "Artifacts":
+                            serializer = new XmlSerializer(typeof(ArtifactData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "SamplerOnes":
-                            serializer = new XmlSerializer(typeof(SamplerOneData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Samplers":
+                            serializer = new XmlSerializer(typeof(SamplerData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "SamplerTwos":
                             serializer = new XmlSerializer(typeof(SamplerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -185,9 +189,6 @@ public class xmlUpdate
                         case "Compressors":
                             data[data.Count - 1].deviceType = DeviceType.Compressor;
                             break;
-                        case "Freeverbs":
-                            data[data.Count - 1].deviceType = DeviceType.Freeverb;
-                            break;
                         case "Delays":
                             data[data.Count - 1].deviceType = DeviceType.Delay;
                             break;
@@ -200,8 +201,9 @@ public class xmlUpdate
                         case "ADs":
                             data[data.Count - 1].deviceType = DeviceType.AD;
                             break;
+                        case "Sequencers":
                         case "SequencerCVs":
-                            data[data.Count - 1].deviceType = DeviceType.SequencerCV;
+                            data[data.Count - 1].deviceType = DeviceType.Sequencer;
                             break;
                         case "SampleHolds":
                             data[data.Count - 1].deviceType = DeviceType.SampleHold;
@@ -237,8 +239,9 @@ public class xmlUpdate
                         case "Maracas":
                             data[data.Count - 1].deviceType = DeviceType.Maracas;
                             break;
+                        case "Xylophones":
                         case "XyloRolls":
-                            data[data.Count - 1].deviceType = DeviceType.XyloRoll;
+                            data[data.Count - 1].deviceType = DeviceType.Xylophone;
                             break;
                         case "TouchPads":
                             data[data.Count - 1].deviceType = DeviceType.TouchPad;
@@ -249,17 +252,16 @@ public class xmlUpdate
                         case "Cameras":
                             data[data.Count - 1].deviceType = DeviceType.Camera;
                             break;
+                        case "Controllers":
                         case "ControlCubes":
-                            data[data.Count - 1].deviceType = DeviceType.ControlCube;
+                            data[data.Count - 1].deviceType = DeviceType.Controller;
                             break;
                         case "VCAs":
                             data[data.Count - 1].deviceType = DeviceType.VCA;
                             break;
+                        case "Freeverbs":
                         case "Reverbs":
                             data[data.Count - 1].deviceType = DeviceType.Reverb;
-                            break;
-                        case "Sequencers":
-                            data[data.Count - 1].deviceType = DeviceType.Sequencer;
                             break;
                         case "Keyboards":
                             data[data.Count - 1].deviceType = DeviceType.Keyboard;
@@ -274,11 +276,13 @@ public class xmlUpdate
                         case "Filters":
                             data[data.Count - 1].deviceType = DeviceType.Filter;
                             break;
-                        case "Artefacts":
-                            data[data.Count - 1].deviceType = DeviceType.Artefact;
+                        case "Artefacts": // legacy alias, remove when old Artefact saves are dropped
+                        case "Artifacts":
+                            data[data.Count - 1].deviceType = DeviceType.Artifact;
                             break;
                         case "SamplerOnes":
-                            data[data.Count - 1].deviceType = DeviceType.SamplerOne;
+                        case "Samplers":
+                            data[data.Count - 1].deviceType = DeviceType.Sampler;
                             break;
                         case "SamplerTwos":
                             data[data.Count - 1].deviceType = DeviceType.SamplerTwo;
@@ -301,4 +305,3 @@ public class xmlUpdate
         return DeviceType.Oscillator;
     }
 }
-

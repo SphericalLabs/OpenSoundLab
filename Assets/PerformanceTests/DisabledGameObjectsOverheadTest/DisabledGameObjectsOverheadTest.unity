@@ -299,7 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f24cfc77ec21ef944932eb97d4919954, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabPath: Prefabs/SequencerCV
+  prefabPath: Prefabs/Sequencer
 --- !u!114 &1243019636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,7 +328,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1000012113822842, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
       propertyPath: m_Name
-      value: SequencerCV
+      value: Sequencer
       objectReference: {fileID: 0}
     - target: {fileID: 4000011047401768, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
       propertyPath: m_LocalPosition.x

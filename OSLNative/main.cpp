@@ -520,13 +520,13 @@ double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinB
     return floatingBufferCount;
 }
 
-void XylorollMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]) {
+void XylophoneMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]) {
     for (int i = 0; i < length; ++i) {
         buf[i] += (buf1[i] + buf2[i]) * .3f;
     }
 }
 
-void XylorollMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]) {
+void XylophoneMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]) {
     for (int i = 0; i < length; ++i) {
         buf[i] += buf1[i] * ((buf2[i] + 1) / 2.f);
     }

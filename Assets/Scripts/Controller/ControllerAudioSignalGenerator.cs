@@ -27,44 +27,15 @@
 
 using UnityEngine;
 using System.Collections;
-using System.Runtime.InteropServices;
 
-public class keyFrequencySignalGenerator : signalGenerator
+public class ControllerAudioSignalGenerator : signalGenerator
 {
 
-    float keyMultConst = Mathf.Pow(2, 1f / 12); // not used anymore, update native api?
-
-    public int octave = 0;
-    int curKey = -1;
-    int semitone = 0; // as key number, not in hertz
-
-    [DllImport("OSLNative")]
-    public static extern void KeyFrequencySignalGenerator(float[] buffer, int length, int channels, int semitone, float keyMultConst, ref float filteredVal);
-
-    public void UpdateKey(int k)
-    {
-        curKey = k;
-        semitone = k + octave * 12;
-    }
-
-    public float getMult(int k)
-    { // only used in xylophone
-        semitone = k + octave * 12;
-        return semitone;
-        //return Mathf.Pow(keyMultConst, semitone);
-    }
-
-    public void updateOctave(int n)
-    {
-        octave = n;
-        semitone = curKey + octave * 12;
-    }
-    float filteredVal = 0;
+    public Vector3 values = new Vector3(0, 0, 0);
+    public oscillatorSignalGenerator osc1;
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
-        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        KeyFrequencySignalGenerator(buffer, buffer.Length, channels, semitone, keyMultConst, ref filteredVal);
-        recursionCheckPost();
+        osc1.processBuffer(buffer, dspTime, channels);
     }
 }

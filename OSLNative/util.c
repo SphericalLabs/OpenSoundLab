@@ -445,7 +445,7 @@ void _fInterleave(const float* src, float* dest, const int n, int channels) {
     /* out of place: */
     if (src == dest) {
 #ifdef _WIN32
-        float* t = _malloca(n * sizeof(float));
+        float* t = (float*) _malloca(n * sizeof(float));
 #else
         float t[n];
 #endif
@@ -502,7 +502,7 @@ void _fDeinterleave(const float* src, float* dest, const int n, int channels) {
     /* out of place: */
     if (src == dest) {
 #ifdef _WIN32
-        float* t = _malloca(n * sizeof(float));
+        float* t = (float*) _malloca(n * sizeof(float));
 #else
         float t[n];
 #endif

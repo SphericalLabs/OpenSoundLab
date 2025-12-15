@@ -95,10 +95,7 @@ Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980
 
 #### Removed features
 - Removed default samples
-- Disabled Airhorn
-- Disabled Maraca
-- Removed oscillator from ADSR, ControlCube, Keyboard
-- Disabled timeline and MIDI for XyloRoll and Keyboard until fixed
+- Disabled timeline and MIDI for Xylophone and Keyboard until fixed
 
 ### FAQ
 

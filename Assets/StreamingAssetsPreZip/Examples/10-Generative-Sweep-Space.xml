@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SynthSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Instruments>
-    <Instruments xsi:type="SequencerCVData">
+    <Instruments xsi:type="SequencerData">
       <ID>-208474</ID>
-      <deviceType>SequencerCV</deviceType>
+      <deviceType>Sequencer</deviceType>
       <position>
         <x>-0.43066895</x>
         <y>1.82393825</y>

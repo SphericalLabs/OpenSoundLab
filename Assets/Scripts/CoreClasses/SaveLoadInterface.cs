@@ -51,6 +51,12 @@ public class SaveLoadInterface : MonoBehaviour
         }
 
         instrumentPrefabs[DeviceType.TapeGroup] = Resources.Load("Prefabs/" + DeviceType.TapeGroup) as GameObject;
+        instrumentPrefabs["Artefact"] = instrumentPrefabs[DeviceType.Artifact]; // legacy alias, remove when old Artefact saves are dropped
+        instrumentPrefabs["SamplerOne"] = instrumentPrefabs[DeviceType.Sampler]; // legacy alias, remove when old SamplerOne saves are dropped
+        instrumentPrefabs["XyloRoll"] = instrumentPrefabs[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
+        instrumentPrefabs["Freeverb"] = instrumentPrefabs[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
+        instrumentPrefabs["SequencerCV"] = instrumentPrefabs[DeviceType.Sequencer]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["ControlCube"] = instrumentPrefabs[DeviceType.Controller]; // legacy alias, remove when old saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -67,6 +73,7 @@ public class SaveLoadInterface : MonoBehaviour
             List<InstrumentData> dataB = _xmlUpdate.UpdateFile(filename);
             foreach (InstrumentData dB in dataB)
             {
+                dB.deviceType = normalizeDeviceTypeName(dB.deviceType);
                 GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
                 g.GetComponent<deviceInterface>().Load(dB, false);
                 //Debug.Log("load data");
@@ -77,6 +84,7 @@ public class SaveLoadInterface : MonoBehaviour
         int c = synthSet.InstrumentList.Count;
         for (int i = 0; i < c; i++)
         {
+            synthSet.InstrumentList[c - 1 - i].deviceType = normalizeDeviceTypeName(synthSet.InstrumentList[c - 1 - i].deviceType);
             GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;
             g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i], false);
             NetworkServer.Spawn(g);
@@ -92,6 +100,7 @@ public class SaveLoadInterface : MonoBehaviour
 
         foreach (InstrumentData data in synthSet.InstrumentList)
         {
+            data.deviceType = normalizeDeviceTypeName(data.deviceType);
             Transform t = (Instantiate(menuManager.instance.refObjects[data.deviceType], par, false) as GameObject).transform;
             t.localPosition = data.position;
             t.localRotation = data.rotation;
@@ -108,6 +117,17 @@ public class SaveLoadInterface : MonoBehaviour
         synthSet.InstrumentList.Clear();
         synthSet.PlugList.Clear();
         synthSet.SystemList.Clear();
+    }
+
+    string normalizeDeviceTypeName(string deviceType)
+    {
+        if (deviceType == "Artefact") return DeviceType.Artifact; // legacy alias, remove when old Artefact saves are dropped
+        if (deviceType == "SamplerOne") return DeviceType.Sampler; // legacy alias, remove when old SamplerOne saves are dropped
+        if (deviceType == "XyloRoll") return DeviceType.Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
+        if (deviceType == "Freeverb") return DeviceType.Reverb; // legacy alias, remove when old Freeverb saves are dropped
+        if (deviceType == "SequencerCV") return DeviceType.Sequencer; // legacy alias, remove when old saves are dropped
+        if (deviceType == "ControlCube") return DeviceType.Controller; // legacy alias, remove when old saves are dropped
+        return deviceType;
     }
 
     void systemSave()
@@ -205,7 +225,8 @@ public class SaveLoadInterface : MonoBehaviour
 
             InstrumentData data = g.GetComponent<deviceInterface>().GetData();
 
-            GameObject g2 = Instantiate(instrumentPrefabs[data.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
+            string normalizedType = normalizeDeviceTypeName(data.deviceType);
+            GameObject g2 = Instantiate(instrumentPrefabs[normalizedType], Vector3.zero, Quaternion.identity) as GameObject;
             deviceInterface device = g2.GetComponent<deviceInterface>();
             device.Load(data, true);
 
@@ -250,15 +271,17 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(DCData))]
 [XmlInclude(typeof(TutorialsData))]
 [XmlInclude(typeof(PolarizerData))]
-[XmlInclude(typeof(ArtefactData))]
+[XmlInclude(typeof(ArtifactData))]
+[XmlInclude(typeof(ArtifactDataLegacy))]
 [XmlInclude(typeof(CompressorData))]
-[XmlInclude(typeof(FreeverbData))]
+[XmlInclude(typeof(FreeverbData))] // legacy alias, remove when old Freeverb saves are dropped
 [XmlInclude(typeof(DelayData))]
 [XmlInclude(typeof(ScopeData))]
 [XmlInclude(typeof(QuantizerData))]
 
 [XmlInclude(typeof(ADData))]
-[XmlInclude(typeof(SequencerCVData))] // update?
+[XmlInclude(typeof(SequencerData))]
+[XmlInclude(typeof(SequencerCVData))] // legacy alias, remove when old saves are dropped
 [XmlInclude(typeof(SampleHoldData))]
 
 
@@ -268,6 +291,7 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(OscillatorData))]
 [XmlInclude(typeof(SpeakerData))]
 [XmlInclude(typeof(CameraData))]
+[XmlInclude(typeof(ControllerData))]
 [XmlInclude(typeof(ControlCubeData))]
 [XmlInclude(typeof(DrumData))]
 [XmlInclude(typeof(NoiseData))]
@@ -284,9 +308,10 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(LooperData))]
 [XmlInclude(typeof(RecorderData))]
 [XmlInclude(typeof(SamplerTwoData))]
-[XmlInclude(typeof(SamplerOneData))]
+[XmlInclude(typeof(SamplerData))]
+[XmlInclude(typeof(SamplerOneData))] // legacy alias, remove when old SamplerOne saves are dropped
 [XmlInclude(typeof(KeyboardData))]
-[XmlInclude(typeof(SequencerData))] // update?
+[XmlInclude(typeof(XylophoneData))]
 [XmlInclude(typeof(XyloRollData))]
 [XmlInclude(typeof(AirhornData))]
 [XmlInclude(typeof(PanoData))]

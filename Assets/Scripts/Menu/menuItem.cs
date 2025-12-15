@@ -85,14 +85,13 @@ public class menuItem : manipObject
     //  Sampler,
     //  Scope,
     //  Sequencer,
-    //  SequencerCV,
     //  Speaker,
     //  Tapes,
     //  Timeline,
     //  TouchPad,
     //  Tutorials,
     //  VCA,
-    //  XyloRoll,
+    //  Xylophone,
     //  // this is a stopper, items below won't appear in menu; alternatively you can skip items in menuManager.loadMenu()
     //  Max,
     //  TapeGroup,
@@ -141,17 +140,15 @@ public class menuItem : manipObject
         else if (item == DeviceType.Gain) label.text = "Gain / Mute";
         else if (item == DeviceType.MIDIIN) label.text = "MIDI In";
         else if (item == DeviceType.MIDIOUT) label.text = "MIDI Out";
-        else if (item == DeviceType.Sequencer) label.text = "Sequencer (Old)";
-        else if (item == DeviceType.SequencerCV) label.text = "Sequencer";
+        else if (item == DeviceType.Sequencer) label.text = "Sequencer";
         else if (item == DeviceType.Timeline) label.text = "Sequencer III";
-        else if (item == DeviceType.ControlCube) label.text = "ControlCube";
+        else if (item == DeviceType.Controller) label.text = "Controller";
         else if (item == DeviceType.Microphone) label.text = "Mic";
         else if (item == DeviceType.SampleHold) label.text = "S&H";
         else if (item == DeviceType.Reverb) label.text = "Reverb";
-        //if (item == deviceType.Freeverb) label.text = "Reverb";
         else if (item == DeviceType.DC) label.text = "DC";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
-        else if (item == DeviceType.SamplerOne) label.text = "Sampler I";
+        else if (item == DeviceType.Sampler) label.text = "Sampler";
         else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
 
 
@@ -165,70 +162,6 @@ public class menuItem : manipObject
 
         Vector3 size = Vector3.zero;
         Vector3 center = Vector3.zero;
-        /*
-        if (item == DeviceType.Sequencer)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                for (int i2 = 0; i2 < 4; i2++)
-                {
-                    GameObject cube = Instantiate(g.GetComponent<sequencerDeviceInterface>().touchCubePrefab, transform.position, transform.rotation) as GameObject;
-                    cube.transform.parent = g.transform;
-                    cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
-                    cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-                }
-
-                GameObject seq = Instantiate(g.GetComponent<sequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
-                seq.transform.parent = g.transform;
-                seq.transform.Translate(Vector3.right * .081f, Space.Self);
-                seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-            }
-            //Destroy(g.transform.Find("stretchNode").gameObject);
-        }
-
-        else if (item == DeviceType.SequencerCV)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                for (int i2 = 0; i2 < 4; i2++)
-                {
-                    GameObject cube = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().touchDialPrefab, transform.position, transform.rotation) as GameObject;
-                    cube.transform.parent = g.transform;
-                    cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
-                    cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-                }
-
-                GameObject seq = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
-                seq.transform.parent = g.transform;
-                seq.transform.Translate(Vector3.right * .081f, Space.Self);
-                seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-            }
-            Destroy(g.transform.Find("stretchNode").gameObject);
-        }
-        else if (item == DeviceType.Tapes)
-        {
-            GameObject tape = Instantiate(g.GetComponent<libraryDeviceInterface>().tapePrefab, transform, false) as GameObject;
-            Destroy(g);
-            g = tape;
-        }
-
-        else if (item == DeviceType.Timeline)
-        {
-            GameObject tl = Instantiate(Resources.Load("MenuPrefabs/timelineRep_Menu") as GameObject, transform, false) as GameObject;
-            Destroy(g);
-            g = tl;
-        }
-
-
-        MonoBehaviour[] m = g.GetComponentsInChildren<MonoBehaviour>();
-        for (int i = 0; i < m.Length; i++) Destroy(m[i]);
-
-        AudioSource[] audios = g.GetComponentsInChildren<AudioSource>();
-        for (int i = 0; i < audios.Length; i++) Destroy(audios[i]);
-
-        Rigidbody[] rig = g.GetComponentsInChildren<Rigidbody>();
-        for (int i = 0; i < rig.Length; i++) Destroy(rig[i]);
-        */
         Renderer[] r = g.GetComponentsInChildren<Renderer>();
         for (int i = 0; i < r.Length; i++)
         {
@@ -247,7 +180,7 @@ public class menuItem : manipObject
 
         if (item == DeviceType.Maracas) g.transform.localPosition = new Vector3(0, -.02f, .02f);
 
-        else if (item == DeviceType.SamplerOne)
+        else if (item == DeviceType.Sampler)
         {
             g.transform.localPosition = new Vector3(-0.023f, 0f, 0.02f);
         }
@@ -268,7 +201,7 @@ public class menuItem : manipObject
             //Destroy(g.transform.Find("KeyboardTimeline").gameObject);
         }
 
-        else if (item == DeviceType.XyloRoll)
+        else if (item == DeviceType.Xylophone)
         {
             g.transform.localPosition = new Vector3(.0239f, 0, .02f);
             g.transform.localScale = Vector3.one * .087f;
@@ -302,13 +235,13 @@ public class menuItem : manipObject
             g.transform.localScale = Vector3.one * 0.47f;
         }
 
-        else if (item == DeviceType.SamplerOne)
+        else if (item == DeviceType.Sampler)
         {
             g.transform.localPosition = new Vector3(-0.0191f, 0.006f, 0.02f);
             g.transform.localScale = Vector3.one * 0.14f;
         }
 
-        else if (item == DeviceType.SequencerCV)
+        else if (item == DeviceType.Sequencer)
         {
             g.transform.localPosition = new Vector3(0.0201f, 0.0057f, 0.0301f);
         }
@@ -362,12 +295,7 @@ public class menuItem : manipObject
         //{
         //    g.transform.localPosition = new Vector3(.0185f, 0, .02f);
         //}
-        else if (item == DeviceType.Sequencer)
-        {
-            g.transform.localScale = Vector3.one * .166f;
-        }
-        else if (item == DeviceType.ControlCube) g.transform.localPosition = new Vector3(0, -.01f, .024f);
-        else if (item == DeviceType.Reverb) g.transform.localPosition = new Vector3(0, -0.0175f, .02f);
+        else if (item == DeviceType.Controller) g.transform.localPosition = new Vector3(0, -.01f, .024f);
         else if (item == DeviceType.Drum)
         {
             g.transform.localPosition = new Vector3(0, 0, .026f);
@@ -385,220 +313,7 @@ public class menuItem : manipObject
     }
 
 
-    /*backup
-     * public GameObject Setup(DeviceType d)
-    {
-        item = d;
-        tex = Resources.Load("Textures/" + item.ToString() + "Symbol") as Texture;
-        if (tex != null) tex.mipMapBias = -1f; // shift mipmap by one level, improves clarity of menu symbols
-        symbol.material.SetTexture("_BaseMap", tex);
-        itemPrefab = Resources.Load("Prefabs/" + item.ToString()) as GameObject;
-        label.text = item.ToString();
-        // Please use the first letter of the original enum name for proper sorting in the menu!
-        if (item == DeviceType.VCA) label.text = "VCA";
-        if (item == DeviceType.Glide) label.text = "Glide";
-        if (item == DeviceType.Gain) label.text = "Gain / Mute";
-        if (item == DeviceType.MIDIIN) label.text = "MIDI In";
-        if (item == DeviceType.MIDIOUT) label.text = "MIDI Out";
-        if (item == DeviceType.Sequencer) label.text = "Sequencer (Old)";
-        if (item == DeviceType.SequencerCV) label.text = "Sequencer";
-        if (item == DeviceType.Timeline) label.text = "Sequencer III";
-        if (item == DeviceType.ControlCube) label.text = "ControlCube";
-        if (item == DeviceType.Microphone) label.text = "Mic";
-        if (item == DeviceType.SampleHold) label.text = "S&H";
-        if (item == DeviceType.Reverb) label.text = "Reverb";
-        //if (item == deviceType.Freeverb) label.text = "Reverb";
-        if (item == DeviceType.DC) label.text = "DC";
-        if (item == DeviceType.Polarizer) label.text = "Polarity";
 
-
-        label.gameObject.SetActive(true);
-        symbol.gameObject.SetActive(true);
-        g = Instantiate(itemPrefab, transform.position, transform.rotation) as GameObject;
-        g.transform.parent = transform;
-
-
-        manager = transform.parent.parent.GetComponent<menuManager>();
-
-        Vector3 size = Vector3.zero;
-        Vector3 center = Vector3.zero;
-
-        if (item == DeviceType.Sequencer)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                for (int i2 = 0; i2 < 4; i2++)
-                {
-                    GameObject cube = Instantiate(g.GetComponent<sequencerDeviceInterface>().touchCubePrefab, transform.position, transform.rotation) as GameObject;
-                    cube.transform.parent = g.transform;
-                    cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
-                    cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-                }
-
-                GameObject seq = Instantiate(g.GetComponent<sequencerDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
-                seq.transform.parent = g.transform;
-                seq.transform.Translate(Vector3.right * .081f, Space.Self);
-                seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-            }
-            Destroy(g.transform.Find("stretchNode").gameObject);
-        }
-
-        if (item == DeviceType.SequencerCV)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                for (int i2 = 0; i2 < 4; i2++)
-                {
-                    GameObject cube = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().touchDialPrefab, transform.position, transform.rotation) as GameObject;
-                    cube.transform.parent = g.transform;
-                    cube.transform.Translate(Vector3.right * i2 * -.04f, Space.Self);
-                    cube.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-                }
-
-                GameObject seq = Instantiate(g.GetComponent<sequencerCVDeviceInterface>().samplerPrefab, transform.position, transform.rotation) as GameObject;
-                seq.transform.parent = g.transform;
-                seq.transform.Translate(Vector3.right * .081f, Space.Self);
-                seq.transform.Translate(Vector3.up * i * -.04f, Space.Self);
-            }
-            Destroy(g.transform.Find("stretchNode").gameObject);
-        }
-
-        if (item == DeviceType.Tapes)
-        {
-            GameObject tape = Instantiate(g.GetComponent<libraryDeviceInterface>().tapePrefab, transform, false) as GameObject;
-            Destroy(g);
-            g = tape;
-        }
-
-        if (item == DeviceType.Timeline)
-        {
-            GameObject tl = Instantiate(Resources.Load("Prefabs/timelineRep") as GameObject, transform, false) as GameObject;
-            Destroy(g);
-            g = tl;
-        }
-
-        MonoBehaviour[] m = g.GetComponentsInChildren<MonoBehaviour>();
-        for (int i = 0; i < m.Length; i++) Destroy(m[i]);
-
-        AudioSource[] audios = g.GetComponentsInChildren<AudioSource>();
-        for (int i = 0; i < audios.Length; i++) Destroy(audios[i]);
-
-        Rigidbody[] rig = g.GetComponentsInChildren<Rigidbody>();
-        for (int i = 0; i < rig.Length; i++) Destroy(rig[i]);
-
-        Renderer[] r = g.GetComponentsInChildren<Renderer>();
-        for (int i = 0; i < r.Length; i++)
-        {
-            r[i].material = menuMat;
-            if (r[i].bounds.size.sqrMagnitude > size.sqrMagnitude)
-            {
-                size = r[i].bounds.size;
-                center = r[i].bounds.center;
-            }
-        }
-
-        Collider[] c = g.GetComponentsInChildren<Collider>();
-        for (int i = 0; i < c.Length; i++) Destroy(c[i]);
-        tooltips t = GetComponentInChildren<tooltips>();
-        if (t != null) Destroy(t.gameObject);
-
-        g.tag = "Untagged";
-        g.transform.localScale = g.transform.localScale / (size.magnitude * 20);
-        g.transform.localPosition = g.transform.localPosition + Vector3.forward * .02f;
-
-        if (item == DeviceType.Maracas) g.transform.localPosition = new Vector3(0, -.02f, .02f);
-
-        if (item == DeviceType.Camera)
-        {
-            g.transform.localRotation = Quaternion.Euler(90, 0, 0);
-            Camera[] cams = g.GetComponentsInChildren<Camera>();
-            for (int i = 0; i < cams.Length; i++) Destroy(cams[i].gameObject);
-            Destroy(g.transform.Find("screenFrame").gameObject);
-        }
-
-        if (item == DeviceType.Keyboard)
-        {
-            g.transform.localPosition = new Vector3(0.013f, 0, .026f);
-            g.transform.localScale = Vector3.one * .08f;
-            Destroy(g.transform.Find("KeyboardTimeline").gameObject);
-        }
-
-        if (item == DeviceType.XyloRoll)
-        {
-            g.transform.localPosition = new Vector3(.0239f, 0, .02f);
-            g.transform.localScale = Vector3.one * .087f;
-            g.transform.localRotation = Quaternion.Euler(34, 0, 0);
-            Destroy(g.transform.Find("KeyboardTimeline").gameObject);
-            Destroy(g.transform.Find("OscillatorBank").gameObject);
-            Destroy(g.transform.Find("ADSR").gameObject);
-        }
-
-        if (item == DeviceType.MIDIOUT)
-        {
-            Destroy(g.transform.Find("CChandle").gameObject);
-            Destroy(g.transform.Find("NOTEhandle").gameObject);
-        }
-
-        if (item == DeviceType.Airhorn)
-        {
-            g.transform.localPosition = new Vector3(-0.005f, -.018f, 0.02f);
-            g.transform.localRotation = Quaternion.Euler(0, 90, 0);
-            g.transform.localScale = Vector3.one * .14f;
-        }
-
-        if (item == DeviceType.Tapes)
-        {
-            g.transform.localPosition = new Vector3(0, 0, 0.02f);
-            g.transform.localRotation = Quaternion.Euler(0, 0, 0);
-        }
-        if (item == DeviceType.Timeline)
-        {
-            g.transform.localPosition = new Vector3(0, 0, 0.02f);
-            g.transform.localRotation = Quaternion.Euler(0, 0, 0);
-        }
-        if (item == DeviceType.Filter)
-        {
-            //g.transform.localPosition = new Vector3(.015f, 0, .02f);
-            //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
-        }
-        if (item == DeviceType.Scope)
-        {
-            //g.transform.localPosition = new Vector3(.015f, 0, .02f);
-            //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
-        }
-        if (item == DeviceType.Multiple)
-        {
-            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
-        }
-        if (item == DeviceType.MultiMix)
-        {
-            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
-        }
-        if (item == DeviceType.MultiSplit)
-        {
-            g.transform.localPosition = new Vector3(.0185f, 0, .02f);
-        }
-        if (item == DeviceType.Sequencer)
-        {
-            g.transform.localScale = Vector3.one * .166f;
-        }
-        if (item == DeviceType.ControlCube) g.transform.localPosition = new Vector3(0, -.01f, .024f);
-        if (item == DeviceType.Reverb) g.transform.localPosition = new Vector3(0, -0.0175f, .02f);
-        if (item == DeviceType.Drum)
-        {
-            g.transform.localPosition = new Vector3(0, 0, .026f);
-            g.transform.localRotation = Quaternion.Euler(40, 0, 0);
-        }
-        if (item == DeviceType.Mixer)
-        {
-            g.transform.localPosition = new Vector3(0.014f, 0, .02f);
-            g.transform.localRotation = Quaternion.Euler(60, 0, 0);
-        }
-
-        g.SetActive(false);
-
-        return g;
-    }*/
 
     IEnumerator appearRoutine(bool on)
     {
@@ -658,11 +373,11 @@ public class menuItem : manipObject
                 localPositionOffset = new Vector3(.1f, .02f, .15f);
                 localRotationOffset = new Vector3(0, 180, 0);
             }
-            else if (item == DeviceType.ControlCube)
+            else if (item == DeviceType.Controller)
             {
                 localPositionOffset = new Vector3(0f, 0f, -0.15f);
             }
-            else if (item == DeviceType.XyloRoll)
+            else if (item == DeviceType.Xylophone)
             {
                 localRotationOffset = new Vector3(90, 0, 0);
                 localPositionOffset = new Vector3(0.15f, 0f, -0.05f);
@@ -705,10 +420,10 @@ public class menuItem : manipObject
                 g.transform.Rotate(0, 180, 0, Space.Self);
             }
 
-            else if (item == DeviceType.ControlCube)
+            else if (item == DeviceType.Controller)
                 g.transform.Translate(0f, 0f, -0.15f, Space.Self);
 
-            else if (item == DeviceType.XyloRoll)
+            else if (item == DeviceType.Xylophone)
             {
                 g.transform.Rotate(90, 0, 0, Space.Self);
                 g.transform.Translate(0.15f, 0f, -0.05f, Space.Self);
@@ -820,23 +535,25 @@ public class DeviceType
     public static readonly DeviceType Recorder = new DeviceType("Recorder", DeviceCategory.SampleGenerator, 4);
     public static readonly DeviceType Microphone = new DeviceType("Microphone", DeviceCategory.SampleGenerator, 3);
     public static readonly DeviceType SamplerTwo = new DeviceType("SamplerTwo", DeviceCategory.SampleGenerator, 2);
-    public static readonly DeviceType SamplerOne = new DeviceType("SamplerOne", DeviceCategory.SampleGenerator, 1);
+    public static readonly DeviceType Sampler = new DeviceType("Sampler", DeviceCategory.SampleGenerator, 1);
+    public static readonly DeviceType SamplerOne = Sampler; // legacy alias, remove when old SamplerOne saves are dropped
 
     // ModulationGenerator
-    public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 6);
     public static readonly DeviceType Timeline = new DeviceType("Timeline", DeviceCategory.ModulationGenerator, 5);
     public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 4);
-    public static readonly DeviceType SequencerCV = new DeviceType("SequencerCV", DeviceCategory.ModulationGenerator, 3);
+    public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 3);
+    public static readonly DeviceType SequencerCV = Sequencer; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType DC = new DeviceType("DC", DeviceCategory.ModulationGenerator, 2);
     public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 1);
 
     // SoundProcessor
-    public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 6);
-    public static readonly DeviceType Artefact = new DeviceType("Artefact", DeviceCategory.SoundProcessor, 5);
+    public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 1);
+    public static readonly DeviceType Artifact = new DeviceType("Artifact", DeviceCategory.SoundProcessor, 5);
+    public static readonly DeviceType Artefact = Artifact; // legacy alias, remove when old Artefact saves are dropped
     public static readonly DeviceType Compressor = new DeviceType("Compressor", DeviceCategory.SoundProcessor, 4);
     public static readonly DeviceType Filter = new DeviceType("Filter", DeviceCategory.SoundProcessor, 3);
     public static readonly DeviceType Delay = new DeviceType("Delay", DeviceCategory.SoundProcessor, 2);
-    public static readonly DeviceType Freeverb = new DeviceType("Freeverb", DeviceCategory.SoundProcessor, 1);
+    public static readonly DeviceType Freeverb = Reverb; // legacy alias, remove when old Freeverb saves are dropped
 
     // ModulationProcessor
     public static readonly DeviceType Polarizer = new DeviceType("Polarizer", DeviceCategory.ModulationProcessor, 5);
@@ -854,10 +571,12 @@ public class DeviceType
     // Interface
     public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.Interface, 7);
     public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.Interface, 6);
-    public static readonly DeviceType XyloRoll = new DeviceType("XyloRoll", DeviceCategory.Interface, 5);
+    public static readonly DeviceType Xylophone = new DeviceType("Xylophone", DeviceCategory.Interface, 5);
+    public static readonly DeviceType XyloRoll = Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
     public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 4);
     public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 3);
-    public static readonly DeviceType ControlCube = new DeviceType("ControlCube", DeviceCategory.Interface, 2);
+    public static readonly DeviceType Controller = new DeviceType("Controller", DeviceCategory.Interface, 2);
+    public static readonly DeviceType ControlCube = Controller; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType TouchPad = new DeviceType("TouchPad", DeviceCategory.Interface, 1);
 
     // Various
@@ -899,4 +618,3 @@ public class DeviceType
 
     public override string ToString() => Name;
 }
-

@@ -14,7 +14,7 @@
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// You may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -25,46 +25,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
-public class keyFrequencySignalGenerator : signalGenerator
+public class artifactSignalGenerator : signalGenerator
 {
-
-    float keyMultConst = Mathf.Pow(2, 1f / 12); // not used anymore, update native api?
-
-    public int octave = 0;
-    int curKey = -1;
-    int semitone = 0; // as key number, not in hertz
-
     [DllImport("OSLNative")]
-    public static extern void KeyFrequencySignalGenerator(float[] buffer, int length, int channels, int semitone, float keyMultConst, ref float filteredVal);
+    public static extern void Artefact_Process(float[] buffer, float noiseAmount, int downsampleFactor, float jitterAmount, int bitReduction, int channels, int n);
 
-    public void UpdateKey(int k)
-    {
-        curKey = k;
-        semitone = k + octave * 12;
-    }
+    public float noiseAmount = 0;
+    public float jitterAmount = 0;
+    public float downsampleFactor = 1; //downsampling with factor 1 == preserve sample rate
+    public float bitReduction = 0;
 
-    public float getMult(int k)
-    { // only used in xylophone
-        semitone = k + octave * 12;
-        return semitone;
-        //return Mathf.Pow(keyMultConst, semitone);
-    }
+    int P_NOISE = 0;
+    int P_JITTER = 1;
+    int P_DOWNSAMPLE = 2;
+    int P_BITREDUCTION = 3;
 
-    public void updateOctave(int n)
-    {
-        octave = n;
-        semitone = curKey + octave * 12;
-    }
-    float filteredVal = 0;
+    public signalGenerator input;
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        KeyFrequencySignalGenerator(buffer, buffer.Length, channels, semitone, keyMultConst, ref filteredVal);
-        recursionCheckPost();
+        if (input != null)
+        {
+            input.processBuffer(buffer, dspTime, channels);
+
+            float noise, jitter;
+            int dwnmpl, bitrdx;
+            noise = Mathf.Pow(noiseAmount, 3);
+            jitter = Mathf.Pow(jitterAmount, 0.5f);
+            dwnmpl = (int)Utils.map(downsampleFactor, 0, 1, 1, 50);
+            bitrdx = (int)Utils.map(bitReduction, 0, 1, 0, 32);
+
+            Artefact_Process(buffer, noise, dwnmpl, jitter, bitrdx, channels, buffer.Length);
+        }
+        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     }
 }
