@@ -139,9 +139,6 @@ public class xmlUpdate
                         case "VCAs":
                             serializer = new XmlSerializer(typeof(vcaData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
-                        case "Sequencers":
-                            serializer = new XmlSerializer(typeof(SequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
                         case "Keyboards":
                             serializer = new XmlSerializer(typeof(KeyboardData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
@@ -257,9 +254,6 @@ public class xmlUpdate
                         case "Freeverbs":
                         case "Reverbs":
                             data[data.Count - 1].deviceType = DeviceType.Reverb;
-                            break;
-                        case "Sequencers":
-                            data[data.Count - 1].deviceType = DeviceType.Sequencer;
                             break;
                         case "Keyboards":
                             data[data.Count - 1].deviceType = DeviceType.Keyboard;

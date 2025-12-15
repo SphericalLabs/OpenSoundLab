@@ -141,7 +141,6 @@ public class menuManager : MonoBehaviour
                     if (devType == DeviceType.Camera) continue;
                 }
 
-                if (devType == DeviceType.Sequencer) continue;
                 if (devType == DeviceType.MIDIIN) continue;
                 if (devType == DeviceType.MIDIOUT) continue;
                 if (devType == DeviceType.Airhorn) continue;

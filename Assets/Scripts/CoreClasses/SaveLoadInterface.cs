@@ -304,7 +304,6 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(SamplerData))]
 [XmlInclude(typeof(SamplerOneData))] // legacy alias, remove when old SamplerOne saves are dropped
 [XmlInclude(typeof(KeyboardData))]
-[XmlInclude(typeof(SequencerData))] // update?
 [XmlInclude(typeof(XylophoneData))]
 [XmlInclude(typeof(XyloRollData))]
 [XmlInclude(typeof(AirhornData))]
