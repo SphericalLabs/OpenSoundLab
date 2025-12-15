@@ -179,6 +179,8 @@ public class menuManager : MonoBehaviour
         }
 
 
+        refObjects["XyloRoll"] = refObjects[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
+
         metronomeNode.transform.localPosition = new Vector3(0.345f, 0.012f + 0.10f, 0.107f);
         metronomeNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);
 

@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-public class xylorollSignalGenerator : signalGenerator
+public class xylophoneSignalGenerator : signalGenerator
 {
     public GameObject monophonicPrefab;
 
@@ -40,10 +40,10 @@ public class xylorollSignalGenerator : signalGenerator
     List<monophone> voices;
 
     [DllImport("OSLNative")]
-    public static extern void XylorollMergeSignalsWithoutOsc(float[] buf, int length, float[] buf1, float[] buf2);
+    public static extern void XylophoneMergeSignalsWithoutOsc(float[] buf, int length, float[] buf1, float[] buf2);
 
     [DllImport("OSLNative")]
-    public static extern void XylorollMergeSignalsWithOsc(float[] buf, int length, float[] buf1, float[] buf2);
+    public static extern void XylophoneMergeSignalsWithOsc(float[] buf, int length, float[] buf1, float[] buf2);
 
     public void spawnVoices(int n, float[] adsrVol, float[] adsrDur)
     {
@@ -179,7 +179,7 @@ public class xylorollSignalGenerator : signalGenerator
                     voices[i].osc[1].processBuffer(b2, dspTime, channels);
 
 
-                    XylorollMergeSignalsWithOsc(buffer, buffer.Length, b1, b2);
+                    XylophoneMergeSignalsWithOsc(buffer, buffer.Length, b1, b2);
 
                 }
                 else
@@ -199,7 +199,7 @@ public class xylorollSignalGenerator : signalGenerator
                     voices[i].sampler.processBuffer(b1, dspTime, channels);
                     voices[i].adsr.processBuffer(b2, dspTime, channels);
 
-                    XylorollMergeSignalsWithoutOsc(buffer, buffer.Length, b1, b2);
+                    XylophoneMergeSignalsWithoutOsc(buffer, buffer.Length, b1, b2);
                 }
                 else voices[i].curKey = -1;
 

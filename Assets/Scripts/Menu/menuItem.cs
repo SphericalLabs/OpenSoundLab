@@ -92,7 +92,7 @@ public class menuItem : manipObject
     //  TouchPad,
     //  Tutorials,
     //  VCA,
-    //  XyloRoll,
+    //  Xylophone,
     //  // this is a stopper, items below won't appear in menu; alternatively you can skip items in menuManager.loadMenu()
     //  Max,
     //  TapeGroup,
@@ -268,7 +268,7 @@ public class menuItem : manipObject
             //Destroy(g.transform.Find("KeyboardTimeline").gameObject);
         }
 
-        else if (item == DeviceType.XyloRoll)
+        else if (item == DeviceType.Xylophone)
         {
             g.transform.localPosition = new Vector3(.0239f, 0, .02f);
             g.transform.localScale = Vector3.one * .087f;
@@ -523,7 +523,7 @@ public class menuItem : manipObject
             Destroy(g.transform.Find("KeyboardTimeline").gameObject);
         }
 
-        if (item == DeviceType.XyloRoll)
+        if (item == DeviceType.Xylophone)
         {
             g.transform.localPosition = new Vector3(.0239f, 0, .02f);
             g.transform.localScale = Vector3.one * .087f;
@@ -662,7 +662,7 @@ public class menuItem : manipObject
             {
                 localPositionOffset = new Vector3(0f, 0f, -0.15f);
             }
-            else if (item == DeviceType.XyloRoll)
+            else if (item == DeviceType.Xylophone)
             {
                 localRotationOffset = new Vector3(90, 0, 0);
                 localPositionOffset = new Vector3(0.15f, 0f, -0.05f);
@@ -708,7 +708,7 @@ public class menuItem : manipObject
             else if (item == DeviceType.ControlCube)
                 g.transform.Translate(0f, 0f, -0.15f, Space.Self);
 
-            else if (item == DeviceType.XyloRoll)
+            else if (item == DeviceType.Xylophone)
             {
                 g.transform.Rotate(90, 0, 0, Space.Self);
                 g.transform.Translate(0.15f, 0f, -0.05f, Space.Self);
@@ -856,7 +856,8 @@ public class DeviceType
     // Interface
     public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.Interface, 7);
     public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.Interface, 6);
-    public static readonly DeviceType XyloRoll = new DeviceType("XyloRoll", DeviceCategory.Interface, 5);
+    public static readonly DeviceType Xylophone = new DeviceType("Xylophone", DeviceCategory.Interface, 5);
+    public static readonly DeviceType XyloRoll = Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
     public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 4);
     public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 3);
     public static readonly DeviceType ControlCube = new DeviceType("ControlCube", DeviceCategory.Interface, 2);

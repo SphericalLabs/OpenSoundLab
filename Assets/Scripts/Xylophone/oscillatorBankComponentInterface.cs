@@ -31,7 +31,7 @@ using System.Collections;
 public class oscillatorBankComponentInterface : componentInterface
 {
 
-    public xylorollSignalGenerator signal;
+    public xylophoneSignalGenerator signal;
 
     public dial[] ampDials;
     public dial[] freqDials;

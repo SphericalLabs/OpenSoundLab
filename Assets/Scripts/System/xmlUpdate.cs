@@ -119,8 +119,9 @@ public class xmlUpdate
                         case "Maracas":
                             serializer = new XmlSerializer(typeof(MaracaData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
+                        case "Xylophones":
                         case "XyloRolls":
-                            serializer = new XmlSerializer(typeof(XyloRollData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            serializer = new XmlSerializer(typeof(XylophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "TouchPads":
                             serializer = new XmlSerializer(typeof(TouchPadData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -239,8 +240,9 @@ public class xmlUpdate
                         case "Maracas":
                             data[data.Count - 1].deviceType = DeviceType.Maracas;
                             break;
+                        case "Xylophones":
                         case "XyloRolls":
-                            data[data.Count - 1].deviceType = DeviceType.XyloRoll;
+                            data[data.Count - 1].deviceType = DeviceType.Xylophone;
                             break;
                         case "TouchPads":
                             data[data.Count - 1].deviceType = DeviceType.TouchPad;

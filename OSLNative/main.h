@@ -83,8 +83,8 @@ OSL_API void ADSRSignalGenerator(float buffer[], int length, int channels, int f
                                  float& ADSRvolume, float volumes[], float startVal, int& curFrame, bool sustaining);
 OSL_API void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int semitone, float keyMultConst,
                                          float& filteredVal);
-OSL_API void XylorollMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]);
-OSL_API void XylorollMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]);
+OSL_API void XylophoneMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]);
+OSL_API void XylophoneMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]);
 OSL_API void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave,
                                        float frequency, float prevFrequency, float amplitude, float prevAmplitude,
                                        float& prevSyncValue, float frequencyExpBuffer[], float frequencyLinBuffer[],

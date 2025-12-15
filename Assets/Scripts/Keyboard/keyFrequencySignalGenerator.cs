@@ -48,7 +48,7 @@ public class keyFrequencySignalGenerator : signalGenerator
     }
 
     public float getMult(int k)
-    { // only used in xyloroll
+    { // only used in xylophone
         semitone = k + octave * 12;
         return semitone;
         //return Mathf.Pow(keyMultConst, semitone);

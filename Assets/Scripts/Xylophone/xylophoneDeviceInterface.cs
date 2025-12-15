@@ -28,8 +28,9 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
-public class xylorollDeviceInterface : deviceInterface
+public class xylophoneDeviceInterface : deviceInterface
 {
     public GameObject keyPrefab;
     public Material blackmat;
@@ -45,7 +46,7 @@ public class xylorollDeviceInterface : deviceInterface
     public omniJack output;
 
     basicSwitch inputSwitch;
-    xylorollSignalGenerator signal;
+    xylophoneSignalGenerator signal;
     adsrInterface _adsrInterface;
 
     public timelineComponentInterface _timeline;
@@ -74,7 +75,7 @@ public class xylorollDeviceInterface : deviceInterface
         base.Awake();
         _beatManager = ScriptableObject.CreateInstance<beatTracker>();
         sticks = GetComponentsInChildren<drumstick>();
-        signal = GetComponent<xylorollSignalGenerator>();
+        signal = GetComponent<xylophoneSignalGenerator>();
         _adsrInterface = GetComponentInChildren<adsrInterface>();
         inputSwitch = GetComponentInChildren<basicSwitch>();
         signal.spawnVoices(voiceCount, _adsrInterface.volumes, _adsrInterface.durations);
@@ -420,8 +421,8 @@ public class xylorollDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        XyloRollData data = new XyloRollData();
-        data.deviceType = DeviceType.XyloRoll;
+        XylophoneData data = new XylophoneData();
+        data.deviceType = DeviceType.Xylophone;
         GetTransformData(data);
 
         data.ADSRdata = new Vector2[3];
@@ -479,7 +480,7 @@ public class xylorollDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        XyloRollData data = d as XyloRollData;
+        XylophoneData data = d as XylophoneData;
         base.Load(data, copyMode);
 
         for (int i = 0; i < 3; i++) _adsrInterface.xyHandles[i].setPercent(data.ADSRdata[i]);
@@ -541,7 +542,7 @@ public class xylorollDeviceInterface : deviceInterface
 
 }
 
-public class XyloRollData : InstrumentData
+public class XylophoneData : InstrumentData
 {
     public Vector2[] ADSRdata;
     public int octaveSetting;
@@ -575,3 +576,6 @@ public class XyloRollData : InstrumentData
     public float timelineHeight;
     public List<int> selectedKeys = new List<int>();
 }
+
+[XmlType("XyloRollData")]
+public class XyloRollData : XylophoneData { }
