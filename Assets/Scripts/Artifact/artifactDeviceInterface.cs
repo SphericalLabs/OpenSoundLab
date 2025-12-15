@@ -25,21 +25,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
-public class artefactDeviceInterface : deviceInterface
+public class artifactDeviceInterface : deviceInterface
 {
     public omniJack input, output;
     public dial noiseDial, jitterDial, downsampleDial, bitreductionDial;
 
-    artefactSignalGenerator signal;
+    artifactSignalGenerator signal;
 
     public override void Awake()
     {
         base.Awake();
-        signal = GetComponent<artefactSignalGenerator>();
+        signal = GetComponent<artifactSignalGenerator>();
     }
 
     void Update()
@@ -54,8 +55,8 @@ public class artefactDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        ArtefactData data = new ArtefactData();
-        data.deviceType = DeviceType.Artefact;
+        ArtifactData data = new ArtifactData();
+        data.deviceType = DeviceType.Artifact;
         GetTransformData(data);
 
         data.noiseAmount = noiseDial.percent;
@@ -71,7 +72,7 @@ public class artefactDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        ArtefactData data = d as ArtefactData;
+        ArtifactData data = d as ArtifactData;
         base.Load(data, copyMode);
 
         input.SetID(data.jackInID, copyMode);
@@ -84,7 +85,7 @@ public class artefactDeviceInterface : deviceInterface
     }
 }
 
-public class ArtefactData : InstrumentData
+public class ArtifactData : InstrumentData
 {
     public float noiseAmount;
     public float jitterAmount;
@@ -93,4 +94,9 @@ public class ArtefactData : InstrumentData
 
     public int jackOutID;
     public int jackInID;
+}
+
+[XmlType("ArtefactData")]
+public class ArtifactDataLegacy : ArtifactData // legacy alias, remove when old Artefact saves are dropped
+{
 }

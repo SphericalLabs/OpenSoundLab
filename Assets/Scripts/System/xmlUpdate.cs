@@ -155,8 +155,9 @@ public class xmlUpdate
                         case "Filters":
                             serializer = new XmlSerializer(typeof(FilterData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
-                        case "Artefacts":
-                            serializer = new XmlSerializer(typeof(ArtefactData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Artefacts": // legacy alias, remove when old Artefact saves are dropped
+                        case "Artifacts":
+                            serializer = new XmlSerializer(typeof(ArtifactData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "SamplerOnes":
                             serializer = new XmlSerializer(typeof(SamplerOneData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -274,8 +275,9 @@ public class xmlUpdate
                         case "Filters":
                             data[data.Count - 1].deviceType = DeviceType.Filter;
                             break;
-                        case "Artefacts":
-                            data[data.Count - 1].deviceType = DeviceType.Artefact;
+                        case "Artefacts": // legacy alias, remove when old Artefact saves are dropped
+                        case "Artifacts":
+                            data[data.Count - 1].deviceType = DeviceType.Artifact;
                             break;
                         case "SamplerOnes":
                             data[data.Count - 1].deviceType = DeviceType.SamplerOne;
@@ -301,4 +303,3 @@ public class xmlUpdate
         return DeviceType.Oscillator;
     }
 }
-

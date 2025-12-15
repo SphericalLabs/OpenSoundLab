@@ -51,6 +51,7 @@ public class SaveLoadInterface : MonoBehaviour
         }
 
         instrumentPrefabs[DeviceType.TapeGroup] = Resources.Load("Prefabs/" + DeviceType.TapeGroup) as GameObject;
+        instrumentPrefabs["Artefact"] = instrumentPrefabs[DeviceType.Artifact]; // legacy alias, remove when old Artefact saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -67,6 +68,7 @@ public class SaveLoadInterface : MonoBehaviour
             List<InstrumentData> dataB = _xmlUpdate.UpdateFile(filename);
             foreach (InstrumentData dB in dataB)
             {
+                dB.deviceType = normalizeDeviceTypeName(dB.deviceType);
                 GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
                 g.GetComponent<deviceInterface>().Load(dB, false);
                 //Debug.Log("load data");
@@ -77,6 +79,7 @@ public class SaveLoadInterface : MonoBehaviour
         int c = synthSet.InstrumentList.Count;
         for (int i = 0; i < c; i++)
         {
+            synthSet.InstrumentList[c - 1 - i].deviceType = normalizeDeviceTypeName(synthSet.InstrumentList[c - 1 - i].deviceType);
             GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;
             g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i], false);
             NetworkServer.Spawn(g);
@@ -92,6 +95,7 @@ public class SaveLoadInterface : MonoBehaviour
 
         foreach (InstrumentData data in synthSet.InstrumentList)
         {
+            data.deviceType = normalizeDeviceTypeName(data.deviceType);
             Transform t = (Instantiate(menuManager.instance.refObjects[data.deviceType], par, false) as GameObject).transform;
             t.localPosition = data.position;
             t.localRotation = data.rotation;
@@ -108,6 +112,12 @@ public class SaveLoadInterface : MonoBehaviour
         synthSet.InstrumentList.Clear();
         synthSet.PlugList.Clear();
         synthSet.SystemList.Clear();
+    }
+
+    string normalizeDeviceTypeName(string deviceType)
+    {
+        if (deviceType == "Artefact") return DeviceType.Artifact; // legacy alias, remove when old Artefact saves are dropped
+        return deviceType;
     }
 
     void systemSave()
@@ -250,7 +260,8 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(DCData))]
 [XmlInclude(typeof(TutorialsData))]
 [XmlInclude(typeof(PolarizerData))]
-[XmlInclude(typeof(ArtefactData))]
+[XmlInclude(typeof(ArtifactData))]
+[XmlInclude(typeof(ArtifactDataLegacy))]
 [XmlInclude(typeof(CompressorData))]
 [XmlInclude(typeof(FreeverbData))]
 [XmlInclude(typeof(DelayData))]

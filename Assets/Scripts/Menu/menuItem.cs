@@ -832,7 +832,8 @@ public class DeviceType
 
     // SoundProcessor
     public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 6);
-    public static readonly DeviceType Artefact = new DeviceType("Artefact", DeviceCategory.SoundProcessor, 5);
+    public static readonly DeviceType Artifact = new DeviceType("Artifact", DeviceCategory.SoundProcessor, 5);
+    public static readonly DeviceType Artefact = Artifact; // legacy alias, remove when old Artefact saves are dropped
     public static readonly DeviceType Compressor = new DeviceType("Compressor", DeviceCategory.SoundProcessor, 4);
     public static readonly DeviceType Filter = new DeviceType("Filter", DeviceCategory.SoundProcessor, 3);
     public static readonly DeviceType Delay = new DeviceType("Delay", DeviceCategory.SoundProcessor, 2);
@@ -899,4 +900,3 @@ public class DeviceType
 
     public override string ToString() => Name;
 }
-

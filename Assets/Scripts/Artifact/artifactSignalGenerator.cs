@@ -25,12 +25,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-public class artefactSignalGenerator : signalGenerator
+public class artifactSignalGenerator : signalGenerator
 {
     [DllImport("OSLNative")]
     public static extern void Artefact_Process(float[] buffer, float noiseAmount, int downsampleFactor, float jitterAmount, int bitReduction, int channels, int n);
