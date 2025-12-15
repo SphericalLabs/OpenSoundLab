@@ -27,9 +27,9 @@
 
 using UnityEngine;
 
-public class cubeZone : manipObject
+public class ControllerZone : manipObject
 {
-    ControlCubeDeviceInterface _deviceInterface;
+    ControllerDeviceInterface _deviceInterface;
     public Transform[] lines;
     Material mat;
 
@@ -49,7 +49,7 @@ public class cubeZone : manipObject
         touchedColor = mat.GetColor("_BaseColor");
         untouchedColor = incrementColor(touchedColor, 0.12f);
         mat.SetColor("_BaseColor", untouchedColor);
-        _deviceInterface = GetComponentInParent<ControlCubeDeviceInterface>();
+        _deviceInterface = GetComponentInParent<ControllerDeviceInterface>();
         updatePercent(p, false);
 
         if (lines != null && lines.Length > 0 && lines[0] != null)

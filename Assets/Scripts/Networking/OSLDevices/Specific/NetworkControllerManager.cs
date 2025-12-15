@@ -29,7 +29,7 @@ using Mirror;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ControlCubePathPointMarker : byte
+public enum ControllerPathPointMarker : byte
 {
     Start = 0,
     Continue = 1,
@@ -37,14 +37,14 @@ public enum ControlCubePathPointMarker : byte
 }
 
 [System.Serializable]
-public struct ControlCubeRecordedPathPoint
+public struct ControllerRecordedPathPoint
 {
     public int pathId;
     public Vector3 position;
-    public ControlCubePathPointMarker marker;
+    public ControllerPathPointMarker marker;
     public Color32 color;
 
-    public ControlCubeRecordedPathPoint(int pathId, Vector3 position, ControlCubePathPointMarker marker, Color32 color)
+    public ControllerRecordedPathPoint(int pathId, Vector3 position, ControllerPathPointMarker marker, Color32 color)
     {
         this.pathId = pathId;
         this.position = position;
@@ -53,14 +53,14 @@ public struct ControlCubeRecordedPathPoint
     }
 }
 
-public class NetworkControlCubeManager : NetworkBehaviour
+public class NetworkControllerManager : NetworkBehaviour
 {
-    public ControlCubeDeviceInterface controlCube;
+    public ControllerDeviceInterface controlCube;
 
     [SyncVar(hook = nameof(OnSyncPercentChanged))]
     public Vector3 syncPercent;
 
-    public readonly SyncList<ControlCubeRecordedPathPoint> recordedPathPoints = new SyncList<ControlCubeRecordedPathPoint>();
+    public readonly SyncList<ControllerRecordedPathPoint> recordedPathPoints = new SyncList<ControllerRecordedPathPoint>();
 
     readonly HashSet<int> activePathIds = new HashSet<int>();
     int nextPathId = 1;
@@ -166,7 +166,7 @@ public class NetworkControlCubeManager : NetworkBehaviour
     {
         int pathId = nextPathId++;
         activePathIds.Add(pathId);
-        recordedPathPoints.Add(new ControlCubeRecordedPathPoint(pathId, startPoint, ControlCubePathPointMarker.Start, color));
+        recordedPathPoints.Add(new ControllerRecordedPathPoint(pathId, startPoint, ControllerPathPointMarker.Start, color));
 
         if (sender != null)
         {
@@ -186,7 +186,7 @@ public class NetworkControlCubeManager : NetworkBehaviour
             return;
         }
 
-        recordedPathPoints.Add(new ControlCubeRecordedPathPoint(pathId, point, ControlCubePathPointMarker.Continue, default));
+        recordedPathPoints.Add(new ControllerRecordedPathPoint(pathId, point, ControllerPathPointMarker.Continue, default));
     }
 
     [Command(requiresAuthority = false)]
@@ -197,7 +197,7 @@ public class NetworkControlCubeManager : NetworkBehaviour
             return;
         }
 
-        recordedPathPoints.Add(new ControlCubeRecordedPathPoint(pathId, lastPoint, ControlCubePathPointMarker.End, default));
+        recordedPathPoints.Add(new ControllerRecordedPathPoint(pathId, lastPoint, ControllerPathPointMarker.End, default));
         activePathIds.Remove(pathId);
     }
 
@@ -215,7 +215,7 @@ public class NetworkControlCubeManager : NetworkBehaviour
         controlCube?.HandlePathConfirmed(requestId, pathId);
     }
 
-    void OnRecordedPathChanged(SyncList<ControlCubeRecordedPathPoint>.Operation op, int index, ControlCubeRecordedPathPoint oldItem, ControlCubeRecordedPathPoint newItem)
+    void OnRecordedPathChanged(SyncList<ControllerRecordedPathPoint>.Operation op, int index, ControllerRecordedPathPoint oldItem, ControllerRecordedPathPoint newItem)
     {
         if (controlCube == null)
         {
@@ -224,8 +224,8 @@ public class NetworkControlCubeManager : NetworkBehaviour
 
         switch (op)
         {
-            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_CLEAR:
-            case SyncList<ControlCubeRecordedPathPoint>.Operation.OP_REMOVEAT:
+            case SyncList<ControllerRecordedPathPoint>.Operation.OP_CLEAR:
+            case SyncList<ControllerRecordedPathPoint>.Operation.OP_REMOVEAT:
                 controlCube.InitializeNetworkedPaths(recordedPathPoints);
                 break;
             default:

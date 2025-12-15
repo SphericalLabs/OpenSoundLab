@@ -56,6 +56,7 @@ public class SaveLoadInterface : MonoBehaviour
         instrumentPrefabs["XyloRoll"] = instrumentPrefabs[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
         instrumentPrefabs["Freeverb"] = instrumentPrefabs[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
         instrumentPrefabs["SequencerCV"] = instrumentPrefabs[DeviceType.Sequencer]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["ControlCube"] = instrumentPrefabs[DeviceType.Controller]; // legacy alias, remove when old saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -125,6 +126,7 @@ public class SaveLoadInterface : MonoBehaviour
         if (deviceType == "XyloRoll") return DeviceType.Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
         if (deviceType == "Freeverb") return DeviceType.Reverb; // legacy alias, remove when old Freeverb saves are dropped
         if (deviceType == "SequencerCV") return DeviceType.Sequencer; // legacy alias, remove when old saves are dropped
+        if (deviceType == "ControlCube") return DeviceType.Controller; // legacy alias, remove when old saves are dropped
         return deviceType;
     }
 
@@ -289,6 +291,7 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(OscillatorData))]
 [XmlInclude(typeof(SpeakerData))]
 [XmlInclude(typeof(CameraData))]
+[XmlInclude(typeof(ControllerData))]
 [XmlInclude(typeof(ControlCubeData))]
 [XmlInclude(typeof(DrumData))]
 [XmlInclude(typeof(NoiseData))]

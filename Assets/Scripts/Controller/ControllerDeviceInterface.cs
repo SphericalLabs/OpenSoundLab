@@ -1,46 +1,20 @@
-// This file is part of OpenSoundLab, which is based on SoundStage VR.
-//
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-//
-// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at
-// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-//
-// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-//
-//
-// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
-// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
-// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 using Mirror;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Xml.Serialization;
 
-public class ControlCubeDeviceInterface : deviceInterface
+public class ControllerDeviceInterface : deviceInterface
 {
     public Vector3 percent;
-    public ControlCubeSingleSignalGenerator[] signals;
+    public ControllerSingleSignalGenerator[] signals;
     public omniJack[] outputs;
-    public cubeZone cubeManip;
+    public ControllerZone cubeManip;
 
     public button recordButton;
     public button deleteButton;
-    public NetworkControlCubeManager networkManager;
-    public ControlCubePathRecorder pathRecorder = new ControlCubePathRecorder();
+    public NetworkControllerManager networkManager;
+    public ControllerPathRecorder pathRecorder = new ControllerPathRecorder();
 
     public UnityEvent onPercentChangedEvent;
 
@@ -100,18 +74,18 @@ public class ControlCubeDeviceInterface : deviceInterface
         }
     }
 
-    public void AssignNetworkManager(NetworkControlCubeManager manager)
+    public void AssignNetworkManager(NetworkControllerManager manager)
     {
         networkManager = manager;
         pathRecorder.NetworkManager = manager;
     }
 
-    public void InitializeNetworkedPaths(IList<ControlCubeRecordedPathPoint> list)
+    public void InitializeNetworkedPaths(IList<ControllerRecordedPathPoint> list)
     {
         pathRecorder.InitializeNetworkedPaths(list);
     }
 
-    public void ApplyNetworkPoint(ControlCubeRecordedPathPoint point)
+    public void ApplyNetworkPoint(ControllerRecordedPathPoint point)
     {
         pathRecorder.ApplyNetworkPoint(point);
     }
@@ -149,9 +123,9 @@ public class ControlCubeDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        ControlCubeData data = new ControlCubeData();
+        ControllerData data = new ControllerData();
 
-        data.deviceType = DeviceType.ControlCube;
+        data.deviceType = DeviceType.Controller;
         GetTransformData(data);
 
         data.jackOutID = new int[4];
@@ -165,7 +139,7 @@ public class ControlCubeDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        ControlCubeData data = d as ControlCubeData;
+        ControllerData data = d as ControllerData;
 
         base.Load(data, copyMode);
 
@@ -268,8 +242,15 @@ public class ControlCubeDeviceInterface : deviceInterface
     }
 }
 
-public class ControlCubeData : InstrumentData
+[XmlInclude(typeof(ControlCubeData))] // Legacy handling
+public class ControllerData : InstrumentData
 {
     public int[] jackOutID;
     public float[] dimensionValues;
+}
+
+[XmlType("ControlCubeData")]
+public class ControlCubeData : ControllerData
+{
+    // Legacy shell for old saves
 }

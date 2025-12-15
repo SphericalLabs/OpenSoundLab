@@ -27,15 +27,18 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Runtime.InteropServices;
 
-public class ControlCubeAudioSignalGenerator : signalGenerator
+public class ControllerSingleSignalGenerator : signalGenerator
 {
 
-    public Vector3 values = new Vector3(0, 0, 0);
-    public oscillatorSignalGenerator osc1;
+    public float value = .5f;
+
+    [DllImport("OSLNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
-        osc1.processBuffer(buffer, dspTime, channels);
+        SetArrayToSingleValue(buffer, buffer.Length, value);
     }
 }

@@ -136,6 +136,9 @@ public class xmlUpdate
                         case "Cameras":
                             serializer = new XmlSerializer(typeof(CameraData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
+                        case "Controllers":
+                            serializer = new XmlSerializer(typeof(ControllerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            break;
                         case "ControlCubes":
                             serializer = new XmlSerializer(typeof(ControlCubeData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
@@ -249,8 +252,9 @@ public class xmlUpdate
                         case "Cameras":
                             data[data.Count - 1].deviceType = DeviceType.Camera;
                             break;
+                        case "Controllers":
                         case "ControlCubes":
-                            data[data.Count - 1].deviceType = DeviceType.ControlCube;
+                            data[data.Count - 1].deviceType = DeviceType.Controller;
                             break;
                         case "VCAs":
                             data[data.Count - 1].deviceType = DeviceType.VCA;

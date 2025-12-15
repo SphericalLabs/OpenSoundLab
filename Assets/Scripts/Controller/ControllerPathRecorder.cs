@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ControlCubePathRecorder
+public class ControllerPathRecorder
 {
     public Material pathMaterial;
     public Vector3 pathExtents = new Vector3(0.3f, 0.3f, 0.3f);
@@ -52,8 +52,8 @@ public class ControlCubePathRecorder
 
     static Material fallbackMaterial;
 
-    NetworkControlCubeManager networkManager;
-    public NetworkControlCubeManager NetworkManager
+    NetworkControllerManager networkManager;
+    public NetworkControllerManager NetworkManager
     {
         get => networkManager;
         set => networkManager = value;
@@ -126,7 +126,7 @@ public class ControlCubePathRecorder
 
         path.points.Add(localPoint);
         UpdateLine(path);
-        SendPointToNetwork(path, localPoint, ControlCubePathPointMarker.Continue);
+        SendPointToNetwork(path, localPoint, ControllerPathPointMarker.Continue);
     }
 
     public void StopRecording()
@@ -168,7 +168,7 @@ public class ControlCubePathRecorder
         }
     }
 
-    public void InitializeNetworkedPaths(IList<ControlCubeRecordedPathPoint> points)
+    public void InitializeNetworkedPaths(IList<ControllerRecordedPathPoint> points)
     {
         ClearPaths(false);
         if (points == null)
@@ -182,7 +182,7 @@ public class ControlCubePathRecorder
         }
     }
 
-    public void ApplyNetworkPoint(ControlCubeRecordedPathPoint point)
+    public void ApplyNetworkPoint(ControllerRecordedPathPoint point)
     {
         PathData path = FindPath(point.pathId);
         if (path != null && path.isLocal)
@@ -192,7 +192,7 @@ public class ControlCubePathRecorder
 
         switch (point.marker)
         {
-            case ControlCubePathPointMarker.Start:
+            case ControllerPathPointMarker.Start:
                 if (path == null)
                 {
                     Color color = ResolveColor(point.color);
@@ -200,7 +200,7 @@ public class ControlCubePathRecorder
                 }
                 break;
 
-            case ControlCubePathPointMarker.Continue:
+            case ControllerPathPointMarker.Continue:
                 if (path == null)
                 {
                     Color color = ResolveColor(point.color);
@@ -209,7 +209,7 @@ public class ControlCubePathRecorder
                 AppendPoint(path, point.position);
                 break;
 
-            case ControlCubePathPointMarker.End:
+            case ControllerPathPointMarker.End:
                 if (path == null)
                 {
                     Color color = ResolveColor(point.color);
@@ -270,7 +270,7 @@ public class ControlCubePathRecorder
             path.id = nextLocalPathId--;
         }
 
-        SendPointToNetwork(path, startPoint, ControlCubePathPointMarker.Start);
+        SendPointToNetwork(path, startPoint, ControllerPathPointMarker.Start);
     }
 
     void FinishPath(PathData path, Vector3 endPoint)
@@ -286,18 +286,18 @@ public class ControlCubePathRecorder
             UpdateLine(path);
         }
 
-        SendPointToNetwork(path, endPoint, ControlCubePathPointMarker.End);
+        SendPointToNetwork(path, endPoint, ControllerPathPointMarker.End);
         currentPathIndex = -1;
     }
 
-    void SendPointToNetwork(PathData path, Vector3 point, ControlCubePathPointMarker marker)
+    void SendPointToNetwork(PathData path, Vector3 point, ControllerPathPointMarker marker)
     {
         if (networkManager == null || path == null)
         {
             return;
         }
 
-        if (marker == ControlCubePathPointMarker.Start)
+        if (marker == ControllerPathPointMarker.Start)
         {
             BeginNetworkPath(path, point);
             return;
@@ -306,7 +306,7 @@ public class ControlCubePathRecorder
         if (path.waitingForId)
         {
             path.pendingNetworkPoints.Add(point);
-            if (marker == ControlCubePathPointMarker.End)
+            if (marker == ControllerPathPointMarker.End)
             {
                 path.pendingEnd = true;
                 path.pendingEndPoint = point;
@@ -319,7 +319,7 @@ public class ControlCubePathRecorder
             return;
         }
 
-        if (marker == ControlCubePathPointMarker.Continue)
+        if (marker == ControllerPathPointMarker.Continue)
         {
             networkManager.CmdAppendPathPoint(path.id, point);
         }
@@ -469,7 +469,7 @@ public class ControlCubePathRecorder
             }
 
             fallbackMaterial = new Material(shader);
-            fallbackMaterial.name = "ControlCubePathFallback";
+            fallbackMaterial.name = "ControllerPathFallback";
         }
 
         return fallbackMaterial;

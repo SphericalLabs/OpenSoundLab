@@ -142,7 +142,7 @@ public class menuItem : manipObject
         else if (item == DeviceType.MIDIOUT) label.text = "MIDI Out";
         else if (item == DeviceType.Sequencer) label.text = "Sequencer";
         else if (item == DeviceType.Timeline) label.text = "Sequencer III";
-        else if (item == DeviceType.ControlCube) label.text = "ControlCube";
+        else if (item == DeviceType.Controller) label.text = "Controller";
         else if (item == DeviceType.Microphone) label.text = "Mic";
         else if (item == DeviceType.SampleHold) label.text = "S&H";
         else if (item == DeviceType.Reverb) label.text = "Reverb";
@@ -295,7 +295,7 @@ public class menuItem : manipObject
         //{
         //    g.transform.localPosition = new Vector3(.0185f, 0, .02f);
         //}
-        else if (item == DeviceType.ControlCube) g.transform.localPosition = new Vector3(0, -.01f, .024f);
+        else if (item == DeviceType.Controller) g.transform.localPosition = new Vector3(0, -.01f, .024f);
         else if (item == DeviceType.Drum)
         {
             g.transform.localPosition = new Vector3(0, 0, .026f);
@@ -313,7 +313,7 @@ public class menuItem : manipObject
     }
 
 
-    
+
 
     IEnumerator appearRoutine(bool on)
     {
@@ -373,7 +373,7 @@ public class menuItem : manipObject
                 localPositionOffset = new Vector3(.1f, .02f, .15f);
                 localRotationOffset = new Vector3(0, 180, 0);
             }
-            else if (item == DeviceType.ControlCube)
+            else if (item == DeviceType.Controller)
             {
                 localPositionOffset = new Vector3(0f, 0f, -0.15f);
             }
@@ -420,7 +420,7 @@ public class menuItem : manipObject
                 g.transform.Rotate(0, 180, 0, Space.Self);
             }
 
-            else if (item == DeviceType.ControlCube)
+            else if (item == DeviceType.Controller)
                 g.transform.Translate(0f, 0f, -0.15f, Space.Self);
 
             else if (item == DeviceType.Xylophone)
@@ -575,7 +575,8 @@ public class DeviceType
     public static readonly DeviceType XyloRoll = Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
     public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 4);
     public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 3);
-    public static readonly DeviceType ControlCube = new DeviceType("ControlCube", DeviceCategory.Interface, 2);
+    public static readonly DeviceType Controller = new DeviceType("Controller", DeviceCategory.Interface, 2);
+    public static readonly DeviceType ControlCube = Controller; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType TouchPad = new DeviceType("TouchPad", DeviceCategory.Interface, 1);
 
     // Various

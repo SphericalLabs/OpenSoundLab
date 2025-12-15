@@ -69,7 +69,7 @@ public class exampleManager : MonoBehaviour
         }
 
         items[4].Setup(this, DeviceType.Mixer, "mixerExample", "Mixer");
-        items[5].Setup(this, DeviceType.ControlCube, "cubeExample", "Cube");
+        items[5].Setup(this, DeviceType.Controller, "cubeExample", "Controller");
         items[6].Setup(this, DeviceType.Maracas, "maracaExample", "Maraca");
         items[7].Setup(this, DeviceType.Filter, "filterExample", "Filter");
         items[8].Setup(this, DeviceType.Drum, "complexDrumExample", "Drumkit");
