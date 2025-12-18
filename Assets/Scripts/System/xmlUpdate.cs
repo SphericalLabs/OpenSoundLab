@@ -106,9 +106,11 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "MultiMixes":
+                        case "MixerOnes":
                             serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "MultiSplits":
+                        case "Splitters":
                             serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Recorders":
@@ -227,6 +229,14 @@ public class xmlUpdate
                             break;
                         case "Drums":
                             data[data.Count - 1].deviceType = DeviceType.Drum;
+                            break;
+                        case "MultiMixes":
+                        case "MixerOnes":
+                            data[data.Count - 1].deviceType = DeviceType.MixerOne;
+                            break;
+                        case "MultiSplits":
+                        case "Splitters":
+                            data[data.Count - 1].deviceType = DeviceType.Splitter;
                             break;
                         case "Recorders":
                             data[data.Count - 1].deviceType = DeviceType.Recorder;

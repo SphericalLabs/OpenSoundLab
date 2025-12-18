@@ -32,6 +32,15 @@ using System.Linq;
 using System;
 using UnityEngine.Events;
 
+/// <summary>
+/// This script handles both "MixerOne" and "Splitter" devices.
+///
+/// SHARED STRUCTURE DESIGN:
+/// To minimize code duplication, multiple user-facing devices (defined in DeviceType)
+/// share this implementation and the MultipleData structure.
+/// They are distinguished by the 'isSplitter' flag (overwritten by the prefab inspector config),
+/// which determines signal flow, labels, and icons.
+/// </summary>
 public class multipleDeviceInterface : deviceInterface
 {
 

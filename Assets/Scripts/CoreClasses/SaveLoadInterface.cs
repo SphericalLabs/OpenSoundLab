@@ -58,6 +58,8 @@ public class SaveLoadInterface : MonoBehaviour
         instrumentPrefabs["SequencerCV"] = instrumentPrefabs[DeviceType.Sequencer]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["ControlCube"] = instrumentPrefabs[DeviceType.Controller]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["Mixer"] = instrumentPrefabs[DeviceType.MixerTwo]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["MultiMix"] = instrumentPrefabs[DeviceType.MixerOne]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["MultiSplit"] = instrumentPrefabs[DeviceType.Splitter]; // legacy alias, remove when old saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -129,6 +131,8 @@ public class SaveLoadInterface : MonoBehaviour
         if (deviceType == "SequencerCV") return DeviceType.Sequencer; // legacy alias, remove when old saves are dropped
         if (deviceType == "ControlCube") return DeviceType.Controller; // legacy alias, remove when old saves are dropped
         if (deviceType == "Mixer") return DeviceType.MixerTwo; // legacy alias, remove when old saves are dropped
+        if (deviceType == "MultiMix") return DeviceType.MixerOne; // legacy alias, remove when old saves are dropped
+        if (deviceType == "MultiSplit") return DeviceType.Splitter; // legacy alias, remove when old saves are dropped
         return deviceType;
     }
 
