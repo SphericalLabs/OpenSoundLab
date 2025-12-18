@@ -30,10 +30,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class mixerDeviceInterface : deviceInterface
+public class mixerTwoDeviceInterface : deviceInterface
 {
 
-    mixer signal;
+    mixerTwo signal;
     public GameObject mixerPrefab;
     public Transform stretchSlider, speaker, output, lengthSlider;
 
@@ -52,7 +52,7 @@ public class mixerDeviceInterface : deviceInterface
     public override void Awake()
     {
         base.Awake();
-        signal = GetComponent<mixer>();
+        signal = GetComponent<mixerTwo>();
 
         count = calculateCount(stretchSlider.localPosition.x);
 
@@ -186,8 +186,8 @@ public class mixerDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        MixerData data = new MixerData();
-        data.deviceType = DeviceType.Mixer;
+        MixerTwoData data = new MixerTwoData();
+        data.deviceType = DeviceType.MixerTwo;
         data.jackOutID = output.GetInstanceID();
 
         GetTransformData(data);
@@ -209,7 +209,7 @@ public class mixerDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        MixerData data = d as MixerData;
+        MixerTwoData data = d as MixerTwoData;
         base.Load(data, copyMode);
         output.GetComponent<omniJack>().SetID(data.jackOutID, copyMode);
 
@@ -233,10 +233,13 @@ public class mixerDeviceInterface : deviceInterface
     }
 }
 
-public class MixerData : InstrumentData
+public class MixerTwoData : InstrumentData
 {
     public int[] jackInID;
     public float[] sliders;
     public int jackOutID;
     public float height;
 }
+
+[System.Xml.Serialization.XmlType("MixerData")]
+public class MixerData : MixerTwoData { }

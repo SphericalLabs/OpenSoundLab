@@ -118,7 +118,8 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(LooperData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Mixers":
-                            serializer = new XmlSerializer(typeof(MixerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "MixerTwos":
+                            serializer = new XmlSerializer(typeof(MixerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Maracas":
                             serializer = new XmlSerializer(typeof(MaracaData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -234,7 +235,8 @@ public class xmlUpdate
                             data[data.Count - 1].deviceType = DeviceType.Looper;
                             break;
                         case "Mixers":
-                            data[data.Count - 1].deviceType = DeviceType.Mixer;
+                        case "MixerTwos":
+                            data[data.Count - 1].deviceType = DeviceType.MixerTwo;
                             break;
                         case "Maracas":
                             data[data.Count - 1].deviceType = DeviceType.Maracas;

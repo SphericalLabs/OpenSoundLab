@@ -57,6 +57,7 @@ public class SaveLoadInterface : MonoBehaviour
         instrumentPrefabs["Freeverb"] = instrumentPrefabs[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
         instrumentPrefabs["SequencerCV"] = instrumentPrefabs[DeviceType.Sequencer]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["ControlCube"] = instrumentPrefabs[DeviceType.Controller]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["Mixer"] = instrumentPrefabs[DeviceType.MixerTwo]; // legacy alias, remove when old saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -127,6 +128,7 @@ public class SaveLoadInterface : MonoBehaviour
         if (deviceType == "Freeverb") return DeviceType.Reverb; // legacy alias, remove when old Freeverb saves are dropped
         if (deviceType == "SequencerCV") return DeviceType.Sequencer; // legacy alias, remove when old saves are dropped
         if (deviceType == "ControlCube") return DeviceType.Controller; // legacy alias, remove when old saves are dropped
+        if (deviceType == "Mixer") return DeviceType.MixerTwo; // legacy alias, remove when old saves are dropped
         return deviceType;
     }
 
@@ -302,6 +304,7 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(vcaData))]
 [XmlInclude(typeof(ReverbData))]
 [XmlInclude(typeof(TapeGroupData))]
+[XmlInclude(typeof(MixerTwoData))]
 [XmlInclude(typeof(MixerData))]
 [XmlInclude(typeof(MultipleData))]
 

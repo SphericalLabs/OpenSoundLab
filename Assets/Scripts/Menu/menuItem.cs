@@ -150,6 +150,7 @@ public class menuItem : manipObject
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
         else if (item == DeviceType.Sampler) label.text = "Sampler";
         else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
+        else if (item == DeviceType.MixerTwo) label.text = "Mixer II";
 
 
         label.gameObject.SetActive(true);
@@ -301,7 +302,7 @@ public class menuItem : manipObject
             g.transform.localPosition = new Vector3(0, 0, .026f);
             g.transform.localRotation = Quaternion.Euler(40, 0, 0);
         }
-        else if (item == DeviceType.Mixer)
+        else if (item == DeviceType.MixerTwo)
         {
             g.transform.localPosition = new Vector3(0.014f, 0, .02f);
             g.transform.localRotation = Quaternion.Euler(60, 0, 0);
@@ -382,7 +383,7 @@ public class menuItem : manipObject
                 localRotationOffset = new Vector3(90, 0, 0);
                 localPositionOffset = new Vector3(0.15f, 0f, -0.05f);
             }
-            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.Mixer)
+            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.MixerTwo)
             {
                 localRotationOffset = new Vector3(90, 0, 0);
             }
@@ -429,7 +430,7 @@ public class menuItem : manipObject
                 g.transform.Translate(0.15f, 0f, -0.05f, Space.Self);
             }
 
-            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.Mixer)
+            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.MixerTwo)
                 g.transform.Rotate(90, 0, 0, Space.Self);
 
 
@@ -563,7 +564,8 @@ public class DeviceType
     public static readonly DeviceType VCA = new DeviceType("VCA", DeviceCategory.ModulationProcessor, 1);
 
     // Mixing
-    public static readonly DeviceType Mixer = new DeviceType("Mixer", DeviceCategory.Mixing, 4);
+    public static readonly DeviceType MixerTwo = new DeviceType("MixerTwo", DeviceCategory.Mixing, 4);
+    public static readonly DeviceType Mixer = MixerTwo; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType Gain = new DeviceType("Gain", DeviceCategory.Mixing, 3);
     public static readonly DeviceType MultiMix = new DeviceType("MultiMix", DeviceCategory.Mixing, 2);
     public static readonly DeviceType MultiSplit = new DeviceType("MultiSplit", DeviceCategory.Mixing, 1);

@@ -30,7 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-public class mixer : signalGenerator
+public class mixerTwo : signalGenerator
 {
     public List<signalGenerator> incomingSignals = new List<signalGenerator>();
 
