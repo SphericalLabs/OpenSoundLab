@@ -148,7 +148,7 @@ public class menuItem : manipObject
         else if (item == DeviceType.Reverb) label.text = "Reverb";
         else if (item == DeviceType.DC) label.text = "DC";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
-        else if (item == DeviceType.Sampler) label.text = "Sampler";
+        else if (item == DeviceType.Sampler) label.text = "Sampler I";
         else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
         else if (item == DeviceType.MixerTwo) label.text = "Mixer II";
         else if (item == DeviceType.MixerOne) label.text = "Mixer I";
