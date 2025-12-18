@@ -153,6 +153,7 @@ public class menuItem : manipObject
         else if (item == DeviceType.MixerTwo) label.text = "Mixer II";
         else if (item == DeviceType.MixerOne) label.text = "Mixer I";
         else if (item == DeviceType.Splitter) label.text = "Splitter";
+        else if (item == DeviceType.Button) label.text = "Button";
 
 
         label.gameObject.SetActive(true);
@@ -583,7 +584,8 @@ public class DeviceType
     public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 3);
     public static readonly DeviceType Controller = new DeviceType("Controller", DeviceCategory.Interface, 2);
     public static readonly DeviceType ControlCube = Controller; // legacy alias, remove when old saves are dropped
-    public static readonly DeviceType TouchPad = new DeviceType("TouchPad", DeviceCategory.Interface, 1);
+    public static readonly DeviceType Button = new DeviceType("Button", DeviceCategory.Interface, 1);
+    public static readonly DeviceType TouchPad = Button; // legacy alias, remove when old saves are dropped
 
     // Various
     public static readonly DeviceType Pano = new DeviceType("Pano", DeviceCategory.Various, 7);

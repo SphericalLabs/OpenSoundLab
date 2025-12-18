@@ -29,7 +29,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class touchpadSignalGenerator : signalGenerator
+public class buttonSignalGenerator : signalGenerator
 {
     public bool signalOn = false;
 

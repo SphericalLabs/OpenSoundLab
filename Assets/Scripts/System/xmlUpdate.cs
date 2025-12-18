@@ -131,7 +131,8 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(XylophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "TouchPads":
-                            serializer = new XmlSerializer(typeof(TouchPadData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Buttons":
+                            serializer = new XmlSerializer(typeof(ButtonData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Microphones":
                             serializer = new XmlSerializer(typeof(MicrophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -256,7 +257,8 @@ public class xmlUpdate
                             data[data.Count - 1].deviceType = DeviceType.Xylophone;
                             break;
                         case "TouchPads":
-                            data[data.Count - 1].deviceType = DeviceType.TouchPad;
+                        case "Buttons":
+                            data[data.Count - 1].deviceType = DeviceType.Button;
                             break;
                         case "Microphones":
                             data[data.Count - 1].deviceType = DeviceType.Microphone;

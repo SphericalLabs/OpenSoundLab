@@ -27,11 +27,12 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Xml.Serialization;
 
-public class touchpadDeviceInterface : deviceInterface
+public class buttonDeviceInterface : deviceInterface
 {
 
-    touchpadSignalGenerator pad;
+    buttonSignalGenerator pad;
     omniJack output;
     basicSwitch isTrigger;
     button touchPad;
@@ -47,7 +48,7 @@ public class touchpadDeviceInterface : deviceInterface
     public override void Awake()
     {
         base.Awake();
-        pad = GetComponent<touchpadSignalGenerator>();
+        pad = GetComponent<buttonSignalGenerator>();
         output = GetComponentInChildren<omniJack>();
         isTrigger = GetComponentInChildren<basicSwitch>();
         touchPad = GetComponentInChildren<button>();
@@ -71,8 +72,8 @@ public class touchpadDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        TouchPadData data = new TouchPadData();
-        data.deviceType = DeviceType.TouchPad;
+        ButtonData data = new ButtonData();
+        data.deviceType = DeviceType.Button;
         GetTransformData(data);
 
         data.jackOutID = output.transform.GetInstanceID();
@@ -82,15 +83,21 @@ public class touchpadDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        TouchPadData data = d as TouchPadData;
+        ButtonData data = d as ButtonData;
         base.Load(data, copyMode);
         output.SetID(data.jackOutID, copyMode);
         isTrigger.setSwitch(data.isTrigger);
     }
 }
 
-public class TouchPadData : InstrumentData
+public class ButtonData : InstrumentData
 {
     public int jackOutID;
     public bool isTrigger;
+}
+
+[XmlType("TouchPadData")]
+public class TouchPadData : ButtonData
+{
+    // legacy alias, remove when old saves are dropped
 }

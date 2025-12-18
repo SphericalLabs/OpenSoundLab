@@ -60,6 +60,7 @@ public class SaveLoadInterface : MonoBehaviour
         instrumentPrefabs["Mixer"] = instrumentPrefabs[DeviceType.MixerTwo]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["MultiMix"] = instrumentPrefabs[DeviceType.MixerOne]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["MultiSplit"] = instrumentPrefabs[DeviceType.Splitter]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["TouchPad"] = instrumentPrefabs[DeviceType.Button]; // legacy alias, remove when old saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -133,6 +134,7 @@ public class SaveLoadInterface : MonoBehaviour
         if (deviceType == "Mixer") return DeviceType.MixerTwo; // legacy alias, remove when old saves are dropped
         if (deviceType == "MultiMix") return DeviceType.MixerOne; // legacy alias, remove when old saves are dropped
         if (deviceType == "MultiSplit") return DeviceType.Splitter; // legacy alias, remove when old saves are dropped
+        if (deviceType == "TouchPad") return DeviceType.Button; // legacy alias, remove when old saves are dropped
         return deviceType;
     }
 
@@ -304,6 +306,7 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(FilterData))]
 [XmlInclude(typeof(MaracaData))]
 [XmlInclude(typeof(MicrophoneData))]
+[XmlInclude(typeof(ButtonData))]
 [XmlInclude(typeof(TouchPadData))]
 [XmlInclude(typeof(vcaData))]
 [XmlInclude(typeof(ReverbData))]
