@@ -27,8 +27,9 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Xml.Serialization;
 
-public class DCDeviceInterface : deviceInterface
+public class KnobDeviceInterface : deviceInterface
 {
     public omniJack input, output;
     //basicSwitch isBipolar;
@@ -36,7 +37,7 @@ public class DCDeviceInterface : deviceInterface
     //AudioSource speaker;
     public TextMesh valueDisplay;
 
-    DCSignalGenerator signal;
+    KnobSignalGenerator signal;
 
     public override void Awake()
     {
@@ -44,7 +45,7 @@ public class DCDeviceInterface : deviceInterface
         //isBipolar = GetComponentInChildren<basicSwitch>();
         attenDial = GetComponentInChildren<dial>();
         //speaker = GetComponentInChildren<AudioSource>();
-        signal = GetComponent<DCSignalGenerator>();
+        signal = GetComponent<KnobSignalGenerator>();
 
         //speaker.volume = signal.incoming == null ? 0f : 1f;
         //attenDial.defaultPercent = isBipolar.switchVal ? 0.5f : 0f;
@@ -70,8 +71,8 @@ public class DCDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        DCData data = new DCData();
-        data.deviceType = DeviceType.DC;
+        KnobData data = new KnobData();
+        data.deviceType = DeviceType.Knob;
         GetTransformData(data);
 
         //data.isBipolar = isBipolar.switchVal;
@@ -85,7 +86,7 @@ public class DCDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        DCData data = d as DCData;
+        KnobData data = d as KnobData;
         base.Load(data, true);
 
         input.SetID(data.jackInID, copyMode);
@@ -97,11 +98,17 @@ public class DCDeviceInterface : deviceInterface
     }
 }
 
-public class DCData : InstrumentData
+public class KnobData : InstrumentData
 {
     //public bool isBipolar;
     public float dial;
 
     public int jackOutID;
     public int jackInID;
+}
+
+[XmlType("DCData")]
+public class DCData : KnobData
+{
+    // legacy alias, remove when old saves are dropped
 }

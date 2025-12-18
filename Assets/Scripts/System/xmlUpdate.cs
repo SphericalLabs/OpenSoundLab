@@ -51,7 +51,8 @@ public class xmlUpdate
                     switch (xmlNode.Name)
                     {
                         case "DCs":
-                            serializer = new XmlSerializer(typeof(DCData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Knobs":
+                            serializer = new XmlSerializer(typeof(KnobData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Tutorialss":
                             serializer = new XmlSerializer(typeof(TutorialsData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -182,7 +183,8 @@ public class xmlUpdate
                     switch (xmlNode.Name)
                     {
                         case "DCs":
-                            data[data.Count - 1].deviceType = DeviceType.DC;
+                        case "Knobs":
+                            data[data.Count - 1].deviceType = DeviceType.Knob;
                             break;
                         case "Tutorialss":
                             data[data.Count - 1].deviceType = DeviceType.Tutorials;

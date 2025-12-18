@@ -29,7 +29,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class DCSignalGenerator : signalGenerator
+public class KnobSignalGenerator : signalGenerator
 {
 
     public signalGenerator incoming;
