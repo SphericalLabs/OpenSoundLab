@@ -4,17 +4,17 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Xml.Serialization;
 
-public class ControllerDeviceInterface : deviceInterface
+public class controllerDeviceInterface : deviceInterface
 {
     public Vector3 percent;
-    public ControllerSingleSignalGenerator[] signals;
+    public controllerSingleSignalGenerator[] signals;
     public omniJack[] outputs;
-    public ControllerZone cubeManip;
+    public controllerZone cubeManip;
 
     public button recordButton;
     public button deleteButton;
     public NetworkControllerManager networkManager;
-    public ControllerPathRecorder pathRecorder = new ControllerPathRecorder();
+    public controllerPathRecorder pathRecorder = new controllerPathRecorder();
 
     public UnityEvent onPercentChangedEvent;
 

@@ -55,7 +55,7 @@ public struct ControllerRecordedPathPoint
 
 public class NetworkControllerManager : NetworkBehaviour
 {
-    public ControllerDeviceInterface controlCube;
+    public controllerDeviceInterface controlCube;
 
     [SyncVar(hook = nameof(OnSyncPercentChanged))]
     public Vector3 syncPercent;

@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ControllerPathRecorder
+public class controllerPathRecorder
 {
     public Material pathMaterial;
     public Vector3 pathExtents = new Vector3(0.3f, 0.3f, 0.3f);
