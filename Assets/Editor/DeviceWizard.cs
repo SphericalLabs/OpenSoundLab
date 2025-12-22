@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Mirror;
 using UnityEditor.Compilation;
+using UnityEditorInternal;
 
 [InitializeOnLoad]
 public class DeviceWizard : EditorWindow
@@ -166,6 +167,7 @@ public class {generatorName} : signalGenerator
     {
         string prefabFolder = "Assets/Resources/Prefabs";
         string menuFolder = "Assets/Resources/MenuPrefabs";
+        string templatePath = "Assets/Resources/Prefabs/Template.prefab";
 
         if (!Directory.Exists(prefabFolder)) Directory.CreateDirectory(prefabFolder);
         if (!Directory.Exists(menuFolder)) Directory.CreateDirectory(menuFolder);
@@ -173,46 +175,52 @@ public class {generatorName} : signalGenerator
         string basePrefabPath = Path.Combine(prefabFolder, name + ".prefab");
         string menuPrefabPath = Path.Combine(menuFolder, name + "_Menu.prefab");
 
-        // 1. Create/Update Base Prefab
-        GameObject baseObj = new GameObject(name);
+        // 1. Copy Template to base path
+        if (!AssetDatabase.CopyAsset(templatePath, basePrefabPath))
+        {
+            Debug.LogError($"Failed to copy template from {templatePath} to {basePrefabPath}");
+            return;
+        }
 
-        // ADD COMPONENTS IN ORDER (Interface/Generator FIRST as requested)
-        System.Type interfaceType = GetTypeByName(interfaceName);
-        System.Type generatorType = GetTypeByName(generatorName);
+        // 2. Modify the copied prefab
+        GameObject baseObj = PrefabUtility.LoadPrefabContents(basePrefabPath);
+        if (baseObj != null)
+        {
+            baseObj.name = name;
 
-        if (generatorType != null) baseObj.AddComponent(generatorType);
-        if (interfaceType != null) baseObj.AddComponent(interfaceType);
-        else Debug.LogError($"Could not find type {interfaceName}. Make sure it compiled correctly.");
+            System.Type interfaceType = GetTypeByName(interfaceName);
+            System.Type generatorType = GetTypeByName(generatorName);
 
-        // Networking
-        baseObj.AddComponent<NetworkIdentity>();
-        baseObj.AddComponent<NetworkAuthorityHandle>();
+            Component interfaceComp = null;
+            Component generatorComp = null;
 
-        // NetworkTransformUnreliable (Mirror) with cached Oscillator values
-        var netTrans = baseObj.AddComponent<NetworkTransformUnreliable>();
-        netTrans.syncDirection = SyncDirection.ServerToClient; // Cached from Oscillator.prefab
-        netTrans.syncPosition = true;
-        netTrans.syncRotation = true;
-        netTrans.syncScale = true;
-        netTrans.onlySyncOnChange = true;
-        netTrans.compressRotation = true;
-        netTrans.interpolatePosition = true;
-        netTrans.interpolateRotation = true;
-        netTrans.interpolateScale = true;
-        netTrans.bufferResetMultiplier = 3;
-        netTrans.changedDetection = true;
-        netTrans.positionSensitivity = 0.002f;
-        netTrans.rotationSensitivity = 0.01f;
-        netTrans.scaleSensitivity = 0.01f;
+            if (generatorType != null) generatorComp = baseObj.AddComponent(generatorType);
+            if (interfaceType != null) interfaceComp = baseObj.AddComponent(interfaceType);
+            else Debug.LogError($"Could not find type {interfaceName}. Make sure it compiled correctly.");
 
-        GameObject basePrefab = PrefabUtility.SaveAsPrefabAsset(baseObj, basePrefabPath);
+            // Move to Top
+            if (interfaceComp != null) MoveToTop(interfaceComp);
+            if (generatorComp != null) MoveToTop(generatorComp);
 
-        // 2. Create Menu Variant
-        GameObject variantObj = (GameObject)PrefabUtility.InstantiatePrefab(basePrefab);
-        PrefabUtility.SaveAsPrefabAsset(variantObj, menuPrefabPath);
+            PrefabUtility.SaveAsPrefabAsset(baseObj, basePrefabPath);
+            PrefabUtility.UnloadPrefabContents(baseObj);
+        }
 
-        DestroyImmediate(baseObj);
-        DestroyImmediate(variantObj);
+        // 3. Create Menu copy
+        AssetDatabase.CopyAsset(basePrefabPath, menuPrefabPath);
+
+        AssetDatabase.Refresh();
+    }
+
+    private static void MoveToTop(Component comp)
+    {
+        if (comp == null) return;
+        // ComponentUtility does not have a "MoveToTop", so we loop MoveComponentUp
+        // Transform is always 0, so we stop before it (or try until it fails)
+        for (int i = 0; i < 20; i++) // Arbitrary limit, usually enough
+        {
+            if (!ComponentUtility.MoveComponentUp(comp)) break;
+        }
     }
 
     private void InjectIntoDeviceType(string name, DeviceCategory cat)
