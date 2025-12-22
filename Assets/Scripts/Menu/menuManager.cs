@@ -39,7 +39,6 @@ public class menuManager : MonoBehaviour
     public GameObject rootNode;
     public GameObject trashNode;
     public GameObject settingsNode;
-    public GameObject metronomeNode;
     public GameObject performanceNode;
 
     public List<GameObject> menuItems;
@@ -80,9 +79,6 @@ public class menuManager : MonoBehaviour
 
     void Start()
     {
-        // todo: make metronome a normal object then you don't need these visibility and init hacks
-        Activate(true, transform); // bugfix for hidden metronome not networking properly
-        StartCoroutine(delayedActivate(false, transform, 0.2f)); // closing it right away, so that nobody is irritated
     }
 
     IEnumerator delayedActivate(bool on, Transform trans, float sec)
@@ -180,9 +176,6 @@ public class menuManager : MonoBehaviour
         refObjects["XyloRoll"] = refObjects[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
         refObjects["Freeverb"] = refObjects[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
 
-        metronomeNode.transform.localPosition = new Vector3(0.345f, 0.012f + 0.10f, 0.107f);
-        metronomeNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);
-
         performanceNode.transform.localPosition = new Vector3(0.329f, 0.012f - 0.12f + 0.10f, 0.107f);
         performanceNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);
 
@@ -220,7 +213,6 @@ public class menuManager : MonoBehaviour
             rootNode.SetActive(true);
             trashNode.SetActive(true);
             settingsNode.SetActive(true);
-            metronomeNode.SetActive(true);
             for (int i = 0; i < menuItems.Count; i++)
             {
                 menuItemScripts[i].Appear(on);
@@ -237,7 +229,6 @@ public class menuManager : MonoBehaviour
         {
             trashNode.SetActive(false);
             settingsNode.SetActive(false);
-            metronomeNode.SetActive(false);
             for (int i = 0; i < menuItems.Count; i++)
             {
                 menuItemScripts[i].Appear(on);

@@ -67,23 +67,13 @@ public class masterControl : MonoBehaviour
     public UnityEngine.UI.Toggle muteEnvToggle;
 
     public float bpm = 120;
-    public float curCycle = 0;
-
-    public double measurePeriod = 4;
 
     public int curMic = 0;
     public string currentScene = "";
 
-    public delegate void BeatUpdateEvent(float t);
-    public BeatUpdateEvent beatUpdateEvent;
-
-    public delegate void BeatResetEvent();
-    public BeatResetEvent beatResetEvent;
 
     public bool showEnvironment = true;
     double _sampleDuration;
-    double _measurePhase;
-    public double MeasurePhase { get => _measurePhase; set => _measurePhase = value; }
 
     public float glowVal = 1;
 
@@ -116,9 +106,6 @@ public class masterControl : MonoBehaviour
         float f;
         bool success = float.TryParse(Application.version, out f);
         if (success) versionNumber = f;
-
-        _measurePhase = 0;
-        _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
 
         var configuration = AudioSettings.GetConfiguration();
 
@@ -199,9 +186,6 @@ public class masterControl : MonoBehaviour
         }
 #endif
 
-        beatUpdateEvent += beatUpdateEventLocal;
-        beatResetEvent += beatResetEventLocal;
-
         GetComponent<sampleManager>().Init();
 
         recorder = GetComponentInChildren<masterBusRecorder>();
@@ -274,20 +258,10 @@ public class masterControl : MonoBehaviour
     }
 
 
-    int lastBeat = -1;
-
     void Update()
     {
-
-        // metronome plays bound to screen updates!
-        // Prone to jitter and CPU hanging!
-        // Do not trust the metronome! Build your own one!
-        // Other sequencers avoid Update calls, continue even if Update call stack hangs
-        if (lastBeat != Mathf.FloorToInt(curCycle * 8f))
-        {
-            //metronomeClick.Play();
-            lastBeat = Mathf.FloorToInt(curCycle * 8f);
-        }
+        // Local metronome visual click loop removed.
+        // Devices now handle their own timing.
 
 
 
@@ -345,7 +319,6 @@ public class masterControl : MonoBehaviour
             }
         }
 
-
         if (metro != null)
         {
             if (metro.volumepercent != metro.volumeDial.percent)
@@ -353,25 +326,13 @@ public class masterControl : MonoBehaviour
                 metro.volumepercent = metro.volumeDial.percent;
                 masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
             }
-            //if (metro.bpmpercent != metro.bpmDial.percent) metro.readBpmDialAndBroadcast();
         }
-
     }
 
     OcclusionShadersMode defaultOcclusionMode = OcclusionShadersMode.SoftOcclusion;
 
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
-        if (!beatUpdateRunning) return;
-        double dspTime = AudioSettings.dspTime;
-
-        for (int i = 0; i < buffer.Length; i += channels)
-        {
-            beatUpdateEvent(curCycle);
-            _measurePhase += _sampleDuration;
-            if (_measurePhase > measurePeriod) _measurePhase -= measurePeriod;
-            curCycle = (float)(_measurePhase / measurePeriod);
-        }
     }
 
     //public void resetMasterClockDSPTime(bool wasChanged){
@@ -666,27 +627,9 @@ public class masterControl : MonoBehaviour
         else backgroundAudio.volume = .02f;
     }
 
-    void beatUpdateEventLocal(float t) { }
-    void beatResetEventLocal() { }
-
     public void setBPM(float b)
     {
         bpm = (float)MathF.Round(b, 1);
-        measurePeriod = 480f / bpm;
-        _measurePhase = curCycle * measurePeriod;
-    }
-
-    public void resetClock()
-    {
-        _measurePhase = 0;
-        curCycle = 0;
-        beatResetEvent();
-    }
-
-    bool beatUpdateRunning = true;
-    public void toggleBeatUpdate(bool on)
-    {
-        beatUpdateRunning = on;
     }
 
     bool _startupSequenceExecuted;

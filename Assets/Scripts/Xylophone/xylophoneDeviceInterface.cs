@@ -66,14 +66,12 @@ public class xylophoneDeviceInterface : deviceInterface
 
     bool inputVal = true;
 
-    beatTracker _beatManager;
 
     keyState[] keyStates = new keyState[24];
 
     public override void Awake()
     {
         base.Awake();
-        _beatManager = ScriptableObject.CreateInstance<beatTracker>();
         sticks = GetComponentsInChildren<drumstick>();
         signal = GetComponent<xylophoneSignalGenerator>();
         _adsrInterface = GetComponentInChildren<adsrInterface>();
@@ -91,11 +89,7 @@ public class xylophoneDeviceInterface : deviceInterface
 
     void Start()
     {
-        _beatManager.setTriggers(arpStep, resetArp);
-        _beatManager.updateBeat(arpSpeed + 2);
-
         enableSequencer(false);
-
     }
 
     void SpawnKeys()
@@ -332,7 +326,7 @@ public class xylophoneDeviceInterface : deviceInterface
     {
         if (arpSpeed == n) return;
         arpSpeed = n;
-        _beatManager.updateBeat(arpSpeed + 2);
+        // _beatManager.updateBeat(arpSpeed + 2);
     }
 
     public void updateArpPattern(int n)
@@ -414,7 +408,6 @@ public class xylophoneDeviceInterface : deviceInterface
 
     void OnDestroy()
     {
-        Destroy(_beatManager);
         for (int i = 0; i < sticks.Length; i++) Destroy(sticks[i].gameObject);
         StopAllCoroutines();
     }

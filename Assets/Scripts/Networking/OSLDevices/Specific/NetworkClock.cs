@@ -14,7 +14,7 @@
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// You may not use this file except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -25,49 +25,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class NetworkMetronome : NetworkSyncListener
+public class NetworkClock : NetworkSyncListener
 {
-    [SerializeField] private button startButton;
-    [SerializeField] private button rewindButton;
-    [SerializeField] private metronome metro;
+    private clockDeviceInterface clockInterface;
+
+    private void Awake()
+    {
+        clockInterface = GetComponent<clockDeviceInterface>();
+    }
 
     private void Start()
     {
-        startButton.onStartGrabEvents.AddListener(OnButtonPress);
-        rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
-
         GetComponent<NetworkDials>().dialValues.Callback += OnBpmDialUpdated;
 
-    }
-
-    void OnBpmDialUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
-    {
-        switch (op)
-        {
-            case SyncList<float>.Operation.OP_ADD:
-                break;
-            case SyncList<float>.Operation.OP_INSERT:
-                break;
-            case SyncList<float>.Operation.OP_REMOVEAT:
-                break;
-            case SyncList<float>.Operation.OP_SET:
-                // careful, this is hardwiring index 0.
-                if (index == 0) metro.readBpmDialAndBroadcast();
-                break;
-            case SyncList<float>.Operation.OP_CLEAR:
-                break;
-        }
+        if (clockInterface.playButton != null) clockInterface.playButton.onStartGrabEvents.AddListener(OnButtonPress);
+        if (clockInterface.rewindButton != null) clockInterface.rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
     }
 
     private void OnDestroy()
     {
-        startButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
-        rewindButton.onToggleChangedEvent.RemoveListener(OnButtonPress);
+        if (clockInterface.playButton != null) clockInterface.playButton.onStartGrabEvents.RemoveListener(OnButtonPress);
+        if (clockInterface.rewindButton != null) clockInterface.rewindButton.onStartGrabEvents.RemoveListener(OnButtonPress);
     }
 
     private void OnButtonPress()
@@ -75,6 +56,9 @@ public class NetworkMetronome : NetworkSyncListener
         NetworkSyncEventManager.Instance.UpdateSync();
     }
 
+    void OnBpmDialUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
+    {
+    }
 
     #region Mirror
 
@@ -86,11 +70,12 @@ public class NetworkMetronome : NetworkSyncListener
             CmdRequestSync();
         }
     }
+
     protected override void OnSync()
     {
         if (isServer)
         {
-            RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+            RpcUpdate_measurePhase(clockInterface.phaseSignal._measurePhase);
         }
         else
         {
@@ -103,16 +88,14 @@ public class NetworkMetronome : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+            RpcUpdate_measurePhase(clockInterface.phaseSignal._measurePhase);
         }
     }
 
     [Command(requiresAuthority = false)]
     protected void CmdRequestSync()
     {
-        Debug.Log($"{gameObject.name} CmdRequestSync");
-
-        RpcUpdate_measurePhase(masterControl.instance.MeasurePhase);
+        RpcUpdate_measurePhase(clockInterface.phaseSignal._measurePhase);
     }
 
     [ClientRpc]
@@ -120,9 +103,9 @@ public class NetworkMetronome : NetworkSyncListener
     {
         if (isClient && !isServer)
         {
-            Debug.Log($"{gameObject.name} old _measurePhase: {masterControl.instance.MeasurePhase}, new _measurePhase {measurePhase}");
-
-            masterControl.instance.MeasurePhase = measurePhase;
+            clockInterface.phaseSignal._measurePhase = measurePhase;
+            clockInterface.clockSignal._measurePhase = measurePhase;
+            clockInterface.resetSignal._measurePhase = measurePhase;
         }
     }
     #endregion

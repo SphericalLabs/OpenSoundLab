@@ -319,6 +319,8 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(MIDIoutData))]
 [XmlInclude(typeof(TimelineData))]
 [XmlInclude(typeof(ADSRData))]
+[XmlInclude(typeof(ClockData))]
+[XmlInclude(typeof(DividerData))]
 
 
 

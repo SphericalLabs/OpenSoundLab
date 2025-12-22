@@ -27,6 +27,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Xml.Serialization;
 using static OVRPlugin;
 using static UnityEngine.Rendering.DebugUI.Table;
 using System;
@@ -65,8 +66,6 @@ public class sequencerDeviceInterface : deviceInterface
 
     // sequencer
     public bool running = true;
-    float swingPercent = 0;
-    int beatSpeed = 0;
 
     // handles
     public xyHandle xyHandle;
@@ -82,19 +81,19 @@ public class sequencerDeviceInterface : deviceInterface
     int maxSteps = 16;
     int maxRows = 8;
 
-    public sliderNotched beatSlider;
-    public omniJack playTriggerInputJack;
+    public basicSwitch modeSwitch; // Switch between Clock (trigger) and Phase (ramp) modes
+    public omniJack resetJack, clockJack, phaseJack;
     public button playButton;
-    dial swingDial;
-    signalGenerator clockGenerator;
-    signalGenerator resetGenerator;
-    beatTracker _beatManager;
     public basicSwitch switchCVRange;
     bool lastRangeLow = true;
 
-    double _phase = 0;
+    signalGenerator clockGenerator;
+    signalGenerator resetGenerator;
+    signalGenerator phaseGenerator;
+
     double _sampleDuration = 0;
-    float[] lastPlaySig = new float[] { 0, 0 };
+    float[] lastClockSig = new float[] { 0, 0 };
+    float[] lastResetSig = new float[] { 0, 0 };
 
     public TextMesh[] dimensionDisplays;
 
@@ -134,12 +133,10 @@ public class sequencerDeviceInterface : deviceInterface
             }
         }
 
-        beatSlider = GetComponentInChildren<sliderNotched>();
-        swingDial = GetComponentInChildren<dial>();
+        playButton = GetComponentInChildren<button>();
         switchCVRange = GetComponentInChildren<basicSwitch>();
 
         _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
-        _beatManager = ScriptableObject.CreateInstance<beatTracker>();
 
         for (int i = 0; i < dimensionDisplays.Length; i++)
         {
@@ -172,10 +169,6 @@ public class sequencerDeviceInterface : deviceInterface
 
     void Start()
     {
-        _beatManager.setTriggers(executeNextStep, resetSteps);
-        _beatManager.updateBeatNoTriplets(beatSpeed);
-        _beatManager.updateSwing(swingPercent);
-
     }
 
     void Update()
@@ -190,24 +183,19 @@ public class sequencerDeviceInterface : deviceInterface
         if (dimensions[1] > maxSteps) dimensions[1] = maxSteps;
         if (dimensions[0] > maxRows) dimensions[0] = maxRows;
         UpdateDimensions();
-        UpdateStepSelect();
-
-        if (beatSpeed != beatSlider.switchVal)
+        if (clockGenerator != clockJack.signal)
         {
-            beatSpeed = beatSlider.switchVal;
-            _beatManager.updateBeatNoTriplets(beatSpeed);
-        }
-        if (swingPercent != swingDial.percent)
-        {
-            swingPercent = swingDial.percent;
-            _beatManager.updateSwing(swingPercent);
+            clockGenerator = clockJack.signal;
         }
 
-        if (clockGenerator != playTriggerInputJack.signal)
+        if (resetGenerator != resetJack.signal)
         {
-            clockGenerator = playTriggerInputJack.signal;
-            _beatManager.toggleMC(clockGenerator == null);
-            if (clockGenerator != null) forcePlay(false);
+            resetGenerator = resetJack.signal;
+        }
+
+        if (phaseGenerator != phaseJack.signal)
+        {
+            phaseGenerator = phaseJack.signal;
         }
 
         if (switchCVRange.switchVal != lastRangeLow)
@@ -225,7 +213,6 @@ public class sequencerDeviceInterface : deviceInterface
 
     void OnDestroy()
     {
-        Destroy(_beatManager);
     }
 
     #endregion
@@ -367,37 +354,63 @@ public class sequencerDeviceInterface : deviceInterface
 
     void resetSteps()
     {
-        SelectStep(0, true);
-        runningUpdated = true;
+        SelectStep(0);
     }
 
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
-        if (clockGenerator == null) return;
-
-        double dspTime = AudioSettings.dspTime;
-
-        float[] playBuffer = new float[buffer.Length];
-        clockGenerator.processBuffer(playBuffer, dspTime, channels);
-
-        for (int i = 0; i < playBuffer.Length; i += channels)
+        if (modeSwitch != null && modeSwitch.switchVal) // Phase mode
         {
-            if (playBuffer[i] > lastPlaySig[1] && lastPlaySig[1] <= lastPlaySig[0])
+            if (phaseGenerator == null) return;
+
+            float[] phaseBuffer = new float[buffer.Length];
+            phaseGenerator.processBuffer(phaseBuffer, AudioSettings.dspTime, channels);
+
+            // Map phase directly to step
+            float latestPhase = phaseBuffer[buffer.Length - channels];
+            int s = Mathf.FloorToInt(latestPhase * dimensions[1]);
+            s = Mathf.Clamp(s, 0, dimensions[1] - 1);
+            if (s != targetStep)
             {
-                _beatManager.beatResetEvent();
-                _phase = 0;
-                forcePlay(true);
+                 // We don't call SelectStep here because it's for the audio thread state usually
+                 // Actually SelectStep handles the signal generator updates which IS what we want
+                 SelectStep(s);
+                 runningUpdated = true;
             }
-            lastPlaySig[0] = lastPlaySig[1];
-            lastPlaySig[1] = playBuffer[i];
         }
-
-        for (int i = 0; i < buffer.Length; i += channels)
+        else // Clock (Trigger) mode
         {
-            _phase += _sampleDuration;
+            if (clockGenerator != null)
+            {
+                float[] clockBuffer = new float[buffer.Length];
+                clockGenerator.processBuffer(clockBuffer, AudioSettings.dspTime, channels);
 
-            if (_phase > masterControl.instance.measurePeriod) _phase -= masterControl.instance.measurePeriod;
-            _beatManager.beatUpdateEvent((float)(_phase / masterControl.instance.measurePeriod));
+                for (int i = 0; i < clockBuffer.Length; i += channels)
+                {
+                    if (clockBuffer[i] > 0f && lastClockSig[1] <= 0f)
+                    {
+                        executeNextStep();
+                    }
+                    lastClockSig[0] = lastClockSig[1];
+                    lastClockSig[1] = clockBuffer[i];
+                }
+            }
+
+            if (resetGenerator != null)
+            {
+                float[] resetBuf = new float[buffer.Length];
+                resetGenerator.processBuffer(resetBuf, AudioSettings.dspTime, channels);
+
+                for (int i = 0; i < resetBuf.Length; i += channels)
+                {
+                    if (resetBuf[i] > 0f && lastResetSig[1] <= 0f)
+                    {
+                        resetSteps();
+                    }
+                    lastResetSig[0] = lastResetSig[1];
+                    lastResetSig[1] = resetBuf[i];
+                }
+            }
         }
     }
 
@@ -419,7 +432,7 @@ public class sequencerDeviceInterface : deviceInterface
     bool runningUpdated = false;
     public void togglePlay(bool on)
     {
-        _beatManager.toggle(on);
+        running = on;
         if (on) runningUpdated = true;
     }
 
@@ -739,10 +752,13 @@ public class sequencerDeviceInterface : deviceInterface
             deviceType = DeviceType.Sequencer
         };
         GetTransformData(data);
-        data.sliderSpeed = beatSlider.switchVal;
 
         data.switchPlay = playButton.isHit;
-        data.jackTriggerInID = playTriggerInputJack.transform.GetInstanceID();
+        data.modeSwitch = modeSwitch != null && modeSwitch.switchVal;
+
+        data.resetJackID = resetJack.transform.GetInstanceID();
+        data.clockJackID = clockJack.transform.GetInstanceID();
+        data.phaseJackID = phaseJack.transform.GetInstanceID();
 
         data.activePattern = activePattern;
         data.dimensions = dimensions;
@@ -791,7 +807,6 @@ public class sequencerDeviceInterface : deviceInterface
             data.rowModes[row] = controlPanelModes[row].switchVal;
         }
 
-        data.dialSwing = swingDial.percent;
         data.switchRange = switchCVRange.switchVal;
 
         return data;
@@ -805,7 +820,9 @@ public class sequencerDeviceInterface : deviceInterface
         // Grow to max size initially
         SetDimensions(maxRows, maxSteps);
 
-        playButton.startToggled = data.switchPlay;
+        playButton.phantomHit(data.switchPlay);
+
+        if (modeSwitch != null) modeSwitch.setSwitch(data.modeSwitch, true);
 
         for (int row = 0; row < maxRows; row++)
         {
@@ -818,7 +835,9 @@ public class sequencerDeviceInterface : deviceInterface
             doModeSwitch(row);
         }
 
-        playTriggerInputJack.SetID(data.jackTriggerInID, copyMode);
+        resetJack.SetID(data.resetJackID, copyMode);
+        clockJack.SetID(data.clockJackID, copyMode);
+        phaseJack.SetID(data.phaseJackID, copyMode);
 
         for (int p = 0; p < maxPattern; p++)
         {
@@ -854,8 +873,6 @@ public class sequencerDeviceInterface : deviceInterface
             jackOutCVTrans[row].GetComponentInChildren<omniJack>().SetID(data.jackCvOutID[row], copyMode);
         }
 
-        beatSlider.setVal(data.sliderSpeed);
-        swingDial.setPercent(data.dialSwing, true);
         switchCVRange.setSwitch(data.switchRange, true);
 
         // Shrink to desired size at the end
@@ -868,22 +885,16 @@ public class sequencerDeviceInterface : deviceInterface
 public class SequencerData : InstrumentData
 {
     public bool switchPlay;
-    public int jackTriggerInID;
-
-    public int sliderSpeed;
-    public float dialSwing;
-
+    public bool modeSwitch;
+    public int resetJackID, clockJackID, phaseJackID;
+    public int activePattern;
+    public int[] dimensions;
+    public bool[][][] stepBools;
+    public float[][][] stepFloats;
     public int[] jackTriggerOutID;
     public int[] jackCvOutID;
-
     public bool[] rowMutes;
     public bool[] rowModes;
-    public int[] dimensions; // rows, steps
-
-    public int activePattern;
-    public bool[][][] stepBools; // Replaced bool[,,] with jagged array
-    public float[][][] stepFloats; // Replaced float[,,] with jagged array
-
     public bool switchRange;
 }
 

@@ -31,7 +31,7 @@ using System.Collections;
 public class beatTracker : ScriptableObject
 {
 
-    // beatTracker maps the 1bar 0-1 phase of masterControl to a series of steps defined in resolutions
+    // beatTracker maps a 0-1 phase ramp to a series of steps defined in resolutions
     // the more steps you select, the faster your sequencer will go
     // swing is just offsetting every odd step by a percentage
 
@@ -39,7 +39,7 @@ public class beatTracker : ScriptableObject
 
     // triplets seem not implemented here, but that just means resolutions that are divisible by 3
 
-    // how can it be that sequencers have another phase than the masterControl?
+    // how can it be that sequencers have another phase than the master clock?
     // it just creates nextStep calls, but does not directly map the ramp phasor to the time in the sequence!
 
     // sequencers subscribe to these
@@ -64,18 +64,9 @@ public class beatTracker : ScriptableObject
     public bool MC = false;
     public void toggleMC(bool on)
     {
-        if (MC == on) return;
         MC = on;
-        if (MC)
-        {
-            masterControl.instance.beatUpdateEvent += beatUpdateEvent;
-            masterControl.instance.beatResetEvent += beatResetEvent;
-        }
-        else
-        {
-            masterControl.instance.beatUpdateEvent -= beatUpdateEvent;
-            masterControl.instance.beatResetEvent -= beatResetEvent;
-        }
+        // masterControl event subscriptions removed.
+        // Devices now drive beatTracker manually.
     }
 
     bool resetRequested = false;
@@ -85,13 +76,12 @@ public class beatTracker : ScriptableObject
         lastTime = 0;
         curStep = 0;
         resetRequested = true;
-        resetEvent();
+        if (resetEvent != null) resetEvent();
     }
 
     public void setTrigger(TriggerEvent t)
     {
         triggerEvent = t;
-        toggleMC(true);
     }
 
 
@@ -99,12 +89,10 @@ public class beatTracker : ScriptableObject
     {
         triggerEvent = t;
         resetEvent = r;
-        toggleMC(true);
     }
 
     void OnDestroy()
     {
-        if (MC) toggleMC(false);
     }
 
     public void toggle(bool on)
