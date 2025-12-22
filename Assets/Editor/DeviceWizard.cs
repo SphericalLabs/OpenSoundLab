@@ -29,6 +29,20 @@ public class DeviceWizard : EditorWindow
             Debug.Log($"<color=green>OSL Device Wizard: Successfully finalized {name} prefabs after compilation.</color>");
         }
     }
+
+    private static System.Type GetTypeByName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return null;
+        var type = System.Type.GetType(name + ",Assembly-CSharp");
+        if (type != null) return type;
+
+        foreach (var assembly in System.AppDomain.CurrentDomain.GetAssemblies())
+        {
+            type = assembly.GetType(name);
+            if (type != null) return type;
+        }
+        return null;
+    }
     private string deviceName = "";
     private DeviceCategory category = DeviceCategory.WaveGenerator;
     private bool includeSignalGenerator = true;
@@ -163,8 +177,8 @@ public class {generatorName} : signalGenerator
         GameObject baseObj = new GameObject(name);
 
         // ADD COMPONENTS IN ORDER (Interface/Generator FIRST as requested)
-        System.Type interfaceType = System.Type.GetType(interfaceName + ",Assembly-CSharp");
-        System.Type generatorType = !string.IsNullOrEmpty(generatorName) ? System.Type.GetType(generatorName + ",Assembly-CSharp") : null;
+        System.Type interfaceType = GetTypeByName(interfaceName);
+        System.Type generatorType = GetTypeByName(generatorName);
 
         if (generatorType != null) baseObj.AddComponent(generatorType);
         if (interfaceType != null) baseObj.AddComponent(interfaceType);
@@ -174,9 +188,22 @@ public class {generatorName} : signalGenerator
         baseObj.AddComponent<NetworkIdentity>();
         baseObj.AddComponent<NetworkAuthorityHandle>();
 
-        // NetworkTransformUnreliable (Mirror)
+        // NetworkTransformUnreliable (Mirror) with cached Oscillator values
         var netTrans = baseObj.AddComponent<NetworkTransformUnreliable>();
-        netTrans.syncDirection = SyncDirection.ClientToServer;
+        netTrans.syncDirection = SyncDirection.ServerToClient; // Cached from Oscillator.prefab
+        netTrans.syncPosition = true;
+        netTrans.syncRotation = true;
+        netTrans.syncScale = true;
+        netTrans.onlySyncOnChange = true;
+        netTrans.compressRotation = true;
+        netTrans.interpolatePosition = true;
+        netTrans.interpolateRotation = true;
+        netTrans.interpolateScale = true;
+        netTrans.bufferResetMultiplier = 3;
+        netTrans.changedDetection = true;
+        netTrans.positionSensitivity = 0.002f;
+        netTrans.rotationSensitivity = 0.01f;
+        netTrans.scaleSensitivity = 0.01f;
 
         GameObject basePrefab = PrefabUtility.SaveAsPrefabAsset(baseObj, basePrefabPath);
 
