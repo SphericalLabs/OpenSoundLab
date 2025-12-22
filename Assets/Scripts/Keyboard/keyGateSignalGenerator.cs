@@ -29,25 +29,23 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class keyGateSignalGenerator : signalGenerator
-{
+public class keyGateSignalGenerator : signalGenerator {
 
-    public bool isHigh = false;
-    public bool newKeyWasPressed = false;
+  public bool isHigh = false;
+  public bool newKeyWasPressed = false;
 
-    [DllImport("OSLNative")]
-    public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
+  [DllImport("OSLNative")]
+  public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
 
-    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
+    if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+    SetArrayToSingleValue(buffer, buffer.Length, isHigh ? 1f : 0f);
+    if (newKeyWasPressed)
     {
-        if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        SetArrayToSingleValue(buffer, buffer.Length, isHigh ? 1f : 0f);
-        if (newKeyWasPressed)
-        {
-            buffer[buffer.Length - 1] = buffer[buffer.Length - 2] = 0f;
-            newKeyWasPressed = false;
-        }
-        recursionCheckPost();
+      buffer[buffer.Length - 1] = buffer[buffer.Length - 2] = 0f;
+      newKeyWasPressed = false;
     }
+    recursionCheckPost();
+  }
 
 }

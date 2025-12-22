@@ -1,22 +1,22 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
 // Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
-//
+// 
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
-// You may obtain a copy of the License at
+// You may obtain a copy of the License at 
 // https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
-//
+// 
 // By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
-//
+// 
 //
 // Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
 // Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
-//
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+// 
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -73,12 +73,7 @@ public class key : manipObject
     public void keyHitCheck()
     {
         if (!initialized) return;
-
-        bool on = curState == manipState.grabbed || toggled;
-        if (!isKeyboard || !sticky)
-        {
-            on = touching || on;
-        }
+        bool on = touching || curState == manipState.grabbed || toggled;
 
         if (on != isHit)
         {
@@ -110,7 +105,6 @@ public class key : manipObject
     {
         phantomHitUpdate = true;
         isHit = on;
-        toggled = on;
         if (triggerDeviceInterface)
         {
             _deviceInterface.hit(on, keyValue);
@@ -181,21 +175,9 @@ public class key : manipObject
     public override void onTouch(bool on, manipulator m)
     {
         touching = on;
-
-        if (isKeyboard && sticky)
-        {
-            if (m != null && m.emptyGrab && on)
-            {
-                m.hapticPulse(700);
-                toggled = !toggled;
-                keyHitCheck();
-            }
-            return;
-        }
-
         if (m != null)
         {
-            if (on) m.hapticPulse(700);
+            if (on) m.hapticPulse(700);            
         }
 
         keyHitCheck();
