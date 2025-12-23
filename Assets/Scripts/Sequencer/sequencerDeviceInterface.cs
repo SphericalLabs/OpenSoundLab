@@ -275,9 +275,7 @@ public class sequencerDeviceInterface : deviceInterface
         }
 
         int next = (targetStep + s) % dimensions[1];
-
-        if (next == 0 && clockGenerator != null && !minicheck) forcePlay(false);
-        else SelectStep(next);
+        SelectStep(next);
     }
 
     void stepOff(int step)
@@ -366,6 +364,7 @@ public class sequencerDeviceInterface : deviceInterface
         if (modeSwitch != null && modeSwitch.switchVal) // Phase mode
         {
             if (phaseGenerator == null) return;
+            if (!running) return;
 
             phaseGenerator.processBuffer(_audioPhaseBuffer, AudioSettings.dspTime, channels);
 
@@ -383,21 +382,6 @@ public class sequencerDeviceInterface : deviceInterface
         }
         else // Clock (Trigger) mode
         {
-            if (clockGenerator != null)
-            {
-                clockGenerator.processBuffer(_audioClockBuffer, AudioSettings.dspTime, channels);
-
-                for (int i = 0; i < buffer.Length; i += channels)
-                {
-                    if (_audioClockBuffer[i] > 0f && lastClockSig[1] <= 0f)
-                    {
-                        executeNextStep();
-                    }
-                    lastClockSig[0] = lastClockSig[1];
-                    lastClockSig[1] = _audioClockBuffer[i];
-                }
-            }
-
             if (resetGenerator != null)
             {
                 resetGenerator.processBuffer(_audioResetBuffer, AudioSettings.dspTime, channels);
@@ -410,6 +394,23 @@ public class sequencerDeviceInterface : deviceInterface
                     }
                     lastResetSig[0] = lastResetSig[1];
                     lastResetSig[1] = _audioResetBuffer[i];
+                }
+            }
+
+            if (!running) return;
+
+            if (clockGenerator != null)
+            {
+                clockGenerator.processBuffer(_audioClockBuffer, AudioSettings.dspTime, channels);
+
+                for (int i = 0; i < buffer.Length; i += channels)
+                {
+                    if (_audioClockBuffer[i] > 0f && lastClockSig[1] <= 0f)
+                    {
+                        executeNextStep();
+                    }
+                    lastClockSig[0] = lastClockSig[1];
+                    lastClockSig[1] = _audioClockBuffer[i];
                 }
             }
         }
@@ -821,6 +822,7 @@ public class sequencerDeviceInterface : deviceInterface
         // Grow to max size initially
         SetDimensions(maxRows, maxSteps);
 
+        togglePlay(data.switchPlay);
         playButton.phantomHit(data.switchPlay);
 
         if (modeSwitch != null) modeSwitch.setSwitch(data.modeSwitch, true);
