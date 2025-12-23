@@ -11,6 +11,7 @@ public class clockSignalGenerator : signalGenerator
 
     public double measurePeriod = 2; // 1 bar
     public double _measurePhase;
+    bool resetPulseQueued = false;
 
     public void setBPM(float b)
     {
@@ -35,6 +36,19 @@ public class clockSignalGenerator : signalGenerator
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
+        if (resetPulseQueued)
+        {
+            System.Array.Clear(buffer, 0, buffer.Length);
+            for (int c = 0; c < channels && c < buffer.Length; c++)
+            {
+                buffer[c] = 1f;
+            }
+            resetPulseQueued = false;
+            lastProcessedDspTime = dspTime;
+            System.Array.Copy(buffer, cachedBuffer, buffer.Length);
+            return;
+        }
+
         if (dspTime == lastProcessedDspTime)
         {
             int len = Mathf.Min(buffer.Length, cachedBuffer.Length);
@@ -88,5 +102,12 @@ public class clockSignalGenerator : signalGenerator
     {
         _measurePhase = 0;
         lastProcessedDspTime = -1; // Force re-calculate on next pull
+    }
+
+    public void triggerResetPulse()
+    {
+        resetPulseQueued = true;
+        _measurePhase = 0;
+        lastProcessedDspTime = -1;
     }
 }

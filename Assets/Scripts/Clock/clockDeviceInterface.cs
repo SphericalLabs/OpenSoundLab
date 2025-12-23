@@ -79,6 +79,19 @@ public class clockDeviceInterface : deviceInterface
 
     void Update()
     {
+        if (nudgeForwardButton != null && nudgeForwardButton.isHit)
+        {
+            pitchBendMult = 1.03f;
+        }
+        else if (nudgeBackwardButton != null && nudgeBackwardButton.isHit)
+        {
+            pitchBendMult = 1f / 1.03f;
+        }
+        else
+        {
+            pitchBendMult = 1f;
+        }
+
         if (bpmDial != null)
         {
             float targetBpm = Mathf.Round(Utils.map(bpmDial.percent, 0f, 1f, minBpm, maxBpm) * 10f) / 10f;
@@ -89,7 +102,7 @@ public class clockDeviceInterface : deviceInterface
                 phaseSignal.setBPM(targetBpm);
                 clockSignal.setBPM(targetBpm);
                 resetSignal.setBPM(targetBpm);
-                if (bpmDisplay != null) bpmDisplay.text = (targetBpm / pitchBendMult).ToString("N1");
+                if (bpmDisplay != null) bpmDisplay.text = targetBpm.ToString("N1");
             }
         }
 
@@ -127,6 +140,7 @@ public class clockDeviceInterface : deviceInterface
             phaseSignal.ResetPhase();
             clockSignal.ResetPhase();
             resetSignal.ResetPhase();
+            resetSignal.triggerResetPulse();
         }
         else if (ID == 3) // Nudge Backward
         {
