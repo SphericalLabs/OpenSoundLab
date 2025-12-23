@@ -100,6 +100,11 @@ public class clockSignalGenerator : signalGenerator
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
         processBuffer(buffer, AudioSettings.dspTime, channels);
+        // Three clock generators live on the same GameObject; Unity calls each in order,
+        // so later ones overwrite earlier ones in this buffer. The dspTime guard above
+        // makes each generator fill its buffer only once per audio slice, and we zero
+        // here so none of those writes reach the speakers.
+        System.Array.Clear(buffer, 0, buffer.Length);
     }
 
     public void ResetPhase()
