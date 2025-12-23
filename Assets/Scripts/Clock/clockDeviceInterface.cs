@@ -118,7 +118,7 @@ public class clockDeviceInterface : deviceInterface
             float curCycle = (float)(phaseSignal._measurePhase / phaseSignal.measurePeriod);
             // Swing twice per bar, min at phase 0
             float swing = -Mathf.Cos(curCycle * Mathf.PI * 4f);
-            rod.localRotation = Quaternion.Euler(0, 0, swing * 45f);
+            rod.localRotation = Quaternion.Euler(0, 0, swing * 65f);
         }
 
         // Record button state sync
