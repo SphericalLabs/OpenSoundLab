@@ -54,7 +54,23 @@ public class clockDeviceInterface : deviceInterface
             if (b.buttonID == 4) nudgeForwardButton = b;
             if (b.buttonID == 5) recordButton = b;
         }
+
+        // bpmDial.onPercentChangedEventLocal.AddListener(readBpmDialAndBroadcast);
     }
+
+    // void readBpmDialAndBroadcast()
+    // {
+    //     float targetBpm = Mathf.Round(Utils.map(bpmDial.percent, 0f, 1f, minBpm, maxBpm) * 10f) / 10f;
+    //     targetBpm *= pitchBendMult;
+
+    //     if (targetBpm != phaseSignal.bpm)
+    //     {
+    //         phaseSignal.setBPM(targetBpm);
+    //         clockSignal.setBPM(targetBpm);
+    //         resetSignal.setBPM(targetBpm);
+    //         if (bpmDisplay != null) bpmDisplay.text = (targetBpm / pitchBendMult).ToString("N1");
+    //     }
+    // }
 
     void Update()
     {
