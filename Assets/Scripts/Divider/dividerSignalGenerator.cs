@@ -13,6 +13,8 @@ public class dividerSignalGenerator : signalGenerator
 
     private bool clockTriggered = false;
     private bool resetTriggered = false;
+    private float lastPhaseSample = 0f;
+    private bool hasPhaseSample = false;
 
     public enum OutputMode { Clock, Reset }
     public OutputMode mode = OutputMode.Clock;
@@ -51,7 +53,18 @@ public class dividerSignalGenerator : signalGenerator
             resetTriggered = false;
 
             // drive the beat tracker with the phase
-            _beatManager.beatUpdateEvent(phaseBuffer[n]);
+            float phaseSample = phaseBuffer[n];
+            if (hasPhaseSample && phaseSample < lastPhaseSample)
+            {
+                _beatManager.beatResetEvent();
+            }
+            else if (!hasPhaseSample)
+            {
+                hasPhaseSample = true;
+            }
+
+            lastPhaseSample = phaseSample;
+            _beatManager.beatUpdateEvent(phaseSample);
 
             if (mode == OutputMode.Clock)
                 buffer[n] = clockTriggered ? 1f : 0f;
