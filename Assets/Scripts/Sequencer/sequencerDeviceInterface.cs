@@ -97,6 +97,10 @@ public class sequencerDeviceInterface : deviceInterface
 
     public TextMesh[] dimensionDisplays;
 
+    float[] _audioPhaseBuffer = new float[2048];
+    float[] _audioClockBuffer = new float[2048];
+    float[] _audioResetBuffer = new float[2048];
+
     public bool initialised = false;
 
     #endregion
@@ -363,11 +367,10 @@ public class sequencerDeviceInterface : deviceInterface
         {
             if (phaseGenerator == null) return;
 
-            float[] phaseBuffer = new float[buffer.Length];
-            phaseGenerator.processBuffer(phaseBuffer, AudioSettings.dspTime, channels);
+            phaseGenerator.processBuffer(_audioPhaseBuffer, AudioSettings.dspTime, channels);
 
             // Map phase directly to step
-            float latestPhase = phaseBuffer[buffer.Length - channels];
+            float latestPhase = _audioPhaseBuffer[buffer.Length - channels];
             int s = Mathf.FloorToInt(latestPhase * dimensions[1]);
             s = Mathf.Clamp(s, 0, dimensions[1] - 1);
             if (s != targetStep)
@@ -382,33 +385,31 @@ public class sequencerDeviceInterface : deviceInterface
         {
             if (clockGenerator != null)
             {
-                float[] clockBuffer = new float[buffer.Length];
-                clockGenerator.processBuffer(clockBuffer, AudioSettings.dspTime, channels);
+                clockGenerator.processBuffer(_audioClockBuffer, AudioSettings.dspTime, channels);
 
-                for (int i = 0; i < clockBuffer.Length; i += channels)
+                for (int i = 0; i < buffer.Length; i += channels)
                 {
-                    if (clockBuffer[i] > 0f && lastClockSig[1] <= 0f)
+                    if (_audioClockBuffer[i] > 0f && lastClockSig[1] <= 0f)
                     {
                         executeNextStep();
                     }
                     lastClockSig[0] = lastClockSig[1];
-                    lastClockSig[1] = clockBuffer[i];
+                    lastClockSig[1] = _audioClockBuffer[i];
                 }
             }
 
             if (resetGenerator != null)
             {
-                float[] resetBuf = new float[buffer.Length];
-                resetGenerator.processBuffer(resetBuf, AudioSettings.dspTime, channels);
+                resetGenerator.processBuffer(_audioResetBuffer, AudioSettings.dspTime, channels);
 
-                for (int i = 0; i < resetBuf.Length; i += channels)
+                for (int i = 0; i < buffer.Length; i += channels)
                 {
-                    if (resetBuf[i] > 0f && lastResetSig[1] <= 0f)
+                    if (_audioResetBuffer[i] > 0f && lastResetSig[1] <= 0f)
                     {
                         resetSteps();
                     }
                     lastResetSig[0] = lastResetSig[1];
-                    lastResetSig[1] = resetBuf[i];
+                    lastResetSig[1] = _audioResetBuffer[i];
                 }
             }
         }

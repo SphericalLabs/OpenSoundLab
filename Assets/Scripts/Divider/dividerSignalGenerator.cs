@@ -7,7 +7,9 @@ public class dividerSignalGenerator : signalGenerator
     public float swingVal = 0.5f;
 
     private beatTracker _beatManager;
-    private float[] phaseBuffer;
+    private double lastProcessedDspTime = -1;
+    private float[] cachedBuffer = new float[2048];
+    private float[] phaseBuffer = new float[2048];
 
     private bool clockTriggered = false;
     private bool resetTriggered = false;
@@ -34,8 +36,12 @@ public class dividerSignalGenerator : signalGenerator
     {
         if (phaseInput == null) return;
 
-        if (phaseBuffer == null || phaseBuffer.Length != buffer.Length)
-            phaseBuffer = new float[buffer.Length];
+        if (dspTime == lastProcessedDspTime)
+        {
+            int len = Mathf.Min(buffer.Length, cachedBuffer.Length);
+            System.Array.Copy(cachedBuffer, buffer, len);
+            return;
+        }
 
         phaseInput.processBuffer(phaseBuffer, dspTime, channels);
 
@@ -54,6 +60,9 @@ public class dividerSignalGenerator : signalGenerator
 
             if (channels > 1) buffer[n + 1] = buffer[n];
         }
+
+        lastProcessedDspTime = dspTime;
+        System.Array.Copy(buffer, cachedBuffer, buffer.Length);
     }
 
     private void OnDestroy()

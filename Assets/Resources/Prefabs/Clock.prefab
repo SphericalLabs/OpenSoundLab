@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 421762}
-  - component: {fileID: 5454490080425272878}
   - component: {fileID: 6886389643430126382}
   - component: {fileID: 3765524906698515557}
   - component: {fileID: 4899192525290910365}
@@ -49,37 +48,15 @@ Transform:
   - {fileID: 6098465493793050728}
   - {fileID: 6098465494874876012}
   - {fileID: 6098465493096094866}
-  - {fileID: 6098741294660086536}
   - {fileID: 3418881850057416551}
   - {fileID: 4000013251892330}
   - {fileID: 79920807376179239}
+  - {fileID: 6098741294660086536}
   - {fileID: 5107638735346481497}
   - {fileID: 5739946632568437145}
   - {fileID: 585364020180731769}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5454490080425272878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbd68bcf3e31f47b5bd2e43e11f15ca0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  index: 0
-  _phase: 0
-  useNativeIfAvailable: 1
-  firstSample: 0
-  prevFirstSample: 0
-  mode: 0
-  bpm: 120
-  running: 1
-  measurePeriod: 4
-  _measurePhase: 0
 --- !u!114 &6886389643430126382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,11 +75,13 @@ MonoBehaviour:
   phaseJack: {fileID: 36266398699913555}
   bpmDial: {fileID: 6140989710792816062}
   bpmDisplay: {fileID: 6180714997656615036}
+  rod: {fileID: 6098465501203969796}
   resetSignal: {fileID: 0}
   clockSignal: {fileID: 0}
   phaseSignal: {fileID: 0}
   minBpm: 60
   maxBpm: 180
+  isRunning: 1
   playButton: {fileID: 6139571967734941802}
   rewindButton: {fileID: 6141724435851468766}
   nudgeForwardButton: {fileID: 6101304317085195648}

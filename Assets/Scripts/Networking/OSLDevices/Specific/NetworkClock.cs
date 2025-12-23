@@ -75,7 +75,7 @@ public class NetworkClock : NetworkSyncListener
     {
         if (isServer)
         {
-            RpcUpdate_measurePhase(clockInterface.phaseSignal._measurePhase);
+            RpcUpdateClock(clockInterface.phaseSignal._measurePhase, clockInterface.isRunning);
         }
         else
         {
@@ -88,24 +88,31 @@ public class NetworkClock : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdate_measurePhase(clockInterface.phaseSignal._measurePhase);
+            RpcUpdateClock(clockInterface.phaseSignal._measurePhase, clockInterface.isRunning);
         }
     }
 
     [Command(requiresAuthority = false)]
     protected void CmdRequestSync()
     {
-        RpcUpdate_measurePhase(clockInterface.phaseSignal._measurePhase);
+        RpcUpdateClock(clockInterface.phaseSignal._measurePhase, clockInterface.isRunning);
     }
 
     [ClientRpc]
-    protected virtual void RpcUpdate_measurePhase(double measurePhase)
+    protected virtual void RpcUpdateClock(double measurePhase, bool running)
     {
         if (isClient && !isServer)
         {
             clockInterface.phaseSignal._measurePhase = measurePhase;
             clockInterface.clockSignal._measurePhase = measurePhase;
             clockInterface.resetSignal._measurePhase = measurePhase;
+            clockInterface.isRunning = running;
+
+            // Sync visual button state
+            if (clockInterface.playButton != null && clockInterface.playButton.isHit != running)
+            {
+                clockInterface.playButton.phantomHit(running);
+            }
         }
     }
     #endregion

@@ -18,20 +18,31 @@ public class clockSignalGenerator : signalGenerator
         measurePeriod = 480f / bpm; // 8 beats = 2 bars
     }
 
-    public void ResetPhase()
-    {
-        _measurePhase = 0;
-    }
-
     public override void Awake()
     {
         base.Awake();
         setBPM(bpm);
     }
 
+    private double lastProcessedDspTime = -1;
+    private float[] cachedBuffer = new float[2048]; // MAX_BUFFER_LENGTH from signalGenerator
+
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
-        if (!running) return;
+        if (dspTime == lastProcessedDspTime)
+        {
+            int len = Mathf.Min(buffer.Length, cachedBuffer.Length);
+            System.Array.Copy(cachedBuffer, buffer, len);
+            return;
+        }
+
+        if (!running)
+        {
+            System.Array.Clear(buffer, 0, buffer.Length);
+            lastProcessedDspTime = dspTime;
+            System.Array.Copy(buffer, cachedBuffer, buffer.Length);
+            return;
+        }
 
         for (int n = 0; n < buffer.Length; n += channels)
         {
@@ -57,5 +68,19 @@ public class clockSignalGenerator : signalGenerator
             _measurePhase += _sampleDuration;
             if (_measurePhase >= measurePeriod) _measurePhase -= measurePeriod;
         }
+
+        lastProcessedDspTime = dspTime;
+        System.Array.Copy(buffer, cachedBuffer, buffer.Length);
+    }
+
+    private void OnAudioFilterRead(float[] buffer, int channels)
+    {
+        processBuffer(buffer, AudioSettings.dspTime, channels);
+    }
+
+    public void ResetPhase()
+    {
+        _measurePhase = 0;
+        lastProcessedDspTime = -1; // Force re-calculate on next pull
     }
 }

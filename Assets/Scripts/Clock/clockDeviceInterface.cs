@@ -7,13 +7,14 @@ public class clockDeviceInterface : deviceInterface
     public omniJack resetJack, clockJack, phaseJack;
     public dial bpmDial;
     public TextMesh bpmDisplay;
+    public Transform rod;
 
     public clockSignalGenerator resetSignal, clockSignal, phaseSignal;
 
     public float minBpm = 60f;
     public float maxBpm = 180f;
 
-    private bool isRunning = true;
+    public bool isRunning = true;
     private float pitchBendMult = 1f;
 
     public button playButton, rewindButton, nudgeForwardButton, nudgeBackwardButton, recordButton;
@@ -21,28 +22,32 @@ public class clockDeviceInterface : deviceInterface
     public override void Awake()
     {
         base.Awake();
-        var gens = GetComponents<clockSignalGenerator>();
-        // Ensure we have 3 generators
-        if (gens.Length < 3)
+        // Initialize signals only if they aren't already assigned
+        if (phaseSignal == null || clockSignal == null || resetSignal == null)
         {
-            phaseSignal = gameObject.AddComponent<clockSignalGenerator>();
-            clockSignal = gameObject.AddComponent<clockSignalGenerator>();
-            resetSignal = gameObject.AddComponent<clockSignalGenerator>();
-        }
-        else
-        {
-            phaseSignal = gens[0];
-            clockSignal = gens[1];
-            resetSignal = gens[2];
+            var gens = GetComponents<clockSignalGenerator>();
+            if (gens.Length < 3)
+            {
+                if (phaseSignal == null) phaseSignal = gameObject.AddComponent<clockSignalGenerator>();
+                if (clockSignal == null) clockSignal = gameObject.AddComponent<clockSignalGenerator>();
+                if (resetSignal == null) resetSignal = gameObject.AddComponent<clockSignalGenerator>();
+            }
+            else
+            {
+                if (phaseSignal == null) phaseSignal = gens[0];
+                if (clockSignal == null) clockSignal = gens[1];
+                if (resetSignal == null) resetSignal = gens[2];
+            }
         }
 
+        // Always ensure modes are correct as they might have been lost or default to Phase
         phaseSignal.mode = clockSignalGenerator.ClockOutputMode.Phase;
         clockSignal.mode = clockSignalGenerator.ClockOutputMode.Pulse;
         resetSignal.mode = clockSignalGenerator.ClockOutputMode.Reset;
 
-        phaseJack.signal = phaseSignal;
-        clockJack.signal = clockSignal;
-        resetJack.signal = resetSignal;
+        if (phaseJack != null) phaseJack.homesignal = phaseSignal;
+        if (clockJack != null) clockJack.homesignal = clockSignal;
+        if (resetJack != null) resetJack.homesignal = resetSignal;
 
         // Auto-discover buttons for visual sync
         button[] buttons = GetComponentsInChildren<button>();
@@ -93,9 +98,15 @@ public class clockDeviceInterface : deviceInterface
         clockSignal.running = isRunning;
         resetSignal.running = isRunning;
 
-        // Sync generators
-        clockSignal._measurePhase = phaseSignal._measurePhase;
-        resetSignal._measurePhase = phaseSignal._measurePhase;
+
+        // Rod animation
+        if (rod != null && phaseSignal != null)
+        {
+            float curCycle = (float)(phaseSignal._measurePhase / phaseSignal.measurePeriod);
+            // Swing twice per 2-bar cycle (once per bar)
+            float swing = Mathf.Sin(curCycle * Mathf.PI * 4);
+            rod.localRotation = Quaternion.Euler(0, 0, swing * 45f);
+        }
 
         // Record button state sync
         if (recordButton != null && masterControl.instance != null && masterControl.instance.recorder != null)
