@@ -60,8 +60,8 @@ public class clockSignalGenerator : signalGenerator
                     buffer[n] = curCycle;
                     break;
                 case ClockOutputMode.Pulse:
-                    // 16 pulses per bar (16th notes)
-                    float step = Mathf.Repeat(curCycle * 16, 1);
+                    // 8 pulses per bar (8th notes)
+                    float step = Mathf.Repeat(curCycle * 8, 1);
                     buffer[n] = step < 0.1f ? 1f : 0f;
                     break;
                 case ClockOutputMode.Reset:
