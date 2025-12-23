@@ -14,8 +14,14 @@ public class clockSignalGenerator : signalGenerator
 
     public void setBPM(float b)
     {
+        float curCycle = 0f;
+        if (measurePeriod > 0)
+        {
+            curCycle = (float)(_measurePhase / measurePeriod);
+        }
         bpm = b;
         measurePeriod = 240f / bpm; // 4 beats = 1 bar
+        _measurePhase = curCycle * measurePeriod;
     }
 
     public override void Awake()
