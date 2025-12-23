@@ -36,6 +36,11 @@ public class clockSignalGenerator : signalGenerator
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
+        if (cachedBuffer.Length != buffer.Length)
+        {
+            System.Array.Resize(ref cachedBuffer, buffer.Length);
+        }
+
         if (resetPulseQueued)
         {
             System.Array.Clear(buffer, 0, buffer.Length);
@@ -51,8 +56,7 @@ public class clockSignalGenerator : signalGenerator
 
         if (dspTime == lastProcessedDspTime)
         {
-            int len = Mathf.Min(buffer.Length, cachedBuffer.Length);
-            System.Array.Copy(cachedBuffer, buffer, len);
+            System.Array.Copy(cachedBuffer, buffer, buffer.Length);
             return;
         }
 

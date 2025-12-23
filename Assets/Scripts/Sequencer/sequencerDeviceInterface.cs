@@ -361,6 +361,21 @@ public class sequencerDeviceInterface : deviceInterface
 
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
+        if (_audioPhaseBuffer.Length != buffer.Length)
+        {
+            System.Array.Resize(ref _audioPhaseBuffer, buffer.Length);
+        }
+
+        if (_audioClockBuffer.Length != buffer.Length)
+        {
+            System.Array.Resize(ref _audioClockBuffer, buffer.Length);
+        }
+
+        if (_audioResetBuffer.Length != buffer.Length)
+        {
+            System.Array.Resize(ref _audioResetBuffer, buffer.Length);
+        }
+
         if (modeSwitch != null && modeSwitch.switchVal) // Phase mode
         {
             if (phaseGenerator == null) return;

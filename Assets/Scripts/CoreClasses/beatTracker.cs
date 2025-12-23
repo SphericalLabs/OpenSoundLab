@@ -123,8 +123,8 @@ public class beatTracker : ScriptableObject
     {
         curResolutionIndex = n;
         curSwingVal = swing;
-        calculatedSubSteps = new float[resolutions[curResolutionIndex] * 2];
-        float stepDuration = .5f / resolutions[curResolutionIndex];
+        calculatedSubSteps = new float[resolutions[curResolutionIndex]];
+        float stepDuration = 1f / resolutions[curResolutionIndex];
         for (int i = 0; i < calculatedSubSteps.Length; i++) calculatedSubSteps[i] = stepDuration * i;
 
         // swing offsets for every odd note
