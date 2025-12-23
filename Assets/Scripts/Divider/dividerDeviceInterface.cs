@@ -28,8 +28,22 @@ public class dividerDeviceInterface : deviceInterface
         clockGenerator.mode = dividerSignalGenerator.OutputMode.Clock;
         resetGenerator.mode = dividerSignalGenerator.OutputMode.Reset;
 
-        clockOutputJack.signal = clockGenerator;
-        resetOutputJack.signal = resetGenerator;
+        if (phaseInputJack != null)
+        {
+            phaseInputJack.outgoing = false;
+        }
+
+        if (clockOutputJack != null)
+        {
+            clockOutputJack.outgoing = true;
+            clockOutputJack.homesignal = clockGenerator;
+        }
+
+        if (resetOutputJack != null)
+        {
+            resetOutputJack.outgoing = true;
+            resetOutputJack.homesignal = resetGenerator;
+        }
 
         // resolutionSlider: 1, 2, 4, 8, 12, 16, 24, 32, 64
         // these match beatTracker.cs resolutions

@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 2861714225421600105}
   - component: {fileID: 5031930295595329128}
   - component: {fileID: 6504317837562399405}
-  - component: {fileID: 5162040382122059068}
   - component: {fileID: -6206879222416063899}
+  - component: {fileID: 2545735590471751455}
   m_Layer: 0
   m_Name: Divider
   m_TagString: instrument
@@ -135,11 +135,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   omniJacks:
-  - {fileID: 114000012859573534}
   - {fileID: 3380366552957750803}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 114000012859573534}
+  - {fileID: 210188628633613920}
 --- !u!114 &6504317837562399405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,27 +154,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.05
   dials:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
---- !u!114 &5162040382122059068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38783740befed9b4ead5b3b54a968b09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  switchs:
-  - {fileID: 0}
+  - {fileID: 788609430124761574}
 --- !u!114 &-6206879222416063899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,6 +190,23 @@ MonoBehaviour:
   positionSensitivity: 0.002
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
+--- !u!114 &2545735590471751455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2652fb293a2d2b546a2bf994e25007a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  sliders:
+  - {fileID: 8683212376065044008}
 --- !u!1 &252540196009635064
 GameObject:
   m_ObjectHideFlags: 0
@@ -2126,6 +2121,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: PHASE IN
+      objectReference: {fileID: 0}
+    - target: {fileID: 7709873738993341025, guid: 914ac49a0a51b47cca057b2d7710fdc8,
+        type: 3}
+      propertyPath: outgoing
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7738818879502467861, guid: 914ac49a0a51b47cca057b2d7710fdc8,
         type: 3}
