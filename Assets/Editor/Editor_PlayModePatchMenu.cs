@@ -38,10 +38,7 @@ public static class Editor_PlayModePatchMenu
     const string saveMenuPath = "OpenSoundLab/Play Mode/Save LastPlayModePatch";
     const string loadOnPlayPrefKey = "LoadLastPlayModePatchOnPlay";
     const string patchFileName = "LastPlayModePatch.xml";
-    const double targetSceneDelaySeconds = 0.5d;
-
     static bool loadOnPlayPending;
-    static double targetSceneEnteredTime = -1;
 
     static Editor_PlayModePatchMenu()
     {
@@ -99,14 +96,12 @@ public static class Editor_PlayModePatchMenu
         if (state == PlayModeStateChange.EnteredPlayMode && isLoadOnPlayEnabled())
         {
             loadOnPlayPending = true;
-            targetSceneEnteredTime = -1;
             return;
         }
 
         if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.ExitingEditMode)
         {
             loadOnPlayPending = false;
-            targetSceneEnteredTime = -1;
         }
     }
 
@@ -120,32 +115,30 @@ public static class Editor_PlayModePatchMenu
         if (!Application.isPlaying)
         {
             loadOnPlayPending = false;
-            targetSceneEnteredTime = -1;
             return;
         }
 
         Scene activeScene = SceneManager.GetActiveScene();
         if (!isTargetPlayScene(activeScene))
         {
-            targetSceneEnteredTime = -1;
             return;
         }
 
-        if (targetSceneEnteredTime < 0)
-        {
-            targetSceneEnteredTime = EditorApplication.timeSinceStartup;
-            return;
-        }
-
-        double elapsed = EditorApplication.timeSinceStartup - targetSceneEnteredTime;
-        if (elapsed < targetSceneDelaySeconds)
+        if (!isReadyToLoad(activeScene))
         {
             return;
         }
 
         loadOnPlayPending = false;
-        targetSceneEnteredTime = -1;
         tryLoadLastPlayModePatch();
+    }
+
+    static bool isReadyToLoad(Scene activeScene)
+    {
+        if (!activeScene.isLoaded) return false;
+        if (!NetworkServer.active) return false;
+        if (SaveLoadInterface.instance == null) return false;
+        return true;
     }
 
     static void tryLoadLastPlayModePatch()
