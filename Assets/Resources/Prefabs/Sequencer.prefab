@@ -1558,7 +1558,7 @@ MonoBehaviour:
   stretchNode: {fileID: 4000013409575508}
   stepSelect: {fileID: 114000012285081508}
   dimensions: 0100000001000000
-  modeSwitch: {fileID: 5121695292029034116}
+  modeSwitch: {fileID: 3315975922580380751}
   resetJack: {fileID: 3515527922812583517}
   clockJack: {fileID: 6029167506048887126}
   phaseJack: {fileID: 114000010336139522}
@@ -4690,7 +4690,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4699458621137395833}
-  m_Text: PHASE
+  m_Text: CLOCK
   m_OffsetZ: 0
   m_CharacterSize: 0.03
   m_LineSpacing: 1
@@ -5140,7 +5140,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6488558698982783925}
-  m_Text: CLOCK
+  m_Text: PHASE
   m_OffsetZ: 0
   m_CharacterSize: 0.03
   m_LineSpacing: 1

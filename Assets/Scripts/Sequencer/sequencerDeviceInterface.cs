@@ -372,12 +372,13 @@ public class sequencerDeviceInterface : deviceInterface
             float latestPhase = _audioPhaseBuffer[buffer.Length - channels];
             int s = Mathf.FloorToInt(latestPhase * dimensions[1]);
             s = Mathf.Clamp(s, 0, dimensions[1] - 1);
-            if (s != targetStep)
+            if (phaseSyncPending || s != targetStep)
             {
                  // We don't call SelectStep here because it's for the audio thread state usually
                  // Actually SelectStep handles the signal generator updates which IS what we want
                  SelectStep(s);
                  runningUpdated = true;
+                 phaseSyncPending = false;
             }
         }
         else // Clock (Trigger) mode
@@ -432,10 +433,19 @@ public class sequencerDeviceInterface : deviceInterface
     }
 
     bool runningUpdated = false;
+    bool phaseSyncPending = false;
     public void togglePlay(bool on)
     {
         running = on;
-        if (on) runningUpdated = true;
+        if (on)
+        {
+            runningUpdated = true;
+            phaseSyncPending = true;
+        }
+        else
+        {
+            phaseSyncPending = false;
+        }
     }
 
     public override void hit(bool on, int ID = -1)
