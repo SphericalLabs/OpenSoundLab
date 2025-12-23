@@ -9,13 +9,13 @@ public class clockSignalGenerator : signalGenerator
     public float bpm = 120;
     public bool running = true;
 
-    public double measurePeriod = 4; // 2 bars
+    public double measurePeriod = 2; // 1 bar
     public double _measurePhase;
 
     public void setBPM(float b)
     {
         bpm = b;
-        measurePeriod = 480f / bpm; // 8 beats = 2 bars
+        measurePeriod = 240f / bpm; // 4 beats = 1 bar
     }
 
     public override void Awake()
@@ -54,8 +54,8 @@ public class clockSignalGenerator : signalGenerator
                     buffer[n] = curCycle;
                     break;
                 case ClockOutputMode.Pulse:
-                    // 32 pulses per 2-bar cycle (16th notes)
-                    float step = Mathf.Repeat(curCycle * 32, 1);
+                    // 16 pulses per bar (16th notes)
+                    float step = Mathf.Repeat(curCycle * 16, 1);
                     buffer[n] = step < 0.1f ? 1f : 0f;
                     break;
                 case ClockOutputMode.Reset:
