@@ -153,7 +153,6 @@ public class beatTracker : ScriptableObject
         if (resetRequested)
         {
             resetRequested = false;
-            if (active) triggerEvent();
         }
 
         lastTime = t;

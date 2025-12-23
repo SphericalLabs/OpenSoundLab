@@ -3,6 +3,8 @@ using UnityEngine;
 public class dividerSignalGenerator : signalGenerator
 {
     public signalGenerator phaseInput;
+    public signalGenerator resetInput;
+    public float resetThreshold = 0.5f;
     public int resolutionIndex = 3; // default 8th notes?
     public float swingVal = 0.5f;
 
@@ -10,19 +12,18 @@ public class dividerSignalGenerator : signalGenerator
     private double lastProcessedDspTime = -1;
     private float[] cachedBuffer = new float[2048];
     private float[] phaseBuffer = new float[2048];
+    private float[] resetBuffer = new float[2048];
 
     private bool clockTriggered = false;
-    private bool resetTriggered = false;
     private float lastPhaseSample = 0f;
+    private float lastResetSample = 0f;
+    private float trackedPhase = 0f;
     private bool hasPhaseSample = false;
-
-    public enum OutputMode { Clock, Reset }
-    public OutputMode mode = OutputMode.Clock;
 
     public void Awake()
     {
         _beatManager = ScriptableObject.CreateInstance<beatTracker>();
-        _beatManager.setTriggers(() => clockTriggered = true, () => resetTriggered = true);
+        _beatManager.setTrigger(() => clockTriggered = true);
         _beatManager.toggleMC(false); // We drive it manually
     }
 
@@ -48,6 +49,11 @@ public class dividerSignalGenerator : signalGenerator
             System.Array.Resize(ref phaseBuffer, buffer.Length);
         }
 
+        if (resetBuffer.Length != buffer.Length)
+        {
+            System.Array.Resize(ref resetBuffer, buffer.Length);
+        }
+
         if (dspTime == lastProcessedDspTime)
         {
             System.Array.Copy(cachedBuffer, buffer, buffer.Length);
@@ -55,30 +61,43 @@ public class dividerSignalGenerator : signalGenerator
         }
 
         phaseInput.processBuffer(phaseBuffer, dspTime, channels);
+        if (resetInput != null) resetInput.processBuffer(resetBuffer, dspTime, channels);
 
         for (int n = 0; n < buffer.Length; n += channels)
         {
             clockTriggered = false;
-            resetTriggered = false;
 
-            // drive the beat tracker with the phase
-            float phaseSample = phaseBuffer[n];
-            if (hasPhaseSample && phaseSample < lastPhaseSample)
+            float resetSample = resetInput != null ? resetBuffer[n] : 0f;
+            bool resetEdge = resetInput != null && resetSample >= resetThreshold && lastResetSample < resetThreshold;
+            if (resetEdge)
             {
+                trackedPhase = 0f;
+                hasPhaseSample = false;
                 _beatManager.beatResetEvent();
             }
-            else if (!hasPhaseSample)
+            lastResetSample = resetSample;
+
+            float phaseSample = phaseBuffer[n];
+            if (!hasPhaseSample)
             {
                 hasPhaseSample = true;
+                trackedPhase = 0f;
+            }
+            else
+            {
+                float phaseDelta = phaseSample - lastPhaseSample;
+                if (phaseDelta < 0f) phaseDelta = 0f;
+                trackedPhase += phaseDelta;
+                if (trackedPhase >= 1f)
+                {
+                    trackedPhase -= Mathf.Floor(trackedPhase);
+                }
             }
 
             lastPhaseSample = phaseSample;
-            _beatManager.beatUpdateEvent(phaseSample);
+            _beatManager.beatUpdateEvent(trackedPhase);
 
-            if (mode == OutputMode.Clock)
-                buffer[n] = clockTriggered ? 1f : 0f;
-            else
-                buffer[n] = resetTriggered ? 1f : 0f;
+            buffer[n] = clockTriggered ? 1f : 0f;
 
             if (channels > 1) buffer[n + 1] = buffer[n];
         }
