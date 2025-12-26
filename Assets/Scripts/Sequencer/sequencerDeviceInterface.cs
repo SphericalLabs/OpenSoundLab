@@ -768,6 +768,56 @@ public class sequencerDeviceInterface : deviceInterface
         stepSelect.transform.localPosition = sPos;
     }
 
+    public int getMaxRows()
+    {
+        return maxRows;
+    }
+
+    public int getMaxSteps()
+    {
+        return maxSteps;
+    }
+
+    public button[,] getStepButtons()
+    {
+        return stepButtons;
+    }
+
+    public dial[,] getStepDials()
+    {
+        return stepDials;
+    }
+
+    public void applyNetworkStepBool(int pattern, int row, int step, bool value)
+    {
+        if (pattern < 0 || pattern >= maxPattern) return;
+        if (row < 0 || row >= maxRows) return;
+        if (step < 0 || step >= maxSteps) return;
+
+        stepBools[pattern, row, step] = value;
+
+        if (pattern != activePattern) return;
+        if (stepButtons == null) return;
+        button b = stepButtons[row, step];
+        if (b == null) return;
+        b.keyHit(value, false);
+    }
+
+    public void applyNetworkStepFloat(int pattern, int row, int step, float value)
+    {
+        if (pattern < 0 || pattern >= maxPattern) return;
+        if (row < 0 || row >= maxRows) return;
+        if (step < 0 || step >= maxSteps) return;
+
+        stepFloats[pattern, row, step] = value;
+
+        if (pattern != activePattern) return;
+        if (stepDials == null) return;
+        dial d = stepDials[row, step];
+        if (d == null) return;
+        d.setPercent(value);
+    }
+
     #endregion
 
     #region saveload
