@@ -124,6 +124,26 @@ public class signalGenerator : MonoBehaviour
         return sample > 0f && lastSample <= 0f;
     }
 
+    public static bool isFallingEdge(float sample, float lastSample)
+    {
+        return sample <= 0f && lastSample > 0f;
+    }
+
+    public static bool containsTrigger(float[] buffer, int channels, ref float lastSample)
+    {
+        for (int i = 0; i < buffer.Length; i += channels)
+        {
+            float sample = buffer[i];
+            if (isRisingEdge(sample, lastSample))
+            {
+                lastSample = sample;
+                return true;
+            }
+            lastSample = sample;
+        }
+        return false;
+    }
+
     public virtual void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
 

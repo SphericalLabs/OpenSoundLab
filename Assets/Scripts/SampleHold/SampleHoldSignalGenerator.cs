@@ -72,7 +72,7 @@ public class SampleHoldSignalGenerator : signalGenerator
 
                 for (int n = 0; n < buffer.Length; n += 2)
                 {
-                    if (trigBuffer[n] > 0f && lastTrig <= 0f)
+                    if (isRisingEdge(trigBuffer[n], lastTrig))
                     {
                         buffer[n] = buffer[n + 1] = holdVal = incomingBuffer[n]; // left only
                     }

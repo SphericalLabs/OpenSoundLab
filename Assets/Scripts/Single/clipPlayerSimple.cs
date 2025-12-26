@@ -144,7 +144,7 @@ public class clipPlayerSimple : clipPlayer
                 // Port to NATIVE at some point, since trigger signal is also being scanned there already
                 for (int n = 0; n < buffer.Length; n += channels) // left only
                 {
-                    if (trigBuffer[n] > 0f && lastTriggValue <= 0f)
+                    if (signalGenerator.isRisingEdge(trigBuffer[n], lastTriggValue))
                     {
                         // careful, this is specific to the Sampler but this code is also used on Drum:
                         devInterface?.flashTriggerButton(); // was activated by trigger signal

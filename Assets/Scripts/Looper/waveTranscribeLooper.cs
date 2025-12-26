@@ -413,7 +413,7 @@ public class waveTranscribeLooper : signalGenerator
 
                 if (gateMode)
                 {
-                    if (recBuffer[i] > 0f && lastRecSig[0] <= 0f)
+                    if (isRisingEdge(recBuffer[i], lastRecSig[0]))
                     {
                         recording = true;
                         recordingTriggeredByCv = true;
@@ -436,7 +436,7 @@ public class waveTranscribeLooper : signalGenerator
                 }
                 else
                 {
-                    if (recBuffer[i] > 0f && lastRecSig[0] <= 0f)
+                    if (isRisingEdge(recBuffer[i], lastRecSig[0]))
                     {
                         recordingTriggeredByCv = false;
                         _deviceInterface.HandleCvTriggerPulse();

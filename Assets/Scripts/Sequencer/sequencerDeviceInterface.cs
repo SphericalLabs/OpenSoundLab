@@ -404,7 +404,7 @@ public class sequencerDeviceInterface : deviceInterface
 
                 for (int i = 0; i < buffer.Length; i += channels)
                 {
-                    if (_audioResetBuffer[i] > 0f && lastResetSig[1] <= 0f)
+                    if (signalGenerator.isRisingEdge(_audioResetBuffer[i], lastResetSig[1]))
                     {
                         resetSteps();
                     }
@@ -421,7 +421,7 @@ public class sequencerDeviceInterface : deviceInterface
 
                 for (int i = 0; i < buffer.Length; i += channels)
                 {
-                    if (_audioClockBuffer[i] > 0f && lastClockSig[1] <= 0f)
+                    if (signalGenerator.isRisingEdge(_audioClockBuffer[i], lastClockSig[1]))
                     {
                         executeNextStep();
                     }
