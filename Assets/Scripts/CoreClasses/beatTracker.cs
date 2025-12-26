@@ -150,12 +150,20 @@ public class beatTracker : ScriptableObject
     {
         if (calculatedSubSteps.Length == 0) return;
 
+        float prevTime = lastTime;
+
         if (resetRequested)
         {
             resetRequested = false;
         }
 
         lastTime = t;
+        if (calculatedSubSteps.Length == 1)
+        {
+            if (t < prevTime && active) triggerEvent();
+            return;
+        }
+
         int candidate = (curStep + 1) % calculatedSubSteps.Length;
         if (candidate != 0)
         {
