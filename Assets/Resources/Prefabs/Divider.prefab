@@ -63,6 +63,9 @@ MonoBehaviour:
   useNativeIfAvailable: 1
   firstSample: 0
   prevFirstSample: 0
+  vizSample: 0
+  prevVizSample: 0
+  vizTriggerLatched: 0
   phaseInput: {fileID: 0}
   resetInput: {fileID: 0}
   resetThreshold: 0.5
@@ -2232,7 +2235,7 @@ PrefabInstance:
     - target: {fileID: 7738818879502467861, guid: 914ac49a0a51b47cca057b2d7710fdc8,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.0077
+      value: 0.0178
       objectReference: {fileID: 0}
     - target: {fileID: 7738818879502467861, guid: 914ac49a0a51b47cca057b2d7710fdc8,
         type: 3}
