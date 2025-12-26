@@ -156,14 +156,14 @@ public class ADSignalGenerator : signalGenerator
         {
 
             // SHOULD BE NATIVE
-            if (incoming != null)
-            {
-                // this trigger implementation is good practice, carry over to other modules
-                if (pulseBuffer[n] > 0f && lastPulseFloat <= 0f)
-                { // left only
-                    counter = 0;
-                    stage = 0;
-                    isRunning = true;
+                if (incoming != null)
+                {
+                    // this trigger implementation is good practice, carry over to other modules
+                    if (isRisingEdge(pulseBuffer[n], lastPulseFloat))
+                    { // left only
+                        counter = 0;
+                        stage = 0;
+                        isRunning = true;
                 }
                 lastPulseFloat = pulseBuffer[n];
             }
@@ -230,4 +230,3 @@ public class ADSignalGenerator : signalGenerator
     }
 
 }
-

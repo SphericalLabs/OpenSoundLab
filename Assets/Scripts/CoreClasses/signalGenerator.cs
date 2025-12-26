@@ -101,7 +101,7 @@ public class signalGenerator : MonoBehaviour
             for (int i = 0; i < buffer.Length; i += channels)
             {
                 float sample = buffer[i];
-                if (sample > 0f && lastVizSample <= 0f)
+                if (isRisingEdge(sample, lastVizSample))
                 {
                     vizSample = 1f;
                     vizTriggerLatched = true;
@@ -117,6 +117,11 @@ public class signalGenerator : MonoBehaviour
         if (!vizTriggerLatched) return false;
         vizTriggerLatched = false;
         return true;
+    }
+
+    public static bool isRisingEdge(float sample, float lastSample)
+    {
+        return sample > 0f && lastSample <= 0f;
     }
 
     public virtual void processBufferImpl(float[] buffer, double dspTime, int channels)
