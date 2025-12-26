@@ -104,7 +104,6 @@ public class NetworkClock : NetworkSyncListener
         if (isClient && !isServer)
         {
             clockInterface.phaseSignal._measurePhase = measurePhase;
-            clockInterface.clockSignal._measurePhase = measurePhase;
             clockInterface.resetSignal._measurePhase = measurePhase;
             clockInterface.isRunning = running;
 

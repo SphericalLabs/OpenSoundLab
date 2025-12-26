@@ -3,7 +3,7 @@ using System.Collections;
 
 public class clockSignalGenerator : signalGenerator
 {
-    public enum ClockOutputMode { Phase, Pulse, Reset }
+    public enum ClockOutputMode { Phase = 0, Reset = 2 }
     public ClockOutputMode mode = ClockOutputMode.Phase;
 
     public float bpm = 120;
@@ -80,12 +80,10 @@ public class clockSignalGenerator : signalGenerator
                 case ClockOutputMode.Phase:
                     buffer[n] = curCycle;
                     break;
-                case ClockOutputMode.Pulse:
-                    // 8 pulses per bar (8th notes)
-                    float step = Mathf.Repeat(curCycle * 8, 1);
-                    buffer[n] = step < 0.1f ? 1f : 0f;
-                    break;
                 case ClockOutputMode.Reset:
+                    buffer[n] = 0f;
+                    break;
+                default:
                     buffer[n] = 0f;
                     break;
             }
@@ -103,7 +101,7 @@ public class clockSignalGenerator : signalGenerator
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
         processBuffer(buffer, AudioSettings.dspTime, channels);
-        // Three clock generators live on the same GameObject; Unity calls each in order,
+        // Two clock generators live on the same GameObject; Unity calls each in order,
         // so later ones overwrite earlier ones in this buffer. The dspTime guard above
         // makes each generator fill its buffer only once per audio slice, and we zero
         // here so none of those writes reach the speakers.

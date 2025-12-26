@@ -4,12 +4,12 @@ using System.Xml.Serialization;
 
 public class clockDeviceInterface : deviceInterface
 {
-    public omniJack resetJack, clockJack, phaseJack;
+    public omniJack resetJack, phaseJack;
     public dial bpmDial;
     public TextMesh bpmDisplay;
     public Transform rod;
 
-    public clockSignalGenerator resetSignal, clockSignal, phaseSignal;
+    public clockSignalGenerator resetSignal, phaseSignal;
 
     public float minBpm = 60f;
     public float maxBpm = 180f;
@@ -23,30 +23,39 @@ public class clockDeviceInterface : deviceInterface
     {
         base.Awake();
         // Initialize signals only if they aren't already assigned
-        if (phaseSignal == null || clockSignal == null || resetSignal == null)
+        if (phaseSignal == null || resetSignal == null)
         {
             var gens = GetComponents<clockSignalGenerator>();
-            if (gens.Length < 3)
+            if (gens.Length < 2)
             {
                 if (phaseSignal == null) phaseSignal = gameObject.AddComponent<clockSignalGenerator>();
-                if (clockSignal == null) clockSignal = gameObject.AddComponent<clockSignalGenerator>();
                 if (resetSignal == null) resetSignal = gameObject.AddComponent<clockSignalGenerator>();
             }
             else
             {
+                for (int i = 0; i < gens.Length; i++)
+                {
+                    if (phaseSignal == null && gens[i].mode == clockSignalGenerator.ClockOutputMode.Phase)
+                    {
+                        phaseSignal = gens[i];
+                    }
+
+                    if (resetSignal == null && gens[i].mode == clockSignalGenerator.ClockOutputMode.Reset)
+                    {
+                        resetSignal = gens[i];
+                    }
+                }
+
                 if (phaseSignal == null) phaseSignal = gens[0];
-                if (clockSignal == null) clockSignal = gens[1];
-                if (resetSignal == null) resetSignal = gens[2];
+                if (resetSignal == null) resetSignal = gens[1];
             }
         }
 
         // Always ensure modes are correct as they might have been lost or default to Phase
         phaseSignal.mode = clockSignalGenerator.ClockOutputMode.Phase;
-        clockSignal.mode = clockSignalGenerator.ClockOutputMode.Pulse;
         resetSignal.mode = clockSignalGenerator.ClockOutputMode.Reset;
 
         if (phaseJack != null) phaseJack.homesignal = phaseSignal;
-        if (clockJack != null) clockJack.homesignal = clockSignal;
         if (resetJack != null) resetJack.homesignal = resetSignal;
 
         // Auto-discover buttons for visual sync
@@ -71,7 +80,6 @@ public class clockDeviceInterface : deviceInterface
     //     if (targetBpm != phaseSignal.bpm)
     //     {
     //         phaseSignal.setBPM(targetBpm);
-    //         clockSignal.setBPM(targetBpm);
     //         resetSignal.setBPM(targetBpm);
     //         if (bpmDisplay != null) bpmDisplay.text = (targetBpm / pitchBendMult).ToString("N1");
     //     }
@@ -100,7 +108,6 @@ public class clockDeviceInterface : deviceInterface
             if (targetBpm != phaseSignal.bpm)
             {
                 phaseSignal.setBPM(targetBpm);
-                clockSignal.setBPM(targetBpm);
                 resetSignal.setBPM(targetBpm);
                 if (bpmDisplay != null) bpmDisplay.text = targetBpm.ToString("N1");
             }
@@ -108,7 +115,6 @@ public class clockDeviceInterface : deviceInterface
 
         // Apply running state
         phaseSignal.running = isRunning;
-        clockSignal.running = isRunning;
         resetSignal.running = isRunning;
 
 
@@ -116,9 +122,8 @@ public class clockDeviceInterface : deviceInterface
         if (rod != null && phaseSignal != null)
         {
             float curCycle = (float)(phaseSignal._measurePhase / phaseSignal.measurePeriod);
-            // Swing twice per bar, min at phase 0
-            float swing = -Mathf.Cos(curCycle * Mathf.PI * 4f);
-            rod.localRotation = Quaternion.Euler(0, 0, swing * 65f);
+            // Full rotation per bar, start at phase 0
+            rod.localRotation = Quaternion.Euler(0, 0, curCycle * 360f);
         }
 
         // Record button state sync
@@ -138,7 +143,6 @@ public class clockDeviceInterface : deviceInterface
         else if (ID == 1 && on) // Rewind
         {
             phaseSignal.ResetPhase();
-            clockSignal.ResetPhase();
             resetSignal.ResetPhase();
             resetSignal.triggerResetPulse();
         }
@@ -168,7 +172,6 @@ public class clockDeviceInterface : deviceInterface
         GetTransformData(data);
         data.bpmPercent = bpmDial != null ? bpmDial.percent : 0.5f;
         data.resetJackID = resetJack.transform.GetInstanceID();
-        data.clockJackID = clockJack.transform.GetInstanceID();
         data.phaseJackID = phaseJack.transform.GetInstanceID();
         data.isRunning = isRunning;
         return data;
@@ -180,7 +183,6 @@ public class clockDeviceInterface : deviceInterface
         base.Load(data, copyMode);
         if (bpmDial != null) bpmDial.setPercent(data.bpmPercent);
         resetJack.SetID(data.resetJackID, copyMode);
-        clockJack.SetID(data.clockJackID, copyMode);
         phaseJack.SetID(data.phaseJackID, copyMode);
 
         isRunning = data.isRunning;
@@ -192,6 +194,6 @@ public class clockDeviceInterface : deviceInterface
 public class ClockData : InstrumentData
 {
     public float bpmPercent;
-    public int resetJackID, clockJackID, phaseJackID;
+    public int resetJackID, phaseJackID;
     public bool isRunning;
 }
