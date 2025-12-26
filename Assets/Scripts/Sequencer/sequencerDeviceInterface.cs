@@ -788,24 +788,36 @@ public class sequencerDeviceInterface : deviceInterface
         data.phaseJackID = phaseJack.transform.GetInstanceID();
 
         data.activePattern = activePattern;
-        data.dimensions = dimensions;
+        int rows = Mathf.Clamp(dimensions[0], 1, maxRows);
+        int steps = Mathf.Clamp(dimensions[1], 1, maxSteps);
+        data.dimensions = new int[] { rows, steps };
 
-        // Initialize jagged arrays for stepBools and stepFloats
+        // Store only visible dimensions to keep saves compact.
         data.stepBools = new bool[maxPattern][][];
         data.stepFloats = new float[maxPattern][][];
 
         for (int p = 0; p < maxPattern; p++)
         {
-            data.stepBools[p] = new bool[maxRows][];
-            data.stepFloats[p] = new float[maxRows][];
-            for (int r = 0; r < maxRows; r++)
+            data.stepBools[p] = new bool[rows][];
+            data.stepFloats[p] = new float[rows][];
+            for (int r = 0; r < rows; r++)
             {
-                data.stepBools[p][r] = new bool[maxSteps];
-                data.stepFloats[p][r] = new float[maxSteps];
-                for (int s = 0; s < maxSteps; s++)
+                bool isTriggerRow = controlPanelModes[r].switchVal;
+                if (isTriggerRow)
                 {
-                    data.stepBools[p][r][s] = stepBools[p, r, s];
-                    data.stepFloats[p][r][s] = stepFloats[p, r, s];
+                    data.stepBools[p][r] = new bool[steps];
+                    for (int s = 0; s < steps; s++)
+                    {
+                        data.stepBools[p][r][s] = stepBools[p, r, s];
+                    }
+                }
+                else
+                {
+                    data.stepFloats[p][r] = new float[steps];
+                    for (int s = 0; s < steps; s++)
+                    {
+                        data.stepFloats[p][r][s] = stepFloats[p, r, s];
+                    }
                 }
             }
         }
@@ -844,6 +856,14 @@ public class sequencerDeviceInterface : deviceInterface
         SequencerData data = d as SequencerData;
         base.Load(data, copyMode);
 
+        int rows = maxRows;
+        int steps = maxSteps;
+        if (data.dimensions != null && data.dimensions.Length >= 2)
+        {
+            rows = Mathf.Clamp(data.dimensions[0], 1, maxRows);
+            steps = Mathf.Clamp(data.dimensions[1], 1, maxSteps);
+        }
+
         // Grow to max size initially
         SetDimensions(maxRows, maxSteps);
 
@@ -852,62 +872,111 @@ public class sequencerDeviceInterface : deviceInterface
 
         if (modeSwitch != null) modeSwitch.setSwitch(data.modeSwitch, true);
 
-        for (int row = 0; row < maxRows; row++)
+        if (data.rowMutes != null)
         {
-            controlPanelMutes[row].phantomHit(data.rowMutes[row]);
+            int rowCount = Mathf.Min(maxRows, data.rowMutes.Length);
+            for (int row = 0; row < rowCount; row++)
+            {
+                controlPanelMutes[row].phantomHit(data.rowMutes[row]);
+            }
         }
 
-        for (int row = 0; row < maxRows; row++)
+        if (data.rowModes != null)
         {
-            controlPanelModes[row].setSwitch(data.rowModes[row], true);
-            doModeSwitch(row);
+            int rowCount = Mathf.Min(maxRows, data.rowModes.Length);
+            for (int row = 0; row < rowCount; row++)
+            {
+                controlPanelModes[row].setSwitch(data.rowModes[row], true);
+                doModeSwitch(row);
+            }
         }
 
         resetJack.SetID(data.resetJackID, copyMode);
         clockJack.SetID(data.clockJackID, copyMode);
         phaseJack.SetID(data.phaseJackID, copyMode);
 
-        for (int p = 0; p < maxPattern; p++)
-        {
-            for (int r = 0; r < maxRows; r++)
-            {
-                for (int s = 0; s < maxSteps; s++)
-                {
-                    stepBools[p, r, s] = data.stepBools[p][r][s];
-                    stepFloats[p, r, s] = data.stepFloats[p][r][s];
-                }
-            }
-        }
+        applyStepData(data);
 
-        for (int step = 0; step < data.dimensions[1]; step++)
+        int activePatternIndex = Mathf.Clamp(data.activePattern, 0, maxPattern - 1);
+        for (int step = 0; step < steps; step++)
         {
-            for (int row = 0; row < data.dimensions[0]; row++)
+            for (int row = 0; row < rows; row++)
             {
-                if (data.stepBools[data.activePattern][row][step])
+                if (stepBools[activePatternIndex, row, step])
                 {
                     stepButtons[row, step].keyHit(true);
                 }
-                stepDials[row, step].setPercent(data.stepFloats[data.activePattern][row][step], true);
+                stepDials[row, step].setPercent(stepFloats[activePatternIndex, row, step], true);
             }
         }
 
-        for (int rows = 0; rows < maxRows; rows++)
+        if (data.jackTriggerOutID != null)
         {
-            jackOutTrigTrans[rows].GetComponentInChildren<omniJack>().SetID(data.jackTriggerOutID[rows], copyMode);
+            int rowCount = Mathf.Min(maxRows, data.jackTriggerOutID.Length);
+            for (int row = 0; row < rowCount; row++)
+            {
+                jackOutTrigTrans[row].GetComponentInChildren<omniJack>().SetID(data.jackTriggerOutID[row], copyMode);
+            }
         }
 
-        for (int row = 0; row < maxRows; row++)
+        if (data.jackCvOutID != null)
         {
-            jackOutCVTrans[row].GetComponentInChildren<omniJack>().SetID(data.jackCvOutID[row], copyMode);
+            int rowCount = Mathf.Min(maxRows, data.jackCvOutID.Length);
+            for (int row = 0; row < rowCount; row++)
+            {
+                jackOutCVTrans[row].GetComponentInChildren<omniJack>().SetID(data.jackCvOutID[row], copyMode);
+            }
         }
 
         switchCVRange.setSwitch(data.switchRange, true);
 
         // Shrink to desired size at the end
-        SetDimensions(data.dimensions[0], data.dimensions[1]);
+        SetDimensions(rows, steps);
     }
 
     #endregion
+
+    void applyStepData(SequencerData data)
+    {
+        if (data.stepBools == null && data.stepFloats == null) return;
+
+        int patternCount = maxPattern;
+        if (data.stepBools != null) patternCount = Mathf.Min(patternCount, data.stepBools.Length);
+        if (data.stepFloats != null) patternCount = Mathf.Min(patternCount, data.stepFloats.Length);
+
+        for (int p = 0; p < patternCount; p++)
+        {
+            bool[][] boolRows = data.stepBools != null && p < data.stepBools.Length ? data.stepBools[p] : null;
+            float[][] floatRows = data.stepFloats != null && p < data.stepFloats.Length ? data.stepFloats[p] : null;
+
+            int rowCount = maxRows;
+            if (boolRows != null) rowCount = Mathf.Min(rowCount, boolRows.Length);
+            if (floatRows != null) rowCount = Mathf.Min(rowCount, floatRows.Length);
+
+            for (int r = 0; r < rowCount; r++)
+            {
+                bool isTriggerRow = controlPanelModes[r].switchVal;
+                if (isTriggerRow)
+                {
+                    if (boolRows == null || r >= boolRows.Length || boolRows[r] == null) continue;
+                    int stepCount = Mathf.Min(maxSteps, boolRows[r].Length);
+                    for (int s = 0; s < stepCount; s++)
+                    {
+                        stepBools[p, r, s] = boolRows[r][s];
+                    }
+                }
+                else
+                {
+                    if (floatRows == null || r >= floatRows.Length || floatRows[r] == null) continue;
+                    int stepCount = Mathf.Min(maxSteps, floatRows[r].Length);
+                    for (int s = 0; s < stepCount; s++)
+                    {
+                        stepFloats[p, r, s] = floatRows[r][s];
+                    }
+                }
+            }
+        }
+    }
 }
 
 public class SequencerData : InstrumentData
