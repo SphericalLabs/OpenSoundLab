@@ -56,6 +56,16 @@ public class NetworkSequencer : NetworkSyncListener
 
     bool suppressStepEvents;
     bool stepListenersReady;
+    int lastObservedRows = -1;
+    int lastObservedSteps = -1;
+
+    bool[,] stepButtonListenerAdded;
+    bool[,] stepDialListenerAdded;
+
+    bool[] rowMuteRegistered;
+    bool[] rowModeRegistered;
+    bool[] rowTriggerJackRegistered;
+    bool[] rowCvJackRegistered;
 
     protected virtual void Awake()
     {
@@ -71,6 +81,7 @@ public class NetworkSequencer : NetworkSyncListener
 
         cacheStepDimensions();
         cacheStepGrid();
+        initializeRowTracking();
 
         button[] stepButtonsFlat = flattenStepButtons(stepButtons);
         dial[] stepDialsFlat = flattenStepDials(stepDials);
@@ -106,6 +117,12 @@ public class NetworkSequencer : NetworkSyncListener
     {
         GetComponent<NetworkXHandles>().xValues.Callback += OnHandleUpdated;
         registerStepListeners();
+    }
+
+    void Update()
+    {
+        updateStepListeners();
+        updateRowNetworking();
     }
 
     void OnHandleUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
@@ -331,38 +348,100 @@ public class NetworkSequencer : NetworkSyncListener
 
     void registerStepListeners()
     {
-        if (stepListenersReady) return;
         cacheStepDimensions();
         cacheStepGrid();
+        initializeListenerBuffers();
+        updateStepListeners();
+        stepListenersReady = true;
+    }
 
+    void updateRowNetworking()
+    {
+        if (sequencerDeviceInterface == null) return;
+
+        int rows = Mathf.Clamp(sequencerDeviceInterface.dimensions[0], 1, maxRows);
+        if (rowMuteRegistered == null || rowMuteRegistered.Length != maxRows) initializeRowTracking();
+
+        button[] rowMutes = sequencerDeviceInterface.getRowMutes();
+        basicSwitch[] rowModes = sequencerDeviceInterface.getRowModeSwitches();
+        omniJack[] rowTrigJacks = sequencerDeviceInterface.getRowTriggerJacks();
+        omniJack[] rowCvJacks = sequencerDeviceInterface.getRowCvJacks();
+
+        for (int row = 0; row < rows; row++)
+        {
+            if (networkButtons != null && !rowMuteRegistered[row] && rowMutes != null && rowMutes[row] != null)
+            {
+                networkButtons.registerButtons(new button[] { rowMutes[row] });
+                rowMuteRegistered[row] = true;
+            }
+
+            if (networkSwitchs != null && !rowModeRegistered[row] && rowModes != null && rowModes[row] != null)
+            {
+                networkSwitchs.registerSwitches(new basicSwitch[] { rowModes[row] });
+                rowModeRegistered[row] = true;
+            }
+
+            if (networkJacks != null && rowTrigJacks != null && rowCvJacks != null)
+            {
+                if (!rowTriggerJackRegistered[row] && rowTrigJacks[row] != null)
+                {
+                    networkJacks.registerJacks(new omniJack[] { rowTrigJacks[row] });
+                    rowTriggerJackRegistered[row] = true;
+                }
+
+                if (!rowCvJackRegistered[row] && rowCvJacks[row] != null)
+                {
+                    networkJacks.registerJacks(new omniJack[] { rowCvJacks[row] });
+                    rowCvJackRegistered[row] = true;
+                }
+            }
+        }
+    }
+
+    void updateStepListeners()
+    {
+        if (sequencerDeviceInterface == null) return;
         if (stepButtons == null || stepDials == null) return;
 
-        int rows = stepButtons.GetLength(0);
-        int steps = stepButtons.GetLength(1);
+        int rows = Mathf.Clamp(sequencerDeviceInterface.dimensions[0], 1, maxRows);
+        int steps = Mathf.Clamp(sequencerDeviceInterface.dimensions[1], 1, maxSteps);
+        if (rows == lastObservedRows && steps == lastObservedSteps && stepListenersReady) return;
+
+        initializeListenerBuffers();
+
         for (int row = 0; row < rows; row++)
         {
             for (int step = 0; step < steps; step++)
             {
-                button b = stepButtons[row, step];
-                if (b != null)
+                if (!stepButtonListenerAdded[row, step])
                 {
-                    int localRow = row;
-                    int localStep = step;
-                    b.onToggleChangedEvent.AddListener(delegate { onStepButtonChanged(localRow, localStep); });
+                    button b = stepButtons[row, step];
+                    if (b != null)
+                    {
+                        int localRow = row;
+                        int localStep = step;
+                        b.onToggleChangedEvent.AddListener(delegate { onStepButtonChanged(localRow, localStep); });
+                        stepButtonListenerAdded[row, step] = true;
+                    }
                 }
 
-                dial d = stepDials[row, step];
-                if (d != null)
+                if (!stepDialListenerAdded[row, step])
                 {
-                    int localRow = row;
-                    int localStep = step;
-                    d.onPercentChangedEvent.AddListener(delegate { onStepDialChanged(localRow, localStep); });
-                    d.onEndGrabEvents.AddListener(delegate { updateLastDialGrabTime(localRow, localStep); });
+                    dial d = stepDials[row, step];
+                    if (d != null)
+                    {
+                        int localRow = row;
+                        int localStep = step;
+                        d.onPercentChangedEvent.AddListener(delegate { onStepDialChanged(localRow, localStep); });
+                        d.onEndGrabEvents.AddListener(delegate { updateLastDialGrabTime(localRow, localStep); });
+                        stepDialListenerAdded[row, step] = true;
+                    }
                 }
             }
         }
 
-        stepListenersReady = true;
+        lastObservedRows = rows;
+        lastObservedSteps = steps;
     }
 
     int getStepIndex(int pattern, int row, int step)
@@ -418,6 +497,27 @@ public class NetworkSequencer : NetworkSyncListener
     {
         stepButtons = sequencerDeviceInterface.getStepButtons();
         stepDials = sequencerDeviceInterface.getStepDials();
+    }
+
+    void initializeRowTracking()
+    {
+        rowMuteRegistered = new bool[maxRows];
+        rowModeRegistered = new bool[maxRows];
+        rowTriggerJackRegistered = new bool[maxRows];
+        rowCvJackRegistered = new bool[maxRows];
+    }
+
+    void initializeListenerBuffers()
+    {
+        if (stepButtonListenerAdded == null || stepButtonListenerAdded.GetLength(0) != maxRows || stepButtonListenerAdded.GetLength(1) != maxSteps)
+        {
+            stepButtonListenerAdded = new bool[maxRows, maxSteps];
+        }
+
+        if (stepDialListenerAdded == null || stepDialListenerAdded.GetLength(0) != maxRows || stepDialListenerAdded.GetLength(1) != maxSteps)
+        {
+            stepDialListenerAdded = new bool[maxRows, maxSteps];
+        }
     }
 
     button[] flattenStepButtons(button[,] buttons)

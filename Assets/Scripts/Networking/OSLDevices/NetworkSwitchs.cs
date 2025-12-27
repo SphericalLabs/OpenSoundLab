@@ -35,10 +35,13 @@ public class NetworkSwitchs : NetworkBehaviour
     public basicSwitch[] switchs;
 
     public readonly SyncList<bool> switchValues = new SyncList<bool>();
+    bool clientReady;
+    bool[] switchListenerAdded;
 
     public override void OnStartServer()
     {
         base.OnStartServer();
+        if (switchs == null) switchs = new basicSwitch[0];
         foreach (var s in switchs)
         {
             switchValues.Add(s.switchVal);
@@ -47,11 +50,12 @@ public class NetworkSwitchs : NetworkBehaviour
 
     private void Start()
     {
+        if (switchs == null) switchs = new basicSwitch[0];
+        switchListenerAdded = new bool[switchs.Length];
         //add dials on change callback event
         for (int i = 0; i < switchs.Length; i++)
         {
-            int index = i;
-            switchs[i].onSwitchChangedEvent.AddListener(delegate { UpdateSwitchValue(index); });
+            addSwitchListener(i);
         }
     }
 
@@ -60,10 +64,12 @@ public class NetworkSwitchs : NetworkBehaviour
         if (!isServer)
         {
             switchValues.Callback += OnSwitchUpdated;
+            clientReady = true;
 
             // Process initial SyncList payload
             for (int i = 0; i < switchValues.Count; i++)
             {
+                if (i >= switchs.Length) break;
                 OnSwitchUpdated(SyncList<bool>.Operation.OP_ADD, i, switchs[i].switchVal, switchValues[i]);
             }
         }
@@ -71,6 +77,7 @@ public class NetworkSwitchs : NetworkBehaviour
 
     void OnSwitchUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
     {
+        if (switchs == null || index < 0 || index >= switchs.Length) return;
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
@@ -88,8 +95,36 @@ public class NetworkSwitchs : NetworkBehaviour
         }
     }
 
+    public void registerSwitches(basicSwitch[] newSwitches)
+    {
+        if (newSwitches == null || newSwitches.Length == 0) return;
+        if (switchs == null) switchs = new basicSwitch[0];
+
+        for (int i = 0; i < newSwitches.Length; i++)
+        {
+            basicSwitch newSwitch = newSwitches[i];
+            if (newSwitch == null) continue;
+            if (containsSwitch(newSwitch)) continue;
+
+            int index = switchs.Length;
+            switchs = Utils.AddElementsToArray(switchs, new basicSwitch[] { newSwitch });
+            ensureListenerBuffers();
+            addSwitchListener(index);
+
+            if (isServer)
+            {
+                switchValues.Add(newSwitch.switchVal);
+            }
+            else if (clientReady && index < switchValues.Count)
+            {
+                OnSwitchUpdated(SyncList<bool>.Operation.OP_ADD, index, newSwitch.switchVal, switchValues[index]);
+            }
+        }
+    }
+
     public void UpdateSwitchValue(int index)
     {
+        if (switchs == null || index < 0 || index >= switchs.Length) return;
         Debug.Log($"Update button hit of index: {index} to value: {switchs[index].switchVal}");
         if (isServer)
         {
@@ -104,8 +139,41 @@ public class NetworkSwitchs : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdUpdateSwitchIsChanged(int index, bool value)
     {
+        if (switchs == null || index < 0 || index >= switchs.Length) return;
         switchValues[index] = value;
         switchs[index].setSwitch(value, false, true);
     }
-}
 
+    void addSwitchListener(int index)
+    {
+        if (switchs == null || index < 0 || index >= switchs.Length) return;
+        if (switchListenerAdded != null && switchListenerAdded[index]) return;
+
+        int localIndex = index;
+        switchs[index].onSwitchChangedEvent.AddListener(delegate { UpdateSwitchValue(localIndex); });
+        if (switchListenerAdded != null) switchListenerAdded[index] = true;
+    }
+
+    void ensureListenerBuffers()
+    {
+        if (switchListenerAdded == null || switchListenerAdded.Length != switchs.Length)
+        {
+            bool[] nextFlags = new bool[switchs.Length];
+            if (switchListenerAdded != null)
+            {
+                int count = Mathf.Min(switchListenerAdded.Length, nextFlags.Length);
+                for (int i = 0; i < count; i++) nextFlags[i] = switchListenerAdded[i];
+            }
+            switchListenerAdded = nextFlags;
+        }
+    }
+
+    bool containsSwitch(basicSwitch candidate)
+    {
+        for (int i = 0; i < switchs.Length; i++)
+        {
+            if (switchs[i] == candidate) return true;
+        }
+        return false;
+    }
+}

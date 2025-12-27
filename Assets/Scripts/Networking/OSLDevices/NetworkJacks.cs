@@ -43,10 +43,13 @@ public class NetworkJacks : NetworkBehaviour
     public readonly SyncList<int> connectedJackIds = new SyncList<int>();
     public readonly SyncList<bool> jackGrabedSync = new SyncList<bool>();
 
+    bool started;
+
     public override void OnStartServer()
     {
         base.OnStartServer();
         Debug.Log("Start network jack on sever");
+        if (omniJacks == null) omniJacks = new omniJack[0];
         //set ID connected jacks into a synclist
         foreach (var jack in omniJacks)
         {
@@ -66,6 +69,7 @@ public class NetworkJacks : NetworkBehaviour
         base.OnStartClient();
         if (!isServer)
         {
+            jackIds.Callback += OnJackIdUpdated;
             connectedJackIds.Callback += OnConnectionUpdated;
             jackGrabedSync.Callback += OnJackGrabedUpdated;
         }
@@ -74,32 +78,70 @@ public class NetworkJacks : NetworkBehaviour
     private void Start()
     {
         Debug.Log("Start network jack");
+        if (omniJacks == null) omniJacks = new omniJack[0];
         for (int i = 0; i < omniJacks.Length; i++)
         {
-            NetworkSpawnManager.Instance.AddJack(omniJacks[i]);
-            int index = i;
-            omniJacks[i].onBeginnConnectionEvent.AddListener(delegate { SetJackConnection(index); });
-            omniJacks[i].onEndConnectionEvent.AddListener(delegate { EndJackConnection(index); });
-            omniJacks[i].onNotGrabableEvent.AddListener(delegate { SetJackGrab(index, true); });
-            omniJacks[i].onIsGrabableEvent.AddListener(delegate { SetJackGrab(index, false); });
+            attachJack(i, omniJacks[i]);
         }
 
         for (int i = 0; i < jackIds.Count; i++)
         {
+            if (i >= omniJacks.Length) break;
             omniJacks[i].SetID(jackIds[i], false);
             OnConnectionUpdated(SyncList<int>.Operation.OP_ADD, i, 0, connectedJackIds[i]);
         }
+
+        started = true;
     }
 
     private void OnDestroy()
     {
+        if (omniJacks == null) return;
         foreach (var jack in omniJacks)
         {
             NetworkSpawnManager.Instance.RemoveJack(jack);
         }
     }
+
+    public void registerJacks(omniJack[] newJacks)
+    {
+        if (newJacks == null || newJacks.Length == 0) return;
+        if (omniJacks == null) omniJacks = new omniJack[0];
+
+        for (int i = 0; i < newJacks.Length; i++)
+        {
+            omniJack newJack = newJacks[i];
+            if (newJack == null) continue;
+            if (containsJack(newJack)) continue;
+
+            int index = omniJacks.Length;
+            omniJacks = Utils.AddElementsToArray(omniJacks, new omniJack[] { newJack });
+
+            if (started)
+            {
+                attachJack(index, newJack);
+            }
+
+            if (isServer)
+            {
+                if (newJack.ID == -1) newJack.SetID(GetNextId, false);
+                jackIds.Add(newJack.ID);
+                connectedJackIds.Add(0);
+                jackGrabedSync.Add(false);
+            }
+            else if (jackIds.Count > index)
+            {
+                newJack.SetID(jackIds[index], false);
+                if (connectedJackIds.Count > index)
+                {
+                    OnConnectionUpdated(SyncList<int>.Operation.OP_ADD, index, 0, connectedJackIds[index]);
+                }
+            }
+        }
+    }
     void OnConnectionUpdated(SyncList<int>.Operation op, int index, int oldValue, int newValue)
     {
+        if (omniJacks == null || index < 0 || index >= omniJacks.Length) return;
         switch (op)
         {
             case SyncList<int>.Operation.OP_ADD:
@@ -128,6 +170,17 @@ public class NetworkJacks : NetworkBehaviour
                 break;
             case SyncList<int>.Operation.OP_CLEAR:
                 break;
+        }
+    }
+
+    void OnJackIdUpdated(SyncList<int>.Operation op, int index, int oldValue, int newValue)
+    {
+        if (op != SyncList<int>.Operation.OP_ADD && op != SyncList<int>.Operation.OP_SET) return;
+        if (omniJacks == null || index < 0 || index >= omniJacks.Length) return;
+        omniJacks[index].SetID(newValue, false);
+        if (connectedJackIds.Count > index)
+        {
+            OnConnectionUpdated(SyncList<int>.Operation.OP_ADD, index, 0, connectedJackIds[index]);
         }
     }
 
@@ -239,6 +292,7 @@ public class NetworkJacks : NetworkBehaviour
 
     void OnJackGrabedUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
     {
+        if (omniJacks == null || index < 0 || index >= omniJacks.Length) return;
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
@@ -257,6 +311,26 @@ public class NetworkJacks : NetworkBehaviour
             case SyncList<bool>.Operation.OP_CLEAR:
                 break;
         }
+    }
+
+    void attachJack(int index, omniJack jack)
+    {
+        if (jack == null) return;
+        NetworkSpawnManager.Instance.AddJack(jack);
+        int localIndex = index;
+        jack.onBeginnConnectionEvent.AddListener(delegate { SetJackConnection(localIndex); });
+        jack.onEndConnectionEvent.AddListener(delegate { EndJackConnection(localIndex); });
+        jack.onNotGrabableEvent.AddListener(delegate { SetJackGrab(localIndex, true); });
+        jack.onIsGrabableEvent.AddListener(delegate { SetJackGrab(localIndex, false); });
+    }
+
+    bool containsJack(omniJack candidate)
+    {
+        for (int i = 0; i < omniJacks.Length; i++)
+        {
+            if (omniJacks[i] == candidate) return true;
+        }
+        return false;
     }
 
     public void SetJackGrab(int index, bool b)
