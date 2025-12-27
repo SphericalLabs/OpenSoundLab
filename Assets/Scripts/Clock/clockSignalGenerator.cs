@@ -65,7 +65,24 @@ public class clockSignalGenerator : signalGenerator
 
         if (!running)
         {
-            System.Array.Clear(buffer, 0, buffer.Length);
+            if (mode == ClockOutputMode.Phase)
+            {
+                float curCycle = 0f;
+                if (measurePeriod > 0)
+                {
+                    curCycle = (float)(_measurePhase / measurePeriod);
+                }
+
+                for (int n = 0; n < buffer.Length; n += channels)
+                {
+                    buffer[n] = curCycle;
+                    if (channels > 1) buffer[n + 1] = buffer[n];
+                }
+            }
+            else
+            {
+                System.Array.Clear(buffer, 0, buffer.Length);
+            }
             lastProcessedDspTime = dspTime;
             System.Array.Copy(buffer, cachedBuffer, buffer.Length);
             return;
