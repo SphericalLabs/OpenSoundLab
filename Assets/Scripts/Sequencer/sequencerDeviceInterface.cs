@@ -89,7 +89,6 @@ public class sequencerDeviceInterface : deviceInterface
 
     bool[] rowModeListenerAdded;
 
-    public basicSwitch modeSwitch; // Switch between Clock (trigger) and Phase (ramp) modes
     public omniJack resetJack, clockJack, phaseJack;
     public button playButton;
     public basicSwitch switchCVRange;
@@ -549,7 +548,6 @@ public class sequencerDeviceInterface : deviceInterface
 public class SequencerData : InstrumentData
 {
     public bool switchPlay;
-    public bool modeSwitch;
     public int resetJackID, clockJackID, phaseJackID;
     public int activePattern;
     public int[] dimensions;

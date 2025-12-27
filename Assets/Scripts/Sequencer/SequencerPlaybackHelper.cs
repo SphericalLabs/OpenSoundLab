@@ -184,9 +184,11 @@ public class SequencerPlaybackHelper
             Array.Resize(ref audioResetBuffer, buffer.Length);
         }
 
-        if (sequencer.modeSwitch != null && sequencer.modeSwitch.switchVal) // Phase mode
+        // Phase mode is implicit: if the phase jack is patched (signal present), we follow phase; otherwise we run on clock/reset.
+        bool phaseMode = phaseGenerator != null;
+
+        if (phaseMode) // Phase mode
         {
-            if (phaseGenerator == null) return;
             if (!sequencer.running) return;
 
             phaseGenerator.processBuffer(audioPhaseBuffer, AudioSettings.dspTime, channels);

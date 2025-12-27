@@ -43,7 +43,6 @@ public class SequencerSaveLoadHelper
         sequencer.GetTransformData(data);
 
         data.switchPlay = sequencer.running;
-        data.modeSwitch = sequencer.modeSwitch != null && sequencer.modeSwitch.switchVal;
         data.resetJackID = sequencer.resetJack.transform.GetInstanceID();
         data.clockJackID = sequencer.clockJack.transform.GetInstanceID();
         data.phaseJackID = sequencer.phaseJack.transform.GetInstanceID();
@@ -73,7 +72,6 @@ public class SequencerSaveLoadHelper
         int steps = getStepsFromData(data);
         sequencer.SetDimensions(rows, steps);
 
-        if (sequencer.modeSwitch != null) sequencer.modeSwitch.setSwitch(data.modeSwitch, true);
         if (sequencer.switchCVRange != null) sequencer.switchCVRange.setSwitch(data.switchRange, true);
 
         sequencer.resetJack.SetID(data.resetJackID, copyMode);
