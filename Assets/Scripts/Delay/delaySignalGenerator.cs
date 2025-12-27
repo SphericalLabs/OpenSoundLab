@@ -180,19 +180,6 @@ public class delaySignalGenerator : signalGenerator
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
-    private bool containsTrigger(float[] buffer)
-    {
-        for (int i = 0; i < buffer.Length; i++)
-        {
-            if (buffer[i] > 0f && lastTriggerFloat <= 0f)
-            {
-                return true;
-            }
-            lastTriggerFloat = buffer[i];
-        }
-        return false;
-    }
-
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
@@ -217,7 +204,7 @@ public class delaySignalGenerator : signalGenerator
         {
             sigModTrigger.processBuffer(modTriggerBuffer, dspTime, channels);
 
-            if (containsTrigger(modTriggerBuffer))
+            if (containsTrigger(modTriggerBuffer, channels, ref lastTriggerFloat))
             {
                 modTriggerState = true;
                 shouldClear = true;
@@ -285,4 +272,3 @@ public class delaySignalGenerator : signalGenerator
         recursionCheckPost();
     }
 }
-

@@ -45,9 +45,18 @@ public class trigSignalGenerator : signalGenerator
         signalOn = on;
     }
 
-    double sigTime = -1;
+    private double lastProcessedDspTime = -1;
+    private float[] cachedBuffer = new float[2048];
+    private double sigTime = -1;
+
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
+        if (dspTime == lastProcessedDspTime)
+        {
+            int len = Mathf.Min(buffer.Length, cachedBuffer.Length);
+            System.Array.Copy(cachedBuffer, buffer, len);
+            return;
+        }
 
         SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
@@ -64,6 +73,9 @@ public class trigSignalGenerator : signalGenerator
                 sigTime = -1;
             }
         }
+
+        lastProcessedDspTime = dspTime;
+        System.Array.Copy(buffer, cachedBuffer, buffer.Length);
     }
 }
 

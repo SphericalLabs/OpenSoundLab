@@ -65,14 +65,10 @@ public class timelinePlayer : MonoBehaviour
 
     void Start()
     {
-        masterControl.instance.beatUpdateEvent += beatUpdateEvent;
-        masterControl.instance.beatResetEvent += beatResetEvent;
     }
 
     void OnDestroy()
     {
-        masterControl.instance.beatUpdateEvent -= beatUpdateEvent;
-        masterControl.instance.beatResetEvent -= beatResetEvent;
     }
 
     void beatResetEvent()

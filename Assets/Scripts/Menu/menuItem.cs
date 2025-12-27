@@ -525,6 +525,8 @@ public class DeviceType
     }
 
     // WaveGenerator
+    public static readonly DeviceType Divider = new DeviceType("Divider", DeviceCategory.WaveGenerator, 1);
+    public static readonly DeviceType Clock = new DeviceType("Clock", DeviceCategory.WaveGenerator, 1);
     public static readonly DeviceType Maracas = new DeviceType("Maracas", DeviceCategory.WaveGenerator, 3);
     public static readonly DeviceType Noise = new DeviceType("Noise", DeviceCategory.WaveGenerator, 2);
     public static readonly DeviceType Oscillator = new DeviceType("Oscillator", DeviceCategory.WaveGenerator, 1);

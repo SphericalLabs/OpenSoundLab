@@ -200,12 +200,12 @@ public class omniPlug : manipObject
 
             if (!isHighlighted && masterControl.instance.WireSetting == WireMode.Visualized && connected != null && connected.signal != null)
             {
+                float vizValue = connected.signal.consumeVizTrigger() ? 1f : connected.signal.vizSample;
                 lr.material.SetColor(
                     "_BaseColor",
                     mapValueToColor(
                         // look at two previous buffers, since otherwise single triggers might not be visualized correctly, ca. 90hz for audio network and 72hz for graphics can lead to missed trigs
-                        Mathf.Clamp(connected.signal.firstSample != 0f ? connected.signal.firstSample : connected.signal.prevFirstSample,
-                            -1f, 1f)
+                        Mathf.Clamp(vizValue, -1f, 1f)
                         )
                     );
             }

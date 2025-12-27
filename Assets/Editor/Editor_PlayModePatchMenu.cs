@@ -35,6 +35,7 @@ using UnityEngine.SceneManagement;
 public static class Editor_PlayModePatchMenu
 {
     const string loadOnPlayMenuPath = "OpenSoundLab/Play Mode/Load LastPlayModePatch on Play";
+    const string loadMenuPath = "OpenSoundLab/Play Mode/Load LastPlayModePatch";
     const string saveMenuPath = "OpenSoundLab/Play Mode/Save LastPlayModePatch";
     const string loadOnPlayPrefKey = "LoadLastPlayModePatchOnPlay";
     const string patchFileName = "LastPlayModePatch.xml";
@@ -61,6 +62,18 @@ public static class Editor_PlayModePatchMenu
     {
         Menu.SetChecked(loadOnPlayMenuPath, isLoadOnPlayEnabled());
         return true;
+    }
+
+    [MenuItem(loadMenuPath)]
+    public static void LoadLastPlayModePatch()
+    {
+        tryLoadLastPlayModePatch();
+    }
+
+    [MenuItem(loadMenuPath, true)]
+    public static bool LoadLastPlayModePatchValidate()
+    {
+        return Application.isPlaying;
     }
 
     [MenuItem(saveMenuPath)]

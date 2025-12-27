@@ -56,6 +56,11 @@ public class scopeSignalGenerator : signalGenerator
     // needed for scope, feeds it in AudioSource on Scope for FFT
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
+        if (isMuted)
+        {
+            SetArrayToSingleValue(buffer, buffer.Length, 0.0f);
+            return;
+        }
         if (incoming == null || bufferCopy == null) return;
         CopyArray(bufferCopy, buffer, buffer.Length);
     }
@@ -84,10 +89,6 @@ public class scopeSignalGenerator : signalGenerator
         /*if(displayOsc.gameObject.activeSelf) */
         displayOsc.storeBuffer(buffer, channels); // copy over for OSC
 
-        if (isMuted)
-        {
-            SetArrayToSingleValue(buffer, buffer.Length, 0.0f); // clear after usage before passing on. todo: this could be made more efficient and click-free
-        }
         recursionCheckPost();
     }
 }

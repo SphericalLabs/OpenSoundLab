@@ -199,11 +199,11 @@ public class adsrSignalGenerator : signalGenerator
 
             for (int n = 0; n < buffer.Length; n += 2)
             {
-                if (pulseBuffer[n] > 0f && lastPulseFloat <= 0f) // high
+                if (isRisingEdge(pulseBuffer[n], lastPulseFloat)) // high
                 {
                     hit(true);
                 }
-                else if (pulseBuffer[n] <= 0f && lastPulseFloat >= 0f)
+                else if (isFallingEdge(pulseBuffer[n], lastPulseFloat))
                 { // low
                     markForReleaseInNextFrame = true;
                 }

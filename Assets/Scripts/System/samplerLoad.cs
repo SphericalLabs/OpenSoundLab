@@ -263,28 +263,8 @@ public class samplerLoad : MonoBehaviour
         deckOutline.gameObject.SetActive(true);
         while (flashing)
         {
-            float cyc = Mathf.Repeat(masterControl.instance.curCycle * 4, 1);
-
-            if (cyc < .1f)
-            {
-                deckMat.SetColor("_TintColor", Color.Lerp(Color.black, deckLight, cyc * 10));
-                yield return null;
-            }
-            else if (cyc < .5f)
-            {
-                deckMat.SetColor("_TintColor", Color.Lerp(deckLight, Color.black, (cyc - .1f) / .4f));
-                yield return null;
-            }
-            else if (cyc < .6f)
-            {
-                deckMat.SetColor("_TintColor", Color.Lerp(Color.black, deckLight, (cyc - .5f) * 10));
-                yield return null;
-            }
-            else
-            {
-                deckMat.SetColor("_TintColor", Color.Lerp(deckLight, Color.black, (cyc - .6f) / .4f));
-                yield return null;
-            }
+            // Flash routine disabled until linked to modular phase.
+            yield return null;
         }
         deckOutline.gameObject.SetActive(false);
     }

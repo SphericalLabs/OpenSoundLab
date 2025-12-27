@@ -44,7 +44,6 @@ public class looperDeviceInterface : deviceInterface
     public int curSliderVal = 0;
     public double period = .0625;
 
-    beatTracker _beatManager;
     AudioSource audioSource;
 
     public override void Awake()
@@ -53,18 +52,10 @@ public class looperDeviceInterface : deviceInterface
         transcriber = GetComponent<waveTranscribeLooper>();
         audioSource = GetComponent<AudioSource>();
         durSlider = GetComponentInChildren<sliderNotched>();
-        _beatManager = ScriptableObject.CreateInstance<beatTracker>();
-    }
-
-    void Start()
-    {
-        _beatManager.setTriggers(onBeatEvent, onResetEvent);
-        _beatManager.updateBeatNoTriplets(2);
     }
 
     void OnDestroy()
     {
-        Destroy(_beatManager);
     }
 
     public bool playClick = false;
@@ -88,10 +79,8 @@ public class looperDeviceInterface : deviceInterface
             audioSource.Play();
             playClick = false;
         }
-        if (curSliderVal != durSlider.switchVal || period != masterControl.instance.measurePeriod)
+        if (curSliderVal != durSlider.switchVal)
         {
-
-            period = masterControl.instance.measurePeriod;
             curSliderVal = durSlider.switchVal;
             transcriber.updateDuration(durations[durSlider.switchVal], period);
         }

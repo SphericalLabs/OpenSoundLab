@@ -43,7 +43,7 @@ public class NetworkSequencer : NetworkSyncListener
     protected virtual void Awake()
     {
         sequencerDeviceInterface = GetComponent<sequencerDeviceInterface>();
-        sequencerDeviceInterface.beatSlider.onEndGrabEvents.AddListener(OnSync);
+        // sequencerDeviceInterface.beatSlider.onEndGrabEvents.AddListener(OnSync);
         sequencerDeviceInterface.stepSelect.onEndGrabEvents.AddListener(OnSync);
         sequencerDeviceInterface.xyHandle.onEndGrabEvents.AddListener(OnSync);
 

@@ -84,28 +84,7 @@ public class metronome : componentInterface
 
     bool rodDir = false;
 
-    void Update()
-    {
-        float cyc = Mathf.Repeat(masterControl.instance.curCycle * 4, 1);
-
-        if (cyc < 0.5f)
-        {
-            rod.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(-80, 80, cyc * 2));
-            if (!rodDir)
-            {
-                rodDir = true;
-            }
-        }
-        else
-        {
-            rod.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(80, -80, (cyc - .5f) * 2));
-            if (rodDir)
-            {
-                rodDir = false;
-            }
-        }
-
-    }
+        // Rod animation temporarily disabled until linked to Clock Phase output.
 
     public void readBpmDialAndBroadcast()
     {
@@ -134,8 +113,8 @@ public class metronome : componentInterface
 
     public override void hit(bool on, int ID = -1)
     {
-        if (ID == 0) masterControl.instance?.toggleBeatUpdate(on);
-        if (ID == 1 && on) masterControl.instance.resetClock();
+        // Legacy masterControl clock calls removed.
+        // Clock controls now happen on spawnable Clock device.
 
         if (ID == 3 && on) pitchBendMult = 1 / 1.03f;
         if (ID == 3 && !on) pitchBendMult = 1;

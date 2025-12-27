@@ -74,13 +74,74 @@ public class signalGenerator : MonoBehaviour
 
     public float firstSample = 0f;
     public float prevFirstSample = 0f;
+    public float vizSample = 0f;
+    public float prevVizSample = 0f;
+
+    // Visualization uses a per-buffer trigger latch to avoid missed pulses.
+    // If the buffer starts at 0, scan for a rising edge; latch forces a single frame of red.
+    // The latch is consumed by the render thread to keep visuals stable.
+    public bool vizTriggerLatched = false;
 
     public void processBuffer(float[] buffer, double dspTime, int channels)
     {
         processBufferImpl(buffer, dspTime, channels);
 
         prevFirstSample = firstSample;
+        prevVizSample = vizSample;
         firstSample = buffer[0];
+        vizSample = firstSample;
+        if (masterControl.instance == null || masterControl.instance.WireSetting != WireMode.Visualized)
+        {
+            vizTriggerLatched = false;
+            return;
+        }
+        if (vizSample == 0f && !vizTriggerLatched)
+        {
+            float lastVizSample = prevFirstSample;
+            for (int i = 0; i < buffer.Length; i += channels)
+            {
+                float sample = buffer[i];
+                if (isRisingEdge(sample, lastVizSample))
+                {
+                    vizSample = 1f;
+                    vizTriggerLatched = true;
+                    break;
+                }
+                lastVizSample = sample;
+            }
+        }
+    }
+
+    public bool consumeVizTrigger()
+    {
+        if (!vizTriggerLatched) return false;
+        vizTriggerLatched = false;
+        return true;
+    }
+
+    public static bool isRisingEdge(float sample, float lastSample)
+    {
+        return sample > 0f && lastSample <= 0f;
+    }
+
+    public static bool isFallingEdge(float sample, float lastSample)
+    {
+        return sample <= 0f && lastSample > 0f;
+    }
+
+    public static bool containsTrigger(float[] buffer, int channels, ref float lastSample)
+    {
+        for (int i = 0; i < buffer.Length; i += channels)
+        {
+            float sample = buffer[i];
+            if (isRisingEdge(sample, lastSample))
+            {
+                lastSample = sample;
+                return true;
+            }
+            lastSample = sample;
+        }
+        return false;
     }
 
     public virtual void processBufferImpl(float[] buffer, double dspTime, int channels)
