@@ -57,6 +57,11 @@ public class SaveLoadInterface : MonoBehaviour
         instrumentPrefabs["Freeverb"] = instrumentPrefabs[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
         instrumentPrefabs["SequencerCV"] = instrumentPrefabs[DeviceType.Sequencer]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["ControlCube"] = instrumentPrefabs[DeviceType.Controller]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["DC"] = instrumentPrefabs[DeviceType.Knob]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["Mixer"] = instrumentPrefabs[DeviceType.MixerTwo]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["MultiMix"] = instrumentPrefabs[DeviceType.MixerOne]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["MultiSplit"] = instrumentPrefabs[DeviceType.Splitter]; // legacy alias, remove when old saves are dropped
+        instrumentPrefabs["TouchPad"] = instrumentPrefabs[DeviceType.Button]; // legacy alias, remove when old saves are dropped
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -129,6 +134,11 @@ public class SaveLoadInterface : MonoBehaviour
         if (deviceType == "Freeverb") return DeviceType.Reverb; // legacy alias, remove when old Freeverb saves are dropped
         if (deviceType == "SequencerCV") return DeviceType.Sequencer; // legacy alias, remove when old saves are dropped
         if (deviceType == "ControlCube") return DeviceType.Controller; // legacy alias, remove when old saves are dropped
+        if (deviceType == "DC") return DeviceType.Knob; // legacy alias, remove when old saves are dropped
+        if (deviceType == "Mixer") return DeviceType.MixerTwo; // legacy alias, remove when old saves are dropped
+        if (deviceType == "MultiMix") return DeviceType.MixerOne; // legacy alias, remove when old saves are dropped
+        if (deviceType == "MultiSplit") return DeviceType.Splitter; // legacy alias, remove when old saves are dropped
+        if (deviceType == "TouchPad") return DeviceType.Button; // legacy alias, remove when old saves are dropped
         return deviceType;
     }
 
@@ -268,6 +278,7 @@ public class SaveLoadInterface : MonoBehaviour
 
 
 [XmlInclude(typeof(DCData))]
+[XmlInclude(typeof(KnobData))]
 [XmlInclude(typeof(TutorialsData))]
 [XmlInclude(typeof(PolarizerData))]
 [XmlInclude(typeof(ArtifactData))]
@@ -297,10 +308,12 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(FilterData))]
 [XmlInclude(typeof(MaracaData))]
 [XmlInclude(typeof(MicrophoneData))]
+[XmlInclude(typeof(ButtonData))]
 [XmlInclude(typeof(TouchPadData))]
 [XmlInclude(typeof(vcaData))]
 [XmlInclude(typeof(ReverbData))]
 [XmlInclude(typeof(TapeGroupData))]
+[XmlInclude(typeof(MixerTwoData))]
 [XmlInclude(typeof(MixerData))]
 [XmlInclude(typeof(MultipleData))]
 

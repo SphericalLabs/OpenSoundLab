@@ -146,10 +146,14 @@ public class menuItem : manipObject
         else if (item == DeviceType.Microphone) label.text = "Mic";
         else if (item == DeviceType.SampleHold) label.text = "S&H";
         else if (item == DeviceType.Reverb) label.text = "Reverb";
-        else if (item == DeviceType.DC) label.text = "DC";
+        else if (item == DeviceType.Knob) label.text = "Knob";
         else if (item == DeviceType.Polarizer) label.text = "Polarity";
-        else if (item == DeviceType.Sampler) label.text = "Sampler";
+        else if (item == DeviceType.Sampler) label.text = "Sampler I";
         else if (item == DeviceType.SamplerTwo) label.text = "Sampler II";
+        else if (item == DeviceType.MixerTwo) label.text = "Mixer II";
+        else if (item == DeviceType.MixerOne) label.text = "Mixer I";
+        else if (item == DeviceType.Splitter) label.text = "Splitter";
+        else if (item == DeviceType.Button) label.text = "Button";
 
 
         label.gameObject.SetActive(true);
@@ -223,13 +227,13 @@ public class menuItem : manipObject
             g.transform.localScale = Vector3.one * 0.39f;
         }
 
-        else if (item == DeviceType.MultiMix)
+        else if (item == DeviceType.MixerOne)
         {
             g.transform.localPosition = new Vector3(0.0118f, 0.0065f, 0.0293f);
             g.transform.localScale = Vector3.one * 0.47f;
         }
 
-        else if (item == DeviceType.MultiSplit)
+        else if (item == DeviceType.Splitter)
         {
             g.transform.localPosition = new Vector3(0.0118f, 0.0065f, 0.0293f);
             g.transform.localScale = Vector3.one * 0.47f;
@@ -301,7 +305,7 @@ public class menuItem : manipObject
             g.transform.localPosition = new Vector3(0, 0, .026f);
             g.transform.localRotation = Quaternion.Euler(40, 0, 0);
         }
-        else if (item == DeviceType.Mixer)
+        else if (item == DeviceType.MixerTwo)
         {
             g.transform.localPosition = new Vector3(0.014f, 0, .02f);
             g.transform.localRotation = Quaternion.Euler(60, 0, 0);
@@ -382,7 +386,7 @@ public class menuItem : manipObject
                 localRotationOffset = new Vector3(90, 0, 0);
                 localPositionOffset = new Vector3(0.15f, 0f, -0.05f);
             }
-            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.Mixer)
+            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.MixerTwo)
             {
                 localRotationOffset = new Vector3(90, 0, 0);
             }
@@ -429,7 +433,7 @@ public class menuItem : manipObject
                 g.transform.Translate(0.15f, 0f, -0.05f, Space.Self);
             }
 
-            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.Mixer)
+            else if (item == DeviceType.Drum || item == DeviceType.Keyboard || item == DeviceType.MixerTwo)
                 g.transform.Rotate(90, 0, 0, Space.Self);
 
 
@@ -542,11 +546,14 @@ public class DeviceType
 
     // ModulationGenerator
     public static readonly DeviceType Timeline = new DeviceType("Timeline", DeviceCategory.ModulationGenerator, 5);
-    public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 4);
-    public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 3);
+    public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 4);
     public static readonly DeviceType SequencerCV = Sequencer; // legacy alias, remove when old saves are dropped
-    public static readonly DeviceType DC = new DeviceType("DC", DeviceCategory.ModulationGenerator, 2);
-    public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 1);
+    public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 3);
+    public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 3);
+    public static readonly DeviceType Button = new DeviceType("Button", DeviceCategory.ModulationGenerator, 2);
+    public static readonly DeviceType TouchPad = Button; // legacy alias, remove when old saves are dropped
+    public static readonly DeviceType Knob = new DeviceType("Knob", DeviceCategory.ModulationGenerator, 1);
+    public static readonly DeviceType DC = Knob; // legacy alias, remove when old saves are dropped
 
     // SoundProcessor
     public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 1);
@@ -565,21 +572,23 @@ public class DeviceType
     public static readonly DeviceType VCA = new DeviceType("VCA", DeviceCategory.ModulationProcessor, 1);
 
     // Mixing
-    public static readonly DeviceType Mixer = new DeviceType("Mixer", DeviceCategory.Mixing, 4);
-    public static readonly DeviceType Gain = new DeviceType("Gain", DeviceCategory.Mixing, 3);
-    public static readonly DeviceType MultiMix = new DeviceType("MultiMix", DeviceCategory.Mixing, 2);
-    public static readonly DeviceType MultiSplit = new DeviceType("MultiSplit", DeviceCategory.Mixing, 1);
+    public static readonly DeviceType Gain = new DeviceType("Gain", DeviceCategory.Mixing, 4);
+    public static readonly DeviceType Mixer = MixerTwo; // legacy alias, remove when old saves are dropped
+    public static readonly DeviceType MixerTwo = new DeviceType("MixerTwo", DeviceCategory.Mixing, 3);
+    public static readonly DeviceType MixerOne = new DeviceType("MixerOne", DeviceCategory.Mixing, 2);
+    public static readonly DeviceType MultiMix = MixerOne; // legacy alias, remove when old saves are dropped. Rename later to mixer when other Mixer legacy is fading out
+    public static readonly DeviceType Splitter = new DeviceType("Splitter", DeviceCategory.Mixing, 1);
+    public static readonly DeviceType MultiSplit = Splitter; // legacy alias, remove when old saves are dropped
 
     // Interface
-    public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.Interface, 7);
-    public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.Interface, 6);
-    public static readonly DeviceType Xylophone = new DeviceType("Xylophone", DeviceCategory.Interface, 5);
+    public static readonly DeviceType MIDIOUT = new DeviceType("MIDIOUT", DeviceCategory.Interface, 6);
+    public static readonly DeviceType MIDIIN = new DeviceType("MIDIIN", DeviceCategory.Interface, 5);
+    public static readonly DeviceType Xylophone = new DeviceType("Xylophone", DeviceCategory.Interface, 4);
     public static readonly DeviceType XyloRoll = Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
-    public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 4);
-    public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 3);
-    public static readonly DeviceType Controller = new DeviceType("Controller", DeviceCategory.Interface, 2);
+    public static readonly DeviceType Drum = new DeviceType("Drum", DeviceCategory.Interface, 3);
+    public static readonly DeviceType Keyboard = new DeviceType("Keyboard", DeviceCategory.Interface, 2);
+    public static readonly DeviceType Controller = new DeviceType("Controller", DeviceCategory.Interface, 1);
     public static readonly DeviceType ControlCube = Controller; // legacy alias, remove when old saves are dropped
-    public static readonly DeviceType TouchPad = new DeviceType("TouchPad", DeviceCategory.Interface, 1);
 
     // Various
     public static readonly DeviceType Pano = new DeviceType("Pano", DeviceCategory.Various, 7);

@@ -51,7 +51,8 @@ public class xmlUpdate
                     switch (xmlNode.Name)
                     {
                         case "DCs":
-                            serializer = new XmlSerializer(typeof(DCData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Knobs":
+                            serializer = new XmlSerializer(typeof(KnobData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Tutorialss":
                             serializer = new XmlSerializer(typeof(TutorialsData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -106,9 +107,11 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "MultiMixes":
+                        case "MixerOnes":
                             serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "MultiSplits":
+                        case "Splitters":
                             serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Recorders":
@@ -118,7 +121,8 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(LooperData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Mixers":
-                            serializer = new XmlSerializer(typeof(MixerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "MixerTwos":
+                            serializer = new XmlSerializer(typeof(MixerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Maracas":
                             serializer = new XmlSerializer(typeof(MaracaData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -128,7 +132,8 @@ public class xmlUpdate
                             serializer = new XmlSerializer(typeof(XylophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "TouchPads":
-                            serializer = new XmlSerializer(typeof(TouchPadData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Buttons":
+                            serializer = new XmlSerializer(typeof(ButtonData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "Microphones":
                             serializer = new XmlSerializer(typeof(MicrophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -178,7 +183,8 @@ public class xmlUpdate
                     switch (xmlNode.Name)
                     {
                         case "DCs":
-                            data[data.Count - 1].deviceType = DeviceType.DC;
+                        case "Knobs":
+                            data[data.Count - 1].deviceType = DeviceType.Knob;
                             break;
                         case "Tutorialss":
                             data[data.Count - 1].deviceType = DeviceType.Tutorials;
@@ -227,6 +233,14 @@ public class xmlUpdate
                         case "Drums":
                             data[data.Count - 1].deviceType = DeviceType.Drum;
                             break;
+                        case "MultiMixes":
+                        case "MixerOnes":
+                            data[data.Count - 1].deviceType = DeviceType.MixerOne;
+                            break;
+                        case "MultiSplits":
+                        case "Splitters":
+                            data[data.Count - 1].deviceType = DeviceType.Splitter;
+                            break;
                         case "Recorders":
                             data[data.Count - 1].deviceType = DeviceType.Recorder;
                             break;
@@ -234,7 +248,8 @@ public class xmlUpdate
                             data[data.Count - 1].deviceType = DeviceType.Looper;
                             break;
                         case "Mixers":
-                            data[data.Count - 1].deviceType = DeviceType.Mixer;
+                        case "MixerTwos":
+                            data[data.Count - 1].deviceType = DeviceType.MixerTwo;
                             break;
                         case "Maracas":
                             data[data.Count - 1].deviceType = DeviceType.Maracas;
@@ -244,7 +259,8 @@ public class xmlUpdate
                             data[data.Count - 1].deviceType = DeviceType.Xylophone;
                             break;
                         case "TouchPads":
-                            data[data.Count - 1].deviceType = DeviceType.TouchPad;
+                        case "Buttons":
+                            data[data.Count - 1].deviceType = DeviceType.Button;
                             break;
                         case "Microphones":
                             data[data.Count - 1].deviceType = DeviceType.Microphone;

@@ -27,36 +27,45 @@
 
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-public class mixer : signalGenerator
+public class KnobSignalGenerator : signalGenerator
 {
-    public List<signalGenerator> incomingSignals = new List<signalGenerator>();
 
-    [DllImport("OSLNative")] public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-    [DllImport("OSLNative")] public static extern void AddArrays(float[] a, float[] b, int length);
+    public signalGenerator incoming;
+    public bool active = true;
+    bool isBipolar = true;
+    public float attenVal = 0f;
+    float lastAttenVal = 0f;
 
-    float[] tempBuff;
 
-    public override void Awake()
-    {
-        base.Awake();
-        tempBuff = new float[1];
-    }
+    [DllImport("OSLNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
 
-        if (tempBuff.Length != buffer.Length)
-            System.Array.Resize(ref tempBuff, buffer.Length);
-
-        SetArrayToSingleValue(buffer, buffer.Length, 0f);
-
-        foreach (signalGenerator gen in incomingSignals)
+        if (incoming != null) // attennuverter mode
         {
-            gen.processBuffer(tempBuff, dspTime, channels);
-            AddArrays(buffer, tempBuff, buffer.Length);
+            if (!recursionCheckPre()) return; // checks and avoids fatal recursions
+
+            incoming.processBuffer(buffer, dspTime, channels);
+
+            for (int i = 0; i < buffer.Length; i++)
+                buffer[i] = buffer[i] * (Utils.lerp(lastAttenVal, attenVal, (float)i / (buffer.Length - 1))); // linear attenuverter
+
+            recursionCheckPost();
         }
+        else
+        { // nothing plugged, DC gen mode
+
+            for (int i = 0; i < buffer.Length; i += channels)
+                buffer[i] = buffer[i + 1] = Utils.lerp(lastAttenVal, attenVal, (float)i / (buffer.Length - 1));
+
+        }
+
+        lastAttenVal = attenVal;
+
     }
+
 }
