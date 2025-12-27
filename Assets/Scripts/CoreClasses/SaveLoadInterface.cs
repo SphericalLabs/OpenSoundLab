@@ -66,6 +66,7 @@ public class SaveLoadInterface : MonoBehaviour
         masterControl.instance.currentScene = filename;
 
         float v = systemLoad(synthSet.SystemList[0]);
+        bool usedLegacyLoad = false;
 
         if (v == 0)
         {
@@ -79,10 +80,11 @@ public class SaveLoadInterface : MonoBehaviour
                 //Debug.Log("load data");
                 NetworkServer.Spawn(g);
             }
+            usedLegacyLoad = dataB.Count > 0;
         }
         Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
         int c = synthSet.InstrumentList.Count;
-        for (int i = 0; i < c; i++)
+        for (int i = 0; i < c && !usedLegacyLoad; i++)
         {
             synthSet.InstrumentList[c - 1 - i].deviceType = normalizeDeviceTypeName(synthSet.InstrumentList[c - 1 - i].deviceType);
             GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;

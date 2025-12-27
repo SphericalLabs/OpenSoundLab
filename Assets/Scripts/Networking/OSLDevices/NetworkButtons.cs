@@ -38,11 +38,14 @@ public class NetworkButtons : NetworkBehaviour
     public readonly SyncList<bool> buttonValues = new SyncList<bool>();
 
     private float[] lastToggeldTimes;
+    private bool[] buttonListenerAdded;
+    bool clientReady;
 
     public override void OnStartServer()
     {
         base.OnStartServer();
         buttonValues.Clear();
+        if (buttons == null) buttons = new button[0];
         foreach (var button in buttons)
         {
             buttonValues.Add(button.isHit);
@@ -51,13 +54,13 @@ public class NetworkButtons : NetworkBehaviour
 
     private void Start()
     {
+        if (buttons == null) buttons = new button[0];
         lastToggeldTimes = new float[buttons.Length];
+        buttonListenerAdded = new bool[buttons.Length];
         //add dials on change callback event
         for (int i = 0; i < buttons.Length; i++)
         {
-            int index = i;
-            buttons[i].onToggleChangedEvent.AddListener(delegate { UpdateButtonIsHit(index); });
-            buttons[i].onToggleChangedEvent.AddListener(delegate { UpdateLastToggledTime(index); });
+            addButtonListener(i);
         }
     }
 
@@ -66,10 +69,12 @@ public class NetworkButtons : NetworkBehaviour
         if (!isServer)
         {
             buttonValues.Callback += OnButtonUpdated;
+            clientReady = true;
 
             // Process initial SyncList payload
             for (int i = 0; i < buttonValues.Count; i++)
             {
+                if (i >= buttons.Length) break;
                 OnButtonUpdated(SyncList<bool>.Operation.OP_ADD, i, buttons[i].isHit, buttonValues[i]);
             }
         }
@@ -77,6 +82,7 @@ public class NetworkButtons : NetworkBehaviour
 
     void OnButtonUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
     {
+        if (buttons == null || index < 0 || index >= buttons.Length) return;
         switch (op)
         {
             case SyncList<bool>.Operation.OP_ADD:
@@ -100,8 +106,40 @@ public class NetworkButtons : NetworkBehaviour
         }
     }
 
+    public void registerButtons(button[] newButtons)
+    {
+        // Dynamic registration for runtime-created buttons (e.g., Sequencer row mutes).
+        // Usage: call with newly spawned buttons so they get listeners + SyncList entries.
+        // Note: this list is flat and ordered by append; no x/y scheme here.
+        // Sequencer step buttons are intentionally excluded and synced elsewhere.
+        if (newButtons == null || newButtons.Length == 0) return;
+        if (buttons == null) buttons = new button[0];
+
+        for (int i = 0; i < newButtons.Length; i++)
+        {
+            button newButton = newButtons[i];
+            if (newButton == null) continue;
+            if (containsButton(newButton)) continue;
+
+            int index = buttons.Length;
+            buttons = Utils.AddElementsToArray(buttons, new button[] { newButton });
+            ensureListenerBuffers();
+            addButtonListener(index);
+
+            if (isServer)
+            {
+                buttonValues.Add(newButton.isHit);
+            }
+            else if (clientReady && index < buttonValues.Count)
+            {
+                OnButtonUpdated(SyncList<bool>.Operation.OP_ADD, index, newButton.isHit, buttonValues[index]);
+            }
+        }
+    }
+
     public void UpdateButtonIsHit(int index)
     {
+        if (buttons == null || index < 0 || index >= buttons.Length) return;
         Debug.Log($"Update button hit of index: {index} to value: {buttons[index].isHit}");
         if (isServer)
         {
@@ -116,6 +154,7 @@ public class NetworkButtons : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdUpdateButtonIsHit(int index, bool value)
     {
+        if (buttons == null || index < 0 || index >= buttons.Length) return;
         buttonValues[index] = value;
         buttons[index].keyHit(value, false);
     }
@@ -130,9 +169,55 @@ public class NetworkButtons : NetworkBehaviour
 
     private bool IsToggleCooldownOver(int index)
     {
+        if (lastToggeldTimes == null || index < 0 || index >= lastToggeldTimes.Length) return true;
         if (lastToggeldTimes[index] + 0.5f < Time.time)
         {
             return true;
+        }
+        return false;
+    }
+
+    void addButtonListener(int index)
+    {
+        if (buttons == null || index < 0 || index >= buttons.Length) return;
+        if (buttonListenerAdded != null && buttonListenerAdded[index]) return;
+
+        int localIndex = index;
+        buttons[index].onToggleChangedEvent.AddListener(delegate { UpdateButtonIsHit(localIndex); });
+        buttons[index].onToggleChangedEvent.AddListener(delegate { UpdateLastToggledTime(localIndex); });
+        if (buttonListenerAdded != null) buttonListenerAdded[index] = true;
+    }
+
+    void ensureListenerBuffers()
+    {
+        if (lastToggeldTimes == null || lastToggeldTimes.Length != buttons.Length)
+        {
+            float[] nextTimes = new float[buttons.Length];
+            if (lastToggeldTimes != null)
+            {
+                int count = Mathf.Min(lastToggeldTimes.Length, nextTimes.Length);
+                for (int i = 0; i < count; i++) nextTimes[i] = lastToggeldTimes[i];
+            }
+            lastToggeldTimes = nextTimes;
+        }
+
+        if (buttonListenerAdded == null || buttonListenerAdded.Length != buttons.Length)
+        {
+            bool[] nextFlags = new bool[buttons.Length];
+            if (buttonListenerAdded != null)
+            {
+                int count = Mathf.Min(buttonListenerAdded.Length, nextFlags.Length);
+                for (int i = 0; i < count; i++) nextFlags[i] = buttonListenerAdded[i];
+            }
+            buttonListenerAdded = nextFlags;
+        }
+    }
+
+    bool containsButton(button candidate)
+    {
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (buttons[i] == candidate) return true;
         }
         return false;
     }
