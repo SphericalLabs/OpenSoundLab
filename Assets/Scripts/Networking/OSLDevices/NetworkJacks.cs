@@ -105,6 +105,9 @@ public class NetworkJacks : NetworkBehaviour
 
     public void registerJacks(omniJack[] newJacks)
     {
+        // Dynamic registration for runtime-created jacks (e.g., Sequencer row output jacks).
+        // Usage: call with newly spawned jacks so they get SyncList entries and callbacks.
+        // Note: this list is flat and ordered by append; no x/y scheme here.
         if (newJacks == null || newJacks.Length == 0) return;
         if (omniJacks == null) omniJacks = new omniJack[0];
 

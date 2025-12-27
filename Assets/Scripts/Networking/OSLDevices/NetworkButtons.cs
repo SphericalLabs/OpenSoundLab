@@ -108,6 +108,10 @@ public class NetworkButtons : NetworkBehaviour
 
     public void registerButtons(button[] newButtons)
     {
+        // Dynamic registration for runtime-created buttons (e.g., Sequencer row mutes).
+        // Usage: call with newly spawned buttons so they get listeners + SyncList entries.
+        // Note: this list is flat and ordered by append; no x/y scheme here.
+        // Sequencer step buttons are intentionally excluded and synced elsewhere.
         if (newButtons == null || newButtons.Length == 0) return;
         if (buttons == null) buttons = new button[0];
 

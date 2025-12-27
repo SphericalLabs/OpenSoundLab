@@ -97,6 +97,9 @@ public class NetworkSwitchs : NetworkBehaviour
 
     public void registerSwitches(basicSwitch[] newSwitches)
     {
+        // Dynamic registration for runtime-created switches (e.g., Sequencer row mode switches).
+        // Usage: call with newly spawned switches to add listeners + SyncList entries.
+        // Note: this list is flat and ordered by append; no x/y scheme here.
         if (newSwitches == null || newSwitches.Length == 0) return;
         if (switchs == null) switchs = new basicSwitch[0];
 

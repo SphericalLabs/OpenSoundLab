@@ -777,6 +777,7 @@ public class sequencerDeviceInterface : deviceInterface
         stepSelect.transform.localPosition = sPos;
     }
 
+    // Ensure row-level prefabs exist when rows are created dynamically.
     void ensureRowPrefabs(int row)
     {
         bool even = row % 2 == 0;
@@ -837,6 +838,7 @@ public class sequencerDeviceInterface : deviceInterface
         registerRowModeListener(row);
     }
 
+    // Ensure step prefabs exist for the given row/step.
     void ensureStepPrefabs(int row, int step)
     {
         if (controlPanelModes[row] == null) ensureRowPrefabs(row);
@@ -845,6 +847,7 @@ public class sequencerDeviceInterface : deviceInterface
         setupStepPrefabRow(stepDialPrefab, row, step, !isTrigger);
     }
 
+    // Hook row mode switch to update row visibility.
     void registerRowModeListener(int row)
     {
         if (rowModeListenerAdded[row]) return;
@@ -855,46 +858,55 @@ public class sequencerDeviceInterface : deviceInterface
         rowModeListenerAdded[row] = true;
     }
 
+    // Expose grid bounds to networking helpers.
     public int getMaxRows()
     {
         return maxRows;
     }
 
+    // Expose grid bounds to networking helpers.
     public int getMaxSteps()
     {
         return maxSteps;
     }
 
+    // Expose step buttons for dynamic listener registration.
     public button[,] getStepButtons()
     {
         return stepButtons;
     }
 
+    // Expose step dials for dynamic listener registration.
     public dial[,] getStepDials()
     {
         return stepDials;
     }
 
+    // Expose row mute buttons for dynamic network registration.
     public button[] getRowMutes()
     {
         return controlPanelMutes;
     }
 
+    // Expose row mode switches for dynamic network registration.
     public basicSwitch[] getRowModeSwitches()
     {
         return controlPanelModes;
     }
 
+    // Expose row trigger jacks for dynamic network registration.
     public omniJack[] getRowTriggerJacks()
     {
         return jackOutTrigJacks;
     }
 
+    // Expose row CV jacks for dynamic network registration.
     public omniJack[] getRowCvJacks()
     {
         return jackOutCVJacks;
     }
 
+    // Apply networked step toggles into local state and UI.
     public void applyNetworkStepBool(int pattern, int row, int step, bool value)
     {
         if (pattern < 0 || pattern >= maxPattern) return;
@@ -910,6 +922,7 @@ public class sequencerDeviceInterface : deviceInterface
         b.keyHit(value, false);
     }
 
+    // Apply networked step dial values into local state and UI.
     public void applyNetworkStepFloat(int pattern, int row, int step, float value)
     {
         if (pattern < 0 || pattern >= maxPattern) return;

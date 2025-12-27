@@ -213,6 +213,7 @@ public class NetworkSequencer : NetworkSyncListener
         }
     }
 
+    // SyncList -> sequencer step toggles.
     void OnStepBoolUpdated(SyncList<bool>.Operation op, int index, bool oldValue, bool newValue)
     {
         if (op != SyncList<bool>.Operation.OP_ADD && op != SyncList<bool>.Operation.OP_SET) return;
@@ -224,6 +225,7 @@ public class NetworkSequencer : NetworkSyncListener
         suppressStepEvents = false;
     }
 
+    // SyncList -> sequencer step dial values.
     void OnStepFloatUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
     {
         if (op != SyncList<float>.Operation.OP_ADD && op != SyncList<float>.Operation.OP_SET) return;
@@ -237,6 +239,7 @@ public class NetworkSequencer : NetworkSyncListener
         suppressStepEvents = false;
     }
 
+    // Local step toggle -> SyncList update (current pattern only).
     void onStepButtonChanged(int row, int step)
     {
         if (suppressStepEvents) return;
@@ -256,6 +259,7 @@ public class NetworkSequencer : NetworkSyncListener
         }
     }
 
+    // Local step dial -> SyncList update (current pattern only).
     void onStepDialChanged(int row, int step)
     {
         if (suppressStepEvents) return;
@@ -296,6 +300,7 @@ public class NetworkSequencer : NetworkSyncListener
         }
     }
 
+    // Cooldown timer to avoid clobbering recent user edits.
     void updateLastDialGrabTime(int row, int step)
     {
         int pattern = Mathf.Clamp(sequencerDeviceInterface.activePattern, 0, maxPatterns - 1);
@@ -325,6 +330,7 @@ public class NetworkSequencer : NetworkSyncListener
         return d.curState == manipObject.manipState.grabbed;
     }
 
+    // Server-side fill of full step state into SyncLists.
     void initializeStepValues()
     {
         cacheStepDimensions();
@@ -346,6 +352,7 @@ public class NetworkSequencer : NetworkSyncListener
         }
     }
 
+    // Initial listener hookup for any currently spawned steps.
     void registerStepListeners()
     {
         cacheStepDimensions();
@@ -355,6 +362,7 @@ public class NetworkSequencer : NetworkSyncListener
         stepListenersReady = true;
     }
 
+    // Register row mutes/mode switches/jacks as rows are created.
     void updateRowNetworking()
     {
         if (sequencerDeviceInterface == null) return;
@@ -398,6 +406,7 @@ public class NetworkSequencer : NetworkSyncListener
         }
     }
 
+    // Register listeners for newly created step buttons/dials.
     void updateStepListeners()
     {
         if (sequencerDeviceInterface == null) return;
@@ -444,12 +453,14 @@ public class NetworkSequencer : NetworkSyncListener
         lastObservedSteps = steps;
     }
 
+    // Row-major indexing for SyncList storage.
     int getStepIndex(int pattern, int row, int step)
     {
         if (stepsPerPattern <= 0) return -1;
         return pattern * stepsPerPattern + row * maxSteps + step;
     }
 
+    // Reverse lookup for SyncList indices.
     bool tryGetStepIndices(int index, out int pattern, out int row, out int step)
     {
         pattern = 0;
@@ -466,6 +477,7 @@ public class NetworkSequencer : NetworkSyncListener
         return true;
     }
 
+    // Cache grid bounds and allocate cooldown buffers.
     void cacheStepDimensions()
     {
         maxRows = Mathf.Max(1, sequencerDeviceInterface.getMaxRows());
@@ -493,12 +505,14 @@ public class NetworkSequencer : NetworkSyncListener
         }
     }
 
+    // Fetch current grid arrays from the sequencer.
     void cacheStepGrid()
     {
         stepButtons = sequencerDeviceInterface.getStepButtons();
         stepDials = sequencerDeviceInterface.getStepDials();
     }
 
+    // Track which rows have been registered with the generic network scripts.
     void initializeRowTracking()
     {
         rowMuteRegistered = new bool[maxRows];
@@ -507,6 +521,7 @@ public class NetworkSequencer : NetworkSyncListener
         rowCvJackRegistered = new bool[maxRows];
     }
 
+    // Track which steps already have event listeners attached.
     void initializeListenerBuffers()
     {
         if (stepButtonListenerAdded == null || stepButtonListenerAdded.GetLength(0) != maxRows || stepButtonListenerAdded.GetLength(1) != maxSteps)
@@ -520,6 +535,7 @@ public class NetworkSequencer : NetworkSyncListener
         }
     }
 
+    // Helper: flatten step button grid for filtering.
     button[] flattenStepButtons(button[,] buttons)
     {
         if (buttons == null) return new button[0];
@@ -537,6 +553,7 @@ public class NetworkSequencer : NetworkSyncListener
         return list.ToArray();
     }
 
+    // Helper: flatten step dial grid for filtering.
     dial[] flattenStepDials(dial[,] dials)
     {
         if (dials == null) return new dial[0];
