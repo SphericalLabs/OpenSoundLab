@@ -103,6 +103,15 @@ public class masterControl : MonoBehaviour
         DontDestroyOnLoad(CameraRig);
 
         instance = this;
+
+#if UNITY_EDITOR
+        // ensure that you see every frame that is calculated, otherwise e.g. the wires couldn't reliably visualize short trigger signals
+        int editorRefreshRate = getDisplayRefreshRate();
+        QualitySettings.vSyncCount = 1; // sync to display refresh
+        Application.targetFrameRate = editorRefreshRate > 0 ? editorRefreshRate : -1;
+#endif
+
+
         float f;
         bool success = float.TryParse(Application.version, out f);
         if (success) versionNumber = f;
@@ -196,6 +205,19 @@ public class masterControl : MonoBehaviour
     }
 
     bool depthIsSupported = false;
+
+    int getDisplayRefreshRate()
+    {
+#if UNITY_2021_2_OR_NEWER
+        float refreshRate = (float)Screen.currentResolution.refreshRateRatio.value;
+        if (refreshRate > 0f)
+        {
+            return Mathf.RoundToInt(refreshRate);
+        }
+#endif
+        int refreshRateFallback = Screen.currentResolution.refreshRate;
+        return refreshRateFallback > 0 ? refreshRateFallback : -1;
+    }
 
 
     private void Start()
