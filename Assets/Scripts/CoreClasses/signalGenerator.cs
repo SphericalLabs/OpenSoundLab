@@ -72,13 +72,10 @@ public class signalGenerator : MonoBehaviour
 
     }
 
-    public float firstSample = 0f;
-    public float prevFirstSample = 0f;
+    public float previousLastSample = 0f;
     public float vizSample = 0f;
-    public float prevVizSample = 0f;
 
     // Visualization uses a per-buffer trigger latch to avoid missed pulses.
-    // If the buffer starts at 0, scan for a rising edge; latch forces a single frame of red.
     // The latch is consumed by the render thread to keep visuals stable.
     public bool vizTriggerLatched = false;
 
@@ -86,30 +83,40 @@ public class signalGenerator : MonoBehaviour
     {
         processBufferImpl(buffer, dspTime, channels);
 
-        prevFirstSample = firstSample;
-        prevVizSample = vizSample;
-        firstSample = buffer[0];
-        vizSample = firstSample;
         if (masterControl.instance == null || masterControl.instance.WireSetting != WireMode.Visualized)
         {
             vizTriggerLatched = false;
+            previousLastSample = buffer[buffer.Length - channels]; // last sample of stereo setup
             return;
         }
-        if (vizSample == 0f && !vizTriggerLatched)
+
+        if (!vizTriggerLatched)
         {
-            float lastVizSample = prevFirstSample;
+            vizSample = buffer[0];
             for (int i = 0; i < buffer.Length; i += channels)
             {
-                float sample = buffer[i];
-                if (isRisingEdge(sample, lastVizSample))
+                if (i == 0)
                 {
-                    vizSample = 1f;
-                    vizTriggerLatched = true;
-                    break;
+                    if (isRisingEdge(buffer[0], previousLastSample))
+                    {
+                        vizTriggerLatched = true;
+                        //vizSample = buffer[0];
+                        break;
+                    }
                 }
-                lastVizSample = sample;
+                else
+                {
+                    if (isRisingEdge(buffer[i], buffer[i - channels]))
+                    {
+                        vizTriggerLatched = true;
+                        vizSample = buffer[i];
+                        break;
+                    }
+                }
             }
         }
+
+        previousLastSample = buffer[buffer.Length - channels]; // last sample of stereo setup
     }
 
     public bool consumeVizTrigger()
