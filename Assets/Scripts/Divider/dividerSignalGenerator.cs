@@ -19,18 +19,31 @@ public class dividerSignalGenerator : signalGenerator
     private float lastResetSample = 0f;
     private float trackedPhase = 0f;
     private bool hasPhaseSample = false;
+    private bool settingsInitialized = false;
+    private int lastResolutionIndex = -1;
+    private float lastSwingVal = -1f;
 
     public void Awake()
     {
         _beatManager = ScriptableObject.CreateInstance<beatTracker>();
         _beatManager.setTrigger(() => clockTriggered = true);
         _beatManager.toggleMC(false); // We drive it manually
+        UpdateSettings(resolutionIndex, swingVal);
     }
 
     public void UpdateSettings(int res, float swing)
     {
         resolutionIndex = res;
         swingVal = swing;
+        if (settingsInitialized &&
+            resolutionIndex == lastResolutionIndex &&
+            Mathf.Abs(swingVal - lastSwingVal) < 0.0001f)
+        {
+            return;
+        }
+        settingsInitialized = true;
+        lastResolutionIndex = resolutionIndex;
+        lastSwingVal = swingVal;
         _beatManager.updateBeatNoTriplets(resolutionIndex);
         _beatManager.updateSwing(swingVal);
     }
@@ -86,7 +99,7 @@ public class dividerSignalGenerator : signalGenerator
             else
             {
                 float phaseDelta = phaseSample - lastPhaseSample;
-                if (phaseDelta < 0f) phaseDelta = 0f;
+                if (phaseDelta < 0f) phaseDelta += 1f;
                 trackedPhase += phaseDelta;
                 if (trackedPhase >= 1f)
                 {
