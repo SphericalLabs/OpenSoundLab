@@ -50,9 +50,10 @@ public class SequencerGridHelper
         sequencer.dimensions[1] = steps;
 
         float cubeConst = sequencer.getCubeConst();
+        Vector2 handleOffset = sequencer.stretchHandleOffset;
         Vector3 p = sequencer.stretchNode.localPosition;
-        p.y = rows * -cubeConst - cubeConst * .75f;
-        p.x = steps * -cubeConst - cubeConst * .75f;
+        p.y = rows * -cubeConst - cubeConst * .75f + handleOffset.y;
+        p.x = steps * -cubeConst - cubeConst * .75f + handleOffset.x;
         sequencer.stretchNode.localPosition = p;
 
         updateDimensions();

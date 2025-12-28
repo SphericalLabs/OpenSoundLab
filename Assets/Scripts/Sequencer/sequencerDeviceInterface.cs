@@ -77,6 +77,7 @@ public class sequencerDeviceInterface : deviceInterface
     public xyHandle xyHandle;
     public Transform stretchNode;
     public xHandle stepSelect;
+    public Vector2 stretchHandleOffset = new Vector2(0.01f, 0.02f);
 
     // row, step
     public int[] dimensions = new int[] { 1, 1 };
@@ -109,6 +110,7 @@ public class sequencerDeviceInterface : deviceInterface
         base.Awake();
 
         ensureHelpers();
+        configureHandleNotches();
 
         jackOutTrigTrans = new Transform[maxRows];
         jackOutCVTrans = new Transform[maxRows];
@@ -172,6 +174,23 @@ public class sequencerDeviceInterface : deviceInterface
         if (gridHelper == null) gridHelper = new SequencerGridHelper(this);
         if (saveLoadHelper == null) saveLoadHelper = new SequencerSaveLoadHelper(this);
         if (playbackHelper == null) playbackHelper = new SequencerPlaybackHelper(this);
+    }
+
+    void configureHandleNotches()
+    {
+        xyHandle target = xyHandle;
+        if (target == null && stretchNode != null) target = stretchNode.GetComponent<xyHandle>();
+        if (target == null) return;
+        target.useNotches = false;
+        target.useGridSnap = true;
+        target.xGridSize = -cubeConst;
+        target.yGridSize = -cubeConst;
+        target.xGridOffset = -cubeConst * .75f + stretchHandleOffset.x;
+        target.yGridOffset = -cubeConst * .75f + stretchHandleOffset.y;
+        target.xGridMin = 1;
+        target.xGridMax = maxSteps;
+        target.yGridMin = 1;
+        target.yGridMax = maxRows;
     }
 
     void Start()

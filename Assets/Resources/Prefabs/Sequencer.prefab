@@ -1518,7 +1518,6 @@ MonoBehaviour:
   stretchNode: {fileID: 4000013409575508}
   stepSelect: {fileID: 114000012285081508}
   dimensions: 0100000001000000
-  modeSwitch: {fileID: 0}
   resetJack: {fileID: 3515527922812583517}
   clockJack: {fileID: 6029167506048887126}
   phaseJack: {fileID: 114000010336139522}
@@ -1984,7 +1983,7 @@ Transform:
   m_GameObject: {fileID: 1000013292012042}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -0.037, y: 0.028, z: 0.0097}
+  m_LocalPosition: {x: -0.061, y: -0.0255, z: 0.0097}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2430,7 +2429,7 @@ Transform:
   m_GameObject: {fileID: 1000014194828180}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.32, y: -0.185, z: 0}
+  m_LocalPosition: {x: -0.3015, y: -0.1601, z: 0}
   m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2536,6 +2535,18 @@ MonoBehaviour:
   xBounds: {x: -64, y: -0.05}
   yBounds: {x: -16, y: 0}
   percent: {x: 0, y: 0}
+  useNotches: 0
+  xNotchSteps: 0
+  yNotchSteps: 0
+  useGridSnap: 0
+  xGridSize: 0
+  yGridSize: 0
+  xGridOffset: 0
+  yGridOffset: 0
+  xGridMin: 0
+  xGridMax: 0
+  yGridMin: 0
+  yGridMax: 0
   onMat: {fileID: 2100000, guid: cdf1d0020a6fee847a4d094468453ae8, type: 2}
   usePercent: 0
   _interface: {fileID: 0}

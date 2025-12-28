@@ -40,6 +40,19 @@ public class xyHandle : manipObject
     public Vector2 yBounds = new Vector2(-Mathf.Infinity, 0);
     public Vector2 percent = Vector2.zero;
 
+    public bool useNotches = false;
+    public int xNotchSteps = 0;
+    public int yNotchSteps = 0;
+    public bool useGridSnap = false;
+    public float xGridSize = 0f;
+    public float yGridSize = 0f;
+    public float xGridOffset = 0f;
+    public float yGridOffset = 0f;
+    public int xGridMin = 0;
+    public int xGridMax = 0;
+    public int yGridMin = 0;
+    public int yGridMax = 0;
+
     Renderer rend;
     public Material onMat;
     Material offMat;
@@ -95,6 +108,7 @@ public class xyHandle : manipObject
         Vector3 p = transform.localPosition;
         p.x = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).x + offset.x, xBounds.x, xBounds.y);
         p.y = Mathf.Clamp(transform.parent.InverseTransformPoint(manipulatorObj.position).y + offset.y, yBounds.x, yBounds.y);
+        p = applySnapping(p);
         transform.localPosition = p;
         updatePercent();
         onHandleChangedEvent.Invoke();
@@ -106,6 +120,7 @@ public class xyHandle : manipObject
         Vector3 p = transform.localPosition;
         p.x = Mathf.Clamp(pos.x, xBounds.x, xBounds.y);
         p.y = Mathf.Clamp(pos.y, yBounds.x, yBounds.y);
+        p = applySnapping(p);
         transform.localPosition = p;
         updatePercent();
 
@@ -140,8 +155,43 @@ public class xyHandle : manipObject
         Vector3 pos = transform.localPosition;
         if (doX) pos.x = Mathf.Lerp(xBounds[0], xBounds[1], p.x);
         if (doY) pos.y = Mathf.Lerp(yBounds[0], yBounds[1], p.y);
+        pos = applySnapping(pos);
         transform.localPosition = pos;
         updatePercent();
+    }
+
+    Vector3 applySnapping(Vector3 pos)
+    {
+        if (useGridSnap)
+        {
+            pos.x = snapGridAxis(pos.x, xGridSize, xGridOffset, xGridMin, xGridMax);
+            pos.y = snapGridAxis(pos.y, yGridSize, yGridOffset, yGridMin, yGridMax);
+        }
+        if (useNotches)
+        {
+            if (xNotchSteps > 1) pos.x = snapAxis(pos.x, xBounds, xNotchSteps);
+            if (yNotchSteps > 1) pos.y = snapAxis(pos.y, yBounds, yNotchSteps);
+        }
+        return pos;
+    }
+
+    float snapGridAxis(float value, float size, float offset, int minStep, int maxStep)
+    {
+        if (Mathf.Approximately(size, 0f)) return value;
+        float step = Mathf.Round((value - offset) / size);
+        if (minStep != 0) step = Mathf.Max(step, minStep);
+        if (maxStep != 0) step = Mathf.Min(step, maxStep);
+        return offset + step * size;
+    }
+
+    float snapAxis(float value, Vector2 bounds, int steps)
+    {
+        if (steps <= 1) return value;
+        if (float.IsInfinity(bounds.x) || float.IsInfinity(bounds.y)) return value;
+        float stepSize = (bounds.y - bounds.x) / (steps - 1);
+        if (Mathf.Approximately(stepSize, 0f)) return value;
+        float step = Mathf.Round((value - bounds.x) / stepSize);
+        return bounds.x + step * stepSize;
     }
 
     Vector3 posstart = Vector2.zero;
@@ -176,4 +226,3 @@ public class xyHandle : manipObject
         }
     }
 }
-
