@@ -37,7 +37,17 @@ public class cvSignalGenerator : signalGenerator
     public static float highRange = 1f; //
 
 
+    struct PendingChange
+    {
+        public int sampleIndex;
+        public float value;
+    }
+
     float outVal = 0f;
+    List<PendingChange> pendingChanges = new List<PendingChange>(4);
+    double pendingDspTime = -1;
+    private double lastProcessedDspTime = -1;
+    private float[] cachedBuffer = new float[2048];
     float rangeMultiplier = lowRange;
 
     [DllImport("OSLNative")]
@@ -49,13 +59,61 @@ public class cvSignalGenerator : signalGenerator
     }
     public void setSignal(float f)
     {
-        outVal = f;
+        setSignal(f, 0, AudioSettings.dspTime);
+    }
+
+    public void setSignal(float f, int sampleIndex, double dspTime)
+    {
+        if (pendingDspTime != dspTime)
+        {
+            pendingChanges.Clear();
+            pendingDspTime = dspTime;
+        }
+        pendingChanges.Add(new PendingChange { sampleIndex = sampleIndex, value = f });
     }
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
+        if (dspTime == lastProcessedDspTime)
+        {
+            int len = Mathf.Min(buffer.Length, cachedBuffer.Length);
+            System.Array.Copy(cachedBuffer, buffer, len);
+            return;
+        }
+
+        if (cachedBuffer.Length != buffer.Length)
+        {
+            System.Array.Resize(ref cachedBuffer, buffer.Length);
+        }
+
         SetArrayToSingleValue(buffer, buffer.Length, outVal * rangeMultiplier);
+
+        if (pendingChanges.Count > 0 && pendingDspTime <= dspTime)
+        {
+            pendingChanges.Sort((a, b) => a.sampleIndex.CompareTo(b.sampleIndex));
+
+            for (int i = 0; i < pendingChanges.Count; i++)
+            {
+                int sampleIndex = Mathf.Clamp(pendingChanges[i].sampleIndex, 0, buffer.Length - channels);
+                float nextVal = pendingChanges[i].value * rangeMultiplier;
+
+                for (int n = sampleIndex; n < buffer.Length; n += channels)
+                {
+                    for (int c = 0; c < channels; c++)
+                    {
+                        buffer[n + c] = nextVal;
+                    }
+                }
+
+                outVal = pendingChanges[i].value;
+            }
+
+            pendingChanges.Clear();
+            pendingDspTime = -1;
+        }
+
+        lastProcessedDspTime = dspTime;
+        System.Array.Copy(buffer, cachedBuffer, buffer.Length);
     }
 
 }
-

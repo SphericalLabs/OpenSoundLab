@@ -93,7 +93,7 @@ public class SequencerPlaybackHelper
         }
     }
 
-    public void selectStep(int s, bool silent = false)
+    public void selectStep(int s, bool silent = false, int sampleIndex = 0, double dspTime = -1)
     {
         targetStep = s;
         selectedStep = s;
@@ -105,13 +105,14 @@ public class SequencerPlaybackHelper
         button[] rowMutes = sequencer.getRowMutes();
         trigSignalGenerator[] trigGenerators = sequencer.getRowTriggerGenerators();
         cvSignalGenerator[] cvGenerators = sequencer.getRowCvGenerators();
+        if (dspTime < 0) dspTime = AudioSettings.dspTime;
 
         for (int row = 0; row < curDimensions[0]; row++)
         {
             if (rowMutes[row].isHit) continue;
 
-            trigGenerators[row].setSignal(sequencer.stepBools[sequencer.activePattern, row, targetStep]);
-            cvGenerators[row].setSignal(sequencer.stepFloats[sequencer.activePattern, row, targetStep] * 2f - 1f);
+            trigGenerators[row].setSignal(sequencer.stepBools[sequencer.activePattern, row, targetStep], sampleIndex, dspTime);
+            cvGenerators[row].setSignal(sequencer.stepFloats[sequencer.activePattern, row, targetStep] * 2f - 1f, sampleIndex, dspTime);
         }
     }
 
@@ -124,7 +125,7 @@ public class SequencerPlaybackHelper
         sequencer.stepSelect.updatePos(-sequencer.getCubeConst() * curStep);
     }
 
-    public void executeNextStep()
+    public void executeNextStep(int sampleIndex = 0, double dspTime = -1)
     {
         if (sequencer.stepSelect.curState == manipObject.manipState.grabbed) return;
 
@@ -137,7 +138,7 @@ public class SequencerPlaybackHelper
         }
 
         int next = (targetStep + s) % sequencer.dimensions[1];
-        selectStep(next);
+        selectStep(next, false, sampleIndex, dspTime);
     }
 
     void stepOff(int step)
@@ -162,9 +163,9 @@ public class SequencerPlaybackHelper
         }
     }
 
-    void resetSteps()
+    void resetSteps(int sampleIndex = 0, double dspTime = -1)
     {
-        selectStep(0);
+        selectStep(0, false, sampleIndex, dspTime);
     }
 
     public void onAudioFilterRead(float[] buffer, int channels)
@@ -200,7 +201,7 @@ public class SequencerPlaybackHelper
             if (phaseSyncPending || s != targetStep)
             {
                 // SelectStep handles the signal generator updates, which is needed here.
-                selectStep(s);
+                selectStep(s, false, buffer.Length - channels, AudioSettings.dspTime);
                 runningUpdated = true;
                 phaseSyncPending = false;
             }
@@ -215,7 +216,7 @@ public class SequencerPlaybackHelper
                 {
                     if (signalGenerator.isRisingEdge(audioResetBuffer[i], lastResetSig[1]))
                     {
-                        resetSteps();
+                        resetSteps(i, AudioSettings.dspTime);
                     }
                     lastResetSig[0] = lastResetSig[1];
                     lastResetSig[1] = audioResetBuffer[i];
@@ -232,7 +233,7 @@ public class SequencerPlaybackHelper
                 {
                     if (signalGenerator.isRisingEdge(audioClockBuffer[i], lastClockSig[1]))
                     {
-                        executeNextStep();
+                        executeNextStep(i, AudioSettings.dspTime);
                     }
                     lastClockSig[0] = lastClockSig[1];
                     lastClockSig[1] = audioClockBuffer[i];

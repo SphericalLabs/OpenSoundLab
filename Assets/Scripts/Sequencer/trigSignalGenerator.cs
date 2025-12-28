@@ -33,21 +33,30 @@ using System.Runtime.InteropServices;
 public class trigSignalGenerator : signalGenerator
 {
 
-    bool newSignal = false;
-    bool signalOn = false;
+    List<int> pendingSampleIndexes = new List<int>(4);
+    double pendingDspTime = -1;
 
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public void setSignal(bool on)
     {
-        newSignal = true;
-        signalOn = on;
+        setSignal(on, 0, AudioSettings.dspTime);
+    }
+
+    public void setSignal(bool on, int sampleIndex, double dspTime)
+    {
+        if (!on) return;
+        if (pendingDspTime != dspTime)
+        {
+            pendingSampleIndexes.Clear();
+            pendingDspTime = dspTime;
+        }
+        pendingSampleIndexes.Add(sampleIndex);
     }
 
     private double lastProcessedDspTime = -1;
     private float[] cachedBuffer = new float[2048];
-    private double sigTime = -1;
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
@@ -60,23 +69,21 @@ public class trigSignalGenerator : signalGenerator
 
         SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
-        if (newSignal)
+        if (pendingSampleIndexes.Count > 0 && pendingDspTime <= dspTime)
         {
-            if ((sigTime == -1 || sigTime == dspTime) && signalOn)
+            for (int i = 0; i < pendingSampleIndexes.Count; i++)
             {
-                sigTime = dspTime;
-                buffer[0] = buffer[1] = 1f;
+                int sampleIndex = Mathf.Clamp(pendingSampleIndexes[i], 0, buffer.Length - channels);
+                for (int c = 0; c < channels; c++)
+                {
+                    buffer[sampleIndex + c] = 1f;
+                }
             }
-            else
-            {
-                newSignal = false;
-                sigTime = -1;
-            }
+            pendingSampleIndexes.Clear();
+            pendingDspTime = -1;
         }
 
         lastProcessedDspTime = dspTime;
         System.Array.Copy(buffer, cachedBuffer, buffer.Length);
     }
 }
-
-
