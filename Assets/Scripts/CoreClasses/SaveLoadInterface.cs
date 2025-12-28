@@ -147,6 +147,7 @@ public class SaveLoadInterface : MonoBehaviour
         SystemData s = new SystemData();
         s.version = masterControl.versionNumber;
         s.binauralMode = (int)masterControl.instance.BinauralSetting;
+        s.wireSetting = (int)masterControl.instance.WireSetting;
         synthSet.SystemList.Add(s);
     }
 
@@ -155,6 +156,10 @@ public class SaveLoadInterface : MonoBehaviour
         if (justpreview) return s.version;
 
         masterControl.instance.updateBinauralSetting(s.binauralMode);
+
+        if (s.wireSetting == 0) s.wireSetting = (int)WireMode.Straight;
+        masterControl.instance.updateWireSetting(s.wireSetting);
+
         synthSet.SystemList.Add(s);
         return s.version;
     }
@@ -348,7 +353,7 @@ public class InstrumentData
 
 public class SystemData
 {
-    public float BPM;
+    public int wireSetting;
     public int binauralMode;
     public float version;
 }
