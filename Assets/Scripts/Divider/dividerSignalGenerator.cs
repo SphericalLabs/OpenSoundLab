@@ -60,7 +60,7 @@ public class dividerSignalGenerator : signalGenerator
             return;
         }
 
-        phaseInput.processBuffer(phaseBuffer, dspTime, channels);
+        if (resetInput != null) phaseInput.processBuffer(phaseBuffer, dspTime, channels);
         if (resetInput != null) resetInput.processBuffer(resetBuffer, dspTime, channels);
 
         for (int n = 0; n < buffer.Length; n += channels)
