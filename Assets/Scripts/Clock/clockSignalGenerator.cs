@@ -46,10 +46,7 @@ public class clockSignalGenerator : signalGenerator
             System.Array.Clear(buffer, 0, buffer.Length);
             if (mode == ClockOutputMode.Reset)
             {
-                for (int c = 0; c < channels && c < buffer.Length; c++)
-                {
-                    buffer[c] = 1f;
-                }
+                buffer[0] = buffer[1] = 1f;
             }
             resetPulseQueued = false;
             lastProcessedDspTime = dspTime;
