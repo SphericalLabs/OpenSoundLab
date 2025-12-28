@@ -429,8 +429,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.1361701, y: 0.030000009, z: 0.029628184}
-  m_Center: {x: -0.037053037, y: 1.4671374e-15, z: -0.0048095314}
+  m_Size: {x: 0.05957255, y: 0.030000009, z: 0.029628184}
+  m_Center: {x: 0.0012456473, y: -1.573819e-17, z: -0.0048095314}
 --- !u!114 &114000011969927138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1517,6 +1517,7 @@ MonoBehaviour:
   xyHandle: {fileID: 114000013778669004}
   stretchNode: {fileID: 4000013409575508}
   stepSelect: {fileID: 114000012285081508}
+  stretchHandleOffset: {x: 0.01, y: 0.02}
   dimensions: 0100000001000000
   resetJack: {fileID: 3515527922812583517}
   clockJack: {fileID: 6029167506048887126}
@@ -2082,7 +2083,7 @@ Transform:
   m_GameObject: {fileID: 1000013326457216}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.07519999, y: 0.0039, z: -0.0022}
+  m_LocalPosition: {x: 0.07519999, y: 0.0043, z: -0.0022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2159,7 +2160,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.02
+  m_Radius: 0.014
   m_Center: {x: 0, y: -0.01, z: 0}
 --- !u!114 &114000010336139522
 MonoBehaviour:
@@ -2751,7 +2752,7 @@ Transform:
   m_GameObject: {fileID: 1022368409478736050}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.0751, y: -0.060459994, z: -0.0022}
+  m_LocalPosition: {x: 0.0751, y: -0.060059994, z: -0.0022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2828,7 +2829,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.02
+  m_Radius: 0.014
   m_Center: {x: 0, y: -0.01, z: 0}
 --- !u!114 &3515527922812583517
 MonoBehaviour:
@@ -3118,7 +3119,7 @@ Transform:
   m_GameObject: {fileID: 2682604550747504995}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.0751, y: -0.02926, z: -0.0022}
+  m_LocalPosition: {x: 0.0751, y: -0.028859999, z: -0.0022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3195,7 +3196,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.02
+  m_Radius: 0.014
   m_Center: {x: 0, y: -0.01, z: 0}
 --- !u!114 &6029167506048887126
 MonoBehaviour:
