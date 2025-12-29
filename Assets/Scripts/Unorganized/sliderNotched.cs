@@ -40,7 +40,6 @@ public class sliderNotched : manipObject
     public int notchCount = 4;
     public Transform labelHolder;
     public GameObject labelPrefab;
-    public float labelVerticalOffset = 0.01f;
 
     Color customColor;
     public Material glowMat;
@@ -144,19 +143,7 @@ public class sliderNotched : manipObject
             return;
         }
 
-        float labelMinX = -xBound;
-        float labelMaxX = xBound;
-        if (labelHolder.childCount > 1)
-        {
-            labelMinX = float.MaxValue;
-            labelMaxX = float.MinValue;
-            for (int i = 0; i < labelHolder.childCount; i++)
-            {
-                float xPos = labelHolder.GetChild(i).localPosition.x;
-                if (xPos < labelMinX) labelMinX = xPos;
-                if (xPos > labelMaxX) labelMaxX = xPos;
-            }
-        }
+        float labelSpan = xBound * 2f;
 
         notchCount = labelTexts.Length;
         for (int i = labelHolder.childCount - 1; i >= 0; i--)
@@ -173,10 +160,9 @@ public class sliderNotched : manipObject
             labelInstance.name = labelPrefab.name + "_" + i;
 
             float percentStep = notchCount > 1 ? i / (float)(notchCount - 1) : 0.5f;
-            float xPos = Mathf.Lerp(labelMinX, labelMaxX, percentStep);
-            Vector3 localPos = labelInstance.transform.localPosition;
+            float xPos = Mathf.Lerp(-labelSpan * 0.5f, labelSpan * 0.5f, percentStep);
+            Vector3 localPos = Vector3.zero;
             localPos.x = xPos;
-            localPos.y += labelVerticalOffset;
             labelInstance.transform.localPosition = localPos;
 
             TextMesh textMesh = labelInstance.GetComponent<TextMesh>();
