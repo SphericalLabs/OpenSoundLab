@@ -7,6 +7,7 @@ public class dividerSignalGenerator : signalGenerator
     public float resetThreshold = 0.5f;
     public int resolutionIndex = 3; // default 8th notes?
     public float swingVal = 0.5f;
+    public int cycleDivision = 1;
 
     private beatTracker _beatManager;
     private double lastProcessedDspTime = -1;
@@ -19,6 +20,7 @@ public class dividerSignalGenerator : signalGenerator
     private float lastResetSample = 0f;
     private float trackedPhase = 0f;
     private bool hasPhaseSample = false;
+    private int cycleCounter = 0;
     private bool settingsInitialized = false;
     private int lastResolutionIndex = -1;
     private float lastSwingVal = -1f;
@@ -76,6 +78,16 @@ public class dividerSignalGenerator : signalGenerator
         if (resetInput != null) phaseInput.processBuffer(phaseBuffer, dspTime, channels);
         if (resetInput != null) resetInput.processBuffer(resetBuffer, dspTime, channels);
 
+        int effectiveCycleDivision = cycleDivision < 1 ? 1 : cycleDivision;
+        if (effectiveCycleDivision == 1)
+        {
+            cycleCounter = 0;
+        }
+        else if (cycleCounter >= effectiveCycleDivision)
+        {
+            cycleCounter %= effectiveCycleDivision;
+        }
+
         for (int n = 0; n < buffer.Length; n += channels)
         {
             clockTriggered = false;
@@ -86,6 +98,7 @@ public class dividerSignalGenerator : signalGenerator
             {
                 trackedPhase = 0f;
                 hasPhaseSample = false;
+                cycleCounter = 0;
                 _beatManager.beatResetEvent();
             }
             lastResetSample = resetSample;
@@ -103,12 +116,19 @@ public class dividerSignalGenerator : signalGenerator
                 trackedPhase += phaseDelta;
                 if (trackedPhase >= 1f)
                 {
-                    trackedPhase -= Mathf.Floor(trackedPhase);
+                    int wrapCount = Mathf.FloorToInt(trackedPhase);
+                    trackedPhase -= wrapCount;
+                    cycleCounter = (cycleCounter + wrapCount) % effectiveCycleDivision;
                 }
             }
 
             lastPhaseSample = phaseSample;
-            _beatManager.beatUpdateEvent(trackedPhase);
+            float beatPhase = trackedPhase;
+            if (effectiveCycleDivision > 1)
+            {
+                beatPhase = (cycleCounter + trackedPhase) / effectiveCycleDivision;
+            }
+            _beatManager.beatUpdateEvent(beatPhase);
 
             buffer[n] = clockTriggered ? 1f : 0f;
 

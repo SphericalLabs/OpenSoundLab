@@ -8,6 +8,8 @@ public class dividerDeviceInterface : deviceInterface
     public dial swingDial;
 
     private dividerSignalGenerator clockGenerator;
+    private static readonly int[] baseResolutions = new int[] { 1, 2, 4, 8, 12, 16, 24, 32, 64 };
+    private static readonly int[] slowCycleDivisions = new int[] { 8, 4, 3, 2 };
 
     public override void Awake()
     {
@@ -32,19 +34,45 @@ public class dividerDeviceInterface : deviceInterface
             clockOutputJack.homesignal = clockGenerator;
         }
 
-        // resolutionSlider: 1, 2, 4, 8, 12, 16, 24, 32, 64
-        // these match beatTracker.cs resolutions
+        // resolutionSlider: 1 step per 8/4/3/2 cycles, then 1, 2, 4, 8, 12, 16, 24, 32, 64
     }
 
     void Update()
     {
-        if (resolutionSlider != null)
-        {
-            clockGenerator.UpdateSettings(resolutionSlider.switchVal, swingDial != null ? swingDial.percent : 0.5f);
-        }
-
+        applyResolutionSettings();
         clockGenerator.phaseInput = phaseInputJack.signal;
         clockGenerator.resetInput = resetInputJack != null ? resetInputJack.signal : null;
+    }
+
+    private void applyResolutionSettings()
+    {
+        float swingPercent = swingDial != null ? swingDial.percent : 0.5f;
+        if (resolutionSlider == null)
+        {
+            clockGenerator.UpdateSettings(3, swingPercent);
+            clockGenerator.cycleDivision = 1;
+            return;
+        }
+
+        int sliderVal = resolutionSlider.switchVal;
+        int resolutionIndex = sliderVal - slowCycleDivisions.Length;
+        int cycleDivision = 1;
+        if (sliderVal < slowCycleDivisions.Length)
+        {
+            resolutionIndex = 0;
+            cycleDivision = slowCycleDivisions[sliderVal];
+        }
+        else if (resolutionIndex < 0)
+        {
+            resolutionIndex = 0;
+        }
+        else if (resolutionIndex >= baseResolutions.Length)
+        {
+            resolutionIndex = baseResolutions.Length - 1;
+        }
+
+        clockGenerator.UpdateSettings(resolutionIndex, swingPercent);
+        clockGenerator.cycleDivision = cycleDivision;
     }
 
     public override InstrumentData GetData()
