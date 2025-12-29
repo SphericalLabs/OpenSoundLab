@@ -35,6 +35,7 @@ public class dividerDeviceInterface : deviceInterface
         }
 
         // resolutionSlider: 1 step per 8/4/3/2 cycles, then 1, 2, 4, 8, 12, 16, 24, 32, 64
+        setupResolutionLabels();
     }
 
     void Update()
@@ -73,6 +74,44 @@ public class dividerDeviceInterface : deviceInterface
 
         clockGenerator.UpdateSettings(resolutionIndex, swingPercent);
         clockGenerator.cycleDivision = cycleDivision;
+    }
+
+    private void setupResolutionLabels()
+    {
+        if (resolutionSlider == null)
+        {
+            return;
+        }
+
+        string[] labels = new string[slowCycleDivisions.Length + baseResolutions.Length];
+        for (int i = 0; i < slowCycleDivisions.Length; i++)
+        {
+            labels[i] = formatCycleLabel(slowCycleDivisions[i]);
+        }
+
+        for (int i = 0; i < baseResolutions.Length; i++)
+        {
+            labels[slowCycleDivisions.Length + i] = baseResolutions[i].ToString();
+        }
+
+        resolutionSlider.createLabels(labels);
+    }
+
+    private string formatCycleLabel(int division)
+    {
+        switch (division)
+        {
+            case 2:
+                return "½";
+            case 3:
+                return "⅓";
+            case 4:
+                return "¼";
+            case 8:
+                return "⅛";
+            default:
+                return "1/" + division;
+        }
     }
 
     public override InstrumentData GetData()

@@ -39,6 +39,8 @@ public class sliderNotched : manipObject
     public int switchVal = 0;
     public int notchCount = 4;
     public Transform labelHolder;
+    public GameObject labelPrefab;
+    public float labelVerticalOffset = 0.01f;
 
     Color customColor;
     public Material glowMat;
@@ -66,7 +68,7 @@ public class sliderNotched : manipObject
         //glowMat.SetFloat("_EmissionGain", .7f);
         //glowMat.SetColor("_TintColor", customColor);
 
-        if (labelsPresent)
+        if (labelsPresent && labelObjects != null && labelObjects.Length > 0)
         {
             labels = new Material[labelObjects.Length];
             for (int i = 0; i < labelObjects.Length; i++)
@@ -133,6 +135,67 @@ public class sliderNotched : manipObject
         {
             updateLabels();
         }
+    }
+
+    public void createLabels(string[] labelTexts)
+    {
+        if (labelHolder == null || labelPrefab == null || labelTexts == null || labelTexts.Length == 0)
+        {
+            return;
+        }
+
+        float labelMinX = -xBound;
+        float labelMaxX = xBound;
+        if (labelHolder.childCount > 1)
+        {
+            labelMinX = float.MaxValue;
+            labelMaxX = float.MinValue;
+            for (int i = 0; i < labelHolder.childCount; i++)
+            {
+                float xPos = labelHolder.GetChild(i).localPosition.x;
+                if (xPos < labelMinX) labelMinX = xPos;
+                if (xPos > labelMaxX) labelMaxX = xPos;
+            }
+        }
+
+        notchCount = labelTexts.Length;
+        for (int i = labelHolder.childCount - 1; i >= 0; i--)
+        {
+            Destroy(labelHolder.GetChild(i).gameObject);
+        }
+
+        labelObjects = new GameObject[notchCount];
+        labels = new Material[notchCount];
+
+        for (int i = 0; i < notchCount; i++)
+        {
+            GameObject labelInstance = Instantiate(labelPrefab, labelHolder, false);
+            labelInstance.name = labelPrefab.name + "_" + i;
+
+            float percentStep = notchCount > 1 ? i / (float)(notchCount - 1) : 0.5f;
+            float xPos = Mathf.Lerp(labelMinX, labelMaxX, percentStep);
+            Vector3 localPos = labelInstance.transform.localPosition;
+            localPos.x = xPos;
+            localPos.y += labelVerticalOffset;
+            labelInstance.transform.localPosition = localPos;
+
+            TextMesh textMesh = labelInstance.GetComponent<TextMesh>();
+            if (textMesh != null)
+            {
+                textMesh.text = labelTexts[i];
+            }
+
+            Renderer labelRenderer = labelInstance.GetComponent<Renderer>();
+            if (labelRenderer != null)
+            {
+                labels[i] = labelRenderer.material;
+                labels[i].SetColor("_TintColor", labelColor);
+            }
+
+            labelObjects[notchCount - 1 - i] = labelInstance;
+        }
+
+        setVal(Mathf.Clamp(switchVal, 0, notchCount - 1));
     }
 
     void updateLabels()
