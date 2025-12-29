@@ -607,7 +607,8 @@ public class manipulator : MonoBehaviour
         }
 
         // manage ongoing grabbing
-        if (grabbing && selectedObject != null) selectedObject.grabUpdate(transform);
+        // Only update grab if the object allows grabbing (prevents null manipulatorObj usage).
+        if (grabbing && selectedObject != null && selectedObject.CanBeGrabed) selectedObject.grabUpdate(transform);
         else if (selectedObject != null) selectedObject.selectUpdate(transform);
     }
 
@@ -714,4 +715,3 @@ public class manipulator : MonoBehaviour
     }
 
 }
-

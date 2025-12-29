@@ -247,6 +247,8 @@ public class SequencerPlaybackHelper
         // bugfix for randomly skipped / missed steps in sequencer.
         // this routine would fire even if the step selector handle was not touched or grabbed.
         // this could be due to an multithread issue between main and audio thread, which is still unsolved.
+        // Skip manual updates while phase lock is active to avoid fighting phase sync.
+        if (sequencer.isPhaseLockActive()) return;
         if (!forced && sequencer.stepSelect.curState != manipObject.manipState.grabbed) return;
 
         int s = (int)Mathf.Round(sequencer.stepSelect.transform.localPosition.x / -sequencer.getCubeConst());

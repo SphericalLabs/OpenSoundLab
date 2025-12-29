@@ -100,6 +100,7 @@ public class sequencerDeviceInterface : deviceInterface
     public TextMesh[] dimensionDisplays;
 
     public bool initialised = false;
+    bool stepSelectLocked = false; // Cache to avoid reapplying lock every frame.
 
     #endregion
 
@@ -202,6 +203,7 @@ public class sequencerDeviceInterface : deviceInterface
     void Update()
     {
         ensureHelpers();
+        updateStepSelectLock();
         playbackHelper.selectStepUpdate();
 
         dimensions[1] = Mathf.CeilToInt((stretchNode.localPosition.x + cubeConst * .75f) / -cubeConst);
@@ -263,6 +265,47 @@ public class sequencerDeviceInterface : deviceInterface
         }
     }
     public bool silent = false;
+
+    public bool isPhaseLockActive()
+    {
+        // Phase lock is active only while running and a phase signal is patched.
+        if (!running) return false;
+        if (phaseJack == null) return false;
+        return phaseJack.signal != null;
+    }
+
+    void updateStepSelectLock()
+    {
+        // Prevent manual step dragging while phase sync drives playback.
+        if (stepSelect == null) return;
+
+        bool lockActive = isPhaseLockActive();
+        if (lockActive == stepSelectLocked)
+        {
+            // Keep the grab flag in sync even if the lock state didn't change.
+            stepSelect.CanBeGrabed = !lockActive;
+            return;
+        }
+
+        stepSelectLocked = lockActive;
+        stepSelect.CanBeGrabed = !lockActive;
+        if (lockActive && stepSelect.curState == manipObject.manipState.grabbed)
+        {
+            // Safely release the handle if lock engages mid-grab.
+            manipulator grabber = stepSelect.manipulatorObjScript;
+            if (grabber != null && grabber.getSelection() == stepSelect)
+            {
+                grabber.ForceRelease();
+            }
+            else
+            {
+                // Fallback: reset local grab state if the grabber is out of sync.
+                stepSelect.manipulatorObj = null;
+                stepSelect.manipulatorObjScript = null;
+                stepSelect.setState(manipObject.manipState.none);
+            }
+        }
+    }
 
 
     public void SelectStep(int s, bool silent = false)
