@@ -42,7 +42,7 @@ public class sequencerDeviceInterface : deviceInterface
     public GameObject stepDialPrefab, stepButtonPrefab;
 
     public int activePattern = 0;
-    public int maxPattern = 16;
+    public int maxPattern = 1;
 
     // 3D array of pattern states: pattern, row / y, step / x
     public bool[,,] stepBools;  // the step sequencer button values
@@ -108,6 +108,8 @@ public class sequencerDeviceInterface : deviceInterface
     public override void Awake()
     {
         base.Awake();
+
+        maxPattern = 1;
 
         ensureHelpers();
         configureHandleNotches();

@@ -47,13 +47,14 @@ public class SequencerSaveLoadHelper
         data.clockJackID = sequencer.clockJack.transform.GetInstanceID();
         data.phaseJackID = sequencer.phaseJack.transform.GetInstanceID();
         data.activePattern = sequencer.activePattern;
-        data.dimensions = new int[] { sequencer.dimensions[0], sequencer.dimensions[1] };
+        int[] clampedDimensions = getClampedDimensions();
+        data.dimensions = clampedDimensions;
         data.switchRange = sequencer.switchCVRange != null && sequencer.switchCVRange.switchVal;
 
         sequencer.readAllData();
-        captureRowStates(data);
-        captureRowJackIds(data);
-        captureStepData(data);
+        captureRowStates(data, clampedDimensions[0]);
+        captureRowJackIds(data, clampedDimensions[0]);
+        captureStepData(data, clampedDimensions[0], clampedDimensions[1]);
 
         return data;
     }
@@ -92,59 +93,69 @@ public class SequencerSaveLoadHelper
         sequencer.transform.localScale = data.scale;
     }
 
-    void captureRowStates(SequencerData data)
+    void captureRowStates(SequencerData data, int rows)
     {
-        int maxRows = sequencer.getMaxRows();
         button[] rowMutes = sequencer.getRowMutes();
         basicSwitch[] rowModes = sequencer.getRowModeSwitches();
 
-        data.rowMutes = new bool[maxRows];
-        data.rowModes = new bool[maxRows];
+        data.rowMutes = new bool[rows];
+        data.rowModes = new bool[rows];
 
-        for (int row = 0; row < maxRows; row++)
+        for (int row = 0; row < rows; row++)
         {
             data.rowMutes[row] = rowMutes[row] != null && rowMutes[row].isHit;
             data.rowModes[row] = rowModes[row] != null && rowModes[row].switchVal;
         }
     }
 
-    void captureRowJackIds(SequencerData data)
+    void captureRowJackIds(SequencerData data, int rows)
     {
-        int maxRows = sequencer.getMaxRows();
         omniJack[] trigJacks = sequencer.getRowTriggerJacks();
         omniJack[] cvJacks = sequencer.getRowCvJacks();
 
-        data.jackTriggerOutID = new int[maxRows];
-        data.jackCvOutID = new int[maxRows];
+        data.jackTriggerOutID = new int[rows];
+        data.jackCvOutID = new int[rows];
 
-        for (int row = 0; row < maxRows; row++)
+        for (int row = 0; row < rows; row++)
         {
             if (trigJacks[row] != null) data.jackTriggerOutID[row] = trigJacks[row].transform.GetInstanceID();
             if (cvJacks[row] != null) data.jackCvOutID[row] = cvJacks[row].transform.GetInstanceID();
         }
     }
 
-    void captureStepData(SequencerData data)
+    void captureStepData(SequencerData data, int rows, int steps)
     {
         int maxPatterns = sequencer.maxPattern;
-        int maxRows = sequencer.getMaxRows();
-        int maxSteps = sequencer.getMaxSteps();
+        basicSwitch[] rowModes = sequencer.getRowModeSwitches();
 
         data.stepBools = new bool[maxPatterns][][];
         data.stepFloats = new float[maxPatterns][][];
 
         for (int pattern = 0; pattern < maxPatterns; pattern++)
         {
-            data.stepBools[pattern] = new bool[maxRows][];
-            data.stepFloats[pattern] = new float[maxRows][];
-            for (int row = 0; row < maxRows; row++)
+            data.stepBools[pattern] = new bool[rows][];
+            data.stepFloats[pattern] = new float[rows][];
+            for (int row = 0; row < rows; row++)
             {
-                data.stepBools[pattern][row] = new bool[maxSteps];
-                data.stepFloats[pattern][row] = new float[maxSteps];
-                for (int step = 0; step < maxSteps; step++)
+                bool isTriggerRow = rowModes != null
+                    && row < rowModes.Length
+                    && rowModes[row] != null
+                    && rowModes[row].switchVal;
+                if (isTriggerRow)
                 {
-                    data.stepBools[pattern][row][step] = sequencer.stepBools[pattern, row, step];
-                    data.stepFloats[pattern][row][step] = sequencer.stepFloats[pattern, row, step];
+                    data.stepBools[pattern][row] = new bool[steps];
+                    for (int step = 0; step < steps; step++)
+                    {
+                        data.stepBools[pattern][row][step] = sequencer.stepBools[pattern, row, step];
+                    }
+                }
+                else
+                {
+                    data.stepFloats[pattern][row] = new float[steps];
+                    for (int step = 0; step < steps; step++)
+                    {
+                        data.stepFloats[pattern][row][step] = sequencer.stepFloats[pattern, row, step];
+                    }
                 }
             }
         }
@@ -285,5 +296,20 @@ public class SequencerSaveLoadHelper
             return Mathf.Clamp(sequencer.dimensions[1], 1, sequencer.getMaxSteps());
         }
         return Mathf.Clamp(data.dimensions[1], 1, sequencer.getMaxSteps());
+    }
+
+    int[] getClampedDimensions()
+    {
+        int rows = 1;
+        int steps = 1;
+        int[] curDimensions = sequencer.getCurrentDimensions();
+        if (curDimensions != null && curDimensions.Length >= 2)
+        {
+            rows = curDimensions[0];
+            steps = curDimensions[1];
+        }
+        rows = Mathf.Clamp(rows, 1, sequencer.getMaxRows());
+        steps = Mathf.Clamp(steps, 1, sequencer.getMaxSteps());
+        return new int[] { rows, steps };
     }
 }
