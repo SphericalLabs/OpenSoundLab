@@ -54,6 +54,8 @@ public class clockDeviceInterface : deviceInterface
         applyResolutionSettings();
         clockGenerator.phaseInput = phaseInputJack != null ? phaseInputJack.signal : null;
         clockGenerator.resetInput = resetInputJack != null ? resetInputJack.signal : null;
+        bool outputPlugged = clockOutputJack != null && clockOutputJack.near != null;
+        clockGenerator.autorunning = !outputPlugged;
         updateProgressBar();
     }
 

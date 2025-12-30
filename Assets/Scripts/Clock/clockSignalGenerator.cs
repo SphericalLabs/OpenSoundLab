@@ -9,6 +9,7 @@ public class clockSignalGenerator : signalGenerator
     public float swingVal = 0.5f;
     public int cycleDivision = 1;
     public float progressToNextTrigger = 0f;
+    public bool autorunning = false;
 
     private beatTracker _beatManager;
     private double lastProcessedDspTime = -1;
@@ -92,7 +93,7 @@ public class clockSignalGenerator : signalGenerator
             return;
         }
 
-        if (resetInput != null) phaseInput.processBuffer(phaseBuffer, dspTime, channels);
+        if (phaseInput != null) phaseInput.processBuffer(phaseBuffer, dspTime, channels);
         if (resetInput != null) resetInput.processBuffer(resetBuffer, dspTime, channels);
 
         int effectiveCycleDivision = cycleDivision < 1 ? 1 : cycleDivision;
@@ -168,5 +169,15 @@ public class clockSignalGenerator : signalGenerator
     private void OnDestroy()
     {
         if (_beatManager != null) Destroy(_beatManager);
+    }
+
+    private void OnAudioFilterRead(float[] buffer, int channels)
+    {
+        if (autorunning)
+        {
+            processBuffer(buffer, AudioSettings.dspTime, channels);
+        }
+
+        // Audio is being muted in the AudioSource
     }
 }
