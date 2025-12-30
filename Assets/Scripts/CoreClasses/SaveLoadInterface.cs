@@ -119,6 +119,24 @@ public class SaveLoadInterface : MonoBehaviour
         return (v != 0);
     }
 
+    public void StartNewPatch()
+    {
+        masterControl.instance.currentScene = "";
+        ClearInstruments();
+    }
+
+    public void ClearInstruments()
+    {
+        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("instrument");
+        for (int i = 0; i < gameObjects.Length; i++)
+        {
+            if (gameObjects[i].name == "Tutorials(Clone)") continue; // Tutorials stays persistent
+            Destroy(gameObjects[i]);
+        }
+
+        if (masterControl.instance.examplesOn) masterControl.instance.toggleExamples();
+    }
+
     void ClearSynthSetList()
     {
         synthSet.InstrumentList.Clear();

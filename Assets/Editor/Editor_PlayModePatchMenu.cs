@@ -37,6 +37,7 @@ public static class Editor_PlayModePatchMenu
     const string loadOnPlayMenuPath = "OpenSoundLab/Play Mode/Load LastPlayModePatch on Play";
     const string loadMenuPath = "OpenSoundLab/Play Mode/Load LastPlayModePatch";
     const string saveMenuPath = "OpenSoundLab/Play Mode/Save LastPlayModePatch";
+    const string newPatchMenuPath = "OpenSoundLab/Play Mode/New Patch";
     const string loadOnPlayPrefKey = "LoadLastPlayModePatchOnPlay";
     const string patchFileName = "LastPlayModePatch.xml";
     static bool loadOnPlayPending;
@@ -48,7 +49,7 @@ public static class Editor_PlayModePatchMenu
         Menu.SetChecked(loadOnPlayMenuPath, isLoadOnPlayEnabled());
     }
 
-    [MenuItem(loadOnPlayMenuPath)]
+    [MenuItem(loadOnPlayMenuPath, false, 20)]
     public static void ToggleLoadOnPlay()
     {
         bool enabled = !isLoadOnPlayEnabled();
@@ -57,26 +58,26 @@ public static class Editor_PlayModePatchMenu
         Menu.SetChecked(loadOnPlayMenuPath, enabled);
     }
 
-    [MenuItem(loadOnPlayMenuPath, true)]
+    [MenuItem(loadOnPlayMenuPath, true, 20)]
     public static bool ToggleLoadOnPlayValidate()
     {
         Menu.SetChecked(loadOnPlayMenuPath, isLoadOnPlayEnabled());
         return true;
     }
 
-    [MenuItem(loadMenuPath)]
+    [MenuItem(loadMenuPath, false, 10)]
     public static void LoadLastPlayModePatch()
     {
         tryLoadLastPlayModePatch();
     }
 
-    [MenuItem(loadMenuPath, true)]
+    [MenuItem(loadMenuPath, true, 10)]
     public static bool LoadLastPlayModePatchValidate()
     {
         return Application.isPlaying;
     }
 
-    [MenuItem(saveMenuPath)]
+    [MenuItem(saveMenuPath, false, 30)]
     public static void SaveLastPlayModePatch()
     {
         if (!Application.isPlaying)
@@ -98,10 +99,42 @@ public static class Editor_PlayModePatchMenu
         Debug.Log($"Saved LastPlayModePatch to {path}");
     }
 
-    [MenuItem(saveMenuPath, true)]
+    [MenuItem(saveMenuPath, true, 30)]
     public static bool SaveLastPlayModePatchValidate()
     {
         return Application.isPlaying && SaveLoadInterface.instance != null;
+    }
+
+    [MenuItem(newPatchMenuPath, false, 1)]
+    public static void StartNewPatch()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("New Patch only works in Play Mode.");
+            return;
+        }
+
+        if (!NetworkServer.active)
+        {
+            Debug.LogWarning("New Patch requires Mirror server to be active.");
+            return;
+        }
+
+        SaveLoadInterface saveLoad = SaveLoadInterface.instance;
+        if (saveLoad == null)
+        {
+            Debug.LogWarning("SaveLoadInterface is not available.");
+            return;
+        }
+
+        saveLoad.StartNewPatch();
+        Debug.Log("Started new patch.");
+    }
+
+    [MenuItem(newPatchMenuPath, true, 1)]
+    public static bool StartNewPatchValidate()
+    {
+        return Application.isPlaying && NetworkServer.active && SaveLoadInterface.instance != null;
     }
 
     static void handlePlayModeStateChanged(PlayModeStateChange state)

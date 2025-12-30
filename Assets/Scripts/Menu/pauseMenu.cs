@@ -168,7 +168,7 @@ public class pauseMenu : MonoBehaviour
 
     public void loadFile(string s)
     {
-        clearInstruments();
+        SaveLoadInterface.instance.ClearInstruments();
         SaveLoadInterface.instance.Load(s);
         mainMenuActive();
         toggleMenu();
@@ -246,9 +246,7 @@ public class pauseMenu : MonoBehaviour
             else if (curItem == itemType.newItem)
             {
                 toggleMenu();
-
-                masterControl.instance.currentScene = "";
-                clearInstruments();
+                SaveLoadInterface.instance.StartNewPatch();
             }
         }
         if (t == itemType.gazeItem)
@@ -260,18 +258,6 @@ public class pauseMenu : MonoBehaviour
             }
         }
         return;
-    }
-
-    public void clearInstruments()
-    {
-        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("instrument");
-        for (int i = 0; i < gameObjects.Length; i++)
-        {
-            if (gameObjects[i].name == "Tutorials(Clone)") continue; // Tutorials stays persistent
-            Destroy(gameObjects[i]);
-        }
-
-        if (masterControl.instance.examplesOn) masterControl.instance.toggleExamples();
     }
 
     public void toggleMenu(bool animated = true)
