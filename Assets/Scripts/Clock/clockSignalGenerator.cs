@@ -25,6 +25,7 @@ public class clockSignalGenerator : signalGenerator
     private bool settingsInitialized = false;
     private int lastResolutionIndex = -1;
     private float lastSwingVal = -1f;
+    private bool globalResetQueued = false;
 
     public void Awake()
     {
@@ -51,8 +52,19 @@ public class clockSignalGenerator : signalGenerator
         _beatManager.updateSwing(swingVal);
     }
 
+    public void requestGlobalReset()
+    {
+        globalResetQueued = true;
+    }
+
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
+        if (globalResetQueued)
+        {
+            applyResetState();
+            globalResetQueued = false;
+        }
+
         if (phaseInput == null)
         {
             progressToNextTrigger = 0f;
@@ -102,10 +114,7 @@ public class clockSignalGenerator : signalGenerator
             bool resetEdge = resetInput != null && resetSample >= resetThreshold && lastResetSample < resetThreshold;
             if (resetEdge)
             {
-                trackedPhase = 0f;
-                hasPhaseSample = false;
-                cycleCounter = 0;
-                _beatManager.beatResetEvent();
+                applyResetState();
             }
             lastResetSample = resetSample;
 
@@ -146,6 +155,14 @@ public class clockSignalGenerator : signalGenerator
 
         lastProcessedDspTime = dspTime;
         System.Array.Copy(buffer, cachedBuffer, buffer.Length);
+    }
+
+    void applyResetState()
+    {
+        trackedPhase = 0f;
+        hasPhaseSample = false;
+        cycleCounter = 0;
+        _beatManager.beatResetEvent();
     }
 
     private void OnDestroy()

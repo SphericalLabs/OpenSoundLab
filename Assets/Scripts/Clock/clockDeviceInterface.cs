@@ -39,6 +39,16 @@ public class clockDeviceInterface : deviceInterface
         setupResolutionLabels();
     }
 
+    void OnEnable()
+    {
+        cycleDeviceInterface.resetPressedEvent += handleCycleReset;
+    }
+
+    void OnDisable()
+    {
+        cycleDeviceInterface.resetPressedEvent -= handleCycleReset;
+    }
+
     void Update()
     {
         applyResolutionSettings();
@@ -97,6 +107,11 @@ public class clockDeviceInterface : deviceInterface
         }
 
         resolutionSlider.createLabels(labels);
+    }
+
+    void handleCycleReset(cycleDeviceInterface cycle)
+    {
+        if (clockGenerator != null) clockGenerator.requestGlobalReset();
     }
 
     private void updateProgressBar()

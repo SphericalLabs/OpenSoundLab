@@ -200,6 +200,16 @@ public class sequencerDeviceInterface : deviceInterface
     {
     }
 
+    void OnEnable()
+    {
+        cycleDeviceInterface.resetPressedEvent += handleCycleReset;
+    }
+
+    void OnDisable()
+    {
+        cycleDeviceInterface.resetPressedEvent -= handleCycleReset;
+    }
+
     void Update()
     {
         ensureHelpers();
@@ -312,6 +322,12 @@ public class sequencerDeviceInterface : deviceInterface
     {
         ensureHelpers();
         playbackHelper.selectStep(s, silent);
+    }
+
+    void handleCycleReset(cycleDeviceInterface cycle)
+    {
+        ensureHelpers();
+        playbackHelper.requestGlobalReset();
     }
 
 

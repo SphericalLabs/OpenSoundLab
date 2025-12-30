@@ -38,6 +38,7 @@ public class SequencerPlaybackHelper
 
     bool runningUpdated = false;
     bool phaseSyncPending = false;
+    bool globalResetQueued = false;
 
     float[] lastClockSig = new float[] { 0, 0 };
     float[] lastResetSig = new float[] { 0, 0 };
@@ -168,6 +169,11 @@ public class SequencerPlaybackHelper
         selectStep(0, false, sampleIndex, dspTime);
     }
 
+    public void requestGlobalReset()
+    {
+        globalResetQueued = true;
+    }
+
     public void onAudioFilterRead(float[] buffer, int channels)
     {
         if (audioPhaseBuffer.Length != buffer.Length)
@@ -183,6 +189,12 @@ public class SequencerPlaybackHelper
         if (audioResetBuffer.Length != buffer.Length)
         {
             Array.Resize(ref audioResetBuffer, buffer.Length);
+        }
+
+        if (globalResetQueued)
+        {
+            resetSteps(0, AudioSettings.dspTime);
+            globalResetQueued = false;
         }
 
         // Phase mode is implicit: if the phase jack is patched (signal present), we follow phase; otherwise we run on clock/reset.

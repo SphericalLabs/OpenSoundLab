@@ -1,9 +1,12 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Xml.Serialization;
 
 public class cycleDeviceInterface : deviceInterface
 {
+    public static Action<cycleDeviceInterface> resetPressedEvent;
+
     public omniJack resetJack, phaseJack;
     public dial bpmDial;
     public TextMesh bpmDisplay;
@@ -142,9 +145,7 @@ public class cycleDeviceInterface : deviceInterface
         }
         else if (ID == 1 && on) // Rewind
         {
-            phaseSignal.ResetPhase();
-            resetSignal.ResetPhase();
-            resetSignal.triggerResetPulse();
+            handleResetPress();
         }
         else if (ID == 3) // Nudge Backward
         {
@@ -161,6 +162,18 @@ public class cycleDeviceInterface : deviceInterface
                 masterControl.instance.recorder.ToggleRec(on);
             }
         }
+    }
+
+    void handleResetPress()
+    {
+        if (phaseSignal != null) phaseSignal.ResetPhase();
+        if (resetSignal != null)
+        {
+            resetSignal.ResetPhase();
+            resetSignal.triggerResetPulse();
+        }
+
+        if (resetPressedEvent != null) resetPressedEvent(this);
     }
 
     public override InstrumentData GetData()
