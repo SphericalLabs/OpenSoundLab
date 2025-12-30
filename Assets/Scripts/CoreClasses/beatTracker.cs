@@ -181,4 +181,29 @@ public class beatTracker : ScriptableObject
             if (active) triggerEvent();
         }
     }
+
+    public float getStepProgress(float t)
+    {
+        if (calculatedSubSteps.Length == 0) return 0f;
+        if (calculatedSubSteps.Length == 1) return Mathf.Clamp01(t);
+
+        int lastIndex = 0;
+        for (int i = 1; i < calculatedSubSteps.Length; i++)
+        {
+            if (calculatedSubSteps[i] <= t) lastIndex = i;
+        }
+
+        int nextIndex = (lastIndex + 1) % calculatedSubSteps.Length;
+        float start = calculatedSubSteps[lastIndex];
+        float end = calculatedSubSteps[nextIndex];
+        if (nextIndex == 0) end += 1f;
+
+        float duration = end - start;
+        if (duration <= 0f) return 0f;
+
+        float localT = t;
+        if (nextIndex == 0 && t < start) localT += 1f;
+
+        return Mathf.Clamp01((localT - start) / duration);
+    }
 }

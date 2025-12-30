@@ -6,6 +6,7 @@ public class clockDeviceInterface : deviceInterface
     public omniJack phaseInputJack, clockOutputJack, resetInputJack;
     public sliderNotched resolutionSlider;
     public dial swingDial;
+    public Transform progressBar;
 
     private clockSignalGenerator clockGenerator;
     private static readonly int[] baseResolutions = new int[] { 1, 2, 4, 8, 12, 16, 24, 32, 64 };
@@ -43,6 +44,7 @@ public class clockDeviceInterface : deviceInterface
         applyResolutionSettings();
         clockGenerator.phaseInput = phaseInputJack != null ? phaseInputJack.signal : null;
         clockGenerator.resetInput = resetInputJack != null ? resetInputJack.signal : null;
+        updateProgressBar();
     }
 
     private void applyResolutionSettings()
@@ -95,6 +97,19 @@ public class clockDeviceInterface : deviceInterface
         }
 
         resolutionSlider.createLabels(labels);
+    }
+
+    private void updateProgressBar()
+    {
+        if (progressBar == null || clockGenerator == null)
+        {
+            return;
+        }
+
+        float progress = Mathf.Clamp01(clockGenerator.progressToNextTrigger);
+        Vector3 scale = progressBar.localScale;
+        scale.x = progress;
+        progressBar.localScale = scale;
     }
 
     private string formatCycleLabel(int division)

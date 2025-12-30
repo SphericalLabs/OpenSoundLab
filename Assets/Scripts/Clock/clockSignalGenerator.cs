@@ -8,6 +8,7 @@ public class clockSignalGenerator : signalGenerator
     public int resolutionIndex = 3; // default 8th notes?
     public float swingVal = 0.5f;
     public int cycleDivision = 1;
+    public float progressToNextTrigger = 0f;
 
     private beatTracker _beatManager;
     private double lastProcessedDspTime = -1;
@@ -52,7 +53,11 @@ public class clockSignalGenerator : signalGenerator
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
-        if (phaseInput == null) return;
+        if (phaseInput == null)
+        {
+            progressToNextTrigger = 0f;
+            return;
+        }
 
         if (cachedBuffer.Length != buffer.Length)
         {
@@ -88,6 +93,7 @@ public class clockSignalGenerator : signalGenerator
             cycleCounter %= effectiveCycleDivision;
         }
 
+        float lastBeatPhase = 0f;
         for (int n = 0; n < buffer.Length; n += channels)
         {
             clockTriggered = false;
@@ -128,12 +134,15 @@ public class clockSignalGenerator : signalGenerator
             {
                 beatPhase = (cycleCounter + trackedPhase) / effectiveCycleDivision;
             }
+            lastBeatPhase = beatPhase;
             _beatManager.beatUpdateEvent(beatPhase);
 
             buffer[n] = clockTriggered ? 1f : 0f;
 
             if (channels > 1) buffer[n + 1] = buffer[n];
         }
+
+        progressToNextTrigger = _beatManager.getStepProgress(lastBeatPhase);
 
         lastProcessedDspTime = dspTime;
         System.Array.Copy(buffer, cachedBuffer, buffer.Length);
