@@ -2526,8 +2526,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.13644941, y: 0.030279277, z: 0.057754856}
-  m_Center: {x: -0.03705304, y: 0, z: 0.009114211}
+  m_Size: {x: 0.22869816, y: 0.08225041, z: 0.04151389}
+  m_Center: {x: -0.02438508, y: -0.0016240962, z: -0.008101221}
 --- !u!114 &8110660952217183978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4254,8 +4254,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.12406606, y: 0.04481856, z: 0.024938598}
-  m_Center: {x: -0.023949243, y: 0.00969623, z: 0.025001632}
+  m_Size: {x: 0.12819815, y: 0.045914635, z: 0.023842525}
+  m_Center: {x: -0.021883288, y: 0.010974936, z: 0.025549676}
 --- !u!114 &2552055342066781060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4334,6 +4334,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: PHASE
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688883654083246565, guid: 914ac49a0a51b47cca057b2d7710fdc8,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.015
       objectReference: {fileID: 0}
     - target: {fileID: 7709873738993341025, guid: 914ac49a0a51b47cca057b2d7710fdc8,
         type: 3}
@@ -4446,6 +4451,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: CLOCK
       objectReference: {fileID: 0}
+    - target: {fileID: 7688883654083246565, guid: 914ac49a0a51b47cca057b2d7710fdc8,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.015
+      objectReference: {fileID: 0}
     - target: {fileID: 7738818879502467861, guid: 914ac49a0a51b47cca057b2d7710fdc8,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4536,6 +4546,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: RESET
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688883654083246565, guid: 914ac49a0a51b47cca057b2d7710fdc8,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.015
       objectReference: {fileID: 0}
     - target: {fileID: 7709873738993341025, guid: 914ac49a0a51b47cca057b2d7710fdc8,
         type: 3}

@@ -435,7 +435,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5739946632568437145}
   - component: {fileID: 8179577551692137085}
-  - component: {fileID: 3919981517040821309}
+  - component: {fileID: 5888519616129466910}
   m_Layer: 0
   m_Name: handle
   m_TagString: Untagged
@@ -452,7 +452,7 @@ Transform:
   m_GameObject: {fileID: 914311799136698240}
   serializedVersion: 2
   m_LocalRotation: {x: 0.70710677, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0039, y: 0.0014999998, z: -0.0003999991}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.83206, y: 0.83206, z: 0.83206}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -492,7 +492,7 @@ MonoBehaviour:
   onTrashEvents:
     m_PersistentCalls:
       m_Calls: []
---- !u!64 &3919981517040821309
+--- !u!64 &5888519616129466910
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
