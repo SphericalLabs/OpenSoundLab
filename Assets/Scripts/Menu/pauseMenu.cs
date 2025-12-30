@@ -245,9 +245,6 @@ public class pauseMenu : MonoBehaviour
             }
             else if (curItem == itemType.newItem)
             {
-                metronome m = FindObjectOfType<metronome>();
-                if (m != null) m.Reset();
-
                 toggleMenu();
 
                 masterControl.instance.currentScene = "";

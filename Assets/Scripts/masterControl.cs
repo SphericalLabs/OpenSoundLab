@@ -84,7 +84,6 @@ public class masterControl : MonoBehaviour
     [SerializeField] bool autoLoadLocalScene;
 
     public masterBusRecorder recorder;
-    public metronome metro;
     public GameObject CameraRig;
     public EnvironmentDepthManager depthManager;
     public manipulator leftManip, rightManip;
@@ -323,14 +322,6 @@ public class masterControl : MonoBehaviour
             }
         }
 
-        if (metro != null)
-        {
-            if (metro.volumepercent != metro.volumeDial.percent)
-            {
-                metro.volumepercent = metro.volumeDial.percent;
-                masterControl.instance.metronomeClick.volume = Mathf.Clamp01(metro.volumepercent - .1f);
-            }
-        }
     }
 
     OcclusionShadersMode defaultOcclusionMode = OcclusionShadersMode.SoftOcclusion;
