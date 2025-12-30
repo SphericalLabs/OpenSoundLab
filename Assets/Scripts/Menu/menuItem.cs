@@ -506,6 +506,7 @@ public enum DeviceCategory
     ModulationGenerator,
     SoundProcessor,
     SampleGenerator,
+    Rhythm,
     WaveGenerator,
     // this order defines the order in the menu
 }
@@ -529,11 +530,16 @@ public class DeviceType
     }
 
     // WaveGenerator
-    public static readonly DeviceType Clock = new DeviceType("Clock", DeviceCategory.WaveGenerator, 1);
-    public static readonly DeviceType Cycle = new DeviceType("Cycle", DeviceCategory.WaveGenerator, 1);
+
     public static readonly DeviceType Maracas = new DeviceType("Maracas", DeviceCategory.WaveGenerator, 3);
     public static readonly DeviceType Noise = new DeviceType("Noise", DeviceCategory.WaveGenerator, 2);
     public static readonly DeviceType Oscillator = new DeviceType("Oscillator", DeviceCategory.WaveGenerator, 1);
+
+    // Rhythm
+    public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.Rhythm, 3);
+    public static readonly DeviceType SequencerCV = Sequencer; // legacy alias, remove when old saves are dropped
+    public static readonly DeviceType Clock = new DeviceType("Clock", DeviceCategory.Rhythm, 2);
+    public static readonly DeviceType Cycle = new DeviceType("Cycle", DeviceCategory.Rhythm, 1);
 
     // SampleGenerator
     public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 6);
@@ -546,8 +552,6 @@ public class DeviceType
 
     // ModulationGenerator
     public static readonly DeviceType Timeline = new DeviceType("Timeline", DeviceCategory.ModulationGenerator, 5);
-    public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.ModulationGenerator, 4);
-    public static readonly DeviceType SequencerCV = Sequencer; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 3);
     public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 3);
     public static readonly DeviceType Button = new DeviceType("Button", DeviceCategory.ModulationGenerator, 2);
