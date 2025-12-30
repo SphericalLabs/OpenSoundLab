@@ -84,7 +84,7 @@ public class metronome : componentInterface
 
     bool rodDir = false;
 
-        // Rod animation temporarily disabled until linked to Clock Phase output.
+        // Rod animation temporarily disabled until linked to Cycle device output.
 
     public void readBpmDialAndBroadcast()
     {
@@ -114,7 +114,7 @@ public class metronome : componentInterface
     public override void hit(bool on, int ID = -1)
     {
         // Legacy masterControl clock calls removed.
-        // Clock controls now happen on spawnable Clock device.
+        // Clock controls now happen on spawnable Cycle device.
 
         if (ID == 3 && on) pitchBendMult = 1 / 1.03f;
         if (ID == 3 && !on) pitchBendMult = 1;

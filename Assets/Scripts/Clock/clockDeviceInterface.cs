@@ -1,165 +1,116 @@
 using UnityEngine;
-using System.Collections;
 using System.Xml.Serialization;
 
 public class clockDeviceInterface : deviceInterface
 {
-    public omniJack resetJack, phaseJack;
-    public dial bpmDial;
-    public TextMesh bpmDisplay;
-    public Transform rod;
+    public omniJack phaseInputJack, clockOutputJack, resetInputJack;
+    public sliderNotched resolutionSlider;
+    public dial swingDial;
 
-    public clockSignalGenerator resetSignal, phaseSignal;
-
-    public float minBpm = 60f;
-    public float maxBpm = 180f;
-
-    public bool isRunning = true;
-    private float pitchBendMult = 1f;
-
-    public button playButton, rewindButton, nudgeForwardButton, nudgeBackwardButton, recordButton;
+    private clockSignalGenerator clockGenerator;
+    private static readonly int[] baseResolutions = new int[] { 1, 2, 4, 8, 12, 16, 24, 32, 64 };
+    private static readonly int[] slowCycleDivisions = new int[] { 8, 4, 3, 2 };
 
     public override void Awake()
     {
         base.Awake();
-        // Initialize signals only if they aren't already assigned
-        if (phaseSignal == null || resetSignal == null)
+
+        var gens = GetComponents<clockSignalGenerator>();
+        clockGenerator = gens.Length > 0 ? gens[0] : gameObject.AddComponent<clockSignalGenerator>();
+
+        if (phaseInputJack != null)
         {
-            var gens = GetComponents<clockSignalGenerator>();
-            if (gens.Length < 2)
-            {
-                if (phaseSignal == null) phaseSignal = gameObject.AddComponent<clockSignalGenerator>();
-                if (resetSignal == null) resetSignal = gameObject.AddComponent<clockSignalGenerator>();
-            }
-            else
-            {
-                for (int i = 0; i < gens.Length; i++)
-                {
-                    if (phaseSignal == null && gens[i].mode == clockSignalGenerator.ClockOutputMode.Phase)
-                    {
-                        phaseSignal = gens[i];
-                    }
-
-                    if (resetSignal == null && gens[i].mode == clockSignalGenerator.ClockOutputMode.Reset)
-                    {
-                        resetSignal = gens[i];
-                    }
-                }
-
-                if (phaseSignal == null) phaseSignal = gens[0];
-                if (resetSignal == null) resetSignal = gens[1];
-            }
+            phaseInputJack.outgoing = false;
         }
 
-        // Always ensure modes are correct as they might have been lost or default to Phase
-        phaseSignal.mode = clockSignalGenerator.ClockOutputMode.Phase;
-        resetSignal.mode = clockSignalGenerator.ClockOutputMode.Reset;
-
-        if (phaseJack != null) phaseJack.homesignal = phaseSignal;
-        if (resetJack != null) resetJack.homesignal = resetSignal;
-
-        // Auto-discover buttons for visual sync
-        button[] buttons = GetComponentsInChildren<button>();
-        foreach (button b in buttons)
+        if (resetInputJack != null)
         {
-            if (b.buttonID == 0) playButton = b;
-            if (b.buttonID == 1) rewindButton = b;
-            if (b.buttonID == 3) nudgeBackwardButton = b;
-            if (b.buttonID == 4) nudgeForwardButton = b;
-            if (b.buttonID == 5) recordButton = b;
+            resetInputJack.outgoing = false;
         }
 
-        // bpmDial.onPercentChangedEventLocal.AddListener(readBpmDialAndBroadcast);
+        if (clockOutputJack != null)
+        {
+            clockOutputJack.outgoing = true;
+            clockOutputJack.homesignal = clockGenerator;
+        }
+
+        // resolutionSlider: 1 step per 8/4/3/2 cycles, then 1, 2, 4, 8, 12, 16, 24, 32, 64
+        setupResolutionLabels();
     }
-
-    // void readBpmDialAndBroadcast()
-    // {
-    //     float targetBpm = Mathf.Round(Utils.map(bpmDial.percent, 0f, 1f, minBpm, maxBpm) * 10f) / 10f;
-    //     targetBpm *= pitchBendMult;
-
-    //     if (targetBpm != phaseSignal.bpm)
-    //     {
-    //         phaseSignal.setBPM(targetBpm);
-    //         resetSignal.setBPM(targetBpm);
-    //         if (bpmDisplay != null) bpmDisplay.text = (targetBpm / pitchBendMult).ToString("N1");
-    //     }
-    // }
 
     void Update()
     {
-        if (nudgeForwardButton != null && nudgeForwardButton.isHit)
-        {
-            pitchBendMult = 1.03f;
-        }
-        else if (nudgeBackwardButton != null && nudgeBackwardButton.isHit)
-        {
-            pitchBendMult = 1f / 1.03f;
-        }
-        else
-        {
-            pitchBendMult = 1f;
-        }
-
-        if (bpmDial != null)
-        {
-            float targetBpm = Mathf.Round(Utils.map(bpmDial.percent, 0f, 1f, minBpm, maxBpm) * 10f) / 10f;
-            targetBpm *= pitchBendMult;
-
-            if (targetBpm != phaseSignal.bpm)
-            {
-                phaseSignal.setBPM(targetBpm);
-                resetSignal.setBPM(targetBpm);
-                if (bpmDisplay != null) bpmDisplay.text = targetBpm.ToString("N1");
-            }
-        }
-
-        // Apply running state
-        phaseSignal.running = isRunning;
-        resetSignal.running = isRunning;
-
-
-        // Rod animation
-        if (rod != null && phaseSignal != null)
-        {
-            float curCycle = (float)(phaseSignal._measurePhase / phaseSignal.measurePeriod);
-            // Full rotation per bar, start at phase 0
-            rod.localRotation = Quaternion.Euler(0, 0, curCycle * 360f);
-        }
-
-        // Record button state sync
-        if (recordButton != null && masterControl.instance != null && masterControl.instance.recorder != null)
-        {
-            bool isRecording = masterControl.instance.recorder.state != masterBusRecorder.State.Idle;
-            if (recordButton.isHit != isRecording) recordButton.phantomHit(isRecording);
-        }
+        applyResolutionSettings();
+        clockGenerator.phaseInput = phaseInputJack != null ? phaseInputJack.signal : null;
+        clockGenerator.resetInput = resetInputJack != null ? resetInputJack.signal : null;
     }
 
-    public override void hit(bool on, int ID = -1)
+    private void applyResolutionSettings()
     {
-        if (ID == 0) // Play/Stop
+        float swingPercent = swingDial != null ? swingDial.percent : 0.5f;
+        if (resolutionSlider == null)
         {
-            isRunning = on;
+            clockGenerator.UpdateSettings(3, swingPercent);
+            clockGenerator.cycleDivision = 1;
+            return;
         }
-        else if (ID == 1 && on) // Rewind
+
+        int sliderVal = resolutionSlider.switchVal;
+        int resolutionIndex = sliderVal - slowCycleDivisions.Length;
+        int cycleDivision = 1;
+        if (sliderVal < slowCycleDivisions.Length)
         {
-            phaseSignal.ResetPhase();
-            resetSignal.ResetPhase();
-            resetSignal.triggerResetPulse();
+            resolutionIndex = 0;
+            cycleDivision = slowCycleDivisions[sliderVal];
         }
-        else if (ID == 3) // Nudge Backward
+        else if (resolutionIndex < 0)
         {
-            pitchBendMult = on ? (1f / 1.03f) : 1f;
+            resolutionIndex = 0;
         }
-        else if (ID == 4) // Nudge Forward
+        else if (resolutionIndex >= baseResolutions.Length)
         {
-            pitchBendMult = on ? 1.03f : 1f;
+            resolutionIndex = baseResolutions.Length - 1;
         }
-        else if (ID == 5) // Record
+
+        clockGenerator.UpdateSettings(resolutionIndex, swingPercent);
+        clockGenerator.cycleDivision = cycleDivision;
+    }
+
+    private void setupResolutionLabels()
+    {
+        if (resolutionSlider == null)
         {
-            if (masterControl.instance != null && masterControl.instance.recorder != null)
-            {
-                masterControl.instance.recorder.ToggleRec(on);
-            }
+            return;
+        }
+
+        string[] labels = new string[slowCycleDivisions.Length + baseResolutions.Length];
+        for (int i = 0; i < slowCycleDivisions.Length; i++)
+        {
+            labels[i] = formatCycleLabel(slowCycleDivisions[i]);
+        }
+
+        for (int i = 0; i < baseResolutions.Length; i++)
+        {
+            labels[slowCycleDivisions.Length + i] = baseResolutions[i].ToString();
+        }
+
+        resolutionSlider.createLabels(labels);
+    }
+
+    private string formatCycleLabel(int division)
+    {
+        switch (division)
+        {
+            case 2:
+                return "½";
+            case 3:
+                return "⅓";
+            case 4:
+                return "¼";
+            case 8:
+                return "⅛";
+            default:
+                return "1/" + division;
         }
     }
 
@@ -170,30 +121,36 @@ public class clockDeviceInterface : deviceInterface
             deviceType = DeviceType.Clock
         };
         GetTransformData(data);
-        data.bpmPercent = bpmDial != null ? bpmDial.percent : 0.5f;
-        data.resetJackID = resetJack.transform.GetInstanceID();
-        data.phaseJackID = phaseJack.transform.GetInstanceID();
-        data.isRunning = isRunning;
+        data.phaseInputJackID = phaseInputJack.transform.GetInstanceID();
+        data.clockOutputJackID = clockOutputJack.transform.GetInstanceID();
+        if (resetInputJack != null) data.resetInputJackID = resetInputJack.transform.GetInstanceID();
+        data.resolution = resolutionSlider != null ? resolutionSlider.switchVal : 3;
+        data.swing = swingDial != null ? swingDial.percent : 0.5f;
         return data;
     }
 
     public override void Load(InstrumentData d, bool copyMode)
     {
         ClockData data = d as ClockData;
+        if (data == null)
+        {
+            Debug.LogWarning("Clock device load received non-ClockData.");
+            base.Load(d, copyMode);
+            return;
+        }
         base.Load(data, copyMode);
-        if (bpmDial != null) bpmDial.setPercent(data.bpmPercent);
-        resetJack.SetID(data.resetJackID, copyMode);
-        phaseJack.SetID(data.phaseJackID, copyMode);
-
-        isRunning = data.isRunning;
-        if (playButton != null) playButton.phantomHit(isRunning);
+        phaseInputJack.SetID(data.phaseInputJackID, copyMode);
+        clockOutputJack.SetID(data.clockOutputJackID, copyMode);
+        if (resetInputJack != null) resetInputJack.SetID(data.resetInputJackID, copyMode);
+        if (resolutionSlider != null) resolutionSlider.setVal(data.resolution);
+        if (swingDial != null) swingDial.setPercent(data.swing);
     }
 }
 
 [XmlType("ClockData")]
 public class ClockData : InstrumentData
 {
-    public float bpmPercent;
-    public int resetJackID, phaseJackID;
-    public bool isRunning;
+    public int phaseInputJackID, clockOutputJackID, resetInputJackID;
+    public int resolution;
+    public float swing;
 }

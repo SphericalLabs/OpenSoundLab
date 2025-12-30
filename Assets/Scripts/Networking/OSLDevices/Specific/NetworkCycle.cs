@@ -28,27 +28,27 @@
 using UnityEngine;
 using Mirror;
 
-public class NetworkClock : NetworkSyncListener
+public class NetworkCycle : NetworkSyncListener
 {
-    private clockDeviceInterface clockInterface;
+    private cycleDeviceInterface cycleInterface;
 
     private void Awake()
     {
-        clockInterface = GetComponent<clockDeviceInterface>();
+        cycleInterface = GetComponent<cycleDeviceInterface>();
     }
 
     private void Start()
     {
         GetComponent<NetworkDials>().dialValues.Callback += OnBpmDialUpdated;
 
-        if (clockInterface.playButton != null) clockInterface.playButton.onStartGrabEvents.AddListener(OnButtonPress);
-        if (clockInterface.rewindButton != null) clockInterface.rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
+        if (cycleInterface.playButton != null) cycleInterface.playButton.onStartGrabEvents.AddListener(OnButtonPress);
+        if (cycleInterface.rewindButton != null) cycleInterface.rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
     }
 
     private void OnDestroy()
     {
-        if (clockInterface.playButton != null) clockInterface.playButton.onStartGrabEvents.RemoveListener(OnButtonPress);
-        if (clockInterface.rewindButton != null) clockInterface.rewindButton.onStartGrabEvents.RemoveListener(OnButtonPress);
+        if (cycleInterface.playButton != null) cycleInterface.playButton.onStartGrabEvents.RemoveListener(OnButtonPress);
+        if (cycleInterface.rewindButton != null) cycleInterface.rewindButton.onStartGrabEvents.RemoveListener(OnButtonPress);
     }
 
     private void OnButtonPress()
@@ -75,7 +75,7 @@ public class NetworkClock : NetworkSyncListener
     {
         if (isServer)
         {
-            RpcUpdateClock(clockInterface.phaseSignal._measurePhase, clockInterface.isRunning);
+            RpcUpdateCycle(cycleInterface.phaseSignal._measurePhase, cycleInterface.isRunning);
         }
         else
         {
@@ -88,29 +88,29 @@ public class NetworkClock : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateClock(clockInterface.phaseSignal._measurePhase, clockInterface.isRunning);
+            RpcUpdateCycle(cycleInterface.phaseSignal._measurePhase, cycleInterface.isRunning);
         }
     }
 
     [Command(requiresAuthority = false)]
     protected void CmdRequestSync()
     {
-        RpcUpdateClock(clockInterface.phaseSignal._measurePhase, clockInterface.isRunning);
+        RpcUpdateCycle(cycleInterface.phaseSignal._measurePhase, cycleInterface.isRunning);
     }
 
     [ClientRpc]
-    protected virtual void RpcUpdateClock(double measurePhase, bool running)
+    protected virtual void RpcUpdateCycle(double measurePhase, bool running)
     {
         if (isClient && !isServer)
         {
-            clockInterface.phaseSignal._measurePhase = measurePhase;
-            clockInterface.resetSignal._measurePhase = measurePhase;
-            clockInterface.isRunning = running;
+            cycleInterface.phaseSignal._measurePhase = measurePhase;
+            cycleInterface.resetSignal._measurePhase = measurePhase;
+            cycleInterface.isRunning = running;
 
             // Sync visual button state
-            if (clockInterface.playButton != null && clockInterface.playButton.isHit != running)
+            if (cycleInterface.playButton != null && cycleInterface.playButton.isHit != running)
             {
-                clockInterface.playButton.phantomHit(running);
+                cycleInterface.playButton.phantomHit(running);
             }
         }
     }

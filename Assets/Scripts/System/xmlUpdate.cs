@@ -97,6 +97,12 @@ public class xmlUpdate
                         case "Oscillator":
                             serializer = new XmlSerializer(typeof(OscillatorData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
+                        case "Clocks":
+                            serializer = new XmlSerializer(typeof(ClockData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            break;
+                        case "Cycles":
+                            serializer = new XmlSerializer(typeof(CycleData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            break;
                         case "TapeGroups":
                             serializer = new XmlSerializer(typeof(TapeGroupData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
@@ -222,6 +228,12 @@ public class xmlUpdate
                             break;
                         case "Oscillators":
                             data[data.Count - 1].deviceType = DeviceType.Oscillator;
+                            break;
+                        case "Clocks":
+                            data[data.Count - 1].deviceType = DeviceType.Clock;
+                            break;
+                        case "Cycles":
+                            data[data.Count - 1].deviceType = DeviceType.Cycle;
                             break;
                         case "TapeGroups":
                             data[data.Count - 1].deviceType = DeviceType.TapeGroup;
