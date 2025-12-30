@@ -84,6 +84,7 @@ public class SequencerGridHelper
         }
 
         sequencer.dimensionDisplays[0].text = curDimensions[1] + " X " + curDimensions[0];
+        applyRowModes(curDimensions[0]);
     }
 
     void addColumns(int count)
@@ -256,6 +257,14 @@ public class SequencerGridHelper
         Vector3 sPos = sequencer.stepSelect.transform.localPosition;
         sPos.y = -sequencer.getCubeConst() * (curDimensions[0]);
         sequencer.stepSelect.transform.localPosition = sPos;
+    }
+
+    void applyRowModes(int rows)
+    {
+        for (int row = 0; row < rows; row++)
+        {
+            sequencer.doModeSwitch(row);
+        }
     }
 
     void ensureRowPrefabs(int row)
