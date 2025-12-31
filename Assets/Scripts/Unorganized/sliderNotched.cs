@@ -67,20 +67,20 @@ public class sliderNotched : manipObject
         //glowMat.SetFloat("_EmissionGain", .7f);
         //glowMat.SetColor("_TintColor", customColor);
 
-        if (labelsPresent && labelObjects != null && labelObjects.Length > 0)
-        {
-            labels = new Material[labelObjects.Length];
-            for (int i = 0; i < labelObjects.Length; i++)
-            {
-                labels[i] = labelObjects[labelObjects.Length - 1 - i].GetComponent<Renderer>().material;
-                labels[i].SetColor("_TintColor", labelColor);
-            }
-        }
+        // if (labelsPresent && labelObjects != null && labelObjects.Length > 0)
+        // {
+        //     labels = new Material[labelObjects.Length];
+        //     for (int i = 0; i < labelObjects.Length; i++)
+        //     {
+        //         labels[i] = labelObjects[labelObjects.Length - 1 - i].GetComponent<Renderer>().material;
+        //         labels[i].SetColor("_TintColor", labelColor);
+        //     }
+        // }
 
-        if (titleLabel != null)
-        {
-            titleLabel.GetComponent<Renderer>().material.SetColor("_TintColor", labelColor);
-        }
+        // if (titleLabel != null)
+        // {
+        //     titleLabel.GetComponent<Renderer>().material.SetColor("_TintColor", labelColor);
+        // }
         setVal(switchVal);
     }
 
@@ -115,7 +115,6 @@ public class sliderNotched : manipObject
         {
             onPercentChangedEvent.Invoke();
         }
-        updateLabels();
     }
 
     public void setValByPercent(float p)
@@ -130,10 +129,6 @@ public class sliderNotched : manipObject
         Vector3 pos = transform.localPosition;
         pos.x = Mathf.Lerp(-xBound, xBound, percent);
         transform.localPosition = pos;
-        if (labels != null)
-        {
-            updateLabels();
-        }
     }
 
     public void createLabels(string[] labelTexts)
@@ -182,18 +177,6 @@ public class sliderNotched : manipObject
         }
 
         setVal(Mathf.Clamp(switchVal, 0, notchCount - 1));
-    }
-
-    void updateLabels()
-    {
-        if (labelsPresent)
-        {
-            for (int i = 0; i < labels.Length; i++)
-            {
-                labels[i].SetColor("_TintColor", Color.HSVToRGB(.4f, .7f, (i == switchVal) ? .9f : .1f));
-                labels[i].SetFloat("_EmissionGain", (i == switchVal) ? .3f : .05f);
-            }
-        }
     }
 
     float offset = 0;

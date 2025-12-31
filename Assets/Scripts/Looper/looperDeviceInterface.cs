@@ -31,7 +31,7 @@ using System.Collections;
 public class looperDeviceInterface : deviceInterface
 {
 
-    public omniJack input, output, recordTrigger, playTrigger;
+    public omniJack input, output, recordTrigger, playTrigger, phaseInput;
     public sliderNotched durSlider;
     waveTranscribeLooper transcriber;
     public button[] buttons;
@@ -43,6 +43,7 @@ public class looperDeviceInterface : deviceInterface
 
     public int curSliderVal = 0;
     public double period = .0625;
+    double lastPeriod = -1;
 
     AudioSource audioSource;
 
@@ -52,6 +53,17 @@ public class looperDeviceInterface : deviceInterface
         transcriber = GetComponent<waveTranscribeLooper>();
         audioSource = GetComponent<AudioSource>();
         durSlider = GetComponentInChildren<sliderNotched>();
+        lastPeriod = period;
+    }
+
+    void OnEnable()
+    {
+        cycleDeviceInterface.resetPressedEvent += handleCycleReset;
+    }
+
+    void OnDisable()
+    {
+        cycleDeviceInterface.resetPressedEvent -= handleCycleReset;
     }
 
     void OnDestroy()
@@ -83,6 +95,12 @@ public class looperDeviceInterface : deviceInterface
         {
             curSliderVal = durSlider.switchVal;
             transcriber.updateDuration(durations[durSlider.switchVal], period);
+            lastPeriod = period;
+        }
+        else if (Mathf.Abs((float)(period - lastPeriod)) > 0.0001f)
+        {
+            transcriber.updateDuration(durations[durSlider.switchVal], period);
+            lastPeriod = period;
         }
 
         countdownText.gameObject.SetActive(recordCountdown || playCountdown);
@@ -100,7 +118,7 @@ public class looperDeviceInterface : deviceInterface
         if (!transcriber.playing)
         {
             if (playCountdown) recCountdownRemaining = playCountdownRemaining;
-            else recCountdownRemaining = 4;
+            else recCountdownRemaining = 4 - (transcriber.lastPhaseBeat >= 0 ? transcriber.lastPhaseBeat : 0);
         }
         else
         {
@@ -122,7 +140,7 @@ public class looperDeviceInterface : deviceInterface
         playCountdown = true;
     }
 
-    void onBeatEvent()
+    public void onBeatEvent()
     {
         if (recordCountdown && !transcriber.playing)
         {
@@ -149,9 +167,14 @@ public class looperDeviceInterface : deviceInterface
         }
     }
 
-    void onResetEvent()
+    public void onResetEvent()
     {
         transcriber.Back();
+    }
+
+    void handleCycleReset(cycleDeviceInterface cycle)
+    {
+        onResetEvent();
     }
 
     void StartRecord(bool on)
@@ -205,6 +228,7 @@ public class looperDeviceInterface : deviceInterface
         data.jackOutID = output.transform.GetInstanceID();
         data.recordTriggerID = recordTrigger.transform.GetInstanceID();
         data.playTriggerID = playTrigger.transform.GetInstanceID();
+        if (phaseInput != null) data.phaseInputID = phaseInput.transform.GetInstanceID();
         data.dur = durSlider.switchVal;
         data.cueLive = buttons[4].isHit;
         data.overwrite = buttons[5].isHit;
@@ -220,6 +244,7 @@ public class looperDeviceInterface : deviceInterface
         output.SetID(data.jackOutID, copyMode);
         recordTrigger.SetID(data.recordTriggerID, copyMode);
         playTrigger.SetID(data.playTriggerID, copyMode);
+        if (phaseInput != null) phaseInput.SetID(data.phaseInputID, copyMode);
         durSlider.setVal(data.dur);
         buttons[4].setOnAtStart(data.cueLive);
         buttons[5].setOnAtStart(data.overwrite);
@@ -232,6 +257,7 @@ public class LooperData : InstrumentData
     public int jackInID;
     public int recordTriggerID;
     public int playTriggerID;
+    public int phaseInputID;
     public int dur;
     public bool overwrite;
     public bool cueLive;

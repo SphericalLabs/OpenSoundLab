@@ -90,6 +90,15 @@ public class waveTranscribeLooper : signalGenerator
     float _cueLiveGain = 0f;
     float _cueFadeStep = 0f;
 
+    const int PhaseBeatsPerBar = 4;
+    const int BufferChannels = 2;
+    signalGenerator phaseSignal;
+    float[] phaseBuffer;
+    float lastPhaseSample = 0f;
+    public int lastPhaseBeat = -1;
+    bool hasPhaseSample = false;
+    double lastPhaseResetDspTime = -1;
+
 
     public override void Awake()
     {
@@ -98,7 +107,7 @@ public class waveTranscribeLooper : signalGenerator
         // assuming stereo
 
         lastbeatperiod = _deviceInterface.period;
-        virtualBufferLength = Mathf.RoundToInt((float)(_deviceInterface.period * .25f * AudioSettings.outputSampleRate));
+        virtualBufferLength = getBufferLengthSamples(1f, _deviceInterface.period);
         sampleBuffer = new float[virtualBufferLength];
         incomingBuffer = new float[1];
 
@@ -118,14 +127,22 @@ public class waveTranscribeLooper : signalGenerator
 
     double lastbeatperiod = 0;
 
+    int getBufferLengthSamples(float beats, double beatperiod)
+    {
+        int length = Mathf.RoundToInt((float)(beats * beatperiod * .25f * AudioSettings.outputSampleRate) * BufferChannels);
+        if (length < 2) length = 2;
+        if (length % 2 != 0) length += 1;
+        return length;
+    }
+
     public void updateDuration(float beats, double beatperiod)
     {
-        virtualBufferLength = Mathf.RoundToInt((float)(beats * beatperiod * .25f * AudioSettings.outputSampleRate));
+        virtualBufferLength = getBufferLengthSamples(beats, beatperiod);
         if (beatperiod > biggestPeriod || beats > biggestBeats)
         {
             if (biggestBeats < beats) biggestBeats = beats;
             if (biggestPeriod < beatperiod) biggestPeriod = beatperiod;
-            Array.Resize<float>(ref sampleBuffer, Mathf.RoundToInt((float)(biggestBeats * biggestPeriod * .25f * AudioSettings.outputSampleRate)));
+            Array.Resize<float>(ref sampleBuffer, getBufferLengthSamples(biggestBeats, biggestPeriod));
         }
 
         columnMult = Mathf.CeilToInt((float)virtualBufferLength / (wavewidth - 1));
@@ -207,7 +224,7 @@ public class waveTranscribeLooper : signalGenerator
             }
         }
         if (curTape != null) Destroy(curTape.gameObject);
-        sampleBuffer = new float[Mathf.RoundToInt((float)(biggestBeats * biggestPeriod * .25f * AudioSettings.outputSampleRate))];
+        sampleBuffer = new float[getBufferLengthSamples(biggestBeats, biggestPeriod)];
         tex.SetPixels32(wavepixels);
         tex.Apply(false);
         ResetRecordingBlendState();
@@ -222,6 +239,14 @@ public class waveTranscribeLooper : signalGenerator
         _recordTailSize = 0;
         _recordEffectiveFadeFrames = Mathf.Min(RecordBlendFrameCount, Mathf.Max(1, virtualBufferLength / 2));
         _cueLiveGain = cueLive ? 1f : 0f;
+    }
+
+    void resetPhaseTracking()
+    {
+        hasPhaseSample = false;
+        lastPhaseBeat = -1;
+        lastPhaseSample = 0f;
+        lastPhaseResetDspTime = -1;
     }
 
     void BeginRecordingSegment()
@@ -385,6 +410,22 @@ public class waveTranscribeLooper : signalGenerator
         float[] recBuffer = new float[buffer.Length];
         float[] playBuffer = new float[buffer.Length];
 
+        signalGenerator nextPhaseSignal = _deviceInterface.phaseInput != null ? _deviceInterface.phaseInput.signal : null;
+        if (nextPhaseSignal != phaseSignal)
+        {
+            phaseSignal = nextPhaseSignal;
+            resetPhaseTracking();
+        }
+
+        if (phaseSignal != null)
+        {
+            if (phaseBuffer == null || phaseBuffer.Length != buffer.Length)
+            {
+                phaseBuffer = new float[buffer.Length];
+            }
+            phaseSignal.processBuffer(phaseBuffer, dspTime, channels);
+        }
+
         if (_deviceInterface.recordTrigger.signal != null) _deviceInterface.recordTrigger.signal.processBuffer(recBuffer, dspTime, channels);
         if (_deviceInterface.playTrigger.signal != null) _deviceInterface.playTrigger.signal.processBuffer(playBuffer, dspTime, channels);
 
@@ -444,6 +485,44 @@ public class waveTranscribeLooper : signalGenerator
                 }
 
                 lastRecSig[0] = recBuffer[i];
+            }
+
+            if (phaseSignal != null)
+            {
+                float phaseSample = phaseBuffer[i];
+                if (!hasPhaseSample)
+                {
+                    hasPhaseSample = true;
+                    lastPhaseSample = phaseSample;
+                    lastPhaseBeat = Mathf.Clamp(Mathf.FloorToInt(Mathf.Clamp01(phaseSample) * PhaseBeatsPerBar), 0, PhaseBeatsPerBar - 1);
+                }
+                else
+                {
+                    if (phaseSample < lastPhaseSample)
+                    {
+                        double sampleTime = dspTime + (i / (double)channels) * _sampleDuration;
+                        bool normalWrap = lastPhaseSample > 0.9f;
+                        if (normalWrap && lastPhaseResetDspTime > 0)
+                        {
+                            double newPeriod = sampleTime - lastPhaseResetDspTime;
+                            if (newPeriod > 0.0001 && Math.Abs(newPeriod - _deviceInterface.period) > 0.0001)
+                            {
+                                _deviceInterface.period = newPeriod;
+                            }
+                        }
+                        lastPhaseResetDspTime = sampleTime;
+                    }
+
+                    int beatIndex = Mathf.FloorToInt(Mathf.Clamp01(phaseSample) * PhaseBeatsPerBar);
+                    if (beatIndex >= PhaseBeatsPerBar) beatIndex = PhaseBeatsPerBar - 1;
+                    if (beatIndex != lastPhaseBeat)
+                    {
+                        _deviceInterface.onBeatEvent();
+                        lastPhaseBeat = beatIndex;
+                    }
+
+                    lastPhaseSample = phaseSample;
+                }
             }
 
             bool recordingFrame = recording;
