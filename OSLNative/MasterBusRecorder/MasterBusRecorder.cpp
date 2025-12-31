@@ -46,6 +46,7 @@
 
 #include "AudioPluginUtil.h"
 #include <atomic>
+#include <math.h>
 /// TODO: Windows include paths are horribly broken. It works for now, but should eventually clean this up.
 #ifdef _WIN32
 #include "../util.h"
@@ -73,6 +74,11 @@ struct EffectData {
         std::atomic<int> newSamples;
         std::atomic<float> level_dB;
         std::atomic<float> level_lin;
+        std::atomic<float> level_dB_left;
+        std::atomic<float> level_lin_left;
+        std::atomic<float> level_dB_right;
+        std::atomic<float> level_lin_right;
+        std::atomic<int> droppedSamples;
         struct RingBuffer* buffer;
         struct CompressorData* limiter;
         int readPtr;
@@ -93,6 +99,19 @@ struct EffectData {
 
 struct EffectData::Data* instance = NULL;
 
+float GetChannelAverage(const float* buffer, unsigned int frames, int channels, int channelIndex) {
+    if (frames == 0 || channels <= 0 || channelIndex < 0 || channelIndex >= channels)
+        return 0.0f;
+
+    float acc = 0.0f;
+    unsigned int index = (unsigned int) channelIndex;
+    for (unsigned int i = 0; i < frames; i++) {
+        acc += fabsf(buffer[index]);
+        index += (unsigned int) channels;
+    }
+    return acc / (float) frames;
+}
+
 int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition) {
     int numparams = P_NUM;
     definition.paramdefs = new UnityAudioParameterDefinition[numparams];
@@ -112,8 +131,10 @@ extern "C" {
 /// too high and is a waste of CPU. As a rule of thumb, you should try to consume the samples at approximately the same
 /// rate and in the same block size as the AudioMxerThread uses.
 OSL_API void MasterBusRecorder_StartRecording() {
-    if (instance != NULL)
+    if (instance != NULL) {
+        instance->droppedSamples.store(0);
         instance->recording.store(true);
+    }
 }
 
 /// Unsets the recording flag. Note that if you call StopRecording() while the AudioMixerThread is processing an audio
@@ -148,6 +169,46 @@ OSL_API float MasterBusRecorder_GetLevel_dB() {
         return instance->level_dB.load();
     else
         return -INFINITY;
+}
+
+/// Returns the average signal energy of the most recent buffer for the left channel as linear value in range [0...1].
+OSL_API float MasterBusRecorder_GetLevelLeft_Lin() {
+    if (instance != NULL)
+        return instance->level_lin_left.load();
+    else
+        return 0;
+}
+
+/// Returns the average signal energy of the most recent buffer for the left channel in dB in range [-inf...0].
+OSL_API float MasterBusRecorder_GetLevelLeft_dB() {
+    if (instance != NULL)
+        return instance->level_dB_left.load();
+    else
+        return -INFINITY;
+}
+
+/// Returns the average signal energy of the most recent buffer for the right channel as linear value in range [0...1].
+OSL_API float MasterBusRecorder_GetLevelRight_Lin() {
+    if (instance != NULL)
+        return instance->level_lin_right.load();
+    else
+        return 0;
+}
+
+/// Returns the average signal energy of the most recent buffer for the right channel in dB in range [-inf...0].
+OSL_API float MasterBusRecorder_GetLevelRight_dB() {
+    if (instance != NULL)
+        return instance->level_dB_right.load();
+    else
+        return -INFINITY;
+}
+
+/// Returns the number of samples dropped because the record buffer overflowed.
+OSL_API int MasterBusRecorder_GetDroppedSamples() {
+    if (instance != NULL)
+        return instance->droppedSamples.load();
+    else
+        return 0;
 }
 
 /// Reads 1 sample from the record buffer. Note that this needs an atomic_load operation, which is not guaranteed to be
@@ -237,6 +298,11 @@ UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectSta
     effectdata->data.newSamples = ATOMIC_VAR_INIT(0);
     effectdata->data.level_lin = ATOMIC_VAR_INIT(0);
     effectdata->data.level_dB = ATOMIC_VAR_INIT(-INFINITY);
+    effectdata->data.level_lin_left = ATOMIC_VAR_INIT(0);
+    effectdata->data.level_dB_left = ATOMIC_VAR_INIT(-INFINITY);
+    effectdata->data.level_lin_right = ATOMIC_VAR_INIT(0);
+    effectdata->data.level_dB_right = ATOMIC_VAR_INIT(-INFINITY);
+    effectdata->data.droppedSamples = ATOMIC_VAR_INIT(0);
     effectdata->data.buffer = RingBuffer_New(MBR_BUFFERLENGTH);
     effectdata->data.readPtr = 0;
     effectdata->data.recording = false;
@@ -337,6 +403,16 @@ UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectSt
     float average = _fAverageSumOfMags(inbuffer, (int) (length * inchannels));
     instance->level_lin.store(average);
     instance->level_dB.store(_atodb(average));
+    float averageLeft = average;
+    float averageRight = average;
+    if (inchannels > 1) {
+        averageLeft = GetChannelAverage(inbuffer, length, inchannels, 0);
+        averageRight = GetChannelAverage(inbuffer, length, inchannels, 1);
+    }
+    instance->level_lin_left.store(averageLeft);
+    instance->level_dB_left.store(_atodb(averageLeft));
+    instance->level_lin_right.store(averageRight);
+    instance->level_dB_right.store(_atodb(averageRight));
 
     /// Check if we should record
     if (data->recording.load() == false)
@@ -353,6 +429,7 @@ UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectSt
     }
 
     else {
+        data->droppedSamples.fetch_add((int) (length * inchannels));
         printv("MasterBusRecorder: buffer overflow!");
         return UNITY_AUDIODSP_OK;
     }

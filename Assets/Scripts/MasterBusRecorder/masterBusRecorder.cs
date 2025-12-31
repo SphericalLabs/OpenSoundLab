@@ -47,6 +47,16 @@ public class masterBusRecorder : MonoBehaviour
     [DllImport("OSLNative")]
     static extern float MasterBusRecorder_GetLevel_dB();
     [DllImport("OSLNative")]
+    static extern int MasterBusRecorder_GetDroppedSamples();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelLeft_Lin();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelLeft_dB();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelRight_Lin();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelRight_dB();
+    [DllImport("OSLNative")]
     static extern int MasterBusRecorder_GetBufferPointer(IntPtr buffer, ref int offset);
     [DllImport("OSLNative")]
     static extern void MasterBusRecorder_Clear();
@@ -61,6 +71,19 @@ public class masterBusRecorder : MonoBehaviour
 
     //public
     public State state => _state;
+    public string filename => recordingFilename;
+    public uint recordedSamples => length;
+    public float recordedSeconds => getSecondsFromSamples(length);
+    public float remainingSeconds => getRemainingSeconds();
+    public long availableStorageBytes => getAvailableStorageBytes();
+    public long totalStorageBytes => getTotalStorageBytes();
+    public float remainingSecondsFromStorage => getRemainingSecondsFromStorage();
+    public float effectiveRemainingSeconds => getEffectiveRemainingSeconds();
+    public float levelLinLeft => MasterBusRecorder_GetLevelLeft_Lin();
+    public float levelDbLeft => MasterBusRecorder_GetLevelLeft_dB();
+    public float levelLinRight => MasterBusRecorder_GetLevelRight_Lin();
+    public float levelDbRight => MasterBusRecorder_GetLevelRight_dB();
+    public int droppedSamples => MasterBusRecorder_GetDroppedSamples();
 
     //properties with private backing fields
     public int bitDepth
@@ -80,7 +103,7 @@ public class masterBusRecorder : MonoBehaviour
     State _state;
     BinaryWriter bw;
     FileStream fs;
-    string filename;
+    string recordingFilename;
     uint length;
     int instanceId;
     uint maxFileSize;
@@ -175,11 +198,11 @@ public class masterBusRecorder : MonoBehaviour
         {
             Directory.CreateDirectory(dir);
         }
-        filename = dir + System.IO.Path.DirectorySeparatorChar +
+        recordingFilename = dir + System.IO.Path.DirectorySeparatorChar +
 string.Format("{0:yyyy-MM-dd_HH-mm-ss}.wav",
 DateTime.Now);
-        Debug.Log(filename);
-        fs = new FileStream(filename, FileMode.Create);
+        Debug.Log(recordingFilename);
+        fs = new FileStream(recordingFilename, FileMode.Create);
         bw = new BinaryWriter(fs);
         bufferToWav.instance.WavHeader(bw, 0, bitDepth / 8); ///We will update the size fields at the end of the process
         length = 0;
@@ -216,10 +239,10 @@ DateTime.Now);
         fs.Close();
 
         ///Finally, update the WAV header so it has the correct size
-        bufferToWav.instance.UpdateWavHeader(filename, length, bitDepth / 8);
+        bufferToWav.instance.UpdateWavHeader(recordingFilename, length, bitDepth / 8);
 
         // show it in Tapes->Sessions
-        sampleManager.instance.AddSession(filename);
+        sampleManager.instance.AddSession(recordingFilename);
 
         //Reset state so a new recording session can be started:
         _state = State.Idle;
@@ -301,15 +324,192 @@ DateTime.Now);
 
     public void WritePseudoFile()
     {
-        filename = masterControl.instance.SaveDir + System.IO.Path.DirectorySeparatorChar + "Samples" + System.IO.Path.DirectorySeparatorChar +
+        recordingFilename = masterControl.instance.SaveDir + System.IO.Path.DirectorySeparatorChar + "Samples" + System.IO.Path.DirectorySeparatorChar +
 "Recordings" + System.IO.Path.DirectorySeparatorChar +
 "DUMMY.txt";
-        fs = new FileStream(filename, FileMode.Create);
+        fs = new FileStream(recordingFilename, FileMode.Create);
         bw = new BinaryWriter(fs);
         bufferToWav.instance.WavHeader(bw, 0, 2);
         bw.Close();
         fs.Close();
-        File.Delete(filename);
-        Debug.Log(filename);
+        File.Delete(recordingFilename);
+        Debug.Log(recordingFilename);
+    }
+
+    float getSecondsFromSamples(long sampleCount)
+    {
+        int sampleRate = AudioSettings.outputSampleRate;
+        int channelCount = getNumberOfAudioChannels();
+        if (sampleRate <= 0 || channelCount <= 0)
+        {
+            return 0f;
+        }
+        return sampleCount / (float)(sampleRate * channelCount);
+    }
+
+    float getRemainingSeconds()
+    {
+        if (maxFileSize == 0 || length >= maxFileSize)
+        {
+            return 0f;
+        }
+        return getSecondsFromSamples((long)(maxFileSize - length));
+    }
+
+    int getNumberOfAudioChannels()
+    {
+        AudioSpeakerMode speakerMode = AudioSettings.speakerMode;
+        switch (speakerMode)
+        {
+            case AudioSpeakerMode.Mono:
+                return 1;
+            case AudioSpeakerMode.Stereo:
+                return 2;
+            case AudioSpeakerMode.Quad:
+                return 4;
+            case AudioSpeakerMode.Surround:
+                return 5;
+            case AudioSpeakerMode.Mode5point1:
+                return 6;
+            case AudioSpeakerMode.Mode7point1:
+                return 8;
+            case AudioSpeakerMode.Prologic:
+                return 2;
+            default:
+                return 2;
+        }
+    }
+
+    long getAvailableStorageBytes()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        try
+        {
+            using (var statFs = new AndroidJavaObject("android.os.StatFs", Application.persistentDataPath))
+            {
+                return statFs.Call<long>("getAvailableBytes");
+            }
+        }
+        catch
+        {
+            return 0;
+        }
+#else
+        string root = getStorageRootPath();
+        if (string.IsNullOrEmpty(root))
+        {
+            return 0;
+        }
+
+        try
+        {
+            DriveInfo driveInfo = new DriveInfo(root);
+            if (!driveInfo.IsReady)
+            {
+                return 0;
+            }
+            return driveInfo.AvailableFreeSpace;
+        }
+        catch
+        {
+            return 0;
+        }
+#endif
+    }
+
+    long getTotalStorageBytes()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        try
+        {
+            using (var statFs = new AndroidJavaObject("android.os.StatFs", Application.persistentDataPath))
+            {
+                return statFs.Call<long>("getTotalBytes");
+            }
+        }
+        catch
+        {
+            return 0;
+        }
+#else
+        string root = getStorageRootPath();
+        if (string.IsNullOrEmpty(root))
+        {
+            return 0;
+        }
+
+        try
+        {
+            DriveInfo driveInfo = new DriveInfo(root);
+            if (!driveInfo.IsReady)
+            {
+                return 0;
+            }
+            return driveInfo.TotalSize;
+        }
+        catch
+        {
+            return 0;
+        }
+#endif
+    }
+
+    string getStorageRootPath()
+    {
+        string path = null;
+        if (!string.IsNullOrEmpty(recordingFilename))
+        {
+            path = recordingFilename;
+        }
+        else if (masterControl.instance != null)
+        {
+            path = masterControl.instance.SaveDir;
+        }
+
+        if (string.IsNullOrEmpty(path))
+        {
+            return null;
+        }
+
+        string root = Path.GetPathRoot(path);
+        if (string.IsNullOrEmpty(root))
+        {
+            return null;
+        }
+
+        return root;
+    }
+
+    float getRemainingSecondsFromStorage()
+    {
+        long availableBytes = getAvailableStorageBytes();
+        if (availableBytes <= 0)
+        {
+            return 0f;
+        }
+
+        int bytesPerSample = bitDepth / 8;
+        if (bytesPerSample <= 0)
+        {
+            return 0f;
+        }
+
+        long availableSamples = availableBytes / bytesPerSample;
+        return getSecondsFromSamples(availableSamples);
+    }
+
+    float getEffectiveRemainingSeconds()
+    {
+        float fileLimit = getRemainingSeconds();
+        float storageLimit = getRemainingSecondsFromStorage();
+        if (storageLimit <= 0f)
+        {
+            return fileLimit;
+        }
+        if (fileLimit <= 0f)
+        {
+            return 0f;
+        }
+        return Mathf.Min(fileLimit, storageLimit);
     }
 }

@@ -49,6 +49,16 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
     [DllImport("OSLNative")]
     static extern float MasterBusRecorder_GetLevel_dB();
     [DllImport("OSLNative")]
+    static extern int MasterBusRecorder_GetDroppedSamples();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelLeft_Lin();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelLeft_dB();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelRight_Lin();
+    [DllImport("OSLNative")]
+    static extern float MasterBusRecorder_GetLevelRight_dB();
+    [DllImport("OSLNative")]
     static extern int MasterBusRecorder_GetBufferPointer(IntPtr buffer, ref int offset);
     [DllImport("OSLNative")]
     static extern void MasterBusRecorder_Clear();
@@ -63,6 +73,11 @@ public class UniVoiceMasterBusRecorder : MonoBehaviour
 
     //public
     public State state => _state;
+    public float levelLinLeft => MasterBusRecorder_GetLevelLeft_Lin();
+    public float levelDbLeft => MasterBusRecorder_GetLevelLeft_dB();
+    public float levelLinRight => MasterBusRecorder_GetLevelRight_Lin();
+    public float levelDbRight => MasterBusRecorder_GetLevelRight_dB();
+    public int droppedSamples => MasterBusRecorder_GetDroppedSamples();
 
     //properties with private backing fields
     public int bitDepth
