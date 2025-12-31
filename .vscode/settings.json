@@ -45,8 +45,8 @@
     "**/*.flare": true,
     "**/*.mat": true,
     "**/*.meta": true,
-    "**/*.prefab": true,
-    "**/*.unity": true,
+    "**/*.prefab": false,
+    "**/*.unity": false,
     "build/": true,
     "Build/": true,
     "Library/": true,
@@ -58,7 +58,8 @@
     "ProjectSettings/": true,
     "UserSettings/": true,
     "temp/": true,
-    "Temp/": true
+    "Temp/": true,
+    "*csproj": true
   },
   "dotnet.defaultSolution": "OpenSoundLab.sln",
   "files.associations": {
