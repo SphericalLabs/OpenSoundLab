@@ -67,7 +67,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useNativeIfAvailable: 1
-  resetJack: {fileID: 3380366552957750803}
+  resetJack: {fileID: 0}
   phaseJack: {fileID: 36266398699913555}
   bpmDial: {fileID: 6140989710792816062}
   bpmDisplay: {fileID: 6180714997656615036}
@@ -6413,6 +6413,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: jackReset
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739566496022717107, guid: 914ac49a0a51b47cca057b2d7710fdc8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -184,7 +184,7 @@ public class cycleDeviceInterface : deviceInterface
         };
         GetTransformData(data);
         data.bpmPercent = bpmDial != null ? bpmDial.percent : 0.5f;
-        data.resetJackID = resetJack.transform.GetInstanceID();
+        // Reset jack persistence disabled for now (re-enable if jackReset returns).
         data.phaseJackID = phaseJack.transform.GetInstanceID();
         data.isRunning = isRunning;
         return data;
@@ -195,7 +195,7 @@ public class cycleDeviceInterface : deviceInterface
         CycleData data = d as CycleData;
         base.Load(data, copyMode);
         if (bpmDial != null) bpmDial.setPercent(data.bpmPercent);
-        resetJack.SetID(data.resetJackID, copyMode);
+        // Reset jack persistence disabled for now (re-enable if jackReset returns).
         phaseJack.SetID(data.phaseJackID, copyMode);
 
         isRunning = data.isRunning;
@@ -207,6 +207,7 @@ public class cycleDeviceInterface : deviceInterface
 public class CycleData : InstrumentData
 {
     public float bpmPercent;
-    public int resetJackID, phaseJackID;
+    // public int resetJackID;
+    public int phaseJackID;
     public bool isRunning;
 }
