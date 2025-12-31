@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright © 2020-2026 OSLLv1 Sphericals OpenSoundLab
 //
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at
@@ -29,7 +29,8 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class keyFrequencySignalGenerator : signalGenerator {
+public class keyFrequencySignalGenerator : signalGenerator
+{
 
   float keyMultConst = Mathf.Pow(2, 1f / 12); // not used anymore, update native api?
 
@@ -40,24 +41,28 @@ public class keyFrequencySignalGenerator : signalGenerator {
   [DllImport("OSLNative")]
   public static extern void KeyFrequencySignalGenerator(float[] buffer, int length, int channels, int semitone, float keyMultConst, ref float filteredVal);
 
-  public void UpdateKey(int k) {
+  public void UpdateKey(int k)
+  {
     curKey = k;
     semitone = k + octave * 12;
   }
 
-  public float getMult(int k) { // only used in xyloroll
+  public float getMult(int k)
+  { // only used in xyloroll
     semitone = k + octave * 12;
     return semitone;
     //return Mathf.Pow(keyMultConst, semitone);
   }
 
-  public void updateOctave(int n) {
+  public void updateOctave(int n)
+  {
     octave = n;
     semitone = curKey + octave * 12;
   }
   float filteredVal = 0;
 
-  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels)
+  {
     if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     KeyFrequencySignalGenerator(buffer, buffer.Length, channels, semitone, keyMultConst, ref filteredVal);
     recursionCheckPost();

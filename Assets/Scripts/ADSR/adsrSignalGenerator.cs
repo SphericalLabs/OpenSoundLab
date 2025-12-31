@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright © 2020-2026 OSLLv1 Sphericals OpenSoundLab
 //
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at
@@ -27,7 +27,7 @@
 
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright © 2020-2026 OSLLv1 Sphericals OpenSoundLab
 //
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at

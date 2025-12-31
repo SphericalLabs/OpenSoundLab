@@ -1,6 +1,6 @@
 // This file is part of OpenSoundLab, which is based on SoundStage VR.
 //
-// Copyright © 2020-2024 OSLLv1 Spherical Labs OpenSoundLab
+// Copyright © 2020-2026 OSLLv1 Sphericals OpenSoundLab
 //
 // OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
 // You may obtain a copy of the License at
@@ -29,7 +29,8 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-public class keyGateSignalGenerator : signalGenerator {
+public class keyGateSignalGenerator : signalGenerator
+{
 
   public bool isHigh = false;
   public bool newKeyWasPressed = false;
@@ -37,7 +38,8 @@ public class keyGateSignalGenerator : signalGenerator {
   [DllImport("OSLNative")]
   public static extern void SetArrayToSingleValue(float[] buffer, int length, float value);
 
-  public override void processBufferImpl(float[] buffer, double dspTime, int channels) {
+  public override void processBufferImpl(float[] buffer, double dspTime, int channels)
+  {
     if (!recursionCheckPre()) return; // checks and avoids fatal recursions
     SetArrayToSingleValue(buffer, buffer.Length, isHigh ? 1f : 0f);
     if (newKeyWasPressed)
