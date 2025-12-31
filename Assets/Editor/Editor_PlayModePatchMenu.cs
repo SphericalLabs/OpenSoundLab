@@ -68,6 +68,7 @@ public static class Editor_PlayModePatchMenu
     [MenuItem(loadMenuPath, false, 10)]
     public static void LoadLastPlayModePatch()
     {
+        clearPatchForManualLoad();
         tryLoadLastPlayModePatch();
     }
 
@@ -185,6 +186,17 @@ public static class Editor_PlayModePatchMenu
         if (!NetworkServer.active) return false;
         if (SaveLoadInterface.instance == null) return false;
         return true;
+    }
+
+    static void clearPatchForManualLoad()
+    {
+        if (!Application.isPlaying) return;
+        if (!NetworkServer.active) return;
+
+        SaveLoadInterface saveLoad = SaveLoadInterface.instance;
+        if (saveLoad == null) return;
+
+        saveLoad.StartNewPatch();
     }
 
     static void tryLoadLastPlayModePatch()
