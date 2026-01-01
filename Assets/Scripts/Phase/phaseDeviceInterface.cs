@@ -3,16 +3,16 @@ using System;
 using System.Collections;
 using System.Xml.Serialization;
 
-public class cycleDeviceInterface : deviceInterface
+public class phaseDeviceInterface : deviceInterface
 {
-    public static Action<cycleDeviceInterface> resetPressedEvent;
+    public static Action<phaseDeviceInterface> resetPressedEvent;
 
     public omniJack resetJack, phaseJack;
     public dial bpmDial;
     public TextMesh bpmDisplay;
     public Transform rod;
 
-    public cycleSignalGenerator resetSignal, phaseSignal;
+    public phaseSignalGenerator resetSignal, phaseSignal;
 
     public float minBpm = 60f;
     public float maxBpm = 180f;
@@ -28,22 +28,22 @@ public class cycleDeviceInterface : deviceInterface
         // Initialize signals only if they aren't already assigned
         if (phaseSignal == null || resetSignal == null)
         {
-            var gens = GetComponents<cycleSignalGenerator>();
+            var gens = GetComponents<phaseSignalGenerator>();
             if (gens.Length < 2)
             {
-                if (phaseSignal == null) phaseSignal = gameObject.AddComponent<cycleSignalGenerator>();
-                if (resetSignal == null) resetSignal = gameObject.AddComponent<cycleSignalGenerator>();
+                if (phaseSignal == null) phaseSignal = gameObject.AddComponent<phaseSignalGenerator>();
+                if (resetSignal == null) resetSignal = gameObject.AddComponent<phaseSignalGenerator>();
             }
             else
             {
                 for (int i = 0; i < gens.Length; i++)
                 {
-                    if (phaseSignal == null && gens[i].mode == cycleSignalGenerator.CycleOutputMode.Phase)
+                    if (phaseSignal == null && gens[i].mode == phaseSignalGenerator.PhaseOutputMode.Phase)
                     {
                         phaseSignal = gens[i];
                     }
 
-                    if (resetSignal == null && gens[i].mode == cycleSignalGenerator.CycleOutputMode.Reset)
+                    if (resetSignal == null && gens[i].mode == phaseSignalGenerator.PhaseOutputMode.Reset)
                     {
                         resetSignal = gens[i];
                     }
@@ -55,8 +55,8 @@ public class cycleDeviceInterface : deviceInterface
         }
 
         // Always ensure modes are correct as they might have been lost or default to Phase
-        phaseSignal.mode = cycleSignalGenerator.CycleOutputMode.Phase;
-        resetSignal.mode = cycleSignalGenerator.CycleOutputMode.Reset;
+        phaseSignal.mode = phaseSignalGenerator.PhaseOutputMode.Phase;
+        resetSignal.mode = phaseSignalGenerator.PhaseOutputMode.Reset;
 
         if (phaseJack != null) phaseJack.homesignal = phaseSignal;
         if (resetJack != null) resetJack.homesignal = resetSignal;
@@ -178,9 +178,9 @@ public class cycleDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        CycleData data = new CycleData
+        PhaseData data = new PhaseData
         {
-            deviceType = DeviceType.Cycle
+            deviceType = DeviceType.Phase
         };
         GetTransformData(data);
         data.bpmPercent = bpmDial != null ? bpmDial.percent : 0.5f;
@@ -192,7 +192,7 @@ public class cycleDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        CycleData data = d as CycleData;
+        PhaseData data = d as PhaseData;
         base.Load(data, copyMode);
         if (bpmDial != null) bpmDial.setPercent(data.bpmPercent);
         // Reset jack persistence disabled for now (re-enable if jackReset returns).
@@ -203,8 +203,8 @@ public class cycleDeviceInterface : deviceInterface
     }
 }
 
-[XmlType("CycleData")]
-public class CycleData : InstrumentData
+[XmlType("PhaseData")]
+public class PhaseData : InstrumentData
 {
     public float bpmPercent;
     // public int resetJackID;

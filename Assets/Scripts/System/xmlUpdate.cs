@@ -100,8 +100,8 @@ public class xmlUpdate
                         case "Clocks":
                             serializer = new XmlSerializer(typeof(ClockData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
-                        case "Cycles":
-                            serializer = new XmlSerializer(typeof(CycleData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                        case "Phases":
+                            serializer = new XmlSerializer(typeof(PhaseData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
                         case "TapeGroups":
                             serializer = new XmlSerializer(typeof(TapeGroupData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -232,8 +232,8 @@ public class xmlUpdate
                         case "Clocks":
                             data[data.Count - 1].deviceType = DeviceType.Clock;
                             break;
-                        case "Cycles":
-                            data[data.Count - 1].deviceType = DeviceType.Cycle;
+                        case "Phases":
+                            data[data.Count - 1].deviceType = DeviceType.Phase;
                             break;
                         case "TapeGroups":
                             data[data.Count - 1].deviceType = DeviceType.TapeGroup;

@@ -539,7 +539,7 @@ public class DeviceType
     public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.Rhythm, 3);
     public static readonly DeviceType SequencerCV = Sequencer; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType Clock = new DeviceType("Clock", DeviceCategory.Rhythm, 2);
-    public static readonly DeviceType Cycle = new DeviceType("Cycle", DeviceCategory.Rhythm, 1);
+    public static readonly DeviceType Phase = new DeviceType("Phase", DeviceCategory.Rhythm, 1);
 
     // SampleGenerator
     public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 6);

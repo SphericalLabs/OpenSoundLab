@@ -271,10 +271,10 @@ DateTime.Now);
                 //which will be ignored bc the recorder is already in the "Idle" state after onEnded().
                 //* Why don't we just call phantomHit, which will in turn trigger the call to onEnded()?
                 //=> Because we need to guarantee here that the coroutine stops IMMEDIATELY.
-                var cycleDevices = FindObjectsOfType<cycleDeviceInterface>();
-                for (int i = 0; i < cycleDevices.Length; i++)
+                var phaseDevices = FindObjectsOfType<phaseDeviceInterface>();
+                for (int i = 0; i < phaseDevices.Length; i++)
                 {
-                    var recButton = cycleDevices[i].recordButton;
+                    var recButton = phaseDevices[i].recordButton;
                     if (recButton != null) recButton.phantomHit(false);
                 }
             }

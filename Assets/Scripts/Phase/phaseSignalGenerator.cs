@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections;
 
-public class cycleSignalGenerator : signalGenerator
+public class phaseSignalGenerator : signalGenerator
 {
-    public enum CycleOutputMode { Phase = 0, Reset = 2 }
-    public CycleOutputMode mode = CycleOutputMode.Phase;
+    public enum PhaseOutputMode { Phase = 0, Reset = 2 }
+    public PhaseOutputMode mode = PhaseOutputMode.Phase;
 
     public float bpm = 120;
     public bool running = true;
@@ -44,7 +44,7 @@ public class cycleSignalGenerator : signalGenerator
         if (resetPulseQueued)
         {
             System.Array.Clear(buffer, 0, buffer.Length);
-            if (mode == CycleOutputMode.Reset)
+            if (mode == PhaseOutputMode.Reset)
             {
                 buffer[0] = buffer[1] = 1f;
             }
@@ -62,7 +62,7 @@ public class cycleSignalGenerator : signalGenerator
 
         if (!running)
         {
-            if (mode == CycleOutputMode.Phase)
+            if (mode == PhaseOutputMode.Phase)
             {
                 float curCycle = 0f;
                 if (measurePeriod > 0)
@@ -91,10 +91,10 @@ public class cycleSignalGenerator : signalGenerator
 
             switch (mode)
             {
-                case CycleOutputMode.Phase:
+                case PhaseOutputMode.Phase:
                     buffer[n] = curCycle;
                     break;
-                case CycleOutputMode.Reset:
+                case PhaseOutputMode.Reset:
                     buffer[n] = 0f;
                     break;
                 default:
