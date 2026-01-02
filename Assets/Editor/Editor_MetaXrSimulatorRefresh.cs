@@ -11,8 +11,14 @@ public static class Editor_MetaXrSimulatorRefresh
     const string refreshMenuPath = "OpenSoundLab/Play Mode/Refresh Meta XR Simulator";
     const string jsonServerPathMenuPath = "OpenSoundLab/Play Mode/Set Meta XR JSON Server Path";
     const string jsonServerToggleMenuPath = "OpenSoundLab/Play Mode/Use Meta XR JSON Server";
+
+    // the idea of this class is to auto-disable the glitchy XR simulator when leaving play mod
+    // so that it does not catch any stale inputs from mouse and keyboards which are then played back
+    // during the next run, causing glitchy behaviours
+    const string autoCycleMenuPath = "OpenSoundLab/Play Mode/Auto-disable XR mode";
     const string jsonServerPathPrefKey = "OpenSoundLab.MetaXrSimulator.JsonServerPath";
     const string jsonServerEnabledPrefKey = "OpenSoundLab.MetaXrSimulator.JsonServerEnabled";
+    const string autoCycleEnabledPrefKey = "OpenSoundLab.MetaXrSimulator.AutoCycleEnabled";
     const string simulatorEditorAssemblyName = "MetaXrSimulator.Editor";
     const string syntheticEnvironmentServerTypeName = "Meta.XR.Simulator.Editor.SyntheticEnvironments.SyntheticEnvironmentServer";
     const string jsonServerTypeName = "Meta.XR.Simulator.Editor.SyntheticEnvironments.JsonServer";
@@ -20,7 +26,6 @@ public static class Editor_MetaXrSimulatorRefresh
     const string registryTypeName = "Meta.XR.Simulator.Editor.SyntheticEnvironments.Registry";
     const string settingsTypeName = "Meta.XR.Simulator.Editor.Settings";
     const double manualDelaySeconds = 2.0d;
-    const double playModeDelaySeconds = 1.0d;
     static bool restartPending;
     static double restartAtTime;
     static bool logResultPending;
@@ -80,14 +85,40 @@ public static class Editor_MetaXrSimulatorRefresh
         return true;
     }
 
+    [MenuItem(autoCycleMenuPath, false, 43)]
+    public static void ToggleAutoCycle()
+    {
+        bool enabled = !EditorPrefs.GetBool(autoCycleEnabledPrefKey, true);
+        EditorPrefs.SetBool(autoCycleEnabledPrefKey, enabled);
+        Menu.SetChecked(autoCycleMenuPath, enabled);
+    }
+
+    [MenuItem(autoCycleMenuPath, true, 43)]
+    public static bool ToggleAutoCycleValidate()
+    {
+        Menu.SetChecked(autoCycleMenuPath, EditorPrefs.GetBool(autoCycleEnabledPrefKey, true));
+        return true;
+    }
+
     static void handlePlayModeStateChanged(PlayModeStateChange state)
     {
-        if (state != PlayModeStateChange.EnteredPlayMode)
+        if (!EditorPrefs.GetBool(autoCycleEnabledPrefKey, true))
         {
             return;
         }
 
-        beginRefresh(playModeDelaySeconds, false, false);
+        if (state == PlayModeStateChange.ExitingPlayMode)
+        {
+            stopServers(false);
+            if (Enabler.Activated)
+            {
+                Enabler.DeactivateSimulator(false);
+            }
+            return;
+        }
+
+        // Manual refresh only; do not auto-start on play.
+        return;
     }
 
     static void handleEditorUpdate()
