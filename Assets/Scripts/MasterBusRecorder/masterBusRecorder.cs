@@ -271,11 +271,9 @@ DateTime.Now);
                 //which will be ignored bc the recorder is already in the "Idle" state after onEnded().
                 //* Why don't we just call phantomHit, which will in turn trigger the call to onEnded()?
                 //=> Because we need to guarantee here that the coroutine stops IMMEDIATELY.
-                var phaseDevices = FindObjectsOfType<phaseDeviceInterface>();
-                for (int i = 0; i < phaseDevices.Length; i++)
+                if (masterBusRecorderInterface.instance != null)
                 {
-                    var recButton = phaseDevices[i].recordButton;
-                    if (recButton != null) recButton.phantomHit(false);
+                    masterBusRecorderInterface.instance.setRecordButtonState(false);
                 }
             }
             ///If we can get a new sample, we convert it to the desired number format and write it to the file

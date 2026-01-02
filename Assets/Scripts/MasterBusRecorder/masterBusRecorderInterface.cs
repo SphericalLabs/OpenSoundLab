@@ -32,6 +32,8 @@ using UnityEngine;
 
 public class masterBusRecorderInterface : componentInterface
 {
+    public static masterBusRecorderInterface instance;
+
     public button recordButton;
     public Transform meterLeft;
     public Transform meterRight;
@@ -64,6 +66,12 @@ public class masterBusRecorderInterface : componentInterface
 
     void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            Debug.LogWarning("masterBusRecorderInterface: Multiple instances detected. Using the latest one.");
+        }
+        instance = this;
+
         if (recordButton != null)
         {
             recordButton._componentInterface = this;
@@ -137,6 +145,27 @@ public class masterBusRecorderInterface : componentInterface
             return;
         }
         recorder.ToggleRec(on);
+    }
+
+    public void setRecordButtonState(bool isRecording)
+    {
+        if (recordButton == null)
+        {
+            return;
+        }
+
+        if (recordButton.isHit != isRecording)
+        {
+            recordButton.phantomHit(isRecording);
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
+        }
     }
 
     void updateButtonState()

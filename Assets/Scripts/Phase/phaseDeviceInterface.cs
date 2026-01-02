@@ -20,7 +20,7 @@ public class phaseDeviceInterface : deviceInterface
     public bool isRunning = true;
     private float pitchBendMult = 1f;
 
-    public button playButton, rewindButton, nudgeForwardButton, nudgeBackwardButton, recordButton;
+    public button playButton, rewindButton, nudgeForwardButton, nudgeBackwardButton;
 
     public override void Awake()
     {
@@ -69,7 +69,6 @@ public class phaseDeviceInterface : deviceInterface
             if (b.buttonID == 1) rewindButton = b;
             if (b.buttonID == 3) nudgeBackwardButton = b;
             if (b.buttonID == 4) nudgeForwardButton = b;
-            if (b.buttonID == 5) recordButton = b;
         }
 
         // bpmDial.onPercentChangedEventLocal.AddListener(readBpmDialAndBroadcast);
@@ -129,12 +128,6 @@ public class phaseDeviceInterface : deviceInterface
             rod.localRotation = Quaternion.Euler(0, 0, curCycle * 360f);
         }
 
-        // Record button state sync
-        if (recordButton != null && masterControl.instance != null && masterControl.instance.recorder != null)
-        {
-            bool isRecording = masterControl.instance.recorder.state != masterBusRecorder.State.Idle;
-            if (recordButton.isHit != isRecording) recordButton.phantomHit(isRecording);
-        }
     }
 
     public override void hit(bool on, int ID = -1)
@@ -154,13 +147,6 @@ public class phaseDeviceInterface : deviceInterface
         else if (ID == 4) // Nudge Forward
         {
             pitchBendMult = on ? 1.03f : 1f;
-        }
-        else if (ID == 5) // Record
-        {
-            if (masterControl.instance != null && masterControl.instance.recorder != null)
-            {
-                masterControl.instance.recorder.ToggleRec(on);
-            }
         }
     }
 
