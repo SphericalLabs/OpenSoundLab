@@ -35,6 +35,7 @@ public class masterBusRecorderInterface : componentInterface
     public button recordButton;
     public Transform meterLeft;
     public Transform meterRight;
+    public TextMesh timeText;
     public TextMesh infoText;
     public TextMesh meterLeftText;
     public TextMesh meterRightText;
@@ -42,7 +43,12 @@ public class masterBusRecorderInterface : componentInterface
     public float meterMinDb = -60f;
     public float meterMaxDb = 0f;
 
+    const float finishHoldSeconds = 6f;
+    const float finishBlinkCadenceSeconds = 0.2f;
+    const int finishBlinkSteps = 4;
+
     Renderer infoRenderer;
+    Renderer timeRenderer;
     Renderer meterLeftRenderer;
     Renderer meterRightRenderer;
     Material meterLeftMaterial;
@@ -50,6 +56,11 @@ public class masterBusRecorderInterface : componentInterface
     Vector3 leftScale;
     Vector3 rightScale;
     int textFrameToggle = 0;
+    masterBusRecorder.State lastState = masterBusRecorder.State.Idle;
+    bool finishActive = false;
+    float finishDisplayStart = 0f;
+    float finishDurationSeconds = 0f;
+    int finishDroppedSamples = 0;
 
     void Awake()
     {
@@ -61,6 +72,11 @@ public class masterBusRecorderInterface : componentInterface
         if (infoText != null)
         {
             infoRenderer = infoText.GetComponent<Renderer>();
+        }
+
+        if (timeText != null)
+        {
+            timeRenderer = timeText.GetComponent<Renderer>();
         }
 
         if (meterLeft != null)
@@ -92,15 +108,23 @@ public class masterBusRecorderInterface : componentInterface
 
         updateButtonState();
         updateMeters();
+        updateFinishState();
 
         if (!shouldUpdateText())
         {
             return;
         }
 
+        bool finishVisible = getFinishTextVisible();
+
+        if (timeText != null)
+        {
+            timeText.text = buildTimeText(finishVisible);
+        }
+
         if (infoText != null)
         {
-            infoText.text = buildStatusTextMinimal();
+            infoText.text = buildStatusTextMinimal(finishVisible);
         }
 
         updateMeterText();
@@ -153,12 +177,7 @@ public class masterBusRecorderInterface : componentInterface
 
     bool shouldUpdateText()
     {
-        if (infoText == null || infoRenderer == null)
-        {
-            return false;
-        }
-
-        if (!infoRenderer.isVisible)
+        if (!isAnyStatusTextVisible())
         {
             textFrameToggle = 0;
             return false;
@@ -167,6 +186,93 @@ public class masterBusRecorderInterface : componentInterface
         bool shouldUpdate = textFrameToggle == 0;
         textFrameToggle = 1 - textFrameToggle;
         return shouldUpdate;
+    }
+
+    void updateFinishState()
+    {
+        if (recorder == null)
+        {
+            lastState = masterBusRecorder.State.Idle;
+            finishActive = false;
+            return;
+        }
+
+        masterBusRecorder.State currentState = recorder.state;
+        if (lastState != currentState)
+        {
+            if (lastState != masterBusRecorder.State.Idle && currentState == masterBusRecorder.State.Idle)
+            {
+                finishActive = true;
+                finishDisplayStart = Time.time;
+                finishDurationSeconds = getRecordedSeconds();
+                finishDroppedSamples = getDroppedSamples();
+            }
+
+            if (currentState == masterBusRecorder.State.Recording)
+            {
+                finishActive = false;
+            }
+
+            lastState = currentState;
+        }
+    }
+
+    bool getFinishTextVisible()
+    {
+        if (!finishActive)
+        {
+            return false;
+        }
+
+        if (recorder != null && recorder.state != masterBusRecorder.State.Idle)
+        {
+            finishActive = false;
+            return false;
+        }
+
+        float elapsed = Time.time - finishDisplayStart;
+        if (elapsed < finishHoldSeconds)
+        {
+            return true;
+        }
+
+        float blinkElapsed = elapsed - finishHoldSeconds;
+        float blinkDuration = finishBlinkCadenceSeconds * finishBlinkSteps;
+        if (blinkElapsed >= blinkDuration)
+        {
+            finishActive = false;
+            return false;
+        }
+
+        int step = Mathf.FloorToInt(blinkElapsed / finishBlinkCadenceSeconds);
+        return step % 2 == 1;
+    }
+
+    bool isAnyStatusTextVisible()
+    {
+        bool infoVisible = infoText != null && infoRenderer != null && infoRenderer.isVisible;
+        bool timeVisible = timeText != null && timeRenderer != null && timeRenderer.isVisible;
+        return infoVisible || timeVisible;
+    }
+
+    string buildTimeText(bool finishVisible)
+    {
+        if (finishActive)
+        {
+            if (!finishVisible)
+            {
+                return string.Empty;
+            }
+
+            return formatDurationMinimal(finishDurationSeconds);
+        }
+
+        if (recorder == null || recorder.state == masterBusRecorder.State.Idle)
+        {
+            return string.Empty;
+        }
+
+        return formatDurationMinimal(getRecordedSeconds());
     }
 
     string buildStatusTextDetailled()
@@ -185,22 +291,39 @@ public class masterBusRecorderInterface : componentInterface
         return builder.ToString();
     }
 
-    string buildStatusTextMinimal()
+    string buildStatusTextMinimal(bool finishVisible)
     {
+        if (finishActive)
+        {
+            if (!finishVisible)
+            {
+                return string.Empty;
+            }
+
+            return buildFinishedStatusText();
+        }
+
         if (recorder == null || recorder.state == masterBusRecorder.State.Idle)
         {
             return string.Empty;
         }
 
         StringBuilder builder = new StringBuilder(96);
-        builder.AppendLine(formatDurationMinimal(getRecordedSeconds()));
-
         int dropped = getDroppedSamples();
         builder.Append("Dropped ").Append(formatSamples(dropped)).AppendLine(" samples");
 
         int percentFull = getStoragePercentFull();
-        builder.Append("Storage ").Append(percentFull).AppendLine("% full");
+        builder.Append("Storage ").Append(percentFull).Append("% full");
 
+        return builder.ToString();
+    }
+
+    string buildFinishedStatusText()
+    {
+        StringBuilder builder = new StringBuilder(96);
+        builder.Append("Saved to Sessions in Tapes\n with ");
+        builder.Append(formatSamples(finishDroppedSamples));
+        builder.Append(" dropped frames");
         return builder.ToString();
     }
 
