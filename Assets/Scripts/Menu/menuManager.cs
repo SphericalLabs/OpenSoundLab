@@ -40,6 +40,7 @@ public class menuManager : MonoBehaviour
     public GameObject trashNode;
     public GameObject settingsNode;
     public GameObject performanceNode;
+    public GameObject recorderNode;
 
     public List<GameObject> menuItems;
 
@@ -157,7 +158,7 @@ public class menuManager : MonoBehaviour
 
 
 
-                float angle = arcSegment * (x - hElements / 2) + arcSegment / 2f;
+                float angle = arcSegment * (x - (categories.Count() - 1) / 2f);
                 Quaternion rotation = Quaternion.Euler(0, angle, 0);
                 Vector3 positionOffset = rotation * Vector3.forward * -0.5f - Vector3.forward * -0.5f;
                 menuItems[tempCount].transform.localPosition = positionOffset + Vector3.up * y * 0.07f;
@@ -182,6 +183,8 @@ public class menuManager : MonoBehaviour
         settingsNode.transform.localPosition = new Vector3(-0.344f, -0.001f, 0.171f);
         settingsNode.transform.rotation = Quaternion.Euler(-0.422f, 40.013f, 0.576f);
 
+        recorderNode.transform.localPosition = new Vector3(0.344f, -0.001f, 0.171f);
+        recorderNode.transform.rotation = Quaternion.Euler(-0.422f, -40.013f, -0.576f);
     }
 
     public void SelectAudio()
@@ -213,6 +216,7 @@ public class menuManager : MonoBehaviour
             rootNode.SetActive(true);
             trashNode.SetActive(true);
             settingsNode.SetActive(true);
+            recorderNode.SetActive(true);
             for (int i = 0; i < menuItems.Count; i++)
             {
                 menuItemScripts[i].Appear(on);
@@ -220,7 +224,6 @@ public class menuManager : MonoBehaviour
             }
             Transform manip = pad.Find("manipCollViz");
             transform.position = manip != null ? manip.position : Vector3.zero;
-            transform.Translate(Vector3.left * -0.03f); // somehow this is only applied from the second menu spawn on
 
             faceCenterEye();
 
@@ -229,6 +232,7 @@ public class menuManager : MonoBehaviour
         {
             trashNode.SetActive(false);
             settingsNode.SetActive(false);
+            recorderNode.SetActive(false);
             for (int i = 0; i < menuItems.Count; i++)
             {
                 menuItemScripts[i].Appear(on);
