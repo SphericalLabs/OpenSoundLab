@@ -1,0 +1,38 @@
+Super Pivot FREE modifier is the FREE version of Super Pivot PRO modifier which include more advanced features.
+PRO version: http://u3d.as/Cgx
+
+When manipulating the pivot of your GameObjects, please make sure that the Transform toggle button of Unity is set in "Pivot" mode. This way Unity will place the transform gizmos at the proper pivot position. Otherwise, in "Center" mode, Unity will place the gizmos at the center of the GameObject's renderer bounds: this may be confusing when manipulating the pivot with SuperPivot. For more information, check the official Unity documentation: https://docs.unity3d.com/Manual/PositioningGameObjects.html (@ "Gizmo handle position toggles").
+
+In addition, you can change the Rotation Gizmo mode (Global or Local) to change how the SuperPivot gizmo will appear:
+- Local keeps the Gizmo’s rotation relative to the GameObject’s.
+- Global clamps the Gizmo to world space orientation.
+
+
+***********************
+Edit Pivot in Editor
+***********************
+By default, Super Pivot overrides your Transform Inspector to add a "Move/Rotate Pivot" button and let you quickly edit the pivot of your GameObjects.
+If you don't want this behavior, simply delete the "Plugins/SuperPivot/Editor/TransformCustomInspector.cs" file.
+
+You still can use SuperPivot using the standalone Window accessible through "Tools/Super Pivot" menu.
+
+
+***********************
+Multi-Object Editing
+***********************
+If you try to modify the pivot while having only one Transform selected, you have access to the full Super Pivot UI and capabilities.
+While having multiple Transform objects selected, Super Pivot gives you the ability to edit the pivot of the objects which are modifiable: this means that if you have 10 objects selected, but only 6 can have their pivot modified (4 of them are meshes for example), your changes will modify only the 6 modifiable objects.
+With multiple selected object, you have access to the "Renderers Bounds" panel, which lets you quickly adjust the pivot of each object according to ther respective bounds.
+
+
+*********************************
+Edit Pivot at runtime from code
+*********************************
+You can use our public API to dynamically edit the pivot position of any GameObject during runtime. Check the "Plugins/SuperPivot/API.cs" file. For more information, check our sample 'ChangeAtRuntime'. You can call the following functions:
+
+- SuperPivot.API.CanChangePivot returns if you are allowed to change the pivot position of 'target' Transform.
+- SuperPivot.API.SetPivotPosition change the pivot position of 'target' Transform.
+- SuperPivot.API.SetPivotRotation change the pivot rotation of 'target' Transform.
+
+
+Super Pivot also offers you a convenient Component "Show Pivot" (located in "Plugins/SuperPivot" folder). You can drag it over any of your GameObjects to visualize their pivot position in the scene view.
