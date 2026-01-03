@@ -9,6 +9,7 @@ public class clockDeviceInterface : deviceInterface
     public Transform progressBar;
     public Renderer visualizationRenderer;
     public Material visualizationMaterial;
+    public Transform progressBarLine;
 
     private clockSignalGenerator clockGenerator;
     private Material visualizationMat;
@@ -68,6 +69,7 @@ public class clockDeviceInterface : deviceInterface
         bool outputPlugged = clockOutputJack != null && clockOutputJack.near != null;
         clockGenerator.autorunning = !outputPlugged;
         updateProgressBar();
+        updateProgressBarLine();
         updateVisualization();
     }
 
@@ -139,6 +141,30 @@ public class clockDeviceInterface : deviceInterface
         Vector3 scale = progressBar.localScale;
         scale.x = progress;
         progressBar.localScale = scale;
+    }
+
+    private void updateProgressBarLine()
+    {
+        if (progressBarLine == null || visualizationRenderer == null)
+        {
+            return;
+        }
+
+        Transform lineParent = progressBarLine.parent;
+        if (lineParent == null)
+        {
+            return;
+        }
+
+        // Use the renderer's local bounds to find the max X in its own space, then convert to world.
+        Bounds localBounds = visualizationRenderer.localBounds;
+        Vector3 localMax = localBounds.center + new Vector3(localBounds.extents.x, 0f, 0f);
+        Vector3 worldMax = visualizationRenderer.transform.TransformPoint(localMax);
+        // Convert that world position into the line parent's space so only local X is updated.
+        Vector3 localPos = lineParent.InverseTransformPoint(worldMax);
+        Vector3 lineLocalPos = progressBarLine.localPosition;
+        lineLocalPos.x = localPos.x;
+        progressBarLine.localPosition = lineLocalPos;
     }
 
     private void updateVisualization()
