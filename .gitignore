@@ -38,6 +38,9 @@ sysinfo.txt
 # Had to whitelist these binaries
 !/Assets/third_party/RuntimeAudioClipLoader/Plugins/*
 
+# SuperPivot plugin (kept locally, not tracked)
+/Assets/Plugins/SuperPivot/
+
 # Player controller personalization
 /Assets/Resources/Personalization/*
 
