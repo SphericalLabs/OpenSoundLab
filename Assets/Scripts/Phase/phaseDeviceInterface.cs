@@ -11,6 +11,9 @@ public class phaseDeviceInterface : deviceInterface
     public dial bpmDial;
     public TextMesh bpmDisplay;
     public Transform rod;
+    public Renderer phaseVisualizationRenderer;
+    public Material phaseVisualizationMaterial;
+    private Material phaseVizMat;
 
     public phaseSignalGenerator resetSignal, phaseSignal;
 
@@ -20,11 +23,15 @@ public class phaseDeviceInterface : deviceInterface
     public bool isRunning = true;
     private float pitchBendMult = 1f;
 
+    Color vizColor;
+
+
     public button playButton, rewindButton, nudgeForwardButton, nudgeBackwardButton;
 
     public override void Awake()
     {
         base.Awake();
+        vizColor = new Color(0.8f, 0.1607843f, 0.1607843f, 1f); // todo: make this standard color which it also used e.g. by the dials somehow centralize this
         // Initialize signals only if they aren't already assigned
         if (phaseSignal == null || resetSignal == null)
         {
@@ -69,6 +76,12 @@ public class phaseDeviceInterface : deviceInterface
             if (b.buttonID == 1) rewindButton = b;
             if (b.buttonID == 3) nudgeBackwardButton = b;
             if (b.buttonID == 4) nudgeForwardButton = b;
+        }
+
+        if (phaseVisualizationRenderer != null && phaseVisualizationMaterial != null)
+        {
+            phaseVizMat = new Material(phaseVisualizationMaterial); // creates a local instance
+            phaseVisualizationRenderer.material = phaseVizMat;
         }
 
         // bpmDial.onPercentChangedEventLocal.AddListener(readBpmDialAndBroadcast);
@@ -126,6 +139,12 @@ public class phaseDeviceInterface : deviceInterface
             float curCycle = (float)(phaseSignal._measurePhase / phaseSignal.measurePeriod);
             // Full rotation per bar, start at phase 0
             rod.localRotation = Quaternion.Euler(0, 0, curCycle * 360f);
+
+            if (phaseVizMat != null)
+            {
+                vizColor.a = Mathf.Pow(curCycle, 2f);
+                phaseVizMat.SetColor("_BaseColor", vizColor);
+            }
         }
 
     }

@@ -7,14 +7,19 @@ public class clockDeviceInterface : deviceInterface
     public sliderNotched resolutionSlider;
     public dial swingDial;
     public Transform progressBar;
+    public Renderer visualizationRenderer;
+    public Material visualizationMaterial;
 
     private clockSignalGenerator clockGenerator;
+    private Material visualizationMat;
     private static readonly int[] baseResolutions = new int[] { 1, 2, 4, 8, 12, 16, 24, 32, 64 };
     private static readonly int[] slowCycleDivisions = new int[] { 8, 4, 3, 2 };
+    Color vizColor;
 
     public override void Awake()
     {
         base.Awake();
+        vizColor = new Color(0.8f, 0.1607843f, 0.1607843f, 1f);
 
         var gens = GetComponents<clockSignalGenerator>();
         clockGenerator = gens.Length > 0 ? gens[0] : gameObject.AddComponent<clockSignalGenerator>();
@@ -33,6 +38,12 @@ public class clockDeviceInterface : deviceInterface
         {
             clockOutputJack.outgoing = true;
             clockOutputJack.homesignal = clockGenerator;
+        }
+
+        if (visualizationRenderer != null && visualizationMaterial != null)
+        {
+            visualizationMat = new Material(visualizationMaterial);
+            visualizationRenderer.material = visualizationMat;
         }
 
         // resolutionSlider: 1 step per 8/4/3/2 cycles, then 1, 2, 4, 8, 12, 16, 24, 32, 64
@@ -57,6 +68,7 @@ public class clockDeviceInterface : deviceInterface
         bool outputPlugged = clockOutputJack != null && clockOutputJack.near != null;
         clockGenerator.autorunning = !outputPlugged;
         updateProgressBar();
+        updateVisualization();
     }
 
     private void applyResolutionSettings()
@@ -127,6 +139,18 @@ public class clockDeviceInterface : deviceInterface
         Vector3 scale = progressBar.localScale;
         scale.x = progress;
         progressBar.localScale = scale;
+    }
+
+    private void updateVisualization()
+    {
+        if (visualizationMat == null || clockGenerator == null)
+        {
+            return;
+        }
+
+        float progress = Mathf.Clamp01(clockGenerator.progressToNextTrigger);
+        vizColor.a = Mathf.Pow(progress, 2f);
+        visualizationMat.SetColor("_BaseColor", vizColor);
     }
 
     private string formatCycleLabel(int division)

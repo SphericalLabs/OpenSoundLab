@@ -48,6 +48,7 @@ public class masterBusRecorderInterface : componentInterface
     const float finishHoldSeconds = 6f;
     const float finishBlinkCadenceSeconds = 0.2f;
     const int finishBlinkSteps = 4;
+    const float meterTextMinDb = -120f;
 
     Renderer infoRenderer;
     Renderer timeRenderer;
@@ -339,7 +340,10 @@ public class masterBusRecorderInterface : componentInterface
 
         StringBuilder builder = new StringBuilder(96);
         int dropped = getDroppedSamples();
-        builder.Append("Dropped ").Append(formatSamples(dropped)).AppendLine(" samples");
+        if (dropped > 0)
+        {
+            builder.Append("Dropped ").Append(formatSamples(dropped)).AppendLine(" samples");
+        }
 
         int percentFull = getStoragePercentFull();
         builder.Append("Storage ").Append(percentFull).Append("% full");
@@ -350,9 +354,13 @@ public class masterBusRecorderInterface : componentInterface
     string buildFinishedStatusText()
     {
         StringBuilder builder = new StringBuilder(96);
-        builder.Append("Saved to Sessions in Tapes\n with ");
-        builder.Append(formatSamples(finishDroppedSamples));
-        builder.Append(" dropped frames");
+        builder.Append("Saved to Sessions in Tapes");
+        if (finishDroppedSamples > 0)
+        {
+            builder.Append("\nwith ");
+            builder.Append(formatSamples(finishDroppedSamples));
+            builder.Append(" samples dropped");
+        }
         return builder.ToString();
     }
 
@@ -442,6 +450,10 @@ public class masterBusRecorderInterface : componentInterface
     string formatDb(float db)
     {
         if (float.IsNegativeInfinity(db) || float.IsNaN(db))
+        {
+            return "-inf";
+        }
+        if (db < meterTextMinDb)
         {
             return "-inf";
         }
