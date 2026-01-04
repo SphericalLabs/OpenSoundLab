@@ -71,7 +71,6 @@ MonoBehaviour:
   visualizationMaterial: {fileID: 2100000, guid: b8cbc4401014a4097b6f7373a1159fc5,
     type: 2}
   progressBarLine: {fileID: 2458801527259611959}
-  progressBarRenderer: {fileID: 0}
 --- !u!114 &3640924082040361020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3789,7 +3788,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6720adb4bf350c3489679896bd5fa9b4, type: 2}
+  - {fileID: 2100000, guid: deb65283edf18824e96029ebd9515b2c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
