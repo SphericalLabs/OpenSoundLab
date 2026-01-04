@@ -40,11 +40,22 @@ namespace Mirror.Discovery
     public class OSLNetworkDiscovery : NetworkDiscoveryBase<ServerRequest, OSLServerResonse>
     {
         public bool isDiscoverable = true;
+        const string launchAsServerPrefKey = "OpenSoundLab.PlayMode.LaunchAsServer";
+        const int launchAsServerDefaultValue = 1;
 
 
         public void Awake()
         {
-            if (Application.isEditor || IsStandalonePlayer()) isDiscoverable = true;
+            if (Application.isEditor)
+            {
+                isDiscoverable = PlayerPrefs.GetInt(launchAsServerPrefKey, launchAsServerDefaultValue) == 1;
+                return;
+            }
+
+            if (IsStandalonePlayer())
+            {
+                isDiscoverable = true;
+            }
         }
 
         private bool IsStandalonePlayer()
