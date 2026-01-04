@@ -367,8 +367,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1841969917}
   - component: {fileID: 1841969916}
+  - component: {fileID: 1841969918}
   m_Layer: 0
-  m_Name: AutoFramer
+  m_Name: DebugTools
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -391,7 +392,7 @@ MonoBehaviour:
   includeLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  boundsPadding: 0.4
+  boundsPadding: 0.8
   minDistance: 0.5
   smoothing: 5
   fieldOfView: 90
@@ -413,6 +414,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1841969918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841969915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bc93ae892cdd4506992af393b798d9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeInEditor: 1
+  activeInMac: 1
+  activeInWindows: 1
+  activeInLinux: 1
+  serverPan: -1
+  clientPan: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

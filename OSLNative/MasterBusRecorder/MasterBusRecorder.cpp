@@ -78,6 +78,7 @@ struct EffectData {
         std::atomic<float> level_lin_left;
         std::atomic<float> level_dB_right;
         std::atomic<float> level_lin_right;
+        std::atomic<float> panorama; // -1.0 (Left) to 1.0 (Right)
         std::atomic<int> droppedSamples;
         struct RingBuffer* buffer;
         struct CompressorData* limiter;
@@ -288,6 +289,28 @@ OSL_API void MasterBusRecorder_AdvanceBufferPointer(int n) {
 OSL_API void* MasterBusRecorder_GetRecorderInstance() {
     return (void*) instance;
 }
+
+/// Returns true when the MasterBusRecorder instance is available.
+OSL_API bool MasterBusRecorder_IsReady() {
+    return instance != NULL;
+}
+
+/// Returns the current panorama (-1.0 = left, 1.0 = right).
+OSL_API float MasterBusRecorder_GetPanorama() {
+    if (instance != NULL)
+        return instance->panorama.load();
+    return 0.0f;
+}
+
+/// Sets the panorama for the recorded signal (-1.0 = full left, 1.0 = full right, 0.0 = centered).
+OSL_API void MasterBusRecorder_SetPanorama(float pan) {
+    if (instance != NULL) {
+        // Clamp to [-1, 1]
+        if (pan < -1.0f) pan = -1.0f;
+        if (pan > 1.0f) pan = 1.0f;
+        instance->panorama.store(pan);
+    }
+}
 }
 
 UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state) {
@@ -301,7 +324,9 @@ UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectSta
     effectdata->data.level_lin_left = ATOMIC_VAR_INIT(0);
     effectdata->data.level_dB_left = ATOMIC_VAR_INIT(-INFINITY);
     effectdata->data.level_lin_right = ATOMIC_VAR_INIT(0);
+    effectdata->data.level_lin_right = ATOMIC_VAR_INIT(0);
     effectdata->data.level_dB_right = ATOMIC_VAR_INIT(-INFINITY);
+    effectdata->data.panorama = ATOMIC_VAR_INIT(0.0f); // Default to center
     effectdata->data.droppedSamples = ATOMIC_VAR_INIT(0);
     effectdata->data.buffer = RingBuffer_New(MBR_BUFFERLENGTH);
     effectdata->data.readPtr = 0;
@@ -391,6 +416,8 @@ UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectSt
                                                               int outchannels) {
     EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
 
+
+
     /// Limit output if limiter is enabled
     if (data->p[P_LIMIT])
         Compressor_Process(inbuffer, inbuffer, (int) (length * inchannels), inchannels, data->limiter);
@@ -415,23 +442,49 @@ UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectSt
     instance->level_dB_right.store(_atodb(averageRight));
 
     /// Check if we should record
-    if (data->recording.load() == false)
-        return UNITY_AUDIODSP_OK;
-
-    /// Check that we have no buffer overflow
-    else if (MBR_BUFFERLENGTH - data->newSamples.load() >= length) {
-        /// Write samples to buffer
-        RingBuffer_Write(inbuffer, length * inchannels, data->buffer);
-        /// Update number of available samples
-        data->newSamples.fetch_add((int) (length * inchannels));
-
-        return UNITY_AUDIODSP_OK;
+    if (data->recording.load() == true) {
+        /// Check that we have no buffer overflow
+        if (MBR_BUFFERLENGTH - data->newSamples.load() >= length) {
+            /// Write samples to buffer
+            RingBuffer_Write(inbuffer, length * inchannels, data->buffer);
+            /// Update number of available samples
+            data->newSamples.fetch_add((int) (length * inchannels));
+        } else {
+            data->droppedSamples.fetch_add((int) (length * inchannels));
+            printv("MasterBusRecorder: buffer overflow!");
+        }
     }
 
-    else {
-        data->droppedSamples.fetch_add((int) (length * inchannels));
-        printv("MasterBusRecorder: buffer overflow!");
-        return UNITY_AUDIODSP_OK;
+    // Apply Panorama (Global) to Output Only, AFTER recording
+    // Only applies to first 2 channels (Stereo).
+    float pan = data->panorama.load();
+    if (pan != 0.0f && outchannels >= 1) {
+        float gainLeft = 1.0f;
+        float gainRight = 1.0f;
+
+        // Simple linear pan law
+        if (pan < 0.0f) {
+             // Pan Left: Right channel attenuates (0.0 to 1.0)
+             gainRight = 1.0f + pan;
+        } else {
+             // Pan Right: Left channel attenuates (0.0 to 1.0)
+             gainLeft = 1.0f - pan;
+        }
+
+        // Apply to outbuffer
+        if (outchannels >= 2) {
+            for (unsigned int i = 0; i < length; i++) {
+                outbuffer[i * outchannels + 0] *= gainLeft;
+                outbuffer[i * outchannels + 1] *= gainRight;
+            }
+        } else if (outchannels == 1) {
+             // Mono output just gets attenuated
+             for (unsigned int i = 0; i < length; i++) {
+                outbuffer[i] *= (pan < 0.0f ? gainLeft : gainRight);
+             }
+        }
     }
+
+    return UNITY_AUDIODSP_OK;
 }
 } // namespace MasterBusRecorder
