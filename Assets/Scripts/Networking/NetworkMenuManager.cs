@@ -119,10 +119,20 @@ public class NetworkMenuManager : MonoBehaviour
             {
                 discoverableToggle.SetIsOnWithoutNotify(networkDiscovery.isDiscoverable);
                 connectToLastServerToggle.SetIsOnWithoutNotify(autoConnectToLastServer);
-                networkManager.StartHost();
-                ActivateHostUI();
-                yield return new WaitForSeconds(0.5f);
-                SetIsDiscoverable(networkDiscovery.isDiscoverable);
+
+                // Try to find an available port before starting host (Auto-Increment logic moved here)
+                bool portFound = FindAvailablePort();
+                if (portFound)
+                {
+                    networkManager.StartHost();
+                    ActivateHostUI();
+                    yield return new WaitForSeconds(0.5f);
+                    SetIsDiscoverable(networkDiscovery.isDiscoverable);
+                }
+                else
+                {
+                     Debug.LogError("Could not find an open port to start the server.");
+                }
             }
         }
 
@@ -169,7 +179,10 @@ public class NetworkMenuManager : MonoBehaviour
         }
         else
         {
-            networkManager.StartHost();
+            if (FindAvailablePort())
+            {
+                 networkManager.StartHost();
+            }
         }
         yield return new WaitForSeconds(0.5f);
         SetIsDiscoverable(networkDiscovery.isDiscoverable);
@@ -484,7 +497,7 @@ public class NetworkMenuManager : MonoBehaviour
             objText[0].text = $"{info.userName} \r\n You: {Application.version} / Them: {info.version}";
             objText[1].text = $"";
 
-            Debug.Log($"Host {info.userName} and ip {info.EndPoint.Address} has a different verion number {info.version}, so you can't connect to it");
+            Debug.Log($"Host {info.userName} and ip {info.EndPoint.Address} has a different version number {info.version}, so you can't connect to it");
             return;
         }
 
@@ -552,6 +565,55 @@ public class NetworkMenuManager : MonoBehaviour
     public void SetTickRate(int value)
     {
         Application.targetFrameRate = value;
+    }
+
+    private bool FindAvailablePort()
+    {
+        if (networkManager == null) return false;
+
+        // Assume KCP Transport or similar PortTransport
+        Transport transport = Transport.active;
+        if (transport is PortTransport portTransport)
+        {
+            ushort startPort = portTransport.Port;
+            int attempts = 30;
+
+            for (int i = 0; i < attempts; i++)
+            {
+                ushort portToCheck = (ushort)(startPort + i);
+
+                // Try to bind a UDP socket to check availability (KCP uses UDP)
+                try
+                {
+                    // Check UDP availability
+                    using (var udpClient = new System.Net.Sockets.UdpClient(portToCheck))
+                    {
+                        // process binds here, so port is available.
+                    }
+
+                    // Note: We close the socket immediately so Mirror can use it.
+                    // There's a tiny race condition window here but it's usually fine for local dev.
+
+                    if (i > 0)
+                    {
+                        Debug.LogWarning($"Mirror: Port {startPort + i - 1} busy. Auto-incrementing to {portToCheck}.");
+                    }
+
+                    portTransport.Port = portToCheck;
+                    return true;
+                }
+                catch (System.Net.Sockets.SocketException)
+                {
+                    // Port busy, continue loop
+                }
+            }
+
+            Debug.LogError($"Mirror: Could not find open port after {attempts} attempts.");
+            return false;
+        }
+
+        // If not a PortTransport, we assume it manages itself or we can't change it.
+        return true;
     }
 }
 

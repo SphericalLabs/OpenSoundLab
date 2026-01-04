@@ -44,7 +44,62 @@ namespace Mirror.Discovery
 
         public void Awake()
         {
-            if (Application.isEditor) isDiscoverable = true;
+            if (Application.isEditor || IsStandalonePlayer()) isDiscoverable = true;
+        }
+
+        private bool IsStandalonePlayer()
+        {
+            RuntimePlatform platform = Application.platform;
+            return platform == RuntimePlatform.OSXPlayer
+                || platform == RuntimePlatform.LinuxPlayer
+                || platform == RuntimePlatform.WindowsPlayer;
+        }
+
+
+        private int _originalServerBroadcastListenPort;
+
+        public new void AdvertiseServer()
+        {
+            if (!SupportedOnThisPlatform)
+                throw new PlatformNotSupportedException("Network discovery not supported in this platform");
+
+            StopDiscovery();
+
+            if (_originalServerBroadcastListenPort == 0) _originalServerBroadcastListenPort = serverBroadcastListenPort;
+
+            // Setup port -- may throw exception
+            // try multiple ports if needed (up to 30)
+            int attempts = 30;
+            for (int i = 0; i < attempts; ++i)
+            {
+                try
+                {
+                    // Accessing protected members from base class
+                    serverUdpClient = new System.Net.Sockets.UdpClient(serverBroadcastListenPort)
+                    {
+                        EnableBroadcast = true,
+                        MulticastLoopback = false
+                    };
+                    if (i > 0) Debug.Log($"Mirror Discovery: Started advertising on port {serverBroadcastListenPort} after {i} attempts.");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (i < attempts - 1)
+                    {
+                        serverBroadcastListenPort++;
+                        Debug.LogWarning($"Mirror Discovery: Port {serverBroadcastListenPort - 1} busy, trying {serverBroadcastListenPort}... ({ex.Message})");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Mirror Discovery: Failed to start after {attempts} attempts. Last error: {ex.Message}");
+                        throw;
+                    }
+                }
+            }
+
+            // listen for client pings
+            _ = ServerListenAsync();
         }
 
         public bool ToggleIsDiscoverable()
@@ -167,37 +222,48 @@ namespace Mirror.Discovery
                 return;
             }*/
 
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, serverBroadcastListenPort);
+            // Target multiple potential server ports (up to 30) starting from the default
+            // to ensure we find instances that might be on any port in the range.
+            // Target multiple potential server ports (up to 30) starting from the default
+            // to ensure we find instances that might be on any port in the range.
+            int basePort = _originalServerBroadcastListenPort > 0 ? _originalServerBroadcastListenPort : serverBroadcastListenPort;
 
-            if (!string.IsNullOrWhiteSpace(BroadcastAddress))
+            // Target multiple potential server ports (up to 30) in case one instance incremented its port
+            for (int i = 0; i < 30; i++)
             {
-                try
+                int targetPort = basePort + i;
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, targetPort);
+
+                if (!string.IsNullOrWhiteSpace(BroadcastAddress))
                 {
-                    endPoint = new IPEndPoint(IPAddress.Parse(BroadcastAddress), serverBroadcastListenPort);
+                    try
+                    {
+                        endPoint = new IPEndPoint(IPAddress.Parse(BroadcastAddress), targetPort);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
                 }
-                catch (Exception ex)
+
+                using (NetworkWriterPooled writer = NetworkWriterPool.Get())
                 {
-                    Debug.LogException(ex);
-                }
-            }
+                    writer.WriteLong(secretHandshake);
 
-            using (NetworkWriterPooled writer = NetworkWriterPool.Get())
-            {
-                writer.WriteLong(secretHandshake);
+                    try
+                    {
+                        ServerRequest request = GetRequest();
 
-                try
-                {
-                    ServerRequest request = GetRequest();
+                        writer.Write(request);
 
-                    writer.Write(request);
+                        ArraySegment<byte> data = writer.ToArraySegment();
 
-                    ArraySegment<byte> data = writer.ToArraySegment();
-
-                    clientUdpClient.SendAsync(data.Array, data.Count, endPoint);
-                }
-                catch (Exception)
-                {
-                    // It is ok if we can't broadcast to one of the addresses
+                        clientUdpClient.SendAsync(data.Array, data.Count, endPoint);
+                    }
+                    catch (Exception)
+                    {
+                        // It is ok if we can't broadcast to one of the addresses or ports
+                    }
                 }
             }
         }

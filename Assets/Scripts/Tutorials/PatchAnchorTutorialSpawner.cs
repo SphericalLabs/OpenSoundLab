@@ -34,7 +34,9 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
     public GameObject tutorialsPrefab;
     public Vector3 tutorialLocalPosition = new Vector3(0f, 1.3f, 0.5f);
     public Vector3 tutorialLocalEuler = new Vector3(0f, -180f, 0f);
-    public bool spawnOnStart = true;
+
+    [Tooltip("Automatically suppresses tutorial spawning when running in the Unity Editor or Standalone Desktop builds (macOS/Windows/Linux).")]
+    public bool disableOnDesktopAndEditor = true;
     public OVRCameraRig cameraRig;
     public float headsetReadyTimeout = 4f;
     public int trackedHeadsetFrames = 2;
@@ -46,10 +48,6 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
 
     IEnumerator Start()
     {
-        if (!spawnOnStart)
-        {
-            yield break;
-        }
 
         if (isNetworkSessionActive())
         {
@@ -96,6 +94,13 @@ public class PatchAnchorTutorialSpawner : MonoBehaviour
 
     bool shouldSpawnTutorials()
     {
+        if (disableOnDesktopAndEditor)
+        {
+#if UNITY_EDITOR || UNITY_STANDALONE
+            return false;
+#endif
+        }
+
         if (PlayerPrefs.GetInt("showTutorialsOnStartup", 1) != 1)
         {
             return false;
