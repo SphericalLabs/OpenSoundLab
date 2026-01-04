@@ -36,6 +36,16 @@ public class RemoveDeviceComponents : MonoBehaviour
     public GameObject[] targets;
     public Material newMaterial;
 
+    private bool shouldRemoveMonoBehaviour(MonoBehaviour component)
+    {
+        if (component == null) return false;
+
+        string typeName = component.GetType().Name;
+        if (typeName == "ProBuilderMesh" || typeName == "ProBuilderMeshFilter") return false;
+
+        return true;
+    }
+
     [ContextMenu("Remove Components")]
     public void RemoveComponents()
     {
@@ -47,7 +57,10 @@ public class RemoveDeviceComponents : MonoBehaviour
                 if (t != null) DestroyImmediate(t.gameObject, true);
 
                 MonoBehaviour[] m = g.GetComponentsInChildren<MonoBehaviour>(true);
-                for (int i = 0; i < m.Length; i++) DestroyImmediate(m[i], true);
+                for (int i = 0; i < m.Length; i++)
+                {
+                    if (shouldRemoveMonoBehaviour(m[i])) DestroyImmediate(m[i], true);
+                }
 
                 AudioSource[] audios = g.GetComponentsInChildren<AudioSource>(true);
                 for (int i = 0; i < audios.Length; i++) DestroyImmediate(audios[i], true);
@@ -73,7 +86,10 @@ public class RemoveDeviceComponents : MonoBehaviour
             else
             {
                 MonoBehaviour[] m = g.GetComponents<MonoBehaviour>();
-                for (int i = 0; i < m.Length; i++) DestroyImmediate(m[i], true);
+                for (int i = 0; i < m.Length; i++)
+                {
+                    if (shouldRemoveMonoBehaviour(m[i])) DestroyImmediate(m[i], true);
+                }
 
                 AudioSource[] audios = g.GetComponents<AudioSource>();
                 for (int i = 0; i < audios.Length; i++) DestroyImmediate(audios[i], true);
