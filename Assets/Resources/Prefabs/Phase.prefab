@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -6435470071801848060}
   - component: {fileID: 2861714225421600105}
   - component: {fileID: 5031930295595329128}
+  - component: {fileID: 3204900029690018766}
   - component: {fileID: 6504317837562399405}
   - component: {fileID: -6206879222416063899}
   m_Layer: 0
@@ -270,6 +271,25 @@ MonoBehaviour:
   omniJacks:
   - {fileID: 3380366552957750803}
   - {fileID: 36266398699913555}
+--- !u!114 &3204900029690018766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778fd28672446cb43bb602ad4e2f2b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  buttons:
+  - {fileID: 6139571967734941802}
+  - {fileID: 6101304317208215945}
+  - {fileID: 6101304317085195648}
 --- !u!114 &6504317837562399405
 MonoBehaviour:
   m_ObjectHideFlags: 0

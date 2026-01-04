@@ -31,6 +31,7 @@ using Mirror;
 public class NetworkPhase : NetworkSyncListener
 {
     private phaseDeviceInterface phaseInterface;
+    private bool resetQueued;
 
     private void Awake()
     {
@@ -39,21 +40,60 @@ public class NetworkPhase : NetworkSyncListener
 
     private void Start()
     {
-        GetComponent<NetworkDials>().dialValues.Callback += OnBpmDialUpdated;
+        base.Start();
 
-        if (phaseInterface.playButton != null) phaseInterface.playButton.onStartGrabEvents.AddListener(OnButtonPress);
-        if (phaseInterface.rewindButton != null) phaseInterface.rewindButton.onStartGrabEvents.AddListener(OnButtonPress);
+        NetworkDials networkDials = GetComponent<NetworkDials>();
+        if (networkDials != null)
+        {
+            networkDials.dialValues.Callback += OnBpmDialUpdated;
+        }
+
+        if (phaseInterface != null && phaseInterface.playButton != null)
+        {
+            phaseInterface.playButton.onToggleChangedEvent.AddListener(OnPlayToggleChanged);
+        }
+        if (phaseInterface != null && phaseInterface.rewindButton != null)
+        {
+            phaseInterface.rewindButton.onToggleChangedEvent.AddListener(OnRewindToggleChanged);
+        }
     }
 
     private void OnDestroy()
     {
-        if (phaseInterface.playButton != null) phaseInterface.playButton.onStartGrabEvents.RemoveListener(OnButtonPress);
-        if (phaseInterface.rewindButton != null) phaseInterface.rewindButton.onStartGrabEvents.RemoveListener(OnButtonPress);
+        if (phaseInterface != null && phaseInterface.playButton != null)
+        {
+            phaseInterface.playButton.onToggleChangedEvent.RemoveListener(OnPlayToggleChanged);
+        }
+        if (phaseInterface != null && phaseInterface.rewindButton != null)
+        {
+            phaseInterface.rewindButton.onToggleChangedEvent.RemoveListener(OnRewindToggleChanged);
+        }
     }
 
-    private void OnButtonPress()
+    private void OnPlayToggleChanged()
     {
-        NetworkSyncEventManager.Instance.UpdateSync();
+        if (phaseInterface == null || phaseInterface.playButton == null) return;
+        if (!phaseInterface.playButton.isHit) return;
+        requestSync(false);
+    }
+
+    private void OnRewindToggleChanged()
+    {
+        if (phaseInterface == null || phaseInterface.rewindButton == null) return;
+        if (!phaseInterface.rewindButton.isHit) return;
+        requestSync(true);
+    }
+
+    void requestSync(bool reset)
+    {
+        if (!isServer)
+        {
+            CmdRequestSync(reset);
+            return;
+        }
+
+        if (reset) resetQueued = true;
+        if (NetworkSyncEventManager.Instance != null) NetworkSyncEventManager.Instance.UpdateSync();
     }
 
     void OnBpmDialUpdated(SyncList<float>.Operation op, int index, float oldValue, float newValue)
@@ -67,44 +107,61 @@ public class NetworkPhase : NetworkSyncListener
         base.OnStartClient();
         if (!isServer)
         {
-            CmdRequestSync();
+            CmdRequestSync(false);
         }
     }
 
     protected override void OnSync()
     {
+        if (phaseInterface == null || phaseInterface.phaseSignal == null) return;
         if (isServer)
         {
-            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning);
+            bool sendReset = resetQueued;
+            resetQueued = false;
+            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning, sendReset);
         }
         else
         {
-            CmdRequestSync();
+            CmdRequestSync(false);
         }
     }
 
     protected override void OnIntervalSync()
     {
         base.OnIntervalSync();
-        if (isServer)
+        if (isServer && phaseInterface != null && phaseInterface.phaseSignal != null)
         {
-            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning);
+            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning, false);
         }
     }
 
     [Command(requiresAuthority = false)]
-    protected void CmdRequestSync()
+    protected void CmdRequestSync(bool requestReset)
     {
-        RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning);
+        if (phaseInterface == null || phaseInterface.phaseSignal == null) return;
+        if (requestReset)
+        {
+            phaseInterface.ApplyNetworkReset();
+        }
+        RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning, requestReset);
     }
 
     [ClientRpc]
-    protected virtual void RpcUpdatePhase(double measurePhase, bool running)
+    protected virtual void RpcUpdatePhase(double measurePhase, bool running, bool triggerReset)
     {
         if (isClient && !isServer)
         {
-            phaseInterface.phaseSignal._measurePhase = measurePhase;
-            phaseInterface.resetSignal._measurePhase = measurePhase;
+            if (phaseInterface == null) return;
+            if (triggerReset)
+            {
+                phaseInterface.ApplyNetworkReset();
+            }
+            else
+            {
+                if (phaseInterface.phaseSignal != null) phaseInterface.phaseSignal._measurePhase = measurePhase;
+                if (phaseInterface.resetSignal != null) phaseInterface.resetSignal._measurePhase = measurePhase;
+            }
+
             phaseInterface.isRunning = running;
 
             // Sync visual button state

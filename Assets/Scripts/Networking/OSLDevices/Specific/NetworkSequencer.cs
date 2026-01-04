@@ -115,6 +115,7 @@ public class NetworkSequencer : NetworkSyncListener
 
     public void Start()
     {
+        base.Start();
         GetComponent<NetworkXHandles>().xValues.Callback += OnHandleUpdated;
         registerStepListeners();
     }

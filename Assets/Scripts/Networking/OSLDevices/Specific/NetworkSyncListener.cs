@@ -32,7 +32,7 @@ using UnityEngine;
 
 public class NetworkSyncListener : NetworkBehaviour
 {
-    private void Start()
+    protected virtual void Start()
     {
         SubscribeToNetworkEvents();
         SubscribeToJacks();

@@ -181,6 +181,11 @@ public class phaseDeviceInterface : deviceInterface
         if (resetPressedEvent != null) resetPressedEvent(this);
     }
 
+    public void ApplyNetworkReset()
+    {
+        handleResetPress();
+    }
+
     public override InstrumentData GetData()
     {
         PhaseData data = new PhaseData
