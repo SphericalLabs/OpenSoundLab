@@ -28,6 +28,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 using Mirror;
 using Unity.Collections.LowLevel.Unsafe;
 
@@ -467,6 +468,69 @@ public class VRNetworkPlayer : NetworkBehaviour
                 audioOutput.audioSource.spatialBlend = 1f;
                 //Debug.Log($"found voicechat output object {gameObject.name}");
             }
+        }
+    }
+
+    #endregion
+
+    #region PlayMode Patch Menu Commands
+
+    [Command(requiresAuthority = false)]
+    public void CmdLoadLastPlayModePatch()
+    {
+        if (SaveLoadInterface.instance != null)
+        {
+            string path = GetPlayModePatchPath();
+            if (File.Exists(path))
+            {
+                SaveLoadInterface.instance.Load(path);
+                Debug.Log($"Loaded LastPlayModePatch from {path} via Client Request");
+            }
+            else
+            {
+                Debug.LogWarning($"LastPlayModePatch not found at {path}");
+            }
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdSaveLastPlayModePatch()
+    {
+        if (SaveLoadInterface.instance != null)
+        {
+            string path = GetPlayModePatchPath();
+            EnsurePatchDirectory(path);
+            SaveLoadInterface.instance.Save(path);
+            Debug.Log($"Saved LastPlayModePatch to {path} via Client Request");
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdNewPatch()
+    {
+        if (SaveLoadInterface.instance != null)
+        {
+            SaveLoadInterface.instance.StartNewPatch();
+            Debug.Log("Started new patch via Client Request");
+        }
+    }
+
+    private string GetPlayModePatchPath()
+    {
+        string baseDir = (masterControl.instance != null) ? masterControl.instance.SaveDir : null;
+        if (string.IsNullOrEmpty(baseDir))
+        {
+            baseDir = Application.persistentDataPath;
+        }
+        return Path.Combine(baseDir, "Saves", "LastPlayModePatch.xml");
+    }
+
+    private void EnsurePatchDirectory(string path)
+    {
+        string dir = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+        {
+            Directory.CreateDirectory(dir);
         }
     }
 

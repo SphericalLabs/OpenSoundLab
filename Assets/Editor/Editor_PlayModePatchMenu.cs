@@ -68,14 +68,31 @@ public static class Editor_PlayModePatchMenu
     [MenuItem(loadMenuPath, false, 10)]
     public static void LoadLastPlayModePatch()
     {
-        clearPatchForManualLoad();
-        tryLoadLastPlayModePatch();
+        if (NetworkServer.active)
+        {
+            clearPatchForManualLoad();
+            tryLoadLastPlayModePatch();
+        }
+        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
+        {
+            var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
+            if (player != null)
+            {
+                player.CmdNewPatch();
+                player.CmdLoadLastPlayModePatch();
+                Debug.Log("Requested Server to Load LastPlayModePatch.");
+            }
+        }
+        else
+        {
+             Debug.LogWarning("Cannot Load LastPlayModePatch: Network not ready.");
+        }
     }
 
     [MenuItem(loadMenuPath, true, 10)]
     public static bool LoadLastPlayModePatchValidate()
     {
-        return Application.isPlaying;
+        return Application.isPlaying && (NetworkServer.active || (NetworkClient.isConnected && NetworkClient.localPlayer != null));
     }
 
     [MenuItem(saveMenuPath, false, 30)]
@@ -87,23 +104,41 @@ public static class Editor_PlayModePatchMenu
             return;
         }
 
-        SaveLoadInterface saveLoad = SaveLoadInterface.instance;
-        if (saveLoad == null)
+        if (NetworkServer.active)
         {
-            Debug.LogWarning("SaveLoadInterface is not available.");
-            return;
-        }
+            SaveLoadInterface saveLoad = SaveLoadInterface.instance;
+            if (saveLoad == null)
+            {
+                Debug.LogWarning("SaveLoadInterface is not available.");
+                return;
+            }
 
-        string path = getPatchPath();
-        ensurePatchDirectory(path);
-        saveLoad.Save(path);
-        Debug.Log($"Saved LastPlayModePatch to {path}");
+            string path = getPatchPath();
+            ensurePatchDirectory(path);
+            saveLoad.Save(path);
+            Debug.Log($"Saved LastPlayModePatch to {path}");
+        }
+        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
+        {
+            var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
+            if (player != null)
+            {
+                player.CmdSaveLastPlayModePatch();
+                Debug.Log("Requested Server to Save LastPlayModePatch.");
+            }
+        }
+        else
+        {
+             Debug.LogWarning("Cannot Save LastPlayModePatch: Network not ready.");
+        }
     }
 
     [MenuItem(saveMenuPath, true, 30)]
     public static bool SaveLastPlayModePatchValidate()
     {
-        return Application.isPlaying && SaveLoadInterface.instance != null;
+        return Application.isPlaying &&
+               ((NetworkServer.active && SaveLoadInterface.instance != null) ||
+                (NetworkClient.isConnected && NetworkClient.localPlayer != null));
     }
 
     [MenuItem(newPatchMenuPath, false, 1)]
@@ -115,27 +150,38 @@ public static class Editor_PlayModePatchMenu
             return;
         }
 
-        if (!NetworkServer.active)
+        if (NetworkServer.active)
         {
-            Debug.LogWarning("New Patch requires Mirror server to be active.");
-            return;
+             SaveLoadInterface saveLoad = SaveLoadInterface.instance;
+            if (saveLoad == null)
+            {
+                Debug.LogWarning("SaveLoadInterface is not available.");
+                return;
+            }
+            saveLoad.StartNewPatch();
+            Debug.Log("Started new patch.");
         }
-
-        SaveLoadInterface saveLoad = SaveLoadInterface.instance;
-        if (saveLoad == null)
+        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
         {
-            Debug.LogWarning("SaveLoadInterface is not available.");
-            return;
+             var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
+             if (player != null)
+             {
+                 player.CmdNewPatch();
+                 Debug.Log("Requested Server to Start New Patch.");
+             }
         }
-
-        saveLoad.StartNewPatch();
-        Debug.Log("Started new patch.");
+        else
+        {
+            Debug.LogWarning("New Patch requires active Network connection.");
+        }
     }
 
     [MenuItem(newPatchMenuPath, true, 1)]
     public static bool StartNewPatchValidate()
     {
-        return Application.isPlaying && NetworkServer.active && SaveLoadInterface.instance != null;
+        return Application.isPlaying &&
+               ((NetworkServer.active && SaveLoadInterface.instance != null) ||
+                (NetworkClient.isConnected && NetworkClient.localPlayer != null));
     }
 
     static void handlePlayModeStateChanged(PlayModeStateChange state)
@@ -165,19 +211,37 @@ public static class Editor_PlayModePatchMenu
             return;
         }
 
-        Scene activeScene = SceneManager.GetActiveScene();
-        if (!isTargetPlayScene(activeScene))
+        // On Client, we might need to wait until connected
+        if (NetworkServer.active)
         {
-            return;
-        }
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (!isTargetPlayScene(activeScene)) return;
+            if (!isReadyToLoad(activeScene)) return;
 
-        if (!isReadyToLoad(activeScene))
+            loadOnPlayPending = false;
+            tryLoadLastPlayModePatch();
+        }
+        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
         {
-            return;
-        }
+             // Client Auto Load?
+             // If the user wants "Load LastPlayModePatch on Play" and they start as Client...
+             // They might want to trigger the server to load it?
+             // But if multiple clients join, restarting the patch every time a client joins is bad.
+             // Usually "Load On Play" is for the host/server startup.
+             // So I will NOT auto-trigger load on client join, unless explicitly requested.
+             // The original code checked checks NetworkServer.active.
+             // I will leave auto-load for Server only for now, as it disrupts other players if a client forces a reload.
+             // Unless "Play Mode" implies single user context.
+             // But simpler to keep auto-load as server-side feature to avoid chaos.
+             // However, I should check if I should turn off `loadOnPlayPending` if I am a client so it doesn't spin forever?
+             // Use a timeout or just check checks.
 
-        loadOnPlayPending = false;
-        tryLoadLastPlayModePatch();
+             // If I am client, I can't load locally anyway (need server).
+             // Checking NetworkClient.isConnected is enough to say "I am fully initialized".
+             // If I am client, and I see I am connected, I should probably stop pending.
+             if (NetworkClient.isConnected)
+                loadOnPlayPending = false;
+        }
     }
 
     static bool isReadyToLoad(Scene activeScene)
