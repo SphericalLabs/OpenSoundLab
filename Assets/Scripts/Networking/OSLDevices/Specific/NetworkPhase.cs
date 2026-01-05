@@ -118,7 +118,7 @@ public class NetworkPhase : NetworkSyncListener
         {
             bool sendReset = resetQueued;
             resetQueued = false;
-            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning, sendReset);
+            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, sendReset);
         }
         else
         {
@@ -131,7 +131,7 @@ public class NetworkPhase : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer && phaseInterface != null && phaseInterface.phaseSignal != null)
         {
-            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning, false);
+            RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, false);
         }
     }
 
@@ -143,11 +143,11 @@ public class NetworkPhase : NetworkSyncListener
         {
             phaseInterface.ApplyNetworkReset();
         }
-        RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, phaseInterface.isRunning, requestReset);
+        RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, requestReset);
     }
 
     [ClientRpc]
-    protected virtual void RpcUpdatePhase(double measurePhase, bool running, bool triggerReset)
+    protected virtual void RpcUpdatePhase(double measurePhase, bool triggerReset)
     {
         if (isClient && !isServer)
         {
@@ -160,14 +160,6 @@ public class NetworkPhase : NetworkSyncListener
             {
                 if (phaseInterface.phaseSignal != null) phaseInterface.phaseSignal._measurePhase = measurePhase;
                 if (phaseInterface.resetSignal != null) phaseInterface.resetSignal._measurePhase = measurePhase;
-            }
-
-            phaseInterface.isRunning = running;
-
-            // Sync visual button state
-            if (phaseInterface.playButton != null && phaseInterface.playButton.isHit != running)
-            {
-                phaseInterface.playButton.phantomHit(running);
             }
         }
     }

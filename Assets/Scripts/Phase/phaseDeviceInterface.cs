@@ -209,7 +209,7 @@ public class phaseDeviceInterface : deviceInterface
         phaseJack.SetID(data.phaseJackID, copyMode);
 
         isRunning = data.isRunning;
-        if (playButton != null) playButton.phantomHit(isRunning);
+        if (playButton != null) playButton.keyHit(isRunning, false);
     }
 }
 
