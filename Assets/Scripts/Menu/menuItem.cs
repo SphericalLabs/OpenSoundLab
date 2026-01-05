@@ -247,7 +247,8 @@ public class menuItem : manipObject
 
         else if (item == DeviceType.Sequencer)
         {
-            g.transform.localPosition = new Vector3(0.0201f, 0.0057f, 0.0301f);
+            g.transform.localPosition = new Vector3(0.01f, 0.0057f, 0.0301f);
+            g.transform.localScale = Vector3.one * 0.25f;
         }
 
         else if (item == DeviceType.Tutorials)
@@ -287,10 +288,10 @@ public class menuItem : manipObject
             //g.transform.localPosition = new Vector3(.015f, 0, .02f);
             //g.transform.localRotation = Quaternion.Euler(0, 180, 0);
         }*/
-        //else if (item == DeviceType.Multiple)
-        //{
-        //    g.transform.localPosition = new Vector3(.0185f, 0, .02f);
-        //}
+        else if (item == DeviceType.MultiMix || item == DeviceType.MultiSplit)
+        {
+            g.transform.localScale = Vector3.one * 0.7f;
+        }
         //else if (item == DeviceType.MultiMix)
         //{
         //    g.transform.localPosition = new Vector3(.0185f, 0, .02f);
