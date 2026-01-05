@@ -38,6 +38,16 @@ public class NetworkPhase : NetworkSyncListener
         phaseInterface = GetComponent<phaseDeviceInterface>();
     }
 
+    private void OnEnable()
+    {
+        phaseDeviceInterface.resetPressedEvent += handlePhaseReset;
+    }
+
+    private void OnDisable()
+    {
+        phaseDeviceInterface.resetPressedEvent -= handlePhaseReset;
+    }
+
     private void Start()
     {
         base.Start();
@@ -68,6 +78,13 @@ public class NetworkPhase : NetworkSyncListener
         {
             phaseInterface.rewindButton.onToggleChangedEvent.RemoveListener(OnRewindToggleChanged);
         }
+    }
+
+    private void handlePhaseReset(phaseDeviceInterface origin)
+    {
+        if (!isServer) return;
+        if (origin == null) return;
+        resetQueued = true;
     }
 
     private void OnPlayToggleChanged()
@@ -141,7 +158,9 @@ public class NetworkPhase : NetworkSyncListener
         if (phaseInterface == null || phaseInterface.phaseSignal == null) return;
         if (requestReset)
         {
-            phaseInterface.ApplyNetworkReset();
+            phaseInterface.BroadcastSyncedReset();
+            if (NetworkSyncEventManager.Instance != null) NetworkSyncEventManager.Instance.UpdateSync();
+            return;
         }
         RpcUpdatePhase(phaseInterface.phaseSignal._measurePhase, requestReset);
     }

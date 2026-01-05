@@ -87,6 +87,16 @@ public class phaseDeviceInterface : deviceInterface
         // bpmDial.onPercentChangedEventLocal.AddListener(readBpmDialAndBroadcast);
     }
 
+    void OnEnable()
+    {
+        resetPressedEvent += handleCrossPhaseReset;
+    }
+
+    void OnDisable()
+    {
+        resetPressedEvent -= handleCrossPhaseReset;
+    }
+
     // void readBpmDialAndBroadcast()
     // {
     //     float targetBpm = Mathf.Round(Utils.map(bpmDial.percent, 0f, 1f, minBpm, maxBpm) * 10f) / 10f;
@@ -171,19 +181,38 @@ public class phaseDeviceInterface : deviceInterface
 
     void handleResetPress()
     {
-        if (phaseSignal != null) phaseSignal.ResetPhase();
-        if (resetSignal != null)
-        {
-            resetSignal.ResetPhase();
-            resetSignal.triggerResetPulse();
-        }
+        applyReset(true);
+        if (resetPressedEvent != null) resetPressedEvent(this);
+    }
 
+    void handleCrossPhaseReset(phaseDeviceInterface origin)
+    {
+        if (origin == null || origin == this) return;
+        ApplySyncedReset();
+    }
+
+    void applyReset(bool triggerPulse)
+    {
+        if (phaseSignal != null) phaseSignal.ResetPhase();
+        if (resetSignal == null) return;
+        resetSignal.ResetPhase();
+        if (triggerPulse) resetSignal.triggerResetPulse();
+    }
+
+    public void ApplySyncedReset()
+    {
+        applyReset(false);
+    }
+
+    public void BroadcastSyncedReset()
+    {
+        applyReset(false);
         if (resetPressedEvent != null) resetPressedEvent(this);
     }
 
     public void ApplyNetworkReset()
     {
-        handleResetPress();
+        ApplySyncedReset();
     }
 
     public override InstrumentData GetData()
