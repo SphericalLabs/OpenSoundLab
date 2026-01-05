@@ -367,6 +367,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1841969917}
   - component: {fileID: 1841969916}
+  - component: {fileID: 1841969919}
   - component: {fileID: 1841969918}
   m_Layer: 0
   m_Name: DebugTools
@@ -382,7 +383,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1841969915}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c5c8deefd82647028d92ecf7175faec3, type: 3}
   m_Name: 
@@ -432,6 +433,26 @@ MonoBehaviour:
   activeInLinux: 1
   serverPan: -1
   clientPan: 1
+--- !u!114 &1841969919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841969915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6205ebbf40640472f9f02decda91bfd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ovrRig: {fileID: 0}
+  baseSpeed: 0.2
+  fastMultiplier: 2
+  mouseSensitivity: 3
+  fieldOfView: 80
+  zoomSensitivity: 10
+  isFlyingActive: 0
+  fallbackCamera: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
