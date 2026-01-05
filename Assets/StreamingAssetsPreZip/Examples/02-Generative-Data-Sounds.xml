@@ -2,7 +2,7 @@
 <SynthSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Instruments>
     <Instruments xsi:type="vcaData">
-      <ID>-592818</ID>
+      <ID>-20962</ID>
       <deviceType>VCA</deviceType>
       <position>
         <x>0.5182647</x>
@@ -19,14 +19,19 @@
         <y>-0.9249922</y>
         <z>-0.09391828</z>
         <w>0.366036445</w>
+        <eulerAngles>
+          <x>348.293182</x>
+          <y>223.149689</y>
+          <z>0.288179845</z>
+        </eulerAngles>
       </rotation>
-      <dialState>0.2848564</dialState>
-      <jackOutID>-592920</jackOutID>
-      <jackInID>-592892</jackInID>
-      <jackControlID>-592948</jackControlID>
+      <dialState>0.199541926</dialState>
+      <jackOutID>-21074</jackOutID>
+      <jackInID>-21046</jackInID>
+      <jackControlID>-21102</jackControlID>
     </Instruments>
     <Instruments xsi:type="ScopeData">
-      <ID>-592466</ID>
+      <ID>-20594</ID>
       <deviceType>Scope</deviceType>
       <position>
         <x>0.280261248</x>
@@ -43,16 +48,21 @@
         <y>-0.9926882</y>
         <z>-0.00887832</z>
         <w>0.119941816</w>
+        <eulerAngles>
+          <x>358.848846</x>
+          <y>193.76825</y>
+          <z>1.04645061</z>
+        </eulerAngles>
       </rotation>
-      <jackOutID>-592524</jackOutID>
-      <jackInID>-592496</jackInID>
+      <jackOutID>-20666</jackOutID>
+      <jackInID>-20638</jackInID>
       <periodState>1</periodState>
       <modeState>false</modeState>
       <triggerState>true</triggerState>
       <muteState>false</muteState>
     </Instruments>
     <Instruments xsi:type="vcaData">
-      <ID>-592232</ID>
+      <ID>-20348</ID>
       <deviceType>VCA</deviceType>
       <position>
         <x>-0.205040112</x>
@@ -69,14 +79,19 @@
         <y>0.968713641</y>
         <z>0.0203711987</z>
         <w>0.247293234</w>
+        <eulerAngles>
+          <x>357.880066</x>
+          <y>151.337784</y>
+          <z>1.13386035</z>
+        </eulerAngles>
       </rotation>
       <dialState>0.771461666</dialState>
-      <jackOutID>-592334</jackOutID>
-      <jackInID>-592306</jackInID>
-      <jackControlID>-592362</jackControlID>
+      <jackOutID>-20460</jackOutID>
+      <jackInID>-20432</jackInID>
+      <jackControlID>-20488</jackControlID>
     </Instruments>
     <Instruments xsi:type="OscillatorData">
-      <ID>-591720</ID>
+      <ID>-19808</ID>
       <deviceType>Oscillator</deviceType>
       <position>
         <x>-0.000905897468</x>
@@ -93,20 +108,25 @@
         <y>0.9930693</y>
         <z>0.08285856</z>
         <w>0.082768485</w>
+        <eulerAngles>
+          <x>350.432953</x>
+          <y>170.499847</y>
+          <z>359.6585</z>
+        </eulerAngles>
       </rotation>
       <amp>0.8796987</amp>
       <freq>0.5</freq>
       <lfo>false</lfo>
       <wave>0</wave>
-      <jackOutID>-591842</jackOutID>
-      <jackInAmpID>-591918</jackInAmpID>
-      <jackInFreqExpID>-591862</jackInFreqExpID>
-      <jackInFreqLinID>-591890</jackInFreqLinID>
-      <jackInSyncID>-592172</jackInSyncID>
-      <jackInPwmID>-592144</jackInPwmID>
+      <jackOutID>-19954</jackOutID>
+      <jackInAmpID>-20030</jackInAmpID>
+      <jackInFreqExpID>-19974</jackInFreqExpID>
+      <jackInFreqLinID>-20002</jackInFreqLinID>
+      <jackInSyncID>-20284</jackInSyncID>
+      <jackInPwmID>-20256</jackInPwmID>
     </Instruments>
     <Instruments xsi:type="NoiseData">
-      <ID>-591590</ID>
+      <ID>-19664</ID>
       <deviceType>Noise</deviceType>
       <position>
         <x>-0.277341455</x>
@@ -123,12 +143,17 @@
         <y>0.778196</y>
         <z>-0.0150665622</z>
         <w>0.627835333</w>
+        <eulerAngles>
+          <x>1.15615845</x>
+          <y>102.1947</y>
+          <z>358.6833</z>
+        </eulerAngles>
       </rotation>
       <dialState>0.5648772</dialState>
-      <jackOutID>-591626</jackOutID>
+      <jackOutID>-19712</jackOutID>
     </Instruments>
     <Instruments xsi:type="OscillatorData">
-      <ID>-591078</ID>
+      <ID>-19124</ID>
       <deviceType>Oscillator</deviceType>
       <position>
         <x>-0.123429164</x>
@@ -145,436 +170,481 @@
         <y>0.978057563</y>
         <z>0.0245196819</z>
         <w>0.206709921</w>
+        <eulerAngles>
+          <x>357.047943</x>
+          <y>156.142365</y>
+          <z>359.621368</z>
+        </eulerAngles>
       </rotation>
-      <amp>0.552216</amp>
-      <freq>0.354771376</freq>
+      <amp>0.3941565</amp>
+      <freq>0.218102768</freq>
       <lfo>false</lfo>
       <wave>0</wave>
-      <jackOutID>-591200</jackOutID>
-      <jackInAmpID>-591276</jackInAmpID>
-      <jackInFreqExpID>-591220</jackInFreqExpID>
-      <jackInFreqLinID>-591248</jackInFreqLinID>
-      <jackInSyncID>-591530</jackInSyncID>
-      <jackInPwmID>-591502</jackInPwmID>
+      <jackOutID>-19270</jackOutID>
+      <jackInAmpID>-19346</jackInAmpID>
+      <jackInFreqExpID>-19290</jackInFreqExpID>
+      <jackInFreqLinID>-19318</jackInFreqLinID>
+      <jackInSyncID>-19600</jackInSyncID>
+      <jackInPwmID>-19572</jackInPwmID>
     </Instruments>
   </Instruments>
   <Plugs>
     <Plugs>
-      <ID>-593428</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21558</ID>
       <position>
-        <x>0.485267639</x>
-        <y>1.52057815</y>
-        <z>0.496541649</z>
+        <x>0.137177676</x>
+        <y>1.53542984</y>
+        <z>0.600797653</z>
       </position>
       <scale>
-        <x>1.23745823</x>
-        <y>1.23746157</y>
-        <z>1.23746073</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>0.0009787176</x>
-        <y>0.917783</y>
-        <z>-0.00226222724</z>
-        <w>0.3970747</w>
+        <x>-0.5658903</x>
+        <y>-0.5467423</y>
+        <z>-0.435675919</z>
+        <w>-0.437067151</w>
+        <eulerAngles>
+          <x>1.04623318</x>
+          <y>103.789619</y>
+          <z>91.15137</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>true</outputPlug>
-      <connected>-592892</connected>
-      <otherPlug>-593396</otherPlug>
+      <connected>-20638</connected>
+      <otherPlug>-21520</otherPlug>
       <plugPath>
         <Vector3>
-          <x>0.436920226</x>
-          <y>1.52734911</y>
-          <z>0.527225</z>
+          <x>0.0561041</x>
+          <y>1.51807618</y>
+          <z>0.58342725</z>
         </Vector3>
         <Vector3>
-          <x>0.4465907</x>
-          <y>1.52599382</y>
-          <z>0.521087468</z>
+          <x>0.078641355</x>
+          <y>1.52394545</y>
+          <z>0.590318441</z>
         </Vector3>
         <Vector3>
-          <x>0.4562607</x>
-          <y>1.52463913</y>
-          <z>0.514950335</z>
+          <x>0.101178564</x>
+          <y>1.52981472</y>
+          <z>0.5972109</z>
         </Vector3>
         <Vector3>
-          <x>0.4659302</x>
-          <y>1.52328491</y>
-          <z>0.5088137</z>
-        </Vector3>
-        <Vector3>
-          <x>0.4755991</x>
-          <y>1.52193117</y>
-          <z>0.502677441</z>
-        </Vector3>
-        <Vector3>
-          <x>0.485267639</x>
-          <y>1.52057815</y>
-          <z>0.496541649</z>
+          <x>0.123715669</x>
+          <y>1.535683</y>
+          <z>0.6041017</z>
         </Vector3>
       </plugPath>
       <cordColor>
-        <r>0.558260262</r>
-        <g>0.9418844</g>
-        <b>0.1993362</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593396</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21520</ID>
       <position>
-        <x>0.436924726</x>
-        <y>1.52734911</y>
-        <z>0.527225</z>
+        <x>0.0424036123</x>
+        <y>1.51799452</y>
+        <z>0.581120551</z>
       </position>
       <scale>
-        <x>1.18016863</x>
-        <y>1.18016946</y>
-        <z>1.18016922</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>-0.007161864</x>
-        <y>-0.6178001</y>
-        <z>-0.005627295</z>
-        <w>0.786282659</w>
+        <x>-0.491557181</x>
+        <y>-0.5842806</y>
+        <z>0.418653578</z>
+        <w>0.4916471</w>
+        <eulerAngles>
+          <x>0.336730272</x>
+          <y>260.443054</y>
+          <z>80.4328</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>false</outputPlug>
-      <connected>-592524</connected>
-      <otherPlug>-593428</otherPlug>
+      <connected>-19954</connected>
+      <otherPlug>-21558</otherPlug>
       <plugPath />
       <cordColor>
-        <r>0.1906996</r>
-        <g>0.396858275</g>
-        <b>0.663971841</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593340</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21482</ID>
       <position>
-        <x>-0.00318269</x>
-        <y>1.59583092</y>
-        <z>0.5870508</z>
+        <x>-0.185271561</x>
+        <y>1.74478769</y>
+        <z>0.487276256</z>
       </position>
       <scale>
-        <x>1.529417</x>
-        <y>1.5294205</y>
-        <z>1.52943182</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>0.06497921</x>
-        <y>0.759769559</y>
-        <z>-0.642356038</z>
-        <w>0.07685648</w>
+        <x>-0.6156859</x>
+        <y>0.600321</y>
+        <z>0.37339893</z>
+        <w>-0.3480214</w>
+        <eulerAngles>
+          <x>358.8669</x>
+          <y>241.37973</y>
+          <z>267.879639</z>
+        </eulerAngles>
+      </rotation>
+      <outputPlug>false</outputPlug>
+      <connected>-20460</connected>
+      <otherPlug>-21444</otherPlug>
+      <plugPath />
+      <cordColor>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
+        <a>1</a>
+      </cordColor>
+    </Plugs>
+    <Plugs>
+      <ID>-21444</ID>
+      <position>
+        <x>-0.148665935</x>
+        <y>1.69188893</y>
+        <z>0.536455035</z>
+      </position>
+      <scale>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </scale>
+      <rotation>
+        <x>0.7089292</x>
+        <y>-0.140116155</y>
+        <z>0.1522158</z>
+        <w>0.674253166</w>
+        <eulerAngles>
+          <x>87.02389</x>
+          <y>148.830719</y>
+          <z>172.69809</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>true</outputPlug>
-      <connected>-591890</connected>
-      <otherPlug>-593308</otherPlug>
+      <connected>-19290</connected>
+      <otherPlug>-21482</otherPlug>
       <plugPath>
         <Vector3>
-          <x>-0.0659960359</x>
-          <y>1.63255942</y>
-          <z>0.5698495</z>
+          <x>-0.175110251</x>
+          <y>1.74455869</y>
+          <z>0.492821038</z>
         </Vector3>
         <Vector3>
-          <x>-0.0502923</x>
-          <y>1.62337852</y>
-          <z>0.574148238</z>
+          <x>-0.162074775</x>
+          <y>1.72516108</y>
+          <z>0.5149467</z>
         </Vector3>
         <Vector3>
-          <x>-0.0345887654</x>
-          <y>1.6141969</y>
-          <z>0.578448</z>
-        </Vector3>
-        <Vector3>
-          <x>-0.0188854951</x>
-          <y>1.60501444</y>
-          <z>0.5827489</z>
-        </Vector3>
-        <Vector3>
-          <x>-0.0031824077</x>
-          <y>1.59583092</y>
-          <z>0.5870508</z>
+          <x>-0.1490393</x>
+          <y>1.70576358</y>
+          <z>0.537072241</z>
         </Vector3>
       </plugPath>
       <cordColor>
-        <r>0.315570861</r>
-        <g>0.9475436</g>
-        <b>0.796618342</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593308</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21406</ID>
       <position>
-        <x>-0.0659960359</x>
-        <y>1.63255942</y>
-        <z>0.5698495</z>
+        <x>-0.27434507</x>
+        <y>1.72366762</y>
+        <z>0.37246114</z>
       </position>
       <scale>
-        <x>1.17765331</x>
-        <y>1.17766023</y>
-        <z>1.17765367</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>0.00179043552</x>
-        <y>-0.838079453</y>
-        <z>0.002750705</z>
-        <w>0.545538366</w>
+        <x>0.6967853</x>
+        <y>-0.7092462</y>
+        <z>-0.06634427</z>
+        <w>0.08401668</w>
+        <eulerAngles>
+          <x>1.31644785</x>
+          <y>192.2213</y>
+          <z>271.1565</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>false</outputPlug>
-      <connected>-591200</connected>
-      <otherPlug>-593340</otherPlug>
+      <connected>-19712</connected>
+      <otherPlug>-21368</otherPlug>
       <plugPath />
       <cordColor>
-        <r>0.3747168</r>
-        <g>0.3738102</g>
-        <b>0.22285834</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593276</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21368</ID>
       <position>
-        <x>-0.241500229</x>
-        <y>1.74605453</y>
-        <z>0.4565956</z>
+        <x>-0.224601761</x>
+        <y>1.74567389</y>
+        <z>0.46581468</z>
       </position>
       <scale>
-        <x>1.4131825</x>
-        <y>1.41319311</y>
-        <z>1.41318464</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>0.008500572</x>
-        <y>0.5104053</y>
-        <z>-0.00504575344</z>
-        <w>0.859877169</w>
+        <x>0.3733992</x>
+        <y>0.348021328</y>
+        <z>0.6156858</z>
+        <w>0.600320935</w>
+        <eulerAngles>
+          <x>1.13310492</x>
+          <y>61.37975</y>
+          <z>92.12038</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>true</outputPlug>
-      <connected>-592306</connected>
-      <otherPlug>-593244</otherPlug>
+      <connected>-20432</connected>
+      <otherPlug>-21406</otherPlug>
       <plugPath>
         <Vector3>
-          <x>-0.268518955</x>
-          <y>1.72457576</y>
-          <z>0.399297</z>
+          <x>-0.272533447</x>
+          <y>1.72386432</y>
+          <z>0.380825132</z>
         </Vector3>
         <Vector3>
-          <x>-0.2552472</x>
-          <y>1.73569036</y>
-          <z>0.42764613</z>
+          <x>-0.253648251</x>
+          <y>1.73488367</y>
+          <z>0.420547545</z>
         </Vector3>
         <Vector3>
-          <x>-0.241975471</x>
-          <y>1.74680483</y>
-          <z>0.4559952</z>
+          <x>-0.234763071</x>
+          <y>1.7459029</y>
+          <z>0.4602699</z>
         </Vector3>
       </plugPath>
       <cordColor>
-        <r>0.911885142</r>
-        <g>0.5868625</g>
-        <b>0.9543798</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593244</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21330</ID>
       <position>
-        <x>-0.268518955</x>
-        <y>1.72457576</y>
-        <z>0.399297</z>
+        <x>-0.08359849</x>
+        <y>1.632433</y>
+        <z>0.562057734</z>
       </position>
       <scale>
-        <x>1.27424955</x>
-        <y>1.27425373</y>
-        <z>1.27425134</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>-0.00122298871</x>
-        <y>0.9942317</y>
-        <z>-0.0114024282</z>
-        <w>-0.106639296</w>
+        <x>-0.575846</x>
+        <y>-0.608921647</y>
+        <z>0.377691925</z>
+        <w>0.393655568</w>
+        <eulerAngles>
+          <x>0.378132284</x>
+          <y>246.122833</y>
+          <z>87.0478745</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>false</outputPlug>
-      <connected>-591626</connected>
-      <otherPlug>-593276</otherPlug>
+      <connected>-19270</connected>
+      <otherPlug>-21292</otherPlug>
       <plugPath />
       <cordColor>
-        <r>0.156668916</r>
-        <g>0.9729332</g>
-        <b>0.8411763</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593212</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21292</ID>
       <position>
-        <x>-0.149350539</x>
-        <y>1.71109152</y>
-        <z>0.537683547</z>
+        <x>-0.00312057277</x>
+        <y>1.576914</y>
+        <z>0.5834084</z>
       </position>
       <scale>
-        <x>1.52942038</x>
-        <y>1.52942026</y>
-        <z>1.52942932</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>0.185584515</x>
-        <y>0.6984101</y>
-        <z>-0.662995</z>
-        <w>0.195497766</w>
+        <x>0.760795832</x>
+        <y>-0.051550664</y>
+        <z>0.0655016452</z>
+        <w>0.643616259</w>
+        <eulerAngles>
+          <x>80.42697</x>
+          <y>168.446152</y>
+          <z>177.9749</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>true</outputPlug>
-      <connected>-591220</connected>
-      <otherPlug>-593180</otherPlug>
+      <connected>-20002</connected>
+      <otherPlug>-21330</otherPlug>
       <plugPath>
         <Vector3>
-          <x>-0.168366343</x>
-          <y>1.7444067</y>
-          <z>0.496497035</z>
+          <x>-0.070894286</x>
+          <y>1.63252473</y>
+          <z>0.567681432</z>
         </Vector3>
         <Vector3>
-          <x>-0.158702165</x>
-          <y>1.72808933</y>
-          <z>0.516983151</z>
+          <x>-0.05406596</x>
+          <y>1.62204826</y>
+          <z>0.5721775</z>
         </Vector3>
         <Vector3>
-          <x>-0.149037987</x>
-          <y>1.711772</y>
-          <z>0.537469149</z>
+          <x>-0.03723784</x>
+          <y>1.61157107</y>
+          <z>0.57667464</z>
+        </Vector3>
+        <Vector3>
+          <x>-0.0204099976</x>
+          <y>1.601093</y>
+          <z>0.5811729</z>
+        </Vector3>
+        <Vector3>
+          <x>-0.003583349</x>
+          <y>1.590614</y>
+          <z>0.58567214</z>
         </Vector3>
       </plugPath>
       <cordColor>
-        <r>0.152818337</r>
-        <g>0.9645523</g>
-        <b>0.985640049</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593180</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21254</ID>
       <position>
-        <x>-0.168366343</x>
-        <y>1.7444067</y>
-        <z>0.496497035</z>
+        <x>0.4258752</x>
+        <y>1.527558</y>
+        <z>0.529937148</z>
       </position>
       <scale>
-        <x>1.41318238</x>
-        <y>1.41319287</y>
-        <z>1.41318429</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>-0.005049153</x>
-        <y>-0.859854341</y>
-        <z>-0.008505436</z>
-        <w>0.5104438</w>
+        <x>0.435676</x>
+        <y>-0.437067151</y>
+        <z>-0.5658903</z>
+        <w>0.5467422</w>
+        <eulerAngles>
+          <x>358.953766</x>
+          <y>283.7896</y>
+          <z>268.848633</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>false</outputPlug>
-      <connected>-592334</connected>
-      <otherPlug>-593212</otherPlug>
+      <connected>-20666</connected>
+      <otherPlug>-21216</otherPlug>
       <plugPath />
       <cordColor>
-        <r>0.2118378</r>
-        <g>0.397370756</g>
-        <b>0.1682222</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
     <Plugs>
-      <ID>-593148</ID>
-      <deviceType>AD</deviceType>
+      <ID>-21216</ID>
       <position>
-        <x>0.0613738671</x>
-        <y>1.51810718</y>
-        <z>0.584316969</z>
+        <x>0.499297</x>
+        <y>1.52048326</y>
+        <z>0.483363032</z>
       </position>
       <scale>
-        <x>1.17765415</x>
-        <y>1.17766166</y>
-        <z>1.177651</z>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
       </scale>
       <rotation>
-        <x>0.00188779877</x>
-        <y>-0.7635064</y>
-        <z>0.002231956</z>
-        <w>0.6457936</w>
-      </rotation>
-      <outputPlug>false</outputPlug>
-      <connected>-591842</connected>
-      <otherPlug>-593116</otherPlug>
-      <plugPath />
-      <cordColor>
-        <r>0.2448434</r>
-        <g>0.7593938</g>
-        <b>0.5613223</b>
-        <a>1</a>
-      </cordColor>
-    </Plugs>
-    <Plugs>
-      <ID>-593116</ID>
-      <deviceType>AD</deviceType>
-      <position>
-        <x>0.118510947</x>
-        <y>1.5357815</y>
-        <z>0.605409741</z>
-      </position>
-      <scale>
-        <x>1.47520661</x>
-        <y>1.47520721</y>
-        <z>1.47520876</z>
-      </scale>
-      <rotation>
-        <x>0.005614427</x>
-        <y>0.786970735</y>
-        <z>-0.00716193253</z>
-        <w>0.6169232</w>
+        <x>-0.7123872</x>
+        <y>-0.5786414</y>
+        <z>-0.306523263</z>
+        <w>-0.2524324</w>
+        <eulerAngles>
+          <x>0.2821887</x>
+          <y>133.208176</y>
+          <z>101.706978</z>
+        </eulerAngles>
       </rotation>
       <outputPlug>true</outputPlug>
-      <connected>-592496</connected>
-      <otherPlug>-593148</otherPlug>
+      <connected>-21046</connected>
+      <otherPlug>-21254</otherPlug>
       <plugPath>
         <Vector3>
-          <x>0.06137213</x>
-          <y>1.51810718</y>
-          <z>0.584316969</z>
+          <x>0.439337254</x>
+          <y>1.52730489</y>
+          <z>0.526633143</z>
         </Vector3>
         <Vector3>
-          <x>0.0804749057</x>
-          <y>1.524059</y>
-          <z>0.591546059</z>
+          <x>0.449411333</x>
+          <y>1.52595246</y>
+          <z>0.519788742</z>
         </Vector3>
         <Vector3>
-          <x>0.09957762</x>
-          <y>1.5300107</y>
-          <z>0.598775</z>
+          <x>0.459463984</x>
+          <y>1.52460063</y>
+          <z>0.5129447</z>
         </Vector3>
         <Vector3>
-          <x>0.1186803</x>
-          <y>1.53596163</y>
-          <z>0.606003761</z>
+          <x>0.469536215</x>
+          <y>1.52324939</y>
+          <z>0.5061012</z>
+        </Vector3>
+        <Vector3>
+          <x>0.479587764</x>
+          <y>1.52189851</y>
+          <z>0.4992581</z>
+        </Vector3>
+        <Vector3>
+          <x>0.4896599</x>
+          <y>1.52054834</y>
+          <z>0.492415428</z>
         </Vector3>
       </plugPath>
       <cordColor>
-        <r>0.125775</r>
-        <g>0.203955561</g>
-        <b>0.02751315</b>
+        <r>0</r>
+        <g>0</g>
+        <b>0</b>
         <a>1</a>
       </cordColor>
     </Plugs>
   </Plugs>
   <Systems>
     <Systems>
-      <BPM>120</BPM>
+      <wireSetting>1</wireSetting>
       <binauralMode>0</binauralMode>
-      <version>0.48</version>
+      <version>0.79</version>
     </Systems>
   </Systems>
 </SynthSet>
