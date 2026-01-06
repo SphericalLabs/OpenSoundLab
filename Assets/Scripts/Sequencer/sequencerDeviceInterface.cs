@@ -93,6 +93,7 @@ public class sequencerDeviceInterface : deviceInterface
     public omniJack resetJack, clockJack, phaseJack;
     public button playButton;
     public basicSwitch switchCVRange;
+    public basicSwitch switchClockResetMode;
     bool lastRangeLow = true;
 
     double _sampleDuration = 0;
@@ -143,8 +144,8 @@ public class sequencerDeviceInterface : deviceInterface
             }
         }
 
-        playButton = GetComponentInChildren<button>();
-        switchCVRange = GetComponentInChildren<basicSwitch>();
+        if (playButton == null) playButton = GetComponentInChildren<button>();
+        if (switchCVRange == null) switchCVRange = GetComponentInChildren<basicSwitch>();
 
         _sampleDuration = 1.0 / AudioSettings.outputSampleRate;
 
@@ -280,8 +281,19 @@ public class sequencerDeviceInterface : deviceInterface
     {
         // Phase lock is active only while running and a phase signal is patched.
         if (!running) return false;
+        if (!isPhaseModeActive()) return false;
         if (phaseJack == null) return false;
         return phaseJack.signal != null;
+    }
+
+    public bool isPhaseModeActive()
+    {
+        if (switchClockResetMode == null)
+        {
+            if (phaseJack == null) return false;
+            return phaseJack.signal != null;
+        }
+        return !switchClockResetMode.switchVal;
     }
 
     void updateStepSelectLock()
@@ -638,6 +650,7 @@ public class SequencerData : InstrumentData
     public bool[] rowMutes;
     public bool[] rowModes;
     public bool switchRange;
+    public bool switchClockResetMode;
 }
 
 [XmlType("SequencerCVData")]

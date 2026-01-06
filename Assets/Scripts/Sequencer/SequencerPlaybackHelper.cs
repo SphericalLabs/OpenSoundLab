@@ -197,11 +197,14 @@ public class SequencerPlaybackHelper
             globalResetQueued = false;
         }
 
-        // Phase mode is implicit: if the phase jack is patched (signal present), we follow phase; otherwise we run on clock/reset.
-        bool phaseMode = phaseGenerator != null;
+        // Phase mode is driven by the clock/reset toggle. Legacy fallback uses phase jack presence.
+        bool phaseMode = sequencer.isPhaseModeActive();
+        bool discardClockReset = phaseMode || !sequencer.running;
+        processClockResetBuffers(buffer, channels, discardClockReset);
 
         if (phaseMode) // Phase mode
         {
+            if (phaseGenerator == null) return;
             if (!sequencer.running) return;
 
             phaseGenerator.processBuffer(audioPhaseBuffer, AudioSettings.dspTime, channels);
@@ -220,36 +223,36 @@ public class SequencerPlaybackHelper
         }
         else // Clock (Trigger) mode
         {
-            if (resetGenerator != null)
-            {
-                resetGenerator.processBuffer(audioResetBuffer, AudioSettings.dspTime, channels);
+        }
+    }
 
-                for (int i = 0; i < buffer.Length; i += channels)
+    void processClockResetBuffers(float[] buffer, int channels, bool discardSamples)
+    {
+        if (resetGenerator != null)
+        {
+            resetGenerator.processBuffer(audioResetBuffer, AudioSettings.dspTime, channels);
+            for (int i = 0; i < buffer.Length; i += channels)
+            {
+                if (!discardSamples && signalGenerator.isRisingEdge(audioResetBuffer[i], lastResetSig[1]))
                 {
-                    if (signalGenerator.isRisingEdge(audioResetBuffer[i], lastResetSig[1]))
-                    {
-                        resetSteps(i, AudioSettings.dspTime);
-                    }
-                    lastResetSig[0] = lastResetSig[1];
-                    lastResetSig[1] = audioResetBuffer[i];
+                    resetSteps(i, AudioSettings.dspTime);
                 }
+                lastResetSig[0] = lastResetSig[1];
+                lastResetSig[1] = audioResetBuffer[i];
             }
+        }
 
-            if (!sequencer.running) return;
-
-            if (clockGenerator != null)
+        if (clockGenerator != null)
+        {
+            clockGenerator.processBuffer(audioClockBuffer, AudioSettings.dspTime, channels);
+            for (int i = 0; i < buffer.Length; i += channels)
             {
-                clockGenerator.processBuffer(audioClockBuffer, AudioSettings.dspTime, channels);
-
-                for (int i = 0; i < buffer.Length; i += channels)
+                if (!discardSamples && signalGenerator.isRisingEdge(audioClockBuffer[i], lastClockSig[1]))
                 {
-                    if (signalGenerator.isRisingEdge(audioClockBuffer[i], lastClockSig[1]))
-                    {
-                        executeNextStep(i, AudioSettings.dspTime);
-                    }
-                    lastClockSig[0] = lastClockSig[1];
-                    lastClockSig[1] = audioClockBuffer[i];
+                    executeNextStep(i, AudioSettings.dspTime);
                 }
+                lastClockSig[0] = lastClockSig[1];
+                lastClockSig[1] = audioClockBuffer[i];
             }
         }
     }

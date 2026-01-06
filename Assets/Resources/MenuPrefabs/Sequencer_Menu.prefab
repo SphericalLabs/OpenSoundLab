@@ -188,11 +188,31 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 1927475858747091168, guid: a6a4b533b4e8ef844832896a3c1eac5c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
     - target: {fileID: 3552881643031036882, guid: a6a4b533b4e8ef844832896a3c1eac5c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 3834690221344284923, guid: a6a4b533b4e8ef844832896a3c1eac5c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 4319854032226040593, guid: a6a4b533b4e8ef844832896a3c1eac5c,
+        type: 3}
+      propertyPath: onLabel
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4319854032226040593, guid: a6a4b533b4e8ef844832896a3c1eac5c,
+        type: 3}
+      propertyPath: offLabel
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4426930815003209661, guid: a6a4b533b4e8ef844832896a3c1eac5c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -219,6 +239,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
     - target: {fileID: 7445775658124708948, guid: a6a4b533b4e8ef844832896a3c1eac5c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: da7026a3d1e5e1f43b35fa71ab10db3b, type: 2}
+    - target: {fileID: 7840359749916058325, guid: a6a4b533b4e8ef844832896a3c1eac5c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -284,6 +309,7 @@ PrefabInstance:
     - {fileID: 2303466892665025804, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
     - {fileID: 7048831982614076315, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
     - {fileID: 3231052383963571707, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
+    - {fileID: 4546210604867254568, guid: a6a4b533b4e8ef844832896a3c1eac5c, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4000011047401768, guid: a6a4b533b4e8ef844832896a3c1eac5c,
         type: 3}

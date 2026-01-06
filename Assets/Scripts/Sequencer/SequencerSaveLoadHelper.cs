@@ -50,6 +50,7 @@ public class SequencerSaveLoadHelper
         int[] clampedDimensions = getClampedDimensions();
         data.dimensions = clampedDimensions;
         data.switchRange = sequencer.switchCVRange != null && sequencer.switchCVRange.switchVal;
+        data.switchClockResetMode = sequencer.switchClockResetMode != null && sequencer.switchClockResetMode.switchVal;
 
         sequencer.readAllData();
         captureRowStates(data, clampedDimensions[0]);
@@ -74,6 +75,10 @@ public class SequencerSaveLoadHelper
         sequencer.SetDimensions(rows, steps);
 
         if (sequencer.switchCVRange != null) sequencer.switchCVRange.setSwitch(data.switchRange, true);
+        if (sequencer.switchClockResetMode != null)
+        {
+            sequencer.switchClockResetMode.setSwitch(data.switchClockResetMode, true);
+        }
 
         sequencer.resetJack.SetID(data.resetJackID, copyMode);
         sequencer.clockJack.SetID(data.clockJackID, copyMode);
