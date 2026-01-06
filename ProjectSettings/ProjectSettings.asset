@@ -144,7 +144,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.81
+  bundleVersion: 0.82
   preloadedAssets:
   - {fileID: 0}
   - {fileID: 11400000, guid: c363b5179947cbb40899ebae53ad2c59, type: 2}
@@ -178,12 +178,12 @@ PlayerSettings:
     iPhone: com.oculus.UnitySample
     tvOS: com.oculus.UnitySample
   buildNumber:
-    Standalone: 0
+    Standalone: 82
     VisionOS: 0
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 81
+  AndroidBundleVersionCode: 82
   AndroidMinSdkVersion: 32
   AndroidTargetSdkVersion: 34
   AndroidPreferredInstallLocation: 0
@@ -956,7 +956,6 @@ PlayerSettings:
   syncCapabilities: 0
   platformCapabilities:
     WindowsStoreApps:
-      EnterpriseAuthentication: False
       VideosLibrary: False
       HumanInterfaceDevice: False
       Location: False
@@ -966,6 +965,7 @@ PlayerSettings:
       MusicLibrary: False
       LowLevelDevices: False
       PrivateNetworkClientServer: False
+      Proximity: False
       Objects3D: False
       RemoteSystem: False
       BlockedChatMessages: False
@@ -987,10 +987,10 @@ PlayerSettings:
       PointOfService: False
       RecordedCallsFolder: False
       Contacts: False
-      Proximity: False
+      InternetClient: False
       CodeGeneration: False
       BackgroundMediaPlayback: False
-      InternetClient: False
+      EnterpriseAuthentication: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
