@@ -191,10 +191,15 @@ public class SequencerPlaybackHelper
             Array.Resize(ref audioResetBuffer, buffer.Length);
         }
 
+        bool resetApplied = false;
         if (globalResetQueued)
         {
             resetSteps(0, AudioSettings.dspTime);
             globalResetQueued = false;
+            lastClockSig[0] = lastClockSig[1] = 0;
+            lastResetSig[0] = lastResetSig[1] = 0;
+            phaseSyncPending = false;
+            resetApplied = true;
         }
 
         // Phase mode is driven by the clock/reset toggle. Legacy fallback uses phase jack presence.
@@ -208,6 +213,7 @@ public class SequencerPlaybackHelper
             if (!sequencer.running) return;
 
             phaseGenerator.processBuffer(audioPhaseBuffer, AudioSettings.dspTime, channels);
+            if (resetApplied) return;
 
             // Map phase directly to step.
             float latestPhase = audioPhaseBuffer[buffer.Length - channels];

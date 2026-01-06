@@ -22,6 +22,7 @@ public class clockSignalGenerator : signalGenerator
     private float lastResetSample = 0f;
     private float trackedPhase = 0f;
     private bool hasPhaseSample = false;
+    private bool ignorePhaseDropAfterReset = false;
     private int cycleCounter = 0;
     private bool settingsInitialized = false;
     private int lastResolutionIndex = -1;
@@ -128,7 +129,24 @@ public class clockSignalGenerator : signalGenerator
             else
             {
                 float phaseDelta = phaseSample - lastPhaseSample;
-                if (phaseDelta < 0f) phaseDelta += 1f;
+                if (phaseDelta < 0f)
+                {
+                    // Global reset can force the phase signal to drop mid-cycle (e.g., 0.5 -> 0).
+                    // Interpreting that drop as a natural wrap would advance the clock early,
+                    // especially in slow (multi-bar) modes, so we ignore the first negative
+                    // delta after a reset. If we ever need to preserve mid-cycle resets, an
+                    // alternative is to only treat drops from very high phase values (e.g., >0.99)
+                    // as true wraps, but that is device- and threshold-sensitive.
+                    if (ignorePhaseDropAfterReset)
+                    {
+                        phaseDelta = 0f;
+                        ignorePhaseDropAfterReset = false;
+                    }
+                    else
+                    {
+                        phaseDelta += 1f;
+                    }
+                }
                 trackedPhase += phaseDelta;
                 if (trackedPhase >= 1f)
                 {
@@ -162,7 +180,11 @@ public class clockSignalGenerator : signalGenerator
     {
         trackedPhase = 0f;
         hasPhaseSample = false;
+        lastPhaseSample = 0f;
+        lastResetSample = 0f;
+        progressToNextTrigger = 0f;
         cycleCounter = 0;
+        ignorePhaseDropAfterReset = true;
         _beatManager.beatResetEvent();
     }
 
