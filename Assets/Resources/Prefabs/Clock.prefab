@@ -92,7 +92,7 @@ MonoBehaviour:
   phaseInput: {fileID: 0}
   resetInput: {fileID: 0}
   resetThreshold: 0.5
-  resolutionIndex: 3
+  resolutionIndex: 7
   swingVal: 0.5
   cycleDivision: 1
   progressToNextTrigger: 0
@@ -544,7 +544,7 @@ MonoBehaviour:
       m_Calls: []
   percent: 0.5
   xBound: 0.08
-  switchVal: 3
+  switchVal: 7
   notchCount: 13
   labelHolder: {fileID: 4087601624404077181}
   labelPrefab: {fileID: 2078164691802018174, guid: d437a12b018294c8789846d5d20314b4,

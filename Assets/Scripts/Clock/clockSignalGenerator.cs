@@ -5,7 +5,7 @@ public class clockSignalGenerator : signalGenerator
     public signalGenerator phaseInput;
     public signalGenerator resetInput;
     public float resetThreshold = 0.5f;
-    public int resolutionIndex = 3; // default 8th notes?
+    public int resolutionIndex = 7; // default 8th notes?
     public float swingVal = 0.5f;
     public int cycleDivision = 1;
     public float progressToNextTrigger = 0f;

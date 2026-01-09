@@ -78,7 +78,7 @@ public class clockDeviceInterface : deviceInterface
         float swingPercent = swingDial != null ? swingDial.percent : 0.5f;
         if (resolutionSlider == null)
         {
-            clockGenerator.UpdateSettings(3, swingPercent);
+            clockGenerator.UpdateSettings(clockGenerator.resolutionIndex, swingPercent);
             clockGenerator.cycleDivision = 1;
             return;
         }
