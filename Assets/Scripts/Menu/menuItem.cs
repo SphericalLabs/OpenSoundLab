@@ -155,6 +155,10 @@ public class menuItem : manipObject
         else if (item == DeviceType.Splitter) label.text = "Splitter";
         else if (item == DeviceType.Button) label.text = "Button";
 
+        else if (item == DeviceType.Phase) label.text = "Phase\nGenerator";
+        else if (item == DeviceType.Clock) label.text = "Phase-to-Clock\nDivider";
+
+        if (label.text.Contains("\n")) label.fontSize = 52;
 
         label.gameObject.SetActive(true);
         symbol.gameObject.SetActive(true);
