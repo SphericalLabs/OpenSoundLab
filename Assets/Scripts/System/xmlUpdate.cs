@@ -100,6 +100,9 @@ public class xmlUpdate
                         case "Clocks":
                             serializer = new XmlSerializer(typeof(ClockData), new XmlRootAttribute { ElementName = xmlNode.Name });
                             break;
+                        case "PhaseToClockDividers":
+                            serializer = new XmlSerializer(typeof(PhaseToClockDividerData), new XmlRootAttribute { ElementName = xmlNode.Name });
+                            break;
                         case "Phases":
                         case "PhaseGenerators":
                             serializer = new XmlSerializer(typeof(PhaseGeneratorData), new XmlRootAttribute { ElementName = xmlNode.Name });
@@ -231,7 +234,8 @@ public class xmlUpdate
                             data[data.Count - 1].deviceType = DeviceType.Oscillator;
                             break;
                         case "Clocks":
-                            data[data.Count - 1].deviceType = DeviceType.Clock;
+                        case "PhaseToClockDividers":
+                            data[data.Count - 1].deviceType = DeviceType.PhaseToClockDivider;
                             break;
                         case "Phases":
                         case "PhaseGenerators":

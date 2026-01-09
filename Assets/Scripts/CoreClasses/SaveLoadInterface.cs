@@ -63,6 +63,7 @@ public class SaveLoadInterface : MonoBehaviour
         instrumentPrefabs["MultiSplit"] = instrumentPrefabs[DeviceType.Splitter]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["TouchPad"] = instrumentPrefabs[DeviceType.Button]; // legacy alias, remove when old saves are dropped
         instrumentPrefabs["Phase"] = instrumentPrefabs[DeviceType.PhaseGenerator]; // legacy alias, remove when old saves are dropped.
+        instrumentPrefabs["Clock"] = instrumentPrefabs[DeviceType.PhaseToClockDivider]; // legacy alias, remove when old saves are dropped.
         //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
     }
 
@@ -159,6 +160,7 @@ public class SaveLoadInterface : MonoBehaviour
         if (deviceType == "MultiSplit") return DeviceType.Splitter; // legacy alias, remove when old saves are dropped
         if (deviceType == "TouchPad") return DeviceType.Button; // legacy alias, remove when old saves are dropped
         if (deviceType == "Phase") return DeviceType.PhaseGenerator; // legacy alias, remove when old saves are dropped.
+        if (deviceType == "Clock") return DeviceType.PhaseToClockDivider; // legacy alias, remove when old saves are dropped.
         return deviceType;
     }
 
@@ -358,7 +360,8 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(ADSRData))]
 [XmlInclude(typeof(PhaseGeneratorData))]
 [XmlInclude(typeof(PhaseDataLegacy))] // legacy alias, remove when old saves are dropped.
-[XmlInclude(typeof(ClockData))]
+[XmlInclude(typeof(PhaseToClockDividerData))]
+[XmlInclude(typeof(ClockData))] // legacy alias, remove when old saves are dropped.
 
 
 

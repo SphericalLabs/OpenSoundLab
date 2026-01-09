@@ -11,7 +11,7 @@ public static class DeviceSpawnerMenu
     [MenuItem(MenuRoot + "Artifact")] public static void SpawnArtifact() => Spawn("Artifact");
     [MenuItem(MenuRoot + "Button")] public static void SpawnButton() => Spawn("Button");
     [MenuItem(MenuRoot + "Camera")] public static void SpawnCamera() => Spawn("Camera");
-    [MenuItem(MenuRoot + "Clock")] public static void SpawnClock() => Spawn("Clock");
+    [MenuItem(MenuRoot + "PhaseToClockDivider")] public static void SpawnPhaseToClockDivider() => Spawn("PhaseToClockDivider");
     [MenuItem(MenuRoot + "Compressor")] public static void SpawnCompressor() => Spawn("Compressor");
     [MenuItem(MenuRoot + "Controller")] public static void SpawnController() => Spawn("Controller");
     [MenuItem(MenuRoot + "Delay")] public static void SpawnDelay() => Spawn("Delay");
@@ -57,7 +57,7 @@ public static class DeviceSpawnerMenu
     [MenuItem(MenuRoot + "Artifact", true)]
     [MenuItem(MenuRoot + "Button", true)]
     [MenuItem(MenuRoot + "Camera", true)]
-    [MenuItem(MenuRoot + "Clock", true)]
+    [MenuItem(MenuRoot + "PhaseToClockDivider", true)]
     [MenuItem(MenuRoot + "Compressor", true)]
     [MenuItem(MenuRoot + "Controller", true)]
     [MenuItem(MenuRoot + "Delay", true)]

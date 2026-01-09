@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SynthSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Instruments>
-    <Instruments xsi:type="ClockData">
+    <Instruments xsi:type="PhaseToClockDividerData">
       <ID>-152994</ID>
-      <deviceType>Clock</deviceType>
+      <deviceType>PhaseToClockDivider</deviceType>
       <position>
         <x>-0.6172766</x>
         <y>1.766278</y>

@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 161644, guid: 7085483ec5ffa4591a9c7fcef19203af, type: 3}
       propertyPath: m_Name
-      value: Clock_Menu
+      value: PhaseToClockDivider_Menu
       objectReference: {fileID: 0}
     - target: {fileID: 421762, guid: 7085483ec5ffa4591a9c7fcef19203af, type: 3}
       propertyPath: m_LocalPosition.x

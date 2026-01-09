@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Xml.Serialization;
 
-public class clockDeviceInterface : deviceInterface
+public class phaseToClockDividerDeviceInterface : deviceInterface
 {
     public omniJack phaseInputJack, clockOutputJack, resetInputJack;
     public sliderNotched resolutionSlider;
@@ -11,7 +11,7 @@ public class clockDeviceInterface : deviceInterface
     public Material visualizationMaterial;
     public Transform progressBarLine;
 
-    private clockSignalGenerator clockGenerator;
+    private phaseToClockDividerSignalGenerator clockGenerator;
     private Material visualizationMat;
     private static readonly int[] baseResolutions = new int[] { 1, 2, 4, 8, 12, 16, 24, 32, 64 };
     private static readonly int[] slowCycleDivisions = new int[] { 8, 4, 3, 2 };
@@ -22,8 +22,8 @@ public class clockDeviceInterface : deviceInterface
         base.Awake();
         vizColor = new Color(0.8f, 0.1607843f, 0.1607843f, 1f);
 
-        var gens = GetComponents<clockSignalGenerator>();
-        clockGenerator = gens.Length > 0 ? gens[0] : gameObject.AddComponent<clockSignalGenerator>();
+        var gens = GetComponents<phaseToClockDividerSignalGenerator>();
+        clockGenerator = gens.Length > 0 ? gens[0] : gameObject.AddComponent<phaseToClockDividerSignalGenerator>();
 
         if (phaseInputJack != null)
         {
@@ -198,9 +198,9 @@ public class clockDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        ClockData data = new ClockData
+        PhaseToClockDividerData data = new PhaseToClockDividerData
         {
-            deviceType = DeviceType.Clock
+            deviceType = DeviceType.PhaseToClockDivider
         };
         GetTransformData(data);
         data.phaseInputJackID = phaseInputJack.transform.GetInstanceID();
@@ -213,10 +213,10 @@ public class clockDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        ClockData data = d as ClockData;
+        PhaseToClockDividerData data = d as PhaseToClockDividerData;
         if (data == null)
         {
-            Debug.LogWarning("Clock device load received non-ClockData.");
+            Debug.LogWarning("Phase-to-Clock Divider load received non-PhaseToClockDividerData.");
             base.Load(d, copyMode);
             return;
         }
@@ -229,10 +229,15 @@ public class clockDeviceInterface : deviceInterface
     }
 }
 
-[XmlType("ClockData")]
-public class ClockData : InstrumentData
+[XmlInclude(typeof(ClockData))]
+public class PhaseToClockDividerData : InstrumentData
 {
     public int phaseInputJackID, clockOutputJackID, resetInputJackID;
     public int resolution;
     public float swing;
+}
+
+[XmlType("ClockData")]
+public class ClockData : PhaseToClockDividerData
+{
 }

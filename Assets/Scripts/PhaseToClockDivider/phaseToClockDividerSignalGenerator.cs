@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class clockSignalGenerator : signalGenerator
+public class phaseToClockDividerSignalGenerator : signalGenerator
 {
     public signalGenerator phaseInput;
     public signalGenerator resetInput;
