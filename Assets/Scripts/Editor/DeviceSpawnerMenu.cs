@@ -31,7 +31,7 @@ public static class DeviceSpawnerMenu
     [MenuItem(MenuRoot + "Noise")] public static void SpawnNoise() => Spawn("Noise");
     [MenuItem(MenuRoot + "Oscillator")] public static void SpawnOscillator() => Spawn("Oscillator");
     [MenuItem(MenuRoot + "Pano")] public static void SpawnPano() => Spawn("Pano");
-    [MenuItem(MenuRoot + "Phase")] public static void SpawnPhase() => Spawn("Phase");
+    [MenuItem(MenuRoot + "PhaseGenerator")] public static void SpawnPhaseGenerator() => Spawn("PhaseGenerator");
     [MenuItem(MenuRoot + "Polarizer")] public static void SpawnPolarizer() => Spawn("Polarizer");
     [MenuItem(MenuRoot + "Quantizer")] public static void SpawnQuantizer() => Spawn("Quantizer");
     [MenuItem(MenuRoot + "Recorder")] public static void SpawnRecorder() => Spawn("Recorder");
@@ -77,7 +77,7 @@ public static class DeviceSpawnerMenu
     [MenuItem(MenuRoot + "Noise", true)]
     [MenuItem(MenuRoot + "Oscillator", true)]
     [MenuItem(MenuRoot + "Pano", true)]
-    [MenuItem(MenuRoot + "Phase", true)]
+    [MenuItem(MenuRoot + "PhaseGenerator", true)]
     [MenuItem(MenuRoot + "Polarizer", true)]
     [MenuItem(MenuRoot + "Quantizer", true)]
     [MenuItem(MenuRoot + "Recorder", true)]

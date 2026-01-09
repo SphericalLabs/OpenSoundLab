@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class phaseSignalGenerator : signalGenerator
+public class phaseGeneratorSignalGenerator : signalGenerator
 {
     public enum PhaseOutputMode { Phase = 0, Reset = 2 }
     public PhaseOutputMode mode = PhaseOutputMode.Phase;

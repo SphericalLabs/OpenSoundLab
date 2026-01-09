@@ -58,12 +58,12 @@ public class looperDeviceInterface : deviceInterface
 
     void OnEnable()
     {
-        phaseDeviceInterface.resetPressedEvent += handlePhaseReset;
+        phaseGeneratorDeviceInterface.resetPressedEvent += handlePhaseReset;
     }
 
     void OnDisable()
     {
-        phaseDeviceInterface.resetPressedEvent -= handlePhaseReset;
+        phaseGeneratorDeviceInterface.resetPressedEvent -= handlePhaseReset;
     }
 
     void OnDestroy()
@@ -172,7 +172,7 @@ public class looperDeviceInterface : deviceInterface
         transcriber.Back();
     }
 
-    void handlePhaseReset(phaseDeviceInterface phase)
+    void handlePhaseReset(phaseGeneratorDeviceInterface phase)
     {
         onResetEvent();
     }

@@ -3,9 +3,9 @@ using System;
 using System.Collections;
 using System.Xml.Serialization;
 
-public class phaseDeviceInterface : deviceInterface
+public class phaseGeneratorDeviceInterface : deviceInterface
 {
-    public static Action<phaseDeviceInterface> resetPressedEvent;
+    public static Action<phaseGeneratorDeviceInterface> resetPressedEvent;
 
     public omniJack resetJack, phaseJack;
     public dial bpmDial;
@@ -15,7 +15,7 @@ public class phaseDeviceInterface : deviceInterface
     public Material phaseVisualizationMaterial;
     private Material phaseVizMat;
 
-    public phaseSignalGenerator resetSignal, phaseSignal;
+    public phaseGeneratorSignalGenerator resetSignal, phaseSignal;
 
     public float minBpm = 60f;
     public float maxBpm = 180f;
@@ -35,22 +35,22 @@ public class phaseDeviceInterface : deviceInterface
         // Initialize signals only if they aren't already assigned
         if (phaseSignal == null || resetSignal == null)
         {
-            var gens = GetComponents<phaseSignalGenerator>();
+            var gens = GetComponents<phaseGeneratorSignalGenerator>();
             if (gens.Length < 2)
             {
-                if (phaseSignal == null) phaseSignal = gameObject.AddComponent<phaseSignalGenerator>();
-                if (resetSignal == null) resetSignal = gameObject.AddComponent<phaseSignalGenerator>();
+                if (phaseSignal == null) phaseSignal = gameObject.AddComponent<phaseGeneratorSignalGenerator>();
+                if (resetSignal == null) resetSignal = gameObject.AddComponent<phaseGeneratorSignalGenerator>();
             }
             else
             {
                 for (int i = 0; i < gens.Length; i++)
                 {
-                    if (phaseSignal == null && gens[i].mode == phaseSignalGenerator.PhaseOutputMode.Phase)
+                    if (phaseSignal == null && gens[i].mode == phaseGeneratorSignalGenerator.PhaseOutputMode.Phase)
                     {
                         phaseSignal = gens[i];
                     }
 
-                    if (resetSignal == null && gens[i].mode == phaseSignalGenerator.PhaseOutputMode.Reset)
+                    if (resetSignal == null && gens[i].mode == phaseGeneratorSignalGenerator.PhaseOutputMode.Reset)
                     {
                         resetSignal = gens[i];
                     }
@@ -62,8 +62,8 @@ public class phaseDeviceInterface : deviceInterface
         }
 
         // Always ensure modes are correct as they might have been lost or default to Phase
-        phaseSignal.mode = phaseSignalGenerator.PhaseOutputMode.Phase;
-        resetSignal.mode = phaseSignalGenerator.PhaseOutputMode.Reset;
+        phaseSignal.mode = phaseGeneratorSignalGenerator.PhaseOutputMode.Phase;
+        resetSignal.mode = phaseGeneratorSignalGenerator.PhaseOutputMode.Reset;
 
         if (phaseJack != null) phaseJack.homesignal = phaseSignal;
         if (resetJack != null) resetJack.homesignal = resetSignal;
@@ -185,7 +185,7 @@ public class phaseDeviceInterface : deviceInterface
         if (resetPressedEvent != null) resetPressedEvent(this);
     }
 
-    void handleCrossPhaseReset(phaseDeviceInterface origin)
+    void handleCrossPhaseReset(phaseGeneratorDeviceInterface origin)
     {
         if (origin == null || origin == this) return;
         ApplySyncedReset();
@@ -217,9 +217,9 @@ public class phaseDeviceInterface : deviceInterface
 
     public override InstrumentData GetData()
     {
-        PhaseData data = new PhaseData
+        PhaseGeneratorData data = new PhaseGeneratorData
         {
-            deviceType = DeviceType.Phase
+            deviceType = DeviceType.PhaseGenerator
         };
         GetTransformData(data);
         data.bpmPercent = bpmDial != null ? bpmDial.percent : 0.5f;
@@ -231,7 +231,7 @@ public class phaseDeviceInterface : deviceInterface
 
     public override void Load(InstrumentData d, bool copyMode)
     {
-        PhaseData data = d as PhaseData;
+        PhaseGeneratorData data = d as PhaseGeneratorData;
         base.Load(data, copyMode);
         if (bpmDial != null) bpmDial.setPercent(data.bpmPercent);
         // Reset jack persistence disabled for now (re-enable if jackReset returns).
@@ -242,11 +242,15 @@ public class phaseDeviceInterface : deviceInterface
     }
 }
 
-[XmlType("PhaseData")]
-public class PhaseData : InstrumentData
+public class PhaseGeneratorData : InstrumentData
 {
     public float bpmPercent;
     // public int resetJackID;
     public int phaseJackID;
     public bool isRunning;
+}
+
+[XmlType("PhaseData")]
+public class PhaseDataLegacy : PhaseGeneratorData // legacy alias, remove when old saves are dropped
+{
 }

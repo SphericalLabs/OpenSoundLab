@@ -53,12 +53,12 @@ public class clockDeviceInterface : deviceInterface
 
     void OnEnable()
     {
-        phaseDeviceInterface.resetPressedEvent += handlePhaseReset;
+        phaseGeneratorDeviceInterface.resetPressedEvent += handlePhaseReset;
     }
 
     void OnDisable()
     {
-        phaseDeviceInterface.resetPressedEvent -= handlePhaseReset;
+        phaseGeneratorDeviceInterface.resetPressedEvent -= handlePhaseReset;
     }
 
     void Update()
@@ -125,7 +125,7 @@ public class clockDeviceInterface : deviceInterface
         resolutionSlider.createLabels(labels);
     }
 
-    void handlePhaseReset(phaseDeviceInterface phase)
+    void handlePhaseReset(phaseGeneratorDeviceInterface phase)
     {
         if (clockGenerator != null) clockGenerator.requestGlobalReset();
     }

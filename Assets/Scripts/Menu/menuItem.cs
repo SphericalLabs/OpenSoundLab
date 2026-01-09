@@ -155,7 +155,7 @@ public class menuItem : manipObject
         else if (item == DeviceType.Splitter) label.text = "Splitter";
         else if (item == DeviceType.Button) label.text = "Button";
 
-        else if (item == DeviceType.Phase) label.text = "Phase\nGenerator";
+        else if (item == DeviceType.PhaseGenerator) label.text = "Phase\nGenerator";
         else if (item == DeviceType.Clock) label.text = "Phase-to-Clock\nDivider";
 
         if (label.text.Contains("\n")) label.fontSize = 52;
@@ -544,7 +544,8 @@ public class DeviceType
     public static readonly DeviceType Sequencer = new DeviceType("Sequencer", DeviceCategory.Rhythm, 3);
     public static readonly DeviceType SequencerCV = Sequencer; // legacy alias, remove when old saves are dropped
     public static readonly DeviceType Clock = new DeviceType("Clock", DeviceCategory.Rhythm, 2);
-    public static readonly DeviceType Phase = new DeviceType("Phase", DeviceCategory.Rhythm, 1);
+    public static readonly DeviceType PhaseGenerator = new DeviceType("PhaseGenerator", DeviceCategory.Rhythm, 1);
+    public static readonly DeviceType Phase = PhaseGenerator; // legacy alias, remove when old saves are dropped.
 
     // SampleGenerator
     public static readonly DeviceType Airhorn = new DeviceType("Airhorn", DeviceCategory.SampleGenerator, 6);

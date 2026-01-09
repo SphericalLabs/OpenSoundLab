@@ -28,24 +28,24 @@
 using UnityEngine;
 using Mirror;
 
-public class NetworkPhase : NetworkSyncListener
+public class NetworkPhaseGenerator : NetworkSyncListener
 {
-    private phaseDeviceInterface phaseInterface;
+    private phaseGeneratorDeviceInterface phaseInterface;
     private bool resetQueued;
 
     private void Awake()
     {
-        phaseInterface = GetComponent<phaseDeviceInterface>();
+        phaseInterface = GetComponent<phaseGeneratorDeviceInterface>();
     }
 
     private void OnEnable()
     {
-        phaseDeviceInterface.resetPressedEvent += handlePhaseReset;
+        phaseGeneratorDeviceInterface.resetPressedEvent += handlePhaseReset;
     }
 
     private void OnDisable()
     {
-        phaseDeviceInterface.resetPressedEvent -= handlePhaseReset;
+        phaseGeneratorDeviceInterface.resetPressedEvent -= handlePhaseReset;
     }
 
     private void Start()
@@ -80,7 +80,7 @@ public class NetworkPhase : NetworkSyncListener
         }
     }
 
-    private void handlePhaseReset(phaseDeviceInterface origin)
+    private void handlePhaseReset(phaseGeneratorDeviceInterface origin)
     {
         if (!isServer) return;
         if (origin == null) return;
