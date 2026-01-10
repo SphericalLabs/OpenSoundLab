@@ -83,6 +83,7 @@ public class handle : manipObject
         highlightMat = Resources.Load("Materials/Highlight") as Material;
         highlightGrabbedMat = Resources.Load("Materials/HighlightGrabbed") as Material;
 
+        if (ID == 1) ensureMeshColliderUsesOtherHandleMesh();
     }
 
     public void setObjectParent(Transform t)
@@ -370,6 +371,29 @@ public class handle : manipObject
         if (curState == manipState.grabbed && manipulatorObjScript.wasGazeBased)
         {
             gazeBasedPosRotStart();
+        }
+    }
+
+    void ensureMeshColliderUsesOtherHandleMesh()
+    {
+        MeshCollider meshCollider = GetComponent<MeshCollider>();
+        if (meshCollider == null || meshCollider.sharedMesh != null) return;
+
+        // ProBuilder-generated meshes are not persistent assets and often recreate on reload.
+        // When handle ID 1 has a MeshCollider without a mesh, we copy the mesh from handle ID 0
+        // (prefer MeshCollider.sharedMesh, fallback to MeshFilter.sharedMesh) so the collider can
+        // reference the runtime-generated mesh instance instead of a missing asset reference.
+        MeshCollider otherMeshCollider = otherHandle != null ? otherHandle.GetComponent<MeshCollider>() : null;
+        if (otherMeshCollider != null && otherMeshCollider.sharedMesh != null)
+        {
+            meshCollider.sharedMesh = otherMeshCollider.sharedMesh;
+            return;
+        }
+
+        MeshFilter otherMeshFilter = otherHandle != null ? otherHandle.GetComponent<MeshFilter>() : null;
+        if (otherMeshFilter != null && otherMeshFilter.sharedMesh != null)
+        {
+            meshCollider.sharedMesh = otherMeshFilter.sharedMesh;
         }
     }
 }
