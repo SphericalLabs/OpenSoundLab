@@ -39,6 +39,8 @@ public class SequencerPlaybackHelper
     bool runningUpdated = false;
     bool phaseSyncPending = false;
     bool globalResetQueued = false;
+    bool clockRearmPending = false;
+    int clockRearmSampleIndex = -1;
 
     float[] lastClockSig = new float[] { 0, 0 };
     float[] lastResetSig = new float[] { 0, 0 };
@@ -101,6 +103,11 @@ public class SequencerPlaybackHelper
 
         if (silent) return;
 
+        applyStepSignals(s, true, sampleIndex, dspTime);
+    }
+
+    void applyStepSignals(int step, bool sendTriggers, int sampleIndex = 0, double dspTime = -1)
+    {
         // This is called from the audio thread and updates signals for sample accuracy.
         int[] curDimensions = sequencer.getCurrentDimensions();
         button[] rowMutes = sequencer.getRowMutes();
@@ -112,8 +119,11 @@ public class SequencerPlaybackHelper
         {
             if (rowMutes[row].isHit) continue;
 
-            trigGenerators[row].setSignal(sequencer.stepBools[sequencer.activePattern, row, targetStep], sampleIndex, dspTime);
-            cvGenerators[row].setSignal(sequencer.stepFloats[sequencer.activePattern, row, targetStep] * 2f - 1f, sampleIndex, dspTime);
+            if (sendTriggers)
+            {
+                trigGenerators[row].setSignal(sequencer.stepBools[sequencer.activePattern, row, step], sampleIndex, dspTime);
+            }
+            cvGenerators[row].setSignal(sequencer.stepFloats[sequencer.activePattern, row, step] * 2f - 1f, sampleIndex, dspTime);
         }
     }
 
@@ -166,7 +176,15 @@ public class SequencerPlaybackHelper
 
     void resetSteps(int sampleIndex = 0, double dspTime = -1)
     {
-        selectStep(0, false, sampleIndex, dspTime);
+        targetStep = 0;
+        selectedStep = 0;
+        applyStepSignals(0, false, sampleIndex, dspTime);
+        // After reset, keep the playhead on step 1 (index 0) and update CV immediately,
+        // but do not emit any trigger yet. The next valid clock edge should fire the
+        // step-1 trigger, and only the following edge advances to step 2.
+        runningUpdated = true;
+        clockRearmPending = true;
+        clockRearmSampleIndex = sampleIndex;
     }
 
     public void requestGlobalReset()
@@ -254,12 +272,29 @@ public class SequencerPlaybackHelper
             clockGenerator.processBuffer(audioClockBuffer, AudioSettings.dspTime, channels);
             for (int i = 0; i < buffer.Length; i += channels)
             {
-                if (!discardClock && signalGenerator.isRisingEdge(audioClockBuffer[i], lastClockSig[1]))
+                float clockSample = audioClockBuffer[i];
+                if (clockRearmPending && clockRearmSampleIndex >= 0 && i >= clockRearmSampleIndex)
+                {
+                    // While rearming, ignore clock edges until the signal goes low.
+                    // This prevents an immediate trigger when reset happens during
+                    // a high clock, and ensures the first post-reset rising edge
+                    // fires step 1 (not step 2) before normal stepping resumes.
+                    if (clockSample <= 0f)
+                    {
+                        clockRearmPending = false;
+                        clockRearmSampleIndex = -1;
+                    }
+                    lastClockSig[0] = lastClockSig[1];
+                    lastClockSig[1] = clockSample;
+                    continue;
+                }
+
+                if (!discardClock && signalGenerator.isRisingEdge(clockSample, lastClockSig[1]))
                 {
                     executeNextStep(i, AudioSettings.dspTime);
                 }
                 lastClockSig[0] = lastClockSig[1];
-                lastClockSig[1] = audioClockBuffer[i];
+                lastClockSig[1] = clockSample;
             }
         }
     }
