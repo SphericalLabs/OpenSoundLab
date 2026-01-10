@@ -10,6 +10,7 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
     public int cycleDivision = 1;
     public float progressToNextTrigger = 0f;
     public bool autorunning = false;
+    public float downbeatHotZone = 0.01f;
 
     private beatTracker _beatManager;
     private double lastProcessedDspTime = -1;
@@ -28,6 +29,8 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
     private int lastResolutionIndex = -1;
     private float lastSwingVal = -1f;
     private bool globalResetQueued = false;
+    private bool downbeatPending = false;
+    private bool phaseMovedSinceReset = false;
 
     public void Awake()
     {
@@ -147,6 +150,10 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
                         phaseDelta += 1f;
                     }
                 }
+                if (phaseDelta > 0f)
+                {
+                    phaseMovedSinceReset = true;
+                }
                 trackedPhase += phaseDelta;
                 if (trackedPhase >= 1f)
                 {
@@ -163,6 +170,23 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
                 beatPhase = (cycleCounter + trackedPhase) / effectiveCycleDivision;
             }
             lastBeatPhase = beatPhase;
+
+            if (downbeatPending)
+            {
+                if (phaseMovedSinceReset && cycleCounter == 0)
+                {
+                    if (phaseSample > downbeatHotZone)
+                    {
+                        downbeatPending = false;
+                    }
+                    else
+                    {
+                        clockTriggered = true;
+                        downbeatPending = false;
+                    }
+                }
+            }
+
             _beatManager.beatUpdateEvent(beatPhase);
 
             buffer[n] = clockTriggered ? 1f : 0f;
@@ -185,6 +209,8 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
         progressToNextTrigger = 0f;
         cycleCounter = 0;
         ignorePhaseDropAfterReset = true;
+        downbeatPending = true;
+        phaseMovedSinceReset = false;
         _beatManager.beatResetEvent();
     }
 
