@@ -181,7 +181,7 @@ public class samplerTwoDeviceInterface : deviceInterface
         tailInput.SetID(data.jackTailID, copyMode);
         output.SetID(data.jackOutID, copyMode);
 
-        playButton.startToggled = data.playToggle;
+        playButton.setOnAtStart(data.playToggle);
         dirSwitch.setSwitch(data.dirSwitch);
         loopSwitch.setSwitch(data.loopSwitch);
         headSlider.setPercent(data.headPos);
