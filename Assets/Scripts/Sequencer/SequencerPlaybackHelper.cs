@@ -41,6 +41,9 @@ public class SequencerPlaybackHelper
     bool globalResetQueued = false;
     bool clockRearmPending = false;
     int clockRearmSampleIndex = -1;
+    bool phaseDownbeatPending = false;
+    bool phaseMovedSinceReset = false;
+    const float phaseDownbeatHotZone = 0.01f;
 
     float[] lastClockSig = new float[] { 0, 0 };
     float[] lastResetSig = new float[] { 0, 0 };
@@ -224,6 +227,13 @@ public class SequencerPlaybackHelper
         bool phaseMode = sequencer.isPhaseModeActive();
         bool discardClock = phaseMode || !sequencer.running;
         bool discardReset = phaseMode;
+        if (resetApplied && phaseMode)
+        {
+            // Global resets re-zero the phase source; arm a single downbeat so phase-mode
+            // sequencing produces a step-1 trigger before normal step changes resume.
+            phaseDownbeatPending = true;
+            phaseMovedSinceReset = false;
+        }
         processClockResetBuffers(buffer, channels, discardClock, discardReset);
 
         if (phaseMode) // Phase mode
@@ -234,11 +244,46 @@ public class SequencerPlaybackHelper
             phaseGenerator.processBuffer(audioPhaseBuffer, AudioSettings.dspTime, channels);
             if (resetApplied) return;
 
+            float phaseStart = audioPhaseBuffer[0];
+            float phaseEnd = audioPhaseBuffer[buffer.Length - channels];
+            if (phaseDownbeatPending && phaseEnd != phaseStart)
+            {
+                phaseMovedSinceReset = true;
+            }
+
+            bool phaseDownbeatTriggered = false;
+            if (phaseDownbeatPending)
+            {
+                // On global reset, emit exactly one step-1 trigger in phase mode once the phase
+                // starts moving and is still near 0. This keeps clocked sequencers in sync
+                // without replacing normal phase-based stepping.
+                // Tradeoff: this one-shot downbeat is emitted at buffer granularity, so the
+                // step-1 trigger can lag by up to one audio buffer plus the hot-zone duration.
+                // At 48 kHz with a 256-sample buffer, that's ~5.33 ms + 1% of the cycle time.
+                // This is typically not audible, even though it's larger than MIDI jitter (~4 ms).
+                // If sample-accurate timing is desired in the future, it could be achieved by detect
+                // the phase crossing inside the buffer and schedule the trigger at the exact
+                // sample index instead of buffer end.
+                if (phaseMovedSinceReset && phaseStart <= phaseDownbeatHotZone)
+                {
+                    selectStep(0, false, buffer.Length - channels, AudioSettings.dspTime);
+                    runningUpdated = true;
+                    phaseDownbeatPending = false;
+                    phaseSyncPending = false;
+                    phaseDownbeatTriggered = true;
+                }
+                else if (phaseMovedSinceReset && phaseStart > phaseDownbeatHotZone)
+                {
+                    // Phase already left the hot zone; avoid firing later and double-triggering.
+                    phaseDownbeatPending = false;
+                }
+            }
+
             // Map phase directly to step.
-            float latestPhase = audioPhaseBuffer[buffer.Length - channels];
+            float latestPhase = phaseEnd;
             int s = Mathf.FloorToInt(latestPhase * sequencer.dimensions[1]);
             s = Mathf.Clamp(s, 0, sequencer.dimensions[1] - 1);
-            if (phaseSyncPending || s != targetStep)
+            if (!phaseDownbeatTriggered && (phaseSyncPending || s != targetStep))
             {
                 // SelectStep handles the signal generator updates, which is needed here.
                 selectStep(s, false, buffer.Length - channels, AudioSettings.dspTime);
