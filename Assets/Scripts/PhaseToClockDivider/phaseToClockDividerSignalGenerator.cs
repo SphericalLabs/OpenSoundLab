@@ -10,6 +10,8 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
     public int cycleDivision = 1;
     public float progressToNextTrigger = 0f;
     public bool autorunning = false;
+    // One-shot trigger window near phase 0 to restore the initial downbeat after reset.
+    // Must stay small to avoid double-firing with beatTracker's wrap trigger.
     public float downbeatHotZone = 0.01f;
 
     private beatTracker _beatManager;
@@ -29,7 +31,9 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
     private int lastResolutionIndex = -1;
     private float lastSwingVal = -1f;
     private bool globalResetQueued = false;
+    // Reset sets this true so the next phase movement can emit a single downbeat in the hot zone.
     private bool downbeatPending = false;
+    // Prevents the reset itself (phase still at 0) from triggering the downbeat.
     private bool phaseMovedSinceReset = false;
 
     public void Awake()
@@ -150,6 +154,7 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
                         phaseDelta += 1f;
                     }
                 }
+                // Track that phase has moved since reset, so the downbeat won't fire immediately at 0.
                 if (phaseDelta > 0f)
                 {
                     phaseMovedSinceReset = true;
@@ -173,6 +178,9 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
 
             if (downbeatPending)
             {
+                // After reset, emit a single downbeat only if we see phase movement and we're still
+                // inside the small hot zone near phase 0. This fixes the missing first beat without
+                // interfering with beatTracker's normal wrap triggers on later cycles.
                 if (phaseMovedSinceReset && cycleCounter == 0)
                 {
                     if (phaseSample > downbeatHotZone)
@@ -209,7 +217,9 @@ public class phaseToClockDividerSignalGenerator : signalGenerator
         progressToNextTrigger = 0f;
         cycleCounter = 0;
         ignorePhaseDropAfterReset = true;
+        // Arm the one-shot downbeat; it will fire only after phase moves and while still near 0.
         downbeatPending = true;
+        // Reset blocks immediate triggering until the next forward phase movement is observed.
         phaseMovedSinceReset = false;
         _beatManager.beatResetEvent();
     }

@@ -559,11 +559,11 @@ public class DeviceType
 
     // ModulationGenerator
     public static readonly DeviceType Timeline = new DeviceType("Timeline", DeviceCategory.ModulationGenerator, 5);
-    public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 3);
-    public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 3);
-    public static readonly DeviceType Button = new DeviceType("Button", DeviceCategory.ModulationGenerator, 2);
+    public static readonly DeviceType ADSR = new DeviceType("ADSR", DeviceCategory.ModulationGenerator, 2);
+    public static readonly DeviceType AD = new DeviceType("AD", DeviceCategory.ModulationGenerator, 1);
+    public static readonly DeviceType Button = new DeviceType("Button", DeviceCategory.ModulationGenerator, 4);
     public static readonly DeviceType TouchPad = Button; // legacy alias, remove when old saves are dropped
-    public static readonly DeviceType Knob = new DeviceType("Knob", DeviceCategory.ModulationGenerator, 1);
+    public static readonly DeviceType Knob = new DeviceType("Knob", DeviceCategory.ModulationGenerator, 3);
     public static readonly DeviceType DC = Knob; // legacy alias, remove when old saves are dropped
 
     // SoundProcessor
