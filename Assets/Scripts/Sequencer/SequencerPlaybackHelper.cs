@@ -204,8 +204,9 @@ public class SequencerPlaybackHelper
 
         // Phase mode is driven by the clock/reset toggle. Legacy fallback uses phase jack presence.
         bool phaseMode = sequencer.isPhaseModeActive();
-        bool discardClockReset = phaseMode || !sequencer.running;
-        processClockResetBuffers(buffer, channels, discardClockReset);
+        bool discardClock = phaseMode || !sequencer.running;
+        bool discardReset = phaseMode;
+        processClockResetBuffers(buffer, channels, discardClock, discardReset);
 
         if (phaseMode) // Phase mode
         {
@@ -232,14 +233,14 @@ public class SequencerPlaybackHelper
         }
     }
 
-    void processClockResetBuffers(float[] buffer, int channels, bool discardSamples)
+    void processClockResetBuffers(float[] buffer, int channels, bool discardClock, bool discardReset)
     {
         if (resetGenerator != null)
         {
             resetGenerator.processBuffer(audioResetBuffer, AudioSettings.dspTime, channels);
             for (int i = 0; i < buffer.Length; i += channels)
             {
-                if (!discardSamples && signalGenerator.isRisingEdge(audioResetBuffer[i], lastResetSig[1]))
+                if (!discardReset && signalGenerator.isRisingEdge(audioResetBuffer[i], lastResetSig[1]))
                 {
                     resetSteps(i, AudioSettings.dspTime);
                 }
@@ -253,7 +254,7 @@ public class SequencerPlaybackHelper
             clockGenerator.processBuffer(audioClockBuffer, AudioSettings.dspTime, channels);
             for (int i = 0; i < buffer.Length; i += channels)
             {
-                if (!discardSamples && signalGenerator.isRisingEdge(audioClockBuffer[i], lastClockSig[1]))
+                if (!discardClock && signalGenerator.isRisingEdge(audioClockBuffer[i], lastClockSig[1]))
                 {
                     executeNextStep(i, AudioSettings.dspTime);
                 }
