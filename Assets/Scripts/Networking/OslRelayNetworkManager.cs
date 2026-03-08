@@ -130,7 +130,7 @@ namespace Network
 
         public override void OnStopServer()
         {
-            //base.OnStopServer();
+            base.OnStopServer();
             Debug.Log("MyNetworkManager: Server Stopped!");
             m_SessionId = "";
         }
@@ -162,8 +162,9 @@ namespace Network
             Dictionary<uint, NetworkIdentity> spawnedPlayers = NetworkServer.spawned;
 
             // Update players list on client disconnect
-            foreach (Player player in m_Players)
+            for (int i = m_Players.Count - 1; i >= 0; i--)
             {
+                Player player = m_Players[i];
                 bool playerFound = false;
 
                 foreach (KeyValuePair<uint, NetworkIdentity> kvp in spawnedPlayers)
@@ -180,7 +181,7 @@ namespace Network
 
                 if (!playerFound)
                 {
-                    m_Players.Remove(player);
+                    m_Players.RemoveAt(i);
                     break;
                 }
             }
@@ -254,4 +255,3 @@ namespace Network
         }*/
     }
 }
-

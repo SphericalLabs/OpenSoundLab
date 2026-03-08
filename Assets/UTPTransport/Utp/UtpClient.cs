@@ -7,6 +7,7 @@ using Unity.Networking.Transport.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Networking.Transport.Utilities;
 
 namespace Utp
 {
@@ -15,6 +16,8 @@ namespace Utp
 	[BurstCompile]
 	struct ClientUpdateJob : IJob
 	{
+		private const int CHANNEL_PREFIX_BYTES = 1;
+
 		/// <summary>
 		/// Used to bind, listen, and send data to connections.
 		/// </summary>
@@ -68,17 +71,35 @@ namespace Utp
 					//Data recieved event
 					case (NetworkEvent.Type.Data):
 						{
+							if (stream.Length <= CHANNEL_PREFIX_BYTES)
+							{
+								break;
+							}
+
 							//Create managed array of data
 							NativeArray<byte> nativeMessage = new NativeArray<byte>(stream.Length, Allocator.Temp);
 
 							//Read data from stream
 							stream.ReadBytes(nativeMessage);
 
+							int payloadLength = stream.Length - CHANNEL_PREFIX_BYTES;
+							byte channelId = nativeMessage[0];
+							NativeArray<byte> eventData = new NativeArray<byte>();
+							byte eventType = (byte)UtpConnectionEventType.OnReceivedData;
+
+							if (payloadLength > 0)
+							{
+								eventData = new NativeArray<byte>(payloadLength, Allocator.Persistent);
+								NativeArray<byte>.Copy(nativeMessage, CHANNEL_PREFIX_BYTES, eventData, 0, payloadLength);
+							}
+
 							connectionEvent = new UtpConnectionEvent()
 							{
-								eventType = (byte)UtpConnectionEventType.OnReceivedData,
+								eventType = eventType,
 								connectionId = connection.GetHashCode(),
-								eventData = GetFixedList(nativeMessage)
+								eventData = eventData,
+								channelId = channelId,
+								payloadLength = payloadLength
 							};
 
 							//Queue event
@@ -106,20 +127,7 @@ namespace Utp
 			}
 		}
 
-		public FixedList4096Bytes<byte> GetFixedList(NativeArray<byte> data)
-		{
-			FixedList4096Bytes<byte> retVal = new FixedList4096Bytes<byte>();
 
-			if (data.Length > 0)
-			{
-				unsafe
-				{
-					retVal.AddRange(NativeArrayUnsafeUtility.GetUnsafePtr(data), data.Length);
-				}
-			}
-
-			return retVal;
-		}
 	}
 
 	[BurstCompile]
@@ -173,6 +181,8 @@ namespace Utp
 	/// </summary>
 	public class UtpClient : UtpEntity
 	{
+		private const int CHANNEL_PREFIX_BYTES = 1;
+
 		/// <summary>
 		/// Invokes when connected to a server.
 		/// </summary>
@@ -181,7 +191,7 @@ namespace Utp
 		/// <summary>
 		/// Invokes when data has been received.
 		/// </summary>
-		public Action<ArraySegment<byte>> OnReceivedData;
+		public Action<ArraySegment<byte>, int> OnReceivedData;
 
 		/// <summary>
 		/// Invokes when disconnected from a server.
@@ -224,7 +234,7 @@ namespace Utp
 		/// <param name="OnReceivedData">Action that is invoked when receiving data.</param>
 		/// <param name="OnDisconnected">Action that is invoked when disconnected.</param>
 		/// <param name="timeoutInMilliseconds">The response timeout in miliseconds.</param>
-		public UtpClient(Action OnConnected, Action<ArraySegment<byte>> OnReceivedData, Action OnDisconnected, int timeoutInMilliseconds)
+		public UtpClient(Action OnConnected, Action<ArraySegment<byte>, int> OnReceivedData, Action OnDisconnected, int timeoutInMilliseconds)
 			: this(timeoutInMilliseconds)
 		{
 			this.OnConnected = OnConnected;
@@ -268,10 +278,11 @@ namespace Utp
 
 			var settings = new NetworkSettings();
 			settings.WithNetworkConfigParameters(disconnectTimeoutMS: timeoutInMilliseconds);
+			settings.WithFragmentationStageParameters(payloadCapacity: 1 * 1024 * 1024);
 
 			driver = NetworkDriver.Create(settings);
-			reliablePipeline = driver.CreatePipeline(typeof(ReliableSequencedPipelineStage));
-			unreliablePipeline = driver.CreatePipeline(typeof(UnreliableSequencedPipelineStage));
+			reliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
+			unreliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(UnreliableSequencedPipelineStage));
 
 			connection = driver.Connect(endpoint);
 
@@ -301,12 +312,14 @@ namespace Utp
 
 			RelayServerData relayServerData = RelayUtils.PlayerRelayData(joinAllocation, RelayServerEndpoint.NetworkOptions.Udp);
 
-			var networkSettings = new NetworkSettings();
-			networkSettings.WithRelayParameters(ref relayServerData);
+			var settings = new NetworkSettings();
+			settings.WithNetworkConfigParameters(disconnectTimeoutMS: timeoutInMilliseconds);
+			settings.WithRelayParameters(ref relayServerData);
+			settings.WithFragmentationStageParameters(payloadCapacity: 1 * 1024 * 1024);
 
-			driver = NetworkDriver.Create(networkSettings);
-			reliablePipeline = driver.CreatePipeline(typeof(ReliableSequencedPipelineStage));
-			unreliablePipeline = driver.CreatePipeline(typeof(UnreliableSequencedPipelineStage));
+			driver = NetworkDriver.Create(settings);
+			reliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
+			unreliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(UnreliableSequencedPipelineStage));
 
 			connection = driver.Connect(relayServerData.Endpoint);
 
@@ -346,7 +359,13 @@ namespace Utp
 			//Flush the event queue
 			if (connectionsEventsQueue.IsCreated)
 			{
-				ProcessIncomingEvents();
+				while (connectionsEventsQueue.TryDequeue(out UtpConnectionEvent connectionEvent))
+				{
+					if (connectionEvent.eventData.IsCreated)
+					{
+						connectionEvent.eventData.Dispose();
+					}
+				}
 				connectionsEventsQueue.Dispose();
 			}
 
@@ -359,7 +378,7 @@ namespace Utp
 		}
 
 		/// <summary>
-		/// Tick the client, creating the client job and scheduling it. Processes incoming events 
+		/// Tick the client, creating the client job and scheduling it. Processes incoming events
 		/// </summary>
 		public void Tick()
 		{
@@ -402,9 +421,9 @@ namespace Utp
 			//Get pipeline for job
 			NetworkPipeline pipeline = channelId == Channels.Reliable ? reliablePipeline : unreliablePipeline;
 
-			//Convert ArraySegment to NativeArray for burst compile
-			NativeArray<byte> segmentArray = new NativeArray<byte>(segment.Count, Allocator.Persistent);
-			NativeArray<byte>.Copy(segment.Array, segment.Offset, segmentArray, 0, segment.Count);
+			NativeArray<byte> segmentArray = new NativeArray<byte>(segment.Count + CHANNEL_PREFIX_BYTES, Allocator.Persistent);
+			segmentArray[0] = (byte)channelId;
+			NativeArray<byte>.Copy(segment.Array, segment.Offset, segmentArray, CHANNEL_PREFIX_BYTES, segment.Count);
 
 			// Create a new job
 			var job = new ClientSendJob
@@ -435,7 +454,7 @@ namespace Utp
 			{
 				switch (connectionEvent.eventType)
 				{
-					//Connect action 
+					//Connect action
 					case ((byte)UtpConnectionEventType.OnConnected):
 						{
 							OnConnected?.Invoke();
@@ -445,7 +464,8 @@ namespace Utp
 					//Receive data action
 					case ((byte)UtpConnectionEventType.OnReceivedData):
 						{
-							OnReceivedData?.Invoke(new ArraySegment<byte>(connectionEvent.eventData.ToArray()));
+							OnReceivedData?.Invoke(new ArraySegment<byte>(connectionEvent.eventData.ToArray(), 0, connectionEvent.payloadLength), connectionEvent.channelId);
+							if (connectionEvent.eventData.IsCreated) connectionEvent.eventData.Dispose();
 							break;
 						}
 
@@ -455,6 +475,8 @@ namespace Utp
 							OnDisconnected?.Invoke();
 							break;
 						}
+
+
 
 					//Invalid action
 					default:

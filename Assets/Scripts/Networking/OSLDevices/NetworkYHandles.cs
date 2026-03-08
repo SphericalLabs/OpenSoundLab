@@ -36,6 +36,7 @@ public class NetworkYHandles : NetworkBehaviour
 
     public readonly SyncList<float> yValues = new SyncList<float>();
     private float[] lastGrabedTimes;
+    private float[] lastSentTimes;
 
     public override void OnStartServer()
     {
@@ -49,13 +50,15 @@ public class NetworkYHandles : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[yHandles.Length];
+        lastSentTimes = new float[yHandles.Length];
+        NetworkSendThrottle.Initialize(lastSentTimes);
 
         //add dials on change callback event
         for (int i = 0; i < yHandles.Length; i++)
         {
             int index = i;
             yHandles[i].onHandleChangedEvent.AddListener(delegate { UpdateHandleValue(index); });
-            yHandles[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            yHandles[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
         }
     }
 
@@ -97,7 +100,21 @@ public class NetworkYHandles : NetworkBehaviour
 
     public void UpdateHandleValue(int index)
     {
+        SendHandleValue(index, false);
+    }
+
+    void SendHandleValue(int index, bool force)
+    {
         Debug.Log($"Update xHandle value of index: {index} to value: {yHandles[index].transform.localPosition.x}");
+        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
+        {
+            return;
+        }
+        if (force)
+        {
+            NetworkSendThrottle.MarkSent(lastSentTimes, index);
+        }
+
         if (isServer)
         {
             yValues[index] = yHandles[index].transform.localPosition.x;
@@ -121,6 +138,13 @@ public class NetworkYHandles : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        NetworkSendThrottle.Reset(lastSentTimes, index);
+        SendHandleValue(index, true);
     }
 
     private bool IsEndGrabCooldownOver(int index)

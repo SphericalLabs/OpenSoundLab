@@ -321,6 +321,10 @@ public class controllerPathRecorder
 
         if (marker == ControllerPathPointMarker.Continue)
         {
+            if (!NetworkSendThrottle.ShouldSend(ref path.lastNetworkPointTime))
+            {
+                return;
+            }
             networkManager.CmdAppendPathPoint(path.id, point);
         }
         else
@@ -526,4 +530,5 @@ class PathData
     public readonly List<Vector3> pendingNetworkPoints = new List<Vector3>();
     public bool pendingEnd;
     public Vector3 pendingEndPoint;
+    public float lastNetworkPointTime = -1f;
 }

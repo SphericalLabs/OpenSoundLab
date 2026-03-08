@@ -37,6 +37,7 @@ public class NetworkDials : NetworkBehaviour
     public readonly SyncList<float> dialValues = new SyncList<float>();
 
     private float[] lastGrabedTimes;
+    private float[] lastSentTimes;
 
     public override void OnStartServer()
     {
@@ -57,12 +58,14 @@ public class NetworkDials : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[dials.Length];
+        lastSentTimes = new float[dials.Length];
+        NetworkSendThrottle.Initialize(lastSentTimes);
         //add dials on change callback event
         for (int i = 0; i < dials.Length; i++)
         {
             int index = i;
             dials[i].onPercentChangedEvent.AddListener(delegate { UpdateDialValue(index); });
-            dials[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            dials[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
             if (dials[i].DialFeedback == null)
             {
                 dials[i].DialFeedback = dials[i].transform.parent.Find("glowDisk").GetComponent<glowDisk>();
@@ -109,7 +112,21 @@ public class NetworkDials : NetworkBehaviour
 
     public void UpdateDialValue(int index)
     {
+        SendDialValue(index, false);
+    }
+
+    void SendDialValue(int index, bool force)
+    {
         //Debug.Log($"Update dial value of index: {index} to value: {dials[index].percent}");
+        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
+        {
+            return;
+        }
+        if (force)
+        {
+            NetworkSendThrottle.MarkSent(lastSentTimes, index);
+        }
+
         if (isServer)
         {
             dialValues[index] = dials[index].percent;
@@ -133,6 +150,13 @@ public class NetworkDials : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        NetworkSendThrottle.Reset(lastSentTimes, index);
+        SendDialValue(index, true);
     }
 
     private bool IsEndGrabCooldownOver(int index)

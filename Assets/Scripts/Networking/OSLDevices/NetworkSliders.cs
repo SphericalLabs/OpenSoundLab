@@ -37,6 +37,7 @@ public class NetworkSliders : NetworkBehaviour
     public readonly SyncList<float> sliderValues = new SyncList<float>(); // synced automatically, but not on first init. changes can and should be handled specifically
 
     private float[] lastGrabedTimes;
+    private float[] lastSentTimes;
     // user grabs slider
     // PercentChanged is triggered by slider
     // OnPercentChanged is triggered by the event
@@ -55,13 +56,15 @@ public class NetworkSliders : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[sliders.Length];
+        lastSentTimes = new float[sliders.Length];
+        NetworkSendThrottle.Initialize(lastSentTimes);
 
         //add dials on change callback event
         for (int i = 0; i < sliders.Length; i++)
         {
             int index = i;
             sliders[i].PercentChanged.AddListener(delegate { OnPercentChanged(index); }); // passing the method to be called, as a lambda delegate in order to also pass the index
-            sliders[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            sliders[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
         }
     }
 
@@ -115,7 +118,21 @@ public class NetworkSliders : NetworkBehaviour
     // client and server
     public void OnPercentChanged(int index) // called from the sliders' onPercentChangedEvent
     {
+        SendSliderValue(index, false);
+    }
+
+    void SendSliderValue(int index, bool force)
+    {
         Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
+        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
+        {
+            return;
+        }
+        if (force)
+        {
+            NetworkSendThrottle.MarkSent(lastSentTimes, index);
+        }
+
         if (isServer)
         {
             sliderValues[index] = sliders[index].percent; // directly write into data model, this triggers a SyncList Update
@@ -141,6 +158,13 @@ public class NetworkSliders : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        NetworkSendThrottle.Reset(lastSentTimes, index);
+        SendSliderValue(index, true);
     }
 
     private bool IsEndGrabCooldownOver(int index)

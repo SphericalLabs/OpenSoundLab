@@ -76,14 +76,14 @@ namespace Utp
 			//Instantiate new UTP server
 			server = new UtpServer(
 				(connectionId) => OnServerConnected.Invoke(connectionId),
-				(connectionId, message) => OnServerDataReceived.Invoke(connectionId, message, Channels.Reliable),
+				(connectionId, message, channelId) => OnServerDataReceived.Invoke(connectionId, message, channelId),
 				(connectionId) => OnServerDisconnected.Invoke(connectionId),
 				TimeoutMS);
 
 			//Instantiate new UTP client
 			client = new UtpClient(
 				() => OnClientConnected.Invoke(),
-				(message) => OnClientDataReceived.Invoke(message, Channels.Reliable),
+				(message, channelId) => OnClientDataReceived.Invoke(message, channelId),
 				() => OnClientDisconnected.Invoke(),
 				TimeoutMS);
 
@@ -206,16 +206,16 @@ namespace Utp
 			//Check for client activity
 			if (client != null && client.IsConnected())
 			{
-				return NetworkParameterConstants.MTU - client.GetMaxHeaderSize(channelId);
+				return NetworkParameterConstants.MTU - client.GetMaxHeaderSize(channelId) - 1;
 			}
 			else if (server != null && server.IsActive())
 			{
-				return NetworkParameterConstants.MTU - server.GetMaxHeaderSize(channelId);
+				return NetworkParameterConstants.MTU - server.GetMaxHeaderSize(channelId) - 1;
 			}
 			else
 			{
 				//Fall back on default MTU
-				return NetworkParameterConstants.MTU;
+				return NetworkParameterConstants.MTU - 1;
 			}
 		}
 

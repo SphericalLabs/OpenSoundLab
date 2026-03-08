@@ -37,6 +37,7 @@ public class NetworkSlidersNotched : NetworkBehaviour
     public readonly SyncList<float> sliderValues = new SyncList<float>();
 
     private float[] lastGrabedTimes;
+    private float[] lastSentTimes;
 
     public override void OnStartServer()
     {
@@ -50,13 +51,15 @@ public class NetworkSlidersNotched : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[sliders.Length];
+        lastSentTimes = new float[sliders.Length];
+        NetworkSendThrottle.Initialize(lastSentTimes);
 
         //add dials on change callback event
         for (int i = 0; i < sliders.Length; i++)
         {
             int index = i;
             sliders[i].onPercentChangedEvent.AddListener(delegate { UpdateSliderValue(index); });
-            sliders[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            sliders[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
         }
     }
 
@@ -98,6 +101,20 @@ public class NetworkSlidersNotched : NetworkBehaviour
 
     public void UpdateSliderValue(int index)
     {
+        SendSliderValue(index, false);
+    }
+
+    void SendSliderValue(int index, bool force)
+    {
+        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
+        {
+            return;
+        }
+        if (force)
+        {
+            NetworkSendThrottle.MarkSent(lastSentTimes, index);
+        }
+
         if (isServer)
         {
             sliderValues[index] = sliders[index].percent;
@@ -122,6 +139,13 @@ public class NetworkSlidersNotched : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        NetworkSendThrottle.Reset(lastSentTimes, index);
+        SendSliderValue(index, true);
     }
 
     private bool IsEndGrabCooldownOver(int index)

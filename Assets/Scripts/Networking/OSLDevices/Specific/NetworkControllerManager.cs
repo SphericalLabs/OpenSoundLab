@@ -65,6 +65,7 @@ public class NetworkControllerManager : NetworkBehaviour
     readonly HashSet<int> activePathIds = new HashSet<int>();
     int nextPathId = 1;
     bool callbackRegistered;
+    float lastHandleSendTime = -1f;
 
     void Awake()
     {
@@ -126,6 +127,11 @@ public class NetworkControllerManager : NetworkBehaviour
     void OnLocalPercentChanged()
     {
         if (controlCube == null)
+        {
+            return;
+        }
+
+        if (!NetworkSendThrottle.ShouldSend(ref lastHandleSendTime))
         {
             return;
         }
