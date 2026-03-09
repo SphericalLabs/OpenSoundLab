@@ -37,6 +37,8 @@ using System.Linq;
 
 public class pauseMenu : MonoBehaviour
 {
+    const float networkedLoadDelaySeconds = 0.3f;
+
     public GameObject savePanel, wireSettingsPanel, settingsLabel;
 
     public pauseMenuItem newItem, loadItem, saveItem;
@@ -81,6 +83,7 @@ public class pauseMenu : MonoBehaviour
     }
 
     Coroutine flashCoroutine;
+    Coroutine loadFileCoroutine;
     void Start()
     {
         saveLoadPanel = GetComponentInChildren<uiPanelComponentInterface>(true);
@@ -168,11 +171,23 @@ public class pauseMenu : MonoBehaviour
 
     public void loadFile(string s)
     {
-        SaveLoadInterface.instance.ClearInstruments();
-        SaveLoadInterface.instance.Load(s);
+        if (loadFileCoroutine != null) StopCoroutine(loadFileCoroutine);
+        loadFileCoroutine = StartCoroutine(loadFileAfterClear(s));
         mainMenuActive();
         toggleMenu();
         curItem = itemType.main;
+    }
+
+    IEnumerator loadFileAfterClear(string filename)
+    {
+        SaveLoadInterface.instance.ClearInstruments();
+
+        // Give networked destroy messages a short head start before spawning the new patch.
+        // This reduces relay hickups where clients are still processing the clear while the load begins.
+        yield return new WaitForSecondsRealtime(networkedLoadDelaySeconds);
+
+        SaveLoadInterface.instance.Load(filename);
+        loadFileCoroutine = null;
     }
 
     public void cancelFileMenu()
