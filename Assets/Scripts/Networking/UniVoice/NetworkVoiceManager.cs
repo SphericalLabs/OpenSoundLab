@@ -58,28 +58,23 @@ public class NetworkVoiceManager : MonoBehaviour
 
     Dictionary<short, PeerView> peerViews = new Dictionary<short, PeerView>();
 
-    private void Awake()
-    {
-        // Quit univoice immediately since any call to Unity microphone will fry the app
-        if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Destroy(this);
-    }
-
     IEnumerator Start()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
+        // Relay host/client startup is triggered very early in this scene. UniVoice needs to
+        // subscribe to Mirror transport callbacks before those connections happen, otherwise the
+        // chatroom never sees peers join even though gameplay networking is already connected.
+        InitializeAgent();
+        InitializeMenu();
+
 #if UNITY_ANDROID
-        while (!Permission.HasUserAuthorizedPermission("android.permission.RECORD_AUDIO"))
+        if (!Permission.HasUserAuthorizedPermission("android.permission.RECORD_AUDIO"))
         {
             Permission.RequestUserPermission("android.permission.RECORD_AUDIO");
-            yield return new WaitForSeconds(1);
         }
 #endif
         yield return null;
-        yield return new WaitForSeconds(1);
-
-        InitializeAgent();
-        InitializeMenu();
     }
 
 
