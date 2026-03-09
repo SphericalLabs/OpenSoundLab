@@ -460,12 +460,12 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
         if (networkVoiceManager != null)
         {
-            var audioOutput = networkVoiceManager.GetSourceOutput((short)voiceChatAgentID);
-            if (audioOutput != null)
+            var audioSource = networkVoiceManager.GetSourceOutput(voiceChatAgentID);
+            if (audioSource != null)
             {
                 moveVoiceChatObject = true;
-                voiceOverTransform = audioOutput.transform;
-                audioOutput.audioSource.spatialBlend = 1f;
+                voiceOverTransform = audioSource.transform;
+                audioSource.spatialBlend = 1f;
                 //Debug.Log($"found voicechat output object {gameObject.name}");
             }
         }

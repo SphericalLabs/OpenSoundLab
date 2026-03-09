@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.adrenak.univoice": "4.11.1",
     "com.meta.xr.depthapi.urp": "https://github.com/oculus-samples/Unity-DepthAPI.git?path=/Packages/com.meta.xr.depthapi.urp",
     "com.meta.xr.sdk.all": "81.0.0",
     "com.unity.ai.navigation": "1.1.6",
@@ -57,13 +58,10 @@
       "url": "https://registry.npmjs.org",
       "scopes": [
         "com.npmjs",
-        "com.adrenak.airpeer",
         "com.adrenak.univoice",
-        "com.adrenak.univoice.airpeernetwork",
-        "com.adrenak.univoice.unimicinput",
-        "com.adrenak.univoice.audiosourceoutput",
         "com.adrenak.unimic",
-        "com.adrenak.brw"
+        "com.adrenak.brw",
+        "com.adrenak.concentus-unity"
       ]
     }
   ]

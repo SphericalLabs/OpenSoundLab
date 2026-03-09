@@ -25,22 +25,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Adrenak.UniVoice;
 using System;
+using Adrenak.UniVoice;
+using UnityEngine;
+using UniVoiceUtils = Adrenak.UniVoice.Utils;
 
 public class SinusAudioInput : IAudioInput
 {
-    public event Action<int, float[]> OnSegmentReady;
-
-    public int Frequency => SinusAudioSender.Instance.Frequency;
-
-    public int ChannelCount =>
-        SinusAudioSender.Instance.AudioClip == null ? 0 : SinusAudioSender.Instance.AudioClip.channels;
-
-    public int SegmentRate => 1000 / SinusAudioSender.Instance.SampleDurationMS;
+    public event Action<AudioFrame> OnFrameReady;
 
     public SinusAudioInput(int deviceIndex = 0, int frequency = 16000, int sampleLen = 100)
     {
@@ -51,7 +43,13 @@ public class SinusAudioInput : IAudioInput
 
     void Bus_OnSampleReady(int segmentIndex, float[] samples)
     {
-        OnSegmentReady?.Invoke(segmentIndex, samples);
+        OnFrameReady?.Invoke(new AudioFrame
+        {
+            timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            frequency = SinusAudioSender.Instance.Frequency,
+            channelCount = SinusAudioSender.Instance.AudioClip == null ? 0 : SinusAudioSender.Instance.AudioClip.channels,
+            samples = UniVoiceUtils.Bytes.FloatsToBytes(samples)
+        });
     }
 
     public void Dispose()
