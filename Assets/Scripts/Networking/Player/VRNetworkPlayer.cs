@@ -31,7 +31,6 @@ using System;
 using UnityEngine;
 using System.IO;
 using Mirror;
-using Unity.Collections.LowLevel.Unsafe;
 
 [System.Serializable]
 public class ManipulatorVisual
@@ -239,6 +238,11 @@ public class VRNetworkPlayer : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdGetObjectAuthority(NetworkIdentity item)
     {
+        if (WorldDragController.Instance != null && WorldDragController.Instance.ShouldBlockModuleGrab(item))
+        {
+            return;
+        }
+
         if (item.connectionToClient != null)
             item.RemoveClientAuthority();
         item.AssignClientAuthority(connectionToClient);
