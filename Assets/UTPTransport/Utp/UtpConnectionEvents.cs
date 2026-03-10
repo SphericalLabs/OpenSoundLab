@@ -25,7 +25,7 @@ namespace Utp
         /// <summary>
         /// Event data, only used for OnReceived event.
         /// </summary>
-        public NativeArray<byte> eventData;
+        public FixedList4096Bytes<byte> eventData;
 
         /// <summary>
         /// Mirror channel restored from the transport payload prefix.

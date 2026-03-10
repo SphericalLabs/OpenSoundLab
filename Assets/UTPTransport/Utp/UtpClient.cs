@@ -84,14 +84,9 @@ namespace Utp
 
 							int payloadLength = stream.Length - CHANNEL_PREFIX_BYTES;
 							byte channelId = nativeMessage[0];
-							NativeArray<byte> eventData = new NativeArray<byte>();
+							FixedList4096Bytes<byte> eventData = getFixedList(nativeMessage, CHANNEL_PREFIX_BYTES, payloadLength);
 							byte eventType = (byte)UtpConnectionEventType.OnReceivedData;
-
-							if (payloadLength > 0)
-							{
-								eventData = new NativeArray<byte>(payloadLength, Allocator.Persistent);
-								NativeArray<byte>.Copy(nativeMessage, CHANNEL_PREFIX_BYTES, eventData, 0, payloadLength);
-							}
+							payloadLength = eventData.Length;
 
 							connectionEvent = new UtpConnectionEvent()
 							{
@@ -125,6 +120,25 @@ namespace Utp
 
 				}
 			}
+		}
+
+		private FixedList4096Bytes<byte> getFixedList(NativeArray<byte> data, int startIndex, int length)
+		{
+			FixedList4096Bytes<byte> retVal = new FixedList4096Bytes<byte>();
+			if (length <= 0)
+			{
+				return retVal;
+			}
+
+			int copyLength = Math.Min(length, retVal.Capacity);
+
+			unsafe
+			{
+				byte* ptr = (byte*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(data);
+				retVal.AddRange(ptr + startIndex, copyLength);
+			}
+
+			return retVal;
 		}
 
 
@@ -359,13 +373,7 @@ namespace Utp
 			//Flush the event queue
 			if (connectionsEventsQueue.IsCreated)
 			{
-				while (connectionsEventsQueue.TryDequeue(out UtpConnectionEvent connectionEvent))
-				{
-					if (connectionEvent.eventData.IsCreated)
-					{
-						connectionEvent.eventData.Dispose();
-					}
-				}
+				while (connectionsEventsQueue.TryDequeue(out UtpConnectionEvent connectionEvent)) { }
 				connectionsEventsQueue.Dispose();
 			}
 
@@ -464,8 +472,12 @@ namespace Utp
 					//Receive data action
 					case ((byte)UtpConnectionEventType.OnReceivedData):
 						{
-							OnReceivedData?.Invoke(new ArraySegment<byte>(connectionEvent.eventData.ToArray(), 0, connectionEvent.payloadLength), connectionEvent.channelId);
-							if (connectionEvent.eventData.IsCreated) connectionEvent.eventData.Dispose();
+							byte[] payload = new byte[connectionEvent.payloadLength];
+							for (int i = 0; i < connectionEvent.payloadLength; i++)
+							{
+								payload[i] = connectionEvent.eventData[i];
+							}
+							OnReceivedData?.Invoke(new ArraySegment<byte>(payload, 0, connectionEvent.payloadLength), connectionEvent.channelId);
 							break;
 						}
 
