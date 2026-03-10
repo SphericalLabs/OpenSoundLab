@@ -32,6 +32,8 @@ using Mirror;
 
 public class NetworkAuthorityHandle : NetworkBehaviour
 {
+    static readonly List<NetworkAuthorityHandle> instances = new List<NetworkAuthorityHandle>();
+
     private handle[] _handles;
     public TMPro.TMP_Text debugtextMesh;
 
@@ -40,6 +42,19 @@ public class NetworkAuthorityHandle : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnControlledByClient))]
     public bool controlledByClient = false;
+
+    void OnEnable()
+    {
+        if (!instances.Contains(this))
+        {
+            instances.Add(this);
+        }
+    }
+
+    void OnDisable()
+    {
+        instances.Remove(this);
+    }
 
     public virtual void Start()
     {
@@ -133,6 +148,12 @@ public class NetworkAuthorityHandle : NetworkBehaviour
     public virtual void StartAuthorityGrabing()
     {
         Debug.Log($"Start authority grab of {gameObject.name}");
+        if (WorldDragController.Instance != null && WorldDragController.Instance.ShouldBlockModuleGrab(netIdentity))
+        {
+            forceReleaseGrabbedHandles();
+            return;
+        }
+
         //todo don't take authority if already has authority and all handles are grabbed
         if (!isServer)
         {
@@ -183,6 +204,55 @@ public class NetworkAuthorityHandle : NetworkBehaviour
             }
         }
         return true;
+    }
+
+    void forceReleaseGrabbedHandles()
+    {
+        if (_handles == null) return;
+
+        foreach (handle h in _handles)
+        {
+            if (h.curState == manipObject.manipState.grabbed && h.manipulatorObjScript != null)
+            {
+                h.manipulatorObjScript.ForceRelease();
+            }
+        }
+    }
+
+    bool isModuleMoveInProgress()
+    {
+        if (controlledByClient)
+        {
+            return true;
+        }
+
+        if (_handles == null)
+        {
+            return false;
+        }
+
+        foreach (handle h in _handles)
+        {
+            if (h.curState == manipObject.manipState.grabbed)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static bool AnyModuleMoveInProgress()
+    {
+        foreach (NetworkAuthorityHandle authorityHandle in instances)
+        {
+            if (authorityHandle != null && authorityHandle.isModuleMoveInProgress())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     #endregion
