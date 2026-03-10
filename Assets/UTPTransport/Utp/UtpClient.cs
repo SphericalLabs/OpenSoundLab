@@ -281,7 +281,7 @@ namespace Utp
 
 			var settings = new NetworkSettings();
 			settings.WithNetworkConfigParameters(disconnectTimeoutMS: timeoutInMilliseconds);
-			settings.WithFragmentationStageParameters(payloadCapacity: 1 * 1024 * 1024);
+			settings.WithFragmentationStageParameters(payloadCapacity: UtpTransport.FragmentedPayloadCapacity);
 
 			driver = NetworkDriver.Create(settings);
 			reliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
@@ -319,7 +319,7 @@ namespace Utp
 			var settings = new NetworkSettings();
 			settings.WithNetworkConfigParameters(disconnectTimeoutMS: timeoutInMilliseconds);
 			settings.WithRelayParameters(ref relayServerData);
-			settings.WithFragmentationStageParameters(payloadCapacity: 1 * 1024 * 1024);
+			settings.WithFragmentationStageParameters(payloadCapacity: UtpTransport.FragmentedPayloadCapacity);
 
 			driver = NetworkDriver.Create(settings);
 			reliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));

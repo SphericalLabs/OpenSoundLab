@@ -300,7 +300,7 @@ namespace Utp
 			// Keep one configured settings instance so direct and relay modes honor the same timeout.
 			var settings = new NetworkSettings();
 			settings.WithNetworkConfigParameters(disconnectTimeoutMS: timeoutInMilliseconds);
-			settings.WithFragmentationStageParameters(payloadCapacity: 1 * 1024 * 1024);
+			settings.WithFragmentationStageParameters(payloadCapacity: UtpTransport.FragmentedPayloadCapacity);
 
 			//Create IPV4 endpoint
 			NetworkEndPoint endpoint = NetworkEndPoint.AnyIpv4;

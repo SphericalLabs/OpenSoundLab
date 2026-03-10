@@ -23,6 +23,11 @@ namespace Utp
 		/// </summary>
 		public const int VoiceChannel = 2;
 
+		/// <summary>
+		/// Maximum payload size the fragmentation stage is configured to carry.
+		/// </summary>
+		public const int FragmentedPayloadCapacity = 1024 * 1024;
+
 		[Header("Transport Configuration")]
 
 		/// <summary>
@@ -208,19 +213,22 @@ namespace Utp
 		/// <returns></returns>
 		public override int GetMaxPacketSize(int channelId = Channels.Reliable)
 		{
+			int packetBudget = channelId == Channels.Reliable
+				? FragmentedPayloadCapacity
+				: NetworkParameterConstants.MTU;
+
 			//Check for client activity
 			if (client != null && client.IsConnected())
 			{
-				return NetworkParameterConstants.MTU - client.GetMaxHeaderSize(channelId) - 1;
+				return packetBudget - client.GetMaxHeaderSize(channelId) - 1;
 			}
 			else if (server != null && server.IsActive())
 			{
-				return NetworkParameterConstants.MTU - server.GetMaxHeaderSize(channelId) - 1;
+				return packetBudget - server.GetMaxHeaderSize(channelId) - 1;
 			}
 			else
 			{
-				//Fall back on default MTU
-				return NetworkParameterConstants.MTU - 1;
+				return packetBudget - 1;
 			}
 		}
 
