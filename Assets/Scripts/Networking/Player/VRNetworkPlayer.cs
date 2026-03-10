@@ -88,6 +88,8 @@ public class VRNetworkPlayer : NetworkBehaviour
     public NetworkPlayerPlugHand leftNetworkPlugHand;
     public NetworkPlayerPlugHand rightNetworkPlugHand;
 
+    Coroutine patchLoadCoroutine;
+
 
     public override void OnStartLocalPlayer()
     {
@@ -475,22 +477,51 @@ public class VRNetworkPlayer : NetworkBehaviour
 
     #region PlayMode Patch Menu Commands
 
+    const float networkedLoadDelaySeconds = 0.3f;
+
+    public bool RequestLoadPatchFromLocalFile(string path)
+    {
+        if (!isLocalPlayer)
+        {
+            Debug.LogError("Cannot upload patch: RequestLoadPatchFromLocalFile must be called on the local player.");
+            return false;
+        }
+
+        if (!NetworkClient.isConnected)
+        {
+            Debug.LogError("Cannot upload patch: Mirror client is not connected.");
+            return false;
+        }
+
+        if (!NetworkPatchTransferUtility.TryPreparePatchUpload(path, out string patchFileName, out byte[] compressedPatch, out string error))
+        {
+            Debug.LogError(error);
+            return false;
+        }
+
+        CmdLoadCompressedPatch(patchFileName, compressedPatch);
+        Debug.Log($"Requested Server to Load Patch from {path}");
+        return true;
+    }
+
     [Command(requiresAuthority = false)]
     public void CmdLoadLastPlayModePatch()
     {
-        if (SaveLoadInterface.instance != null)
+        if (SaveLoadInterface.instance == null)
         {
-            string path = GetPlayModePatchPath();
-            if (File.Exists(path))
-            {
-                SaveLoadInterface.instance.Load(path);
-                Debug.Log($"Loaded LastPlayModePatch from {path} via Client Request");
-            }
-            else
-            {
-                Debug.LogWarning($"LastPlayModePatch not found at {path}");
-            }
+            Debug.LogError("Cannot load LastPlayModePatch: SaveLoadInterface is not available.");
+            return;
         }
+
+        string path = GetPlayModePatchPath();
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning($"LastPlayModePatch not found at {path}");
+            return;
+        }
+
+        BeginServerPatchLoad(path);
+        Debug.Log($"Queued LastPlayModePatch load from {path} via Client Request");
     }
 
     [Command(requiresAuthority = false)]
@@ -515,6 +546,25 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
     }
 
+    [Command(requiresAuthority = false)]
+    void CmdLoadCompressedPatch(string patchFileName, byte[] compressedPatch)
+    {
+        if (SaveLoadInterface.instance == null)
+        {
+            Debug.LogError("Cannot load uploaded patch: SaveLoadInterface is not available.");
+            return;
+        }
+
+        if (!NetworkPatchTransferUtility.TryWriteUploadedPatch(compressedPatch, patchFileName, netId, out string patchPath, out string error))
+        {
+            Debug.LogError(error);
+            return;
+        }
+
+        BeginServerPatchLoad(patchPath);
+        Debug.Log($"Queued uploaded patch {patchFileName} via Client Request");
+    }
+
     private string GetPlayModePatchPath()
     {
         string baseDir = (masterControl.instance != null) ? masterControl.instance.SaveDir : null;
@@ -532,6 +582,51 @@ public class VRNetworkPlayer : NetworkBehaviour
         {
             Directory.CreateDirectory(dir);
         }
+    }
+
+    void BeginServerPatchLoad(string path)
+    {
+        if (!isServer)
+        {
+            Debug.LogError("Cannot begin server patch load: this player is not running on the server.");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        {
+            Debug.LogError($"Cannot begin server patch load: patch file not found at {path}");
+            return;
+        }
+
+        if (patchLoadCoroutine != null)
+        {
+            StopCoroutine(patchLoadCoroutine);
+        }
+
+        patchLoadCoroutine = StartCoroutine(loadPatchAfterClear(path));
+    }
+
+    IEnumerator loadPatchAfterClear(string path)
+    {
+        if (SaveLoadInterface.instance == null)
+        {
+            Debug.LogError("Cannot load patch after clear: SaveLoadInterface is not available.");
+            patchLoadCoroutine = null;
+            yield break;
+        }
+
+        SaveLoadInterface.instance.ClearInstruments();
+        yield return new WaitForSecondsRealtime(networkedLoadDelaySeconds);
+
+        if (SaveLoadInterface.instance == null)
+        {
+            Debug.LogError("Cannot finish patch load: SaveLoadInterface is not available.");
+            patchLoadCoroutine = null;
+            yield break;
+        }
+
+        SaveLoadInterface.instance.Load(path);
+        patchLoadCoroutine = null;
     }
 
     #endregion

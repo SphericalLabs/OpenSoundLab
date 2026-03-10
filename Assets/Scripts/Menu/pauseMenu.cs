@@ -110,13 +110,15 @@ public class pauseMenu : MonoBehaviour
         // it is a bit brute force and could be improved by a more elegant rewrite
         if (curItem == itemType.main)
         {
-            if (!NetworkServer.active) // Now check if Client
+            bool canLoadPatch = NetworkServer.active || (NetworkClient.isConnected && NetworkClient.localPlayer != null);
+
+            if (!canLoadPatch)
             {
                 newItem.gameObject.SetActive(false);
                 loadItem.gameObject.SetActive(false);
             }
 
-            if (NetworkServer.active) // or Server
+            if (canLoadPatch)
             {
                 newItem.gameObject.SetActive(true);
                 loadItem.gameObject.SetActive(true);
@@ -171,8 +173,28 @@ public class pauseMenu : MonoBehaviour
 
     public void loadFile(string s)
     {
-        if (loadFileCoroutine != null) StopCoroutine(loadFileCoroutine);
-        loadFileCoroutine = StartCoroutine(loadFileAfterClear(s));
+        if (NetworkServer.active)
+        {
+            if (loadFileCoroutine != null) StopCoroutine(loadFileCoroutine);
+            loadFileCoroutine = StartCoroutine(loadFileAfterClear(s));
+        }
+        else if (NetworkClient.isConnected)
+        {
+            VRNetworkPlayer player = getLocalNetworkPlayer();
+            if (player == null)
+            {
+                Debug.LogError("Cannot upload patch: local network player is not available.");
+            }
+            else
+            {
+                player.RequestLoadPatchFromLocalFile(s);
+            }
+        }
+        else
+        {
+            Debug.LogError("Cannot load patch: no active Mirror server or client.");
+        }
+
         mainMenuActive();
         toggleMenu();
         curItem = itemType.main;
@@ -261,7 +283,22 @@ public class pauseMenu : MonoBehaviour
             else if (curItem == itemType.newItem)
             {
                 toggleMenu();
-                SaveLoadInterface.instance.StartNewPatch();
+                if (NetworkServer.active)
+                {
+                    SaveLoadInterface.instance.StartNewPatch();
+                }
+                else
+                {
+                    VRNetworkPlayer player = getLocalNetworkPlayer();
+                    if (player != null)
+                    {
+                        player.CmdNewPatch();
+                    }
+                    else
+                    {
+                        Debug.LogError("Cannot start new patch: local network player is not available.");
+                    }
+                }
             }
         }
         if (t == itemType.gazeItem)
@@ -344,5 +381,20 @@ public class pauseMenu : MonoBehaviour
 
         yield return null;
         if (!on) menuObject.SetActive(on);
+    }
+
+    VRNetworkPlayer getLocalNetworkPlayer()
+    {
+        if (NetworkMenuManager.Instance != null && NetworkMenuManager.Instance.localPlayer != null)
+        {
+            return NetworkMenuManager.Instance.localPlayer;
+        }
+
+        if (NetworkClient.localPlayer != null)
+        {
+            return NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
+        }
+
+        return null;
     }
 }

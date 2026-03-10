@@ -78,9 +78,10 @@ public static class Editor_PlayModePatchMenu
             var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
             if (player != null)
             {
-                player.CmdNewPatch();
-                player.CmdLoadLastPlayModePatch();
-                Debug.Log("Requested Server to Load LastPlayModePatch.");
+                if (player.RequestLoadPatchFromLocalFile(getPatchPath()))
+                {
+                    Debug.Log("Requested Server to Load LastPlayModePatch from the client patch file.");
+                }
             }
         }
         else
