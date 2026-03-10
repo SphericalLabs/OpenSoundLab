@@ -1,11 +1,10 @@
 {
   "dependencies": {
     "com.adrenak.brw": {
-      "version": "1.2.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://registry.npmjs.org"
+      "version": "file:com.adrenak.brw",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.adrenak.concentus-unity": {
       "version": "1.0.1",
