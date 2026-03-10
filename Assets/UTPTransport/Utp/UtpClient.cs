@@ -84,9 +84,18 @@ namespace Utp
 
 							int payloadLength = stream.Length - CHANNEL_PREFIX_BYTES;
 							byte channelId = nativeMessage[0];
-							FixedList4096Bytes<byte> eventData = getFixedList(nativeMessage, CHANNEL_PREFIX_BYTES, payloadLength);
+							UnsafeList<byte> eventData = default;
 							byte eventType = (byte)UtpConnectionEventType.OnReceivedData;
-							payloadLength = eventData.Length;
+
+							if (payloadLength > 0)
+							{
+								eventData = new UnsafeList<byte>(payloadLength, Allocator.Persistent);
+								unsafe
+								{
+									byte* ptr = (byte*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(nativeMessage);
+									eventData.AddRange(ptr + CHANNEL_PREFIX_BYTES, payloadLength);
+								}
+							}
 
 							connectionEvent = new UtpConnectionEvent()
 							{
@@ -121,26 +130,6 @@ namespace Utp
 				}
 			}
 		}
-
-		private FixedList4096Bytes<byte> getFixedList(NativeArray<byte> data, int startIndex, int length)
-		{
-			FixedList4096Bytes<byte> retVal = new FixedList4096Bytes<byte>();
-			if (length <= 0)
-			{
-				return retVal;
-			}
-
-			int copyLength = Math.Min(length, retVal.Capacity);
-
-			unsafe
-			{
-				byte* ptr = (byte*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(data);
-				retVal.AddRange(ptr + startIndex, copyLength);
-			}
-
-			return retVal;
-		}
-
 
 	}
 
@@ -373,7 +362,13 @@ namespace Utp
 			//Flush the event queue
 			if (connectionsEventsQueue.IsCreated)
 			{
-				while (connectionsEventsQueue.TryDequeue(out UtpConnectionEvent connectionEvent)) { }
+				while (connectionsEventsQueue.TryDequeue(out UtpConnectionEvent connectionEvent))
+				{
+					if (connectionEvent.eventData.IsCreated)
+					{
+						connectionEvent.eventData.Dispose();
+					}
+				}
 				connectionsEventsQueue.Dispose();
 			}
 
@@ -477,6 +472,7 @@ namespace Utp
 							{
 								payload[i] = connectionEvent.eventData[i];
 							}
+							if (connectionEvent.eventData.IsCreated) connectionEvent.eventData.Dispose();
 							OnReceivedData?.Invoke(new ArraySegment<byte>(payload, 0, connectionEvent.payloadLength), connectionEvent.channelId);
 							break;
 						}
