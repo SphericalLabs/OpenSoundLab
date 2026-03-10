@@ -44,13 +44,16 @@ using Adrenak.UniVoice.Samples;
 
 public class NetworkVoiceManager : MonoBehaviour
 {
-    const int microphoneFrameDurationMs = 60;
+    const int microphoneFrameDurationMs = 20;
     const int opusBitrate = 32000;
     const int opusResamplerQuality = 3;
     const int opusEncoderComplexity = 5;
-    const int jitterStartupFrames = 2;
-    const int jitterMaxBufferedFrames = 4;
-    const int jitterReorderWindowMs = 80;
+    const int jitterStartupFrames = 1;
+    const int jitterMaxBufferedFrames = 3;
+    const int jitterReorderWindowMs = 40;
+    const float outputTargetLatencySec = 0.15f;
+    const float outputFrameLifetimeSec = 0.25f;
+    const float outputStartSafetyMarginSec = 0.01f;
 
     IAudioServer<int> audioServer;
     IAudioClient<int> audioClient;
@@ -167,6 +170,7 @@ public class NetworkVoiceManager : MonoBehaviour
 
             peerViews.Add(id, view);
             view.SetPeerID(id);
+            ConfigurePeerOutput(id);
             ApplyPeerIncomingAudio(id, view.IncomingAudio);
         };
 
@@ -306,6 +310,17 @@ public class NetworkVoiceManager : MonoBehaviour
         var audioSource = GetSourceOutput(id);
         if (audioSource != null)
             audioSource.mute = !allowIncomingAudio;
+    }
+
+    void ConfigurePeerOutput(int id)
+    {
+        if (clientSession == null || clientSession.PeerOutputs == null) return;
+        if (!clientSession.PeerOutputs.TryGetValue(id, out var audioOutput)) return;
+        if (audioOutput is not StreamedAudioSourceOutput streamedOutput) return;
+
+        streamedOutput.Stream.TargetLatency = outputTargetLatencySec;
+        streamedOutput.Stream.FrameLifetime = outputFrameLifetimeSec;
+        streamedOutput.Stream.StartSafetyMarginSec = outputStartSafetyMarginSec;
     }
 
     public AudioSource GetSourceOutput(int id)
