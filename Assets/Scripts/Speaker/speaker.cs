@@ -31,6 +31,7 @@ using System.Runtime.InteropServices;
 
 public class speaker : signalGenerator
 {
+    static volatile bool patchLoadMuted;
 
     public float volume = 1;
     public signalGenerator incoming;
@@ -40,8 +41,19 @@ public class speaker : signalGenerator
     [DllImport("OSLNative")]
     public static extern void MultiplyArrayBySingleValue(float[] buffer, int length, float val);
 
+    public static void SetPatchLoadMuted(bool muted)
+    {
+        patchLoadMuted = muted;
+    }
+
     private void OnAudioFilterRead(float[] buffer, int channels)
     {
+        if (patchLoadMuted)
+        {
+            System.Array.Clear(buffer, 0, buffer.Length);
+            return;
+        }
+
         if (incoming == null) return;
         double dspTime = AudioSettings.dspTime;
         incoming.processBuffer(buffer, dspTime, channels);
