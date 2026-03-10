@@ -45,9 +45,9 @@ using Adrenak.UniVoice.Samples;
 public class NetworkVoiceManager : MonoBehaviour
 {
     const int microphoneFrameDurationMs = 60;
-    const int opusBitrate = 16000;
-    const int opusResamplerQuality = 1;
-    const int opusEncoderComplexity = 1;
+    const int opusBitrate = 32000;
+    const int opusResamplerQuality = 3;
+    const int opusEncoderComplexity = 5;
     const int jitterStartupFrames = 2;
     const int jitterMaxBufferedFrames = 4;
     const int jitterReorderWindowMs = 80;
