@@ -27,7 +27,6 @@
 
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 using Mirror;
 using UnityEngine;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
@@ -37,6 +36,19 @@ public static class NetworkPatchTransferUtility
     const int commandEnvelopeBytes = 128;
     const string incomingDirectoryName = "Incoming";
     const string defaultPatchName = "Patch";
+
+    // Patch uploads are sent as gzip-compressed XML and then chunked by VRNetworkPlayer into
+    // reliable messages, so the transport's single-message size is no longer the main limit.
+    // The current practical ceiling is this helper's in-memory buffering model:
+    // - chunks are capped at ~48 KB each
+    // - the server currently rebuilds the whole compressed upload in RAM before writing/decompressing
+    // - maxBufferedPatchBytes therefore limits compressed uploads to 16 MB
+    // This is fine for patch XML files, but not for large sample sync.
+    // To push this into hundreds of MB later, keep the chunked transport but replace the RAM buffer
+    // with streamed append-to-disk uploads, plus per-upload state, integrity checks, throttling,
+    // and ideally resume support.
+    const int patchChunkBytes = 48 * 1024;
+    const int maxBufferedPatchBytes = 16 * 1024 * 1024;
 
     public static bool TryPreparePatchUpload(string patchPath, out string patchFileName, out byte[] compressedPatch, out string error)
     {
@@ -72,19 +84,18 @@ public static class NetworkPatchTransferUtility
             return false;
         }
 
-        int maxCompressedBytes = GetMaxCompressedPatchBytes(patchFileName);
-        if (maxCompressedBytes <= 0)
+        if (Transport.active == null)
         {
             compressedPatch = null;
             error = "Cannot upload patch: Mirror transport is not ready for reliable patch transfer.";
             return false;
         }
 
-        if (compressedPatch.Length > maxCompressedBytes)
+        if (compressedPatch.Length > maxBufferedPatchBytes)
         {
             int compressedBytes = compressedPatch.Length;
             compressedPatch = null;
-            error = $"Cannot upload patch {patchFileName}: compressed payload is {compressedBytes} bytes, max reliable upload size is {maxCompressedBytes} bytes.";
+            error = $"Cannot upload patch {patchFileName}: compressed payload is {compressedBytes} bytes, max buffered upload size is {maxBufferedPatchBytes} bytes.";
             return false;
         }
 
@@ -143,22 +154,31 @@ public static class NetworkPatchTransferUtility
         }
     }
 
-    public static int GetMaxCompressedPatchBytes(string patchFileName)
+    public static int GetPatchUploadChunkBytes()
     {
         if (Transport.active == null)
         {
-            return 0;
+            return patchChunkBytes;
         }
 
         int maxContentBytes = NetworkMessages.MaxContentSize(Channels.Reliable);
         if (maxContentBytes <= 0)
         {
-            return 0;
+            return patchChunkBytes;
         }
 
-        int fileNameBytes = Encoding.UTF8.GetByteCount(string.IsNullOrEmpty(patchFileName) ? defaultPatchName : patchFileName);
-        int maxBytes = maxContentBytes - fileNameBytes - commandEnvelopeBytes;
-        return Mathf.Max(0, maxBytes);
+        int maxBytes = maxContentBytes - commandEnvelopeBytes;
+        if (maxBytes <= 0)
+        {
+            return patchChunkBytes;
+        }
+
+        return Mathf.Max(8 * 1024, Mathf.Min(patchChunkBytes, maxBytes));
+    }
+
+    public static int GetMaxBufferedPatchBytes()
+    {
+        return maxBufferedPatchBytes;
     }
 
     static byte[] compressBytes(byte[] patchBytes)

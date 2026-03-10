@@ -27,6 +27,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using System.IO;
 using Mirror;
@@ -89,6 +90,11 @@ public class VRNetworkPlayer : NetworkBehaviour
     public NetworkPlayerPlugHand rightNetworkPlugHand;
 
     Coroutine patchLoadCoroutine;
+    int nextPatchUploadId = 1;
+    int pendingPatchUploadId = -1;
+    string pendingPatchFileName;
+    byte[] pendingCompressedPatchUpload;
+    int pendingPatchUploadOffset;
 
 
     public override void OnStartLocalPlayer()
@@ -499,7 +505,30 @@ public class VRNetworkPlayer : NetworkBehaviour
             return false;
         }
 
-        CmdLoadCompressedPatch(patchFileName, compressedPatch);
+        int chunkSize = NetworkPatchTransferUtility.GetPatchUploadChunkBytes();
+        if (chunkSize <= 0)
+        {
+            Debug.LogError("Cannot upload patch: reliable chunk size is not available.");
+            return false;
+        }
+
+        if (nextPatchUploadId == int.MaxValue)
+        {
+            nextPatchUploadId = 1;
+        }
+
+        int uploadId = nextPatchUploadId++;
+        CmdBeginCompressedPatchUpload(uploadId, patchFileName, compressedPatch.Length);
+
+        for (int offset = 0; offset < compressedPatch.Length; offset += chunkSize)
+        {
+            int chunkLength = Mathf.Min(chunkSize, compressedPatch.Length - offset);
+            byte[] chunk = new byte[chunkLength];
+            Buffer.BlockCopy(compressedPatch, offset, chunk, 0, chunkLength);
+            CmdAppendCompressedPatchChunk(uploadId, chunk);
+        }
+
+        CmdFinishCompressedPatchUpload(uploadId);
         Debug.Log($"Requested Server to Load Patch from {path}");
         return true;
     }
@@ -547,13 +576,83 @@ public class VRNetworkPlayer : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    void CmdLoadCompressedPatch(string patchFileName, byte[] compressedPatch)
+    void CmdBeginCompressedPatchUpload(int uploadId, string patchFileName, int totalBytes)
     {
         if (SaveLoadInterface.instance == null)
         {
             Debug.LogError("Cannot load uploaded patch: SaveLoadInterface is not available.");
+            clearPendingPatchUpload();
             return;
         }
+
+        if (uploadId <= 0)
+        {
+            Debug.LogError($"Cannot begin patch upload: invalid upload id {uploadId}.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (totalBytes <= 0 || totalBytes > NetworkPatchTransferUtility.GetMaxBufferedPatchBytes())
+        {
+            Debug.LogError($"Cannot begin patch upload {patchFileName}: invalid compressed size {totalBytes} bytes.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        pendingPatchUploadId = uploadId;
+        pendingPatchFileName = patchFileName;
+        pendingCompressedPatchUpload = new byte[totalBytes];
+        pendingPatchUploadOffset = 0;
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdAppendCompressedPatchChunk(int uploadId, byte[] chunk)
+    {
+        if (pendingCompressedPatchUpload == null || uploadId != pendingPatchUploadId)
+        {
+            Debug.LogError($"Cannot append patch chunk: no active upload for id {uploadId}.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (chunk == null || chunk.Length == 0)
+        {
+            Debug.LogError($"Cannot append patch chunk: upload {uploadId} sent an empty chunk.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (pendingPatchUploadOffset + chunk.Length > pendingCompressedPatchUpload.Length)
+        {
+            Debug.LogError($"Cannot append patch chunk: upload {uploadId} exceeds announced size.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        Buffer.BlockCopy(chunk, 0, pendingCompressedPatchUpload, pendingPatchUploadOffset, chunk.Length);
+        pendingPatchUploadOffset += chunk.Length;
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdFinishCompressedPatchUpload(int uploadId)
+    {
+        if (pendingCompressedPatchUpload == null || uploadId != pendingPatchUploadId)
+        {
+            Debug.LogError($"Cannot finish patch upload: no active upload for id {uploadId}.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (pendingPatchUploadOffset != pendingCompressedPatchUpload.Length)
+        {
+            Debug.LogError($"Cannot finish patch upload {pendingPatchFileName}: received {pendingPatchUploadOffset} of {pendingCompressedPatchUpload.Length} bytes.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        byte[] compressedPatch = pendingCompressedPatchUpload;
+        string patchFileName = pendingPatchFileName;
+        clearPendingPatchUpload();
 
         if (!NetworkPatchTransferUtility.TryWriteUploadedPatch(compressedPatch, patchFileName, netId, out string patchPath, out string error))
         {
@@ -627,6 +726,14 @@ public class VRNetworkPlayer : NetworkBehaviour
 
         SaveLoadInterface.instance.Load(path);
         patchLoadCoroutine = null;
+    }
+
+    void clearPendingPatchUpload()
+    {
+        pendingPatchUploadId = -1;
+        pendingPatchFileName = null;
+        pendingCompressedPatchUpload = null;
+        pendingPatchUploadOffset = 0;
     }
 
     #endregion
