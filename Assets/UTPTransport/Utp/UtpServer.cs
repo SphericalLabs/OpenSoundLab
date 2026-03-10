@@ -252,7 +252,7 @@ namespace Utp
 		/// <summary>
 		/// The number of pipelines tracked in the header size array.
 		/// </summary>
-		private const int NUM_PIPELINES = 2;
+		private const int NUM_PIPELINES = 3;
 
 		/// <summary>
 		/// The driver's max header size for UTP transport.
@@ -326,6 +326,7 @@ namespace Utp
 			//Create network pipelines
 			reliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
 			unreliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(UnreliableSequencedPipelineStage));
+			voicePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage));
 
 			int bindReturnCode = driver.Bind(endpoint);
 			if (!driver.Bound)
@@ -465,7 +466,7 @@ namespace Utp
 			if (TryGetConnection(connectionId, out Unity.Networking.Transport.NetworkConnection connection))
 			{
 				//Get pipeline for job
-				NetworkPipeline pipeline = channelId == Channels.Reliable ? reliablePipeline : unreliablePipeline;
+				NetworkPipeline pipeline = GetPipeline(channelId);
 
 				NativeArray<byte> segmentArray = new NativeArray<byte>(segment.Count + CHANNEL_PREFIX_BYTES, Allocator.Persistent);
 				segmentArray[0] = (byte)channelId;
@@ -509,7 +510,7 @@ namespace Utp
 		{
 			if (IsNetworkDriverInitialized())
 			{
-				return driverMaxHeaderSize[channelId];
+				return driverMaxHeaderSize[GetPipelineIndex(channelId)];
 			}
 
 			return 0;
@@ -622,8 +623,9 @@ namespace Utp
 			//If driver is active, cache its max header size for UTP transport
 			if (isInitialized)
 			{
-				driverMaxHeaderSize[Channels.Reliable] = driver.MaxHeaderSize(reliablePipeline);
-				driverMaxHeaderSize[Channels.Unreliable] = driver.MaxHeaderSize(unreliablePipeline);
+				driverMaxHeaderSize[GetPipelineIndex(Channels.Reliable)] = driver.MaxHeaderSize(reliablePipeline);
+				driverMaxHeaderSize[GetPipelineIndex(Channels.Unreliable)] = driver.MaxHeaderSize(unreliablePipeline);
+				driverMaxHeaderSize[GetPipelineIndex(UtpTransport.VoiceChannel)] = driver.MaxHeaderSize(voicePipeline);
 			}
 
 		}

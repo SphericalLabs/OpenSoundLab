@@ -18,6 +18,11 @@ namespace Utp
 		/// </summary>
 		public const string Scheme = "udp";
 
+		/// <summary>
+		/// Dedicated transport channel for real-time voice.
+		/// </summary>
+		public const int VoiceChannel = 2;
+
 		[Header("Transport Configuration")]
 
 		/// <summary>

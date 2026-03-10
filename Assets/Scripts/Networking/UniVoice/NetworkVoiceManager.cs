@@ -35,7 +35,6 @@ using TMPro;
 using Adrenak.UniVoice;
 using Adrenak.UniVoice.Filters;
 using Adrenak.UniVoice.Inputs;
-using Adrenak.UniVoice.Networks;
 using Adrenak.UniVoice.Outputs;
 using Adrenak.UniMic;
 
@@ -104,9 +103,9 @@ public class NetworkVoiceManager : MonoBehaviour
 
     void InitializeVoice()
     {
-        audioServer = new MirrorServer();
+        audioServer = new OslMirrorAudioServer();
         jitterBufferedAudioClient = new JitterBufferedAudioClient(
-            new MirrorClient(),
+            new OslMirrorAudioClient(),
             jitterStartupFrames,
             jitterMaxBufferedFrames,
             jitterReorderWindowMs

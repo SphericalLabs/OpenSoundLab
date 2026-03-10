@@ -30,6 +30,11 @@ namespace Utp
         protected NetworkPipeline unreliablePipeline;
 
         /// <summary>
+        /// A pipeline on the driver that is unordered and optimized for voice frames.
+        /// </summary>
+        protected NetworkPipeline voicePipeline;
+
+        /// <summary>
 		/// Job handle to schedule jobs.
 		/// </summary>
 		protected JobHandle jobHandle;
@@ -56,6 +61,36 @@ namespace Utp
 		public bool IsNetworkDriverInitialized()
         {
             return driver.IsCreated;
+        }
+
+        protected NetworkPipeline GetPipeline(int channelId)
+        {
+            if (channelId == Mirror.Channels.Reliable)
+            {
+                return reliablePipeline;
+            }
+
+            if (channelId == UtpTransport.VoiceChannel)
+            {
+                return voicePipeline;
+            }
+
+            return unreliablePipeline;
+        }
+
+        protected int GetPipelineIndex(int channelId)
+        {
+            if (channelId == Mirror.Channels.Reliable)
+            {
+                return 0;
+            }
+
+            if (channelId == UtpTransport.VoiceChannel)
+            {
+                return 2;
+            }
+
+            return 1;
         }
     }
 }
