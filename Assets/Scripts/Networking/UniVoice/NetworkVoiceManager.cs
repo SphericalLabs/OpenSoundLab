@@ -49,10 +49,14 @@ public class NetworkVoiceManager : MonoBehaviour
     const int opusBitrate = 16000;
     const int opusResamplerQuality = 1;
     const int opusEncoderComplexity = 1;
+    const int jitterStartupFrames = 2;
+    const int jitterMaxBufferedFrames = 4;
+    const int jitterReorderWindowMs = 80;
 
     IAudioServer<int> audioServer;
     IAudioClient<int> audioClient;
     ClientSession<int> clientSession;
+    JitterBufferedAudioClient jitterBufferedAudioClient;
 
     bool requestedMicrophonePermission;
     bool microphoneInputReady;
@@ -101,7 +105,13 @@ public class NetworkVoiceManager : MonoBehaviour
     void InitializeVoice()
     {
         audioServer = new MirrorServer();
-        audioClient = new MirrorClient();
+        jitterBufferedAudioClient = new JitterBufferedAudioClient(
+            new MirrorClient(),
+            jitterStartupFrames,
+            jitterMaxBufferedFrames,
+            jitterReorderWindowMs
+        );
+        audioClient = jitterBufferedAudioClient;
         clientSession = new ClientSession<int>(
             audioClient,
             new EmptyAudioInput(),
@@ -202,6 +212,8 @@ public class NetworkVoiceManager : MonoBehaviour
 
     void Update()
     {
+        jitterBufferedAudioClient?.Tick();
+
         if (!microphoneInputReady && Time.unscaledTime >= nextMicrophoneCheckTime)
         {
             TryEnableMicrophoneInput();
@@ -279,7 +291,7 @@ public class NetworkVoiceManager : MonoBehaviour
 
         var mic = Mic.AvailableDevices[0];
         mic.StartRecording(microphoneFrameDurationMs);
-        clientSession.Input = new UniMicInput(mic);
+        clientSession.Input = new MonotonicUniMicInput(mic);
         microphoneInputReady = true;
     }
 
