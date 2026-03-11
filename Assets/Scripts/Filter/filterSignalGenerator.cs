@@ -40,33 +40,18 @@ public class filterSignalGenerator : signalGenerator
 
     float[] frequencyBuffer;
 
-    // Changing this number requires changing native code.
-    //const int NUM_FILTERS = 4;
-
-    // Changing this enum requires changing the mirrored native enum.
     public enum filterType
     {
-        none,
-        LP, // x
-        HP, // x
-        LP_long,
-        HP_long,
-        BP, // x
-        Notch, // x
-        pass
+        LP
     };
 
     public filterType curType = filterType.LP;
 
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
-    [DllImport("OSLNative")]
-    public static extern void CopyArray(float[] a, float[] b, int length);
-    [DllImport("OSLNative")]
-    public static extern void AddArrays(float[] a, float[] b, int length);
 
     [DllImport("OSLNative")]
-    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, [MarshalAs(UnmanagedType.I1)] bool freqGen, float[] frequencyBuffer, float resonance/*, IntPtr logger*/);
+    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, float[] frequencyBuffer, float resonance, float sampleRate);
 
     // create structs for passing to native code
     mfValues mf1L = new mfValues();
@@ -94,8 +79,7 @@ public class filterSignalGenerator : signalGenerator
             SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
         curType = filterType.LP;
-        mf1R.LP = mf1L.LP = true;
-        processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, freqIncoming != null, frequencyBuffer, resonance);
+        processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, frequencyBuffer, resonance, (float)_sampleRate);
 
         lastCutoffFrequency = cutoffFrequency; // for slope limiting in native code
         recursionCheckPost();
@@ -106,6 +90,4 @@ public struct mfValues
 {
     public float f, p, q; // filter coefficients
     public float b0, b1, b2, b3, b4; // filter buffers (beware denormals!)
-    public bool LP;
 };
-

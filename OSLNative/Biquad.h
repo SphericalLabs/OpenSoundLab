@@ -25,12 +25,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* Adapted from https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt
-
- A biquad filter with a very simple API. Coefficients are recalculated automatically if necessary.
- A change of type, frequency, Q, gain or sampleRate will cause re-calculation of the filter coefficients.
- At the moment, only stereo processing is exposed to the public API, though the filter can handle any number of
- channels.
+/* Biquad is OSL's clean utility filter core.
+ It follows the RBJ Audio EQ Cookbook transfer functions, with a direct interleaved stereo path for devices like
+ FilterThree where predictable EQ behavior matters more than synth character.
 
  C# / Unity usage example:
 
@@ -93,6 +90,9 @@ OSL_API Biquad* Biquad_new(int type, float frequency, float Q, float gain, float
 
 /* Deletes an existing instance. */
 OSL_API void Biquad_free(Biquad* x);
+
+/* Clears all filter state memories without changing coefficients. */
+OSL_API void Biquad_reset(Biquad* x);
 
 /*
 Processes a block of INTERLEAVED (!) audio data.

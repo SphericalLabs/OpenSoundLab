@@ -237,10 +237,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Artefact.cpp" />
+    <ClCompile Include="Biquad.cpp" />
     <ClCompile Include="Compressor.cpp" />
     <ClCompile Include="CRingBuffer.cpp" />
     <ClCompile Include="Delay.cpp" />
     <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="FilterThree.cpp" />
+    <ClCompile Include="FilterTwo.cpp" />
     <ClCompile Include="FreeVerb\freeverb\components\allpass.cpp" />
     <ClCompile Include="FreeVerb\freeverb\components\comb.cpp" />
     <ClCompile Include="FreeVerb\freeverb\components\revmodel.cpp" />
@@ -261,10 +264,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Artefact.h" />
+    <ClInclude Include="Biquad.h" />
     <ClInclude Include="Compressor.h" />
     <ClInclude Include="CRingBuffer.hpp" />
     <ClInclude Include="Delay.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="FilterThree.h" />
+    <ClInclude Include="FilterTwo.h" />
     <ClInclude Include="FreeVerb\dfx-library\dfxsmoothedvalue.h" />
     <ClInclude Include="FreeVerb\dfx-library\dfxsmoothedvalue.hpp" />
     <ClInclude Include="FreeVerb\dfx-library\idfxsmoothedvalue.h" />

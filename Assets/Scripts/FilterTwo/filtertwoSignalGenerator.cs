@@ -1,13 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using System.Runtime.InteropServices;
+using System;
 
 public class filtertwoSignalGenerator : signalGenerator
 {
-    const float baseFrequency = 261.6256f;
-    const float excitationThreshold = 0.985f;
-    const float excitationAmount = 0.0001f;
-    const float silenceThreshold = 0.0002f;
-
     public enum filterMode
     {
         LP,
@@ -24,20 +21,39 @@ public class filtertwoSignalGenerator : signalGenerator
 
     float lastCutoffFrequency = 0f;
     float lastResonance = 0.5f;
-
     float[] frequencyBuffer;
-    float[] lowEq;
-    float[] bandEq;
-
     bool excitationQueued = false;
+
+    IntPtr x = IntPtr.Zero;
+    int nativeChannels = 0;
+
+    [DllImport("OSLNative")]
+    static extern IntPtr FilterTwo_New(int channels, float sampleRate);
+
+    [DllImport("OSLNative")]
+    static extern void FilterTwo_Free(IntPtr x);
+
+    [DllImport("OSLNative")]
+    static extern void FilterTwo_Reset(IntPtr x);
+
+    [DllImport("OSLNative")]
+    static extern void FilterTwo_Process(IntPtr x, float[] buffer, int length, float cutoffFrequency,
+                                         float lastCutoffFrequency, float[] frequencyBuffer, float resonance,
+                                         float lastResonance, int mode, [MarshalAs(UnmanagedType.I1)] bool queueExcitation);
+
+    [DllImport("OSLNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void Awake()
     {
         base.Awake();
         frequencyBuffer = new float[MAX_BUFFER_LENGTH];
-        lowEq = new float[2];
-        bandEq = new float[2];
         lastResonance = resonance;
+    }
+
+    void OnDestroy()
+    {
+        freeNative();
     }
 
     public void queueExcitation()
@@ -83,29 +99,17 @@ public class filtertwoSignalGenerator : signalGenerator
     {
         if (!recursionCheckPre()) return;
 
-        ensureBuffers(buffer.Length, channels);
-        fillModulationBuffer(dspTime, channels, buffer.Length);
+        ensureNative(channels);
+        ensureBuffers(buffer.Length);
+        fillFrequencyBuffer(dspTime, channels);
 
         if (incoming != null)
             incoming.processBuffer(buffer, dspTime, channels);
         else
-            System.Array.Clear(buffer, 0, buffer.Length);
+            SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
-        bool crossedThreshold = lastResonance < excitationThreshold && resonance >= excitationThreshold;
-        bool shouldExcite = excitationQueued || crossedThreshold;
-        if (shouldExcite && isSilent(buffer))
-            addExcitation(buffer, channels);
-
-        int frameCount = buffer.Length / channels;
-        for (int frame = 0; frame < frameCount; frame++)
-        {
-            float t = frameCount > 1 ? frame / (float)(frameCount - 1) : 1f;
-            float cutoff = Mathf.Lerp(lastCutoffFrequency, cutoffFrequency, t);
-            float currentResonance = Mathf.Lerp(lastResonance, resonance, t);
-            float cutoffHz = getCutoffHz(cutoff, frequencyBuffer[frame * channels]);
-
-            processFrame(buffer, frame * channels, channels, cutoffHz, currentResonance);
-        }
+        FilterTwo_Process(x, buffer, buffer.Length, cutoffFrequency, lastCutoffFrequency, frequencyBuffer, resonance,
+                          lastResonance, (int)curMode, excitationQueued);
 
         lastCutoffFrequency = cutoffFrequency;
         lastResonance = resonance;
@@ -113,108 +117,37 @@ public class filtertwoSignalGenerator : signalGenerator
         recursionCheckPost();
     }
 
-    void ensureBuffers(int bufferLength, int channels)
+    void ensureNative(int channels)
     {
-        if (frequencyBuffer.Length != bufferLength)
-            System.Array.Resize(ref frequencyBuffer, bufferLength);
+        if (channels == nativeChannels && x != IntPtr.Zero)
+            return;
 
-        if (lowEq.Length != channels)
-            System.Array.Resize(ref lowEq, channels);
-
-        if (bandEq.Length != channels)
-            System.Array.Resize(ref bandEq, channels);
+        freeNative();
+        nativeChannels = channels;
+        x = FilterTwo_New(nativeChannels, (float)_sampleRate);
+        FilterTwo_Reset(x);
     }
 
-    void fillModulationBuffer(double dspTime, int channels, int bufferLength)
+    void ensureBuffers(int length)
     {
-        System.Array.Clear(frequencyBuffer, 0, bufferLength);
+        if (frequencyBuffer.Length != length)
+            Array.Resize(ref frequencyBuffer, length);
+    }
+
+    void fillFrequencyBuffer(double dspTime, int channels)
+    {
+        SetArrayToSingleValue(frequencyBuffer, frequencyBuffer.Length, 0f);
         if (freqIncoming != null)
             freqIncoming.processBuffer(frequencyBuffer, dspTime, channels);
     }
 
-    bool isSilent(float[] buffer)
+    void freeNative()
     {
-        for (int i = 0; i < buffer.Length; i++)
-        {
-            if (Mathf.Abs(buffer[i]) > silenceThreshold)
-                return false;
-        }
-        return true;
-    }
+        if (x == IntPtr.Zero)
+            return;
 
-    void addExcitation(float[] buffer, int channels)
-    {
-        for (int i = 0; i < channels && i < buffer.Length; i++)
-            buffer[i] += excitationAmount;
-    }
-
-    float getCutoffHz(float cutoff, float modulation)
-    {
-        float octaveOffset = (Mathf.Clamp(modulation, -1f, 1f) + cutoff) * 10f;
-        float cutoffHz = baseFrequency * Mathf.Pow(2f, octaveOffset);
-        return Mathf.Clamp(cutoffHz, 5f, (float)_sampleRate * 0.45f);
-    }
-
-    void processFrame(float[] buffer, int index, int channels, float cutoffHz, float currentResonance)
-    {
-        float g = Mathf.Tan(Mathf.PI * cutoffHz / (float)_sampleRate);
-        float k = getDamping(currentResonance);
-        float a1 = 1f / (1f + g * (g + k));
-        float a2 = g * a1;
-        float a3 = g * a2;
-        float drive = 1.1f + currentResonance * 1.2f;
-
-        for (int channel = 0; channel < channels; channel++)
-        {
-            float inputSample = softClip(buffer[index + channel] * (1f + currentResonance * 0.25f));
-            float v3 = inputSample - lowEq[channel];
-            float band = a1 * bandEq[channel] + a2 * v3;
-            band = softClip(band * drive) / drive;
-
-            float low = lowEq[channel] + a2 * bandEq[channel] + a3 * v3;
-            low = softClip(low * drive) / drive;
-
-            float high = inputSample - k * band - low;
-            float notch = high + low;
-
-            bandEq[channel] = 2f * band - bandEq[channel];
-            lowEq[channel] = 2f * low - lowEq[channel];
-
-            switch (curMode)
-            {
-                case filterMode.HP:
-                    buffer[index + channel] = high;
-                    break;
-                case filterMode.BP:
-                    buffer[index + channel] = band;
-                    break;
-                case filterMode.Notch:
-                    buffer[index + channel] = notch;
-                    break;
-                default:
-                    buffer[index + channel] = low;
-                    break;
-            }
-        }
-    }
-
-    float getDamping(float currentResonance)
-    {
-        float clampedResonance = Mathf.Clamp01(currentResonance);
-        float k = Mathf.Lerp(1.9f, 0.08f, clampedResonance * clampedResonance);
-
-        if (clampedResonance > excitationThreshold)
-        {
-            float tail = (clampedResonance - excitationThreshold) / (1f - excitationThreshold);
-            k = Mathf.Lerp(k, 0f, tail * tail);
-        }
-
-        return Mathf.Max(0f, k);
-    }
-
-    float softClip(float value)
-    {
-        float clamped = Mathf.Clamp(value, -1.5f, 1.5f);
-        return clamped - 0.14814815f * clamped * clamped * clamped;
+        FilterTwo_Free(x);
+        x = IntPtr.Zero;
+        nativeChannels = 0;
     }
 }

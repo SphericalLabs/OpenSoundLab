@@ -24,18 +24,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #pragma once
 
-// Filter is the character lowpass in OSL.
-// It is derived from the classic Paul Kellett / Stilson-Smith-style Moog ladder approximation:
-// saturated, resonant, and intended to stay unapologetically lowpass-only.
+#include "main.h"
 
-struct FilterData {
-    float f, p, q;            // filter coefficients
-    float b0, b1, b2, b3, b4; // filter buffers (beware denormals!)
+struct Biquad;
+
+// FilterThree is OSL's clean utility EQ.
+// It is a six-stage chain of cookbook biquads: corrective and sculpting rather than characterful.
+
+struct FilterThreeData {
+    int channels;
+    float sampleRate;
+    Biquad* lowCut;
+    Biquad* lowShelf;
+    Biquad* bellOne;
+    Biquad* bellTwo;
+    Biquad* highShelf;
+    Biquad* highCut;
 };
 
 extern "C" {
-OSL_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency,
-                                 float lastCutoffFrequency, float filterBuffer[], float resonance, float sampleRate);
+OSL_API FilterThreeData* FilterThree_New(int channels, float sampleRate);
+OSL_API void FilterThree_Free(FilterThreeData* x);
+OSL_API void FilterThree_Reset(FilterThreeData* x);
+OSL_API void FilterThree_Process(FilterThreeData* x, float buffer[], int length, float lowCutFrequency,
+                                 float lowShelfFrequency, float lowShelfGain, float bellOneFrequency,
+                                 float bellOneGain, float bellOneQ, float bellTwoFrequency, float bellTwoGain,
+                                 float bellTwoQ, float highShelfFrequency, float highShelfGain,
+                                 float highCutFrequency);
 }

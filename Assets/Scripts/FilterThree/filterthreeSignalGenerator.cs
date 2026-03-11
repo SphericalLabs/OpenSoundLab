@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using System.Runtime.InteropServices;
+using System;
 
 public class filterthreeSignalGenerator : signalGenerator
 {
@@ -18,58 +20,75 @@ public class filterthreeSignalGenerator : signalGenerator
     public float highShelfGainPercent = 0.5f;
     public float highCutPercent = 1f;
 
-    BiquadSection[] sections;
+    IntPtr x = IntPtr.Zero;
+    int nativeChannels = 0;
+
+    [DllImport("OSLNative")]
+    static extern IntPtr FilterThree_New(int channels, float sampleRate);
+
+    [DllImport("OSLNative")]
+    static extern void FilterThree_Free(IntPtr x);
+
+    [DllImport("OSLNative")]
+    static extern void FilterThree_Reset(IntPtr x);
+
+    [DllImport("OSLNative")]
+    static extern void FilterThree_Process(IntPtr x, float[] buffer, int length, float lowCutFrequency,
+                                           float lowShelfFrequency, float lowShelfGain, float bellOneFrequency,
+                                           float bellOneGain, float bellOneQ, float bellTwoFrequency,
+                                           float bellTwoGain, float bellTwoQ, float highShelfFrequency,
+                                           float highShelfGain, float highCutFrequency);
+
+    [DllImport("OSLNative")]
+    public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     public override void Awake()
     {
         base.Awake();
-        sections = new BiquadSection[6];
-        for (int i = 0; i < sections.Length; i++)
-            sections[i] = new BiquadSection();
+    }
+
+    void OnDestroy()
+    {
+        freeNative();
     }
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return;
 
-        ensureChannels(channels);
-        updateSections();
+        ensureNative(channels);
 
         if (incoming != null)
             incoming.processBuffer(buffer, dspTime, channels);
         else
-            System.Array.Clear(buffer, 0, buffer.Length);
+            SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
-        for (int i = 0; i < buffer.Length; i += channels)
-        {
-            for (int channel = 0; channel < channels; channel++)
-            {
-                float sample = buffer[i + channel];
-                for (int section = 0; section < sections.Length; section++)
-                    sample = sections[section].processSample(sample, channel);
-
-                buffer[i + channel] = sample;
-            }
-        }
+        FilterThree_Process(x, buffer, buffer.Length,
+                            mapFrequency(lowCutPercent, 20f, 2000f),
+                            mapFrequency(lowShelfFrequencyPercent, 40f, 1600f),
+                            mapGain(lowShelfGainPercent),
+                            mapFrequency(bellOneFrequencyPercent, 60f, 4000f),
+                            mapGain(bellOneGainPercent),
+                            mapQ(bellOneQPercent),
+                            mapFrequency(bellTwoFrequencyPercent, 300f, 12000f),
+                            mapGain(bellTwoGainPercent),
+                            mapQ(bellTwoQPercent),
+                            mapFrequency(highShelfFrequencyPercent, 1200f, 16000f),
+                            mapGain(highShelfGainPercent),
+                            mapFrequency(highCutPercent, 1000f, 20000f));
 
         recursionCheckPost();
     }
 
-    void ensureChannels(int channels)
+    void ensureNative(int channels)
     {
-        for (int i = 0; i < sections.Length; i++)
-            sections[i].ensureChannels(channels);
-    }
+        if (channels == nativeChannels && x != IntPtr.Zero)
+            return;
 
-    void updateSections()
-    {
-        float sampleRate = (float)_sampleRate;
-        sections[0].setHighpass(sampleRate, mapFrequency(lowCutPercent, 20f, 2000f), 0.7071f);
-        sections[1].setLowShelf(sampleRate, mapFrequency(lowShelfFrequencyPercent, 40f, 1600f), mapGain(lowShelfGainPercent), 1f);
-        sections[2].setPeak(sampleRate, mapFrequency(bellOneFrequencyPercent, 60f, 4000f), mapQ(bellOneQPercent), mapGain(bellOneGainPercent));
-        sections[3].setPeak(sampleRate, mapFrequency(bellTwoFrequencyPercent, 300f, 12000f), mapQ(bellTwoQPercent), mapGain(bellTwoGainPercent));
-        sections[4].setHighShelf(sampleRate, mapFrequency(highShelfFrequencyPercent, 1200f, 16000f), mapGain(highShelfGainPercent), 1f);
-        sections[5].setLowpass(sampleRate, mapFrequency(highCutPercent, 1000f, 20000f), 0.7071f);
+        freeNative();
+        nativeChannels = channels;
+        x = FilterThree_New(nativeChannels, (float)_sampleRate);
+        FilterThree_Reset(x);
     }
 
     float mapFrequency(float percent, float minFrequency, float maxFrequency)
@@ -82,7 +101,7 @@ public class filterthreeSignalGenerator : signalGenerator
 
     float mapGain(float percent)
     {
-        return Utils.map(Mathf.Clamp01(percent), 0f, 1f, -18f, 18f);
+        return Utils.map(Mathf.Clamp01(percent), 0f, 1f, -36f, 36f);
     }
 
     float mapQ(float percent)
@@ -92,113 +111,14 @@ public class filterthreeSignalGenerator : signalGenerator
         float maxLog = Mathf.Log(10f);
         return Mathf.Exp(Mathf.Lerp(minLog, maxLog, clampedPercent));
     }
-}
 
-class BiquadSection
-{
-    float b0 = 1f;
-    float b1 = 0f;
-    float b2 = 0f;
-    float a1 = 0f;
-    float a2 = 0f;
-
-    float[] z1 = new float[2];
-    float[] z2 = new float[2];
-
-    public void ensureChannels(int channels)
+    void freeNative()
     {
-        if (z1.Length != channels)
-            System.Array.Resize(ref z1, channels);
+        if (x == IntPtr.Zero)
+            return;
 
-        if (z2.Length != channels)
-            System.Array.Resize(ref z2, channels);
-    }
-
-    public float processSample(float input, int channel)
-    {
-        float output = b0 * input + z1[channel];
-        z1[channel] = b1 * input - a1 * output + z2[channel];
-        z2[channel] = b2 * input - a2 * output;
-        return output;
-    }
-
-    public void setLowpass(float sampleRate, float frequency, float q)
-    {
-        float w0 = 2f * Mathf.PI * frequency / sampleRate;
-        float cosW0 = Mathf.Cos(w0);
-        float alpha = Mathf.Sin(w0) / (2f * q);
-        float a0 = 1f + alpha;
-        normalize((1f - cosW0) * 0.5f, 1f - cosW0, (1f - cosW0) * 0.5f, a0, -2f * cosW0, 1f - alpha);
-    }
-
-    public void setHighpass(float sampleRate, float frequency, float q)
-    {
-        float w0 = 2f * Mathf.PI * frequency / sampleRate;
-        float cosW0 = Mathf.Cos(w0);
-        float alpha = Mathf.Sin(w0) / (2f * q);
-        float a0 = 1f + alpha;
-        normalize((1f + cosW0) * 0.5f, -(1f + cosW0), (1f + cosW0) * 0.5f, a0, -2f * cosW0, 1f - alpha);
-    }
-
-    public void setPeak(float sampleRate, float frequency, float q, float gainDb)
-    {
-        float a = Mathf.Pow(10f, gainDb / 40f);
-        float w0 = 2f * Mathf.PI * frequency / sampleRate;
-        float cosW0 = Mathf.Cos(w0);
-        float alpha = Mathf.Sin(w0) / (2f * q);
-        float a0 = 1f + alpha / a;
-        normalize(1f + alpha * a, -2f * cosW0, 1f - alpha * a, a0, -2f * cosW0, 1f - alpha / a);
-    }
-
-    public void setLowShelf(float sampleRate, float frequency, float gainDb, float slope)
-    {
-        float a = Mathf.Pow(10f, gainDb / 40f);
-        float w0 = 2f * Mathf.PI * frequency / sampleRate;
-        float cosW0 = Mathf.Cos(w0);
-        float alpha = getShelfAlpha(w0, a, slope);
-        float twoRootAAlpha = 2f * Mathf.Sqrt(a) * alpha;
-        float a0 = (a + 1f) + (a - 1f) * cosW0 + twoRootAAlpha;
-
-        normalize(
-            a * ((a + 1f) - (a - 1f) * cosW0 + twoRootAAlpha),
-            2f * a * ((a - 1f) - (a + 1f) * cosW0),
-            a * ((a + 1f) - (a - 1f) * cosW0 - twoRootAAlpha),
-            a0,
-            -2f * ((a - 1f) + (a + 1f) * cosW0),
-            (a + 1f) + (a - 1f) * cosW0 - twoRootAAlpha);
-    }
-
-    public void setHighShelf(float sampleRate, float frequency, float gainDb, float slope)
-    {
-        float a = Mathf.Pow(10f, gainDb / 40f);
-        float w0 = 2f * Mathf.PI * frequency / sampleRate;
-        float cosW0 = Mathf.Cos(w0);
-        float alpha = getShelfAlpha(w0, a, slope);
-        float twoRootAAlpha = 2f * Mathf.Sqrt(a) * alpha;
-        float a0 = (a + 1f) - (a - 1f) * cosW0 + twoRootAAlpha;
-
-        normalize(
-            a * ((a + 1f) + (a - 1f) * cosW0 + twoRootAAlpha),
-            -2f * a * ((a - 1f) + (a + 1f) * cosW0),
-            a * ((a + 1f) + (a - 1f) * cosW0 - twoRootAAlpha),
-            a0,
-            2f * ((a - 1f) - (a + 1f) * cosW0),
-            (a + 1f) - (a - 1f) * cosW0 - twoRootAAlpha);
-    }
-
-    float getShelfAlpha(float w0, float a, float slope)
-    {
-        float sinW0 = Mathf.Sin(w0);
-        float shelfTerm = (a + 1f / a) * (1f / slope - 1f) + 2f;
-        return sinW0 * 0.5f * Mathf.Sqrt(Mathf.Max(0f, shelfTerm));
-    }
-
-    void normalize(float inB0, float inB1, float inB2, float a0, float inA1, float inA2)
-    {
-        b0 = inB0 / a0;
-        b1 = inB1 / a0;
-        b2 = inB2 / a0;
-        a1 = inA1 / a0;
-        a2 = inA2 / a0;
+        FilterThree_Free(x);
+        x = IntPtr.Zero;
+        nativeChannels = 0;
     }
 }
