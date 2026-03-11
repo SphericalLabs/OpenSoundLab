@@ -28,21 +28,16 @@
 using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
-using System;
 
 public class filterSignalGenerator : signalGenerator
 {
 
     public signalGenerator incoming, freqIncoming;
 
-    //MonoFilter[] filters;
-
     public float cutoffFrequency = 0f;
     float lastCutoffFrequency = 0f;
-    public float bandWidthHalfed = 0.05f;
     public float resonance = .5f;
 
-    float[] bufferCopy;
     float[] frequencyBuffer;
 
     // Changing this number requires changing native code.
@@ -77,40 +72,15 @@ public class filterSignalGenerator : signalGenerator
     mfValues mf1L = new mfValues();
     mfValues mf1R = new mfValues();
 
-    mfValues mf2L = new mfValues();
-    mfValues mf2R = new mfValues();
-
-    //IntPtr delegatePtr;
-
     public override void Awake()
     {
         base.Awake();
-        bufferCopy = new float[MAX_BUFFER_LENGTH];
         frequencyBuffer = new float[MAX_BUFFER_LENGTH];
-
-        //LogDelegate callback_delegate = new LogDelegate(LogCallback);
-        //delegatePtr = Marshal.GetFunctionPointerForDelegate(callback_delegate);
-    }
-
-    //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    //public delegate void LogDelegate(int level, string str);
-
-    static void LogCallback(int level, string msg)
-    {
-        if (level == 0)
-            Debug.Log(msg);
-        else if (level == 1)
-            Debug.LogWarning(msg);
-        else if (level == 2)
-            Debug.LogError(msg);
     }
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        if (bufferCopy.Length != buffer.Length)
-            System.Array.Resize(ref bufferCopy, buffer.Length);
-
         if (frequencyBuffer.Length != buffer.Length)
             System.Array.Resize(ref frequencyBuffer, buffer.Length);
 
@@ -118,45 +88,14 @@ public class filterSignalGenerator : signalGenerator
         if (freqIncoming != null)
             freqIncoming.processBuffer(frequencyBuffer, dspTime, channels);
 
-        // if silent, 0 out and return
-        //if (!incoming)
-        //{
-        //  SetArrayToSingleValue(buffer, buffer.Length, 0.0f);
-        //  SetArrayToSingleValue(bufferCopy, bufferCopy.Length, 0.0f);
-        //  return;
-        //}
-        if (incoming != null) incoming.processBuffer(buffer, dspTime, channels);
+        if (incoming != null)
+            incoming.processBuffer(buffer, dspTime, channels);
+        else
+            SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
-
-        if (curType != filterType.Notch && curType != filterType.BP) // not a double filter setup, either LP or HP
-        {
-            mf1R.LP = mf1L.LP = curType == filterType.LP;
-            processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, freqIncoming != null, frequencyBuffer, resonance/*, delegatePtr*/);
-        }
-        else if (curType == filterType.Notch) // duplicate buffer in order to process two filters in parallel
-        {
-            CopyArray(buffer, bufferCopy, buffer.Length);
-
-            mf1R.LP = mf1L.LP = true;
-            processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/); // less resonance for double filter mode
-
-            mf2R.LP = mf2L.LP = false;
-            processStereoFilter(bufferCopy, bufferCopy.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/);
-
-            AddArrays(buffer, bufferCopy, buffer.Length);
-        }
-
-        else if (curType == filterType.BP) // process two filter in series
-        {
-
-            mf1R.LP = mf1L.LP = false;
-            processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency - bandWidthHalfed, lastCutoffFrequency - bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/);
-
-            mf2R.LP = mf2L.LP = true;
-            processStereoFilter(buffer, buffer.Length, ref mf2L, ref mf2R, cutoffFrequency + bandWidthHalfed, lastCutoffFrequency + bandWidthHalfed, freqIncoming != null, frequencyBuffer, resonance * 0.7f/*, delegatePtr*/);
-        }
-
-        CopyArray(buffer, bufferCopy, buffer.Length);
+        curType = filterType.LP;
+        mf1R.LP = mf1L.LP = true;
+        processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, freqIncoming != null, frequencyBuffer, resonance);
 
         lastCutoffFrequency = cutoffFrequency; // for slope limiting in native code
         recursionCheckPost();
@@ -169,5 +108,4 @@ public struct mfValues
     public float b0, b1, b2, b3, b4; // filter buffers (beware denormals!)
     public bool LP;
 };
-
 

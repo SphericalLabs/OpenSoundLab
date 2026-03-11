@@ -17,6 +17,8 @@ public static class DeviceSpawnerMenu
     [MenuItem(MenuRoot + "Delay")] public static void SpawnDelay() => Spawn("Delay");
     [MenuItem(MenuRoot + "Drum")] public static void SpawnDrum() => Spawn("Drum");
     [MenuItem(MenuRoot + "Filter")] public static void SpawnFilter() => Spawn("Filter");
+    [MenuItem(MenuRoot + "FilterTwo")] public static void SpawnFilterTwo() => Spawn("FilterTwo");
+    [MenuItem(MenuRoot + "FilterThree")] public static void SpawnFilterThree() => Spawn("FilterThree");
     [MenuItem(MenuRoot + "Gain")] public static void SpawnGain() => Spawn("Gain");
     [MenuItem(MenuRoot + "Glide")] public static void SpawnGlide() => Spawn("Glide");
     [MenuItem(MenuRoot + "Keyboard")] public static void SpawnKeyboard() => Spawn("Keyboard");
@@ -63,6 +65,8 @@ public static class DeviceSpawnerMenu
     [MenuItem(MenuRoot + "Delay", true)]
     [MenuItem(MenuRoot + "Drum", true)]
     [MenuItem(MenuRoot + "Filter", true)]
+    [MenuItem(MenuRoot + "FilterTwo", true)]
+    [MenuItem(MenuRoot + "FilterThree", true)]
     [MenuItem(MenuRoot + "Gain", true)]
     [MenuItem(MenuRoot + "Glide", true)]
     [MenuItem(MenuRoot + "Keyboard", true)]

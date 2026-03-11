@@ -395,6 +395,8 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(PhaseDataLegacy))] // legacy alias, remove when old saves are dropped.
 [XmlInclude(typeof(PhaseToClockDividerData))]
 [XmlInclude(typeof(ClockData))] // legacy alias, remove when old saves are dropped.
+[XmlInclude(typeof(FilterTwoData))]
+[XmlInclude(typeof(FilterThreeData))]
 
 
 

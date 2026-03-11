@@ -154,6 +154,8 @@ public class menuItem : manipObject
         else if (item == DeviceType.MixerOne) label.text = "Mixer I";
         else if (item == DeviceType.Splitter) label.text = "Splitter";
         else if (item == DeviceType.Button) label.text = "Button";
+        else if (item == DeviceType.FilterTwo) label.text = "Filter II";
+        else if (item == DeviceType.FilterThree) label.text = "Filter III";
 
         else if (item == DeviceType.PhaseGenerator) label.text = "Phase\nGenerator";
         else if (item == DeviceType.PhaseToClockDivider) label.text = "Phase-to-Clock\nDivider";
@@ -568,11 +570,13 @@ public class DeviceType
 
     // SoundProcessor
     public static readonly DeviceType Reverb = new DeviceType("Reverb", DeviceCategory.SoundProcessor, 1);
-    public static readonly DeviceType Artifact = new DeviceType("Artifact", DeviceCategory.SoundProcessor, 5);
-    public static readonly DeviceType Artefact = Artifact; // legacy alias, remove when old Artefact saves are dropped
-    public static readonly DeviceType Compressor = new DeviceType("Compressor", DeviceCategory.SoundProcessor, 4);
-    public static readonly DeviceType Filter = new DeviceType("Filter", DeviceCategory.SoundProcessor, 3);
     public static readonly DeviceType Delay = new DeviceType("Delay", DeviceCategory.SoundProcessor, 2);
+    public static readonly DeviceType Filter = new DeviceType("Filter", DeviceCategory.SoundProcessor, 3);
+    public static readonly DeviceType FilterTwo = new DeviceType("FilterTwo", DeviceCategory.SoundProcessor, 4);
+    public static readonly DeviceType FilterThree = new DeviceType("FilterThree", DeviceCategory.SoundProcessor, 5);
+    public static readonly DeviceType Compressor = new DeviceType("Compressor", DeviceCategory.SoundProcessor, 6);
+    public static readonly DeviceType Artifact = new DeviceType("Artifact", DeviceCategory.SoundProcessor, 7);
+    public static readonly DeviceType Artefact = Artifact; // legacy alias, remove when old Artefact saves are dropped
     public static readonly DeviceType Freeverb = Reverb; // legacy alias, remove when old Freeverb saves are dropped
 
     // ModulationProcessor

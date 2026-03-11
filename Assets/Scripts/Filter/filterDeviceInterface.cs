@@ -30,44 +30,38 @@ using System.Collections;
 
 public class filterDeviceInterface : deviceInterface
 {
-
-    int ID = 0;
     public omniJack input, controlInput, output;
     public dial frequencyDial, resonanceDial, modeDial, bandwidthDial;
 
     filterSignalGenerator filter;
 
-    float freqPercent, resPercent, modePercent = -1f;
-    //public float bandwidthPercent = 0f;
-
+    float freqPercent = -1f;
+    float resPercent = -1f;
 
     public override void Awake()
     {
         base.Awake();
         filter = GetComponent<filterSignalGenerator>();
+        filter.curType = filterSignalGenerator.filterType.LP;
     }
 
     void Update()
     {
+        signalGenerator nextInput = input != null ? input.signal : null;
+        signalGenerator nextControlInput = controlInput != null ? controlInput.signal : null;
 
+        if (filter.incoming != nextInput)
+            filter.incoming = nextInput;
 
-        if (filter.incoming != input.signal)
-        {
-            filter.incoming = input.signal;
-        }
+        if (filter.freqIncoming != nextControlInput)
+            filter.freqIncoming = nextControlInput;
 
-        if (filter.freqIncoming != controlInput.signal)
-        {
-            filter.freqIncoming = controlInput.signal;
-        }
+        filter.curType = filterSignalGenerator.filterType.LP;
 
-        if (freqPercent != frequencyDial.percent) updateFrequency();
-        if (resPercent != resonanceDial.percent) updateResonance();
-        if (modePercent != modeDial.percent) updateMode();
-
-
-        //filter.bandWidthHalfed = bandwidthPercent = Utils.map(bandwidthDial.percent, 0f, 1f, 0f, 0.4f) / 2f; // up to 4 octaves
-        //filter.bandWidthHalfed = Mathf.Pow(bandwidthPercent, 3f) / 2f;
+        if (frequencyDial != null && freqPercent != frequencyDial.percent)
+            updateFrequency();
+        if (resonanceDial != null && resPercent != resonanceDial.percent)
+            updateResonance();
     }
 
     void updateFrequency()
@@ -81,27 +75,6 @@ public class filterDeviceInterface : deviceInterface
         resPercent = resonanceDial.percent;
         filter.resonance = resonanceDial.percent;
     }
-    void updateMode()
-    {
-        modePercent = modeDial.percent;
-
-        switch (Mathf.RoundToInt(modePercent * 3))
-        {
-            case 0:
-                filter.curType = filterSignalGenerator.filterType.LP;
-                break;
-            case 1:
-                filter.curType = filterSignalGenerator.filterType.HP;
-                break;
-            case 2:
-                filter.curType = filterSignalGenerator.filterType.BP;
-                break;
-            case 3:
-                filter.curType = filterSignalGenerator.filterType.Notch;
-                break;
-        }
-
-    }
 
     public override InstrumentData GetData()
     {
@@ -109,13 +82,13 @@ public class filterDeviceInterface : deviceInterface
         data.deviceType = DeviceType.Filter;
         GetTransformData(data);
 
-        data.jackInID = input.transform.GetInstanceID();
-        data.jackOutID = output.transform.GetInstanceID();
-        data.jackControlInID = controlInput.transform.GetInstanceID();
+        data.jackInID = input != null ? input.transform.GetInstanceID() : 0;
+        data.jackOutID = output != null ? output.transform.GetInstanceID() : 0;
+        data.jackControlInID = controlInput != null ? controlInput.transform.GetInstanceID() : 0;
 
-        data.resonance = resonanceDial.percent;
-        data.frequency = frequencyDial.percent;
-        data.filterMode = modeDial.percent;
+        data.resonance = resonanceDial != null ? resonanceDial.percent : Mathf.Clamp01(filter.resonance);
+        data.frequency = frequencyDial != null ? frequencyDial.percent : Mathf.InverseLerp(-0.5f, 0.5f, filter.cutoffFrequency);
+        data.filterMode = 0f;
 
         return data;
     }
@@ -125,17 +98,25 @@ public class filterDeviceInterface : deviceInterface
         FilterData data = d as FilterData;
         base.Load(data, true);
 
-        ID = data.ID;
-        input.SetID(data.jackInID, copyMode);
-        output.SetID(data.jackOutID, copyMode);
-        controlInput.SetID(data.jackControlInID, copyMode);
+        if (input != null) input.SetID(data.jackInID, copyMode);
+        if (output != null) output.SetID(data.jackOutID, copyMode);
+        if (controlInput != null) controlInput.SetID(data.jackControlInID, copyMode);
 
-        resonanceDial.setPercent(data.resonance);
-        frequencyDial.setPercent(data.frequency);
-        modeDial.setPercent(data.filterMode);
+        if (resonanceDial != null)
+            resonanceDial.setPercent(data.resonance);
+        else
+            filter.resonance = data.resonance;
+
+        if (frequencyDial != null)
+            frequencyDial.setPercent(data.frequency);
+        else
+            filter.cutoffFrequency = Utils.map(data.frequency, 0f, 1f, -0.5f, 0.5f);
+
+        if (modeDial != null)
+            modeDial.setPercent(0f);
+
+        filter.curType = filterSignalGenerator.filterType.LP;
     }
-
-
 }
 
 

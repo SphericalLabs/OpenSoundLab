@@ -1,0 +1,97 @@
+using UnityEngine;
+using System.Collections;
+using System.Xml.Serialization;
+
+public class filtertwoDeviceInterface : deviceInterface
+{
+    const float excitationThreshold = 0.985f;
+
+    public omniJack input, controlInput, output;
+    public dial frequencyDial, resonanceDial, modeDial;
+
+    filtertwoSignalGenerator signal;
+
+    public override void Awake()
+    {
+        base.Awake();
+        signal = GetComponent<filtertwoSignalGenerator>();
+    }
+
+    void Update()
+    {
+        signalGenerator nextInput = input != null ? input.signal : null;
+        signalGenerator nextControlInput = controlInput != null ? controlInput.signal : null;
+
+        if (signal.incoming != nextInput)
+            signal.incoming = nextInput;
+
+        if (signal.freqIncoming != nextControlInput)
+            signal.freqIncoming = nextControlInput;
+
+        if (frequencyDial != null)
+            signal.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -0.5f, 0.5f);
+
+        if (resonanceDial != null)
+        {
+            float previousResonance = signal.resonance;
+            signal.resonance = resonanceDial.percent;
+            if (previousResonance < excitationThreshold && signal.resonance >= excitationThreshold)
+                signal.queueExcitation();
+        }
+
+        if (modeDial != null)
+            signal.setModeFromPercent(modeDial.percent);
+    }
+
+    public override InstrumentData GetData()
+    {
+        FilterTwoData data = new FilterTwoData();
+        data.deviceType = DeviceType.FilterTwo;
+        GetTransformData(data);
+
+        data.jackInID = input != null ? input.transform.GetInstanceID() : 0;
+        data.jackOutID = output != null ? output.transform.GetInstanceID() : 0;
+        data.jackControlInID = controlInput != null ? controlInput.transform.GetInstanceID() : 0;
+
+        data.frequency = frequencyDial != null ? frequencyDial.percent : Mathf.InverseLerp(-0.5f, 0.5f, signal.cutoffFrequency);
+        data.resonance = resonanceDial != null ? resonanceDial.percent : Mathf.Clamp01(signal.resonance);
+        data.filterMode = modeDial != null ? modeDial.percent : signal.getModePercent();
+
+        return data;
+    }
+
+    public override void Load(InstrumentData d, bool copyMode)
+    {
+        FilterTwoData data = d as FilterTwoData;
+        base.Load(data, copyMode);
+
+        if (input != null) input.SetID(data.jackInID, copyMode);
+        if (output != null) output.SetID(data.jackOutID, copyMode);
+        if (controlInput != null) controlInput.SetID(data.jackControlInID, copyMode);
+
+        if (frequencyDial != null)
+            frequencyDial.setPercent(data.frequency);
+        else
+            signal.cutoffFrequency = Utils.map(data.frequency, 0f, 1f, -0.5f, 0.5f);
+
+        if (resonanceDial != null)
+            resonanceDial.setPercent(data.resonance);
+        else
+            signal.resonance = data.resonance;
+
+        if (modeDial != null)
+            modeDial.setPercent(data.filterMode);
+        else
+            signal.setModeFromPercent(data.filterMode);
+    }
+}
+
+[XmlType("FilterTwoData")]
+public class FilterTwoData : InstrumentData
+{
+    public float resonance, frequency;
+    public float filterMode;
+    public int jackOutID;
+    public int jackInID;
+    public int jackControlInID;
+}
