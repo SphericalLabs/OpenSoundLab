@@ -11,6 +11,8 @@ set -euo pipefail
 # --- Config ---------------------------------------------------------------
 
 REQUIRED_NDK_VERSION="26.1.10909125"   # Android NDK r26b
+REQUIRED_CMAKE_VERSION="3.22.1"
+REQUIRED_PLATFORM="android-34"
 ANDROID_HOME="${ANDROID_HOME:-${HOME}/Library/Android/sdk}"
 ZSHRC="${HOME}/.zshrc"
 
@@ -41,6 +43,55 @@ append_once() {
   grep -Fqx "$line" "$file" 2>/dev/null || printf "%s\n" "$line" >>"$file"
 }
 
+brew_has_cask() {
+  local brewbin="$1" cask="$2"
+  "${brewbin}" list --cask "$cask" >/dev/null 2>&1
+}
+
+jdk17_installed() {
+  /usr/libexec/java_home -v 17 >/dev/null 2>&1
+}
+
+sdkmanager_path() {
+  if [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+    echo "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+    return 0
+  fi
+  if [ -x "/opt/homebrew/share/android-commandlinetools/cmdline-tools/latest/bin/sdkmanager" ]; then
+    echo "/opt/homebrew/share/android-commandlinetools/cmdline-tools/latest/bin/sdkmanager"
+    return 0
+  fi
+  if [ -x "/usr/local/share/android-commandlinetools/cmdline-tools/latest/bin/sdkmanager" ]; then
+    echo "/usr/local/share/android-commandlinetools/cmdline-tools/latest/bin/sdkmanager"
+    return 0
+  fi
+  if command -v sdkmanager >/dev/null 2>&1; then
+    command -v sdkmanager
+    return 0
+  fi
+  return 1
+}
+
+have_android_cmdline_tools() {
+  [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]
+}
+
+have_android_platform_tools() {
+  [ -x "$ANDROID_HOME/platform-tools/adb" ]
+}
+
+have_android_platform() {
+  [ -d "$ANDROID_HOME/platforms/${REQUIRED_PLATFORM}" ]
+}
+
+have_android_cmake() {
+  [ -x "$ANDROID_HOME/cmake/${REQUIRED_CMAKE_VERSION}/bin/cmake" ]
+}
+
+have_required_ndk() {
+  [ -x "$ANDROID_HOME/ndk/${REQUIRED_NDK_VERSION}/ndk-build" ]
+}
+
 ensure_env() {
   mkdir -p "${ANDROID_HOME}"
 
@@ -62,38 +113,68 @@ install_prereqs() {
     exit 1
   fi
 
-  log "Updating Homebrew..."
-  "${brewbin}" update
+  local needs_brew_work=0
+  if ! jdk17_installed && ! brew_has_cask "${brewbin}" "temurin@17"; then
+    needs_brew_work=1
+  fi
+  if ! sdkmanager_path >/dev/null 2>&1 && ! brew_has_cask "${brewbin}" "android-commandlinetools"; then
+    needs_brew_work=1
+  fi
 
-  log "Ensuring Temurin 17 JDK and Android command-line tools..."
-  "${brewbin}" install --cask temurin@17 || true
-  "${brewbin}" install android-commandlinetools || true
+  if [ "${needs_brew_work}" -eq 1 ]; then
+    log "Bootstrapping Homebrew prerequisites..."
+    "${brewbin}" update
+
+    if ! jdk17_installed; then
+      if brew_has_cask "${brewbin}" "temurin@17"; then
+        log "Temurin 17 already installed via Homebrew."
+      else
+        log "Installing Temurin 17 JDK..."
+        "${brewbin}" install --cask temurin@17
+      fi
+    else
+      log "JDK 17 already available."
+    fi
+
+    if sdkmanager_path >/dev/null 2>&1; then
+      log "Android command-line tools already available."
+    elif brew_has_cask "${brewbin}" "android-commandlinetools"; then
+      log "android-commandlinetools already installed."
+    else
+      log "Installing android-commandlinetools..."
+      "${brewbin}" install --cask android-commandlinetools
+    fi
+  else
+    log "Homebrew prerequisites already present; skipping brew update/install."
+  fi
 
   # Set JAVA_HOME for this script run if available
-  if /usr/libexec/java_home -v 17 >/dev/null 2>&1; then
+  if jdk17_installed; then
     export JAVA_HOME="$("/usr/libexec/java_home" -v 17)"
   fi
 }
 
 ensure_cmdline_tools_in_sdk() {
-  log "Installing cmdline-tools;latest into \$ANDROID_HOME via --sdk_root…"
   local S
-  if [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-    S="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-  elif command -v sdkmanager >/dev/null 2>&1; then
-    S="$(command -v sdkmanager)"
-  else
+  if ! S="$(sdkmanager_path)"; then
     echo "sdkmanager not found on PATH or under \$ANDROID_HOME"; exit 1
   fi
 
   # Ensure repos config exists (prevents first-run oddities)
   mkdir -p "$HOME/.android"
-  : > "$HOME/.android/repositories.cfg"
+  if [ ! -f "$HOME/.android/repositories.cfg" ]; then
+    : > "$HOME/.android/repositories.cfg"
+  fi
 
   # Show what we’re using and its version
   "$S" --version || { echo "sdkmanager not runnable"; exit 1; }
 
-  # Install cmdline-tools;latest with visible output and a retry
+  if have_android_cmdline_tools; then
+    log "cmdline-tools;latest already present in \$ANDROID_HOME."
+    return
+  fi
+
+  log "Installing cmdline-tools;latest into \$ANDROID_HOME via --sdk_root…"
   if ! "$S" --sdk_root="$ANDROID_HOME" --install "cmdline-tools;latest"; then
     echo "cmdline-tools install failed — retrying once…"
     sleep 2
@@ -109,14 +190,28 @@ install_android_packages() {
   local S="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
   [ -x "$S" ] || { echo "Expected $S after cmdline-tools install"; exit 1; }
 
-  log "Installing platform-tools, a platform, CMake, and NDK ${REQUIRED_NDK_VERSION}…"
-  "$S" --sdk_root="$ANDROID_HOME" --install \
-    "platform-tools" \
-    "platforms;android-34" \
-    "cmake;3.22.1" \
-    "ndk;${REQUIRED_NDK_VERSION}"
+  local packages=()
 
-  yes | "$S" --sdk_root="$ANDROID_HOME" --licenses || true
+  if ! have_android_platform_tools; then
+    packages+=("platform-tools")
+  fi
+  if ! have_android_platform; then
+    packages+=("platforms;${REQUIRED_PLATFORM}")
+  fi
+  if ! have_android_cmake; then
+    packages+=("cmake;${REQUIRED_CMAKE_VERSION}")
+  fi
+  if ! have_required_ndk; then
+    packages+=("ndk;${REQUIRED_NDK_VERSION}")
+  fi
+
+  if [ "${#packages[@]}" -gt 0 ]; then
+    log "Installing missing Android SDK packages..."
+    "$S" --sdk_root="$ANDROID_HOME" --install "${packages[@]}"
+    yes | "$S" --sdk_root="$ANDROID_HOME" --licenses || true
+  else
+    log "Android SDK packages already match required versions; skipping sdkmanager installs."
+  fi
 
   log "NDK folders under $ANDROID_HOME/ndk:"
   ls -1 "$ANDROID_HOME/ndk" || true
