@@ -31,7 +31,7 @@ using System.Collections;
 public class filterDeviceInterface : deviceInterface
 {
     public omniJack input, controlInput, output;
-    public dial frequencyDial, resonanceDial, modeDial, bandwidthDial;
+    public dial frequencyDial, resonanceDial;
 
     filterSignalGenerator filter;
 
@@ -112,9 +112,6 @@ public class filterDeviceInterface : deviceInterface
         else
             filter.cutoffFrequency = Utils.map(data.frequency, 0f, 1f, -0.5f, 0.5f);
 
-        if (modeDial != null)
-            modeDial.setPercent(0f);
-
         filter.curType = filterSignalGenerator.filterType.LP;
     }
 }
@@ -122,9 +119,7 @@ public class filterDeviceInterface : deviceInterface
 
 public class FilterData : InstrumentData
 {
-    public float resonance, frequency; // width is for BP
-                                       //public int filterMode; // 0 = LP, 1 == BP, 2 = HP, 4 = NO(TCH)
-                                       //public filterSignalGenerator.filterType filterMode; // possible?
+    public float resonance, frequency;
     public float filterMode;
     public int jackOutID;
     public int jackInID;
