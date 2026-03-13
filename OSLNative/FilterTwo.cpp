@@ -38,7 +38,8 @@ inline float softClip(float value) {
     return clamped - 0.14814815f * clamped * clamped * clamped;
 }
 
-inline float getCutoffHz(float cutoffPercent, float modulation, float minCutoffHz, float maxCutoffHz, float sampleRate) {
+inline float getCutoffHz(float cutoffPercent, float modulation, float minCutoffHz, float maxCutoffHz,
+                         float sampleRate) {
     float safeMin = _max(1.f, minCutoffHz);
     float safeMax = _max(safeMin + 1.f, maxCutoffHz);
     float baseCutoffHz = expf(lerp(logf(safeMin), logf(safeMax), _clamp(cutoffPercent, 0.f, 1.f)));
@@ -46,10 +47,18 @@ inline float getCutoffHz(float cutoffPercent, float modulation, float minCutoffH
     return _clamp(cutoffHz, 1.f, sampleRate * 0.495f);
 }
 
+inline float getModulationCoeff(float modulationLowpassHz, float sampleRate) {
+    if (modulationLowpassHz <= 0.f)
+        return 1.f;
+
+    float safeHz = _clamp(modulationLowpassHz, 1.f, sampleRate * 0.25f);
+    return 1.f - expf(-2.f * 3.14159265358979323846f * safeHz / sampleRate);
+}
+
 inline float getQ(float resonance) {
     float clampedResonance = _clamp(resonance, 0.f, 1.f);
     float minQ = 0.7071f;
-    float maxQ = 18.f;
+    float maxQ = 10.f;
     return expf(lerp(logf(minQ), logf(maxQ), clampedResonance * clampedResonance * 0.8f));
 }
 
@@ -74,6 +83,11 @@ bool hasPerFrameModulation(const float* frequencyBuffer, int length, int channel
     return false;
 }
 
+inline float getRawModulation(const float* frequencyBuffer, int index, float modulationOctaveRange) {
+    float raw = _clamp(frequencyBuffer[index], -1.f, 1.f) * modulationOctaveRange;
+    return isfinite(raw) ? raw : 0.f;
+}
+
 void shapeOutput(float* buffer, int length, float resonance, int biquadType) {
     float clampedResonance = _clamp(resonance, 0.f, 1.f);
     float drive = lerp(1.f, 1.18f, clampedResonance);
@@ -81,8 +95,6 @@ void shapeOutput(float* buffer, int length, float resonance, int biquadType) {
 
     if (biquadType == BIQUAD_BANDPASS)
         trim *= 0.82f;
-    else if (biquadType == BIQUAD_NOTCH)
-        trim *= 0.92f;
 
     for (int i = 0; i < length; ++i)
         buffer[i] = softClip(buffer[i] * drive) * trim;
@@ -97,6 +109,7 @@ OSL_API FilterTwoData* FilterTwo_New(int channels, float sampleRate) {
     x->sampleRate = sampleRate > 0.f ? sampleRate : 48000.f;
     x->biquad = Biquad_new(BIQUAD_LOWPASS, 1000.f, 0.7071f, 0.f, x->sampleRate, x->channels);
     x->lastMode = -1;
+    x->filteredModulation = 0.f;
     return x;
 }
 
@@ -114,12 +127,13 @@ OSL_API void FilterTwo_Reset(FilterTwoData* x) {
 
     Biquad_reset(x->biquad);
     x->lastMode = -1;
+    x->filteredModulation = 0.f;
 }
 
 OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, float cutoffPercent,
                                float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
-                               float modulationOctaveRange, float frequencyBuffer[], float resonance,
-                               float lastResonance, int mode, bool queueExcitation) {
+                               float modulationOctaveRange, float modulationLowpassHz, float frequencyBuffer[],
+                               float resonance, float lastResonance, int mode, bool queueExcitation) {
     if (x == nullptr || buffer == nullptr || frequencyBuffer == nullptr || x->channels <= 0 || length <= 0)
         return;
 
@@ -131,12 +145,13 @@ OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, flo
         x->lastMode = biquadType;
     }
 
-    bool perFrame = hasPerFrameModulation(frequencyBuffer, length, x->channels) ||
-                    cutoffPercent != lastCutoffPercent || resonance != lastResonance;
+    float modulationCoeff = getModulationCoeff(modulationLowpassHz, x->sampleRate);
+    bool modulationActive = hasPerFrameModulation(frequencyBuffer, length, x->channels) ||
+                            fabsf(x->filteredModulation) > kModulationThreshold;
+    bool perFrame = modulationActive || cutoffPercent != lastCutoffPercent || resonance != lastResonance;
 
     if (!perFrame) {
-        float cutoffHz = getCutoffHz(cutoffPercent, frequencyBuffer[0] * modulationOctaveRange, minCutoffHz,
-                                     maxCutoffHz, x->sampleRate);
+        float cutoffHz = getCutoffHz(cutoffPercent, x->filteredModulation, minCutoffHz, maxCutoffHz, x->sampleRate);
         Biquad_process(x->biquad, biquadType, cutoffHz, getQ(resonance), 0.f, x->sampleRate, buffer, buffer, length);
         shapeOutput(buffer, length, resonance, biquadType);
         return;
@@ -147,8 +162,12 @@ OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, flo
         float t = frames > 1 ? (float) frame / (float) (frames - 1) : 1.f;
         float currentCutoff = lerp(lastCutoffPercent, cutoffPercent, t);
         float currentResonance = lerp(lastResonance, resonance, t);
-        float cutoffHz = getCutoffHz(currentCutoff, frequencyBuffer[frame * x->channels] * modulationOctaveRange,
-                                     minCutoffHz, maxCutoffHz, x->sampleRate);
+        float rawModulation = getRawModulation(frequencyBuffer, frame * x->channels, modulationOctaveRange);
+        x->filteredModulation += modulationCoeff * (rawModulation - x->filteredModulation);
+        if (!isfinite(x->filteredModulation))
+            x->filteredModulation = 0.f;
+        float cutoffHz =
+            getCutoffHz(currentCutoff, x->filteredModulation, minCutoffHz, maxCutoffHz, x->sampleRate);
         Biquad_process(x->biquad, biquadType, cutoffHz, getQ(currentResonance), 0.f, x->sampleRate,
                        buffer + frame * x->channels, buffer + frame * x->channels, x->channels);
         shapeOutput(buffer + frame * x->channels, x->channels, currentResonance, biquadType);

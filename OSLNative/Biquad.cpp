@@ -39,6 +39,22 @@
 
 namespace {
 constexpr float kPi = 3.14159265358979323846f;
+constexpr float kStateLimit = 1000000.f;
+
+inline bool invalidValue(float value) {
+    return !isfinite(value) || fabsf(value) > kStateLimit;
+}
+
+inline void sanitizeState(float& x1, float& x2, float& y1, float& y2, float& out) {
+    if (!invalidValue(out) && !invalidValue(x1) && !invalidValue(x2) && !invalidValue(y1) && !invalidValue(y2))
+        return;
+
+    x1 = 0.f;
+    x2 = 0.f;
+    y1 = 0.f;
+    y2 = 0.f;
+    out = 0.f;
+}
 
 void Biquad_calculateCoeffs(Biquad* x) {
     x->A = powf(10.f, x->gain / 40.f);
@@ -177,6 +193,8 @@ void processStereoScalar(Biquad* x, float* in, float* out, int frames) {
                      x->a2_over_a0 * y2L;
         float outR = x->b0_over_a0 * inR + x->b1_over_a0 * x1R + x->b2_over_a0 * x2R - x->a1_over_a0 * y1R -
                      x->a2_over_a0 * y2R;
+        sanitizeState(x1L, x2L, y1L, y2L, outL);
+        sanitizeState(x1R, x2R, y1R, y2R, outR);
 
         out[index] = outL;
         out[index + 1] = outR;
@@ -208,14 +226,19 @@ void processInterleavedScalar(Biquad* x, float* in, float* out, int frames) {
         for (int channel = 0; channel < x->channels; ++channel) {
             int offset = 2 * channel;
             float x0 = in[base + channel];
-            float y0 = x->b0_over_a0 * x0 + x->b1_over_a0 * x->xMem[offset] + x->b2_over_a0 * x->xMem[offset + 1] -
-                       x->a1_over_a0 * x->yMem[offset] - x->a2_over_a0 * x->yMem[offset + 1];
+            float x1 = x->xMem[offset];
+            float x2 = x->xMem[offset + 1];
+            float y1 = x->yMem[offset];
+            float y2 = x->yMem[offset + 1];
+            float y0 = x->b0_over_a0 * x0 + x->b1_over_a0 * x1 + x->b2_over_a0 * x2 - x->a1_over_a0 * y1 -
+                       x->a2_over_a0 * y2;
+            sanitizeState(x1, x2, y1, y2, y0);
 
             out[base + channel] = y0;
 
-            x->xMem[offset + 1] = x->xMem[offset];
+            x->xMem[offset + 1] = x1;
             x->xMem[offset] = x0;
-            x->yMem[offset + 1] = x->yMem[offset];
+            x->yMem[offset + 1] = y1;
             x->yMem[offset] = y0;
         }
     }
@@ -305,7 +328,7 @@ OSL_API void Biquad_process(Biquad* x, int type, float frequency, float Q, float
     Biquad_setParameters(x, type, frequency, Q, gain, sampleRate);
     int frames = n / x->channels;
 
-    if (x->channels == 2) {
+    if (x->channels == 2 && frames > 4) {
 #if OSL_ARM_NEON
         processStereoNeon(x, in, out, frames);
 #else
@@ -314,6 +337,9 @@ OSL_API void Biquad_process(Biquad* x, int type, float frequency, float Q, float
         return;
     }
 
-    processInterleavedScalar(x, in, out, frames);
+    if (x->channels == 2)
+        processStereoScalar(x, in, out, frames);
+    else
+        processInterleavedScalar(x, in, out, frames);
 }
 }

@@ -47,6 +47,7 @@ struct FilterTwoData {
     float sampleRate;
     Biquad* biquad;
     int lastMode;
+    float filteredModulation;
 };
 
 extern "C" {
@@ -55,6 +56,6 @@ OSL_API void FilterTwo_Free(FilterTwoData* x);
 OSL_API void FilterTwo_Reset(FilterTwoData* x);
 OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, float cutoffPercent,
                                float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
-                               float modulationOctaveRange, float frequencyBuffer[], float resonance,
-                               float lastResonance, int mode, bool queueExcitation);
+                               float modulationOctaveRange, float modulationLowpassHz, float frequencyBuffer[],
+                               float resonance, float lastResonance, int mode, bool queueExcitation);
 }
