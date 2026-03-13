@@ -93,6 +93,24 @@ void Biquad_calculateCoeffs(Biquad* x) {
         x->b2 = 1.f - x->alpha * x->A;
         break;
 
+    case BIQUAD_BANDPASS:
+        x->a0 = 1.f + x->alpha;
+        x->a1 = -2.f * x->cosW0;
+        x->a2 = 1.f - x->alpha;
+        x->b0 = x->alpha;
+        x->b1 = 0.f;
+        x->b2 = -x->alpha;
+        break;
+
+    case BIQUAD_NOTCH:
+        x->a0 = 1.f + x->alpha;
+        x->a1 = -2.f * x->cosW0;
+        x->a2 = 1.f - x->alpha;
+        x->b0 = 1.f;
+        x->b1 = -2.f * x->cosW0;
+        x->b2 = 1.f;
+        break;
+
     default:
         x->a0 = 1.f;
         x->a1 = 0.f;

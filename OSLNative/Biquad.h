@@ -53,6 +53,8 @@
 #define BIQUAD_LOWSHELF 3
 #define BIQUAD_HIGHSHELF 4
 #define BIQUAD_PEAK 5
+#define BIQUAD_BANDPASS 6
+#define BIQUAD_NOTCH 7
 
 typedef struct Biquad {
     // public
@@ -98,7 +100,7 @@ OSL_API void Biquad_reset(Biquad* x);
 Processes a block of INTERLEAVED (!) audio data.
 
 Params:
- type: BIQUAD_LOWPASS, BIQUAD_HIGHPASS, BIQUAD_LOWSHELF, BIQUAD_HIGHSHELF or BIQUAD_PEAK.
+ type: BIQUAD_LOWPASS, BIQUAD_HIGHPASS, BIQUAD_LOWSHELF, BIQUAD_HIGHSHELF, BIQUAD_PEAK, BIQUAD_BANDPASS or BIQUAD_NOTCH.
  frequency: the center frequency in Hertz.
  Q: the quality factor ("resonance") of the filter.
  gain: the overall gain of the filter.

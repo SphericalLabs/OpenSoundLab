@@ -64,8 +64,8 @@ public class filterthreeSignalGenerator : signalGenerator
             SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
         FilterThree_Process(x, buffer, buffer.Length,
-                            mapFrequency(lowCutPercent, 20f, 2000f),
-                            mapFrequency(lowShelfFrequencyPercent, 40f, 1600f),
+                            mapFrequency(lowCutPercent, 20f, 20000f),
+                            mapFrequency(lowShelfFrequencyPercent, 28f, 2080f),
                             mapGain(lowShelfGainPercent),
                             mapFrequency(bellOneFrequencyPercent, 60f, 4000f),
                             mapGain(bellOneGainPercent),
@@ -73,9 +73,9 @@ public class filterthreeSignalGenerator : signalGenerator
                             mapFrequency(bellTwoFrequencyPercent, 300f, 12000f),
                             mapGain(bellTwoGainPercent),
                             mapQ(bellTwoQPercent),
-                            mapFrequency(highShelfFrequencyPercent, 1200f, 16000f),
+                            mapFrequency(highShelfFrequencyPercent, 840f, 20800f),
                             mapGain(highShelfGainPercent),
-                            mapFrequency(highCutPercent, 1000f, 20000f));
+                            mapFrequency(highCutPercent, 20f, 20000f));
 
         recursionCheckPost();
     }

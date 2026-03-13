@@ -5,6 +5,10 @@ using System;
 
 public class filtertwoSignalGenerator : signalGenerator
 {
+    public const float minCutoffHz = 2f;
+    public const float maxCutoffHz = 22000f;
+    public const float modulationOctaveRange = 8f;
+
     public enum filterMode
     {
         LP,
@@ -15,11 +19,11 @@ public class filtertwoSignalGenerator : signalGenerator
 
     public signalGenerator incoming, freqIncoming;
 
-    public float cutoffFrequency = 0f;
+    public float cutoffFrequency = 0.5f;
     public float resonance = 0.5f;
     public filterMode curMode = filterMode.LP;
 
-    float lastCutoffFrequency = 0f;
+    float lastCutoffFrequency = 0.5f;
     float lastResonance = 0.5f;
     float[] frequencyBuffer;
     bool excitationQueued = false;
@@ -37,8 +41,9 @@ public class filtertwoSignalGenerator : signalGenerator
     static extern void FilterTwo_Reset(IntPtr x);
 
     [DllImport("OSLNative")]
-    static extern void FilterTwo_Process(IntPtr x, float[] buffer, int length, float cutoffFrequency,
-                                         float lastCutoffFrequency, float[] frequencyBuffer, float resonance,
+    static extern void FilterTwo_Process(IntPtr x, float[] buffer, int length, float cutoffPercent,
+                                         float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
+                                         float modulationOctaveRange, float[] frequencyBuffer, float resonance,
                                          float lastResonance, int mode, [MarshalAs(UnmanagedType.I1)] bool queueExcitation);
 
     [DllImport("OSLNative")]
@@ -108,8 +113,9 @@ public class filtertwoSignalGenerator : signalGenerator
         else
             SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
-        FilterTwo_Process(x, buffer, buffer.Length, cutoffFrequency, lastCutoffFrequency, frequencyBuffer, resonance,
-                          lastResonance, (int)curMode, excitationQueued);
+        FilterTwo_Process(x, buffer, buffer.Length, cutoffFrequency, lastCutoffFrequency, minCutoffHz, maxCutoffHz,
+                          modulationOctaveRange, frequencyBuffer, resonance, lastResonance, (int)curMode,
+                          excitationQueued);
 
         lastCutoffFrequency = cutoffFrequency;
         lastResonance = resonance;

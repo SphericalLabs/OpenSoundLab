@@ -29,7 +29,7 @@ public class filtertwoDeviceInterface : deviceInterface
             signal.freqIncoming = nextControlInput;
 
         if (frequencyDial != null)
-            signal.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -0.5f, 0.5f);
+            signal.cutoffFrequency = frequencyDial.percent;
 
         if (resonanceDial != null)
         {
@@ -53,7 +53,7 @@ public class filtertwoDeviceInterface : deviceInterface
         data.jackOutID = output != null ? output.transform.GetInstanceID() : 0;
         data.jackControlInID = controlInput != null ? controlInput.transform.GetInstanceID() : 0;
 
-        data.frequency = frequencyDial != null ? frequencyDial.percent : Mathf.InverseLerp(-0.5f, 0.5f, signal.cutoffFrequency);
+        data.frequency = frequencyDial != null ? frequencyDial.percent : Mathf.Clamp01(signal.cutoffFrequency);
         data.resonance = resonanceDial != null ? resonanceDial.percent : Mathf.Clamp01(signal.resonance);
         data.filterMode = modeDial != null ? modeDial.percent : signal.getModePercent();
 
@@ -72,7 +72,7 @@ public class filtertwoDeviceInterface : deviceInterface
         if (frequencyDial != null)
             frequencyDial.setPercent(data.frequency);
         else
-            signal.cutoffFrequency = Utils.map(data.frequency, 0f, 1f, -0.5f, 0.5f);
+            signal.cutoffFrequency = data.frequency;
 
         if (resonanceDial != null)
             resonanceDial.setPercent(data.resonance);

@@ -29,9 +29,11 @@
 
 #include "main.h"
 
-// FilterTwo is OSL's clean multimode synth filter.
-// It is a fresh TPT/state-variable design informed by the virtual analog literature around Zavalishin and Simper:
-// stable under fast modulation, coherent across LP/BP/HP/Notch, and lightly saturated for a less clinical sound.
+struct Biquad;
+
+// FilterTwo is OSL's multimode filter testbed.
+// This revision intentionally uses the same cookbook-biquad family as FilterThree so their tone can be compared
+// directly, while still updating cutoff and resonance per frame to probe how far audio-rate modulation remains useful.
 
 enum FilterTwoMode {
     FILTERTWO_LP = 0,
@@ -43,15 +45,16 @@ enum FilterTwoMode {
 struct FilterTwoData {
     int channels;
     float sampleRate;
-    float* lowEq;
-    float* bandEq;
+    Biquad* biquad;
+    int lastMode;
 };
 
 extern "C" {
 OSL_API FilterTwoData* FilterTwo_New(int channels, float sampleRate);
 OSL_API void FilterTwo_Free(FilterTwoData* x);
 OSL_API void FilterTwo_Reset(FilterTwoData* x);
-OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, float cutoffFrequency,
-                               float lastCutoffFrequency, float frequencyBuffer[], float resonance,
+OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, float cutoffPercent,
+                               float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
+                               float modulationOctaveRange, float frequencyBuffer[], float resonance,
                                float lastResonance, int mode, bool queueExcitation);
 }
