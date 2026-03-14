@@ -63,6 +63,11 @@ OSL_API void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps);
 OSL_API int GetCurrentSeed(NoiseProcessor* processor);
 OSL_API int GetCurrentStep(NoiseProcessor* processor);
 
+struct OscillatorProcessor;
+OSL_API OscillatorProcessor* CreateOscillatorProcessor(float sampleRate);
+OSL_API void DestroyOscillatorProcessor(OscillatorProcessor* processor);
+OSL_API void OscillatorSetPhase(OscillatorProcessor* processor, double phase);
+
 OSL_API void GateProcessBuffer(float buffer[], int length, int channels, bool incoming, float controlBuffer[],
                                bool bControlSig, float amp);
 OSL_API double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[],
@@ -78,13 +83,11 @@ OSL_API void KeyFrequencySignalGenerator(float buffer[], int length, int channel
                                          float& filteredVal);
 OSL_API void XylophoneMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]);
 OSL_API void XylophoneMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]);
-OSL_API void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave,
-                                       bool bLfo, float frequency, float prevFrequency, float amplitude,
-                                       float prevAmplitude,
-                                       float& prevSyncValue, float frequencyExpBuffer[], float frequencyLinBuffer[],
-                                       float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqExpGen,
-                                       bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen,
-                                       double _sampleDuration, double& dspTime);
+OSL_API void OscillatorSignalGenerator(OscillatorProcessor* processor, float buffer[], int length, int channels,
+                                       double& _phase, float analogWave, bool bLfo, float frequency, float amplitude,
+                                       float frequencyExpBuffer[], float frequencyLinBuffer[], float amplitudeBuffer[],
+                                       float syncBuffer[], float pwmBuffer[], bool bFreqExpGen, bool bFreqLinGen,
+                                       bool bAmpGen, bool bSyncGen, bool bPwmGen, double& dspTime);
 OSL_API void addCombFilterSignal(float inputbuffer[], float addbuffer[], int length, float delayBufferL[],
                                  float delayBufferR[], int delaylength, float gain, int& inPoint, int& outPoint);
 OSL_API void processCombFilterSignal(float buffer[], int length, float delayBufferL[], float delayBufferR[],
