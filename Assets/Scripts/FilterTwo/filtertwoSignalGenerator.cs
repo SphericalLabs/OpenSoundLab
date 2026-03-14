@@ -27,7 +27,6 @@ public class filtertwoSignalGenerator : signalGenerator
     float lastCutoffFrequency = 0.5f;
     float lastResonance = 0.5f;
     float[] frequencyBuffer;
-    bool excitationQueued = false;
 
     IntPtr x = IntPtr.Zero;
     int nativeChannels = 0;
@@ -45,8 +44,7 @@ public class filtertwoSignalGenerator : signalGenerator
     static extern void FilterTwo_Process(IntPtr x, float[] buffer, int length, float cutoffPercent,
                                          float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
                                          float modulationOctaveRange, float modulationLowpassHz,
-                                         float[] frequencyBuffer, float resonance, float lastResonance, int mode,
-                                         [MarshalAs(UnmanagedType.I1)] bool queueExcitation);
+                                         float[] frequencyBuffer, float resonance, float lastResonance, int mode);
 
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
@@ -61,11 +59,6 @@ public class filtertwoSignalGenerator : signalGenerator
     void OnDestroy()
     {
         freeNative();
-    }
-
-    public void queueExcitation()
-    {
-        excitationQueued = true;
     }
 
     public float getModePercent()
@@ -117,12 +110,10 @@ public class filtertwoSignalGenerator : signalGenerator
 
         FilterTwo_Process(x, buffer, buffer.Length, cutoffFrequency, lastCutoffFrequency, minCutoffHz, maxCutoffHz,
                           modulationOctaveRange, modulationLowpassHz, frequencyBuffer, resonance, lastResonance,
-                          (int)curMode,
-                          excitationQueued);
+                          (int)curMode);
 
         lastCutoffFrequency = cutoffFrequency;
         lastResonance = resonance;
-        excitationQueued = false;
         recursionCheckPost();
     }
 

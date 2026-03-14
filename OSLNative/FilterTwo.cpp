@@ -133,11 +133,9 @@ OSL_API void FilterTwo_Reset(FilterTwoData* x) {
 OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, float cutoffPercent,
                                float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
                                float modulationOctaveRange, float modulationLowpassHz, float frequencyBuffer[],
-                               float resonance, float lastResonance, int mode, bool queueExcitation) {
+                               float resonance, float lastResonance, int mode) {
     if (x == nullptr || buffer == nullptr || frequencyBuffer == nullptr || x->channels <= 0 || length <= 0)
         return;
-
-    (void) queueExcitation;
 
     int biquadType = getBiquadType(mode);
     if (biquadType != x->lastMode) {

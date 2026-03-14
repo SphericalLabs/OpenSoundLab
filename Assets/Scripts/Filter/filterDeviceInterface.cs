@@ -30,6 +30,8 @@ using System.Collections;
 
 public class filterDeviceInterface : deviceInterface
 {
+    const float excitationThreshold = 0.985f;
+
     public omniJack input, controlInput, output;
     public dial frequencyDial, resonanceDial;
 
@@ -67,13 +69,16 @@ public class filterDeviceInterface : deviceInterface
     void updateFrequency()
     {
         freqPercent = frequencyDial.percent;
-        filter.cutoffFrequency = Utils.map(frequencyDial.percent, 0f, 1f, -0.5f, 0.5f); // 13 octaves around C4
+        filter.cutoffFrequency = frequencyDial.percent;
     }
 
     void updateResonance()
     {
+        float previousResonance = filter.resonance;
         resPercent = resonanceDial.percent;
         filter.resonance = resonanceDial.percent;
+        if (previousResonance < excitationThreshold && filter.resonance >= excitationThreshold)
+            filter.queueExcitation();
     }
 
     public override InstrumentData GetData()
@@ -87,7 +92,7 @@ public class filterDeviceInterface : deviceInterface
         data.jackControlInID = controlInput != null ? controlInput.transform.GetInstanceID() : 0;
 
         data.resonance = resonanceDial != null ? resonanceDial.percent : Mathf.Clamp01(filter.resonance);
-        data.frequency = frequencyDial != null ? frequencyDial.percent : Mathf.InverseLerp(-0.5f, 0.5f, filter.cutoffFrequency);
+        data.frequency = frequencyDial != null ? frequencyDial.percent : Mathf.Clamp01(filter.cutoffFrequency);
         data.filterMode = 0f;
 
         return data;
@@ -110,9 +115,11 @@ public class filterDeviceInterface : deviceInterface
         if (frequencyDial != null)
             frequencyDial.setPercent(data.frequency);
         else
-            filter.cutoffFrequency = Utils.map(data.frequency, 0f, 1f, -0.5f, 0.5f);
+            filter.cutoffFrequency = Mathf.Clamp01(data.frequency);
 
         filter.curType = filterSignalGenerator.filterType.LP;
+        if (data.resonance >= excitationThreshold)
+            filter.queueExcitation();
     }
 }
 

@@ -36,6 +36,8 @@ struct FilterData {
 };
 
 extern "C" {
-OSL_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency,
-                                 float lastCutoffFrequency, float filterBuffer[], float resonance, float sampleRate);
+OSL_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffPercent,
+                                 float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
+                                 float modulationOctaveRange, float filterBuffer[], float resonance, float sampleRate,
+                                 bool queueExcitation);
 }

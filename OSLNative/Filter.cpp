@@ -32,6 +32,28 @@
 
 extern "C" {
 
+namespace {
+constexpr float kSilentInputThreshold = 0.00001f;
+constexpr float kExcitationAmplitude = 0.0002f;
+
+inline float getCutoffHz(float cutoffPercent, float modulation, float minCutoffHz, float maxCutoffHz,
+                         float sampleRate) {
+    float safeMin = _max(1.f, minCutoffHz);
+    float safeMax = _max(safeMin + 1.f, maxCutoffHz);
+    float baseCutoffHz = expf(lerp(logf(safeMin), logf(safeMax), _clamp(cutoffPercent, 0.f, 1.f)));
+    float cutoffHz = baseCutoffHz * powf(2.f, modulation);
+    return _clamp(cutoffHz, 1.f, sampleRate * 0.495f);
+}
+
+bool bufferIsNearSilent(const float* buffer, int length) {
+    for (int i = 0; i < length; ++i) {
+        if (fabsf(buffer[i]) > kSilentInputThreshold)
+            return false;
+    }
+    return true;
+}
+} // namespace
+
 static inline float ProcessSample(FilterData* fd, float sample) {
     float input = _clamp(sample, -1.f, 1.f) - fd->q * fd->b4; // feedback
 
@@ -55,17 +77,26 @@ static inline float ProcessSample(FilterData* fd, float sample) {
     return fd->b4;
 }
 
-void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency,
-                         float lastCutoffFrequency, float frequencyBuffer[], float resonance, float sampleRate) {
+// Filter is OSL's character lowpass: a saturated 4-pole ladder approximation derived from the
+// Paul Kellett / Stilson-Smith-style Moog VCF family. It is intentionally LP-only and built to
+// be musical near self-oscillation rather than perfectly neutral.
+void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffPercent,
+                         float lastCutoffPercent, float minCutoffHz, float maxCutoffHz, float modulationOctaveRange,
+                         float frequencyBuffer[], float resonance, float sampleRate, bool queueExcitation) {
     float safeSampleRate = sampleRate > 0.f ? sampleRate : 48000.f;
     float freqDiv = 2.f / safeSampleRate;
-    float cut = cutoffFrequency;
+    bool injectExcitation = queueExcitation && bufferIsNearSilent(buffer, length);
+    int frames = length / 2;
 
     for (int i = 0; i < length; i += 2) {
-        cut = lerp(lastCutoffFrequency, cutoffFrequency, (float) i / length); // slope limiting for dial
+        int frame = i / 2;
+        float t = frames > 1 ? (float) frame / (float) (frames - 1) : 1.f;
+        float currentCutoffPercent = lerp(lastCutoffPercent, cutoffPercent, t);
+        float modulation = _clamp(frequencyBuffer[i], -1.f, 1.f) * modulationOctaveRange;
+        float normalizedCutoff = getCutoffHz(currentCutoffPercent, modulation, minCutoffHz, maxCutoffHz,
+                                             safeSampleRate) * freqDiv;
 
-        float normalizedCutoff =
-            _clamp(261.6256f * powf(2, (_clamp(frequencyBuffer[i], -1.f, 1.f) + cut) * 10.f) * freqDiv, 0.f, 1.f);
+        normalizedCutoff = _clamp(normalizedCutoff, 0.f, 1.f);
 
         mfL->q = 1.0f - normalizedCutoff;
         mfL->p = normalizedCutoff + 0.8f * normalizedCutoff * mfL->q;
@@ -77,8 +108,15 @@ void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData
         mfR->f = mfR->p + mfR->p - 1.0f;
         mfR->q = resonance * (1.0f + 0.5f * mfR->q * (1.0f - mfR->q + 5.6f * mfR->q * mfR->q));
 
-        buffer[i] = ProcessSample(mfL, buffer[i]);
-        buffer[i + 1] = ProcessSample(mfR, buffer[i + 1]);
+        float leftSample = buffer[i];
+        float rightSample = buffer[i + 1];
+        if (injectExcitation && i == 0) {
+            leftSample += kExcitationAmplitude;
+            rightSample += kExcitationAmplitude;
+        }
+
+        buffer[i] = ProcessSample(mfL, leftSample);
+        buffer[i + 1] = ProcessSample(mfR, rightSample);
     }
 }
 }

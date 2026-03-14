@@ -4,8 +4,6 @@ using System.Xml.Serialization;
 
 public class filtertwoDeviceInterface : deviceInterface
 {
-    const float excitationThreshold = 0.985f;
-
     public omniJack input, controlInput, output;
     public dial frequencyDial, resonanceDial, modeDial;
 
@@ -32,12 +30,7 @@ public class filtertwoDeviceInterface : deviceInterface
             signal.cutoffFrequency = frequencyDial.percent;
 
         if (resonanceDial != null)
-        {
-            float previousResonance = signal.resonance;
             signal.resonance = resonanceDial.percent;
-            if (previousResonance < excitationThreshold && signal.resonance >= excitationThreshold)
-                signal.queueExcitation();
-        }
 
         if (modeDial != null)
             signal.setModeFromPercent(modeDial.percent);

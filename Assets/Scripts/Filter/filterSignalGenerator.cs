@@ -31,14 +31,18 @@ using System.Runtime.InteropServices;
 
 public class filterSignalGenerator : signalGenerator
 {
+    public const float minCutoffHz = 8f;
+    public const float maxCutoffHz = 30000f;
+    public const float modulationOctaveRange = 8f;
 
     public signalGenerator incoming, freqIncoming;
 
-    public float cutoffFrequency = 0f;
-    float lastCutoffFrequency = 0f;
+    public float cutoffFrequency = 0.5f;
+    float lastCutoffFrequency = 0.5f;
     public float resonance = .5f;
 
     float[] frequencyBuffer;
+    bool excitationQueued = false;
 
     public enum filterType
     {
@@ -51,7 +55,11 @@ public class filterSignalGenerator : signalGenerator
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
     [DllImport("OSLNative")]
-    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR, float cutoffFrequency, float lastCutoffFrequency, float[] frequencyBuffer, float resonance, float sampleRate);
+    public static extern void processStereoFilter(float[] buffer, int length, ref mfValues mfL, ref mfValues mfR,
+                                                  float cutoffPercent, float lastCutoffPercent, float minCutoffHz,
+                                                  float maxCutoffHz, float modulationOctaveRange,
+                                                  float[] frequencyBuffer, float resonance, float sampleRate,
+                                                  [MarshalAs(UnmanagedType.I1)] bool queueExcitation);
 
     // create structs for passing to native code
     mfValues mf1L = new mfValues();
@@ -61,6 +69,11 @@ public class filterSignalGenerator : signalGenerator
     {
         base.Awake();
         frequencyBuffer = new float[MAX_BUFFER_LENGTH];
+    }
+
+    public void queueExcitation()
+    {
+        excitationQueued = true;
     }
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
@@ -79,9 +92,12 @@ public class filterSignalGenerator : signalGenerator
             SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
         curType = filterType.LP;
-        processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency, frequencyBuffer, resonance, (float)_sampleRate);
+        processStereoFilter(buffer, buffer.Length, ref mf1L, ref mf1R, cutoffFrequency, lastCutoffFrequency,
+                            minCutoffHz, maxCutoffHz, modulationOctaveRange, frequencyBuffer, resonance,
+                            (float)_sampleRate, excitationQueued);
 
         lastCutoffFrequency = cutoffFrequency; // for slope limiting in native code
+        excitationQueued = false;
         recursionCheckPost();
     }
 }
