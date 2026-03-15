@@ -315,9 +315,7 @@ public class SaveLoadInterface : MonoBehaviour
 
             g2.transform.position = g.transform.position;
             g2.transform.rotation = g.transform.rotation;
-            g2.transform.localScale = g.transform.localScale;
-
-            Vector3 v = g.transform.localScale;
+            Vector3 v = g.transform.lossyScale;
             if (v.x < 0) v.x *= -1; // needs mirroring if dragged while copying, because left controller was always mirrored and this copies down to the duplicate
             g2.transform.localScale = v;
 
