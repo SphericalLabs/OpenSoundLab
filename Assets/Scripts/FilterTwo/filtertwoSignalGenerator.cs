@@ -7,8 +7,9 @@ public class filtertwoSignalGenerator : signalGenerator
 {
     public float minCutoffHz = 8f;
     public float maxCutoffHz = 22000f;
-    public float modulationOctaveRange = 4f;
     public int oversampling = 1; // Legacy field kept for compatibility. FilterTwo currently always runs at 1x.
+
+    const float modulationOctaveRange = 10f; // full modulation range is 2x that value
 
     public enum filterMode
     {
