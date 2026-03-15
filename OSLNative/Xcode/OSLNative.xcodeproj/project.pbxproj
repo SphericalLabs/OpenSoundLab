@@ -50,6 +50,8 @@
 		02F52C772C340C9B009F8DBA /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C762C340C9B009F8DBA /* util.c */; };
 		A10000012F00000100000001 /* FilterTwo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000032F00000100000001 /* FilterTwo.cpp */; };
 		A10000022F00000100000001 /* FilterThree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000052F00000100000001 /* FilterThree.cpp */; };
+		A1B2C3D42E4F500100ABC001 /* Oscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D62E4F500100ABC001 /* Oscillator.cpp */; };
+		A1B2C3D52E4F500100ABC001 /* Oscillator.h in Headers */ = {isa = PBXBuildFile; fileRef = A1B2C3D72E4F500100ABC001 /* Oscillator.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -114,6 +116,8 @@
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		974D48A027B158430087EC11 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
+		A1B2C3D62E4F500100ABC001 /* Oscillator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Oscillator.cpp; path = ../Oscillator.cpp; sourceTree = "<group>"; };
+		A1B2C3D72E4F500100ABC001 /* Oscillator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Oscillator.h; path = ../Oscillator.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +200,8 @@
 				02E0A87D2C33ED0E00807471 /* lookup_tables.h */,
 				02E0A86E2C33ED0D00807471 /* main.cpp */,
 				02E0A86B2C33ED0D00807471 /* main.h */,
+				A1B2C3D62E4F500100ABC001 /* Oscillator.cpp */,
+				A1B2C3D72E4F500100ABC001 /* Oscillator.h */,
 				02E0A8772C33ED0D00807471 /* resample_tables.h */,
 				02E0A87C2C33ED0E00807471 /* resample.cpp */,
 				02E0A8732C33ED0D00807471 /* resample.h */,
@@ -233,6 +239,7 @@
 				02F52C722C340C09009F8DBA /* CRingBuffer.hpp in Headers */,
 				02F52C5D2C340C09009F8DBA /* AudioPluginUtil.h in Headers */,
 				02F52C732C340C09009F8DBA /* main.h in Headers */,
+				A1B2C3D52E4F500100ABC001 /* Oscillator.h in Headers */,
 				02F52C612C340C09009F8DBA /* resample_tables.h in Headers */,
 				02F52C5E2C340C09009F8DBA /* allpass.hpp in Headers */,
 				02F52C752C340C09009F8DBA /* util.h in Headers */,
@@ -350,6 +357,7 @@
 				02F52C6F2C340C09009F8DBA /* revmodel.cpp in Sources */,
 				02F52C742C340C09009F8DBA /* allpass.cpp in Sources */,
 				02F52C582C340C09009F8DBA /* Freeverb.cpp in Sources */,
+				A1B2C3D42E4F500100ABC001 /* Oscillator.cpp in Sources */,
 				02F52C6C2C340C09009F8DBA /* resample.cpp in Sources */,
 				02F52C542C340C09009F8DBA /* CompressedRingBuffer.cpp in Sources */,
 				A10000012F00000100000001 /* FilterTwo.cpp in Sources */,

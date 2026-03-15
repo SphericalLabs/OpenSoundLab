@@ -67,6 +67,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FilterThree.cpp">
+    <ClCompile Include="Oscillator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -147,6 +148,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FilterThree.h">
+    <ClInclude Include="Oscillator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

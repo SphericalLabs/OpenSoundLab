@@ -29,6 +29,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System;
 
 public class oscillatorSignalGenerator : signalGenerator
 {
@@ -48,12 +49,10 @@ public class oscillatorSignalGenerator : signalGenerator
     float[] amplitudeBuffer = new float[0];
     float[] syncBuffer = new float[0];
     float[] pwmBuffer = new float[0];
-    float lastSyncValue = -1f;
+    IntPtr oscillatorProcessor = IntPtr.Zero;
+    double mirroredNativePhase;
 
     int counter = 0;
-
-    float prevAmplitude;
-    float prevFrequency;
 
     // macOS native interop note:
     // Clang on macOS uses 1-byte C++ bool in ABIs; default P/Invoke marshals C# bool as 4 bytes.
@@ -62,20 +61,42 @@ public class oscillatorSignalGenerator : signalGenerator
     // This verbose fix is meant as a cautionary measure in order to emphasize the delicacy of cross-language interop.
     // Using int instead of bool would be an easy fix, but less verbose and clear.
     [DllImport("OSLNative")]
-    public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave,
+    public static extern IntPtr CreateOscillatorProcessor(float sampleRate);
+
+    [DllImport("OSLNative")]
+    public static extern void DestroyOscillatorProcessor(IntPtr processor);
+
+    [DllImport("OSLNative")]
+    public static extern void OscillatorSetPhase(IntPtr processor, double phase);
+
+    [DllImport("OSLNative")]
+    public static extern void OscillatorSignalGenerator(IntPtr processor, float[] buffer, int length, int channels, ref double _phase, float analogWave,
                                 [MarshalAs(UnmanagedType.I1)] bool bLfo,
-                                float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
+                                float frequency, float amplitude,
                                 float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer,
                                 [MarshalAs(UnmanagedType.I1)] bool bFreqExpGen,
                                 [MarshalAs(UnmanagedType.I1)] bool bFreqLinGen,
                                 [MarshalAs(UnmanagedType.I1)] bool bAmpGen,
                                 [MarshalAs(UnmanagedType.I1)] bool bSyncGen,
                                 [MarshalAs(UnmanagedType.I1)] bool bPwmGen,
-                                double _sampleDuration, ref double dspTime);
+                                ref double dspTime);
 
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
 
+    public override void Awake()
+    {
+        base.Awake();
+        oscillatorProcessor = CreateOscillatorProcessor(AudioSettings.outputSampleRate);
+        mirroredNativePhase = _phase;
+    }
+
+    public void OnDestroy()
+    {
+        if (oscillatorProcessor == IntPtr.Zero) return;
+        DestroyOscillatorProcessor(oscillatorProcessor);
+        oscillatorProcessor = IntPtr.Zero;
+    }
 
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
@@ -114,19 +135,18 @@ public class oscillatorSignalGenerator : signalGenerator
             Debug.LogWarning("catched a stackoverflow because of recursive patch connections");
         }
 
-        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, lfo, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
-            freqExpGen != null, freqLinGen != null, ampGen != null, syncGen != null, pwmGen != null, _sampleDuration, ref dspTime);
+        if (_phase != mirroredNativePhase)
+            OscillatorSetPhase(oscillatorProcessor, _phase);
+
+        OscillatorSignalGenerator(oscillatorProcessor, buffer, buffer.Length, channels, ref _phase, analogWave, lfo, frequency, amplitude, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
+            freqExpGen != null, freqLinGen != null, ampGen != null, syncGen != null, pwmGen != null, ref dspTime);
+        mirroredNativePhase = _phase;
 
 
         // wave viz if there
         if (viz != null) viz.storeBuffer(buffer, channels);
 
-        // memory for next go around
-        prevAmplitude = amplitude;
-        prevFrequency = frequency;
-
         recursionCheckPost();
     }
 
 }
-

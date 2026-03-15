@@ -12,7 +12,7 @@ LOCAL_C_INCLUDES  += $(LOCAL_PATH)/FreeVerb/freeverb/components
 FREEVERB_SOURCES := $(wildcard $(LOCAL_PATH)/FreeVerb/freeverb/components/*.cpp)
 FREEVERB_SOURCES += $(wildcard $(LOCAL_PATH)/FreeVerb/dfx-library/*.cpp)
 MASTERBUSRECORDER_SOURCES := $(wildcard $(LOCAL_PATH)/MasterBusRecorder/*.cpp)
-LOCAL_SRC_FILES := main.cpp util.c Biquad.cpp Filter.cpp FilterTwo.cpp FilterThree.cpp Compressor.cpp RingBuffer.cpp CRingBuffer.cpp Delay.cpp Freeverb.cpp resample.cpp Artefact.cpp $(MASTERBUSRECORDER_SOURCES) $(FREEVERB_SOURCES:$(LOCAL_PATH)/%=%)
+LOCAL_SRC_FILES := main.cpp Oscillator.cpp util.c Biquad.cpp Filter.cpp FilterTwo.cpp FilterThree.cpp Compressor.cpp RingBuffer.cpp CRingBuffer.cpp Delay.cpp Freeverb.cpp resample.cpp Artefact.cpp $(MASTERBUSRECORDER_SOURCES) $(FREEVERB_SOURCES:$(LOCAL_PATH)/%=%)
 LOCAL_LDLIBS    := -llog
 LOCAL_CFLAGS := -Wno-implicit-const-int-float-conversion -Wno-braced-scalar-init
 
