@@ -44,10 +44,8 @@ struct FilterTwoData {
     int channels;
     float sampleRate;
     int lastMode;
-    float previousModulation;
     float* lowEq;
     float* bandEq;
-    float* previousInput;
     float* notchLowEq[3];
     float* notchBandEq[3];
 };

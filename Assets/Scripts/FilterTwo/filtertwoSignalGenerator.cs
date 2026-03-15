@@ -8,7 +8,7 @@ public class filtertwoSignalGenerator : signalGenerator
     public float minCutoffHz = 8f;
     public float maxCutoffHz = 22000f;
     public float modulationOctaveRange = 4f;
-    public int oversampling = 1; // Native SVF substeps per sample. Higher values reduce modulation artifacts at higher CPU cost. Unclear if that really brings a lot so keep it at 1 for now.
+    public int oversampling = 1; // Legacy field kept for compatibility. FilterTwo currently always runs at 1x.
 
     public enum filterMode
     {
@@ -110,7 +110,7 @@ public class filtertwoSignalGenerator : signalGenerator
 
         FilterTwo_Process(x, buffer, buffer.Length, cutoffFrequency, lastCutoffFrequency, minCutoffHz, maxCutoffHz,
                           modulationOctaveRange, frequencyBuffer, resonance, lastResonance, (int)curMode,
-                          Mathf.Clamp(oversampling, 1, 2));
+                          1);
 
         lastCutoffFrequency = cutoffFrequency;
         lastResonance = resonance;
