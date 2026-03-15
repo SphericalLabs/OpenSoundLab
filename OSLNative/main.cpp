@@ -32,6 +32,9 @@
 #include <random>
 #include "libs/pcg-cpp/include/pcg_random.hpp"
 #include <random>
+#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+#include <arm_neon.h>
+#endif
 
 #define PI 3.14159265
 
@@ -525,7 +528,118 @@ void XylophoneMergeSignalsWithoutOsc(float buf[], int length, float buf1[], floa
     }
 }
 
-void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave,
+static inline float wrapPhase01(float phase) {
+    phase -= floorf(phase);
+    return phase < 0.f ? phase + 1.f : phase;
+}
+
+static inline float blepPhaseStep(float phaseStep) {
+    return _min(fabsf(phaseStep), 0.499f);
+}
+
+static inline float polyBlep(float phase, float phaseStep) {
+    if (phaseStep <= 0.f)
+        return 0.f;
+
+    if (phase < phaseStep) {
+        phase /= phaseStep;
+        return phase + phase - phase * phase - 1.f;
+    }
+
+    if (phase > 1.f - phaseStep) {
+        phase = (phase - 1.f) / phaseStep;
+        return phase * phase + phase + phase + 1.f;
+    }
+
+    return 0.f;
+}
+
+static inline float clampPulseWidth(float duty, float phaseStep) {
+    float minDuty = blepPhaseStep(phaseStep);
+    if (minDuty >= 0.5f)
+        return 0.5f;
+
+    return _clamp(duty, minDuty, 1.f - minDuty);
+}
+
+static inline float positiveSaw(float phase, float phaseStep) {
+    float sample = phase * 2.f - 1.f;
+    sample -= polyBlep(phase, phaseStep);
+    return sample;
+}
+
+static inline float positiveSquare(float phase, float phaseStep, float duty) {
+    float sample = phase < duty ? 1.f : -1.f;
+    sample += polyBlep(phase, phaseStep);
+    sample -= polyBlep(wrapPhase01(phase - duty), phaseStep);
+    return sample;
+}
+
+static inline float generateNaiveOscillatorWave(int waveMode, float phase, float duty) {
+    phase = wrapPhase01(phase);
+
+    if (waveMode == 0)
+        return sinf(phase * 2.f * PI);
+
+    if (waveMode == 1)
+        return phase >= duty ? -1.f : 1.f;
+
+    if (waveMode == 2)
+        return phase * 2.f - 1.f;
+
+    float sample = phase <= 0.5f ? phase * 2.f : 1.f - (phase - 0.5f) * 2.f;
+    return sample * 2.f - 1.f;
+}
+
+static inline float generateOscillatorWave(int waveMode, float phase, float phaseStep, float duty) {
+    phase = wrapPhase01(phase);
+
+    if (waveMode == 0)
+        return sinf(phase * 2.f * PI);
+
+    if (waveMode == 1) {
+        duty = clampPulseWidth(duty, phaseStep);
+        if (phaseStep >= 0.f)
+            return positiveSquare(phase, phaseStep, duty);
+
+        float reversePhase = wrapPhase01(1.f - phase);
+        float reverseDuty = 1.f - duty;
+        return -positiveSquare(reversePhase, -phaseStep, reverseDuty);
+    }
+
+    if (waveMode == 2) {
+        if (phaseStep >= 0.f)
+            return positiveSaw(phase, phaseStep);
+
+        return -positiveSaw(wrapPhase01(1.f - phase), -phaseStep);
+    }
+
+    float sample = phase <= 0.5f ? phase * 2.f : 1.f - (phase - 0.5f) * 2.f;
+    return sample * 2.f - 1.f;
+}
+
+static inline float estimatePositiveCrossing(float prevValue, float curValue) {
+    float delta = curValue - prevValue;
+    if (fabsf(delta) < 1e-6f)
+        return 1.f;
+
+    return _clamp(-prevValue / delta, 0.f, 1.f);
+}
+
+static inline void writeOscillatorSample(float buffer[], int offset, int channels, float sample) {
+#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+    if (channels == 2) {
+        float32x2_t stereo = vdup_n_f32(sample);
+        vst1_f32(buffer + offset, stereo);
+        return;
+    }
+#endif
+
+    for (int c = 0; c < channels; ++c)
+        buffer[offset + c] = sample;
+}
+
+void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave, bool bLfo,
                                float frequency, float prevFrequency, float amplitude, float prevAmplitude,
                                float& prevSyncValue, float frequencyExpBuffer[], float frequencyLinBuffer[],
                                float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqExpGen,
@@ -534,45 +648,14 @@ void OscillatorSignalGenerator(float buffer[], int length, int channels, double&
     int waveMode = (int) roundf(analogWave * 3);
 
     for (int i = 0; i < length; i += channels) {
-
-        // manage phase reset/sync
-        if (bSyncGen) {
-            if (syncBuffer[i] > 0.f && prevSyncValue <= 0.f)
-                _phase = 0.;
-
-            prevSyncValue = syncBuffer[i];
-        }
-
-        if (waveMode == 0) { // sine
-            buffer[i] = sin(_phase * 2 * PI);
-        } else if (waveMode == 1) { // square
-            if (bPwmGen) {
-                buffer[i] = _phase >= (pwmBuffer[i] + 1) / 2.f ? 1.f : -1.f; // expects value range -1,1f
-            } else {
-                buffer[i] = _phase >= 0.5f ? 1.f : -1.f;
-            }
-        } else if (waveMode == 2) { // saw
-            buffer[i] = _phase * 2 - 1;
-        } else { // tri
-            if (_phase <= 0.5f) {
-                buffer[i] = _phase * 2;
-            } else if (_phase > 0.5f) {
-                buffer[i] = 1 - (_phase - 0.5f) * 2;
-            }
-            buffer[i] = buffer[i] * 2 - 1; // [0,1]->[-1,1]
-        }
-
-        // frequency compute
         float endFrequency = frequency;
         if (prevFrequency != frequency)
             endFrequency = lerp(prevFrequency, frequency, (float) i / length); // slope limiting
 
-        // amp compute
         float endAmplitude = amplitude;
         if (prevAmplitude != amplitude)
             endAmplitude = lerp(prevAmplitude, amplitude, (float) i / length); // slope limiting
 
-        // calc control inputs
         if (bFreqExpGen) {
             endFrequency = endFrequency * powf(2, _clamp(frequencyExpBuffer[i], -1.f, 1.f) *
                                                       10.f); // convert 0.1V/Oct to 1V/Oct; this has to be clamped,
@@ -587,22 +670,55 @@ void OscillatorSignalGenerator(float buffer[], int length, int channels, double&
                 amplitudeBuffer[i]; // expects 0,1 for fading, but allows for negative inputs, will invert phase then
         }
 
-        // update phase for next sample
-        _phase += _clamp(endFrequency, -24000.f, 24000.f) * _sampleDuration; // clamp to +/- 24kHz
+        float phase = (float) _phase;
+        float phaseStep = _clamp(endFrequency, -24000.f, 24000.f) * (float) _sampleDuration;
+        float duty = bPwmGen ? (pwmBuffer[i] + 1.f) * 0.5f : 0.5f;
+        float sample;
 
-        // wrap into [0,1) for both positive and through-zero frequencies without distorting phase
-        double wrappedPhase = _phase - floor(_phase);
-        if (wrappedPhase < 0.0) {
-            wrappedPhase += 1.0;
-        } else if (wrappedPhase >= 1.0) {
-            wrappedPhase -= 1.0;
+        if (bLfo) {
+            if (bSyncGen) {
+                if (syncBuffer[i] > 0.f && prevSyncValue <= 0.f)
+                    phase = 0.f;
+
+                prevSyncValue = syncBuffer[i];
+            }
+
+            sample = generateNaiveOscillatorWave(waveMode, phase, duty);
+        } else {
+            sample = generateOscillatorWave(waveMode, phase, phaseStep, duty);
+
+            if (bSyncGen) {
+                bool syncTriggered = syncBuffer[i] > 0.f && prevSyncValue <= 0.f;
+                if (syncTriggered) {
+                    float syncPosition = estimatePositiveCrossing(prevSyncValue, syncBuffer[i]);
+                    float phaseAfterSync = 1.f - syncPosition;
+                    float preSyncPhase = wrapPhase01(phase - phaseStep * phaseAfterSync);
+                    float postSyncPhase = wrapPhase01(phaseStep * phaseAfterSync);
+                    float preSyncSample = generateOscillatorWave(waveMode, preSyncPhase, phaseStep, duty);
+                    float postResetSample = generateOscillatorWave(waveMode, 0.f, phaseStep, duty);
+                    float blepStep = blepPhaseStep(phaseStep);
+                    float syncCorrection = 0.f;
+
+                    sample = generateOscillatorWave(waveMode, postSyncPhase, phaseStep, duty);
+                    if (blepStep > 0.f) {
+                        float syncPhase = _min(fabsf(phaseStep) * phaseAfterSync, blepStep);
+                        syncCorrection = (postResetSample - preSyncSample) * polyBlep(syncPhase, blepStep);
+                    }
+
+                    sample += syncCorrection;
+                    phase = postSyncPhase;
+                }
+
+                prevSyncValue = syncBuffer[i];
+            }
         }
-        _phase = wrappedPhase;
 
-        // final buffer
-        buffer[i] = buffer[i + 1] = buffer[i] * endAmplitude;
+        phase = wrapPhase01(phase + phaseStep);
+        _phase = phase;
 
-        // dsptime update
+        sample *= endAmplitude;
+        writeOscillatorSample(buffer, i, channels, sample);
+
         dspTime += _sampleDuration;
     }
 }

@@ -62,7 +62,9 @@ public class oscillatorSignalGenerator : signalGenerator
     // This verbose fix is meant as a cautionary measure in order to emphasize the delicacy of cross-language interop.
     // Using int instead of bool would be an easy fix, but less verbose and clear.
     [DllImport("OSLNative")]
-    public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave, float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
+    public static extern void OscillatorSignalGenerator(float[] buffer, int length, int channels, ref double _phase, float analogWave,
+                                [MarshalAs(UnmanagedType.I1)] bool bLfo,
+                                float frequency, float prevFrequency, float amplitude, float prevAmplitude, ref float prevSyncValue,
                                 float[] frequencyExpBuffer, float[] frequencyLinBuffer, float[] amplitudeBuffer, float[] syncBuffer, float[] pwmBuffer,
                                 [MarshalAs(UnmanagedType.I1)] bool bFreqExpGen,
                                 [MarshalAs(UnmanagedType.I1)] bool bFreqLinGen,
@@ -112,7 +114,7 @@ public class oscillatorSignalGenerator : signalGenerator
             Debug.LogWarning("catched a stackoverflow because of recursive patch connections");
         }
 
-        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
+        OscillatorSignalGenerator(buffer, buffer.Length, channels, ref _phase, analogWave, lfo, frequency, prevFrequency, amplitude, prevAmplitude, ref lastSyncValue, frequencyExpBuffer, frequencyLinBuffer, amplitudeBuffer, syncBuffer, pwmBuffer,
             freqExpGen != null, freqLinGen != null, ampGen != null, syncGen != null, pwmGen != null, _sampleDuration, ref dspTime);
 
 
@@ -127,5 +129,4 @@ public class oscillatorSignalGenerator : signalGenerator
     }
 
 }
-
 

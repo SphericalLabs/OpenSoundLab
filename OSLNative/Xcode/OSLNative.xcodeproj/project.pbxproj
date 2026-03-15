@@ -48,6 +48,8 @@
 		02F52C742C340C09009F8DBA /* allpass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C312C340B9F009F8DBA /* allpass.cpp */; };
 		02F52C752C340C09009F8DBA /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8692C33ED0D00807471 /* util.h */; };
 		02F52C772C340C9B009F8DBA /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C762C340C9B009F8DBA /* util.c */; };
+		A10000012F00000100000001 /* FilterTwo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000032F00000100000001 /* FilterTwo.cpp */; };
+		A10000022F00000100000001 /* FilterThree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000052F00000100000001 /* FilterThree.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -105,6 +107,10 @@
 		02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioPluginUtil.cpp; path = ../MasterBusRecorder/AudioPluginUtil.cpp; sourceTree = "<group>"; };
 		02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MasterBusRecorder.cpp; path = ../MasterBusRecorder/MasterBusRecorder.cpp; sourceTree = "<group>"; };
 		02F52C762C340C9B009F8DBA /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../util.c; sourceTree = "<group>"; };
+		A10000032F00000100000001 /* FilterTwo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterTwo.cpp; path = ../FilterTwo.cpp; sourceTree = "<group>"; };
+		A10000042F00000100000001 /* FilterTwo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterTwo.h; path = ../FilterTwo.h; sourceTree = "<group>"; };
+		A10000052F00000100000001 /* FilterThree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterThree.cpp; path = ../FilterThree.cpp; sourceTree = "<group>"; };
+		A10000062F00000100000001 /* FilterThree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterThree.h; path = ../FilterThree.h; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		974D48A027B158430087EC11 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
@@ -153,6 +159,8 @@
 			isa = PBXGroup;
 			children = (
 				02E0A8762C33ED0D00807471 /* Filter.h */,
+				A10000042F00000100000001 /* FilterTwo.h */,
+				A10000062F00000100000001 /* FilterThree.h */,
 				02E0A8722C33ED0D00807471 /* Freeverb.cpp */,
 				02F52C762C340C9B009F8DBA /* util.c */,
 				02E0A8712C33ED0D00807471 /* Artefact.cpp */,
@@ -182,6 +190,8 @@
 				02E0A8672C33ED0D00807471 /* Delay.cpp */,
 				02E0A8792C33ED0D00807471 /* Delay.h */,
 				02E0A8682C33ED0D00807471 /* Filter.cpp */,
+				A10000032F00000100000001 /* FilterTwo.cpp */,
+				A10000052F00000100000001 /* FilterThree.cpp */,
 				02E0A86C2C33ED0D00807471 /* Freeverb.h */,
 				02E0A87D2C33ED0E00807471 /* lookup_tables.h */,
 				02E0A86E2C33ED0D00807471 /* main.cpp */,
@@ -342,6 +352,8 @@
 				02F52C582C340C09009F8DBA /* Freeverb.cpp in Sources */,
 				02F52C6C2C340C09009F8DBA /* resample.cpp in Sources */,
 				02F52C542C340C09009F8DBA /* CompressedRingBuffer.cpp in Sources */,
+				A10000012F00000100000001 /* FilterTwo.cpp in Sources */,
+				A10000022F00000100000001 /* FilterThree.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

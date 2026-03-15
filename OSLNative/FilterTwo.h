@@ -24,20 +24,38 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #pragma once
 
-// Filter is the character lowpass in OSL.
-// It is derived from the classic Paul Kellett / Stilson-Smith-style Moog ladder approximation:
-// saturated, resonant, and intended to stay unapologetically lowpass-only.
+#include "main.h"
 
-struct FilterData {
-    float f, p, q;            // filter coefficients
-    float b0, b1, b2, b3, b4; // filter buffers (beware denormals!)
+// FilterTwo is OSL's modulatable multimode synth filter.
+// It uses a TPT / zero-delay-feedback state-variable design in the Zavalishin / Simper family:
+// cleaner and more coherent than the ladder, but intended to stay musical under audio-rate cutoff modulation.
+
+enum FilterTwoMode {
+    FILTERTWO_LP = 0,
+    FILTERTWO_HP = 1,
+    FILTERTWO_BP = 2,
+    FILTERTWO_NOTCH = 3
+};
+
+struct FilterTwoData {
+    int channels;
+    float sampleRate;
+    int lastMode;
+    float* lowEq;
+    float* bandEq;
+    float* notchLowEq[3];
+    float* notchBandEq[3];
 };
 
 extern "C" {
-OSL_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffPercent,
-                                 float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
-                                 float modulationOctaveRange, float filterBuffer[], float resonance, float sampleRate,
-                                 bool queueExcitation);
+OSL_API FilterTwoData* FilterTwo_New(int channels, float sampleRate);
+OSL_API void FilterTwo_Free(FilterTwoData* x);
+OSL_API void FilterTwo_Reset(FilterTwoData* x);
+OSL_API void FilterTwo_Process(FilterTwoData* x, float buffer[], int length, float cutoffPercent,
+                               float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
+                               float modulationOctaveRange, float frequencyBuffer[], float resonance,
+                               float lastResonance, int mode, int oversampling);
 }

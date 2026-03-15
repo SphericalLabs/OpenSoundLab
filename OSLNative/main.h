@@ -79,7 +79,8 @@ OSL_API void KeyFrequencySignalGenerator(float buffer[], int length, int channel
 OSL_API void XylophoneMergeSignalsWithOsc(float buf[], int length, float buf1[], float buf2[]);
 OSL_API void XylophoneMergeSignalsWithoutOsc(float buf[], int length, float buf1[], float buf2[]);
 OSL_API void OscillatorSignalGenerator(float buffer[], int length, int channels, double& _phase, float analogWave,
-                                       float frequency, float prevFrequency, float amplitude, float prevAmplitude,
+                                       bool bLfo, float frequency, float prevFrequency, float amplitude,
+                                       float prevAmplitude,
                                        float& prevSyncValue, float frequencyExpBuffer[], float frequencyLinBuffer[],
                                        float amplitudeBuffer[], float syncBuffer[], float pwmBuffer[], bool bFreqExpGen,
                                        bool bFreqLinGen, bool bAmpGen, bool bSyncGen, bool bPwmGen,
