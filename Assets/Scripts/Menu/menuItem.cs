@@ -154,6 +154,7 @@ public class menuItem : manipObject
         else if (item == DeviceType.MixerOne) label.text = "Mixer I";
         else if (item == DeviceType.Splitter) label.text = "Splitter";
         else if (item == DeviceType.Button) label.text = "Button";
+        else if (item == DeviceType.Filter) label.text = "Filter I";
         else if (item == DeviceType.FilterTwo) label.text = "Filter II";
         else if (item == DeviceType.FilterThree) label.text = "Filter III";
 
