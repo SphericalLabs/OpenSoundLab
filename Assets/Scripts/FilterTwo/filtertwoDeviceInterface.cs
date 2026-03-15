@@ -6,8 +6,10 @@ public class filtertwoDeviceInterface : deviceInterface
 {
     public omniJack input, controlInput, output;
     public dial frequencyDial, resonanceDial, modeDial;
+    public TextMesh resonanceLabel;
 
     filtertwoSignalGenerator signal;
+    string lastResonanceLabel = "";
 
     public override void Awake()
     {
@@ -34,6 +36,8 @@ public class filtertwoDeviceInterface : deviceInterface
 
         if (modeDial != null)
             signal.setModeFromPercent(modeDial.percent);
+
+        updateResonanceLabel();
     }
 
     public override InstrumentData GetData()
@@ -76,6 +80,21 @@ public class filtertwoDeviceInterface : deviceInterface
             modeDial.setPercent(data.filterMode);
         else
             signal.setModeFromPercent(data.filterMode);
+
+        updateResonanceLabel();
+    }
+
+    void updateResonanceLabel()
+    {
+        if (resonanceLabel == null)
+            return;
+
+        string nextLabel = signal.curMode == filtertwoSignalGenerator.filterMode.Notch ? "DEPTH" : "RESONANCE";
+        if (nextLabel == lastResonanceLabel)
+            return;
+
+        resonanceLabel.text = nextLabel;
+        lastResonanceLabel = nextLabel;
     }
 }
 

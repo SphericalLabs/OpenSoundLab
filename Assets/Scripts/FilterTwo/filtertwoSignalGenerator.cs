@@ -5,10 +5,10 @@ using System;
 
 public class filtertwoSignalGenerator : signalGenerator
 {
-    public const float minCutoffHz = 10f;
-    public const float maxCutoffHz = 18000f;
-    public const float modulationOctaveRange = 4f;
-    public const float modulationLowpassHz = 500f;
+    public float minCutoffHz = 8f;
+    public float maxCutoffHz = 22000f;
+    public float modulationOctaveRange = 4f;
+    public int oversampling = 1; // Native SVF substeps per sample. Higher values reduce modulation artifacts at higher CPU cost. Unclear if that really brings a lot so keep it at 1 for now.
 
     public enum filterMode
     {
@@ -43,8 +43,8 @@ public class filtertwoSignalGenerator : signalGenerator
     [DllImport("OSLNative")]
     static extern void FilterTwo_Process(IntPtr x, float[] buffer, int length, float cutoffPercent,
                                          float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
-                                         float modulationOctaveRange, float modulationLowpassHz,
-                                         float[] frequencyBuffer, float resonance, float lastResonance, int mode);
+                                         float modulationOctaveRange, float[] frequencyBuffer, float resonance,
+                                         float lastResonance, int mode, int oversampling);
 
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
@@ -109,8 +109,8 @@ public class filtertwoSignalGenerator : signalGenerator
             SetArrayToSingleValue(buffer, buffer.Length, 0f);
 
         FilterTwo_Process(x, buffer, buffer.Length, cutoffFrequency, lastCutoffFrequency, minCutoffHz, maxCutoffHz,
-                          modulationOctaveRange, modulationLowpassHz, frequencyBuffer, resonance, lastResonance,
-                          (int)curMode);
+                          modulationOctaveRange, frequencyBuffer, resonance, lastResonance, (int)curMode,
+                          Mathf.Clamp(oversampling, 1, 2));
 
         lastCutoffFrequency = cutoffFrequency;
         lastResonance = resonance;
