@@ -56,6 +56,9 @@ public class WorldDragController : NetworkBehaviour
     bool isVertical = false;
     bool isHorizontal = false;
     bool localSidesPressedLastFrame = false;
+    uint localEndingDragSessionId = 0;
+    uint nextDragSessionId = 1;
+    float nextPatchAnchorScaleLogTime = 0f;
     Transform[] transArray;
     NetworkTransformBase patchNetTransform;
     uint lastAppliedFinalSessionId = 0;
@@ -94,13 +97,23 @@ public class WorldDragController : NetworkBehaviour
 
     void Update()
     {
+        //logPatchAnchorScalePeriodically();
         updateLocalDragRequest();
+        updateLocalDragReleaseRequest();
         updateOwnedDrag();
 
         if (isServer)
         {
             updateServerDragLock();
         }
+    }
+
+    void logPatchAnchorScalePeriodically()
+    {
+        if (Time.unscaledTime < nextPatchAnchorScaleLogTime) return;
+
+        nextPatchAnchorScaleLogTime = Time.unscaledTime + 1f;
+        Debug.Log($"WorldDragController PatchAnchor scale={transform.localScale} session={activeDragSessionId} owner={activeDragOwnerNetId} isServer={isServer} isClient={isClient} isOwned={isOwned}");
     }
 
     void cacheLocalRig()
@@ -217,7 +230,10 @@ public class WorldDragController : NetworkBehaviour
 
     bool canDriveLocalDrag()
     {
-        return isClient && isLocalDragOwner() && (isOwned || isServer);
+        return isClient &&
+               isLocalDragOwner() &&
+               activeDragSessionId != localEndingDragSessionId &&
+               (isOwned || isServer);
     }
 
     [Command(requiresAuthority = false)]
@@ -244,8 +260,7 @@ public class WorldDragController : NetworkBehaviour
         if (patchNetTransform == null) return false;
 
         activeDragOwnerNetId = player.netId;
-        activeDragSessionId++;
-        if (activeDragSessionId == 0) activeDragSessionId = 1;
+        activeDragSessionId = allocateDragSessionId();
 
         setPatchSyncActive(true);
 
@@ -343,21 +358,7 @@ public class WorldDragController : NetworkBehaviour
 
     void endLocalDrag()
     {
-        uint sessionId = activeDragSessionId;
-        Vector3 finalPosition = transform.position;
-        Quaternion finalRotation = transform.rotation;
-        Vector3 finalScale = transform.localScale;
-
-        clearLocalDragState();
-
-        if (isServer)
-        {
-            finishWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
-        }
-        else
-        {
-            CmdEndWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
-        }
+        requestLocalDragEnd(false);
     }
 
     [Command(requiresAuthority = false)]
@@ -391,6 +392,7 @@ public class WorldDragController : NetworkBehaviour
         }
         activeDragOwnerNetId = 0;
         activeDragSessionId = 0;
+        localEndingDragSessionId = 0;
         setPatchSyncActive(false);
     }
 
@@ -403,7 +405,11 @@ public class WorldDragController : NetworkBehaviour
 
     void applyFinalWorldDrag(uint sessionId, Vector3 position, Quaternion rotation, Vector3 scale)
     {
-        if (sessionId <= lastAppliedFinalSessionId) return;
+        if (sessionId <= lastAppliedFinalSessionId)
+        {
+            Debug.LogWarning($"WorldDragController skipped stale final drag session={sessionId} lastApplied={lastAppliedFinalSessionId}");
+            return;
+        }
 
         lastAppliedFinalSessionId = sessionId;
         applyDragTransform(position, rotation, scale);
@@ -427,6 +433,11 @@ public class WorldDragController : NetworkBehaviour
     {
         setPatchSyncActive(newValue != 0);
 
+        if (newValue == 0 || newValue != oldValue)
+        {
+            localEndingDragSessionId = 0;
+        }
+
         if (newValue == 0)
         {
             clearLocalDragState();
@@ -435,6 +446,51 @@ public class WorldDragController : NetworkBehaviour
                 activeDragOwnerNetId = 0;
             }
         }
+    }
+
+    void updateLocalDragReleaseRequest()
+    {
+        if (!isClient) return;
+        if (activeDragSessionId == 0 || !isLocalDragOwner()) return;
+        if (activeDragSessionId == localEndingDragSessionId) return;
+
+        cacheLocalRig();
+
+        OSLInput input = OSLInput.getInstance();
+        bool missingRigReference = leftHandAnchor == null || rightHandAnchor == null || centerEyeAnchor == null;
+        bool releaseRequested = input == null || input.didAnySideReleaseThisFrame() || !input.areBothSidesPressed();
+
+        if (!releaseRequested && !missingRigReference) return;
+
+        requestLocalDragEnd(false);
+    }
+
+    void requestLocalDragEnd(bool bakeImmediately)
+    {
+        uint sessionId = activeDragSessionId;
+        if (sessionId == 0 || sessionId == localEndingDragSessionId) return;
+
+        Vector3 finalPosition = transform.position;
+        Quaternion finalRotation = transform.rotation;
+        Vector3 finalScale = transform.localScale;
+
+        localEndingDragSessionId = sessionId;
+        clearLocalDragState();
+
+        if (isServer)
+        {
+            finishWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
+            return;
+        }
+
+        if (bakeImmediately)
+        {
+            stopPatchSync();
+            applyFinalWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
+            setPatchSyncActive(false);
+        }
+
+        CmdEndWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
     }
 
     [ClientRpc]
@@ -531,6 +587,49 @@ public class WorldDragController : NetworkBehaviour
         patchNetTransform.syncDirection = SyncDirection.ServerToClient;
         patchNetTransform.ResetState();
         patchNetTransform.enabled = false;
+    }
+
+    public void PrepareForPersistence()
+    {
+        if (activeDragSessionId != 0)
+        {
+            if (isServer || (isClient && isLocalDragOwner()))
+            {
+                requestLocalDragEnd(true);
+            }
+            return;
+        }
+
+        if (hasResidualPatchTransform())
+        {
+            bakeTransforms();
+            clearLocalDragState();
+        }
+    }
+
+    bool hasResidualPatchTransform()
+    {
+        if (transform.position.sqrMagnitude > 0.000001f) return true;
+        if (Quaternion.Angle(transform.rotation, Quaternion.identity) > 0.001f) return true;
+        return (transform.localScale - Vector3.one).sqrMagnitude > 0.000001f;
+    }
+
+    uint allocateDragSessionId()
+    {
+        if (nextDragSessionId == 0)
+        {
+            nextDragSessionId = 1;
+        }
+
+        uint sessionId = nextDragSessionId;
+        nextDragSessionId++;
+
+        if (nextDragSessionId == 0)
+        {
+            nextDragSessionId = 1;
+        }
+
+        return sessionId;
     }
 
 

@@ -72,6 +72,7 @@ public class SaveLoadInterface : MonoBehaviour
 
     public void Load(string filename, bool tutorial = false)
     {
+        preparePatchAnchorForPersistence();
         synthSet = xmlSaveLoad.LoadFromFile(filename);
         masterControl.instance.currentScene = filename;
         int loadSequence = ++patchLoadSequence;
@@ -145,6 +146,8 @@ public class SaveLoadInterface : MonoBehaviour
 
     public void ClearInstruments()
     {
+        preparePatchAnchorForPersistence();
+
         GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("instrument");
         for (int i = 0; i < gameObjects.Length; i++)
         {
@@ -205,6 +208,7 @@ public class SaveLoadInterface : MonoBehaviour
     public void Save(string filename)
     {
         masterControl.instance.currentScene = filename;
+        preparePatchAnchorForPersistence();
 
         if (synthSet == null) synthSet = new xmlSaveLoad();
         ClearSynthSetList();
@@ -224,6 +228,14 @@ public class SaveLoadInterface : MonoBehaviour
         }
 
         synthSet.SaveToFile(filename);
+    }
+
+    void preparePatchAnchorForPersistence()
+    {
+        if (WorldDragController.Instance != null)
+        {
+            WorldDragController.Instance.PrepareForPersistence();
+        }
     }
 
     IEnumerator LoadPlugs(int loadSequence)

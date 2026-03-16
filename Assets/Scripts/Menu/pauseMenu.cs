@@ -283,6 +283,11 @@ public class pauseMenu : MonoBehaviour
             else if (curItem == itemType.newItem)
             {
                 toggleMenu();
+                if (WorldDragController.Instance != null)
+                {
+                    WorldDragController.Instance.PrepareForPersistence();
+                }
+
                 if (NetworkServer.active)
                 {
                     SaveLoadInterface.instance.StartNewPatch();
