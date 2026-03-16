@@ -381,6 +381,7 @@ public class WorldDragController : NetworkBehaviour
     {
         if (sessionId == 0 || sessionId != activeDragSessionId) return;
 
+        stopPatchSync();
         RpcFinishWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
         applyFinalWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
 
@@ -441,6 +442,7 @@ public class WorldDragController : NetworkBehaviour
     {
         if (isServer) return;
 
+        stopPatchSync();
         applyFinalWorldDrag(sessionId, position, rotation, scale);
         setPatchSyncActive(false);
         activeDragOwnerNetId = 0;
@@ -520,6 +522,15 @@ public class WorldDragController : NetworkBehaviour
         {
             transArray[n].parent = transform;
         }
+    }
+
+    void stopPatchSync()
+    {
+        if (patchNetTransform == null) return;
+
+        patchNetTransform.syncDirection = SyncDirection.ServerToClient;
+        patchNetTransform.ResetState();
+        patchNetTransform.enabled = false;
     }
 
 
