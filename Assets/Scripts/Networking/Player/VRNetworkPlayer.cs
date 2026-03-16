@@ -533,6 +533,10 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
 
         CmdFinishCompressedPatchUpload(uploadId);
+        if (masterControl.instance != null)
+        {
+            masterControl.instance.currentScene = path;
+        }
         Debug.Log($"Requested Server to Load Patch from {path}");
         return true;
     }
