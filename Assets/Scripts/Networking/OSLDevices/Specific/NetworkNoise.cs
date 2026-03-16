@@ -25,18 +25,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using UnityEngine;
 using System.Collections;
-using System.Runtime.InteropServices;
-using System;
 using Mirror;
+using UnityEngine;
 
 public class NetworkNoise : NetworkSyncListener
 {
     private NoiseSignalGenerator noiseSignalGenerator;
-    [SyncVar]//(hook = nameof(OnUpdateSeed))]
-    private int syncSeed = 0; // select a specific noise pattern
-    //private bool initialSeedSet = false;
+    private float lastStateSyncTime = -1f;
+    private int lastReceivedRevision = -1;
+    private int stateRevision = 0;
+
     protected virtual void Awake()
     {
         noiseSignalGenerator = GetComponent<NoiseSignalGenerator>();
@@ -47,11 +46,6 @@ public class NetworkNoise : NetworkSyncListener
 
 
     #region Mirror
-    public override void OnStartServer()
-    {
-        Debug.Log($"{gameObject.name} initial noise seed {noiseSignalGenerator.GetSeed()}");
-        syncSeed = noiseSignalGenerator.GetSeed();
-    }
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -60,21 +54,12 @@ public class NetworkNoise : NetworkSyncListener
             CmdRequestSync();
         }
     }
-    /* only needed when seed changed during lifetime
-    private void OnUpdateSeed(int oldValue, int newValue)
-    {
-        Debug.Log($"{gameObject.name} update seed {newValue}");
-        if (initialSeedSet)
-        {
-            noiseSignalGenerator.syncNoiseSignalGenerator(newValue, noiseSignalGenerator.NoiseStep);
-        }
-    }*/
 
     protected override void OnSync()
     {
         if (isServer)
         {
-            RpcUpdateSteps(noiseSignalGenerator.GetStep());
+            sendState(true);
         }
         else
         {
@@ -87,25 +72,26 @@ public class NetworkNoise : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            RpcUpdateSteps(noiseSignalGenerator.GetStep());
+            sendState(true);
         }
     }
+
     [Command(requiresAuthority = false)]
     protected void CmdRequestSync()
     {
         Debug.Log($"{gameObject.name} CmdRequestSync noise step {noiseSignalGenerator.GetStep()}");
-
-        RpcUpdateSteps(noiseSignalGenerator.GetStep());
-
+        sendState(true);
     }
+
     [ClientRpc]
-    protected virtual void RpcUpdateSteps(int noiseStep)
+    protected virtual void RpcUpdateNoiseState(int revision, int seed, int noiseStep, float currentSample, int currentCounter, float ratePercent)
     {
         if (isClient && !isServer)
         {
+            if (revision <= lastReceivedRevision) return;
+            lastReceivedRevision = revision;
             Debug.Log($"{gameObject.name} old noiseStep: {noiseSignalGenerator.GetStep()}, new noiseStep {noiseStep}");
-            noiseSignalGenerator.syncNoiseSignalGenerator(syncSeed, noiseStep);
-            //initialSeedSet = true;
+            noiseSignalGenerator.applyNetworkState(seed, noiseStep, currentSample, currentCounter, ratePercent);
         }
     }
 
@@ -114,16 +100,45 @@ public class NetworkNoise : NetworkSyncListener
     #region onDial
     public void OnDragDial()
     {
-        /*
-        if (Time.frameCount % 8 == 0)
-        {
-            OnSync();
-        }*/
+        if (!isServer) return;
+        sendState(false);
     }
 
     public void OnStopDragDial()
     {
-        OnSync();
+        if (isServer)
+        {
+            NetworkSendThrottle.Reset(ref lastStateSyncTime);
+            sendState(true);
+        }
+        else
+        {
+            StartCoroutine(requestStateAfterFrame());
+        }
     }
     #endregion
+
+    void sendState(bool force)
+    {
+        if (noiseSignalGenerator == null) return;
+        if (!force && !NetworkSendThrottle.ShouldSend(ref lastStateSyncTime))
+        {
+            return;
+        }
+
+        if (force)
+        {
+            NetworkSendThrottle.MarkSent(ref lastStateSyncTime);
+        }
+
+        noiseSignalGenerator.captureNetworkState(out int seed, out int step, out float currentSample, out int currentCounter, out float ratePercent);
+        stateRevision++;
+        RpcUpdateNoiseState(stateRevision, seed, step, currentSample, currentCounter, ratePercent);
+    }
+
+    IEnumerator requestStateAfterFrame()
+    {
+        yield return new WaitForEndOfFrame();
+        CmdRequestSync();
+    }
 }

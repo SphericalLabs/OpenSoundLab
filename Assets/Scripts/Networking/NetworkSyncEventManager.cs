@@ -38,8 +38,8 @@ public class NetworkSyncEventManager : MonoBehaviour
     public event SyncHandler IntervalSyncEvent;
 
     [Header("Fixed Interval Sync")]
-    private bool syncInFixedIntervals = false;
-    private float syncTime = 60;
+    private bool syncInFixedIntervals = true;
+    private float syncTime = 1f; // in seconds
 
     private void Awake()
     {
@@ -92,8 +92,11 @@ public class NetworkSyncEventManager : MonoBehaviour
 
     private IEnumerator IntervalSync()
     {
-        yield return new WaitForSeconds(syncTime);
-        IntervalSyncEvent?.Invoke();
+        while (syncInFixedIntervals)
+        {
+            yield return new WaitForSeconds(syncTime);
+            IntervalSyncEvent?.Invoke();
+        }
     }
 
 }

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -8646682192796059688}
   - component: {fileID: -2740082585448891106}
   - component: {fileID: 786234898037747256}
+  - component: {fileID: -6123456789012345678}
   - component: {fileID: -5004252879970475421}
   m_Layer: 0
   m_Name: SampleHold
@@ -133,6 +134,21 @@ MonoBehaviour:
   - {fileID: 114000012040633690}
   - {fileID: 114000012859573534}
   - {fileID: 114000010992678350}
+--- !u!114 &-6123456789012345678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 022002604869443e8f796a67aef2fac8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!114 &-5004252879970475421
 MonoBehaviour:
   m_ObjectHideFlags: 0
