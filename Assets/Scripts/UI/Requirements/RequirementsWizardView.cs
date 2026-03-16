@@ -84,8 +84,6 @@ public class RequirementsWizardView
         scaler.referencePixelsPerUnit = 100f;
         scaler.dynamicPixelsPerUnit = 8000f;
 
-        canvasGo.AddComponent<GraphicRaycaster>();
-
         RectTransform canvasRect = canvas.transform as RectTransform;
         canvasRect.anchorMin = Vector2.zero;
         canvasRect.anchorMax = Vector2.one;

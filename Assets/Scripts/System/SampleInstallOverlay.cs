@@ -116,8 +116,6 @@ public class SampleInstallOverlay : MonoBehaviour
         var scaler = gameObject.AddComponent<CanvasScaler>();
         scaler.dynamicPixelsPerUnit = 12000f;
 
-        gameObject.AddComponent<GraphicRaycaster>();
-
         var rectTransform = (RectTransform)transform;
         rectTransform.sizeDelta = new Vector2(PanelWidthPixels, PanelHeightPixels);
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
