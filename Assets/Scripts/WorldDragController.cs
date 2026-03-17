@@ -29,6 +29,7 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using IAS.CoLocationMUVR;
 
 /*
 Controls whole-patch world dragging from the local VR rig.
@@ -62,6 +63,7 @@ public class WorldDragController : NetworkBehaviour
     Transform[] transArray;
     NetworkTransformBase patchNetTransform;
     uint lastAppliedFinalSessionId = 0;
+    CalibrationManager calibrationManager;
 
     Vector3 tiltAxis;
     Vector3 rollAxis;
@@ -191,6 +193,12 @@ public class WorldDragController : NetworkBehaviour
         cacheLocalRig();
 
         bool bothSidesPressed = OSLInput.getInstance() != null && OSLInput.getInstance().areBothSidesPressed();
+        if (isCalibrationUiActive())
+        {
+            localSidesPressedLastFrame = bothSidesPressed;
+            return;
+        }
+
         if (bothSidesPressed && !localSidesPressedLastFrame)
         {
             beginLocalDragRequest();
@@ -201,6 +209,7 @@ public class WorldDragController : NetworkBehaviour
 
     void beginLocalDragRequest()
     {
+        if (isCalibrationUiActive()) return;
         if (activeDragOwnerNetId != 0) return;
         if (leftManip == null || rightManip == null) return;
         if (leftManip.isGrabbing() || rightManip.isGrabbing()) return;
@@ -281,6 +290,13 @@ public class WorldDragController : NetworkBehaviour
     void updateOwnedDrag()
     {
         if (!canDriveLocalDrag()) return;
+
+        if (isCalibrationUiActive())
+        {
+            requestLocalDragEnd(false);
+            return;
+        }
+
         cacheLocalRig();
         if (leftHandAnchor == null || rightHandAnchor == null || centerEyeAnchor == null) return;
 
@@ -667,6 +683,19 @@ public class WorldDragController : NetworkBehaviour
     float getDistanceBetweenControllers()
     {
         return Vector3.Distance(leftHandAnchor.transform.position, rightHandAnchor.transform.position);
+    }
+
+    bool isCalibrationUiActive()
+    {
+        if (calibrationManager == null)
+        {
+            calibrationManager = FindObjectOfType<CalibrationManager>();
+        }
+
+        if (calibrationManager == null) return false;
+        if (calibrationManager.uiParentObject != null && calibrationManager.uiParentObject.activeInHierarchy) return true;
+        if (calibrationManager.calibrateCourser != null && calibrationManager.calibrateCourser.activeInHierarchy) return true;
+        return false;
     }
 
     // https://answers.unity.com/questions/14170/scaling-an-object-from-a-different-center.html
