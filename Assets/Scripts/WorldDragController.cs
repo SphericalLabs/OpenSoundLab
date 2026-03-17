@@ -230,6 +230,8 @@ public class WorldDragController : NetworkBehaviour
 
     bool canDriveLocalDrag()
     {
+        // Once a release was detected for this session, stop applying more
+        // local drag deltas until the server finalizes the bake.
         return isClient &&
                isLocalDragOwner() &&
                activeDragSessionId != localEndingDragSessionId &&
@@ -407,6 +409,8 @@ public class WorldDragController : NetworkBehaviour
     {
         if (sessionId <= lastAppliedFinalSessionId)
         {
+            // Each drag needs a unique session id. If a later drag reuses an
+            // old id, the bake would be skipped as a stale finalize.
             Debug.LogWarning($"WorldDragController skipped stale final drag session={sessionId} lastApplied={lastAppliedFinalSessionId}");
             return;
         }
@@ -458,6 +462,9 @@ public class WorldDragController : NetworkBehaviour
 
         OSLInput input = OSLInput.getInstance();
         bool missingRigReference = leftHandAnchor == null || rightHandAnchor == null || centerEyeAnchor == null;
+        // The original drag-end path depended on the owner still being in the
+        // normal drive loop. Watch for release separately so we still finalize
+        // if ownership/input/rig state changes during release.
         bool releaseRequested = input == null || input.didAnySideReleaseThisFrame() || !input.areBothSidesPressed();
 
         if (!releaseRequested && !missingRigReference) return;
@@ -485,6 +492,8 @@ public class WorldDragController : NetworkBehaviour
 
         if (bakeImmediately)
         {
+            // Save/load/new patch can happen before the server round-trip
+            // finishes. Bake locally first so PatchAnchor is already normalized.
             stopPatchSync();
             applyFinalWorldDrag(sessionId, finalPosition, finalRotation, finalScale);
             setPatchSyncActive(false);
@@ -578,6 +587,20 @@ public class WorldDragController : NetworkBehaviour
         {
             transArray[n].parent = transform;
         }
+
+        // Child NetworkTransforms may still hold pre-bake local snapshots.
+        // Clear them so old buffered states aren't replayed under the reset parent.
+        resetChildTransformSyncBuffers();
+    }
+
+    void resetChildTransformSyncBuffers()
+    {
+        NetworkTransformBase[] childTransforms = GetComponentsInChildren<NetworkTransformBase>(true);
+        for (int i = 0; i < childTransforms.Length; i++)
+        {
+            if (childTransforms[i] == null || childTransforms[i] == patchNetTransform) continue;
+            childTransforms[i].ResetState();
+        }
     }
 
     void stopPatchSync()
@@ -621,6 +644,8 @@ public class WorldDragController : NetworkBehaviour
             nextDragSessionId = 1;
         }
 
+        // Keep drag session ids monotonic across drags. Reusing "1" after every
+        // drag caused later finalization bakes to be rejected as stale.
         uint sessionId = nextDragSessionId;
         nextDragSessionId++;
 

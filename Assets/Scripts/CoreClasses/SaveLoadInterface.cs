@@ -234,6 +234,8 @@ public class SaveLoadInterface : MonoBehaviour
     {
         if (WorldDragController.Instance != null)
         {
+            // World drag temporarily stores transform on PatchAnchor. Normalize
+            // that first so save/load/new patch operate on baked child transforms.
             WorldDragController.Instance.PrepareForPersistence();
         }
     }
