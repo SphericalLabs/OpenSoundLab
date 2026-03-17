@@ -36,7 +36,6 @@ public class NetworkSlidersUneven : NetworkBehaviour
 
     public readonly SyncList<float> sliderValues = new SyncList<float>();
     private float[] lastGrabedTimes;
-    private float[] lastSentTimes;
 
     public override void OnStartServer()
     {
@@ -50,8 +49,6 @@ public class NetworkSlidersUneven : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[sliders.Length];
-        lastSentTimes = new float[sliders.Length];
-        NetworkSendThrottle.Initialize(lastSentTimes);
 
         //add dials on change callback event
         for (int i = 0; i < sliders.Length; i++)
@@ -100,21 +97,12 @@ public class NetworkSlidersUneven : NetworkBehaviour
 
     public void UpdateSliderValue(int index)
     {
-        SendSliderValue(index, false);
+        SendSliderValue(index);
     }
 
-    void SendSliderValue(int index, bool force)
+    void SendSliderValue(int index)
     {
         Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
-        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
-        {
-            return;
-        }
-        if (force)
-        {
-            NetworkSendThrottle.MarkSent(lastSentTimes, index);
-        }
-
         if (isServer)
         {
             sliderValues[index] = sliders[index].percent;
@@ -143,8 +131,7 @@ public class NetworkSlidersUneven : NetworkBehaviour
     public void HandleEndGrab(int index)
     {
         UpdateLastGrabedTime(index);
-        NetworkSendThrottle.Reset(lastSentTimes, index);
-        SendSliderValue(index, true);
+        SendSliderValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

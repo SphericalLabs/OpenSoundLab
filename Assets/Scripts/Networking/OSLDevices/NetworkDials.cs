@@ -37,7 +37,6 @@ public class NetworkDials : NetworkBehaviour
     public readonly SyncList<float> dialValues = new SyncList<float>();
 
     private float[] lastGrabedTimes;
-    private float[] lastSentTimes;
 
     public override void OnStartServer()
     {
@@ -58,8 +57,6 @@ public class NetworkDials : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[dials.Length];
-        lastSentTimes = new float[dials.Length];
-        NetworkSendThrottle.Initialize(lastSentTimes);
         //add dials on change callback event
         for (int i = 0; i < dials.Length; i++)
         {
@@ -112,21 +109,12 @@ public class NetworkDials : NetworkBehaviour
 
     public void UpdateDialValue(int index)
     {
-        SendDialValue(index, false);
+        SendDialValue(index);
     }
 
-    void SendDialValue(int index, bool force)
+    void SendDialValue(int index)
     {
         //Debug.Log($"Update dial value of index: {index} to value: {dials[index].percent}");
-        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
-        {
-            return;
-        }
-        if (force)
-        {
-            NetworkSendThrottle.MarkSent(lastSentTimes, index);
-        }
-
         if (isServer)
         {
             dialValues[index] = dials[index].percent;
@@ -155,8 +143,7 @@ public class NetworkDials : NetworkBehaviour
     public void HandleEndGrab(int index)
     {
         UpdateLastGrabedTime(index);
-        NetworkSendThrottle.Reset(lastSentTimes, index);
-        SendDialValue(index, true);
+        SendDialValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

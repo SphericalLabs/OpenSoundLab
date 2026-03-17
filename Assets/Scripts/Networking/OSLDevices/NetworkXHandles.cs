@@ -36,7 +36,6 @@ public class NetworkXHandles : NetworkBehaviour
 
     public readonly SyncList<float> xValues = new SyncList<float>();
     private float[] lastGrabedTimes;
-    private float[] lastSentTimes;
 
     public override void OnStartServer()
     {
@@ -50,8 +49,6 @@ public class NetworkXHandles : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[xHandles.Length];
-        lastSentTimes = new float[xHandles.Length];
-        NetworkSendThrottle.Initialize(lastSentTimes);
 
         //add dials on change callback event
         for (int i = 0; i < xHandles.Length; i++)
@@ -101,21 +98,12 @@ public class NetworkXHandles : NetworkBehaviour
 
     public void UpdateHandleValue(int index)
     {
-        SendHandleValue(index, false);
+        SendHandleValue(index);
     }
 
-    void SendHandleValue(int index, bool force)
+    void SendHandleValue(int index)
     {
         Debug.Log($"Update xHandle value of index: {index} to value: {xHandles[index].transform.localPosition.x}");
-        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
-        {
-            return;
-        }
-        if (force)
-        {
-            NetworkSendThrottle.MarkSent(lastSentTimes, index);
-        }
-
         if (isServer)
         {
             xValues[index] = xHandles[index].transform.localPosition.x;
@@ -144,8 +132,7 @@ public class NetworkXHandles : NetworkBehaviour
     public void HandleEndGrab(int index)
     {
         UpdateLastGrabedTime(index);
-        NetworkSendThrottle.Reset(lastSentTimes, index);
-        SendHandleValue(index, true);
+        SendHandleValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

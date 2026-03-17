@@ -32,7 +32,6 @@ using UnityEngine;
 public class NetworkNoise : NetworkSyncListener
 {
     private NoiseSignalGenerator noiseSignalGenerator;
-    private float lastStateSyncTime = -1f;
     private int lastReceivedRevision = -1;
     private int stateRevision = 0;
 
@@ -59,7 +58,7 @@ public class NetworkNoise : NetworkSyncListener
     {
         if (isServer)
         {
-            sendState(true);
+            sendState();
         }
         else
         {
@@ -72,7 +71,7 @@ public class NetworkNoise : NetworkSyncListener
         base.OnIntervalSync();
         if (isServer)
         {
-            sendState(true);
+            sendState();
         }
     }
 
@@ -80,7 +79,7 @@ public class NetworkNoise : NetworkSyncListener
     protected void CmdRequestSync()
     {
         Debug.Log($"{gameObject.name} CmdRequestSync noise step {noiseSignalGenerator.GetStep()}");
-        sendState(true);
+        sendState();
     }
 
     [ClientRpc]
@@ -101,15 +100,14 @@ public class NetworkNoise : NetworkSyncListener
     public void OnDragDial()
     {
         if (!isServer) return;
-        sendState(false);
+        sendState();
     }
 
     public void OnStopDragDial()
     {
         if (isServer)
         {
-            NetworkSendThrottle.Reset(ref lastStateSyncTime);
-            sendState(true);
+            sendState();
         }
         else
         {
@@ -118,19 +116,9 @@ public class NetworkNoise : NetworkSyncListener
     }
     #endregion
 
-    void sendState(bool force)
+    void sendState()
     {
         if (noiseSignalGenerator == null) return;
-        if (!force && !NetworkSendThrottle.ShouldSend(ref lastStateSyncTime))
-        {
-            return;
-        }
-
-        if (force)
-        {
-            NetworkSendThrottle.MarkSent(ref lastStateSyncTime);
-        }
-
         noiseSignalGenerator.captureNetworkState(out int seed, out int step, out float currentSample, out int currentCounter, out float ratePercent);
         stateRevision++;
         RpcUpdateNoiseState(stateRevision, seed, step, currentSample, currentCounter, ratePercent);

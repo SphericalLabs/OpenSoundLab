@@ -32,7 +32,6 @@ public class NetworkSampleHold : NetworkSyncListener
 {
     SampleHoldSignalGenerator sampleHoldSignalGenerator;
 
-    float lastStateSyncTime = -1f;
     int lastObservedRevision = -1;
     int lastReceivedRevision = -1;
     bool pendingSync;
@@ -54,9 +53,8 @@ public class NetworkSampleHold : NetworkSyncListener
         }
 
         if (!pendingSync) return;
-        if (!NetworkSendThrottle.ShouldSend(ref lastStateSyncTime)) return;
 
-        sendState(false);
+        sendState();
     }
 
     public override void OnStartClient()
@@ -73,7 +71,7 @@ public class NetworkSampleHold : NetworkSyncListener
         base.OnSync();
         if (isServer)
         {
-            sendState(true);
+            sendState();
         }
         else
         {
@@ -85,13 +83,13 @@ public class NetworkSampleHold : NetworkSyncListener
     {
         base.OnIntervalSync();
         if (!isServer) return;
-        sendState(true);
+        sendState();
     }
 
     [Command(requiresAuthority = false)]
     protected void CmdRequestSync()
     {
-        sendState(true);
+        sendState();
     }
 
     [ClientRpc]
@@ -105,14 +103,9 @@ public class NetworkSampleHold : NetworkSyncListener
         sampleHoldSignalGenerator.applyNetworkState(currentHoldValue, triggerHigh, revision);
     }
 
-    void sendState(bool force)
+    void sendState()
     {
         if (sampleHoldSignalGenerator == null) return;
-        if (force)
-        {
-            NetworkSendThrottle.MarkSent(ref lastStateSyncTime);
-        }
-
         sampleHoldSignalGenerator.captureNetworkState(out float currentHoldValue, out bool triggerHigh, out int revision);
         RpcUpdateState(currentHoldValue, triggerHigh, revision);
         pendingSync = false;

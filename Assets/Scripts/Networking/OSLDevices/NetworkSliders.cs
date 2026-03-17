@@ -37,7 +37,6 @@ public class NetworkSliders : NetworkBehaviour
     public readonly SyncList<float> sliderValues = new SyncList<float>(); // synced automatically, but not on first init. changes can and should be handled specifically
 
     private float[] lastGrabedTimes;
-    private float[] lastSentTimes;
     // user grabs slider
     // PercentChanged is triggered by slider
     // OnPercentChanged is triggered by the event
@@ -56,8 +55,6 @@ public class NetworkSliders : NetworkBehaviour
     private void Start()
     {
         lastGrabedTimes = new float[sliders.Length];
-        lastSentTimes = new float[sliders.Length];
-        NetworkSendThrottle.Initialize(lastSentTimes);
 
         //add dials on change callback event
         for (int i = 0; i < sliders.Length; i++)
@@ -118,21 +115,12 @@ public class NetworkSliders : NetworkBehaviour
     // client and server
     public void OnPercentChanged(int index) // called from the sliders' onPercentChangedEvent
     {
-        SendSliderValue(index, false);
+        SendSliderValue(index);
     }
 
-    void SendSliderValue(int index, bool force)
+    void SendSliderValue(int index)
     {
         Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
-        if (!force && !NetworkSendThrottle.ShouldSend(lastSentTimes, index))
-        {
-            return;
-        }
-        if (force)
-        {
-            NetworkSendThrottle.MarkSent(lastSentTimes, index);
-        }
-
         if (isServer)
         {
             sliderValues[index] = sliders[index].percent; // directly write into data model, this triggers a SyncList Update
@@ -163,8 +151,7 @@ public class NetworkSliders : NetworkBehaviour
     public void HandleEndGrab(int index)
     {
         UpdateLastGrabedTime(index);
-        NetworkSendThrottle.Reset(lastSentTimes, index);
-        SendSliderValue(index, true);
+        SendSliderValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)
