@@ -37,8 +37,11 @@ public class NetworkSyncEventManager : MonoBehaviour
     public event SyncHandler OsSyncEvent;
     public event SyncHandler IntervalSyncEvent;
 
+
     [Header("Fixed Interval Sync")]
-    private bool syncInFixedIntervals = true;
+    // this is disabled for now since it did not run very reliably on wifi
+    // at least with a 1s interval the occasional wifi hickups mess are too severe
+    private bool syncInFixedIntervals = false;
     private float syncTime = 1f; // in seconds
 
     private void Awake()
