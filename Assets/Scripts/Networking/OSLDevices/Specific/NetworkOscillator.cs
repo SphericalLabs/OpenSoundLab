@@ -85,7 +85,7 @@ public class NetworkOscillator : NetworkSyncListener
 
     protected override void OnIntervalSync()
     {
-        if (oscillatorDeviceInterface.lfoSwitch.switchVal)
+        if (oscillatorDeviceInterface.lfoSwitch.switchVal) // if lfo, since lfo = !lfoSwitch.switchVal
         {
             return;
         }
