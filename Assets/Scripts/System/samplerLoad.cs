@@ -25,6 +25,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,6 +35,8 @@ using UnityEngine.Events;
 
 public class samplerLoad : MonoBehaviour
 {
+    const int BIQUAD_LOWPASS = 1;
+
     public GameObject tapePrefab;
     public GameObject loadingPrefab;
     public Transform deckOutline;
@@ -47,12 +50,25 @@ public class samplerLoad : MonoBehaviour
     Material deckMat;
     Color deckLight;
 
-    public float[] clipSamples;
+    [NonSerialized] public float[] clipSamples;
+    public int generatedLayerCount = 3;
+    public int clipReadFramesPerChunk = 16384;
+    public int layerBuildFramesPerChunk = 8192;
 
-    GCHandle m_ClipHandle;
+    SampleLayerBank sampleLayerBank;
 
     public UnityEvent onLoadTapeEvents;
     public UnityEvent onUnloadTapeEvents;
+
+    [DllImport("OSLNative")]
+    static extern IntPtr Biquad_new(int type, float frequency, float Q, float gain, float sampleRate, int channels);
+
+    [DllImport("OSLNative")]
+    static extern void Biquad_free(IntPtr x);
+
+    [DllImport("OSLNative")]
+    static extern void Biquad_process(IntPtr x, int type, float frequency, float Q, float gain, float sampleRate,
+        float[] input, float[] output, int n);
 
     void Awake()
     {
@@ -133,12 +149,13 @@ public class samplerLoad : MonoBehaviour
 
             if (miniSpeaker != null) miniSpeaker.updateSecondary(false);
 
-            // unallocate memory
-            if (m_ClipHandle.IsAllocated)
-            {
-                m_ClipHandle.Free();
-            }
             for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
+            if (sampleLayerBank != null)
+            {
+                sampleLayerBank.Release();
+                sampleLayerBank = null;
+            }
+            clipSamples = null;
 
             if (updateEvent)
             {
@@ -181,26 +198,41 @@ public class samplerLoad : MonoBehaviour
         {
             yield return null;
         }
-        if (loaderObject != null) Destroy(loaderObject);
-
 
         for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
+        if (sampleLayerBank != null)
+        {
+            sampleLayerBank.Release();
+            sampleLayerBank = null;
+        }
+        clipSamples = null;
 
         while (c.loadState != AudioDataLoadState.Loaded) yield return null;
 
-        clipSamples = new float[c.samples * c.channels];
-        c.GetData(clipSamples, 0);
+        int channels = Mathf.Max(1, c.channels);
+        int frames = Mathf.Max(1, c.samples);
+        clipSamples = new float[frames * channels];
+        yield return copyClipDataIncrementally(c, clipSamples, frames, channels);
 
-        //allocate the memory
-        m_ClipHandle = GCHandle.Alloc(clipSamples, GCHandleType.Pinned);
-        for (int i = 0; i < players.Length; i++) players[i].LoadSamples(clipSamples, m_ClipHandle, c.channels);
+        int requestedAdditionalLayers = Mathf.Clamp(generatedLayerCount, 0, SampleLayerBank.MaxAdditionalLayers);
+        sampleLayerBank = null;
+        yield return buildLayerBankIncrementally(clipSamples, channels, frames, c.frequency, requestedAdditionalLayers);
+
+        if (loaderObject != null) Destroy(loaderObject);
+
+        if (sampleLayerBank != null)
+        {
+            for (int i = 0; i < players.Length; i++) players[i].LoadSamples(sampleLayerBank);
+        }
     }
 
     void OnDestroy()
     {
-        if (m_ClipHandle.IsAllocated)
+        for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
+        if (sampleLayerBank != null)
         {
-            m_ClipHandle.Free();
+            sampleLayerBank.Release();
+            sampleLayerBank = null;
         }
     }
 
@@ -257,6 +289,115 @@ public class samplerLoad : MonoBehaviour
     }
 
     Coroutine _flashRoutine;
+
+    IEnumerator copyClipDataIncrementally(AudioClip clip, float[] destination, int totalFrames, int channels)
+    {
+        int framesPerChunk = Mathf.Max(1024, clipReadFramesPerChunk);
+        float[] chunk = new float[Mathf.Min(framesPerChunk, totalFrames) * channels];
+
+        for (int offsetFrame = 0; offsetFrame < totalFrames; offsetFrame += framesPerChunk)
+        {
+            int framesThisChunk = Mathf.Min(framesPerChunk, totalFrames - offsetFrame);
+            int samplesThisChunk = framesThisChunk * channels;
+            if (chunk.Length != samplesThisChunk)
+            {
+                chunk = new float[samplesThisChunk];
+            }
+
+            clip.GetData(chunk, offsetFrame);
+            System.Array.Copy(chunk, 0, destination, offsetFrame * channels, samplesThisChunk);
+            yield return null;
+        }
+    }
+
+    IEnumerator buildLayerBankIncrementally(float[] source, int channels, int sourceFrames, int sourceSampleRate,
+        int additionalLayers)
+    {
+        List<float[]> layers = new List<float[]> { source };
+        float[] currentLayer = source;
+        int currentFrames = sourceFrames;
+        int currentSampleRate = Mathf.Max(1, sourceSampleRate);
+
+        for (int layerIndex = 0; layerIndex < additionalLayers; layerIndex++)
+        {
+            if (currentFrames < 32)
+            {
+                break;
+            }
+
+            float[] nextLayer = null;
+            yield return buildDownsampledLayer(currentLayer, currentFrames, channels, currentSampleRate,
+                value => nextLayer = value);
+            if (nextLayer == null || nextLayer.Length == 0)
+            {
+                break;
+            }
+
+            layers.Add(nextLayer);
+            currentLayer = nextLayer;
+            currentFrames = Mathf.Max(1, nextLayer.Length / channels);
+            currentSampleRate = Mathf.Max(1, currentSampleRate / 2);
+        }
+
+        sampleLayerBank = new SampleLayerBank(layers.ToArray(), channels);
+    }
+
+    IEnumerator buildDownsampledLayer(float[] source, int sourceFrames, int channels, int sourceSampleRate,
+        System.Action<float[]> onComplete)
+    {
+        int framesPerChunk = Mathf.Max(1024, layerBuildFramesPerChunk);
+        int destinationFrames = Mathf.Max(1, (sourceFrames + 1) / 2);
+        float[] destination = new float[destinationFrames * channels];
+        float[] filteredChunk = new float[Mathf.Min(framesPerChunk, sourceFrames) * channels];
+        IntPtr lowpass = Biquad_new(BIQUAD_LOWPASS, Mathf.Max(80f, sourceSampleRate * 0.225f), 0.7071f, 0f,
+            sourceSampleRate, channels);
+
+        int writeFrame = 0;
+        try
+        {
+            for (int offsetFrame = 0; offsetFrame < sourceFrames; offsetFrame += framesPerChunk)
+            {
+                int framesThisChunk = Mathf.Min(framesPerChunk, sourceFrames - offsetFrame);
+                int samplesThisChunk = framesThisChunk * channels;
+                if (filteredChunk.Length != samplesThisChunk)
+                {
+                    filteredChunk = new float[samplesThisChunk];
+                }
+
+                System.Array.Copy(source, offsetFrame * channels, filteredChunk, 0, samplesThisChunk);
+                Biquad_process(lowpass, BIQUAD_LOWPASS, Mathf.Max(80f, sourceSampleRate * 0.225f), 0.7071f, 0f,
+                    sourceSampleRate, filteredChunk, filteredChunk, samplesThisChunk);
+
+                int parity = offsetFrame & 1;
+                for (int frame = parity; frame < framesThisChunk && writeFrame < destinationFrames; frame += 2)
+                {
+                    int readIndex = frame * channels;
+                    int writeIndex = writeFrame * channels;
+                    for (int channel = 0; channel < channels; channel++)
+                    {
+                        destination[writeIndex + channel] = filteredChunk[readIndex + channel];
+                    }
+                    writeFrame++;
+                }
+
+                yield return null;
+            }
+        }
+        finally
+        {
+            if (lowpass != IntPtr.Zero)
+            {
+                Biquad_free(lowpass);
+            }
+        }
+
+        if (writeFrame * channels != destination.Length)
+        {
+            System.Array.Resize(ref destination, writeFrame * channels);
+        }
+
+        onComplete?.Invoke(destination);
+    }
 
     IEnumerator flashRoutine()
     {

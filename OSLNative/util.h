@@ -64,6 +64,8 @@
 #define INTERPOLATION_NONE 1
 #define INTERPOLATION_LINEAR 2
 #define INTERPOLATION_WSINC 3
+#define INTERPOLATION_HERMITE 4
+#define INTERPOLATION_LAGRANGE 5
 
 #ifdef __cplusplus
 extern "C" {

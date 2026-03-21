@@ -51,7 +51,7 @@ public class clipPlayerSimple : clipPlayer
 
     [DllImport("OSLNative")]
     public static extern double ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, [MarshalAs(UnmanagedType.I1)] bool freqExpGen, [MarshalAs(UnmanagedType.I1)] bool freqLinGen, [MarshalAs(UnmanagedType.I1)] bool ampGen, [MarshalAs(UnmanagedType.I1)] bool seqGen, double floatingBufferCount
-  , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, [MarshalAs(UnmanagedType.I1)] bool playdirection, [MarshalAs(UnmanagedType.I1)] bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
+  , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip0, System.IntPtr clip1, System.IntPtr clip2, System.IntPtr clip3, System.IntPtr clip4, int clipFrames0, int clipFrames1, int clipFrames2, int clipFrames3, int clipFrames4, int availableLayers, int interpolationMode, [MarshalAs(UnmanagedType.I1)] bool useSampleLayers, int clipChannels, float amplitude, float lastAmplitude, [MarshalAs(UnmanagedType.I1)] bool playdirection, [MarshalAs(UnmanagedType.I1)] bool looping, double _sampleDuration, int bufferCount, [MarshalAs(UnmanagedType.I1)] ref bool active, int windowLength);
 
 
     [DllImport("OSLNative")]
@@ -62,9 +62,14 @@ public class clipPlayerSimple : clipPlayer
     float[] trigBuffer = new float[0];
     float[] startBuffer = new float[0];
 
+    public override void Awake()
+    {
+        base.Awake();
+        lastSeqGen = new float[] { 0, 0 };
+    }
+
     void Start()
     {
-        lastSeqGen = new float[] { 0, 0 };
         devInterface = GetComponent<samplerDeviceInterface>();
     }
 
@@ -72,7 +77,7 @@ public class clipPlayerSimple : clipPlayer
 
     public void Play()
     {
-        lock (lockObject)
+        lock (clipStateLock)
         {
             updateSampleBounds(startGen != null ? startBuffer[0] : 0f);
             floatingBufferCount = _lastBuffer = sampleBounds[0] + 1; // WARNING: Due to the code structure in the native ClipSignalGenerator function resetting to 0 (instead of 0 + 1) would mean that playback does not work anymore for speeds lower than 1f. It would always floor() to 0 and would not move through the file anymore.
@@ -107,15 +112,18 @@ public class clipPlayerSimple : clipPlayer
 
     float lastTriggValue = 0f;
 
-    private readonly object lockObject = new object(); // Lock object
-
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
 
-        lock (lockObject)
+        lock (clipStateLock)
         {
-            if (!loaded) return;
+            ensureRuntimeState();
+            if (!loaded)
+            {
+                recursionCheckPost();
+                return;
+            }
 
             floatingBufferCount = _lastBuffer;
 
@@ -160,13 +168,18 @@ public class clipPlayerSimple : clipPlayer
             }
 
             floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, null, ampBuffer, trigBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, false, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
-                  playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, true, false, _sampleDuration, bufferCount, ref active, 0);
+                  playbackSpeed, lastPlaybackSpeed, sampleLayerPointers[0], sampleLayerPointers[1], sampleLayerPointers[2], sampleLayerPointers[3], sampleLayerPointers[4],
+                  sampleLayerFrameCounts[0], sampleLayerFrameCounts[1], sampleLayerFrameCounts[2], sampleLayerFrameCounts[3], sampleLayerFrameCounts[4],
+                  sampleLayerCount, (int)interpolationMode, useSampleLayers, clipChannels, amplitude, lastAmplitude, true, false, _sampleDuration, bufferCount, ref active, 0);
 
             _lastBuffer = floatingBufferCount;
 
             lastAmplitude = amplitude;
             lastPlaybackSpeed = playbackSpeed;
         }
+
+        ApplyPlaybackFilters(buffer, channels,
+            EstimatePlaybackStep(playbackSpeed, freqExpBuffer, freqExpGen != null, null, false, channels), false);
         recursionCheckPost();
     }
 }

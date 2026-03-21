@@ -74,8 +74,8 @@ public class clipPlayerComplex : clipPlayer
     float lastAmplitude = 0f;
 
     [DllImport("OSLNative")]
-    public static extern double ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, bool freqExpGen, bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount
-  , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip, int clipChannels, float amplitude, float lastAmplitude, bool playdirection, bool looping, double _sampleDuration, int bufferCount, ref bool active, int windowLength);
+    public static extern double ClipSignalGenerator(float[] buffer, float[] freqExpBuffer, float[] freqLinBuffer, float[] ampBuffer, float[] seqBuffer, int length, float[] lastSeqGen, int channels, [MarshalAs(UnmanagedType.I1)] bool freqExpGen, [MarshalAs(UnmanagedType.I1)] bool freqLinGen, [MarshalAs(UnmanagedType.I1)] bool ampGen, [MarshalAs(UnmanagedType.I1)] bool seqGen, double floatingBufferCount
+  , int[] sampleBounds, float playbackSpeed, float lastPlaybackSpeed, System.IntPtr clip0, System.IntPtr clip1, System.IntPtr clip2, System.IntPtr clip3, System.IntPtr clip4, int clipFrames0, int clipFrames1, int clipFrames2, int clipFrames3, int clipFrames4, int availableLayers, int interpolationMode, [MarshalAs(UnmanagedType.I1)] bool useSampleLayers, int clipChannels, float amplitude, float lastAmplitude, [MarshalAs(UnmanagedType.I1)] bool playdirection, [MarshalAs(UnmanagedType.I1)] bool looping, double _sampleDuration, int bufferCount, [MarshalAs(UnmanagedType.I1)] ref bool active, int windowLength);
 
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
@@ -83,6 +83,7 @@ public class clipPlayerComplex : clipPlayer
     public override void Awake()
     {
         base.Awake();
+        lastSeqGen = new float[] { 0, 0 };
         freqExpBuffer = new float[MAX_BUFFER_LENGTH];
         freqLinBuffer = new float[MAX_BUFFER_LENGTH];
         ampBuffer = new float[MAX_BUFFER_LENGTH];
@@ -93,7 +94,6 @@ public class clipPlayerComplex : clipPlayer
 
     void Start()
     {
-        lastSeqGen = new float[] { 0, 0 };
         if (!loaded) toggleWaveDisplay(false);
     }
 
@@ -244,18 +244,43 @@ public class clipPlayerComplex : clipPlayer
     public bool playdirection = true;
     public void Play()
     {
-        _lastBuffer = sampleBounds[0];
-        active = true;
+        lock (clipStateLock)
+        {
+            ensureRuntimeState();
+            _lastBuffer = floatingBufferCount = Mathf.Min(sampleBounds[1], sampleBounds[0] + 1);
+            active = true;
+        }
     }
 
     public void Back()
     {
-        _lastBuffer = playdirection ? sampleBounds[0] : sampleBounds[1];
+        lock (clipStateLock)
+        {
+            ensureRuntimeState();
+            _lastBuffer = floatingBufferCount = playdirection ? Mathf.Min(sampleBounds[1], sampleBounds[0] + 1) : sampleBounds[1];
+        }
     }
 
     public void togglePause(bool on)
     {
-        active = on;
+        lock (clipStateLock)
+        {
+            ensureRuntimeState();
+            if (on && loaded)
+            {
+                double minFrame = Mathf.Min(sampleBounds[1], sampleBounds[0] + 1);
+                double maxFrame = sampleBounds[1];
+                if (playdirection)
+                {
+                    if (_lastBuffer < minFrame || _lastBuffer > maxFrame) _lastBuffer = floatingBufferCount = minFrame;
+                }
+                else
+                {
+                    if (_lastBuffer <= sampleBounds[0] || _lastBuffer > maxFrame) _lastBuffer = floatingBufferCount = maxFrame;
+                }
+            }
+            active = on;
+        }
     }
 
     public void Loop()
@@ -315,122 +340,131 @@ public class clipPlayerComplex : clipPlayer
     public override void processBufferImpl(float[] buffer, double dspTime, int channels)
     {
         if (!recursionCheckPre()) return; // checks and avoids fatal recursions
-        if (!loaded) return;
-        floatingBufferCount = _lastBuffer;
-
-        if (freqExpBuffer.Length != buffer.Length)
-            System.Array.Resize(ref freqExpBuffer, buffer.Length);
-        if (freqLinBuffer.Length != buffer.Length)
-            System.Array.Resize(ref freqLinBuffer, buffer.Length);
-        if (ampBuffer.Length != buffer.Length)
-            System.Array.Resize(ref ampBuffer, buffer.Length);
-        if (seqBuffer.Length != buffer.Length)
-            System.Array.Resize(ref seqBuffer, buffer.Length);
-
-        if (headBuffer.Length != buffer.Length)
-            System.Array.Resize(ref headBuffer, buffer.Length);
-        if (tailBuffer.Length != buffer.Length)
-            System.Array.Resize(ref tailBuffer, buffer.Length);
-
-        SetArrayToSingleValue(freqExpBuffer, freqExpBuffer.Length, 0f);
-        SetArrayToSingleValue(freqLinBuffer, freqLinBuffer.Length, 0f);
-        SetArrayToSingleValue(ampBuffer, ampBuffer.Length, 0f);
-        SetArrayToSingleValue(seqBuffer, seqBuffer.Length, 0f);
-        SetArrayToSingleValue(headBuffer, headBuffer.Length, 0f);
-        SetArrayToSingleValue(tailBuffer, tailBuffer.Length, 0f);
-
-        if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
-        if (freqLinGen != null) freqLinGen.processBuffer(freqLinBuffer, dspTime, channels);
-        if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
-        if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
-
-        if (headGen != null)
+        lock (clipStateLock)
         {
-            headGen.processBuffer(headBuffer, dspTime, channels);
-            headOffset = Mathf.Clamp01(headBuffer[0] + headTrim); // use buffer for offset, take only first sample of buffer
-        }
-        else
-        {
-            headOffset = 0f;
-        }
-
-        if (tailGen != null)
-        {
-            tailGen.processBuffer(tailBuffer, dspTime, channels);
-            tailOffset = Mathf.Clamp01(tailBuffer[0] + tailTrim); // use buffer for offset, take only first sample of buffer
-        }
-        else
-        {
-            tailOffset = 0f;
-        }
-
-
-        updateSampleBounds(); // might be overkill!
-
-        if (!scrubGrabbed && !turntableGrabbed)
-        {
-            bool curActive = active;
-            windowLength = Mathf.FloorToInt(windowing * 4800);
-
-            floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, freqLinBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, freqLinGen != null, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
-                playbackSpeed, lastPlaybackSpeed, m_ClipHandle.AddrOfPinnedObject(), clipChannels, amplitude, lastAmplitude, playdirection, looping, _sampleDuration, bufferCount, ref active, windowLength);
-            if (curActive != active) _sampleInterface.playEvent(active);
-
-            lp_filter[0] = buffer[buffer.Length - 2];
-            lp_filter[1] = buffer[buffer.Length - 1];
-        }
-        else if (scrubGrabbed) // keeping scrub non-native because such an edge-case and maxes out at 2 instances
-        {
-            double amount = (scrubTarg - _lastBuffer) / (buffer.Length / channels);
-
-            for (int i = 0; i < buffer.Length; i += channels)
+            ensureRuntimeState();
+            if (!loaded)
             {
-                bufferCount = (int)System.Math.Round(floatingBufferCount);
-                floatingBufferCount += amount;
-
-                float endAmplitude = amplitude;
-                if (ampGen != null) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2f); // -1,1 > 0,1
-                buffer[i] = lp_filter[0] = lp_filter[0] * .9f + .1f * clipSamples[bufferCount * clipChannels] * endAmplitude;
-                if (clipChannels == 2) buffer[i + 1] = lp_filter[1] = lp_filter[1] * .9f + .1f * clipSamples[bufferCount * clipChannels + 1] * endAmplitude;
-                else buffer[i + 1] = buffer[i];
-
-                dspTime += _sampleDuration;
+                recursionCheckPost();
+                return;
             }
-        }
-        else
-        {
-            float amount = turntableDelta * (float)_sampleRate * channels / buffer.Length;
-            for (int i = 0; i < buffer.Length; i += channels)
+            floatingBufferCount = _lastBuffer;
+
+            if (freqExpBuffer.Length != buffer.Length)
+                System.Array.Resize(ref freqExpBuffer, buffer.Length);
+            if (freqLinBuffer.Length != buffer.Length)
+                System.Array.Resize(ref freqLinBuffer, buffer.Length);
+            if (ampBuffer.Length != buffer.Length)
+                System.Array.Resize(ref ampBuffer, buffer.Length);
+            if (seqBuffer.Length != buffer.Length)
+                System.Array.Resize(ref seqBuffer, buffer.Length);
+
+            if (headBuffer.Length != buffer.Length)
+                System.Array.Resize(ref headBuffer, buffer.Length);
+            if (tailBuffer.Length != buffer.Length)
+                System.Array.Resize(ref tailBuffer, buffer.Length);
+
+            SetArrayToSingleValue(freqExpBuffer, freqExpBuffer.Length, 0f);
+            SetArrayToSingleValue(freqLinBuffer, freqLinBuffer.Length, 0f);
+            SetArrayToSingleValue(ampBuffer, ampBuffer.Length, 0f);
+            SetArrayToSingleValue(seqBuffer, seqBuffer.Length, 0f);
+            SetArrayToSingleValue(headBuffer, headBuffer.Length, 0f);
+            SetArrayToSingleValue(tailBuffer, tailBuffer.Length, 0f);
+
+            if (freqExpGen != null) freqExpGen.processBuffer(freqExpBuffer, dspTime, channels);
+            if (freqLinGen != null) freqLinGen.processBuffer(freqLinBuffer, dspTime, channels);
+            if (ampGen != null) ampGen.processBuffer(ampBuffer, dspTime, channels);
+            if (seqGen != null) seqGen.processBuffer(seqBuffer, dspTime, channels);
+
+            if (headGen != null)
             {
-                bufferCount = (int)System.Math.Round(floatingBufferCount);
-                floatingBufferCount += amount;
-
-                if (bufferCount > sampleBounds[1]) floatingBufferCount = bufferCount = sampleBounds[0];
-
-                else if (bufferCount < sampleBounds[0]) floatingBufferCount = bufferCount = sampleBounds[1];
-
-                float endAmplitude = amplitude;
-                if (ampGen != null) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2f);
-
-                buffer[i] = lp_filter[0] = lp_filter[0] * .9f + .1f * clipSamples[bufferCount * clipChannels] * endAmplitude;
-                if (clipChannels == 2) buffer[i + 1] = lp_filter[1] = lp_filter[1] * .9f + .1f * clipSamples[bufferCount * clipChannels + 1] * endAmplitude;
-                else buffer[i + 1] = buffer[i];
-
-                dspTime += _sampleDuration;
+                headGen.processBuffer(headBuffer, dspTime, channels);
+                headOffset = Mathf.Clamp01(headBuffer[0] + headTrim); // use buffer for offset, take only first sample of buffer
             }
-            turntableDelta = 0;
+            else
+            {
+                headOffset = 0f;
+            }
 
+            if (tailGen != null)
+            {
+                tailGen.processBuffer(tailBuffer, dspTime, channels);
+                tailOffset = Mathf.Clamp01(tailBuffer[0] + tailTrim); // use buffer for offset, take only first sample of buffer
+            }
+            else
+            {
+                tailOffset = 0f;
+            }
+
+
+            updateSampleBounds(); // might be overkill!
+
+            if (!scrubGrabbed && !turntableGrabbed)
+            {
+                bool curActive = active;
+                windowLength = Mathf.FloorToInt(windowing * 4800);
+
+                floatingBufferCount = ClipSignalGenerator(buffer, freqExpBuffer, freqLinBuffer, ampBuffer, seqBuffer, buffer.Length, lastSeqGen, channels, freqExpGen != null, freqLinGen != null, ampGen != null, seqGen != null, floatingBufferCount, sampleBounds,
+                    playbackSpeed, lastPlaybackSpeed, sampleLayerPointers[0], sampleLayerPointers[1], sampleLayerPointers[2], sampleLayerPointers[3], sampleLayerPointers[4],
+                    sampleLayerFrameCounts[0], sampleLayerFrameCounts[1], sampleLayerFrameCounts[2], sampleLayerFrameCounts[3], sampleLayerFrameCounts[4],
+                    sampleLayerCount, (int)interpolationMode, useSampleLayers, clipChannels, amplitude, lastAmplitude, playdirection, looping, _sampleDuration, bufferCount, ref active, windowLength);
+                if (curActive != active) _sampleInterface.playEvent(active);
+                ApplyPlaybackFilters(buffer, channels,
+                    EstimatePlaybackStep(playbackSpeed, freqExpBuffer, freqExpGen != null, freqLinBuffer, freqLinGen != null,
+                        channels), false);
+            }
+            else if (scrubGrabbed) // keeping scrub non-native because such an edge-case and maxes out at 2 instances
+            {
+                double amount = (scrubTarg - _lastBuffer) / (buffer.Length / channels);
+
+                for (int i = 0; i < buffer.Length; i += channels)
+                {
+                    bufferCount = (int)System.Math.Round(floatingBufferCount);
+                    floatingBufferCount += amount;
+
+                    float endAmplitude = amplitude;
+                    if (ampGen != null) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2f); // -1,1 > 0,1
+                    buffer[i] = ReadLayeredSample(floatingBufferCount, 0, (float)amount) * endAmplitude;
+                    if (clipChannels == 2) buffer[i + 1] = ReadLayeredSample(floatingBufferCount, 1, (float)amount) * endAmplitude;
+                    else buffer[i + 1] = buffer[i];
+
+                    dspTime += _sampleDuration;
+                }
+
+                ApplyPlaybackFilters(buffer, channels, (float)amount, true);
+            }
+            else
+            {
+                float amount = turntableDelta * (float)_sampleRate * channels / buffer.Length;
+                for (int i = 0; i < buffer.Length; i += channels)
+                {
+                    floatingBufferCount += amount;
+
+                    if (floatingBufferCount > sampleBounds[1]) floatingBufferCount = sampleBounds[0];
+
+                    else if (floatingBufferCount < sampleBounds[0]) floatingBufferCount = sampleBounds[1];
+
+                    float endAmplitude = amplitude;
+                    if (ampGen != null) endAmplitude = endAmplitude * ((ampBuffer[i] + 1) / 2f);
+
+                    buffer[i] = ReadLayeredSample(floatingBufferCount, 0, amount) * endAmplitude;
+                    if (clipChannels == 2) buffer[i + 1] = ReadLayeredSample(floatingBufferCount, 1, amount) * endAmplitude;
+                    else buffer[i + 1] = buffer[i];
+
+                    dspTime += _sampleDuration;
+                }
+                turntableDelta = 0;
+                ApplyPlaybackFilters(buffer, channels, amount, true);
+
+            }
+
+            _lastBuffer = floatingBufferCount;
+            samplePos = (float)floatingBufferCount * clipChannels / clipSamples.Length;
+
+            lastAmplitude = amplitude;
+            lastPlaybackSpeed = playbackSpeed;
         }
-
-        _lastBuffer = floatingBufferCount;
-        samplePos = (float)floatingBufferCount * clipChannels / clipSamples.Length;
-
-        lastAmplitude = amplitude;
-        lastPlaybackSpeed = playbackSpeed;
         recursionCheckPost();
     }
-
-    float[] lp_filter = new float[] { 0, 0 };
-
 
 }

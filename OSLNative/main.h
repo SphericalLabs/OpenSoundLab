@@ -70,13 +70,15 @@ OSL_API void OscillatorSetPhase(OscillatorProcessor* processor, double phase);
 
 OSL_API void GateProcessBuffer(float buffer[], int length, int channels, bool incoming, float controlBuffer[],
                                bool bControlSig, float amp);
-OSL_API double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[],
-                                   float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen,
-                                   bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount,
-                                   int sampleBounds[2], float playbackSpeed, float lastPlaybackSpeed, void* clip,
-                                   int clipChannels, float amplitude, float lastAmplitude, bool playdirection,
-                                   bool looping, double _sampleDuration, int bufferCount, bool& active,
-                                   int windowLength);
+    OSL_API double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[],
+                                       float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen,
+                                       bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount,
+                                       int sampleBounds[2], float playbackSpeed, float lastPlaybackSpeed, void* clip0,
+                                       void* clip1, void* clip2, void* clip3, void* clip4, int clipFrames0,
+                                       int clipFrames1, int clipFrames2, int clipFrames3, int clipFrames4,
+                                       int availableLayers, int interpolationMode, bool useSampleLayers, int clipChannels,
+                                       float amplitude, float lastAmplitude, bool playdirection, bool looping,
+                                       double _sampleDuration, int bufferCount, bool& active, int windowLength);
 OSL_API void ADSRSignalGenerator(float buffer[], int length, int channels, int frames[], int& frameCount, bool active,
                                  float& ADSRvolume, float volumes[], float startVal, int& curFrame, bool sustaining);
 OSL_API void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int semitone, float keyMultConst,

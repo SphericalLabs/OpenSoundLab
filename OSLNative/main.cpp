@@ -27,23 +27,281 @@
 
 #include "main.h"
 #include "Oscillator.h"
+#include "resample.h"
 #include "util.h"
 #include <math.h>
 #include <stdlib.h>
 #include <random>
 #include "libs/pcg-cpp/include/pcg_random.hpp"
 #include <random>
-#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM64) || defined(_M_ARM)
 #include <arm_neon.h>
+#define OSL_ARM_NEON 1
+#else
+#define OSL_ARM_NEON 0
 #endif
 
 #define PI 3.14159265
+constexpr int kMaxClipLayers = 5;
 
 extern "C" {
 
 float lerp(float a, float b, float f) {
     return (a * (1.0f - f)) + (b * f);
 }
+
+static inline int clampFrameIndex(int frame, int frameCount) {
+    if (frame < 0)
+        return 0;
+    if (frame >= frameCount)
+        return frameCount - 1;
+    return frame;
+}
+
+static inline float readClipFrame(const float* clipData, int frameCount, int clipChannels, int frame, int channel) {
+    if (!clipData || frameCount <= 0)
+        return 0.f;
+
+    frame = clampFrameIndex(frame, frameCount);
+    int channelIndex = clipChannels > 1 ? channel : 0;
+    return clipData[frame * clipChannels + channelIndex];
+}
+
+#if OSL_ARM_NEON
+static inline float32x2_t readClipFrameStereo(const float* clipData, int frameCount, int frame) {
+    if (!clipData || frameCount <= 0)
+        return vdup_n_f32(0.f);
+
+    frame = clampFrameIndex(frame, frameCount);
+    return vld1_f32(clipData + frame * 2);
+}
+
+static inline float32x2_t readNearestSampleStereo(const float* clipData, int frameCount, double position) {
+    return readClipFrameStereo(clipData, frameCount, (int) round(position));
+}
+
+static inline float32x2_t readLinearSampleStereo(const float* clipData, int frameCount, double position) {
+    int frame = (int) floor(position);
+    float frac = (float) (position - frame);
+    float32x2_t a = readClipFrameStereo(clipData, frameCount, frame);
+    float32x2_t b = readClipFrameStereo(clipData, frameCount, frame + 1);
+    float32x2_t delta = vsub_f32(b, a);
+    return vmla_n_f32(a, delta, frac);
+}
+
+static inline float32x2_t readHermiteSampleStereo(const float* clipData, int frameCount, double position) {
+    int x1 = (int) floor(position);
+    float frac = (float) (position - x1);
+
+    float32x2_t y0 = readClipFrameStereo(clipData, frameCount, x1 - 1);
+    float32x2_t y1 = readClipFrameStereo(clipData, frameCount, x1);
+    float32x2_t y2 = readClipFrameStereo(clipData, frameCount, x1 + 1);
+    float32x2_t y3 = readClipFrameStereo(clipData, frameCount, x1 + 2);
+
+    float32x2_t c0 = y1;
+    float32x2_t c1 = vmul_n_f32(vsub_f32(y2, y0), 0.5f);
+
+    float32x2_t c2 = vsub_f32(y0, vmul_n_f32(y1, 2.5f));
+    c2 = vadd_f32(c2, vmul_n_f32(y2, 2.f));
+    c2 = vsub_f32(c2, vmul_n_f32(y3, 0.5f));
+
+    float32x2_t c3 = vmul_n_f32(vsub_f32(y3, y0), 0.5f);
+    c3 = vadd_f32(c3, vmul_n_f32(vsub_f32(y1, y2), 1.5f));
+
+    float32x2_t result = vmla_n_f32(c2, c3, frac);
+    result = vmla_n_f32(c1, result, frac);
+    return vmla_n_f32(c0, result, frac);
+}
+
+static inline float32x2_t readLagrangeSampleStereo(const float* clipData, int frameCount, double position) {
+    int x1 = (int) floor(position);
+    float frac = (float) (position - x1);
+
+    float32x2_t y0 = readClipFrameStereo(clipData, frameCount, x1 - 1);
+    float32x2_t y1 = readClipFrameStereo(clipData, frameCount, x1);
+    float32x2_t y2 = readClipFrameStereo(clipData, frameCount, x1 + 1);
+    float32x2_t y3 = readClipFrameStereo(clipData, frameCount, x1 + 2);
+
+    float w0 = -frac * (frac - 1.f) * (frac - 2.f) / 6.f;
+    float w1 = (frac + 1.f) * (frac - 1.f) * (frac - 2.f) * 0.5f;
+    float w2 = -(frac + 1.f) * frac * (frac - 2.f) * 0.5f;
+    float w3 = (frac + 1.f) * frac * (frac - 1.f) / 6.f;
+
+    float32x2_t result = vmul_n_f32(y0, w0);
+    result = vmla_n_f32(result, y1, w1);
+    result = vmla_n_f32(result, y2, w2);
+    result = vmla_n_f32(result, y3, w3);
+    return result;
+}
+
+static inline float32x2_t readWindowedSincSampleStereo(const float* clipData, int frameCount, double position) {
+    int ptr = (int) round(position);
+    float frac = (float) (position - ptr);
+    float convL[CONV_LENGTH];
+    float convR[CONV_LENGTH];
+    float tapValues[2];
+
+    for (int i = 0; i < CONV_LENGTH; i++) {
+        int frame = ptr - ZEROCROSSINGS_PER_AXIS + i;
+        float32x2_t tap = readClipFrameStereo(clipData, frameCount, frame);
+        vst1_f32(tapValues, tap);
+        convL[i] = tapValues[0];
+        convR[i] = tapValues[1];
+    }
+
+    float left = wsinc_resample(convL, -frac);
+    float right = wsinc_resample(convR, -frac);
+    float out[2] = {left, right};
+    return vld1_f32(out);
+}
+
+static inline float32x2_t readInterpolatedSampleStereo(const float* clipData, int frameCount, double position,
+                                                       int interpolationMode) {
+    if (!clipData || frameCount <= 0)
+        return vdup_n_f32(0.f);
+
+    switch (interpolationMode) {
+    case INTERPOLATION_NONE:
+        return readNearestSampleStereo(clipData, frameCount, position);
+    case INTERPOLATION_LINEAR:
+        return readLinearSampleStereo(clipData, frameCount, position);
+    case INTERPOLATION_WSINC:
+        return readWindowedSincSampleStereo(clipData, frameCount, position);
+    case INTERPOLATION_LAGRANGE:
+        return readLagrangeSampleStereo(clipData, frameCount, position);
+    case INTERPOLATION_HERMITE:
+    default:
+        return readHermiteSampleStereo(clipData, frameCount, position);
+    }
+}
+#endif
+
+static inline float readNearestSample(const float* clipData, int frameCount, int clipChannels, double position,
+                                      int channel) {
+    return readClipFrame(clipData, frameCount, clipChannels, (int) round(position), channel);
+}
+
+static inline float readLinearSample(const float* clipData, int frameCount, int clipChannels, double position,
+                                     int channel) {
+    int frame = (int) floor(position);
+    float frac = (float) (position - frame);
+    float a = readClipFrame(clipData, frameCount, clipChannels, frame, channel);
+    float b = readClipFrame(clipData, frameCount, clipChannels, frame + 1, channel);
+    return a + frac * (b - a);
+}
+
+static inline float readHermiteSample(const float* clipData, int frameCount, int clipChannels, double position,
+                                      int channel) {
+    int x1 = (int) floor(position);
+    float frac = (float) (position - x1);
+
+    float y0 = readClipFrame(clipData, frameCount, clipChannels, x1 - 1, channel);
+    float y1 = readClipFrame(clipData, frameCount, clipChannels, x1, channel);
+    float y2 = readClipFrame(clipData, frameCount, clipChannels, x1 + 1, channel);
+    float y3 = readClipFrame(clipData, frameCount, clipChannels, x1 + 2, channel);
+
+    float c0 = y1;
+    float c1 = 0.5f * (y2 - y0);
+    float c2 = y0 - 2.5f * y1 + 2.f * y2 - 0.5f * y3;
+    float c3 = 0.5f * (y3 - y0) + 1.5f * (y1 - y2);
+    return ((c3 * frac + c2) * frac + c1) * frac + c0;
+}
+
+static inline float readLagrangeSample(const float* clipData, int frameCount, int clipChannels, double position,
+                                       int channel) {
+    int x1 = (int) floor(position);
+    float frac = (float) (position - x1);
+
+    float y0 = readClipFrame(clipData, frameCount, clipChannels, x1 - 1, channel);
+    float y1 = readClipFrame(clipData, frameCount, clipChannels, x1, channel);
+    float y2 = readClipFrame(clipData, frameCount, clipChannels, x1 + 1, channel);
+    float y3 = readClipFrame(clipData, frameCount, clipChannels, x1 + 2, channel);
+
+    float w0 = -frac * (frac - 1.f) * (frac - 2.f) / 6.f;
+    float w1 = (frac + 1.f) * (frac - 1.f) * (frac - 2.f) * 0.5f;
+    float w2 = -(frac + 1.f) * frac * (frac - 2.f) * 0.5f;
+    float w3 = (frac + 1.f) * frac * (frac - 1.f) / 6.f;
+    return y0 * w0 + y1 * w1 + y2 * w2 + y3 * w3;
+}
+
+static inline float readWindowedSincSample(const float* clipData, int frameCount, int clipChannels, double position,
+                                           int channel) {
+    int ptr = (int) round(position);
+    float frac = (float) (position - ptr);
+    float conv[CONV_LENGTH];
+
+    for (int i = 0; i < CONV_LENGTH; i++) {
+        int frame = ptr - ZEROCROSSINGS_PER_AXIS + i;
+        conv[i] = readClipFrame(clipData, frameCount, clipChannels, frame, channel);
+    }
+
+    return wsinc_resample(conv, -frac);
+}
+
+static inline float readInterpolatedSample(const float* clipData, int frameCount, int clipChannels, double position,
+                                           int channel, int interpolationMode) {
+    if (!clipData || frameCount <= 0)
+        return 0.f;
+
+    switch (interpolationMode) {
+    case INTERPOLATION_NONE:
+        return readNearestSample(clipData, frameCount, clipChannels, position, channel);
+    case INTERPOLATION_LINEAR:
+        return readLinearSample(clipData, frameCount, clipChannels, position, channel);
+    case INTERPOLATION_WSINC:
+        return readWindowedSincSample(clipData, frameCount, clipChannels, position, channel);
+    case INTERPOLATION_LAGRANGE:
+        return readLagrangeSample(clipData, frameCount, clipChannels, position, channel);
+    case INTERPOLATION_HERMITE:
+    default:
+        return readHermiteSample(clipData, frameCount, clipChannels, position, channel);
+    }
+}
+
+static inline int selectLayerIndex(float playbackStep, int availableLayers, bool useSampleLayers) {
+    if (!useSampleLayers || availableLayers <= 1)
+        return 0;
+
+    playbackStep = fabsf(playbackStep);
+    int layer = 0;
+    while (layer + 1 < availableLayers && playbackStep > 1.25f) {
+        playbackStep *= 0.5f;
+        layer++;
+    }
+
+    return layer;
+}
+
+static inline float readLayeredSample(void* clipLayers[], int clipFrames[], int availableLayers, int clipChannels,
+                                      double position, int channel, int interpolationMode, bool useSampleLayers,
+                                      float playbackStep) {
+    int layer = selectLayerIndex(playbackStep, availableLayers, useSampleLayers);
+    while (layer > 0 && (!clipLayers[layer] || clipFrames[layer] <= 0)) {
+        layer--;
+    }
+
+    const float* clipData = reinterpret_cast<const float*>(clipLayers[layer]);
+    float scale = (float) (1 << layer);
+    double scaledPosition = position / scale;
+    return readInterpolatedSample(clipData, clipFrames[layer], clipChannels, scaledPosition, channel,
+                                  interpolationMode);
+}
+
+#if OSL_ARM_NEON
+static inline float32x2_t readLayeredSampleStereo(void* clipLayers[], int clipFrames[], int availableLayers,
+                                                  double position, int interpolationMode, bool useSampleLayers,
+                                                  float playbackStep) {
+    int layer = selectLayerIndex(playbackStep, availableLayers, useSampleLayers);
+    while (layer > 0 && (!clipLayers[layer] || clipFrames[layer] <= 0)) {
+        layer--;
+    }
+
+    const float* clipData = reinterpret_cast<const float*>(clipLayers[layer]);
+    float scale = (float) (1 << layer);
+    double scaledPosition = position / scale;
+    return readInterpolatedSampleStereo(clipData, clipFrames[layer], scaledPosition, interpolationMode);
+}
+#endif
 
 void SetArrayToFixedValue(float buf[], int length, float value) {
     for (int i = 0; i < length; ++i) // how pre-increment? clicks?
@@ -416,15 +674,40 @@ void KeyFrequencySignalGenerator(float buffer[], int length, int channels, int s
 double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinBuffer[], float ampBuffer[],
                            float seqBuffer[], int length, float lastSeqGen[2], int channels, bool freqExpGen,
                            bool freqLinGen, bool ampGen, bool seqGen, double floatingBufferCount, int sampleBounds[2],
-                           float playbackSpeed, float lastPlayBackSpeed, void* clip, int clipChannels, float amplitude,
-                           float lastAmplitude, bool playdirection, bool looping, double _sampleDuration,
-                           int bufferCount, bool& active, int windowLength = 0) {
+                           float playbackSpeed, float lastPlayBackSpeed, void* clip0, void* clip1, void* clip2,
+                           void* clip3, void* clip4, int clipFrames0, int clipFrames1, int clipFrames2,
+                           int clipFrames3, int clipFrames4, int availableLayers, int interpolationMode,
+                           bool useSampleLayers, int clipChannels, float amplitude, float lastAmplitude,
+                           bool playdirection, bool looping, double _sampleDuration, int bufferCount, bool& active,
+                           int windowLength = 0) {
     // clip not yet or not available anymore, but wouldn't check for segmentation fault due to outdated pointer
-    if (!clip) {
+    if (!clip0) {
+        return floatingBufferCount;
+    }
+    if (!sampleBounds) {
         return floatingBufferCount;
     }
 
-    float* clipdata = reinterpret_cast<float*>(clip);
+    void* clipLayers[kMaxClipLayers];
+    clipLayers[0] = clip0;
+    clipLayers[1] = clip1;
+    clipLayers[2] = clip2;
+    clipLayers[3] = clip3;
+    clipLayers[4] = clip4;
+
+    int clipFrames[kMaxClipLayers];
+    clipFrames[0] = clipFrames0;
+    clipFrames[1] = clipFrames1;
+    clipFrames[2] = clipFrames2;
+    clipFrames[3] = clipFrames3;
+    clipFrames[4] = clipFrames4;
+    if (availableLayers < 1)
+        availableLayers = 1;
+    if (availableLayers > kMaxClipLayers)
+        availableLayers = kMaxClipLayers;
+    if (sampleBounds[1] <= sampleBounds[0])
+        return floatingBufferCount;
+
     float sampleBoundsCenter = (sampleBounds[0] + sampleBounds[1]) * 0.5f;
 
     for (int i = 0; i < length; i += channels) {
@@ -439,14 +722,17 @@ double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinB
         if (lastPlayBackSpeed != playbackSpeed)
             endPlaybackSpeed = lerp(lastPlayBackSpeed, playbackSpeed, (float) i / length); // slope limiting
 
+        float playbackStep = 0.f;
         if (active) {
             if (freqExpGen)
-                floatingBufferCount += endPlaybackSpeed * pow(2, _clamp(freqExpBuffer[i], -1.f, 1.f) *
-                                                                     10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
+                playbackStep = endPlaybackSpeed * pow(2, _clamp(freqExpBuffer[i], -1.f, 1.f) *
+                                                             10.f); // exp fm, upscale 0.1V/Oct to 1V/Oct
             else
-                floatingBufferCount += endPlaybackSpeed;
+                playbackStep = endPlaybackSpeed;
             if (freqLinGen)
-                floatingBufferCount += freqLinBuffer[i] * 20.f; // lin fm
+                playbackStep += freqLinBuffer[i] * 20.f; // lin fm
+
+            floatingBufferCount += playbackStep;
         }
 
         bool endOfSample = false;
@@ -497,20 +783,28 @@ double ClipSignalGenerator(float buffer[], float freqExpBuffer[], float freqLinB
         }
 
         if (active) {
-            // linear interpolation
-            buffer[i] = lerp(clipdata[(int) floor(floatingBufferCount) * clipChannels],
-                             clipdata[(int) ceil(floatingBufferCount) * clipChannels],
-                             fmod(floatingBufferCount, floor(floatingBufferCount))) *
+#if OSL_ARM_NEON
+            if (clipChannels == 2 && channels == 2) {
+                float32x2_t frame = readLayeredSampleStereo(clipLayers, clipFrames, availableLayers,
+                                                            floatingBufferCount, interpolationMode,
+                                                            useSampleLayers, playbackStep);
+                frame = vmul_n_f32(frame, endAmplitude * windowing);
+                vst1_f32(buffer + i, frame);
+            } else
+#endif
+            {
+            buffer[i] = readLayeredSample(clipLayers, clipFrames, availableLayers, clipChannels, floatingBufferCount, 0,
+                                          interpolationMode, useSampleLayers, playbackStep) *
                         endAmplitude * windowing;
-            ;
 
             if (clipChannels == 2) {
-                buffer[i + 1] = lerp(clipdata[(int) floor(floatingBufferCount) * clipChannels + 1],
-                                     clipdata[(int) ceil(floatingBufferCount) * clipChannels + 1],
-                                     fmod(floatingBufferCount, floor(floatingBufferCount))) *
-                                endAmplitude * windowing;
+                buffer[i + 1] =
+                    readLayeredSample(clipLayers, clipFrames, availableLayers, clipChannels, floatingBufferCount, 1,
+                                      interpolationMode, useSampleLayers, playbackStep) *
+                    endAmplitude * windowing;
             } else {
                 buffer[i + 1] = buffer[i];
+            }
             }
         }
     }
