@@ -100,10 +100,38 @@ public class clipPlayerComplex : clipPlayer
     public override void toggleWaveDisplay(bool on)
     {
         if (_waveDisplayAnimation != null) StopCoroutine(_waveDisplayAnimation);
+        if (!isActiveAndEnabled)
+        {
+            applyWaveDisplayState(on, on ? 0.55f : 0f);
+            _waveDisplayAnimation = null;
+            return;
+        }
         _waveDisplayAnimation = StartCoroutine(waveDisplayAnimation(on));
     }
 
     Coroutine _waveDisplayAnimation;
+    void applyWaveDisplayState(bool on, float emissionGain)
+    {
+        if (waverend != null)
+        {
+            waverend.gameObject.SetActive(on);
+            if (waverend.material != null)
+            {
+                waverend.material.SetFloat("_EmissionGain", emissionGain);
+            }
+        }
+
+        if (scrubTransform != null)
+        {
+            scrubTransform.gameObject.SetActive(on);
+        }
+
+        for (int i = 0; i < scrubIndicators.Length; i++)
+        {
+            if (scrubIndicators[i] != null) scrubIndicators[i].SetActive(on);
+        }
+    }
+
     IEnumerator waveDisplayAnimation(bool on)
     {
         if (on)
@@ -147,12 +175,11 @@ public class clipPlayerComplex : clipPlayer
 
         if (!on)
         {
-            waverend.gameObject.SetActive(on);
+            applyWaveDisplayState(false, 0f);
         }
         else
         {
-            scrubTransform.gameObject.SetActive(on);
-            for (int i = 0; i < scrubIndicators.Length; i++) scrubIndicators[i].SetActive(on);
+            applyWaveDisplayState(true, 0.55f);
         }
     }
 

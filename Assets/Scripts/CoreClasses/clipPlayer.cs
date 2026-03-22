@@ -42,7 +42,8 @@ public class clipPlayer : signalGenerator
     public double floatingBufferCount = 0;
     public int bufferCount = 0;
     public Vector2 trackBounds = new Vector2(0, 1);
-    public SamplerInterpolationMode interpolationMode = SamplerInterpolationMode.Hermite4;
+    // Shared sampler defaults for A/B testing: set interpolation mode, sample-layer use, and post-filter strength here.
+    public SamplerInterpolationMode interpolationMode = SamplerInterpolationMode.WindowedSinc23;
     public bool useSampleLayers = true;
     [Range(0f, 1f)] public float postFilterStrength = 0.5f;
 
@@ -88,7 +89,10 @@ public class clipPlayer : signalGenerator
             sampleLayerCount = 0;
             clearLayerPointers();
             resetPlaybackFilters();
-            toggleWaveDisplay(false);
+            if (isActiveAndEnabled)
+            {
+                toggleWaveDisplay(false);
+            }
         }
     }
 
@@ -97,7 +101,7 @@ public class clipPlayer : signalGenerator
         freePlaybackFilters();
     }
 
-    public void LoadSamples(SampleLayerBank bank)
+    public void LoadSamples(SampleLayerBank bank, bool preservePlaybackState = false)
     {
         if (bank == null || bank.Count == 0)
         {
@@ -120,12 +124,23 @@ public class clipPlayer : signalGenerator
 
             sampleBounds[0] = (int)((clipSamples.Length / clipChannels - 1) * (trackBounds.x));
             sampleBounds[1] = (int)((clipSamples.Length / clipChannels - 1) * (trackBounds.y));
-            int safeStartFrame = Mathf.Min(sampleBounds[1], sampleBounds[0] + 1);
-            floatingBufferCount = _lastBuffer = bufferCount = safeStartFrame;
+            if (!preservePlaybackState || !loaded)
+            {
+                int safeStartFrame = Mathf.Min(sampleBounds[1], sampleBounds[0] + 1);
+                floatingBufferCount = _lastBuffer = bufferCount = safeStartFrame;
+                resetPlaybackFilters();
+                toggleWaveDisplay(true);
+                DrawClipTex();
+            }
+            else
+            {
+                double minFrame = Mathf.Min(sampleBounds[1], sampleBounds[0] + 1);
+                double maxFrame = sampleBounds[1];
+                _lastBuffer = Math.Max(minFrame, Math.Min(maxFrame, _lastBuffer));
+                floatingBufferCount = Math.Max(minFrame, Math.Min(maxFrame, floatingBufferCount));
+                bufferCount = Mathf.Clamp(bufferCount, (int)minFrame, sampleBounds[1]);
+            }
 
-            resetPlaybackFilters();
-            toggleWaveDisplay(true);
-            DrawClipTex();
             loaded = true;
         }
     }

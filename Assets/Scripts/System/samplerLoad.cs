@@ -28,15 +28,11 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using UnityEngine.Events;
 
 public class samplerLoad : MonoBehaviour
 {
-    const int BIQUAD_LOWPASS = 1;
-
     public GameObject tapePrefab;
     public GameObject loadingPrefab;
     public Transform deckOutline;
@@ -54,21 +50,24 @@ public class samplerLoad : MonoBehaviour
     public int generatedLayerCount = 3;
     public int clipReadFramesPerChunk = 16384;
     public int layerBuildFramesPerChunk = 8192;
+    public float wavetableSampleSeconds = 1f;
+    public int wavetableAdditionalLayers = 4;
+    public float extraShortSampleSeconds = 2.5f;
+    public float shortSampleSeconds = 5f;
+    public float mediumSampleSeconds = 20f;
+    public int extraShortAdditionalLayers = 3;
+    public int shortAdditionalLayers = 2;
+    public int mediumAdditionalLayers = 1;
+    public int longAdditionalLayers = 0;
+    [NonSerialized] public float loadingProgress = 0f;
+    [NonSerialized] public SamplerLoadStage loadingStage = SamplerLoadStage.Idle;
 
     SampleLayerBank sampleLayerBank;
+    SamplerBackgroundLoadJob activeLoadJob;
+    int activeLoadRequestId = 0;
 
     public UnityEvent onLoadTapeEvents;
     public UnityEvent onUnloadTapeEvents;
-
-    [DllImport("OSLNative")]
-    static extern IntPtr Biquad_new(int type, float frequency, float Q, float gain, float sampleRate, int channels);
-
-    [DllImport("OSLNative")]
-    static extern void Biquad_free(IntPtr x);
-
-    [DllImport("OSLNative")]
-    static extern void Biquad_process(IntPtr x, int type, float frequency, float Q, float gain, float sampleRate,
-        float[] input, float[] output, int n);
 
     void Awake()
     {
@@ -141,21 +140,11 @@ public class samplerLoad : MonoBehaviour
         if (currentTape == t)
         {
             currentTape = null;
-            if (_streamRoutine != null)
-            {
-                if (loaderObject != null) Destroy(loaderObject);
-                StopCoroutine(_streamRoutine);
-            }
+            cancelActiveLoad();
 
             if (miniSpeaker != null) miniSpeaker.updateSecondary(false);
 
-            for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
-            if (sampleLayerBank != null)
-            {
-                sampleLayerBank.Release();
-                sampleLayerBank = null;
-            }
-            clipSamples = null;
+            clearLoadedSampleState();
 
             if (updateEvent)
             {
@@ -166,74 +155,85 @@ public class samplerLoad : MonoBehaviour
 
     public void LoadClip(string path)
     {
-
         string fullpath = sampleManager.instance.parseFilename(path);
-
         if (!File.Exists(fullpath))
         {
             return;
         }
 
-        if (_streamRoutine != null)
-        {
-            if (loaderObject != null) Destroy(loaderObject);
-            StopCoroutine(_streamRoutine);
-        }
+        cancelActiveLoad();
+        clearLoadedSampleState();
 
-        _streamRoutine = StartCoroutine(streamRoutine(fullpath));
+        activeLoadRequestId++;
+        int requestId = activeLoadRequestId;
+        activeLoadJob = new SamplerBackgroundLoadJob(fullpath, generatedLayerCount, clipReadFramesPerChunk,
+            layerBuildFramesPerChunk, wavetableSampleSeconds, extraShortSampleSeconds, shortSampleSeconds,
+            mediumSampleSeconds, wavetableAdditionalLayers, extraShortAdditionalLayers, shortAdditionalLayers,
+            mediumAdditionalLayers, longAdditionalLayers);
+        activeLoadJob.Start();
+        _streamRoutine = StartCoroutine(streamRoutine(activeLoadJob, requestId));
     }
 
     GameObject loaderObject;
     Coroutine _streamRoutine;
-    IEnumerator streamRoutine(string fullpath)
+    IEnumerator streamRoutine(SamplerBackgroundLoadJob job, int requestId)
     {
-        AudioClip c = RuntimeAudioClipLoader.Manager.Load(fullpath, false, true, true);
-
         loaderObject = Instantiate(loadingPrefab, transform, false) as GameObject;
         loaderObject.transform.localPosition = new Vector3(-.05f, .013f, 0.061f);
         loaderObject.transform.localRotation = Quaternion.Euler(0, 180, 0);
         loaderObject.transform.localScale = Vector3.one * .1f;
 
-        while (RuntimeAudioClipLoader.Manager.GetAudioClipLoadState(c) != AudioDataLoadState.Loaded)
+        bool baseBankPublished = false;
+        while (requestId == activeLoadRequestId && activeLoadJob == job)
         {
+            loadingProgress = job.Progress;
+            loadingStage = job.Stage;
+
+            if (job.TryConsumeRaw(out float[] rawSamples, out int rawChannels, out int rawFrames, out int rawSampleRate))
+            {
+                clipSamples = rawSamples;
+                applySampleBank(new float[][] { rawSamples }, rawChannels, false);
+                baseBankPublished = true;
+            }
+
+            if (job.TryConsumeLayers(out float[][] layers, out int layerChannels))
+            {
+                clipSamples = layers[0];
+                applySampleBank(layers, layerChannels, baseBankPublished);
+            }
+
+            if (job.Completed)
+            {
+                if (job.Failed && job.Error != null)
+                {
+                    Debug.LogException(job.Error, this);
+                }
+                break;
+            }
+
             yield return null;
         }
 
-        for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
-        if (sampleLayerBank != null)
+        if (requestId == activeLoadRequestId)
         {
-            sampleLayerBank.Release();
-            sampleLayerBank = null;
+            activeLoadJob = null;
+            loadingProgress = job.Progress;
+            loadingStage = job.Stage;
         }
-        clipSamples = null;
 
-        while (c.loadState != AudioDataLoadState.Loaded) yield return null;
-
-        int channels = Mathf.Max(1, c.channels);
-        int frames = Mathf.Max(1, c.samples);
-        clipSamples = new float[frames * channels];
-        yield return copyClipDataIncrementally(c, clipSamples, frames, channels);
-
-        int requestedAdditionalLayers = Mathf.Clamp(generatedLayerCount, 0, SampleLayerBank.MaxAdditionalLayers);
-        sampleLayerBank = null;
-        yield return buildLayerBankIncrementally(clipSamples, channels, frames, c.frequency, requestedAdditionalLayers);
-
-        if (loaderObject != null) Destroy(loaderObject);
-
-        if (sampleLayerBank != null)
+        if (loaderObject != null)
         {
-            for (int i = 0; i < players.Length; i++) players[i].LoadSamples(sampleLayerBank);
+            Destroy(loaderObject);
+            loaderObject = null;
         }
+
+        _streamRoutine = null;
     }
 
     void OnDestroy()
     {
-        for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
-        if (sampleLayerBank != null)
-        {
-            sampleLayerBank.Release();
-            sampleLayerBank = null;
-        }
+        cancelActiveLoad();
+        clearLoadedSampleState();
     }
 
     public string[] queuedSample = new string[] { "", "" };
@@ -290,115 +290,6 @@ public class samplerLoad : MonoBehaviour
 
     Coroutine _flashRoutine;
 
-    IEnumerator copyClipDataIncrementally(AudioClip clip, float[] destination, int totalFrames, int channels)
-    {
-        int framesPerChunk = Mathf.Max(1024, clipReadFramesPerChunk);
-        float[] chunk = new float[Mathf.Min(framesPerChunk, totalFrames) * channels];
-
-        for (int offsetFrame = 0; offsetFrame < totalFrames; offsetFrame += framesPerChunk)
-        {
-            int framesThisChunk = Mathf.Min(framesPerChunk, totalFrames - offsetFrame);
-            int samplesThisChunk = framesThisChunk * channels;
-            if (chunk.Length != samplesThisChunk)
-            {
-                chunk = new float[samplesThisChunk];
-            }
-
-            clip.GetData(chunk, offsetFrame);
-            System.Array.Copy(chunk, 0, destination, offsetFrame * channels, samplesThisChunk);
-            yield return null;
-        }
-    }
-
-    IEnumerator buildLayerBankIncrementally(float[] source, int channels, int sourceFrames, int sourceSampleRate,
-        int additionalLayers)
-    {
-        List<float[]> layers = new List<float[]> { source };
-        float[] currentLayer = source;
-        int currentFrames = sourceFrames;
-        int currentSampleRate = Mathf.Max(1, sourceSampleRate);
-
-        for (int layerIndex = 0; layerIndex < additionalLayers; layerIndex++)
-        {
-            if (currentFrames < 32)
-            {
-                break;
-            }
-
-            float[] nextLayer = null;
-            yield return buildDownsampledLayer(currentLayer, currentFrames, channels, currentSampleRate,
-                value => nextLayer = value);
-            if (nextLayer == null || nextLayer.Length == 0)
-            {
-                break;
-            }
-
-            layers.Add(nextLayer);
-            currentLayer = nextLayer;
-            currentFrames = Mathf.Max(1, nextLayer.Length / channels);
-            currentSampleRate = Mathf.Max(1, currentSampleRate / 2);
-        }
-
-        sampleLayerBank = new SampleLayerBank(layers.ToArray(), channels);
-    }
-
-    IEnumerator buildDownsampledLayer(float[] source, int sourceFrames, int channels, int sourceSampleRate,
-        System.Action<float[]> onComplete)
-    {
-        int framesPerChunk = Mathf.Max(1024, layerBuildFramesPerChunk);
-        int destinationFrames = Mathf.Max(1, (sourceFrames + 1) / 2);
-        float[] destination = new float[destinationFrames * channels];
-        float[] filteredChunk = new float[Mathf.Min(framesPerChunk, sourceFrames) * channels];
-        IntPtr lowpass = Biquad_new(BIQUAD_LOWPASS, Mathf.Max(80f, sourceSampleRate * 0.225f), 0.7071f, 0f,
-            sourceSampleRate, channels);
-
-        int writeFrame = 0;
-        try
-        {
-            for (int offsetFrame = 0; offsetFrame < sourceFrames; offsetFrame += framesPerChunk)
-            {
-                int framesThisChunk = Mathf.Min(framesPerChunk, sourceFrames - offsetFrame);
-                int samplesThisChunk = framesThisChunk * channels;
-                if (filteredChunk.Length != samplesThisChunk)
-                {
-                    filteredChunk = new float[samplesThisChunk];
-                }
-
-                System.Array.Copy(source, offsetFrame * channels, filteredChunk, 0, samplesThisChunk);
-                Biquad_process(lowpass, BIQUAD_LOWPASS, Mathf.Max(80f, sourceSampleRate * 0.225f), 0.7071f, 0f,
-                    sourceSampleRate, filteredChunk, filteredChunk, samplesThisChunk);
-
-                int parity = offsetFrame & 1;
-                for (int frame = parity; frame < framesThisChunk && writeFrame < destinationFrames; frame += 2)
-                {
-                    int readIndex = frame * channels;
-                    int writeIndex = writeFrame * channels;
-                    for (int channel = 0; channel < channels; channel++)
-                    {
-                        destination[writeIndex + channel] = filteredChunk[readIndex + channel];
-                    }
-                    writeFrame++;
-                }
-
-                yield return null;
-            }
-        }
-        finally
-        {
-            if (lowpass != IntPtr.Zero)
-            {
-                Biquad_free(lowpass);
-            }
-        }
-
-        if (writeFrame * channels != destination.Length)
-        {
-            System.Array.Resize(ref destination, writeFrame * channels);
-        }
-
-        onComplete?.Invoke(destination);
-    }
-
     IEnumerator flashRoutine()
     {
         deckOutline.gameObject.SetActive(true);
@@ -410,5 +301,63 @@ public class samplerLoad : MonoBehaviour
         deckOutline.gameObject.SetActive(false);
     }
 
+    void cancelActiveLoad()
+    {
+        activeLoadRequestId++;
+
+        if (activeLoadJob != null)
+        {
+            activeLoadJob.Cancel();
+            activeLoadJob = null;
+        }
+
+        if (_streamRoutine != null)
+        {
+            StopCoroutine(_streamRoutine);
+            _streamRoutine = null;
+        }
+
+        if (loaderObject != null)
+        {
+            Destroy(loaderObject);
+            loaderObject = null;
+        }
+
+        loadingProgress = 0f;
+        loadingStage = SamplerLoadStage.Idle;
+    }
+
+    void clearLoadedSampleState()
+    {
+        for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
+
+        if (sampleLayerBank != null)
+        {
+            sampleLayerBank.Release();
+            sampleLayerBank = null;
+        }
+
+        clipSamples = null;
+    }
+
+    void applySampleBank(float[][] layers, int channels, bool preservePlaybackState)
+    {
+        if (layers == null || layers.Length == 0 || layers[0] == null || layers[0].Length == 0)
+        {
+            return;
+        }
+
+        SampleLayerBank oldBank = sampleLayerBank;
+        sampleLayerBank = new SampleLayerBank(layers, channels);
+        for (int i = 0; i < players.Length; i++)
+        {
+            players[i].LoadSamples(sampleLayerBank, preservePlaybackState);
+        }
+
+        if (oldBank != null && oldBank != sampleLayerBank)
+        {
+            oldBank.Release();
+        }
+    }
 
 }
