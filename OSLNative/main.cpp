@@ -43,6 +43,11 @@
 
 #define PI 3.14159265
 constexpr int kMaxClipLayers = 5;
+constexpr float kWsincCutoffNormalized = 0.85f;
+constexpr float kWsincWindowA0 = 0.35875f;
+constexpr float kWsincWindowA1 = 0.48829f;
+constexpr float kWsincWindowA2 = 0.14128f;
+constexpr float kWsincWindowA3 = 0.01168f;
 
 extern "C" {
 
@@ -65,6 +70,26 @@ static inline float readClipFrame(const float* clipData, int frameCount, int cli
     frame = clampFrameIndex(frame, frameCount);
     int channelIndex = clipChannels > 1 ? channel : 0;
     return clipData[frame * clipChannels + channelIndex];
+}
+
+static inline float windowedSincWeight(float distance) {
+    float absDistance = fabsf(distance);
+    if (absDistance > ZEROCROSSINGS_PER_AXIS)
+        return 0.f;
+
+    float sinc = 0.f;
+    if (absDistance < 1e-6f) {
+        sinc = kWsincCutoffNormalized;
+    } else {
+        float x = kWsincCutoffNormalized * (float) PI * distance;
+        sinc = sinf(x) / x * kWsincCutoffNormalized;
+    }
+
+    float phase = (distance + ZEROCROSSINGS_PER_AXIS) / (2.f * ZEROCROSSINGS_PER_AXIS);
+    float window = kWsincWindowA0 - kWsincWindowA1 * cosf(2.f * (float) PI * phase) +
+                   kWsincWindowA2 * cosf(4.f * (float) PI * phase) -
+                   kWsincWindowA3 * cosf(6.f * (float) PI * phase);
+    return sinc * window;
 }
 
 #if OSL_ARM_NEON
@@ -135,24 +160,18 @@ static inline float32x2_t readLagrangeSampleStereo(const float* clipData, int fr
 }
 
 static inline float32x2_t readWindowedSincSampleStereo(const float* clipData, int frameCount, double position) {
-    int ptr = (int) round(position);
-    float frac = (float) (position - ptr);
-    float convL[CONV_LENGTH];
-    float convR[CONV_LENGTH];
-    float tapValues[2];
+    int center = (int) round(position);
+    float frac = (float) (position - center);
+    float32x2_t sum = vdup_n_f32(0.f);
 
-    for (int i = 0; i < CONV_LENGTH; i++) {
-        int frame = ptr - ZEROCROSSINGS_PER_AXIS + i;
-        float32x2_t tap = readClipFrameStereo(clipData, frameCount, frame);
-        vst1_f32(tapValues, tap);
-        convL[i] = tapValues[0];
-        convR[i] = tapValues[1];
+    for (int tap = -ZEROCROSSINGS_PER_AXIS; tap <= ZEROCROSSINGS_PER_AXIS; tap++) {
+        int frame = center + tap;
+        float32x2_t sample = readClipFrameStereo(clipData, frameCount, frame);
+        float weight = windowedSincWeight((float) tap - frac);
+        sum = vmla_n_f32(sum, sample, weight);
     }
 
-    float left = wsinc_resample(convL, -frac);
-    float right = wsinc_resample(convR, -frac);
-    float out[2] = {left, right};
-    return vld1_f32(out);
+    return sum;
 }
 
 static inline float32x2_t readInterpolatedSampleStereo(const float* clipData, int frameCount, double position,
@@ -226,16 +245,17 @@ static inline float readLagrangeSample(const float* clipData, int frameCount, in
 
 static inline float readWindowedSincSample(const float* clipData, int frameCount, int clipChannels, double position,
                                            int channel) {
-    int ptr = (int) round(position);
-    float frac = (float) (position - ptr);
-    float conv[CONV_LENGTH];
+    int center = (int) round(position);
+    float frac = (float) (position - center);
+    float sum = 0.f;
 
-    for (int i = 0; i < CONV_LENGTH; i++) {
-        int frame = ptr - ZEROCROSSINGS_PER_AXIS + i;
-        conv[i] = readClipFrame(clipData, frameCount, clipChannels, frame, channel);
+    for (int tap = -ZEROCROSSINGS_PER_AXIS; tap <= ZEROCROSSINGS_PER_AXIS; tap++) {
+        int frame = center + tap;
+        float sample = readClipFrame(clipData, frameCount, clipChannels, frame, channel);
+        sum += sample * windowedSincWeight((float) tap - frac);
     }
 
-    return wsinc_resample(conv, -frac);
+    return sum;
 }
 
 static inline float readInterpolatedSample(const float* clipData, int frameCount, int clipChannels, double position,
