@@ -4,8 +4,11 @@ using System.Runtime.InteropServices;
 
 public class ClientServerPanorama : MonoBehaviour
 {
+    public const string editorSplitAudioPrefKey = "OpenSoundLab.PlayMode.SplitAudioServerLClientR";
+    public const int editorSplitAudioDefaultValue = 0;
+
     [Header("Platform Settings")]
-    public bool activeInEditor = true;
+    public bool activeInEditor = false;
     public bool activeInMac = true;
     public bool activeInWindows = true;
     public bool activeInLinux = true;
@@ -26,6 +29,7 @@ public class ClientServerPanorama : MonoBehaviour
     bool hasLoggedMissingEntryPoint;
     bool hasLoggedNotReady;
     bool hasLoggedMismatch;
+    bool hasAppliedPan;
 
     private void Awake()
     {
@@ -41,7 +45,11 @@ public class ClientServerPanorama : MonoBehaviour
 
     void Update()
     {
-        if (!ShouldRun()) return;
+        if (!ShouldRun())
+        {
+            resetPanIfNeeded();
+            return;
+        }
 
         float pan = NetworkServer.active ? serverPan : clientPan;
         try
@@ -57,6 +65,7 @@ public class ClientServerPanorama : MonoBehaviour
             }
 
             MasterBusRecorder_SetPanorama(pan);
+            hasAppliedPan = true;
 
             if (!hasLoggedMismatch)
             {
@@ -78,9 +87,14 @@ public class ClientServerPanorama : MonoBehaviour
         }
     }
 
+    void OnDisable()
+    {
+        resetPanIfNeeded();
+    }
+
     bool ShouldRun()
     {
-        if (Application.isEditor) return activeInEditor;
+        if (Application.isEditor) return IsEditorSplitAudioEnabled();
 
         switch (Application.platform)
         {
@@ -93,5 +107,30 @@ public class ClientServerPanorama : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    void resetPanIfNeeded()
+    {
+        if (!hasAppliedPan) return;
+
+        try
+        {
+            if (!MasterBusRecorder_IsReady()) return;
+            MasterBusRecorder_SetPanorama(0f);
+            hasAppliedPan = false;
+        }
+        catch (System.EntryPointNotFoundException)
+        {
+            if (!hasLoggedMissingEntryPoint)
+            {
+                Debug.LogWarning("ClientServerPanorama: OSLNative entry points missing. Check plugin import settings and rebuild.", this);
+                hasLoggedMissingEntryPoint = true;
+            }
+        }
+    }
+
+    public static bool IsEditorSplitAudioEnabled()
+    {
+        return PlayerPrefs.GetInt(editorSplitAudioPrefKey, editorSplitAudioDefaultValue) == 1;
     }
 }
