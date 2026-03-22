@@ -44,7 +44,7 @@ public class clipPlayer : signalGenerator
     public Vector2 trackBounds = new Vector2(0, 1);
     public SamplerInterpolationMode interpolationMode = SamplerInterpolationMode.Hermite4;
     public bool useSampleLayers = true;
-    [Range(0f, 1f)] public float postFilterStrength = 1f;
+    [Range(0f, 1f)] public float postFilterStrength = 0.5f;
 
     protected double _lastBuffer = 0;
     public double LastBuffer { get => _lastBuffer; set => _lastBuffer = value; }
