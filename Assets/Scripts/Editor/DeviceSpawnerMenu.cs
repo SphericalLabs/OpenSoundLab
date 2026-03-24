@@ -1,107 +1,290 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using Mirror;
 using UnityEditor;
 using UnityEngine;
 
-public static class DeviceSpawnerMenu
+public class DeviceSpawnerMenu : EditorWindow
 {
-    private const string MenuRoot = "OpenSoundLab/Play Mode/Device Spawner/";
+    private const string MenuRoot = "OpenSoundLab/Play Mode/Device Spawner";
+    private const string LocalScenePath = "Assets/Scenes/oslLocalNetworkScene.unity";
+    private const string LocalNetworkManagerGuid = "96e6d8119da164ac1902626d138102d1";
 
-    [MenuItem(MenuRoot + "AD")] public static void SpawnAD() => Spawn("AD");
-    [MenuItem(MenuRoot + "ADSR")] public static void SpawnADSR() => Spawn("ADSR");
-    [MenuItem(MenuRoot + "Airhorn")] public static void SpawnAirhorn() => Spawn("Airhorn");
-    [MenuItem(MenuRoot + "Artifact")] public static void SpawnArtifact() => Spawn("Artifact");
-    [MenuItem(MenuRoot + "Button")] public static void SpawnButton() => Spawn("Button");
-    [MenuItem(MenuRoot + "Camera")] public static void SpawnCamera() => Spawn("Camera");
-    [MenuItem(MenuRoot + "PhaseToClockDivider")] public static void SpawnPhaseToClockDivider() => Spawn("PhaseToClockDivider");
-    [MenuItem(MenuRoot + "Compressor")] public static void SpawnCompressor() => Spawn("Compressor");
-    [MenuItem(MenuRoot + "Controller")] public static void SpawnController() => Spawn("Controller");
-    [MenuItem(MenuRoot + "Delay")] public static void SpawnDelay() => Spawn("Delay");
-    [MenuItem(MenuRoot + "Drum")] public static void SpawnDrum() => Spawn("Drum");
-    [MenuItem(MenuRoot + "Filter")] public static void SpawnFilter() => Spawn("Filter");
-    [MenuItem(MenuRoot + "FilterTwo")] public static void SpawnFilterTwo() => Spawn("FilterTwo");
-    [MenuItem(MenuRoot + "FilterThree")] public static void SpawnFilterThree() => Spawn("FilterThree");
-    [MenuItem(MenuRoot + "Gain")] public static void SpawnGain() => Spawn("Gain");
-    [MenuItem(MenuRoot + "Glide")] public static void SpawnGlide() => Spawn("Glide");
-    [MenuItem(MenuRoot + "Keyboard")] public static void SpawnKeyboard() => Spawn("Keyboard");
-    [MenuItem(MenuRoot + "Knob")] public static void SpawnKnob() => Spawn("Knob");
-    [MenuItem(MenuRoot + "Looper")] public static void SpawnLooper() => Spawn("Looper");
-    [MenuItem(MenuRoot + "Maracas")] public static void SpawnMaracas() => Spawn("Maracas");
-    [MenuItem(MenuRoot + "Microphone")] public static void SpawnMicrophone() => Spawn("Microphone");
-    [MenuItem(MenuRoot + "MIDIIN")] public static void SpawnMIDIIN() => Spawn("MIDIIN");
-    [MenuItem(MenuRoot + "MIDIOUT")] public static void SpawnMIDIOUT() => Spawn("MIDIOUT");
-    [MenuItem(MenuRoot + "MixerOne")] public static void SpawnMixerOne() => Spawn("MixerOne");
-    [MenuItem(MenuRoot + "MixerTwo")] public static void SpawnMixerTwo() => Spawn("MixerTwo");
-    [MenuItem(MenuRoot + "Noise")] public static void SpawnNoise() => Spawn("Noise");
-    [MenuItem(MenuRoot + "Oscillator")] public static void SpawnOscillator() => Spawn("Oscillator");
-    [MenuItem(MenuRoot + "Pano")] public static void SpawnPano() => Spawn("Pano");
-    [MenuItem(MenuRoot + "PhaseGenerator")] public static void SpawnPhaseGenerator() => Spawn("PhaseGenerator");
-    [MenuItem(MenuRoot + "Polarizer")] public static void SpawnPolarizer() => Spawn("Polarizer");
-    [MenuItem(MenuRoot + "Quantizer")] public static void SpawnQuantizer() => Spawn("Quantizer");
-    [MenuItem(MenuRoot + "Recorder")] public static void SpawnRecorder() => Spawn("Recorder");
-    [MenuItem(MenuRoot + "Reverb")] public static void SpawnReverb() => Spawn("Reverb");
-    [MenuItem(MenuRoot + "SampleHold")] public static void SpawnSampleHold() => Spawn("SampleHold");
-    [MenuItem(MenuRoot + "Sampler")] public static void SpawnSampler() => Spawn("Sampler");
-    [MenuItem(MenuRoot + "SamplerTwo")] public static void SpawnSamplerTwo() => Spawn("SamplerTwo");
-    [MenuItem(MenuRoot + "Scope")] public static void SpawnScope() => Spawn("Scope");
-    [MenuItem(MenuRoot + "Sequencer")] public static void SpawnSequencer() => Spawn("Sequencer");
-    [MenuItem(MenuRoot + "Speaker")] public static void SpawnSpeaker() => Spawn("Speaker");
-    [MenuItem(MenuRoot + "Splitter")] public static void SpawnSplitter() => Spawn("Splitter");
-    [MenuItem(MenuRoot + "TapeGroup")] public static void SpawnTapeGroup() => Spawn("TapeGroup");
-    [MenuItem(MenuRoot + "Tapes")] public static void SpawnTapes() => Spawn("Tapes");
-    [MenuItem(MenuRoot + "Timeline")] public static void SpawnTimeline() => Spawn("Timeline");
-    [MenuItem(MenuRoot + "Tutorials")] public static void SpawnTutorials() => Spawn("Tutorials");
-    [MenuItem(MenuRoot + "VCA")] public static void SpawnVCA() => Spawn("VCA");
-    [MenuItem(MenuRoot + "Xylophone")] public static void SpawnXylophone() => Spawn("Xylophone");
+    private static readonly Regex prefabGuidPattern = new Regex(@"guid:\s*([a-f0-9]{32})", RegexOptions.Compiled);
 
-    // Validators
-    [MenuItem(MenuRoot + "AD", true)]
-    [MenuItem(MenuRoot + "ADSR", true)]
-    [MenuItem(MenuRoot + "Airhorn", true)]
-    [MenuItem(MenuRoot + "Artifact", true)]
-    [MenuItem(MenuRoot + "Button", true)]
-    [MenuItem(MenuRoot + "Camera", true)]
-    [MenuItem(MenuRoot + "PhaseToClockDivider", true)]
-    [MenuItem(MenuRoot + "Compressor", true)]
-    [MenuItem(MenuRoot + "Controller", true)]
-    [MenuItem(MenuRoot + "Delay", true)]
-    [MenuItem(MenuRoot + "Drum", true)]
-    [MenuItem(MenuRoot + "Filter", true)]
-    [MenuItem(MenuRoot + "FilterTwo", true)]
-    [MenuItem(MenuRoot + "FilterThree", true)]
-    [MenuItem(MenuRoot + "Gain", true)]
-    [MenuItem(MenuRoot + "Glide", true)]
-    [MenuItem(MenuRoot + "Keyboard", true)]
-    [MenuItem(MenuRoot + "Knob", true)]
-    [MenuItem(MenuRoot + "Looper", true)]
-    [MenuItem(MenuRoot + "Maracas", true)]
-    [MenuItem(MenuRoot + "Microphone", true)]
-    [MenuItem(MenuRoot + "MIDIIN", true)]
-    [MenuItem(MenuRoot + "MIDIOUT", true)]
-    [MenuItem(MenuRoot + "MixerOne", true)]
-    [MenuItem(MenuRoot + "MixerTwo", true)]
-    [MenuItem(MenuRoot + "Noise", true)]
-    [MenuItem(MenuRoot + "Oscillator", true)]
-    [MenuItem(MenuRoot + "Pano", true)]
-    [MenuItem(MenuRoot + "PhaseGenerator", true)]
-    [MenuItem(MenuRoot + "Polarizer", true)]
-    [MenuItem(MenuRoot + "Quantizer", true)]
-    [MenuItem(MenuRoot + "Recorder", true)]
-    [MenuItem(MenuRoot + "Reverb", true)]
-    [MenuItem(MenuRoot + "SampleHold", true)]
-    [MenuItem(MenuRoot + "Sampler", true)]
-    [MenuItem(MenuRoot + "SamplerTwo", true)]
-    [MenuItem(MenuRoot + "Scope", true)]
-    [MenuItem(MenuRoot + "Sequencer", true)]
-    [MenuItem(MenuRoot + "Speaker", true)]
-    [MenuItem(MenuRoot + "Splitter", true)]
-    [MenuItem(MenuRoot + "TapeGroup", true)]
-    [MenuItem(MenuRoot + "Tapes", true)]
-    [MenuItem(MenuRoot + "Timeline", true)]
-    [MenuItem(MenuRoot + "Tutorials", true)]
-    [MenuItem(MenuRoot + "VCA", true)]
-    [MenuItem(MenuRoot + "Xylophone", true)]
-    private static bool ValidatePlayMode()
+    private Vector2 scrollPosition;
+    private string searchFilter = string.Empty;
+    private string sourceLabel = string.Empty;
+    private string refreshMessage = string.Empty;
+    private List<GameObject> spawnablePrefabs = new List<GameObject>();
+
+    [MenuItem(MenuRoot)]
+    public static void ShowWindow()
     {
-        return Application.isPlaying;
+        DeviceSpawnerMenu window = GetWindow<DeviceSpawnerMenu>("Device Spawner");
+        window.minSize = new Vector2(280f, 320f);
+        window.RefreshSpawnablePrefabs();
+    }
+
+    private void OnEnable()
+    {
+        RefreshSpawnablePrefabs();
+        EditorApplication.playModeStateChanged += handlePlayModeChanged;
+    }
+
+    private void OnDisable()
+    {
+        EditorApplication.playModeStateChanged -= handlePlayModeChanged;
+    }
+
+    private void OnFocus()
+    {
+        RefreshSpawnablePrefabs();
+    }
+
+    private void OnGUI()
+    {
+        drawToolbar();
+        drawStatus();
+        drawPrefabList();
+    }
+
+    private void handlePlayModeChanged(PlayModeStateChange state)
+    {
+        RefreshSpawnablePrefabs();
+        Repaint();
+    }
+
+    private void drawToolbar()
+    {
+        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+        GUILayout.Label("Search", GUILayout.Width(42f));
+        searchFilter = GUILayout.TextField(searchFilter, GUILayout.ExpandWidth(true));
+
+        if (GUILayout.Button("Refresh", EditorStyles.toolbarButton, GUILayout.Width(70f)))
+        {
+            RefreshSpawnablePrefabs();
+        }
+
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private void drawStatus()
+    {
+        string modeText = Application.isPlaying ? "Play Mode" : "Edit Mode";
+        EditorGUILayout.LabelField($"Source: {sourceLabel}", EditorStyles.miniLabel);
+        EditorGUILayout.LabelField($"State: {modeText}", EditorStyles.miniLabel);
+
+        if (!Application.isPlaying)
+        {
+            EditorGUILayout.HelpBox("Spawning is only available in Play Mode. The list below is still populated from the local network scene.", MessageType.Info);
+        }
+        else if (NetworkSpawnManager.Instance == null)
+        {
+            EditorGUILayout.HelpBox("NetworkSpawnManager.Instance is null. Enter the local network scene before spawning devices.", MessageType.Warning);
+        }
+
+        if (!string.IsNullOrEmpty(refreshMessage))
+        {
+            EditorGUILayout.HelpBox(refreshMessage, MessageType.Warning);
+        }
+
+        EditorGUILayout.Space(4f);
+    }
+
+    private void drawPrefabList()
+    {
+        if (spawnablePrefabs.Count == 0)
+        {
+            EditorGUILayout.HelpBox("No registered spawnable prefabs were found.", MessageType.Warning);
+            return;
+        }
+
+        bool canSpawn = Application.isPlaying && NetworkSpawnManager.Instance != null;
+        int visibleCount = 0;
+
+        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+
+        foreach (GameObject prefab in spawnablePrefabs)
+        {
+            if (!matchesFilter(prefab.name))
+            {
+                continue;
+            }
+
+            visibleCount++;
+
+            EditorGUI.BeginDisabledGroup(!canSpawn);
+            if (GUILayout.Button(prefab.name, GUILayout.Height(26f)))
+            {
+                Spawn(prefab.name);
+            }
+            EditorGUI.EndDisabledGroup();
+        }
+
+        EditorGUILayout.EndScrollView();
+
+        if (visibleCount == 0)
+        {
+            EditorGUILayout.HelpBox("No devices match the current search filter.", MessageType.Info);
+        }
+    }
+
+    private bool matchesFilter(string prefabName)
+    {
+        if (string.IsNullOrWhiteSpace(searchFilter))
+        {
+            return true;
+        }
+
+        return prefabName.IndexOf(searchFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private void RefreshSpawnablePrefabs()
+    {
+        refreshMessage = string.Empty;
+
+        if (TryGetRuntimePrefabs(out List<GameObject> runtimePrefabs))
+        {
+            spawnablePrefabs = buildUniquePrefabList(runtimePrefabs);
+            sourceLabel = "NetworkManager.singleton.spawnPrefabs";
+            return;
+        }
+
+        if (TryGetScenePrefabs(out List<GameObject> scenePrefabs))
+        {
+            spawnablePrefabs = buildUniquePrefabList(scenePrefabs);
+            sourceLabel = $"{LocalScenePath} -> LocalNetworkManager.spawnPrefabs";
+            return;
+        }
+
+        spawnablePrefabs = new List<GameObject>();
+        sourceLabel = $"{LocalScenePath} -> LocalNetworkManager.spawnPrefabs";
+        refreshMessage = "Failed to resolve registered spawnable prefabs from the local network scene.";
+    }
+
+    private bool TryGetRuntimePrefabs(out List<GameObject> prefabs)
+    {
+        prefabs = new List<GameObject>();
+
+        if (NetworkManager.singleton == null || NetworkManager.singleton.spawnPrefabs == null)
+        {
+            return false;
+        }
+
+        foreach (GameObject prefab in NetworkManager.singleton.spawnPrefabs)
+        {
+            if (prefab == null)
+            {
+                continue;
+            }
+
+            prefabs.Add(prefab);
+        }
+
+        return prefabs.Count > 0;
+    }
+
+    private bool TryGetScenePrefabs(out List<GameObject> prefabs)
+    {
+        prefabs = new List<GameObject>();
+
+        string projectRootPath = Directory.GetParent(Application.dataPath).FullName;
+        string sceneFilePath = Path.Combine(projectRootPath, LocalScenePath);
+        if (!File.Exists(sceneFilePath))
+        {
+            return false;
+        }
+
+        bool foundLocalNetworkManager = false;
+        bool foundSpawnPrefabs = false;
+
+        foreach (string line in File.ReadLines(sceneFilePath))
+        {
+            if (!foundLocalNetworkManager)
+            {
+                if (line.Contains($"guid: {LocalNetworkManagerGuid}, type: 3"))
+                {
+                    foundLocalNetworkManager = true;
+                }
+
+                continue;
+            }
+
+            if (!foundSpawnPrefabs)
+            {
+                if (line == "  spawnPrefabs:")
+                {
+                    foundSpawnPrefabs = true;
+                }
+                else if (line.StartsWith("--- !u!"))
+                {
+                    break;
+                }
+
+                continue;
+            }
+
+            if (!line.StartsWith("  - "))
+            {
+                break;
+            }
+
+            Match match = prefabGuidPattern.Match(line);
+            if (!match.Success)
+            {
+                continue;
+            }
+
+            string prefabPath = AssetDatabase.GUIDToAssetPath(match.Groups[1].Value);
+            if (string.IsNullOrEmpty(prefabPath))
+            {
+                continue;
+            }
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab != null)
+            {
+                prefabs.Add(prefab);
+            }
+        }
+
+        return prefabs.Count > 0;
+    }
+
+    private List<GameObject> buildUniquePrefabList(List<GameObject> prefabs)
+    {
+        List<GameObject> uniquePrefabs = new List<GameObject>();
+
+        foreach (GameObject prefab in prefabs)
+        {
+            if (prefab == null)
+            {
+                continue;
+            }
+
+            string prefabPath = AssetDatabase.GetAssetPath(prefab);
+            bool alreadyAdded = false;
+
+            foreach (GameObject existingPrefab in uniquePrefabs)
+            {
+                if (AssetDatabase.GetAssetPath(existingPrefab) == prefabPath)
+                {
+                    alreadyAdded = true;
+                    break;
+                }
+            }
+
+            if (!alreadyAdded)
+            {
+                uniquePrefabs.Add(prefab);
+            }
+        }
+
+        uniquePrefabs.Sort((left, right) => string.Compare(left.name, right.name, StringComparison.OrdinalIgnoreCase));
+        return uniquePrefabs;
     }
 
     private static void Spawn(string deviceName)
@@ -126,7 +309,6 @@ public static class DeviceSpawnerMenu
             spawnPosition = SceneView.lastActiveSceneView.pivot;
             if (SceneView.lastActiveSceneView.camera != null)
             {
-                // Look at the camera
                 Vector3 direction = SceneView.lastActiveSceneView.camera.transform.position - spawnPosition;
                 if (direction != Vector3.zero)
                 {
@@ -137,8 +319,16 @@ public static class DeviceSpawnerMenu
 
         GetOffsets(deviceName, out Vector3 localPositionOffset, out Vector3 localRotationOffset);
 
-        NetworkSpawnManager.Instance.CreateItem(deviceName, spawnPosition, spawnRotation, localPositionOffset, localRotationOffset);
-        Debug.Log($"Spawned {deviceName} via Editor Menu");
+        if (NetworkManager.singleton != null && NetworkManager.singleton.mode == NetworkManagerMode.ClientOnly)
+        {
+            NetworkSpawnManager.Instance.CmdCreateItem(deviceName, spawnPosition, spawnRotation, localPositionOffset, localRotationOffset);
+        }
+        else
+        {
+            NetworkSpawnManager.Instance.CreateItem(deviceName, spawnPosition, spawnRotation, localPositionOffset, localRotationOffset);
+        }
+
+        Debug.Log($"Spawned {deviceName} via Device Spawner");
     }
 
     private static void GetOffsets(string deviceName, out Vector3 localPositionOffset, out Vector3 localRotationOffset)
@@ -146,7 +336,6 @@ public static class DeviceSpawnerMenu
         localPositionOffset = Vector3.zero;
         localRotationOffset = Vector3.zero;
 
-        // Logic adapted from menuItem.cs to ensure correct orientation
         switch (deviceName)
         {
             case "Tapes":
