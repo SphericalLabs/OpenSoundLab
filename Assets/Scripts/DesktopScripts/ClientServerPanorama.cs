@@ -30,9 +30,12 @@ public class ClientServerPanorama : MonoBehaviour
     bool hasLoggedNotReady;
     bool hasLoggedMismatch;
     bool hasAppliedPan;
+    bool hasCenteredPan;
 
     private void Awake()
     {
+        ensureEditorSplitAudioPreferenceInitialized();
+
         if (transform.parent == null)
         {
             DontDestroyOnLoad(gameObject);
@@ -52,6 +55,7 @@ public class ClientServerPanorama : MonoBehaviour
         }
 
         float pan = NetworkServer.active ? serverPan : clientPan;
+        hasCenteredPan = false;
         try
         {
             if (!MasterBusRecorder_IsReady())
@@ -111,13 +115,14 @@ public class ClientServerPanorama : MonoBehaviour
 
     void resetPanIfNeeded()
     {
-        if (!hasAppliedPan) return;
+        if (hasCenteredPan && !hasAppliedPan) return;
 
         try
         {
             if (!MasterBusRecorder_IsReady()) return;
             MasterBusRecorder_SetPanorama(0f);
             hasAppliedPan = false;
+            hasCenteredPan = true;
         }
         catch (System.EntryPointNotFoundException)
         {
@@ -131,6 +136,16 @@ public class ClientServerPanorama : MonoBehaviour
 
     public static bool IsEditorSplitAudioEnabled()
     {
+        ensureEditorSplitAudioPreferenceInitialized();
         return PlayerPrefs.GetInt(editorSplitAudioPrefKey, editorSplitAudioDefaultValue) == 1;
+    }
+
+    static void ensureEditorSplitAudioPreferenceInitialized()
+    {
+        if (!Application.isEditor) return;
+        if (PlayerPrefs.HasKey(editorSplitAudioPrefKey)) return;
+
+        PlayerPrefs.SetInt(editorSplitAudioPrefKey, editorSplitAudioDefaultValue);
+        PlayerPrefs.Save();
     }
 }
