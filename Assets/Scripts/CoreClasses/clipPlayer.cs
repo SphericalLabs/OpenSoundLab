@@ -43,7 +43,7 @@ public class clipPlayer : signalGenerator
     public int bufferCount = 0;
     public Vector2 trackBounds = new Vector2(0, 1);
     // Shared sampler defaults for A/B testing: set interpolation mode, sample-layer use, and post-filter strength here.
-    public SamplerInterpolationMode interpolationMode = SamplerInterpolationMode.WindowedSinc23;
+    public SamplerInterpolationMode interpolationMode = SamplerInterpolationMode.Lagrange4;
     public bool useSampleLayers = true;
     [Range(0f, 1f)] public float postFilterStrength = 0.5f;
 

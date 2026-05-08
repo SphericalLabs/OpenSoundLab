@@ -33,9 +33,9 @@ public enum SamplerInterpolationMode
 {
     None = 1,
     Linear = 2,
-    WindowedSinc23 = 3,
-    Hermite4 = 4,
-    Lagrange4 = 5
+    Hermite4 = 3,
+    Lagrange4 = 4,
+    WindowedSinc23 = 5
 }
 
 public class SampleLayerBank
