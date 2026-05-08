@@ -411,6 +411,8 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
+  minProjectedControllerAxis: 0.15
+  maxControllerAngleDelta: 45
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
@@ -797,8 +799,9 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
-  firstSample: 0
-  prevFirstSample: 0
+  previousLastSample: 0
+  vizSample: 0
+  vizTriggerLatched: 0
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0
@@ -2083,6 +2086,8 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
+  minProjectedControllerAxis: 0.15
+  maxControllerAngleDelta: 45
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
@@ -2372,7 +2377,18 @@ MonoBehaviour:
   CurTapeLabel: 
   CurFile: 
   miniSpeaker: {fileID: 0}
-  clipSamples: []
+  generatedLayerCount: 3
+  clipReadFramesPerChunk: 16384
+  layerBuildFramesPerChunk: 8192
+  wavetableSampleSeconds: 1
+  wavetableAdditionalLayers: 4
+  extraShortSampleSeconds: 2.5
+  shortSampleSeconds: 5
+  mediumSampleSeconds: 20
+  extraShortAdditionalLayers: 3
+  shortAdditionalLayers: 2
+  mediumAdditionalLayers: 1
+  longAdditionalLayers: 0
   onLoadTapeEvents:
     m_PersistentCalls:
       m_Calls: []
@@ -2397,15 +2413,17 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
-  firstSample: 0
-  prevFirstSample: 0
+  previousLastSample: 0
+  vizSample: 0
+  vizTriggerLatched: 0
   loaded: 0
-  clipSamples: []
   clipChannels: 2
-  sampleBounds: 0000000000000000
   floatingBufferCount: 0
   bufferCount: 0
   trackBounds: {x: 1, y: 0}
+  interpolationMode: 4
+  useSampleLayers: 1
+  postFilterStrength: 0.5
   playbackSpeed: 1
   amplitude: 1
   headTrim: 0.5
@@ -6139,6 +6157,8 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
+  minProjectedControllerAxis: 0.15
+  maxControllerAngleDelta: 45
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
@@ -6424,6 +6444,8 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
+  minProjectedControllerAxis: 0.15
+  maxControllerAngleDelta: 45
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
@@ -9043,6 +9065,8 @@ MonoBehaviour:
   realRot: 0
   prevShakeRot: 0
   fineMult: 5
+  minProjectedControllerAxis: 0.15
+  maxControllerAngleDelta: 45
   isNotched: 0
   isBipolar: 0
   notchSteps: 4
