@@ -76,8 +76,8 @@ DEST_FILE="${SCRIPT_DIR}/../Assets/OSLNative/macos/Release/libOSLNative.dylib"
 
 if [ -f "$OUTPUT_FILE" ]; then
     mkdir -p "$(dirname "$DEST_FILE")"
-    cp "$OUTPUT_FILE" "$DEST_FILE"
-    echo "Success: Created $DEST_FILE"
+    mv "$OUTPUT_FILE" "$DEST_FILE"
+    echo "Success: Moved $OUTPUT_FILE -> $DEST_FILE"
 else
     echo "Error: Build finished but output file not found at $OUTPUT_FILE"
     exit 1

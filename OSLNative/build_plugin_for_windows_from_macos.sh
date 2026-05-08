@@ -12,6 +12,7 @@ COMPILER="x86_64-w64-mingw32-g++"
 
 # Main
 echo "Build Windows Plugin from macOS..."
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Enter script directory to resolve relative paths
 cd "$SCRIPT_DIR"
