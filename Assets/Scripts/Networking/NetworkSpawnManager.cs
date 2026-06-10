@@ -46,13 +46,39 @@ public class NetworkSpawnManager : NetworkBehaviour
         {
             Instance = this;
             networkedJacks = new List<omniJack>();
+            registerRegistrySpawnPrefabs();
         }
     }
 
-    #region Create Item
-    public void CreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset)
+    void registerRegistrySpawnPrefabs()
     {
-        var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
+        if (NetworkManager.singleton == null || NetworkManager.singleton.spawnPrefabs == null) return;
+
+        List<GameObject> registryPrefabs = OSLDeviceRegistry.GetNetworkPrefabs();
+        for (int i = 0; i < registryPrefabs.Count; ++i)
+        {
+            GameObject prefab = registryPrefabs[i];
+            if (prefab == null || hasSpawnPrefab(prefab)) continue;
+            NetworkManager.singleton.spawnPrefabs.Add(prefab);
+        }
+    }
+
+    bool hasSpawnPrefab(GameObject targetPrefab)
+    {
+        if (targetPrefab == null) return false;
+        for (int i = 0; i < NetworkManager.singleton.spawnPrefabs.Count; ++i)
+        {
+            GameObject prefab = NetworkManager.singleton.spawnPrefabs[i];
+            if (prefab == targetPrefab) return true;
+        }
+
+        return false;
+    }
+
+    #region Create Item
+    public void CreateItem(string deviceIdOrPrefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset)
+    {
+        GameObject prefab = findSpawnPrefab(deviceIdOrPrefabName);
         if (prefab != null)
         {
             var g = Instantiate(prefab, position, rotation);
@@ -61,13 +87,13 @@ public class NetworkSpawnManager : NetworkBehaviour
             NetworkServer.Spawn(g);
             g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
-            Debug.Log($"{prefabName} spawned by the host");
+            Debug.Log($"{deviceIdOrPrefabName} spawned by the host");
         }
     }
 
-    public void CreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, manipulator manip)
+    public void CreateItem(string deviceIdOrPrefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, manipulator manip)
     {
-        var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
+        GameObject prefab = findSpawnPrefab(deviceIdOrPrefabName);
         if (prefab != null)
         {
             var g = Instantiate(prefab, position, rotation);
@@ -84,14 +110,14 @@ public class NetworkSpawnManager : NetworkBehaviour
             NetworkServer.Spawn(g);
             manip.ForceGrab(g.GetComponentInChildren<handle>());
 
-            Debug.Log($"{prefabName} spawned by the host into manipulatorObject");
+            Debug.Log($"{deviceIdOrPrefabName} spawned by the host into manipulatorObject");
         }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdCreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, NetworkIdentity player, bool isLeftHand)
+    public void CmdCreateItem(string deviceIdOrPrefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset, NetworkIdentity player, bool isLeftHand)
     {
-        var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
+        GameObject prefab = findSpawnPrefab(deviceIdOrPrefabName);
         if (prefab != null)
         {
             var g = Instantiate(prefab, position, rotation);
@@ -101,7 +127,7 @@ public class NetworkSpawnManager : NetworkBehaviour
             g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
             //todo send local player the info of the prefab and set grabbed
-            Debug.Log($"{player.gameObject} spawned {prefabName}");
+            Debug.Log($"{player.gameObject} spawned {deviceIdOrPrefabName}");
             if (player.TryGetComponent<VRNetworkPlayer>(out VRNetworkPlayer networkPlayer))
             {
                 networkPlayer.GrabNewObjectByHand(g, isLeftHand);
@@ -110,9 +136,9 @@ public class NetworkSpawnManager : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdCreateItem(string prefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset)
+    public void CmdCreateItem(string deviceIdOrPrefabName, Vector3 position, Quaternion rotation, Vector3 localPositionOffset, Vector3 localRotationOffset)
     {
-        var prefab = NetworkManager.singleton.spawnPrefabs.Find(prefab => prefab.name == prefabName);
+        GameObject prefab = findSpawnPrefab(deviceIdOrPrefabName);
         if (prefab != null)
         {
             var g = Instantiate(prefab, position, rotation);
@@ -121,8 +147,38 @@ public class NetworkSpawnManager : NetworkBehaviour
             NetworkServer.Spawn(g);
             g.transform.parent = GameObject.Find("PatchAnchor").transform;
 
-            Debug.Log($"Spawned {prefabName}");
+            Debug.Log($"Spawned {deviceIdOrPrefabName}");
         }
+    }
+
+    GameObject findSpawnPrefab(string deviceIdOrPrefabName)
+    {
+        if (NetworkManager.singleton == null || NetworkManager.singleton.spawnPrefabs == null) return null;
+
+        string prefabName = deviceIdOrPrefabName;
+        GameObject registeredPrefab = null;
+        if (OSLDeviceRegistry.TryGet(deviceIdOrPrefabName, out OSLDeviceRegistration registration))
+        {
+            if (!registration.IsAvailable)
+            {
+                Debug.LogWarning("OpenSoundLab: Cannot spawn unavailable device " + registration.canonicalDeviceId + " (" + registration.Access.availability + ").");
+                return null;
+            }
+
+            registeredPrefab = registration.LoadPrefab();
+            if (registeredPrefab != null) prefabName = registeredPrefab.name;
+        }
+
+        for (int i = 0; i < NetworkManager.singleton.spawnPrefabs.Count; ++i)
+        {
+            GameObject prefab = NetworkManager.singleton.spawnPrefabs[i];
+            if (prefab == null) continue;
+            if (registeredPrefab != null && prefab == registeredPrefab) return prefab;
+            if (registeredPrefab == null && prefab.name == prefabName) return prefab;
+        }
+
+        Debug.LogWarning("OpenSoundLab: Missing network spawn prefab for " + deviceIdOrPrefabName + ".");
+        return null;
     }
 
     #endregion
@@ -132,6 +188,7 @@ public class NetworkSpawnManager : NetworkBehaviour
     public void DuplicateItem(GameObject obj, manipulator manip)
     {
         var g = SaveLoadInterface.instance.Copy(obj, manip);
+        if (g == null) return;
         NetworkServer.Spawn(g);
         g.transform.parent = GameObject.Find("PatchAnchor").transform;
         Debug.Log($"{g} duplicated by the host");
@@ -141,6 +198,7 @@ public class NetworkSpawnManager : NetworkBehaviour
     public void CmdDuplicateItem(NetworkIdentity obj, NetworkIdentity player, bool isLeftHand)
     {
         var g = SaveLoadInterface.instance.Copy(obj.gameObject, null);
+        if (g == null) return;
         Debug.Log($"{g} duplicated by the client");
 
         NetworkServer.Spawn(g, player.connectionToClient);

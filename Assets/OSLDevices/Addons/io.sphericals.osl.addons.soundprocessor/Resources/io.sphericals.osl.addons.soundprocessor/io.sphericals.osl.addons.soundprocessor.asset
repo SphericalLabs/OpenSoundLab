@@ -1,0 +1,152 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.addons.soundprocessor
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.addons.soundprocessor
+  resourceSlug: io.sphericals.osl.addons.soundprocessor
+  displayName: "Sound Processors"
+  description: Example add-on collection for audio effect devices.
+  source: 1
+  enabled: 1
+  nativeSymbols:
+  - Artifact_Process
+  - Delay_Process
+  - Delay_Clear
+  - Delay_SetParam
+  - Delay_SetRange
+  - Delay_SetMode
+  - Delay_New
+  - Delay_Free
+  - Freeverb_New
+  - Freeverb_Free
+  - Freeverb_SetParam
+  - Freeverb_GetParam
+  - Freeverb_Clear
+  - Freeverb_Process
+  - Compressor_Process
+  - Compressor_SetParam
+  - Compressor_GetAttenuation
+  - Compressor_IsRamping
+  - Compressor_IsClipping
+  - Compressor_New
+  - Compressor_Free
+  devices:
+  - deviceLocalId: Reverb
+    canonicalDeviceId: io.sphericals.osl.addons.soundprocessor.Reverb
+    displayName: Reverb
+    category: 5
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.addons.soundprocessor/Prefabs/Reverb
+    menuPrefabResourcePath: io.sphericals.osl.addons.soundprocessor/MenuPrefabs/Reverb_Menu
+    symbolResourcePath: io.sphericals.osl.addons.soundprocessor/Textures/ReverbSymbol
+    dataTypeName: OpenSoundLab.Addons.SoundProcessors.ReverbData
+    legacyDeviceIds:
+    - Freeverb
+    - io.sphericals.osl.addons.soundprocessors.Reverb
+    legacyDataTypeNames:
+    - OpenSoundLab.Addons.SoundProcessors.FreeverbData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Delay
+    canonicalDeviceId: io.sphericals.osl.addons.soundprocessor.Delay
+    displayName: Delay
+    category: 5
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.addons.soundprocessor/Prefabs/Delay
+    menuPrefabResourcePath: io.sphericals.osl.addons.soundprocessor/MenuPrefabs/Delay_Menu
+    symbolResourcePath: io.sphericals.osl.addons.soundprocessor/Textures/DelaySymbol
+    dataTypeName: OpenSoundLab.Addons.SoundProcessors.DelayData
+    legacyDeviceIds:
+    - io.sphericals.osl.addons.soundprocessors.Delay
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Compressor
+    canonicalDeviceId: io.sphericals.osl.addons.soundprocessor.Compressor
+    displayName: Compressor
+    category: 5
+    tags: []
+    order: 6
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.addons.soundprocessor/Prefabs/Compressor
+    menuPrefabResourcePath: io.sphericals.osl.addons.soundprocessor/MenuPrefabs/Compressor_Menu
+    symbolResourcePath: io.sphericals.osl.addons.soundprocessor/Textures/CompressorSymbol
+    dataTypeName: OpenSoundLab.Addons.SoundProcessors.CompressorData
+    legacyDeviceIds:
+    - io.sphericals.osl.addons.soundprocessors.Compressor
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Artifact
+    canonicalDeviceId: io.sphericals.osl.addons.soundprocessor.Artifact
+    displayName: Artifact
+    category: 5
+    tags: []
+    order: 7
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.addons.soundprocessor/Prefabs/Artifact
+    menuPrefabResourcePath: io.sphericals.osl.addons.soundprocessor/MenuPrefabs/Artifact_Menu
+    symbolResourcePath: io.sphericals.osl.addons.soundprocessor/Textures/ArtifactSymbol
+    dataTypeName: OpenSoundLab.Addons.SoundProcessors.ArtifactData
+    legacyDeviceIds:
+    - io.sphericals.osl.addons.soundprocessors.Artifact
+    - Artefact
+    legacyDataTypeNames:
+    - OpenSoundLab.Addons.SoundProcessors.ArtifactDataLegacy
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

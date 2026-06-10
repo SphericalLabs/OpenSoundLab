@@ -1,0 +1,153 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.modulationprocessor
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.modulationprocessor
+  resourceSlug: io.sphericals.osl.core.modulationprocessor
+  displayName: "Modulation Processor"
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols: []
+  devices:
+  - deviceLocalId: VCA
+    canonicalDeviceId: io.sphericals.osl.core.modulationprocessor.VCA
+    displayName: VCA
+    category: 3
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationprocessor/Prefabs/VCA
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationprocessor/MenuPrefabs/VCA_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationprocessor/Textures/VCASymbol
+    dataTypeName: vcaData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationprocessor.VCA
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 0.42, y: 0.42, z: 0.42}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Quantizer
+    canonicalDeviceId: io.sphericals.osl.core.modulationprocessor.Quantizer
+    displayName: Quantizer
+    category: 3
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationprocessor/Prefabs/Quantizer
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationprocessor/MenuPrefabs/Quantizer_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationprocessor/Textures/QuantizerSymbol
+    dataTypeName: QuantizerData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationprocessor.Quantizer
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: SampleHold
+    canonicalDeviceId: io.sphericals.osl.core.modulationprocessor.SampleHold
+    displayName: "S&H"
+    category: 3
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationprocessor/Prefabs/SampleHold
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationprocessor/MenuPrefabs/SampleHold_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationprocessor/Textures/SampleHoldSymbol
+    dataTypeName: SampleHoldData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationprocessor.SampleHold
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Glide
+    canonicalDeviceId: io.sphericals.osl.core.modulationprocessor.Glide
+    displayName: Glide
+    category: 3
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationprocessor/Prefabs/Glide
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationprocessor/MenuPrefabs/Glide_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationprocessor/Textures/GlideSymbol
+    dataTypeName: GlideData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationprocessor.Glide
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Polarizer
+    canonicalDeviceId: io.sphericals.osl.core.modulationprocessor.Polarizer
+    displayName: Polarity
+    category: 3
+    tags: []
+    order: 5
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationprocessor/Prefabs/Polarizer
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationprocessor/MenuPrefabs/Polarizer_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationprocessor/Textures/PolarizerSymbol
+    dataTypeName: PolarizerData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationprocessor.Polarizer
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

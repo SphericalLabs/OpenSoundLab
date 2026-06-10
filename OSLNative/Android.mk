@@ -7,14 +7,12 @@ LOCAL_ARM_MODE  := arm
 LOCAL_PATH      := $(NDK_PROJECT_PATH)
 LOCAL_MODULE    := libOSLNative
 #LOCAL_CFLAGS    := -Werror
-LOCAL_C_INCLUDES  := $(LOCAL_PATH)/FreeVerb/dfx-library
-LOCAL_C_INCLUDES  += $(LOCAL_PATH)/FreeVerb/freeverb/components
-FREEVERB_SOURCES := $(wildcard $(LOCAL_PATH)/FreeVerb/freeverb/components/*.cpp)
-FREEVERB_SOURCES += $(wildcard $(LOCAL_PATH)/FreeVerb/dfx-library/*.cpp)
-MASTERBUSRECORDER_SOURCES := $(wildcard $(LOCAL_PATH)/MasterBusRecorder/*.cpp)
-LOCAL_SRC_FILES := main.cpp Oscillator.cpp util.c Biquad.cpp Filter.cpp FilterTwo.cpp FilterThree.cpp Compressor.cpp RingBuffer.cpp CRingBuffer.cpp Delay.cpp Freeverb.cpp resample.cpp Artefact.cpp $(MASTERBUSRECORDER_SOURCES) $(FREEVERB_SOURCES:$(LOCAL_PATH)/%=%)
-LOCAL_LDLIBS    := -llog
-LOCAL_CFLAGS := -Wno-implicit-const-int-float-conversion -Wno-braced-scalar-init
+include $(LOCAL_PATH)/Build/native_sources.mk
+
+LOCAL_C_INCLUDES  := $(OSL_NATIVE_INCLUDE_DIRS)
+LOCAL_SRC_FILES := $(OSL_NATIVE_SOURCES)
+LOCAL_LDLIBS    := -llog -lm
+LOCAL_CFLAGS := -DTEST=1 -Wno-implicit-const-int-float-conversion -Wno-braced-scalar-init
 
 # optional: print source files
 # $(warning $(LOCAL_SRC_FILES))

@@ -158,7 +158,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-79084</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>0.4003694</x>
         <y>1.39155459</y>

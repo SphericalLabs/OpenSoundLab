@@ -39,14 +39,77 @@ public class OverloadWarning : MonoBehaviour
     static extern float MasterBusRecorder_GetLevel_dB();
 
     public GameObject overloadText;
+    public GameObject hrtfText;
+    public float hrtfDisplaySeconds = 2f;
+    TextMesh hrtfMesh;
+    string lastHrtfSubjectName = "";
+    bool hrtfSubjectInitialized = false;
+    float hrtfTextHideTime = -1f;
 
     void Awake()
     {
         overloadText.SetActive(false);
+        if (hrtfText != null)
+        {
+            hrtfText.SetActive(false);
+            hrtfMesh = hrtfText.GetComponent<TextMesh>();
+        }
     }
 
     void Update()
     {
         overloadText.SetActive(MasterBusRecorder_GetLevel_dB() > -3f);
+        updateHrtfText();
+    }
+
+    void updateHrtfText()
+    {
+        if (hrtfText == null)
+        {
+            return;
+        }
+
+        if (masterControl.instance == null)
+        {
+            hrtfText.SetActive(false);
+            return;
+        }
+
+        string hrtfSubjectName = masterControl.instance.getHrtfSubjectLabel();
+        if (string.IsNullOrEmpty(hrtfSubjectName))
+        {
+            hrtfText.SetActive(false);
+            return;
+        }
+
+        if (!hrtfSubjectInitialized)
+        {
+            lastHrtfSubjectName = hrtfSubjectName;
+            hrtfSubjectInitialized = true;
+            return;
+        }
+
+        if (hrtfSubjectName != lastHrtfSubjectName)
+        {
+            if (hrtfMesh == null)
+            {
+                hrtfMesh = hrtfText.GetComponent<TextMesh>();
+            }
+
+            if (hrtfMesh != null)
+            {
+                hrtfMesh.text = "HRTF\n\n  " + hrtfSubjectName.ToUpperInvariant();
+            }
+
+            hrtfText.SetActive(true);
+            hrtfTextHideTime = Time.unscaledTime + hrtfDisplaySeconds;
+            lastHrtfSubjectName = hrtfSubjectName;
+            return;
+        }
+
+        if (hrtfText.activeSelf && Time.unscaledTime >= hrtfTextHideTime)
+        {
+            hrtfText.SetActive(false);
+        }
     }
 }

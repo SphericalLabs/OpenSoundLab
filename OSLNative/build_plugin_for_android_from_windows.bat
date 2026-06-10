@@ -4,7 +4,7 @@ setlocal EnableExtensions
 set "REQUIRED_NDK_VERSION=26.1.10909125"
 set "SCRIPT_DIR=%~dp0"
 set "OUTPUT_SO=%SCRIPT_DIR%libs\arm64-v8a\libOSLNative.so"
-set "DEST_SO=%SCRIPT_DIR%..\Assets\OSLNative\arm64\Release\libOSLNative.so"
+set "DEST_SO=%SCRIPT_DIR%..\Assets\Plugins\OSLNative\arm64\Release\libOSLNative.so"
 
 echo Build Android Plugin from Windows...
 
@@ -53,8 +53,14 @@ if not exist "%OUTPUT_SO%" (
     exit /b 1
 )
 
-if not exist "%SCRIPT_DIR%..\Assets\OSLNative\arm64\Release" mkdir "%SCRIPT_DIR%..\Assets\OSLNative\arm64\Release"
+if not exist "%SCRIPT_DIR%..\Assets\Plugins\OSLNative\arm64\Release" mkdir "%SCRIPT_DIR%..\Assets\Plugins\OSLNative\arm64\Release"
 move /Y "%OUTPUT_SO%" "%DEST_SO%" >nul
+if errorlevel 1 (
+    popd
+    exit /b %ERRORLEVEL%
+)
+
+call "%SCRIPT_DIR%Build\restore_plugin_meta_templates.bat" "arm64\Release\libOSLNative.so.meta"
 if errorlevel 1 (
     popd
     exit /b %ERRORLEVEL%

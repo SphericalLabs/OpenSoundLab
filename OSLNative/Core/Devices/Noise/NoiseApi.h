@@ -1,0 +1,46 @@
+// This file is part of OpenSoundLab, which is based on SoundStage VR.
+//
+// Copyright © 2020-2026 OSLLv1 Sphericals OpenSoundLab
+//
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// You may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#pragma once
+
+#include "OSLNativeExport.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct NoiseProcessor;
+OSL_API NoiseProcessor* CreateNoiseProcessor(int seed);
+OSL_API void DestroyNoiseProcessor(NoiseProcessor* processor);
+OSL_API void NoiseProcessBuffer(NoiseProcessor* processor, float* buffer, int length, int channels, float sampleRatePercent, float* lastSample, int* counter, int speedFrames, bool* updated);
+OSL_API void SyncNoiseProcessor(NoiseProcessor* processor, int seed, int steps);
+OSL_API int GetCurrentSeed(NoiseProcessor* processor);
+OSL_API int GetCurrentStep(NoiseProcessor* processor);
+
+#ifdef __cplusplus
+}
+#endif

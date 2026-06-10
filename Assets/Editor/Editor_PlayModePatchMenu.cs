@@ -25,6 +25,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 using Mirror;
 using UnityEditor;
@@ -34,10 +35,12 @@ using UnityEngine.SceneManagement;
 [InitializeOnLoad]
 public static class Editor_PlayModePatchMenu
 {
-    const string loadOnPlayMenuPath = "OpenSoundLab/Play Mode/Load LastPlayModePatch on Play";
+    const string newPatchMenuPath = "OpenSoundLab/Play Mode/New Patch";
+    const string loadPatchMenuPath = "OpenSoundLab/Play Mode/Load Patch";
+    const string savePatchMenuPath = "OpenSoundLab/Play Mode/Save Patch";
     const string loadMenuPath = "OpenSoundLab/Play Mode/Load LastPlayModePatch";
     const string saveMenuPath = "OpenSoundLab/Play Mode/Save LastPlayModePatch";
-    const string newPatchMenuPath = "OpenSoundLab/Play Mode/New Patch";
+    const string loadOnPlayMenuPath = "OpenSoundLab/Play Mode/Load LastPlayModePatch on Play";
     const string loadOnPlayPrefKey = "LoadLastPlayModePatchOnPlay";
     const string patchFileName = "LastPlayModePatch.xml";
     static bool loadOnPlayPending;
@@ -49,7 +52,7 @@ public static class Editor_PlayModePatchMenu
         Menu.SetChecked(loadOnPlayMenuPath, isLoadOnPlayEnabled());
     }
 
-    [MenuItem(loadOnPlayMenuPath, false, 20)]
+    [MenuItem(loadOnPlayMenuPath, false, 6)]
     public static void ToggleLoadOnPlay()
     {
         bool enabled = !isLoadOnPlayEnabled();
@@ -58,50 +61,19 @@ public static class Editor_PlayModePatchMenu
         Menu.SetChecked(loadOnPlayMenuPath, enabled);
     }
 
-    [MenuItem(loadOnPlayMenuPath, true, 20)]
+    [MenuItem(loadOnPlayMenuPath, true, 6)]
     public static bool ToggleLoadOnPlayValidate()
     {
         Menu.SetChecked(loadOnPlayMenuPath, isLoadOnPlayEnabled());
         return true;
     }
 
-    [MenuItem(loadMenuPath, false, 10)]
-    public static void LoadLastPlayModePatch()
-    {
-        if (NetworkServer.active)
-        {
-            clearPatchForManualLoad();
-            tryLoadLastPlayModePatch();
-        }
-        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
-        {
-            var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
-            if (player != null)
-            {
-                if (player.RequestLoadPatchFromLocalFile(getPatchPath()))
-                {
-                    Debug.Log("Requested Server to Load LastPlayModePatch from the client patch file.");
-                }
-            }
-        }
-        else
-        {
-             Debug.LogWarning("Cannot Load LastPlayModePatch: Network not ready.");
-        }
-    }
-
-    [MenuItem(loadMenuPath, true, 10)]
-    public static bool LoadLastPlayModePatchValidate()
-    {
-        return Application.isPlaying && (NetworkServer.active || (NetworkClient.isConnected && NetworkClient.localPlayer != null));
-    }
-
-    [MenuItem(saveMenuPath, false, 30)]
-    public static void SaveLastPlayModePatch()
+    [MenuItem(newPatchMenuPath, false, 1)]
+    public static void StartNewPatch()
     {
         if (!Application.isPlaying)
         {
-            Debug.LogWarning("Save LastPlayModePatch only works in Play Mode.");
+            Debug.LogWarning("New Patch only works in Play Mode.");
             return;
         }
 
@@ -113,7 +85,170 @@ public static class Editor_PlayModePatchMenu
                 Debug.LogWarning("SaveLoadInterface is not available.");
                 return;
             }
+            saveLoad.StartNewPatch();
+            Debug.Log("Started new patch.");
+        }
+        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
+        {
+            var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
+            if (player != null)
+            {
+                player.CmdNewPatch();
+                Debug.Log("Requested Server to Start New Patch.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("New Patch requires active Network connection.");
+        }
+    }
 
+    [MenuItem(newPatchMenuPath, true, 1)]
+    public static bool StartNewPatchValidate()
+    {
+        return Application.isPlaying &&
+               ((NetworkServer.active && SaveLoadInterface.instance != null) ||
+                (NetworkClient.isConnected && NetworkClient.localPlayer != null));
+    }
+
+    [MenuItem(loadPatchMenuPath, false, 2)]
+    public static void LoadPatch()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("Load Patch only works in Play Mode.");
+            return;
+        }
+
+        string path = EditorUtility.OpenFilePanelWithFilters(
+            "Load Patch",
+            getPatchDirectory(),
+            new[] { "XML files", "xml", "All files", "*" });
+
+        if (string.IsNullOrEmpty(path)) return;
+
+        loadPatch(path, "Patch");
+    }
+
+    [MenuItem(loadPatchMenuPath, true, 2)]
+    public static bool LoadPatchValidate()
+    {
+        return canLoadPatch();
+    }
+
+    [MenuItem(savePatchMenuPath, false, 3)]
+    public static void SavePatch()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("Save Patch only works in Play Mode.");
+            return;
+        }
+
+        if (!NetworkServer.active)
+        {
+            Debug.LogWarning("Save Patch requires an active Mirror server.");
+            return;
+        }
+
+        SaveLoadInterface saveLoad = SaveLoadInterface.instance;
+        if (saveLoad == null)
+        {
+            Debug.LogWarning("SaveLoadInterface is not available.");
+            return;
+        }
+
+        string path = EditorUtility.SaveFilePanel(
+            "Save Patch",
+            getDocumentsOpenSoundLabDirectory(),
+            getDefaultPatchFileName(),
+            "xml");
+
+        if (string.IsNullOrEmpty(path)) return;
+
+        path = ensureXmlExtension(path);
+        ensurePatchDirectory(path);
+        saveLoad.Save(path);
+        Debug.Log("Saved Patch to " + path);
+    }
+
+    [MenuItem(savePatchMenuPath, true, 3)]
+    public static bool SavePatchValidate()
+    {
+        return Application.isPlaying && NetworkServer.active && SaveLoadInterface.instance != null;
+    }
+
+    [MenuItem(loadMenuPath, false, 4)]
+    public static void LoadLastPlayModePatch()
+    {
+        loadPatch(getPatchPath(), "LastPlayModePatch");
+    }
+
+    [MenuItem(loadMenuPath, true, 4)]
+    public static bool LoadLastPlayModePatchValidate()
+    {
+        return canLoadPatch();
+    }
+
+    [MenuItem(saveMenuPath, false, 5)]
+    public static void SaveLastPlayModePatch()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("Save LastPlayModePatch only works in Play Mode.");
+            return;
+        }
+
+        saveLastPlayModePatch();
+    }
+
+    [MenuItem(saveMenuPath, true, 5)]
+    public static bool SaveLastPlayModePatchValidate()
+    {
+        return Application.isPlaying &&
+               ((NetworkServer.active && SaveLoadInterface.instance != null) ||
+                (NetworkClient.isConnected && NetworkClient.localPlayer != null));
+    }
+
+    static bool canLoadPatch()
+    {
+        return Application.isPlaying && (NetworkServer.active || (NetworkClient.isConnected && NetworkClient.localPlayer != null));
+    }
+
+    static void loadPatch(string path, string patchLabel)
+    {
+        if (NetworkServer.active)
+        {
+            clearPatchForManualLoad();
+            tryLoadPatch(path, patchLabel);
+        }
+        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
+        {
+            var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
+            if (player != null)
+            {
+                if (player.RequestLoadPatchFromLocalFile(path))
+                {
+                    Debug.Log("Requested Server to Load " + patchLabel + " from the client patch file.");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Cannot Load " + patchLabel + ": Network not ready.");
+        }
+    }
+
+    static void saveLastPlayModePatch()
+    {
+        if (NetworkServer.active)
+        {
+            SaveLoadInterface saveLoad = SaveLoadInterface.instance;
+            if (saveLoad == null)
+            {
+                Debug.LogWarning("SaveLoadInterface is not available.");
+                return;
+            }
             string path = getPatchPath();
             ensurePatchDirectory(path);
             saveLoad.Save(path);
@@ -130,59 +265,8 @@ public static class Editor_PlayModePatchMenu
         }
         else
         {
-             Debug.LogWarning("Cannot Save LastPlayModePatch: Network not ready.");
+            Debug.LogWarning("Cannot Save LastPlayModePatch: Network not ready.");
         }
-    }
-
-    [MenuItem(saveMenuPath, true, 30)]
-    public static bool SaveLastPlayModePatchValidate()
-    {
-        return Application.isPlaying &&
-               ((NetworkServer.active && SaveLoadInterface.instance != null) ||
-                (NetworkClient.isConnected && NetworkClient.localPlayer != null));
-    }
-
-    [MenuItem(newPatchMenuPath, false, 1)]
-    public static void StartNewPatch()
-    {
-        if (!Application.isPlaying)
-        {
-            Debug.LogWarning("New Patch only works in Play Mode.");
-            return;
-        }
-
-        if (NetworkServer.active)
-        {
-             SaveLoadInterface saveLoad = SaveLoadInterface.instance;
-            if (saveLoad == null)
-            {
-                Debug.LogWarning("SaveLoadInterface is not available.");
-                return;
-            }
-            saveLoad.StartNewPatch();
-            Debug.Log("Started new patch.");
-        }
-        else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
-        {
-             var player = NetworkClient.localPlayer.GetComponent<VRNetworkPlayer>();
-             if (player != null)
-             {
-                 player.CmdNewPatch();
-                 Debug.Log("Requested Server to Start New Patch.");
-             }
-        }
-        else
-        {
-            Debug.LogWarning("New Patch requires active Network connection.");
-        }
-    }
-
-    [MenuItem(newPatchMenuPath, true, 1)]
-    public static bool StartNewPatchValidate()
-    {
-        return Application.isPlaying &&
-               ((NetworkServer.active && SaveLoadInterface.instance != null) ||
-                (NetworkClient.isConnected && NetworkClient.localPlayer != null));
     }
 
     static void handlePlayModeStateChanged(PlayModeStateChange state)
@@ -224,23 +308,8 @@ public static class Editor_PlayModePatchMenu
         }
         else if (NetworkClient.isConnected && NetworkClient.localPlayer != null)
         {
-             // Client Auto Load?
-             // If the user wants "Load LastPlayModePatch on Play" and they start as Client...
-             // They might want to trigger the server to load it?
-             // But if multiple clients join, restarting the patch every time a client joins is bad.
-             // Usually "Load On Play" is for the host/server startup.
-             // So I will NOT auto-trigger load on client join, unless explicitly requested.
-             // The original code checked checks NetworkServer.active.
-             // I will leave auto-load for Server only for now, as it disrupts other players if a client forces a reload.
-             // Unless "Play Mode" implies single user context.
-             // But simpler to keep auto-load as server-side feature to avoid chaos.
-             // However, I should check if I should turn off `loadOnPlayPending` if I am a client so it doesn't spin forever?
-             // Use a timeout or just check checks.
-
-             // If I am client, I can't load locally anyway (need server).
-             // Checking NetworkClient.isConnected is enough to say "I am fully initialized".
-             // If I am client, and I see I am connected, I should probably stop pending.
-             if (NetworkClient.isConnected)
+            // Auto-load is for Server only to avoid chaos
+            if (NetworkClient.isConnected)
                 loadOnPlayPending = false;
         }
     }
@@ -266,11 +335,16 @@ public static class Editor_PlayModePatchMenu
 
     static void tryLoadLastPlayModePatch()
     {
+        tryLoadPatch(getPatchPath(), "LastPlayModePatch");
+    }
+
+    static void tryLoadPatch(string path, string patchLabel)
+    {
         if (!Application.isPlaying) return;
 
         if (!NetworkServer.active)
         {
-            Debug.Log("Load LastPlayModePatch skipped because Mirror server is not active.");
+            Debug.Log("Load " + patchLabel + " skipped because Mirror server is not active.");
             return;
         }
 
@@ -281,10 +355,9 @@ public static class Editor_PlayModePatchMenu
             return;
         }
 
-        string path = getPatchPath();
         if (!File.Exists(path))
         {
-            Debug.LogWarning($"LastPlayModePatch not found at {path}");
+            Debug.LogWarning(patchLabel + " not found at " + path);
             return;
         }
 
@@ -312,6 +385,33 @@ public static class Editor_PlayModePatchMenu
 
         string savesDir = Path.Combine(baseDir, "Saves");
         return Path.Combine(savesDir, patchFileName);
+    }
+
+    static string getPatchDirectory()
+    {
+        return Path.GetDirectoryName(getPatchPath());
+    }
+
+    static string getDocumentsOpenSoundLabDirectory()
+    {
+        string documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (string.IsNullOrEmpty(documentsDir)) return getPatchDirectory();
+
+        string openSoundLabDir = Path.Combine(documentsDir, "OpenSoundLab");
+        if (Directory.Exists(openSoundLabDir)) return openSoundLabDir;
+        if (Directory.Exists(documentsDir)) return documentsDir;
+        return getPatchDirectory();
+    }
+
+    static string getDefaultPatchFileName()
+    {
+        return string.Format("{0:yyyy-MM-dd_HH-mm-ss}.xml", DateTime.Now);
+    }
+
+    static string ensureXmlExtension(string path)
+    {
+        if (path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) return path;
+        return path + ".xml";
     }
 
     static void ensurePatchDirectory(string path)

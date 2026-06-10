@@ -59,6 +59,7 @@ namespace Network
         public override void Awake()
         {
             base.Awake();
+            OSLNetworkSpawnPrefabRegistrar.RegisterManifestPrefabs(this);
             m_Players = new List<Player>();
 
             m_Username = SystemInfo.deviceName;

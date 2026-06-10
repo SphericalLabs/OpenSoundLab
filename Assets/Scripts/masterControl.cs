@@ -87,6 +87,12 @@ public class masterControl : MonoBehaviour
     public GameObject CameraRig;
     public EnvironmentDepthManager depthManager;
     public manipulator leftManip, rightManip;
+    public int hrtfSubjectIndex = 5;
+    string[] hrtfSubjectIds = new string[0];
+    string[] hrtfSubjectNames = new string[0];
+    string currentHrtfSubjectId = "";
+    string currentHrtfSubjectName = "";
+    Type resonanceAudioType;
 
     void Awake()
     {
@@ -244,6 +250,10 @@ public class masterControl : MonoBehaviour
 
         _startupSequenceExecuted = true;
 
+        updateBinauralSetting((int)BinauralMode.Speaker);
+        updateWireSetting((int)WireMode.Visualized);
+        refreshHrtfSubjectLabel();
+
         if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
         {
             PlayerPrefs.SetInt("showTutorialsOnStartup", 1);
@@ -270,13 +280,15 @@ public class masterControl : MonoBehaviour
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch))
         {
-            nextWireSetting();
+            previousHrtfSubject();
         }
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
         {
-            nextBinauralSetting();
+            nextHrtfSubject();
         }
+
+        refreshHrtfSubjectLabel();
 
         leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.LTouch);
         rightStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
@@ -650,17 +662,237 @@ public class masterControl : MonoBehaviour
     public UnityEvent onBinauralChangedEvent;
     public UnityEvent onWireChangedEvent;
     public UnityEvent onDisplayChangedEvent;
+    public UnityEvent onHrtfChangedEvent = new UnityEvent();
+
+    public void previousHrtfSubject()
+    {
+        selectHrtfSubject(-1);
+    }
+
+    public void nextHrtfSubject()
+    {
+        selectHrtfSubject(1);
+    }
+
+    public string getHrtfSubjectLabel()
+    {
+        refreshHrtfSubjectLabel();
+        return currentHrtfSubjectName;
+    }
+
+    public string getHrtfSubjectId()
+    {
+        refreshHrtfSubjectLabel();
+        return currentHrtfSubjectId;
+    }
+
+    void selectHrtfSubject(int offset)
+    {
+        if (!ensureHrtfSubjects())
+        {
+            Debug.LogWarning("masterControl: no HRTF subjects found for switching.", this);
+            return;
+        }
+
+        int nextIndex = wrapIndex(hrtfSubjectIndex + offset, hrtfSubjectIds.Length);
+        updateHrtfSubjectId(hrtfSubjectIds[nextIndex]);
+    }
+
+    public void updateHrtfSubjectId(string subjectId)
+    {
+        if (string.IsNullOrEmpty(subjectId) || !ensureHrtfSubjects())
+        {
+            return;
+        }
+
+        refreshHrtfSubjectLabel();
+        bool changed = currentHrtfSubjectId != subjectId;
+        int nextIndex = getHrtfSubjectIndex(subjectId);
+        if (nextIndex < 0)
+        {
+            Debug.LogWarning("masterControl: unknown HRTF subject " + subjectId + ".", this);
+            return;
+        }
+
+        hrtfSubjectIndex = nextIndex;
+        refreshHrtfSubjectLabel();
+
+        bool didApply = applyHrtfSubject(currentHrtfSubjectId);
+        if (!didApply)
+        {
+            Debug.LogWarning("masterControl: selected HRTF subject " + currentHrtfSubjectId + " but the native renderer did not accept it.", this);
+        }
+
+        if (changed && onHrtfChangedEvent != null)
+        {
+            onHrtfChangedEvent.Invoke();
+        }
+    }
+
+    int getHrtfSubjectIndex(string subjectId)
+    {
+        for (int i = 0; i < hrtfSubjectIds.Length; i++)
+        {
+            if (hrtfSubjectIds[i] == subjectId)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    bool ensureHrtfSubjects()
+    {
+        if (hrtfSubjectIds.Length > 0 && hrtfSubjectIds.Length == hrtfSubjectNames.Length)
+        {
+            return true;
+        }
+
+        string[] nativeSubjectIds = invokeResonanceAudioStringArray("GetHrtfSubjectIds");
+        string[] nativeSubjectNames = invokeResonanceAudioStringArray("GetHrtfSubjectNames");
+        if (nativeSubjectIds.Length > 0 && nativeSubjectIds.Length == nativeSubjectNames.Length)
+        {
+            hrtfSubjectIds = nativeSubjectIds;
+            hrtfSubjectNames = nativeSubjectNames;
+            return true;
+        }
+
+        hrtfSubjectIds = new string[] {
+            "Subject_002",
+            "D1", "D2", "H3", "H4", "H5", "H6", "H7", "H8", "H9",
+            "H10", "H11", "H12", "H13", "H14", "H15", "H16", "H17",
+            "H18", "H19", "H20"
+        };
+
+        hrtfSubjectNames = new string[] {
+            "Legacy SADIE Subject 002",
+            "SADIE II D1", "SADIE II D2", "SADIE II H3", "SADIE II H4",
+            "SADIE II H5", "SADIE II H6", "SADIE II H7", "SADIE II H8",
+            "SADIE II H9", "SADIE II H10", "SADIE II H11", "SADIE II H12",
+            "SADIE II H13", "SADIE II H14", "SADIE II H15", "SADIE II H16",
+            "SADIE II H17", "SADIE II H18", "SADIE II H19", "SADIE II H20"
+        };
+
+        return true;
+    }
+
+    void refreshHrtfSubjectLabel()
+    {
+        if (!ensureHrtfSubjects())
+        {
+            currentHrtfSubjectId = "";
+            currentHrtfSubjectName = "";
+            return;
+        }
+
+        int count = Mathf.Min(hrtfSubjectIds.Length, hrtfSubjectNames.Length);
+        if (count == 0)
+        {
+            currentHrtfSubjectId = "";
+            currentHrtfSubjectName = "";
+            return;
+        }
+
+        hrtfSubjectIndex = wrapIndex(hrtfSubjectIndex, count);
+        currentHrtfSubjectId = hrtfSubjectIds[hrtfSubjectIndex];
+        currentHrtfSubjectName = hrtfSubjectNames[hrtfSubjectIndex];
+    }
+
+    string[] invokeResonanceAudioStringArray(string methodName)
+    {
+        Type type = getResonanceAudioType();
+        if (type == null)
+        {
+            return new string[0];
+        }
+
+        System.Reflection.MethodInfo method = type.GetMethod(methodName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        if (method == null)
+        {
+            return new string[0];
+        }
+
+        try
+        {
+            return method.Invoke(null, null) as string[] ?? new string[0];
+        }
+        catch (Exception)
+        {
+            return new string[0];
+        }
+    }
+
+    bool applyHrtfSubject(string subjectId)
+    {
+        if (string.IsNullOrEmpty(subjectId))
+        {
+            return false;
+        }
+
+        Type type = getResonanceAudioType();
+        if (type == null)
+        {
+            return false;
+        }
+
+        System.Reflection.MethodInfo method = type.GetMethod("SetHrtfSubject", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+        if (method == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            object result = method.Invoke(null, new object[] { subjectId });
+            return result is bool && (bool)result;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    Type getResonanceAudioType()
+    {
+        if (resonanceAudioType != null)
+        {
+            return resonanceAudioType;
+        }
+
+        resonanceAudioType = Type.GetType("ResonanceAudio");
+        if (resonanceAudioType != null)
+        {
+            return resonanceAudioType;
+        }
+
+        System.Reflection.Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        for (int i = 0; i < assemblies.Length; i++)
+        {
+            resonanceAudioType = assemblies[i].GetType("ResonanceAudio");
+            if (resonanceAudioType != null)
+            {
+                return resonanceAudioType;
+            }
+        }
+
+        return null;
+    }
+
+    int wrapIndex(int index, int count)
+    {
+        int wrappedIndex = index % count;
+        return wrappedIndex < 0 ? wrappedIndex + count : wrappedIndex;
+    }
 
 
     public BinauralMode BinauralSetting = BinauralMode.Speaker;
 
     public void updateBinauralSetting(int num)
     {
-        if (BinauralSetting == (BinauralMode)num)
-        {
-            return;
-        }
-        BinauralSetting = (BinauralMode)num;
+        BinauralMode nextSetting = BinauralMode.Speaker;
+        bool changed = BinauralSetting != nextSetting;
+        BinauralSetting = nextSetting;
 
         //speakerDeviceInterface[] standaloneSpeakers = FindObjectsOfType<speakerDeviceInterface>();
         //for (int i = 0; i < standaloneSpeakers.Length; i++) {
@@ -670,27 +902,25 @@ public class masterControl : MonoBehaviour
         embeddedSpeaker[] embeddedSpeakers = FindObjectsOfType<embeddedSpeaker>();
         for (int i = 0; i < embeddedSpeakers.Length; i++)
         {
-            if (BinauralSetting == BinauralMode.All) embeddedSpeakers[i].audio.spatialize = true;
-            else embeddedSpeakers[i].audio.spatialize = false;
+            embeddedSpeakers[i].audio.spatialize = false;
         }
 
-        onBinauralChangedEvent.Invoke();
+        if (changed)
+        {
+            onBinauralChangedEvent.Invoke();
+        }
     }
 
 
 
-    public WireMode WireSetting = WireMode.Straight;
+    public WireMode WireSetting = WireMode.Visualized;
 
 
     public void updateWireSetting(int num)
     {
-        // make straight in case for loading legacy with curved
-        if ((WireMode)num == WireMode.Curved)
-        {
-            num = (int)WireMode.Straight;
-        }
-
-        WireSetting = (WireMode)num;
+        WireMode nextSetting = WireMode.Visualized;
+        bool changed = WireSetting != nextSetting;
+        WireSetting = nextSetting;
 
         omniPlug[] plugs = FindObjectsOfType<omniPlug>();
         for (int i = 0; i < plugs.Length; i++)
@@ -698,29 +928,21 @@ public class masterControl : MonoBehaviour
             plugs[i].activateWireMode(WireSetting);
         }
 
-        onWireChangedEvent.Invoke();
+        if (changed)
+        {
+            onWireChangedEvent.Invoke();
+        }
     }
 
     public void nextWireSetting()
     {
-        // Get the total number of WireMode enum values
-        int totalModes = System.Enum.GetNames(typeof(WireMode)).Length;
-
-        // Get the current WireSetting as an integer
-        int currentSetting = (int)WireSetting;
-
-        // Calculate the next setting, ensuring it skips 0 and wraps around properly
-        // Avoid curved for now until path points are synced
-        int nextSetting = (currentSetting % (totalModes - 1)) + 1;
-
-        // Update the WireSetting with the new value
-        updateWireSetting(nextSetting);
+        updateWireSetting((int)WireMode.Visualized);
     }
 
 
     public void nextBinauralSetting()
     {
-        updateBinauralSetting((BinauralSetting.GetHashCode() + 1) % System.Enum.GetNames(typeof(BinauralMode)).Length);
+        updateBinauralSetting((int)BinauralMode.Speaker);
     }
 
 

@@ -201,7 +201,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-582880</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.08252894</x>
         <y>1.66190386</y>
@@ -625,7 +625,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-573130</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>-0.06323199</x>
         <y>0.696987867</y>
@@ -687,7 +687,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-572400</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.204828337</x>
         <y>0.7189105</y>
@@ -821,7 +821,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-569884</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.243294924</x>
         <y>1.43233323</y>
@@ -1081,7 +1081,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-565400</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.438378632</x>
         <y>0.8519288</y>
@@ -1355,7 +1355,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-558674</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.478105932</x>
         <y>1.01774478</y>

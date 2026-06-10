@@ -1,0 +1,220 @@
+// This file is part of OpenSoundLab, which is based on SoundStage VR.
+//
+// Copyright © 2020-2026 OSLLv1 Sphericals OpenSoundLab
+//
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// You may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+///  Created by Hannes Barfuss on 28.12.2021.
+///
+///  This is a collection of utility functions that are often used in audio processing. Some of them are optimized with
+///  Neon Instrinsics for arm64 CPUs. Make sure you compile with Neon support if available on the target hardware, as
+///  performance gains are substantial (up to 4x faster).
+///
+///  Please follow these style conventions:
+///  * all functions start with an underscore: _func(...)
+///  * functions on float buffers start with _f: _fCopy(...)
+///  * Document "what it does & how to use it" only in Util.h
+///  * Document "how it works" only in Util.c
+
+#ifndef UTIL_H
+#define UTIL_H
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "OSLNativeExport.h"
+
+#if defined(ANDROID) || defined(__ANDROID__)
+#include <android/log.h>
+#define ANDROID_LOG_TAG "OSLNative"
+#define printv(...) __android_log_print(ANDROID_LOG_INFO, ANDROID_LOG_TAG, __VA_ARGS__)
+#else
+#define printv(...) printf(__VA_ARGS__)
+#endif
+
+// Windows needs explicit import of the intxx_t types
+#ifdef _WIN32
+#include <stdint.h>
+#endif
+
+#define one_minus_oneOverE 0.6321205588285576784044762298 // 1-(1/e)
+
+#define WAV_BIG_ENDIAN 0
+#define WAV_LITTLE_ENDIAN 1
+
+#define INTERPOLATION_NONE 1
+#define INTERPOLATION_LINEAR 2
+#define INTERPOLATION_HERMITE 3
+#define INTERPOLATION_LAGRANGE 4
+#define INTERPOLATION_WSINC 5
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* Allocate n bytes of memory. */
+OSL_API void* _malloc(size_t n);
+
+/* Frees a previously allocated pointer. */
+OSL_API void _free(void* x);
+
+/* Converts millisceonds to samples */
+OSL_API int _mstosmpls(float ms, float sampleRate);
+
+/* Converts seconds to samples */
+OSL_API int _stosmpls(float s, float sampleRate);
+
+/* Converts one linear domain sample to logarithmic domain sample */
+OSL_API float _atodb(float a);
+
+/* Converts one logarithmic domain sample to linear domain sample */
+OSL_API float _dbtoa(float a);
+
+/* Clamps f between min and max */
+OSL_API float _clamp(float f, float min, float max);
+
+/* Performs linear interpolation between two samples. The output is the hypothetical sample at position [a + frac]. */
+OSL_API float _interpolate_linear(float a, float b, float frac);
+
+/* Converts a 32bit float to a 16bit signed int */
+OSL_API int16_t _float32toint16(float f);
+
+OSL_API void _float32toint16buffer(float* src, int16_t* dest, int n);
+
+OSL_API void _float32toint24buffer(float* src, int8_t* dest, int endianness, int n);
+
+/* Returns the bigger of two floats */
+OSL_API float _max(float a, float b);
+
+/* Returns the smaller of two floats */
+OSL_API float _min(float a, float b);
+
+/* Fills a buffer with 0's */
+OSL_API void _fZero(float* dest, int n);
+
+/* Copies n samples of src into dest */
+OSL_API void _fCopy(float* src, float* dest, int n);
+
+/* Multiples all elements of src with factor and writes them to dest */
+OSL_API void _fScale(float* src, float* dest, float factor, int n);
+
+/* Multiplies all elements of src1 with the corresponding elements of src2 and writes the results to dest */
+OSL_API void _fMultiply(float* src1, float* src2, float* dest, int n);
+
+/* Applies pow to all elements of src and writes to dest */
+OSL_API void _fPow(float* src, float* dest, float power, int n);
+
+/* Adds corresponding elements of src1 and src2 and writes the result to dest */
+OSL_API void _fAdd(float* src1, float* src2, float* dest, int n);
+
+OSL_API void _fAddSingle(float* src1, float val, float* dest, int n);
+
+/* Multiplies elements of src1 and src2 and adds the results to dest */
+OSL_API void _fMultiplyAdd(float* src1, float* src2, float* dest, int n);
+
+/* Calculates the sum of magnitudes of src. */
+OSL_API float _fSumOfMags(float* src, int n);
+
+/* Calculates the average signal energy of src. */
+OSL_API float _fAverageSumOfMags(float* src, int n);
+
+/* Clears the negative sign from all elements in src */
+OSL_API void _fAbs(float* src, float* dest, int n);
+
+/* Returns the next power of 2 that is >= n. */
+OSL_API int _nextPowOf2(int n);
+
+/* Returns 1 if n is a power of 2, and 0 otherwise. */
+OSL_API int _isPowOf2(int n);
+
+/* Interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory
+ * address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory
+ * addresses, a slightly faster in-place operation is performed. */
+OSL_API void _fInterleave(const float* src, float* dest, int n, int channels);
+
+/* De-interleaves the src vector and writes the result to the dest vector. If src and dest point to the same memory
+ * address, an out-of-place operation with a temporary buffer is performed. If src and dest point to different memory
+ * addresses, a slightly faster in-place operation is performed. */
+OSL_API void _fDeinterleave(const float* src, float* dest, int n, int channels);
+
+OSL_API void _fDryWetLogarithmic(float* dryBuf, float* wetBuf, float* dest, float dry, float wet, int n);
+
+/* scales dryBuf by dry and wetBuf by wet, adding the result in dest. dryBuf and wetBuf are not modified. */
+OSL_API void _fDryWetLinear(float* dryBuf, float* wetBuf, float* dest, float dry, float wet, int n);
+
+/* Executes a linear crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves power
+ * with totally correlated signals. */
+OSL_API void _fCrossfadeLinear(float* src1, float* src2, float* dest, int n);
+
+/* Executes a logarithmic crossfade of signal src1 and src2 over n samples and stores the result in dest. Preserves
+ * power with totally uncorrelated signals. */
+/* If destructive is set true (or >= 1), lookup tables ares used for calculation and the source arrays are used to store
+ * immediate results. You are advised to use the destructive version whenever possible, as the computation is MUCH
+ * faster. */
+OSL_API void _fCrossfadeLogarithmic(float* src1, float* src2, float* dest, int destructive, int n);
+
+/* Multiplies the src array with a linear ramp that starts at gain1 and ends at gain2.
+ * If gain1 == gain2, the more efficient _fScale operation is called.
+ */
+OSL_API void _fLerp(float* src, float* dest, float gain1, float gain2, int n);
+
+/* Clamps all values in src array. */
+OSL_API void _fClamp(float* src, float min, float max, int n);
+
+/* Fills the input buffer with white noise of the specified amplitude. */
+OSL_API void _fNoise(float* buf, float amplitude, int n);
+
+/* Adds noise to the input signal. Overall amplitudes are preserved. 0 corresponds to no noise, 1 corresponds to "only
+ * noise". */
+OSL_API void _fNoiseAdditive(float* buf, float amount, int n);
+
+/* Reduces the sample rate of the input signal by factor. */
+OSL_API void _fDownSample(float* buf, int factor, int n);
+
+/* Adds jitter to the input signal. An amount of 1 corresponds to jitter of 2/samplerate. An amount of 0 corresponds to
+ * no jitter at all. */
+OSL_API void _fJitter(float* buf, float amount, int n);
+
+/* Reduces the bit depth of the input signal. */
+OSL_API void _fBitCrush(float* buf, int bitReduction, int n);
+
+/* Evaluates y = ab^x with slope ym. x will be clamped to [0..1]. ym < 0.5 yields an exponential curve, ym > 0.5 yields
+ * a logarithmic curve. Return val will be in range [0..1]. */
+OSL_API float _expCurve(float x, float ym);
+
+/* Maps a value from one range to another, applying a slope between 0 and 1 (0.5 is linear or "no slope"). */
+OSL_API float _map(float x, float start1, float stop1, float start2, float stop2, float slope);
+
+#if defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__)
+OSL_API double _wallTime(void);
+
+OSL_API double _cpuTime(void);
+
+OSL_API void _neonFeatures(void);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* UTIL_H */

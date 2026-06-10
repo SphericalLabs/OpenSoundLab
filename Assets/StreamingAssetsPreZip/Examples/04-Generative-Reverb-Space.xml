@@ -158,7 +158,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-33210</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.44817245</x>
         <y>1.438364</y>

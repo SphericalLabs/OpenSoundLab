@@ -97,6 +97,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OSLNativeCoreIncludeDirectories>$(ProjectDir)Core\Abi;$(ProjectDir)Core\Shared\Buffers;$(ProjectDir)Core\Shared\Math;$(ProjectDir)Core\Devices\ClipPlayer;$(ProjectDir)Core\Devices\Drum;$(ProjectDir)Core\Devices\Envelope;$(ProjectDir)Core\Devices\Filter;$(ProjectDir)Core\Devices\FilterTwo;$(ProjectDir)Core\Devices\Keyboard;$(ProjectDir)Core\Devices\LinkPhaseGenerator;$(ProjectDir)Core\Devices\Maraca;$(ProjectDir)Core\Devices\Noise;$(ProjectDir)Core\Devices\Oscillator;$(ProjectDir)Core\Devices\Utilities;$(ProjectDir)Core\Devices\Xylophone;$(ProjectDir)Core\External\FreeVerb\dfx-library;$(ProjectDir)Core\External\FreeVerb\freeverb\components;$(ProjectDir)Core\External\UnityAudioPlugin;$(ProjectDir)Core\External\pcg-cpp\include;$(ProjectDir)Core\External\link\include;$(ProjectDir)Core\External\link\modules\asio-standalone\asio\include</OSLNativeCoreIncludeDirectories>
+    <OSLNativeCoreAdditionalDependencies>ws2_32.lib;iphlpapi.lib</OSLNativeCoreAdditionalDependencies>
+  </PropertyGroup>
+  <Import Project="$(ProjectDir)Addons\*\addon.vcxproj.props" Condition="Exists('$(ProjectDir)Addons')" />
+  <Import Project="$(ProjectDir)..\Packages\*\OSLNativeAddons~\*\addon.vcxproj.props" Condition="Exists('$(ProjectDir)..\Packages')" />
+  <Import Project="$(ProjectDir)..\Packages\*\OSLNativeAddons\*\addon.vcxproj.props" Condition="Exists('$(ProjectDir)..\Packages')" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
@@ -117,7 +124,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\..\Assets\OSLNative\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)\..\Assets\Plugins\OSLNative\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -129,12 +136,12 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSLNativeCoreIncludeDirectories);$(OSLNativeAddonIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib;$(OSLNativeCoreAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -147,12 +154,12 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSLNativeCoreIncludeDirectories);$(OSLNativeAddonIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib;$(OSLNativeCoreAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -165,11 +172,12 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSLNativeCoreIncludeDirectories);$(OSLNativeAddonIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(OSLNativeCoreAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -184,13 +192,14 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSLNativeCoreIncludeDirectories);$(OSLNativeAddonIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(OSLNativeCoreAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -205,13 +214,14 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSLNativeCoreIncludeDirectories);$(OSLNativeAddonIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(OSLNativeCoreAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -226,71 +236,59 @@
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VC_SourcePath)/MasterBusRecorder; $(VC_SourcePath)/FreeVerb/dfx-library; $(VC_SourcePath)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSLNativeCoreIncludeDirectories);$(OSLNativeAddonIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(OSLNativeCoreAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Artefact.cpp" />
-    <ClCompile Include="Biquad.cpp" />
-    <ClCompile Include="Compressor.cpp" />
-    <ClCompile Include="CRingBuffer.cpp" />
-    <ClCompile Include="Delay.cpp" />
-    <ClCompile Include="Filter.cpp" />
-    <ClCompile Include="FilterThree.cpp" />
-    <ClCompile Include="FilterTwo.cpp" />
-    <ClCompile Include="FreeVerb\freeverb\components\allpass.cpp" />
-    <ClCompile Include="FreeVerb\freeverb\components\comb.cpp" />
-    <ClCompile Include="FreeVerb\freeverb\components\revmodel.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MasterBusRecorder\AudioPluginUtil.cpp" />
-    <ClCompile Include="MasterBusRecorder\MasterBusRecorder.cpp" />
-    <ClCompile Include="Oscillator.cpp" />
-    <ClCompile Include="resample.cpp" />
-    <ClCompile Include="RingBuffer.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)/MasterBusRecorder; $(ProjectDir)/FreeVerb/dfx-library; $(ProjectDir)/FreeVerb/freeverb/components</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="Freeverb.cpp" />
-    <ClCompile Include="util.c" />
+    <ClCompile Include="Core\Abi\*.cpp" />
+    <ClCompile Include="Core\Shared\Buffers\*.cpp" />
+    <ClCompile Include="Core\Shared\Math\*.c" />
+    <ClCompile Include="Core\Shared\Math\*.cpp" />
+    <ClCompile Include="Core\Devices\ClipPlayer\*.cpp" />
+    <ClCompile Include="Core\Devices\Drum\*.cpp" />
+    <ClCompile Include="Core\Devices\Envelope\*.cpp" />
+    <ClCompile Include="Core\Devices\Filter\*.cpp" />
+    <ClCompile Include="Core\Devices\FilterTwo\*.cpp" />
+    <ClCompile Include="Core\Devices\Keyboard\*.cpp" />
+    <ClCompile Include="Core\Devices\LinkPhaseGenerator\*.cpp" />
+    <ClCompile Include="Core\Devices\Maraca\*.cpp" />
+    <ClCompile Include="Core\Devices\Noise\*.cpp" />
+    <ClCompile Include="Core\Devices\Oscillator\*.cpp" />
+    <ClCompile Include="Core\Devices\Utilities\*.cpp" />
+    <ClCompile Include="Core\Devices\Xylophone\*.cpp" />
+    <ClCompile Include="Core\External\FreeVerb\dfx-library\*.cpp" />
+    <ClCompile Include="Core\External\FreeVerb\freeverb\components\*.cpp" />
+    <ClCompile Include="Core\External\UnityAudioPlugin\*.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Artefact.h" />
-    <ClInclude Include="Biquad.h" />
-    <ClInclude Include="Compressor.h" />
-    <ClInclude Include="CRingBuffer.hpp" />
-    <ClInclude Include="Delay.h" />
-    <ClInclude Include="Filter.h" />
-    <ClInclude Include="FilterThree.h" />
-    <ClInclude Include="FilterTwo.h" />
-    <ClInclude Include="FreeVerb\dfx-library\dfxsmoothedvalue.h" />
-    <ClInclude Include="FreeVerb\dfx-library\dfxsmoothedvalue.hpp" />
-    <ClInclude Include="FreeVerb\dfx-library\idfxsmoothedvalue.h" />
-    <ClInclude Include="FreeVerb\freeverb\components\allpass.hpp" />
-    <ClInclude Include="FreeVerb\freeverb\components\comb.hpp" />
-    <ClInclude Include="FreeVerb\freeverb\components\revmodel.hpp" />
-    <ClInclude Include="FreeVerb\freeverb\components\tuning.h" />
-    <ClInclude Include="lookup_tables.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="MasterBusRecorder\AudioPluginInterface.h" />
-    <ClInclude Include="MasterBusRecorder\AudioPluginUtil.h" />
-    <ClInclude Include="MasterBusRecorder\PluginList.h" />
-    <ClInclude Include="Oscillator.h" />
-    <ClInclude Include="pcg-cpp\include\pcg_random.hpp" />
-    <ClInclude Include="resample.h" />
-    <ClInclude Include="resample_tables.h" />
-    <ClInclude Include="RingBuffer.h" />
-    <ClInclude Include="Freeverb.h" />
-    <ClInclude Include="util.h" />
+    <ClInclude Include="Core\Abi\*.h" />
+    <ClInclude Include="Core\Shared\Buffers\*.h" />
+    <ClInclude Include="Core\Shared\Buffers\*.hpp" />
+    <ClInclude Include="Core\Shared\Math\*.h" />
+    <ClInclude Include="Core\Devices\ClipPlayer\*.h" />
+    <ClInclude Include="Core\Devices\Drum\*.h" />
+    <ClInclude Include="Core\Devices\Envelope\*.h" />
+    <ClInclude Include="Core\Devices\Filter\*.h" />
+    <ClInclude Include="Core\Devices\FilterTwo\*.h" />
+    <ClInclude Include="Core\Devices\Keyboard\*.h" />
+    <ClInclude Include="Core\Devices\Maraca\*.h" />
+    <ClInclude Include="Core\Devices\Noise\*.h" />
+    <ClInclude Include="Core\Devices\Oscillator\*.h" />
+    <ClInclude Include="Core\Devices\Utilities\*.h" />
+    <ClInclude Include="Core\Devices\Xylophone\*.h" />
+    <ClInclude Include="Core\External\FreeVerb\**\*.h" />
+    <ClInclude Include="Core\External\FreeVerb\**\*.hpp" />
+    <ClInclude Include="Core\External\link\include\ableton\**\*.hpp" />
+    <ClInclude Include="Core\External\link\modules\asio-standalone\asio\include\**\*.hpp" />
+    <ClInclude Include="Core\External\pcg-cpp\include\*.hpp" />
+    <ClInclude Include="Core\External\UnityAudioPlugin\*.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

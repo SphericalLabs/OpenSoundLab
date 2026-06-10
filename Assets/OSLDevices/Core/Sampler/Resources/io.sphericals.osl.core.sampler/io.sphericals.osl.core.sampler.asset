@@ -1,0 +1,187 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.sampler
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.sampler
+  resourceSlug: io.sphericals.osl.core.sampler
+  displayName: Sampler
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols: []
+  devices:
+  - deviceLocalId: Sampler
+    canonicalDeviceId: io.sphericals.osl.core.sampler.Sampler
+    displayName: "Sampler I"
+    category: 6
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.sampler/Prefabs/Sampler
+    menuPrefabResourcePath: io.sphericals.osl.core.sampler/MenuPrefabs/Sampler_Menu
+    symbolResourcePath: io.sphericals.osl.core.sampler/Textures/SamplerSymbol
+    dataTypeName: SamplerData
+    legacyDeviceIds:
+    - SamplerOne
+    - io.sphericals.osl.core.samplegenerator.Sampler
+    - io.sphericals.opensoundlab.samplegenerator.Sampler
+    legacyDataTypeNames:
+    - SamplerOneData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: -0.023, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: SamplerTwo
+    canonicalDeviceId: io.sphericals.osl.core.sampler.SamplerTwo
+    displayName: "Sampler II"
+    category: 6
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.sampler/Prefabs/SamplerTwo
+    menuPrefabResourcePath: io.sphericals.osl.core.sampler/MenuPrefabs/SamplerTwo_Menu
+    symbolResourcePath: io.sphericals.osl.core.sampler/Textures/SamplerTwoSymbol
+    dataTypeName: SamplerTwoData
+    legacyDeviceIds:
+    - io.sphericals.osl.core.samplegenerator.SamplerTwo
+    - io.sphericals.opensoundlab.samplegenerator.SamplerTwo
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Microphone
+    canonicalDeviceId: io.sphericals.osl.core.sampler.Microphone
+    displayName: Mic
+    category: 6
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.sampler/Prefabs/Microphone
+    menuPrefabResourcePath: io.sphericals.osl.core.sampler/MenuPrefabs/Microphone_Menu
+    symbolResourcePath: io.sphericals.osl.core.sampler/Textures/MicrophoneSymbol
+    dataTypeName: MicrophoneData
+    legacyDeviceIds:
+    - io.sphericals.osl.core.samplegenerator.Microphone
+    - io.sphericals.opensoundlab.samplegenerator.Microphone
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0.0024}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 0.39, y: 0.39, z: 0.39}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Recorder
+    canonicalDeviceId: io.sphericals.osl.core.sampler.Recorder
+    displayName: Recorder
+    category: 6
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.sampler/Prefabs/Recorder
+    menuPrefabResourcePath: io.sphericals.osl.core.sampler/MenuPrefabs/Recorder_Menu
+    symbolResourcePath: io.sphericals.osl.core.sampler/Textures/RecorderSymbol
+    dataTypeName: RecorderData
+    legacyDeviceIds:
+    - io.sphericals.osl.core.samplegenerator.Recorder
+    - io.sphericals.opensoundlab.samplegenerator.Recorder
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Looper
+    canonicalDeviceId: io.sphericals.osl.core.sampler.Looper
+    displayName: Looper
+    category: 6
+    tags: []
+    order: 5
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.sampler/Prefabs/Looper
+    menuPrefabResourcePath: io.sphericals.osl.core.sampler/MenuPrefabs/Looper_Menu
+    symbolResourcePath: io.sphericals.osl.core.sampler/Textures/LooperSymbol
+    dataTypeName: LooperData
+    legacyDeviceIds:
+    - io.sphericals.osl.core.samplegenerator.Looper
+    - io.sphericals.opensoundlab.samplegenerator.Looper
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Airhorn
+    canonicalDeviceId: io.sphericals.osl.core.sampler.Airhorn
+    displayName: Airhorn
+    category: 6
+    tags: []
+    order: 6
+    enabled: 1
+    showInMenu: 0
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.sampler/Prefabs/Airhorn
+    menuPrefabResourcePath: io.sphericals.osl.core.sampler/MenuPrefabs/Airhorn_Menu
+    symbolResourcePath:
+    dataTypeName: AirhornData
+    legacyDeviceIds:
+    - io.sphericals.osl.core.samplegenerator.Airhorn
+    - io.sphericals.opensoundlab.samplegenerator.Airhorn
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: -0.005, y: -0.018, z: 0}
+    previewRotationOffset: {x: 0, y: 90, z: 0}
+    previewScale: {x: 0.14, y: 0.14, z: 0.14}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

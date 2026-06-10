@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.modulationgenerator
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.modulationgenerator
+  resourceSlug: io.sphericals.osl.core.modulationgenerator
+  displayName: "Modulation Generator"
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols: []
+  devices:
+  - deviceLocalId: AD
+    canonicalDeviceId: io.sphericals.osl.core.modulationgenerator.AD
+    displayName: AD
+    category: 4
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationgenerator/Prefabs/AD
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationgenerator/MenuPrefabs/AD_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationgenerator/Textures/ADSymbol
+    dataTypeName: ADData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationgenerator.AD
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: ADSR
+    canonicalDeviceId: io.sphericals.osl.core.modulationgenerator.ADSR
+    displayName: ADSR
+    category: 4
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationgenerator/Prefabs/ADSR
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationgenerator/MenuPrefabs/ADSR_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationgenerator/Textures/ADSRSymbol
+    dataTypeName: ADSRData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationgenerator.ADSR
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Knob
+    canonicalDeviceId: io.sphericals.osl.core.modulationgenerator.Knob
+    displayName: Knob
+    category: 4
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationgenerator/Prefabs/Knob
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationgenerator/MenuPrefabs/Knob_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationgenerator/Textures/KnobSymbol
+    dataTypeName: KnobData
+    legacyDeviceIds:
+    - DC
+    - io.sphericals.opensoundlab.modulationgenerator.Knob
+    legacyDataTypeNames:
+    - DCData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Button
+    canonicalDeviceId: io.sphericals.osl.core.modulationgenerator.Button
+    displayName: Button
+    category: 4
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationgenerator/Prefabs/Button
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationgenerator/MenuPrefabs/Button_Menu
+    symbolResourcePath: io.sphericals.osl.core.modulationgenerator/Textures/ButtonSymbol
+    dataTypeName: ButtonData
+    legacyDeviceIds:
+    - TouchPad
+    - io.sphericals.opensoundlab.modulationgenerator.Button
+    legacyDataTypeNames:
+    - TouchPadData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Timeline
+    canonicalDeviceId: io.sphericals.osl.core.modulationgenerator.Timeline
+    displayName: "Sequencer III"
+    category: 4
+    tags: []
+    order: 5
+    enabled: 1
+    showInMenu: 0
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.modulationgenerator/Prefabs/Timeline
+    menuPrefabResourcePath: io.sphericals.osl.core.modulationgenerator/MenuPrefabs/Timeline_Menu
+    symbolResourcePath:
+    dataTypeName: TimelineData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.modulationgenerator.Timeline
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.soundprocessor
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.soundprocessor
+  resourceSlug: io.sphericals.osl.core.soundprocessor
+  displayName: "Sound Processor"
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols: []
+  devices:
+  - deviceLocalId: Filter
+    canonicalDeviceId: io.sphericals.osl.core.soundprocessor.Filter
+    displayName: "Filter I"
+    category: 5
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.soundprocessor/Prefabs/Filter
+    menuPrefabResourcePath: io.sphericals.osl.core.soundprocessor/MenuPrefabs/Filter_Menu
+    symbolResourcePath: io.sphericals.osl.core.soundprocessor/Textures/FilterSymbol
+    dataTypeName: FilterData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.soundprocessor.Filter
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: FilterTwo
+    canonicalDeviceId: io.sphericals.osl.core.soundprocessor.FilterTwo
+    displayName: "Filter II"
+    category: 5
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.soundprocessor/Prefabs/FilterTwo
+    menuPrefabResourcePath: io.sphericals.osl.core.soundprocessor/MenuPrefabs/FilterTwo_Menu
+    symbolResourcePath: io.sphericals.osl.core.soundprocessor/Textures/FilterSymbol
+    dataTypeName: FilterTwoData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.soundprocessor.FilterTwo
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

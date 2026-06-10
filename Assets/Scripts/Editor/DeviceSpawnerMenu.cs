@@ -148,6 +148,7 @@ public class DeviceSpawnerMenu : EditorWindow
 
         if (TryGetRuntimePrefabs(out List<GameObject> runtimePrefabs))
         {
+            addRegistryPrefabs(runtimePrefabs);
             spawnablePrefabs = buildUniquePrefabList(runtimePrefabs);
             sourceLabel = "NetworkManager.singleton.spawnPrefabs";
             return;
@@ -155,14 +156,32 @@ public class DeviceSpawnerMenu : EditorWindow
 
         if (TryGetScenePrefabs(out List<GameObject> scenePrefabs))
         {
+            addRegistryPrefabs(scenePrefabs);
             spawnablePrefabs = buildUniquePrefabList(scenePrefabs);
             sourceLabel = $"{LocalScenePath} -> LocalNetworkManager.spawnPrefabs";
+            return;
+        }
+
+        List<GameObject> registryPrefabs = OSLDeviceRegistry.GetNetworkPrefabs();
+        if (registryPrefabs.Count > 0)
+        {
+            spawnablePrefabs = buildUniquePrefabList(registryPrefabs);
+            sourceLabel = "OSL device registry";
             return;
         }
 
         spawnablePrefabs = new List<GameObject>();
         sourceLabel = $"{LocalScenePath} -> LocalNetworkManager.spawnPrefabs";
         refreshMessage = "Failed to resolve registered spawnable prefabs from the local network scene.";
+    }
+
+    private void addRegistryPrefabs(List<GameObject> prefabs)
+    {
+        List<GameObject> registryPrefabs = OSLDeviceRegistry.GetNetworkPrefabs();
+        foreach (GameObject prefab in registryPrefabs)
+        {
+            if (prefab != null) prefabs.Add(prefab);
+        }
     }
 
     private bool TryGetRuntimePrefabs(out List<GameObject> prefabs)
@@ -317,43 +336,40 @@ public class DeviceSpawnerMenu : EditorWindow
             }
         }
 
-        GetOffsets(deviceName, out Vector3 localPositionOffset, out Vector3 localRotationOffset);
+        string spawnDeviceId = resolveSpawnDeviceId(deviceName);
+        GetOffsets(spawnDeviceId, out Vector3 localPositionOffset, out Vector3 localRotationOffset);
 
         if (NetworkManager.singleton != null && NetworkManager.singleton.mode == NetworkManagerMode.ClientOnly)
         {
-            NetworkSpawnManager.Instance.CmdCreateItem(deviceName, spawnPosition, spawnRotation, localPositionOffset, localRotationOffset);
+            NetworkSpawnManager.Instance.CmdCreateItem(spawnDeviceId, spawnPosition, spawnRotation, localPositionOffset, localRotationOffset);
         }
         else
         {
-            NetworkSpawnManager.Instance.CreateItem(deviceName, spawnPosition, spawnRotation, localPositionOffset, localRotationOffset);
+            NetworkSpawnManager.Instance.CreateItem(spawnDeviceId, spawnPosition, spawnRotation, localPositionOffset, localRotationOffset);
         }
 
-        Debug.Log($"Spawned {deviceName} via Device Spawner");
+        Debug.Log($"Spawned {spawnDeviceId} via Device Spawner");
     }
 
-    private static void GetOffsets(string deviceName, out Vector3 localPositionOffset, out Vector3 localRotationOffset)
+    private static string resolveSpawnDeviceId(string deviceName)
+    {
+        if (OSLDeviceRegistry.TryGetByPrefabName(deviceName, out OSLDeviceRegistration registration) &&
+            !string.IsNullOrWhiteSpace(registration.canonicalDeviceId))
+        {
+            return registration.canonicalDeviceId;
+        }
+
+        return deviceName;
+    }
+
+    private static void GetOffsets(string deviceId, out Vector3 localPositionOffset, out Vector3 localRotationOffset)
     {
         localPositionOffset = Vector3.zero;
         localRotationOffset = Vector3.zero;
 
-        switch (deviceName)
+        if (OSLDeviceRegistry.TryGetSpawnOffsets(deviceId, out localPositionOffset, out localRotationOffset))
         {
-            case "Tapes":
-                localPositionOffset = new Vector3(.1f, .02f, .15f);
-                localRotationOffset = new Vector3(0, 180, 0);
-                break;
-            case "Controller":
-                localPositionOffset = new Vector3(0f, 0f, -0.15f);
-                break;
-            case "Xylophone":
-                localRotationOffset = new Vector3(90, 0, 0);
-                localPositionOffset = new Vector3(0.15f, 0f, -0.05f);
-                break;
-            case "Drum":
-            case "Keyboard":
-            case "MixerTwo":
-                localRotationOffset = new Vector3(90, 0, 0);
-                break;
+            return;
         }
     }
 }

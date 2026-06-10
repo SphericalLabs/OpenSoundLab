@@ -9,49 +9,58 @@
 /* Begin PBXBuildFile section */
 		02D93F202C353FF400F2F319 /* libOSLNative.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 02D44CBC2C33F9ED006D8C29 /* libOSLNative.dylib */; };
 		02F52C4F2C340C09009F8DBA /* CompressedRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A87A2C33ED0D00807471 /* CompressedRingBuffer.h */; };
-		02F52C502C340C09009F8DBA /* resample.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8732C33ED0D00807471 /* resample.h */; };
-		02F52C512C340C09009F8DBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A86E2C33ED0D00807471 /* main.cpp */; };
+		02F52C502C340C09009F8DBA /* Resample.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8732C33ED0D00807471 /* Resample.h */; };
+		02F52C512C340C09009F8DBA /* AudioMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A86E2C33ED0D00807471 /* AudioMath.cpp */; };
 		02F52C522C340C09009F8DBA /* RingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A86D2C33ED0D00807471 /* RingBuffer.cpp */; };
 		02F52C532C340C09009F8DBA /* Filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8762C33ED0D00807471 /* Filter.h */; };
 		02F52C542C340C09009F8DBA /* CompressedRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A87E2C33ED0E00807471 /* CompressedRingBuffer.cpp */; };
 		02F52C552C340C09009F8DBA /* PluginList.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C452C340BCA009F8DBA /* PluginList.h */; };
 		02F52C562C340C09009F8DBA /* dfxsmoothedvalue.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C402C340BB6009F8DBA /* dfxsmoothedvalue.h */; };
-		02F52C572C340C09009F8DBA /* Artefact.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86A2C33ED0D00807471 /* Artefact.h */; };
-		02F52C582C340C09009F8DBA /* Freeverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8722C33ED0D00807471 /* Freeverb.cpp */; };
 		02F52C592C340C09009F8DBA /* AudioPluginInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C472C340BCA009F8DBA /* AudioPluginInterface.h */; };
 		02F52C5A2C340C09009F8DBA /* revmodel.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C352C340B9F009F8DBA /* revmodel.hpp */; };
-		02F52C5B2C340C09009F8DBA /* Artefact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8712C33ED0D00807471 /* Artefact.cpp */; };
-		02F52C5C2C340C09009F8DBA /* lookup_tables.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A87D2C33ED0E00807471 /* lookup_tables.h */; };
+		02F52C5C2C340C09009F8DBA /* LookupTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A87D2C33ED0E00807471 /* LookupTables.h */; };
 		02F52C5D2C340C09009F8DBA /* AudioPluginUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C462C340BCA009F8DBA /* AudioPluginUtil.h */; };
 		02F52C5E2C340C09009F8DBA /* allpass.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C322C340B9F009F8DBA /* allpass.hpp */; };
 		02F52C5F2C340C09009F8DBA /* comb.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C362C340B9F009F8DBA /* comb.hpp */; };
 		02F52C602C340C09009F8DBA /* comb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C372C340B9F009F8DBA /* comb.cpp */; };
-		02F52C612C340C09009F8DBA /* resample_tables.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8772C33ED0D00807471 /* resample_tables.h */; };
+		02F52C612C340C09009F8DBA /* ResampleTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8772C33ED0D00807471 /* ResampleTables.h */; };
 		02F52C622C340C09009F8DBA /* CRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A87B2C33ED0D00807471 /* CRingBuffer.cpp */; };
 		02F52C632C340C09009F8DBA /* Biquad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8742C33ED0D00807471 /* Biquad.cpp */; };
 		02F52C642C340C09009F8DBA /* RingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8702C33ED0D00807471 /* RingBuffer.h */; };
-		02F52C652C340C09009F8DBA /* Delay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8672C33ED0D00807471 /* Delay.cpp */; };
-		02F52C662C340C09009F8DBA /* Compressor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86F2C33ED0D00807471 /* Compressor.h */; };
-		02F52C672C340C09009F8DBA /* Compressor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8782C33ED0D00807471 /* Compressor.cpp */; };
 		02F52C682C340C09009F8DBA /* tuning.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C342C340B9F009F8DBA /* tuning.h */; };
 		02F52C692C340C09009F8DBA /* Filter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A8682C33ED0D00807471 /* Filter.cpp */; };
-		02F52C6A2C340C09009F8DBA /* Delay.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8792C33ED0D00807471 /* Delay.h */; };
-		02F52C6B2C340C09009F8DBA /* Freeverb.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86C2C33ED0D00807471 /* Freeverb.h */; };
-		02F52C6C2C340C09009F8DBA /* resample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A87C2C33ED0E00807471 /* resample.cpp */; };
+		02F52C6C2C340C09009F8DBA /* Resample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02E0A87C2C33ED0E00807471 /* Resample.cpp */; };
 		02F52C6D2C340C09009F8DBA /* dfxsmoothedvalue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C412C340BB6009F8DBA /* dfxsmoothedvalue.hpp */; };
 		02F52C6E2C340C09009F8DBA /* idfxsmoothedvalue.h in Headers */ = {isa = PBXBuildFile; fileRef = 02F52C3F2C340BB6009F8DBA /* idfxsmoothedvalue.h */; };
 		02F52C6F2C340C09009F8DBA /* revmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C332C340B9F009F8DBA /* revmodel.cpp */; };
 		02F52C702C340C09009F8DBA /* AudioPluginUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */; };
 		02F52C712C340C09009F8DBA /* MasterBusRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */; };
+		B30000000000000000000001 /* MasterBusLimiter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B30000000000000000000101 /* MasterBusLimiter.cpp */; };
+		B30000000000000000000002 /* MasterBusLimiter.h in Headers */ = {isa = PBXBuildFile; fileRef = B30000000000000000000102 /* MasterBusLimiter.h */; };
 		02F52C722C340C09009F8DBA /* CRingBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8752C33ED0D00807471 /* CRingBuffer.hpp */; };
-		02F52C732C340C09009F8DBA /* main.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86B2C33ED0D00807471 /* main.h */; };
+		02F52C732C340C09009F8DBA /* AudioMath.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A86B2C33ED0D00807471 /* AudioMath.h */; };
 		02F52C742C340C09009F8DBA /* allpass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C312C340B9F009F8DBA /* allpass.cpp */; };
-		02F52C752C340C09009F8DBA /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8692C33ED0D00807471 /* util.h */; };
-		02F52C772C340C9B009F8DBA /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C762C340C9B009F8DBA /* util.c */; };
+		02F52C752C340C09009F8DBA /* Util.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E0A8692C33ED0D00807471 /* Util.h */; };
+		02F52C772C340C9B009F8DBA /* Util.c in Sources */ = {isa = PBXBuildFile; fileRef = 02F52C762C340C9B009F8DBA /* Util.c */; };
 		A10000012F00000100000001 /* FilterTwo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000032F00000100000001 /* FilterTwo.cpp */; };
-		A10000022F00000100000001 /* FilterThree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000052F00000100000001 /* FilterThree.cpp */; };
 		A1B2C3D42E4F500100ABC001 /* Oscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D62E4F500100ABC001 /* Oscillator.cpp */; };
 		A1B2C3D52E4F500100ABC001 /* Oscillator.h in Headers */ = {isa = PBXBuildFile; fileRef = A1B2C3D72E4F500100ABC001 /* Oscillator.h */; };
+		B20000000000000000000001 /* ClipPlayerApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000101 /* ClipPlayerApi.cpp */; };
+		B20000000000000000000002 /* CombFilterApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000102 /* CombFilterApi.cpp */; };
+		B20000000000000000000003 /* DrumApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000103 /* DrumApi.cpp */; };
+		B20000000000000000000004 /* EnvelopeApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000104 /* EnvelopeApi.cpp */; };
+		B20000000000000000000005 /* EnvelopeMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000105 /* EnvelopeMath.cpp */; };
+		B20000000000000000000006 /* KeyboardApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000106 /* KeyboardApi.cpp */; };
+		B20000000000000000000007 /* MaracaApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000107 /* MaracaApi.cpp */; };
+		B20000000000000000000008 /* NoiseApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000108 /* NoiseApi.cpp */; };
+		B20000000000000000000009 /* OscillatorApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000109 /* OscillatorApi.cpp */; };
+		B2000000000000000000000A /* BufferApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000010A /* BufferApi.cpp */; };
+		B2000000000000000000000B /* DiagnosticApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000010B /* DiagnosticApi.cpp */; };
+		B2000000000000000000000C /* FaderApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000010C /* FaderApi.cpp */; };
+		B2000000000000000000000D /* GateApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000010D /* GateApi.cpp */; };
+		B2000000000000000000000E /* MicApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000010E /* MicApi.cpp */; };
+		B2000000000000000000000F /* WaveTextureApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2000000000000000000010F /* WaveTextureApi.cpp */; };
+		B20000000000000000000010 /* XylophoneApi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000110 /* XylophoneApi.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -69,55 +78,81 @@
 
 /* Begin PBXFileReference section */
 		02D44CBC2C33F9ED006D8C29 /* libOSLNative.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libOSLNative.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		02E0A8672C33ED0D00807471 /* Delay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Delay.cpp; path = ../Delay.cpp; sourceTree = "<group>"; };
-		02E0A8682C33ED0D00807471 /* Filter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Filter.cpp; path = ../Filter.cpp; sourceTree = "<group>"; };
-		02E0A8692C33ED0D00807471 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = ../util.h; sourceTree = "<group>"; };
-		02E0A86A2C33ED0D00807471 /* Artefact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Artefact.h; path = ../Artefact.h; sourceTree = "<group>"; };
-		02E0A86B2C33ED0D00807471 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = main.h; path = ../main.h; sourceTree = "<group>"; };
-		02E0A86C2C33ED0D00807471 /* Freeverb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Freeverb.h; path = ../Freeverb.h; sourceTree = "<group>"; };
-		02E0A86D2C33ED0D00807471 /* RingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RingBuffer.cpp; path = ../RingBuffer.cpp; sourceTree = "<group>"; };
-		02E0A86E2C33ED0D00807471 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = "<group>"; };
-		02E0A86F2C33ED0D00807471 /* Compressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compressor.h; path = ../Compressor.h; sourceTree = "<group>"; };
-		02E0A8702C33ED0D00807471 /* RingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RingBuffer.h; path = ../RingBuffer.h; sourceTree = "<group>"; };
-		02E0A8712C33ED0D00807471 /* Artefact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Artefact.cpp; path = ../Artefact.cpp; sourceTree = "<group>"; };
-		02E0A8722C33ED0D00807471 /* Freeverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Freeverb.cpp; path = ../Freeverb.cpp; sourceTree = "<group>"; };
-		02E0A8732C33ED0D00807471 /* resample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resample.h; path = ../resample.h; sourceTree = "<group>"; };
-		02E0A8742C33ED0D00807471 /* Biquad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Biquad.cpp; path = ../Biquad.cpp; sourceTree = "<group>"; };
-		02E0A8752C33ED0D00807471 /* CRingBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CRingBuffer.hpp; path = ../CRingBuffer.hpp; sourceTree = "<group>"; };
-		02E0A8762C33ED0D00807471 /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../Filter.h; sourceTree = "<group>"; };
-		02E0A8772C33ED0D00807471 /* resample_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resample_tables.h; path = ../resample_tables.h; sourceTree = "<group>"; };
-		02E0A8782C33ED0D00807471 /* Compressor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Compressor.cpp; path = ../Compressor.cpp; sourceTree = "<group>"; };
-		02E0A8792C33ED0D00807471 /* Delay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Delay.h; path = ../Delay.h; sourceTree = "<group>"; };
-		02E0A87A2C33ED0D00807471 /* CompressedRingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompressedRingBuffer.h; path = ../CompressedRingBuffer.h; sourceTree = "<group>"; };
-		02E0A87B2C33ED0D00807471 /* CRingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CRingBuffer.cpp; path = ../CRingBuffer.cpp; sourceTree = "<group>"; };
-		02E0A87C2C33ED0E00807471 /* resample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resample.cpp; path = ../resample.cpp; sourceTree = "<group>"; };
-		02E0A87D2C33ED0E00807471 /* lookup_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lookup_tables.h; path = ../lookup_tables.h; sourceTree = "<group>"; };
-		02E0A87E2C33ED0E00807471 /* CompressedRingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompressedRingBuffer.cpp; path = ../CompressedRingBuffer.cpp; sourceTree = "<group>"; };
-		02F52C312C340B9F009F8DBA /* allpass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = allpass.cpp; path = ../FreeVerb/freeverb/components/allpass.cpp; sourceTree = "<group>"; };
-		02F52C322C340B9F009F8DBA /* allpass.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = allpass.hpp; path = ../FreeVerb/freeverb/components/allpass.hpp; sourceTree = "<group>"; };
-		02F52C332C340B9F009F8DBA /* revmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = revmodel.cpp; path = ../FreeVerb/freeverb/components/revmodel.cpp; sourceTree = "<group>"; };
-		02F52C342C340B9F009F8DBA /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuning.h; path = ../FreeVerb/freeverb/components/tuning.h; sourceTree = "<group>"; };
-		02F52C352C340B9F009F8DBA /* revmodel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = revmodel.hpp; path = ../FreeVerb/freeverb/components/revmodel.hpp; sourceTree = "<group>"; };
-		02F52C362C340B9F009F8DBA /* comb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = comb.hpp; path = ../FreeVerb/freeverb/components/comb.hpp; sourceTree = "<group>"; };
-		02F52C372C340B9F009F8DBA /* comb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = comb.cpp; path = ../FreeVerb/freeverb/components/comb.cpp; sourceTree = "<group>"; };
-		02F52C3F2C340BB6009F8DBA /* idfxsmoothedvalue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = idfxsmoothedvalue.h; path = "../FreeVerb/dfx-library/idfxsmoothedvalue.h"; sourceTree = "<group>"; };
-		02F52C402C340BB6009F8DBA /* dfxsmoothedvalue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dfxsmoothedvalue.h; path = "../FreeVerb/dfx-library/dfxsmoothedvalue.h"; sourceTree = "<group>"; };
-		02F52C412C340BB6009F8DBA /* dfxsmoothedvalue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dfxsmoothedvalue.hpp; path = "../FreeVerb/dfx-library/dfxsmoothedvalue.hpp"; sourceTree = "<group>"; };
-		02F52C452C340BCA009F8DBA /* PluginList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PluginList.h; path = ../MasterBusRecorder/PluginList.h; sourceTree = "<group>"; };
-		02F52C462C340BCA009F8DBA /* AudioPluginUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginUtil.h; path = ../MasterBusRecorder/AudioPluginUtil.h; sourceTree = "<group>"; };
-		02F52C472C340BCA009F8DBA /* AudioPluginInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginInterface.h; path = ../MasterBusRecorder/AudioPluginInterface.h; sourceTree = "<group>"; };
-		02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioPluginUtil.cpp; path = ../MasterBusRecorder/AudioPluginUtil.cpp; sourceTree = "<group>"; };
-		02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MasterBusRecorder.cpp; path = ../MasterBusRecorder/MasterBusRecorder.cpp; sourceTree = "<group>"; };
-		02F52C762C340C9B009F8DBA /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../util.c; sourceTree = "<group>"; };
-		A10000032F00000100000001 /* FilterTwo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterTwo.cpp; path = ../FilterTwo.cpp; sourceTree = "<group>"; };
-		A10000042F00000100000001 /* FilterTwo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterTwo.h; path = ../FilterTwo.h; sourceTree = "<group>"; };
-		A10000052F00000100000001 /* FilterThree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterThree.cpp; path = ../FilterThree.cpp; sourceTree = "<group>"; };
-		A10000062F00000100000001 /* FilterThree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterThree.h; path = ../FilterThree.h; sourceTree = "<group>"; };
+		02E0A8682C33ED0D00807471 /* Filter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Filter.cpp; path = ../Core/Devices/Filter/Filter.cpp; sourceTree = "<group>"; };
+		02E0A8692C33ED0D00807471 /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../Core/Shared/Math/Util.h; sourceTree = "<group>"; };
+		02E0A86B2C33ED0D00807471 /* AudioMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioMath.h; path = ../Core/Shared/Math/AudioMath.h; sourceTree = "<group>"; };
+		02E0A86D2C33ED0D00807471 /* RingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RingBuffer.cpp; path = ../Core/Shared/Buffers/RingBuffer.cpp; sourceTree = "<group>"; };
+		02E0A86E2C33ED0D00807471 /* AudioMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioMath.cpp; path = ../Core/Shared/Math/AudioMath.cpp; sourceTree = "<group>"; };
+		02E0A8702C33ED0D00807471 /* RingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RingBuffer.h; path = ../Core/Shared/Buffers/RingBuffer.h; sourceTree = "<group>"; };
+		02E0A8732C33ED0D00807471 /* Resample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Resample.h; path = ../Core/Shared/Math/Resample.h; sourceTree = "<group>"; };
+		02E0A8742C33ED0D00807471 /* Biquad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Biquad.cpp; path = ../Core/Shared/Math/Biquad.cpp; sourceTree = "<group>"; };
+		02E0A8752C33ED0D00807471 /* CRingBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CRingBuffer.hpp; path = ../Core/Shared/Buffers/CRingBuffer.hpp; sourceTree = "<group>"; };
+		02E0A8762C33ED0D00807471 /* Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filter.h; path = ../Core/Devices/Filter/Filter.h; sourceTree = "<group>"; };
+		02E0A8772C33ED0D00807471 /* ResampleTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResampleTables.h; path = ../Core/Shared/Math/ResampleTables.h; sourceTree = "<group>"; };
+		02E0A87A2C33ED0D00807471 /* CompressedRingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompressedRingBuffer.h; path = ../Core/Shared/Buffers/CompressedRingBuffer.h; sourceTree = "<group>"; };
+		02E0A87B2C33ED0D00807471 /* CRingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CRingBuffer.cpp; path = ../Core/Shared/Buffers/CRingBuffer.cpp; sourceTree = "<group>"; };
+		02E0A87C2C33ED0E00807471 /* Resample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resample.cpp; path = ../Core/Shared/Math/Resample.cpp; sourceTree = "<group>"; };
+		02E0A87D2C33ED0E00807471 /* LookupTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LookupTables.h; path = ../Core/Shared/Math/LookupTables.h; sourceTree = "<group>"; };
+		02E0A87E2C33ED0E00807471 /* CompressedRingBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompressedRingBuffer.cpp; path = ../Core/Shared/Buffers/CompressedRingBuffer.cpp; sourceTree = "<group>"; };
+		02F52C312C340B9F009F8DBA /* allpass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = allpass.cpp; path = ../Core/External/FreeVerb/freeverb/components/allpass.cpp; sourceTree = "<group>"; };
+		02F52C322C340B9F009F8DBA /* allpass.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = allpass.hpp; path = ../Core/External/FreeVerb/freeverb/components/allpass.hpp; sourceTree = "<group>"; };
+		02F52C332C340B9F009F8DBA /* revmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = revmodel.cpp; path = ../Core/External/FreeVerb/freeverb/components/revmodel.cpp; sourceTree = "<group>"; };
+		02F52C342C340B9F009F8DBA /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuning.h; path = ../Core/External/FreeVerb/freeverb/components/tuning.h; sourceTree = "<group>"; };
+		02F52C352C340B9F009F8DBA /* revmodel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = revmodel.hpp; path = ../Core/External/FreeVerb/freeverb/components/revmodel.hpp; sourceTree = "<group>"; };
+		02F52C362C340B9F009F8DBA /* comb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = comb.hpp; path = ../Core/External/FreeVerb/freeverb/components/comb.hpp; sourceTree = "<group>"; };
+		02F52C372C340B9F009F8DBA /* comb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = comb.cpp; path = ../Core/External/FreeVerb/freeverb/components/comb.cpp; sourceTree = "<group>"; };
+		02F52C3F2C340BB6009F8DBA /* idfxsmoothedvalue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = idfxsmoothedvalue.h; path = "../Core/External/FreeVerb/dfx-library/idfxsmoothedvalue.h"; sourceTree = "<group>"; };
+		02F52C402C340BB6009F8DBA /* dfxsmoothedvalue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dfxsmoothedvalue.h; path = "../Core/External/FreeVerb/dfx-library/dfxsmoothedvalue.h"; sourceTree = "<group>"; };
+		02F52C412C340BB6009F8DBA /* dfxsmoothedvalue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dfxsmoothedvalue.hpp; path = "../Core/External/FreeVerb/dfx-library/dfxsmoothedvalue.hpp"; sourceTree = "<group>"; };
+		02F52C452C340BCA009F8DBA /* PluginList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PluginList.h; path = ../Core/External/UnityAudioPlugin/PluginList.h; sourceTree = "<group>"; };
+		02F52C462C340BCA009F8DBA /* AudioPluginUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginUtil.h; path = ../Core/External/UnityAudioPlugin/AudioPluginUtil.h; sourceTree = "<group>"; };
+		02F52C472C340BCA009F8DBA /* AudioPluginInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginInterface.h; path = ../Core/External/UnityAudioPlugin/AudioPluginInterface.h; sourceTree = "<group>"; };
+		02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioPluginUtil.cpp; path = ../Core/External/UnityAudioPlugin/AudioPluginUtil.cpp; sourceTree = "<group>"; };
+		02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MasterBusRecorder.cpp; path = ../Core/External/UnityAudioPlugin/MasterBusRecorder.cpp; sourceTree = "<group>"; };
+		B30000000000000000000101 /* MasterBusLimiter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MasterBusLimiter.cpp; path = ../Core/External/UnityAudioPlugin/MasterBusLimiter.cpp; sourceTree = "<group>"; };
+		B30000000000000000000102 /* MasterBusLimiter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MasterBusLimiter.h; path = ../Core/External/UnityAudioPlugin/MasterBusLimiter.h; sourceTree = "<group>"; };
+		02F52C762C340C9B009F8DBA /* Util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Util.c; path = ../Core/Shared/Math/Util.c; sourceTree = "<group>"; };
+		A10000032F00000100000001 /* FilterTwo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FilterTwo.cpp; path = ../Core/Devices/FilterTwo/FilterTwo.cpp; sourceTree = "<group>"; };
+		A10000042F00000100000001 /* FilterTwo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterTwo.h; path = ../Core/Devices/FilterTwo/FilterTwo.h; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		974D48A027B158430087EC11 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
-		A1B2C3D62E4F500100ABC001 /* Oscillator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Oscillator.cpp; path = ../Oscillator.cpp; sourceTree = "<group>"; };
-		A1B2C3D72E4F500100ABC001 /* Oscillator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Oscillator.h; path = ../Oscillator.h; sourceTree = "<group>"; };
+		A1B2C3D62E4F500100ABC001 /* Oscillator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Oscillator.cpp; path = ../Core/Devices/Oscillator/Oscillator.cpp; sourceTree = "<group>"; };
+		A1B2C3D72E4F500100ABC001 /* Oscillator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Oscillator.h; path = ../Core/Devices/Oscillator/Oscillator.h; sourceTree = "<group>"; };
+		B20000000000000000000101 /* ClipPlayerApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ClipPlayerApi.cpp; path = ../Core/Devices/ClipPlayer/ClipPlayerApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000102 /* CombFilterApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CombFilterApi.cpp; path = ../Core/Devices/Filter/CombFilterApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000103 /* DrumApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DrumApi.cpp; path = ../Core/Devices/Drum/DrumApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000104 /* EnvelopeApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EnvelopeApi.cpp; path = ../Core/Devices/Envelope/EnvelopeApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000105 /* EnvelopeMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EnvelopeMath.cpp; path = ../Core/Devices/Envelope/EnvelopeMath.cpp; sourceTree = "<group>"; };
+		B20000000000000000000106 /* KeyboardApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KeyboardApi.cpp; path = ../Core/Devices/Keyboard/KeyboardApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000107 /* MaracaApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MaracaApi.cpp; path = ../Core/Devices/Maraca/MaracaApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000108 /* NoiseApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NoiseApi.cpp; path = ../Core/Devices/Noise/NoiseApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000109 /* OscillatorApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OscillatorApi.cpp; path = ../Core/Devices/Oscillator/OscillatorApi.cpp; sourceTree = "<group>"; };
+		B2000000000000000000010A /* BufferApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BufferApi.cpp; path = ../Core/Devices/Utilities/BufferApi.cpp; sourceTree = "<group>"; };
+		B2000000000000000000010B /* DiagnosticApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DiagnosticApi.cpp; path = ../Core/Devices/Utilities/DiagnosticApi.cpp; sourceTree = "<group>"; };
+		B2000000000000000000010C /* FaderApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FaderApi.cpp; path = ../Core/Devices/Utilities/FaderApi.cpp; sourceTree = "<group>"; };
+		B2000000000000000000010D /* GateApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GateApi.cpp; path = ../Core/Devices/Utilities/GateApi.cpp; sourceTree = "<group>"; };
+		B2000000000000000000010E /* MicApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MicApi.cpp; path = ../Core/Devices/Utilities/MicApi.cpp; sourceTree = "<group>"; };
+		B2000000000000000000010F /* WaveTextureApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WaveTextureApi.cpp; path = ../Core/Devices/Utilities/WaveTextureApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000110 /* XylophoneApi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XylophoneApi.cpp; path = ../Core/Devices/Xylophone/XylophoneApi.cpp; sourceTree = "<group>"; };
+		B20000000000000000000200 /* OSLNativeExport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSLNativeExport.h; path = ../Core/Abi/OSLNativeExport.h; sourceTree = "<group>"; };
+		B20000000000000000000201 /* ClipInterpolation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClipInterpolation.h; path = ../Core/Devices/ClipPlayer/ClipInterpolation.h; sourceTree = "<group>"; };
+		B20000000000000000000202 /* ClipPlayerApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClipPlayerApi.h; path = ../Core/Devices/ClipPlayer/ClipPlayerApi.h; sourceTree = "<group>"; };
+		B20000000000000000000203 /* CombFilterApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CombFilterApi.h; path = ../Core/Devices/Filter/CombFilterApi.h; sourceTree = "<group>"; };
+		B20000000000000000000204 /* DrumApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DrumApi.h; path = ../Core/Devices/Drum/DrumApi.h; sourceTree = "<group>"; };
+		B20000000000000000000205 /* EnvelopeApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EnvelopeApi.h; path = ../Core/Devices/Envelope/EnvelopeApi.h; sourceTree = "<group>"; };
+		B20000000000000000000206 /* EnvelopeMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EnvelopeMath.h; path = ../Core/Devices/Envelope/EnvelopeMath.h; sourceTree = "<group>"; };
+		B20000000000000000000207 /* KeyboardApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyboardApi.h; path = ../Core/Devices/Keyboard/KeyboardApi.h; sourceTree = "<group>"; };
+		B20000000000000000000208 /* MaracaApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MaracaApi.h; path = ../Core/Devices/Maraca/MaracaApi.h; sourceTree = "<group>"; };
+		B20000000000000000000209 /* NoiseApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NoiseApi.h; path = ../Core/Devices/Noise/NoiseApi.h; sourceTree = "<group>"; };
+		B2000000000000000000020A /* OscillatorApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscillatorApi.h; path = ../Core/Devices/Oscillator/OscillatorApi.h; sourceTree = "<group>"; };
+		B2000000000000000000020B /* BufferApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BufferApi.h; path = ../Core/Devices/Utilities/BufferApi.h; sourceTree = "<group>"; };
+		B2000000000000000000020C /* DiagnosticApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DiagnosticApi.h; path = ../Core/Devices/Utilities/DiagnosticApi.h; sourceTree = "<group>"; };
+		B2000000000000000000020D /* FaderApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FaderApi.h; path = ../Core/Devices/Utilities/FaderApi.h; sourceTree = "<group>"; };
+		B2000000000000000000020E /* GateApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GateApi.h; path = ../Core/Devices/Utilities/GateApi.h; sourceTree = "<group>"; };
+		B2000000000000000000020F /* MicApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MicApi.h; path = ../Core/Devices/Utilities/MicApi.h; sourceTree = "<group>"; };
+		B20000000000000000000210 /* WaveTextureApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WaveTextureApi.h; path = ../Core/Devices/Utilities/WaveTextureApi.h; sourceTree = "<group>"; };
+		B20000000000000000000211 /* XylophoneApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XylophoneApi.h; path = ../Core/Devices/Xylophone/XylophoneApi.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,19 +199,17 @@
 			children = (
 				02E0A8762C33ED0D00807471 /* Filter.h */,
 				A10000042F00000100000001 /* FilterTwo.h */,
-				A10000062F00000100000001 /* FilterThree.h */,
-				02E0A8722C33ED0D00807471 /* Freeverb.cpp */,
-				02F52C762C340C9B009F8DBA /* util.c */,
-				02E0A8712C33ED0D00807471 /* Artefact.cpp */,
+				02F52C762C340C9B009F8DBA /* Util.c */,
 				02F52C402C340BB6009F8DBA /* dfxsmoothedvalue.h */,
 				02F52C472C340BCA009F8DBA /* AudioPluginInterface.h */,
 				02F52C482C340BCA009F8DBA /* AudioPluginUtil.cpp */,
 				02F52C462C340BCA009F8DBA /* AudioPluginUtil.h */,
 				02F52C492C340BCA009F8DBA /* MasterBusRecorder.cpp */,
+				B30000000000000000000101 /* MasterBusLimiter.cpp */,
+				B30000000000000000000102 /* MasterBusLimiter.h */,
 				02F52C452C340BCA009F8DBA /* PluginList.h */,
 				02F52C412C340BB6009F8DBA /* dfxsmoothedvalue.hpp */,
 				02F52C3F2C340BB6009F8DBA /* idfxsmoothedvalue.h */,
-				02E0A86A2C33ED0D00807471 /* Artefact.h */,
 				02F52C312C340B9F009F8DBA /* allpass.cpp */,
 				02F52C322C340B9F009F8DBA /* allpass.hpp */,
 				02F52C372C340B9F009F8DBA /* comb.cpp */,
@@ -187,27 +220,55 @@
 				02E0A8742C33ED0D00807471 /* Biquad.cpp */,
 				02E0A87E2C33ED0E00807471 /* CompressedRingBuffer.cpp */,
 				02E0A87A2C33ED0D00807471 /* CompressedRingBuffer.h */,
-				02E0A8782C33ED0D00807471 /* Compressor.cpp */,
-				02E0A86F2C33ED0D00807471 /* Compressor.h */,
 				02E0A87B2C33ED0D00807471 /* CRingBuffer.cpp */,
 				02E0A8752C33ED0D00807471 /* CRingBuffer.hpp */,
-				02E0A8672C33ED0D00807471 /* Delay.cpp */,
-				02E0A8792C33ED0D00807471 /* Delay.h */,
 				02E0A8682C33ED0D00807471 /* Filter.cpp */,
 				A10000032F00000100000001 /* FilterTwo.cpp */,
-				A10000052F00000100000001 /* FilterThree.cpp */,
-				02E0A86C2C33ED0D00807471 /* Freeverb.h */,
-				02E0A87D2C33ED0E00807471 /* lookup_tables.h */,
-				02E0A86E2C33ED0D00807471 /* main.cpp */,
-				02E0A86B2C33ED0D00807471 /* main.h */,
+				02E0A87D2C33ED0E00807471 /* LookupTables.h */,
+				02E0A86E2C33ED0D00807471 /* AudioMath.cpp */,
+				02E0A86B2C33ED0D00807471 /* AudioMath.h */,
+				B20000000000000000000101 /* ClipPlayerApi.cpp */,
+				B20000000000000000000102 /* CombFilterApi.cpp */,
+				B20000000000000000000103 /* DrumApi.cpp */,
+				B20000000000000000000104 /* EnvelopeApi.cpp */,
+				B20000000000000000000105 /* EnvelopeMath.cpp */,
+				B20000000000000000000106 /* KeyboardApi.cpp */,
+				B20000000000000000000107 /* MaracaApi.cpp */,
+				B20000000000000000000108 /* NoiseApi.cpp */,
+				B20000000000000000000109 /* OscillatorApi.cpp */,
+				B2000000000000000000010A /* BufferApi.cpp */,
+				B2000000000000000000010B /* DiagnosticApi.cpp */,
+				B2000000000000000000010C /* FaderApi.cpp */,
+				B2000000000000000000010D /* GateApi.cpp */,
+				B2000000000000000000010E /* MicApi.cpp */,
+				B2000000000000000000010F /* WaveTextureApi.cpp */,
+				B20000000000000000000110 /* XylophoneApi.cpp */,
+				B20000000000000000000200 /* OSLNativeExport.h */,
+				B20000000000000000000201 /* ClipInterpolation.h */,
+				B20000000000000000000202 /* ClipPlayerApi.h */,
+				B20000000000000000000203 /* CombFilterApi.h */,
+				B20000000000000000000204 /* DrumApi.h */,
+				B20000000000000000000205 /* EnvelopeApi.h */,
+				B20000000000000000000206 /* EnvelopeMath.h */,
+				B20000000000000000000207 /* KeyboardApi.h */,
+				B20000000000000000000208 /* MaracaApi.h */,
+				B20000000000000000000209 /* NoiseApi.h */,
+				B2000000000000000000020A /* OscillatorApi.h */,
+				B2000000000000000000020B /* BufferApi.h */,
+				B2000000000000000000020C /* DiagnosticApi.h */,
+				B2000000000000000000020D /* FaderApi.h */,
+				B2000000000000000000020E /* GateApi.h */,
+				B2000000000000000000020F /* MicApi.h */,
+				B20000000000000000000210 /* WaveTextureApi.h */,
+				B20000000000000000000211 /* XylophoneApi.h */,
 				A1B2C3D62E4F500100ABC001 /* Oscillator.cpp */,
 				A1B2C3D72E4F500100ABC001 /* Oscillator.h */,
-				02E0A8772C33ED0D00807471 /* resample_tables.h */,
-				02E0A87C2C33ED0E00807471 /* resample.cpp */,
-				02E0A8732C33ED0D00807471 /* resample.h */,
+				02E0A8772C33ED0D00807471 /* ResampleTables.h */,
+				02E0A87C2C33ED0E00807471 /* Resample.cpp */,
+				02E0A8732C33ED0D00807471 /* Resample.h */,
 				02E0A86D2C33ED0D00807471 /* RingBuffer.cpp */,
 				02E0A8702C33ED0D00807471 /* RingBuffer.h */,
-				02E0A8692C33ED0D00807471 /* util.h */,
+				02E0A8692C33ED0D00807471 /* Util.h */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -238,27 +299,24 @@
 				02F52C6D2C340C09009F8DBA /* dfxsmoothedvalue.hpp in Headers */,
 				02F52C722C340C09009F8DBA /* CRingBuffer.hpp in Headers */,
 				02F52C5D2C340C09009F8DBA /* AudioPluginUtil.h in Headers */,
-				02F52C732C340C09009F8DBA /* main.h in Headers */,
+				B30000000000000000000002 /* MasterBusLimiter.h in Headers */,
+				02F52C732C340C09009F8DBA /* AudioMath.h in Headers */,
 				A1B2C3D52E4F500100ABC001 /* Oscillator.h in Headers */,
-				02F52C612C340C09009F8DBA /* resample_tables.h in Headers */,
+				02F52C612C340C09009F8DBA /* ResampleTables.h in Headers */,
 				02F52C5E2C340C09009F8DBA /* allpass.hpp in Headers */,
-				02F52C752C340C09009F8DBA /* util.h in Headers */,
+				02F52C752C340C09009F8DBA /* Util.h in Headers */,
 				02F52C682C340C09009F8DBA /* tuning.h in Headers */,
-				02F52C6A2C340C09009F8DBA /* Delay.h in Headers */,
 				02F52C5A2C340C09009F8DBA /* revmodel.hpp in Headers */,
 				02F52C5F2C340C09009F8DBA /* comb.hpp in Headers */,
-				02F52C6B2C340C09009F8DBA /* Freeverb.h in Headers */,
 				02F52C532C340C09009F8DBA /* Filter.h in Headers */,
-				02F52C662C340C09009F8DBA /* Compressor.h in Headers */,
 				02F52C552C340C09009F8DBA /* PluginList.h in Headers */,
 				02F52C6E2C340C09009F8DBA /* idfxsmoothedvalue.h in Headers */,
-				02F52C572C340C09009F8DBA /* Artefact.h in Headers */,
 				02F52C562C340C09009F8DBA /* dfxsmoothedvalue.h in Headers */,
 				02F52C4F2C340C09009F8DBA /* CompressedRingBuffer.h in Headers */,
 				02F52C642C340C09009F8DBA /* RingBuffer.h in Headers */,
-				02F52C5C2C340C09009F8DBA /* lookup_tables.h in Headers */,
+				02F52C5C2C340C09009F8DBA /* LookupTables.h in Headers */,
 				02F52C592C340C09009F8DBA /* AudioPluginInterface.h in Headers */,
-				02F52C502C340C09009F8DBA /* resample.h in Headers */,
+				02F52C502C340C09009F8DBA /* Resample.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,6 +328,7 @@
 			buildConfigurationList = 02D44CBD2C33F9ED006D8C29 /* Build configuration list for PBXNativeTarget "OSLNative" */;
 			buildPhases = (
 				02D44CB82C33F9ED006D8C29 /* Headers */,
+				C30000000000000000000001 /* Build Native Addon Archive */,
 				02D44CB92C33F9ED006D8C29 /* Sources */,
 				02D44CBA2C33F9ED006D8C29 /* Frameworks */,
 				02D93F1D2C353F5800F2F319 /* CopyFiles */,
@@ -317,6 +376,25 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		C30000000000000000000001 /* Build Native Addon Archive */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Native Addon Archive";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(PROJECT_DIR)/build/XcodeAddons/$(CONFIGURATION)/libOSLNativeAddons.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${PROJECT_DIR}/../Build/build_xcode_addon_archive.sh\"\n";
+		};
 		02F8CB1A2C4271F5001F4AE7 /* Sign libOSLNative.dylib */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -333,7 +411,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -euo pipefail\nCODESIGN_BIN=\"/usr/bin/codesign\"\nTARGET_FILE=\"$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH\"\nif [ -f \"$TARGET_FILE\" ]; then\n  \"$CODESIGN_BIN\" --force --timestamp=none --sign - \"$TARGET_FILE\"\nfi\nASSET_PATH=\"${PROJECT_DIR}/../../Assets/OSLNative/macos/Release/libOSLNative.dylib\"\nif [ -f \"$ASSET_PATH\" ]; then\n  \"$CODESIGN_BIN\" --force --timestamp=none --sign - \"$ASSET_PATH\"\nfi\n";
+			shellScript = "set -euo pipefail\nCODESIGN_BIN=\"/usr/bin/codesign\"\nTARGET_FILE=\"$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH\"\nif [ -f \"$TARGET_FILE\" ]; then\n  \"$CODESIGN_BIN\" --force --timestamp=none --sign - \"$TARGET_FILE\"\nfi\nASSET_PATH=\"${PROJECT_DIR}/../../Assets/Plugins/OSLNative/macos/Release/libOSLNative.dylib\"\nif [ -f \"$ASSET_PATH\" ]; then\n  \"$CODESIGN_BIN\" --force --timestamp=none --sign - \"$ASSET_PATH\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -342,26 +420,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02F52C512C340C09009F8DBA /* main.cpp in Sources */,
-				02F52C772C340C9B009F8DBA /* util.c in Sources */,
+				02F52C512C340C09009F8DBA /* AudioMath.cpp in Sources */,
+				B20000000000000000000001 /* ClipPlayerApi.cpp in Sources */,
+				B20000000000000000000002 /* CombFilterApi.cpp in Sources */,
+				B20000000000000000000003 /* DrumApi.cpp in Sources */,
+				B20000000000000000000004 /* EnvelopeApi.cpp in Sources */,
+				B20000000000000000000005 /* EnvelopeMath.cpp in Sources */,
+				B20000000000000000000006 /* KeyboardApi.cpp in Sources */,
+				B20000000000000000000007 /* MaracaApi.cpp in Sources */,
+				B20000000000000000000008 /* NoiseApi.cpp in Sources */,
+				B20000000000000000000009 /* OscillatorApi.cpp in Sources */,
+				B2000000000000000000000A /* BufferApi.cpp in Sources */,
+				B2000000000000000000000B /* DiagnosticApi.cpp in Sources */,
+				B2000000000000000000000C /* FaderApi.cpp in Sources */,
+				B2000000000000000000000D /* GateApi.cpp in Sources */,
+				B2000000000000000000000E /* MicApi.cpp in Sources */,
+				B2000000000000000000000F /* WaveTextureApi.cpp in Sources */,
+				B20000000000000000000010 /* XylophoneApi.cpp in Sources */,
+				02F52C772C340C9B009F8DBA /* Util.c in Sources */,
 				02F52C632C340C09009F8DBA /* Biquad.cpp in Sources */,
-				02F52C5B2C340C09009F8DBA /* Artefact.cpp in Sources */,
 				02F52C692C340C09009F8DBA /* Filter.cpp in Sources */,
 				02F52C602C340C09009F8DBA /* comb.cpp in Sources */,
 				02F52C712C340C09009F8DBA /* MasterBusRecorder.cpp in Sources */,
-				02F52C672C340C09009F8DBA /* Compressor.cpp in Sources */,
+				B30000000000000000000001 /* MasterBusLimiter.cpp in Sources */,
 				02F52C622C340C09009F8DBA /* CRingBuffer.cpp in Sources */,
-				02F52C652C340C09009F8DBA /* Delay.cpp in Sources */,
 				02F52C522C340C09009F8DBA /* RingBuffer.cpp in Sources */,
 				02F52C702C340C09009F8DBA /* AudioPluginUtil.cpp in Sources */,
 				02F52C6F2C340C09009F8DBA /* revmodel.cpp in Sources */,
 				02F52C742C340C09009F8DBA /* allpass.cpp in Sources */,
-				02F52C582C340C09009F8DBA /* Freeverb.cpp in Sources */,
 				A1B2C3D42E4F500100ABC001 /* Oscillator.cpp in Sources */,
-				02F52C6C2C340C09009F8DBA /* resample.cpp in Sources */,
+				02F52C6C2C340C09009F8DBA /* Resample.cpp in Sources */,
 				02F52C542C340C09009F8DBA /* CompressedRingBuffer.cpp in Sources */,
 				A10000012F00000100000001 /* FilterTwo.cpp in Sources */,
-				A10000022F00000100000001 /* FilterThree.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,11 +516,35 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/Release";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Core/Abi",
+					"$(PROJECT_DIR)/../Core/Shared/Buffers",
+					"$(PROJECT_DIR)/../Core/Shared/Math",
+					"$(PROJECT_DIR)/../Core/Devices/ClipPlayer",
+					"$(PROJECT_DIR)/../Core/Devices/Drum",
+					"$(PROJECT_DIR)/../Core/Devices/Envelope",
+					"$(PROJECT_DIR)/../Core/Devices/Keyboard",
+					"$(PROJECT_DIR)/../Core/Devices/Maraca",
+					"$(PROJECT_DIR)/../Core/Devices/Noise",
+					"$(PROJECT_DIR)/../Core/Devices/Utilities",
+					"$(PROJECT_DIR)/../Core/Devices/Xylophone",
+					"$(PROJECT_DIR)/../Core/Devices/Filter",
+					"$(PROJECT_DIR)/../Core/Devices/FilterTwo",
+					"$(PROJECT_DIR)/../Core/Devices/Oscillator",
+					"$(PROJECT_DIR)/../Core/External/FreeVerb/dfx-library",
+					"$(PROJECT_DIR)/../Core/External/FreeVerb/freeverb/components",
+					"$(PROJECT_DIR)/../Core/External/UnityAudioPlugin",
+					"$(PROJECT_DIR)/../Core/External/pcg-cpp/include",
+				);
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/Plugins/OSLNative/macos/Release";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl,-force_load,$(PROJECT_DIR)/build/XcodeAddons/$(CONFIGURATION)/libOSLNativeAddons.a",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -491,11 +605,35 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos/Release";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Core/Abi",
+					"$(PROJECT_DIR)/../Core/Shared/Buffers",
+					"$(PROJECT_DIR)/../Core/Shared/Math",
+					"$(PROJECT_DIR)/../Core/Devices/ClipPlayer",
+					"$(PROJECT_DIR)/../Core/Devices/Drum",
+					"$(PROJECT_DIR)/../Core/Devices/Envelope",
+					"$(PROJECT_DIR)/../Core/Devices/Keyboard",
+					"$(PROJECT_DIR)/../Core/Devices/Maraca",
+					"$(PROJECT_DIR)/../Core/Devices/Noise",
+					"$(PROJECT_DIR)/../Core/Devices/Utilities",
+					"$(PROJECT_DIR)/../Core/Devices/Xylophone",
+					"$(PROJECT_DIR)/../Core/Devices/Filter",
+					"$(PROJECT_DIR)/../Core/Devices/FilterTwo",
+					"$(PROJECT_DIR)/../Core/Devices/Oscillator",
+					"$(PROJECT_DIR)/../Core/External/FreeVerb/dfx-library",
+					"$(PROJECT_DIR)/../Core/External/FreeVerb/freeverb/components",
+					"$(PROJECT_DIR)/../Core/External/UnityAudioPlugin",
+					"$(PROJECT_DIR)/../Core/External/pcg-cpp/include",
+				);
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/Plugins/OSLNative/macos/Release";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl,-force_load,$(PROJECT_DIR)/build/XcodeAddons/$(CONFIGURATION)/libOSLNativeAddons.a",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -512,7 +650,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos";
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/Plugins/OSLNative/macos";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
@@ -528,7 +666,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/OSLNative/macos";
+				INSTALL_PATH = "$(PROJECT_DIR)/../../Assets/Plugins/OSLNative/macos";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PREBINDING = NO;
 				SDKROOT = macosx14.2;

@@ -83,6 +83,7 @@ public static class Editor_OSLNativeBuild
     public static void RebuildAllPossiblePlatforms()
     {
         string nativeDirectory = GetNativeDirectory();
+        bool currentEditorPluginAlreadyExisted = CurrentEditorPluginAlreadyExists(nativeDirectory);
         Debug.Log("OpenSoundLab: Rebuilding OSLNative plugins...");
 
         try
@@ -110,6 +111,7 @@ public static class Editor_OSLNativeBuild
         }
 
         Debug.Log("OpenSoundLab: OSLNative rebuild completed.");
+        LogCurrentEditorPluginRestartWarning(nativeDirectory, currentEditorPluginAlreadyExisted);
     }
 
     public static void RunBuildBatch(Action buildAction)
@@ -158,7 +160,7 @@ public static class Editor_OSLNativeBuild
         }
 
         string templateDirectory = Path.Combine(nativeDirectory, "PluginMetaTemplates");
-        string pluginDirectory = Path.Combine(projectDirectory.FullName, "Assets", "OSLNative");
+        string pluginDirectory = Path.Combine(projectDirectory.FullName, "Assets", "Plugins", "OSLNative");
 
         for (int i = 0; i < pluginMetaTemplatePaths.Length; i++)
         {
@@ -182,6 +184,52 @@ public static class Editor_OSLNativeBuild
             Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
             File.Copy(sourcePath, destinationPath, true);
         }
+    }
+
+    static bool CurrentEditorPluginAlreadyExists(string nativeDirectory)
+    {
+        string pluginPath = GetCurrentEditorPluginPath(nativeDirectory);
+        return !string.IsNullOrEmpty(pluginPath) && File.Exists(pluginPath);
+    }
+
+    static void LogCurrentEditorPluginRestartWarning(string nativeDirectory, bool currentEditorPluginAlreadyExisted)
+    {
+        if (!currentEditorPluginAlreadyExisted)
+        {
+            return;
+        }
+
+        string pluginPath = GetCurrentEditorPluginPath(nativeDirectory);
+        if (string.IsNullOrEmpty(pluginPath) || !File.Exists(pluginPath))
+        {
+            return;
+        }
+
+        Debug.LogWarning("OpenSoundLab: IMPORTANT - OSLNative was rebuilt for the platform currently running this Unity Editor. "
+            + "A native plugin already existed before the rebuild, so Unity may still have the previous binary loaded. "
+            + "Restart Unity before testing or profiling OSLNative; otherwise the rebuilt native plugin will not be used.");
+    }
+
+    static string GetCurrentEditorPluginPath(string nativeDirectory)
+    {
+        DirectoryInfo projectDirectory = Directory.GetParent(nativeDirectory);
+        if (projectDirectory == null)
+        {
+            return null;
+        }
+
+        if (Application.platform == RuntimePlatform.OSXEditor)
+        {
+            return Path.Combine(projectDirectory.FullName, "Assets", "Plugins", "OSLNative", "macos", "Release",
+                "libOSLNative.dylib");
+        }
+
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            return Path.Combine(projectDirectory.FullName, "Assets", "Plugins", "OSLNative", "x64", "Release", "OSLNative.dll");
+        }
+
+        return null;
     }
 
     static void RunProcess(string fileName, string arguments, string workingDirectory)

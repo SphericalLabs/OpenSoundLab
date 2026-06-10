@@ -11,7 +11,7 @@ public static class Editor_PlayModeSplitAudioMenu
         Menu.SetChecked(splitAudioMenuPath, ClientServerPanorama.IsEditorSplitAudioEnabled());
     }
 
-    [MenuItem(splitAudioMenuPath, false, 6)]
+    [MenuItem(splitAudioMenuPath, false, 8)]
     public static void ToggleSplitAudio()
     {
         bool enabled = !ClientServerPanorama.IsEditorSplitAudioEnabled();
@@ -20,7 +20,7 @@ public static class Editor_PlayModeSplitAudioMenu
         Menu.SetChecked(splitAudioMenuPath, enabled);
     }
 
-    [MenuItem(splitAudioMenuPath, true, 6)]
+    [MenuItem(splitAudioMenuPath, true, 8)]
     public static bool ToggleSplitAudioValidate()
     {
         Menu.SetChecked(splitAudioMenuPath, ClientServerPanorama.IsEditorSplitAudioEnabled());

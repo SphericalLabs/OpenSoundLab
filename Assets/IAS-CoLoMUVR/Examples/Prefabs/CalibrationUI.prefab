@@ -89,6 +89,8 @@ GameObject:
   m_Component:
   - component: {fileID: 248447823999277032}
   - component: {fileID: 248447823999277047}
+  - component: {fileID: 4544277422666816516}
+  - component: {fileID: 7740838328204023463}
   m_Layer: 0
   m_Name: CalibrationUI
   m_TagString: Untagged
@@ -130,6 +132,55 @@ MonoBehaviour:
   minAngleOffset: 15
   pressWaitingTime: 1.5
   pressWaitingImage: {fileID: 5588972360804053383}
+--- !u!114 &4544277422666816516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248447823999277046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6f4574ae9f7499ca5d1d5d53eb5e85e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraAccess: {fileID: 7740838328204023463}
+  cameraPreviewPlane: {fileID: 0}
+  createCameraPreviewMaterial: 1
+  cameraPreviewTexturePropertyName: 
+  cameraRig: {fileID: 0}
+  manualCalibrationManager: {fileID: 248447823999277047}
+  contextButton: 256
+  ownManualContextButton: 1
+  longPressSeconds: 0.8
+  permissionRequestTimeoutSeconds: 12
+  cameraWarmupSeconds: 2
+  sampleSeconds: 0.6
+  minSamples: 4
+  maxDetections: 8
+  expectedTagId: -1
+  maxHamming: 1
+  minDecisionMargin: 20
+  maxPoseError: 10
+  tagSizeMeters: 0.056
+  flipCameraImageY: 1
+  logCalibrationDetails: 1
+--- !u!114 &7740838328204023463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248447823999277046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef9a7893e57c04c0db4114c70954b915, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CameraPosition: 0
+  RequestedResolution: {x: 1280, y: 960}
+  TargetMaterial: {fileID: 0}
+  _texturePropertyName: 
 --- !u!1 &248447824229387110
 GameObject:
   m_ObjectHideFlags: 0

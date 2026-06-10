@@ -3,7 +3,7 @@ setlocal EnableExtensions
 
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_PATH=%SCRIPT_DIR%OSLNative.vcxproj"
-set "OUTPUT_FILE=%SCRIPT_DIR%..\Assets\OSLNative\x64\Release\OSLNative.dll"
+set "OUTPUT_FILE=%SCRIPT_DIR%..\Assets\Plugins\OSLNative\x64\Release\OSLNative.dll"
 
 echo Build Windows Plugin from Windows...
 
@@ -43,6 +43,8 @@ if errorlevel 1 exit /b %ERRORLEVEL%
 
 if exist "%OUTPUT_FILE%" (
     echo Success: Created %OUTPUT_FILE%
+    call "%SCRIPT_DIR%Build\restore_plugin_meta_templates.bat" "x64\Release\OSLNative.dll.meta"
+    if errorlevel 1 exit /b %ERRORLEVEL%
 ) else (
     echo Error: Build finished but output file not found at %OUTPUT_FILE%
     exit /b 1

@@ -37,6 +37,11 @@ namespace Network
 {
     public class LocalNetworkManager : NetworkManager
     {
+        public override void Awake()
+        {
+            base.Awake();
+            OSLNetworkSpawnPrefabRegistrar.RegisterManifestPrefabs(this);
+        }
 
         public override void OnStartHost()
         {
@@ -88,4 +93,3 @@ namespace Network
 
     }
 }
-

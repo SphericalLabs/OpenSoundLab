@@ -3,6 +3,7 @@
 # Project-local documentation and test content
 /docs
 /Samples/Testing
+/Goals/
 
 # Unity generated directories
 /[Ll]ibrary/
@@ -129,19 +130,28 @@ Temporary Items
 
 # OSLNative build outputs
 /OSLNative/OSLNative
+/OSLNative/Build/obj/
+/OSLNative/libs/
+/OSLNative/obj/
 /OSLNative/x64/
 /OSLNative/Xcode/build/
-/Assets/OSLNative/arm64/Release/libOSLNative.so
-/Assets/OSLNative/arm64/Release/libOSLNative.so.meta
-/Assets/OSLNative/macos/Release/libOSLNative.dylib
-/Assets/OSLNative/macos/Release/libOSLNative.dylib.meta
-/Assets/OSLNative/x64/Release/OSLNative.dll
-/Assets/OSLNative/x64/Release/OSLNative.dll.meta
-/Assets/OSLNative/x64/Release/OSLNative.exp*
-/Assets/OSLNative/x64/Release/OSLNative.lib*
-/Assets/OSLNative/x64/Release/OSLNative.pdb*
-/Assets/OSLNative/macos/arm64 x86_64/*
-!/Assets/OSLNative/macos/arm64 x86_64/Release/
-/Assets/OSLNative/macos/arm64 x86_64/Release/*
-!/Assets/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib
-!/Assets/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib.meta
+/Assets/Plugins/OSLNative/arm64/Release/libOSLNative.so
+/Assets/Plugins/OSLNative/arm64/Release/libOSLNative.so.meta
+/Assets/Plugins/OSLNative/macos/Release/libOSLNative.dylib
+/Assets/Plugins/OSLNative/macos/Release/libOSLNative.dylib.meta
+/Assets/Plugins/OSLNative/x64/Release/OSLNative.dll
+/Assets/Plugins/OSLNative/x64/Release/OSLNative.dll.meta
+/Assets/Plugins/OSLNative/x64/Release/OSLNative.exp*
+/Assets/Plugins/OSLNative/x64/Release/OSLNative.lib*
+/Assets/Plugins/OSLNative/x64/Release/OSLNative.pdb*
+/Assets/Plugins/OSLNative/macos/arm64 x86_64/*
+!/Assets/Plugins/OSLNative/macos/arm64 x86_64/Release/
+/Assets/Plugins/OSLNative/macos/arm64 x86_64/Release/*
+!/Assets/Plugins/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib
+!/Assets/Plugins/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib.meta
+
+# OpenResonance generated Unity install and build outputs
+/OpenResonanceBuild/Build/
+/OpenResonanceBuild/Staging/
+/Assets/ResonanceAudio/
+/Assets/ResonanceAudio.meta

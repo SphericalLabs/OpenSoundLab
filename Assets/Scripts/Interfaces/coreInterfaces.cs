@@ -89,6 +89,41 @@ public class deviceInterface : componentInterface
         data.ID = transform.GetInstanceID();
     }
 
+    public void setDeviceType(InstrumentData data)
+    {
+        if (data == null) return;
+        if (OSLDeviceRegistry.TryGetCanonicalDeviceIdForDataType(data.GetType(), out string canonicalDeviceId))
+        {
+            data.deviceType = canonicalDeviceId;
+            return;
+        }
+
+        if (trySetDeviceTypeFromObjectName(data)) return;
+
+        Debug.LogWarning("OpenSoundLab: Could not resolve canonical device ID for " + data.GetType().FullName + " on " + name + ".");
+    }
+
+    bool trySetDeviceTypeFromObjectName(InstrumentData data)
+    {
+        string prefabName = getPrefabLookupName(name);
+        if (string.IsNullOrWhiteSpace(prefabName)) return false;
+        if (!OSLDeviceRegistry.TryGetByPrefabName(prefabName, out OSLDeviceRegistration registration)) return false;
+        if (registration == null || string.IsNullOrWhiteSpace(registration.canonicalDeviceId)) return false;
+
+        data.deviceType = registration.canonicalDeviceId;
+        return true;
+    }
+
+    string getPrefabLookupName(string objectName)
+    {
+        if (string.IsNullOrWhiteSpace(objectName)) return "";
+
+        string lookupName = objectName.Trim();
+        const string cloneSuffix = "(Clone)";
+        if (lookupName.EndsWith(cloneSuffix)) lookupName = lookupName.Substring(0, lookupName.Length - cloneSuffix.Length).Trim();
+        return lookupName;
+    }
+
     public virtual void Load(InstrumentData data, bool copyMode)
     {
         transform.localPosition = data.position;

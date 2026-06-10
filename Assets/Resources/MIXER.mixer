@@ -154,6 +154,7 @@ AudioMixerGroupController:
   m_Send: 00000000000000000000000000000000
   m_Effects:
   - {fileID: 244937980433664302}
+  - {fileID: 7225605048188890985}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -227,6 +228,20 @@ AudioMixerEffectController:
   m_Parameters:
   - m_ParameterName: Limiter
     m_GUID: 8744ac7b54cf40e478f65ebbe727d90f
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
+--- !u!244 &7225605048188890985
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 4cb35964d72b74a3b97f0c85c0c96319
+  m_EffectName: Resonance Audio Renderer
+  m_MixLevel: beb4f5c4ca25c45a0b0ab9a6052cba4d
+  m_Parameters: []
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0

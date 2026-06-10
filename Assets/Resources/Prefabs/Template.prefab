@@ -99,9 +99,6 @@ MonoBehaviour:
   omniJacks:
   - {fileID: 114000012859573534}
   - {fileID: 3380366552957750803}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!114 &6504317837562399405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1552,8 +1549,9 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
-  firstSample: 0
-  prevFirstSample: 0
+  previousLastSample: 0
+  vizSample: 0
+  vizTriggerLatched: 0
   volume: 1
   incoming: {fileID: 0}
   monoMode: 0

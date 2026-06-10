@@ -64,5 +64,9 @@
   "dotnet.defaultSolution": "OpenSoundLab.sln",
   "files.associations": {
     "*.gitattribues": "cpp"
-  }
+  },
+  "git.autorefresh": true, // default
+  "git.autoRepositoryDetection": true,
+  "git.repositoryScanMaxDepth": 2,
+  "git.repositoryScanIgnoredFolders": []
 }

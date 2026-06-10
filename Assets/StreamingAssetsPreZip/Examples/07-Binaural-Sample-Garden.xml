@@ -132,7 +132,7 @@
     </Instruments>
     <Instruments xsi:type="CompressorData">
       <ID>-99684</ID>
-      <deviceType>Compressor</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Compressor</deviceType>
       <position>
         <x>-0.562821567</x>
         <y>1.74398088</y>
@@ -166,7 +166,7 @@
     </Instruments>
     <Instruments xsi:type="CompressorData">
       <ID>-99004</ID>
-      <deviceType>Compressor</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Compressor</deviceType>
       <position>
         <x>-0.3627541</x>
         <y>1.74277806</y>
@@ -316,7 +316,7 @@
     </Instruments>
     <Instruments xsi:type="CompressorData">
       <ID>-97340</ID>
-      <deviceType>Compressor</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Compressor</deviceType>
       <position>
         <x>0.2775194</x>
         <y>1.733068</y>
@@ -350,7 +350,7 @@
     </Instruments>
     <Instruments xsi:type="CompressorData">
       <ID>-96660</ID>
-      <deviceType>Compressor</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Compressor</deviceType>
       <position>
         <x>-0.106964819</x>
         <y>1.76465857</y>
@@ -442,7 +442,7 @@
     </Instruments>
     <Instruments xsi:type="CompressorData">
       <ID>-95488</ID>
-      <deviceType>Compressor</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Compressor</deviceType>
       <position>
         <x>0.7974867</x>
         <y>1.744813</y>
@@ -476,7 +476,7 @@
     </Instruments>
     <Instruments xsi:type="CompressorData">
       <ID>-94808</ID>
-      <deviceType>Compressor</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Compressor</deviceType>
       <position>
         <x>0.6409887</x>
         <y>1.77288651</y>
@@ -718,7 +718,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-92510</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>-0.5468517</x>
         <y>1.74103081</y>
@@ -753,7 +753,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-91932</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>-0.0143091753</x>
         <y>1.7190125</y>
@@ -788,7 +788,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-91354</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>0.667596</x>
         <y>1.74798191</y>
@@ -823,7 +823,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-90776</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>0.842342436</x>
         <y>1.77595556</y>
@@ -858,7 +858,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-90198</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>0.1691062</x>
         <y>1.75385833</y>
@@ -893,7 +893,7 @@
     </Instruments>
     <Instruments xsi:type="DelayData">
       <ID>-89620</ID>
-      <deviceType>Delay</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Delay</deviceType>
       <position>
         <x>-0.461170971</x>
         <y>1.73251116</y>

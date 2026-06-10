@@ -14,7 +14,7 @@
 // Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// You may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -25,317 +25,136 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using UnityEngine;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
+using UnityEngine;
 
 public class xmlUpdate
 {
-
-    public List<InstrumentData> UpdateFile(string s)
+    public List<InstrumentData> UpdateFile(string path)
     {
         List<InstrumentData> data = new List<InstrumentData>();
 
         XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(s);
-        XmlNode newNode = xmlDoc.CreateElement("Instruments");
+        xmlDoc.Load(path);
+        if (xmlDoc.DocumentElement == null) return data;
+
         foreach (XmlNode xmlNodeParent in xmlDoc.DocumentElement.ChildNodes)
         {
-            if (xmlNodeParent.Name != "Systems" && xmlNodeParent.Name != "Plugs" && xmlNodeParent.Name != "Instruments")
+            if (isCurrentSaveSection(xmlNodeParent.Name)) continue;
+
+            foreach (XmlNode xmlNode in xmlNodeParent.ChildNodes)
             {
-                foreach (XmlNode xmlNode in xmlNodeParent)
-                {
-                    XmlSerializer serializer;
-                    switch (xmlNode.Name)
-                    {
-                        case "DCs":
-                        case "Knobs":
-                            serializer = new XmlSerializer(typeof(KnobData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Tutorialss":
-                            serializer = new XmlSerializer(typeof(TutorialsData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Polarizers":
-                            serializer = new XmlSerializer(typeof(PolarizerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Compressors":
-                            serializer = new XmlSerializer(typeof(CompressorData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Freeverbs":
-                        case "Reverbs":
-                            serializer = new XmlSerializer(typeof(ReverbData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Delays":
-                            serializer = new XmlSerializer(typeof(DelayData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Scopes":
-                            serializer = new XmlSerializer(typeof(ScopeData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Quantizers":
-                            serializer = new XmlSerializer(typeof(QuantizerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "ADs":
-                            serializer = new XmlSerializer(typeof(ADData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Sequencers":
-                            serializer = new XmlSerializer(typeof(SequencerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "SequencerCVs":
-                            serializer = new XmlSerializer(typeof(SequencerCVData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "SampleHolds":
-                            serializer = new XmlSerializer(typeof(SampleHoldData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Glides":
-                            serializer = new XmlSerializer(typeof(GlideData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Gains":
-                            serializer = new XmlSerializer(typeof(GainData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Oscillator":
-                            serializer = new XmlSerializer(typeof(OscillatorData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Clocks":
-                            serializer = new XmlSerializer(typeof(ClockData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "PhaseToClockDividers":
-                            serializer = new XmlSerializer(typeof(PhaseToClockDividerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Phases":
-                        case "PhaseGenerators":
-                            serializer = new XmlSerializer(typeof(PhaseGeneratorData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "TapeGroups":
-                            serializer = new XmlSerializer(typeof(TapeGroupData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Speaker":
-                            serializer = new XmlSerializer(typeof(SpeakerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Drums":
-                            serializer = new XmlSerializer(typeof(DrumData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "MultiMixes":
-                        case "MixerOnes":
-                            serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "MultiSplits":
-                        case "Splitters":
-                            serializer = new XmlSerializer(typeof(MultipleData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Recorders":
-                            serializer = new XmlSerializer(typeof(RecorderData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Loopers":
-                            serializer = new XmlSerializer(typeof(LooperData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Mixers":
-                        case "MixerTwos":
-                            serializer = new XmlSerializer(typeof(MixerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Maracas":
-                            serializer = new XmlSerializer(typeof(MaracaData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Xylophones":
-                        case "XyloRolls":
-                            serializer = new XmlSerializer(typeof(XylophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "TouchPads":
-                        case "Buttons":
-                            serializer = new XmlSerializer(typeof(ButtonData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Microphones":
-                            serializer = new XmlSerializer(typeof(MicrophoneData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Cameras":
-                            serializer = new XmlSerializer(typeof(CameraData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Controllers":
-                            serializer = new XmlSerializer(typeof(ControllerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "ControlCubes":
-                            serializer = new XmlSerializer(typeof(ControlCubeData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "VCAs":
-                            serializer = new XmlSerializer(typeof(vcaData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Keyboards":
-                            serializer = new XmlSerializer(typeof(KeyboardData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Tapes":
-                            serializer = new XmlSerializer(typeof(InstrumentData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Noises":
-                            serializer = new XmlSerializer(typeof(NoiseData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Filters":
-                            serializer = new XmlSerializer(typeof(FilterData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "Artefacts": // legacy alias, remove when old Artefact saves are dropped
-                        case "Artifacts":
-                            serializer = new XmlSerializer(typeof(ArtifactData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "SamplerOnes":
-                        case "Samplers":
-                            serializer = new XmlSerializer(typeof(SamplerData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        case "SamplerTwos":
-                            serializer = new XmlSerializer(typeof(SamplerTwoData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                        default:
-                            serializer = new XmlSerializer(typeof(InstrumentData), new XmlRootAttribute { ElementName = xmlNode.Name });
-                            break;
-                    }
-
-                    data.Add((InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode)));
-
-                    switch (xmlNode.Name)
-                    {
-                        case "DCs":
-                        case "Knobs":
-                            data[data.Count - 1].deviceType = DeviceType.Knob;
-                            break;
-                        case "Tutorialss":
-                            data[data.Count - 1].deviceType = DeviceType.Tutorials;
-                            break;
-                        case "Polarizers":
-                            data[data.Count - 1].deviceType = DeviceType.Polarizer;
-                            break;
-                        case "Compressors":
-                            data[data.Count - 1].deviceType = DeviceType.Compressor;
-                            break;
-                        case "Delays":
-                            data[data.Count - 1].deviceType = DeviceType.Delay;
-                            break;
-                        case "Scopes":
-                            data[data.Count - 1].deviceType = DeviceType.Scope;
-                            break;
-                        case "Quantizers":
-                            data[data.Count - 1].deviceType = DeviceType.Quantizer;
-                            break;
-                        case "ADs":
-                            data[data.Count - 1].deviceType = DeviceType.AD;
-                            break;
-                        case "Sequencers":
-                        case "SequencerCVs":
-                            data[data.Count - 1].deviceType = DeviceType.Sequencer;
-                            break;
-                        case "SampleHolds":
-                            data[data.Count - 1].deviceType = DeviceType.SampleHold;
-                            break;
-                        case "Glides":
-                            data[data.Count - 1].deviceType = DeviceType.Glide;
-                            break;
-                        case "Gains":
-                            data[data.Count - 1].deviceType = DeviceType.Gain;
-                            break;
-                        case "Oscillators":
-                            data[data.Count - 1].deviceType = DeviceType.Oscillator;
-                            break;
-                        case "Clocks":
-                        case "PhaseToClockDividers":
-                            data[data.Count - 1].deviceType = DeviceType.PhaseToClockDivider;
-                            break;
-                        case "Phases":
-                        case "PhaseGenerators":
-                            data[data.Count - 1].deviceType = DeviceType.PhaseGenerator;
-                            break;
-                        case "TapeGroups":
-                            data[data.Count - 1].deviceType = DeviceType.TapeGroup;
-                            data[data.Count - 1].scale = Vector3.one;
-                            break;
-                        case "Speaker":
-                            data[data.Count - 1].deviceType = DeviceType.Speaker;
-                            break;
-                        case "Drums":
-                            data[data.Count - 1].deviceType = DeviceType.Drum;
-                            break;
-                        case "MultiMixes":
-                        case "MixerOnes":
-                            data[data.Count - 1].deviceType = DeviceType.MixerOne;
-                            break;
-                        case "MultiSplits":
-                        case "Splitters":
-                            data[data.Count - 1].deviceType = DeviceType.Splitter;
-                            break;
-                        case "Recorders":
-                            data[data.Count - 1].deviceType = DeviceType.Recorder;
-                            break;
-                        case "Loopers":
-                            data[data.Count - 1].deviceType = DeviceType.Looper;
-                            break;
-                        case "Mixers":
-                        case "MixerTwos":
-                            data[data.Count - 1].deviceType = DeviceType.MixerTwo;
-                            break;
-                        case "Maracas":
-                            data[data.Count - 1].deviceType = DeviceType.Maracas;
-                            break;
-                        case "Xylophones":
-                        case "XyloRolls":
-                            data[data.Count - 1].deviceType = DeviceType.Xylophone;
-                            break;
-                        case "TouchPads":
-                        case "Buttons":
-                            data[data.Count - 1].deviceType = DeviceType.Button;
-                            break;
-                        case "Microphones":
-                            data[data.Count - 1].deviceType = DeviceType.Microphone;
-                            break;
-                        case "Cameras":
-                            data[data.Count - 1].deviceType = DeviceType.Camera;
-                            break;
-                        case "Controllers":
-                        case "ControlCubes":
-                            data[data.Count - 1].deviceType = DeviceType.Controller;
-                            break;
-                        case "VCAs":
-                            data[data.Count - 1].deviceType = DeviceType.VCA;
-                            break;
-                        case "Freeverbs":
-                        case "Reverbs":
-                            data[data.Count - 1].deviceType = DeviceType.Reverb;
-                            break;
-                        case "Keyboards":
-                            data[data.Count - 1].deviceType = DeviceType.Keyboard;
-                            break;
-                        case "Tapes":
-                            data[data.Count - 1].deviceType = DeviceType.Tapes;
-                            data[data.Count - 1].scale = Vector3.one;
-                            break;
-                        case "Noise":
-                            data[data.Count - 1].deviceType = DeviceType.Noise;
-                            break;
-                        case "Filters":
-                            data[data.Count - 1].deviceType = DeviceType.Filter;
-                            break;
-                        case "Artefacts": // legacy alias, remove when old Artefact saves are dropped
-                        case "Artifacts":
-                            data[data.Count - 1].deviceType = DeviceType.Artifact;
-                            break;
-                        case "SamplerOnes":
-                        case "Samplers":
-                            data[data.Count - 1].deviceType = DeviceType.Sampler;
-                            break;
-                        case "SamplerTwos":
-                            data[data.Count - 1].deviceType = DeviceType.SamplerTwo;
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                InstrumentData instrumentData = deserializeLegacyInstrument(xmlNode);
+                if (instrumentData != null) data.Add(instrumentData);
             }
         }
-        return data;
 
+        return data;
     }
 
-    DeviceType getDeviceType(string s)
+    bool isCurrentSaveSection(string sectionName)
     {
-        if (s == "Drums") return DeviceType.Drum;
-        if (s == "TapeGroups") return DeviceType.TapeGroup;
+        return sectionName == "Systems" || sectionName == "Plugs" || sectionName == "Instruments";
+    }
 
-        return DeviceType.Oscillator;
+    InstrumentData deserializeLegacyInstrument(XmlNode xmlNode)
+    {
+        if (xmlNode == null) return null;
+
+        if (!OSLDeviceRegistry.TryGetByLegacyXmlRootName(xmlNode.Name, out OSLDeviceRegistration registration))
+        {
+            Debug.LogWarning("OpenSoundLab: Skipping unknown legacy XML device root " + xmlNode.Name + ".");
+            return null;
+        }
+
+        Type dataType = resolveDataType(xmlNode.Name, registration);
+        XmlSerializer serializer = new XmlSerializer(dataType, new XmlRootAttribute { ElementName = xmlNode.Name });
+        InstrumentData data = (InstrumentData)serializer.Deserialize(new XmlNodeReader(xmlNode));
+        data.deviceType = registration.deviceId;
+
+        if (registration.deviceId == "TapeGroup" || registration.deviceId == "Tapes")
+        {
+            data.scale = Vector3.one;
+        }
+
+        return data;
+    }
+
+    Type resolveDataType(string xmlRootName, OSLDeviceRegistration registration)
+    {
+        if (registration == null) return typeof(InstrumentData);
+
+        if (isXmlRootForDeviceId(xmlRootName, registration.deviceId) ||
+            isXmlRootForDeviceId(xmlRootName, registration.deviceLocalId))
+        {
+            return registration.dataType != null ? registration.dataType : typeof(InstrumentData);
+        }
+
+        if (registration.legacyDeviceIds != null)
+        {
+            for (int i = 0; i < registration.legacyDeviceIds.Length; ++i)
+            {
+                if (!isXmlRootForDeviceId(xmlRootName, registration.legacyDeviceIds[i])) continue;
+
+                Type legacyDataType = findTypeAtIndex(registration.legacyDataTypeNames, i);
+                return legacyDataType != null ? legacyDataType : registration.dataType ?? typeof(InstrumentData);
+            }
+        }
+
+        return registration.dataType != null ? registration.dataType : typeof(InstrumentData);
+    }
+
+    Type findTypeAtIndex(string[] typeNames, int index)
+    {
+        if (typeNames == null || index < 0 || index >= typeNames.Length) return null;
+        return findType(typeNames[index]);
+    }
+
+    Type findType(string typeName)
+    {
+        if (string.IsNullOrWhiteSpace(typeName)) return null;
+
+        Type directType = Type.GetType(typeName);
+        if (directType != null) return directType;
+
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        for (int i = 0; i < assemblies.Length; ++i)
+        {
+            Type resolvedType = assemblies[i].GetType(typeName);
+            if (resolvedType != null) return resolvedType;
+        }
+
+        return null;
+    }
+
+    bool isXmlRootForDeviceId(string xmlRootName, string deviceId)
+    {
+        if (string.IsNullOrWhiteSpace(xmlRootName) || string.IsNullOrWhiteSpace(deviceId)) return false;
+        return xmlRootName == deviceId ||
+               xmlRootName == deviceId + "s" ||
+               xmlRootName == pluralizeDeviceId(deviceId);
+    }
+
+    string pluralizeDeviceId(string deviceId)
+    {
+        if (string.IsNullOrWhiteSpace(deviceId)) return "";
+        if (deviceId.EndsWith("ch", StringComparison.OrdinalIgnoreCase) ||
+            deviceId.EndsWith("sh", StringComparison.OrdinalIgnoreCase) ||
+            deviceId.EndsWith("s", StringComparison.OrdinalIgnoreCase) ||
+            deviceId.EndsWith("x", StringComparison.OrdinalIgnoreCase) ||
+            deviceId.EndsWith("z", StringComparison.OrdinalIgnoreCase))
+        {
+            return deviceId + "es";
+        }
+
+        if (deviceId.EndsWith("y", StringComparison.OrdinalIgnoreCase) && deviceId.Length > 1)
+        {
+            return deviceId.Substring(0, deviceId.Length - 1) + "ies";
+        }
+
+        return deviceId + "s";
     }
 }

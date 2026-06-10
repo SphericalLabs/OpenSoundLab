@@ -201,7 +201,7 @@
     </Instruments>
     <Instruments xsi:type="CompressorData">
       <ID>-145682</ID>
-      <deviceType>Compressor</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Compressor</deviceType>
       <position>
         <x>0.59282583</x>
         <y>1.360617</y>
@@ -515,7 +515,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-141126</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.452343673</x>
         <y>1.31515944</y>
@@ -699,7 +699,7 @@
     </Instruments>
     <Instruments xsi:type="ReverbData">
       <ID>-139012</ID>
-      <deviceType>Reverb</deviceType>
+      <deviceType>io.sphericals.osl.addons.soundprocessor.Reverb</deviceType>
       <position>
         <x>0.150245517</x>
         <y>1.2757858</y>

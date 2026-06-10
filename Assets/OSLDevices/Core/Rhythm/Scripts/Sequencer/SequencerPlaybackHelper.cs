@@ -1,0 +1,377 @@
+// This file is part of OpenSoundLab, which is based on SoundStage VR.
+//
+// Copyright © 2020-2026 OSLLv1 Sphericals OpenSoundLab
+//
+// OpenSoundLab is licensed under the OpenSoundLab License Agreement (OSLLv1).
+// You may obtain a copy of the License at
+// https://github.com/SphericalLabs/OpenSoundLab/LICENSE-OSLLv1.md
+//
+// By using, modifying, or distributing this software, you agree to be bound by the terms of the license.
+//
+//
+// Copyright © 2020 Apache 2.0 Maximilian Maroe SoundStage VR
+// Copyright © 2019-2020 Apache 2.0 James Surine SoundStage VR
+// Copyright © 2017 Apache 2.0 Google LLC SoundStage VR
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using UnityEngine;
+
+public class SequencerPlaybackHelper
+{
+    sequencerDeviceInterface sequencer;
+
+    int selectedStep = 0;
+    int targetStep = 0;
+    int curStep = 0;
+
+    bool runningUpdated = false;
+    bool phaseSyncPending = false;
+    bool globalResetQueued = false;
+    bool clockRearmPending = false;
+    int clockRearmSampleIndex = -1;
+    bool phaseDownbeatPending = false;
+    bool phaseMovedSinceReset = false;
+    const float phaseDownbeatHotZone = 0.01f;
+
+    float[] lastClockSig = new float[] { 0, 0 };
+    float[] lastResetSig = new float[] { 0, 0 };
+
+    float[] audioPhaseBuffer = new float[2048];
+    float[] audioClockBuffer = new float[2048];
+    float[] audioResetBuffer = new float[2048];
+
+    signalGenerator clockGenerator;
+    signalGenerator resetGenerator;
+    signalGenerator phaseGenerator;
+
+    public SequencerPlaybackHelper(sequencerDeviceInterface sequencer)
+    {
+        this.sequencer = sequencer;
+    }
+
+    public int getCurStep()
+    {
+        return curStep;
+    }
+
+    public void setCurStep(int value)
+    {
+        curStep = value;
+    }
+
+    public int getTargetStep()
+    {
+        return targetStep;
+    }
+
+    public void setTargetStep(int value)
+    {
+        targetStep = value;
+    }
+
+    public void updateGenerators()
+    {
+        if (clockGenerator != sequencer.clockJack.signal)
+        {
+            clockGenerator = sequencer.clockJack.signal;
+        }
+
+        if (resetGenerator != sequencer.resetJack.signal)
+        {
+            resetGenerator = sequencer.resetJack.signal;
+        }
+
+        if (phaseGenerator != sequencer.phaseJack.signal)
+        {
+            phaseGenerator = sequencer.phaseJack.signal;
+        }
+    }
+
+    public void selectStep(int s, bool silent = false, int sampleIndex = 0, double dspTime = -1)
+    {
+        targetStep = s;
+        selectedStep = s;
+
+        if (silent) return;
+
+        applyStepSignals(s, true, sampleIndex, dspTime);
+    }
+
+    void applyStepSignals(int step, bool sendTriggers, int sampleIndex = 0, double dspTime = -1)
+    {
+        // This is called from the audio thread and updates signals for sample accuracy.
+        int[] curDimensions = sequencer.getCurrentDimensions();
+        button[] rowMutes = sequencer.getRowMutes();
+        trigSignalGenerator[] trigGenerators = sequencer.getRowTriggerGenerators();
+        cvSignalGenerator[] cvGenerators = sequencer.getRowCvGenerators();
+        if (dspTime < 0) dspTime = AudioSettings.dspTime;
+
+        for (int row = 0; row < curDimensions[0]; row++)
+        {
+            if (rowMutes[row].isHit) continue;
+
+            if (sendTriggers)
+            {
+                trigGenerators[row].setSignal(sequencer.stepBools[sequencer.activePattern, row, step], sampleIndex, dspTime);
+            }
+            cvGenerators[row].setSignal(sequencer.stepFloats[sequencer.activePattern, row, step] * 2f - 1f, sampleIndex, dspTime);
+        }
+    }
+
+    public void selectStepUpdate()
+    {
+        if (targetStep == curStep) return;
+        if (curStep < sequencer.dimensions[1]) stepOff(curStep);
+        curStep = targetStep;
+        stepOn(curStep);
+        sequencer.stepSelect.updatePos(-sequencer.getCubeConst() * curStep);
+    }
+
+    public void executeNextStep(int sampleIndex = 0, double dspTime = -1)
+    {
+        if (sequencer.stepSelect.curState == manipObject.manipState.grabbed) return;
+
+        int s = 1;
+
+        if (runningUpdated)
+        {
+            s = 0;
+            runningUpdated = false;
+        }
+
+        int next = (targetStep + s) % sequencer.dimensions[1];
+        selectStep(next, false, sampleIndex, dspTime);
+    }
+
+    void stepOff(int step)
+    {
+        int[] curDimensions = sequencer.getCurrentDimensions();
+        button[,] stepButtons = sequencer.getStepButtons();
+
+        for (int i = 0; i < curDimensions[0]; i++)
+        {
+            if (stepButtons[i, step] != null) stepButtons[i, step].Highlight(false);
+        }
+    }
+
+    void stepOn(int step)
+    {
+        int[] curDimensions = sequencer.getCurrentDimensions();
+        button[,] stepButtons = sequencer.getStepButtons();
+
+        for (int i = 0; i < curDimensions[0]; i++)
+        {
+            if (stepButtons[i, step] != null) stepButtons[i, step].Highlight(true);
+        }
+    }
+
+    void resetSteps(int sampleIndex = 0, double dspTime = -1)
+    {
+        targetStep = 0;
+        selectedStep = 0;
+        applyStepSignals(0, false, sampleIndex, dspTime);
+        // After reset, keep the playhead on step 1 (index 0) and update CV immediately,
+        // but do not emit any trigger yet. The next valid clock edge should fire the
+        // step-1 trigger, and only the following edge advances to step 2.
+        runningUpdated = true;
+        clockRearmPending = true;
+        clockRearmSampleIndex = sampleIndex;
+    }
+
+    public void requestGlobalReset()
+    {
+        globalResetQueued = true;
+    }
+
+    public void onAudioFilterRead(float[] buffer, int channels)
+    {
+        if (audioPhaseBuffer.Length != buffer.Length)
+        {
+            Array.Resize(ref audioPhaseBuffer, buffer.Length);
+        }
+
+        if (audioClockBuffer.Length != buffer.Length)
+        {
+            Array.Resize(ref audioClockBuffer, buffer.Length);
+        }
+
+        if (audioResetBuffer.Length != buffer.Length)
+        {
+            Array.Resize(ref audioResetBuffer, buffer.Length);
+        }
+
+        bool resetApplied = false;
+        if (globalResetQueued)
+        {
+            resetSteps(0, AudioSettings.dspTime);
+            globalResetQueued = false;
+            lastClockSig[0] = lastClockSig[1] = 0;
+            lastResetSig[0] = lastResetSig[1] = 0;
+            phaseSyncPending = false;
+            resetApplied = true;
+        }
+
+        // Phase mode is driven by the clock/reset toggle. Legacy fallback uses phase jack presence.
+        bool phaseMode = sequencer.isPhaseModeActive();
+        bool discardClock = phaseMode || !sequencer.running;
+        bool discardReset = phaseMode;
+        if (resetApplied && phaseMode)
+        {
+            // Global resets re-zero the phase source; arm a single downbeat so phase-mode
+            // sequencing produces a step-1 trigger before normal step changes resume.
+            phaseDownbeatPending = true;
+            phaseMovedSinceReset = false;
+        }
+        processClockResetBuffers(buffer, channels, discardClock, discardReset);
+
+        if (phaseMode) // Phase mode
+        {
+            if (phaseGenerator == null) return;
+            if (!sequencer.running) return;
+
+            phaseGenerator.processBuffer(audioPhaseBuffer, AudioSettings.dspTime, channels);
+
+            float phaseStart = audioPhaseBuffer[0];
+            float phaseEnd = audioPhaseBuffer[buffer.Length - channels];
+            if (phaseDownbeatPending && phaseEnd != phaseStart)
+            {
+                phaseMovedSinceReset = true;
+            }
+
+            bool phaseDownbeatTriggered = false;
+            if (phaseDownbeatPending)
+            {
+                // External phase starts can be confirmed from Update just after the boundary.
+                // Keep the first trigger valid for the whole first sequencer step, not just
+                // a tiny phase sliver, so step 1 is not skipped after a quantized launch.
+                float downbeatWindow = Mathf.Max(phaseDownbeatHotZone, 1f / Mathf.Max(1, sequencer.dimensions[1]));
+                if (resetApplied && !phaseMovedSinceReset && phaseStart < downbeatWindow)
+                {
+                    // A stopped phase source rewinds to a constant 0. The reset has already
+                    // moved the sequencer to step 1, so there is no downbeat to wait for yet.
+                    phaseDownbeatPending = false;
+                }
+                else if (phaseMovedSinceReset && phaseStart < downbeatWindow)
+                {
+                    selectStep(0, false, 0, AudioSettings.dspTime);
+                    runningUpdated = true;
+                    phaseDownbeatPending = false;
+                    phaseSyncPending = false;
+                    phaseDownbeatTriggered = true;
+                }
+                else if (phaseMovedSinceReset && phaseStart >= downbeatWindow)
+                {
+                    // Phase already left step 1, so firing it now would be late.
+                    phaseDownbeatPending = false;
+                }
+
+                if (phaseDownbeatPending) return;
+            }
+
+            // Map phase directly to step.
+            float latestPhase = phaseEnd;
+            int s = Mathf.FloorToInt(latestPhase * sequencer.dimensions[1]);
+            s = Mathf.Clamp(s, 0, sequencer.dimensions[1] - 1);
+            if (!phaseDownbeatTriggered && (phaseSyncPending || s != targetStep))
+            {
+                // SelectStep handles the signal generator updates, which is needed here.
+                selectStep(s, false, buffer.Length - channels, AudioSettings.dspTime);
+                runningUpdated = true;
+                phaseSyncPending = false;
+            }
+        }
+        else // Clock (Trigger) mode
+        {
+        }
+    }
+
+    void processClockResetBuffers(float[] buffer, int channels, bool discardClock, bool discardReset)
+    {
+        if (resetGenerator != null)
+        {
+            resetGenerator.processBuffer(audioResetBuffer, AudioSettings.dspTime, channels);
+            for (int i = 0; i < buffer.Length; i += channels)
+            {
+                if (!discardReset && signalGenerator.isRisingEdge(audioResetBuffer[i], lastResetSig[1]))
+                {
+                    resetSteps(i, AudioSettings.dspTime);
+                }
+                lastResetSig[0] = lastResetSig[1];
+                lastResetSig[1] = audioResetBuffer[i];
+            }
+        }
+
+        if (clockGenerator != null)
+        {
+            clockGenerator.processBuffer(audioClockBuffer, AudioSettings.dspTime, channels);
+            for (int i = 0; i < buffer.Length; i += channels)
+            {
+                float clockSample = audioClockBuffer[i];
+                if (clockRearmPending && clockRearmSampleIndex >= 0 && i >= clockRearmSampleIndex)
+                {
+                    // While rearming, ignore clock edges until the signal goes low.
+                    // This prevents an immediate trigger when reset happens during
+                    // a high clock, and ensures the first post-reset rising edge
+                    // fires step 1 (not step 2) before normal stepping resumes.
+                    if (clockSample <= 0f)
+                    {
+                        clockRearmPending = false;
+                        clockRearmSampleIndex = -1;
+                    }
+                    lastClockSig[0] = lastClockSig[1];
+                    lastClockSig[1] = clockSample;
+                    continue;
+                }
+
+                if (!discardClock && signalGenerator.isRisingEdge(clockSample, lastClockSig[1]))
+                {
+                    executeNextStep(i, AudioSettings.dspTime);
+                }
+                lastClockSig[0] = lastClockSig[1];
+                lastClockSig[1] = clockSample;
+            }
+        }
+    }
+
+    public void updateStepSelect(bool forced = false)
+    {
+        // bugfix for randomly skipped / missed steps in sequencer.
+        // this routine would fire even if the step selector handle was not touched or grabbed.
+        // this could be due to an multithread issue between main and audio thread, which is still unsolved.
+        // Skip manual updates while phase lock is active to avoid fighting phase sync.
+        if (sequencer.isPhaseLockActive()) return;
+        if (!forced && sequencer.stepSelect.curState != manipObject.manipState.grabbed) return;
+
+        int s = (int)Mathf.Round(sequencer.stepSelect.transform.localPosition.x / -sequencer.getCubeConst());
+        if (s == selectedStep) return;
+        sequencer.stepSelect.pulse();
+        selectedStep = s;
+        selectStep(s);
+    }
+
+    public void togglePlay(bool on)
+    {
+        sequencer.running = on;
+        if (on)
+        {
+            runningUpdated = true;
+            phaseSyncPending = true;
+        }
+        else
+        {
+            phaseSyncPending = false;
+        }
+    }
+}

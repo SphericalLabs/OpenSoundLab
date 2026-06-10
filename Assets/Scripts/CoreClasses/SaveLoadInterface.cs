@@ -29,9 +29,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using System.Xml.Serialization;
 using Mirror;
-using System.Reflection;
 
 public class SaveLoadInterface : MonoBehaviour
 {
@@ -48,26 +46,32 @@ public class SaveLoadInterface : MonoBehaviour
         instance = this;
         instrumentPrefabs = new Dictionary<string, GameObject>();
 
-        foreach (var devType in DeviceType.GetAll())
+        foreach (OSLDeviceRegistration registration in OSLDeviceRegistry.GetAll())
         {
-            instrumentPrefabs[devType] = Resources.Load("Prefabs/" + devType) as GameObject;
+            cacheInstrumentPrefab(registration);
+        }
+    }
+
+    void cacheInstrumentPrefab(OSLDeviceRegistration registration)
+    {
+        if (registration == null || registration.deviceType == null) return;
+        if (!registration.IsAvailable) return;
+
+        GameObject prefab = registration.LoadPrefab();
+        if (prefab == null)
+        {
+            Debug.LogWarning("OpenSoundLab: No prefab registered for device type " + registration.deviceId + ".");
+            return;
         }
 
-        instrumentPrefabs[DeviceType.TapeGroup] = Resources.Load("Prefabs/" + DeviceType.TapeGroup) as GameObject;
-        instrumentPrefabs["Artefact"] = instrumentPrefabs[DeviceType.Artifact]; // legacy alias, remove when old Artefact saves are dropped
-        instrumentPrefabs["SamplerOne"] = instrumentPrefabs[DeviceType.Sampler]; // legacy alias, remove when old SamplerOne saves are dropped
-        instrumentPrefabs["XyloRoll"] = instrumentPrefabs[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
-        instrumentPrefabs["Freeverb"] = instrumentPrefabs[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
-        instrumentPrefabs["SequencerCV"] = instrumentPrefabs[DeviceType.Sequencer]; // legacy alias, remove when old saves are dropped
-        instrumentPrefabs["ControlCube"] = instrumentPrefabs[DeviceType.Controller]; // legacy alias, remove when old saves are dropped
-        instrumentPrefabs["DC"] = instrumentPrefabs[DeviceType.Knob]; // legacy alias, remove when old saves are dropped
-        instrumentPrefabs["Mixer"] = instrumentPrefabs[DeviceType.MixerTwo]; // legacy alias, remove when old saves are dropped
-        instrumentPrefabs["MultiMix"] = instrumentPrefabs[DeviceType.MixerOne]; // legacy alias, remove when old saves are dropped
-        instrumentPrefabs["MultiSplit"] = instrumentPrefabs[DeviceType.Splitter]; // legacy alias, remove when old saves are dropped
-        instrumentPrefabs["TouchPad"] = instrumentPrefabs[DeviceType.Button]; // legacy alias, remove when old saves are dropped
-        instrumentPrefabs["Phase"] = instrumentPrefabs[DeviceType.PhaseGenerator]; // legacy alias, remove when old saves are dropped.
-        instrumentPrefabs["Clock"] = instrumentPrefabs[DeviceType.PhaseToClockDivider]; // legacy alias, remove when old saves are dropped.
-        //instrumentPrefabs[deviceType.Pano] = Resources.Load("Prefabs/" + (deviceType.Pano).ToString()) as GameObject;
+        instrumentPrefabs[registration.deviceId] = prefab;
+
+        if (registration.legacyDeviceIds == null) return;
+        for (int i = 0; i < registration.legacyDeviceIds.Length; ++i)
+        {
+            string legacyDeviceId = registration.legacyDeviceIds[i];
+            if (!string.IsNullOrWhiteSpace(legacyDeviceId)) instrumentPrefabs[legacyDeviceId] = prefab;
+        }
     }
 
     public void Load(string filename, bool tutorial = false)
@@ -90,7 +94,8 @@ public class SaveLoadInterface : MonoBehaviour
                 foreach (InstrumentData dB in dataB)
                 {
                     dB.deviceType = normalizeDeviceTypeName(dB.deviceType);
-                    GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
+                    if (!tryGetInstrumentPrefab(dB.deviceType, out GameObject prefab)) continue;
+                    GameObject g = Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
                     g.GetComponent<deviceInterface>().Load(dB, false);
                     //Debug.Log("load data");
                     NetworkServer.Spawn(g);
@@ -102,7 +107,8 @@ public class SaveLoadInterface : MonoBehaviour
             for (int i = 0; i < c && !usedLegacyLoad; i++)
             {
                 synthSet.InstrumentList[c - 1 - i].deviceType = normalizeDeviceTypeName(synthSet.InstrumentList[c - 1 - i].deviceType);
-                GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;
+                if (!tryGetInstrumentPrefab(synthSet.InstrumentList[c - 1 - i].deviceType, out GameObject prefab)) continue;
+                GameObject g = Instantiate(prefab, patchAnchor) as GameObject;
                 g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i], false);
                 NetworkServer.Spawn(g);
             }
@@ -127,7 +133,9 @@ public class SaveLoadInterface : MonoBehaviour
         foreach (InstrumentData data in synthSet.InstrumentList)
         {
             data.deviceType = normalizeDeviceTypeName(data.deviceType);
-            Transform t = (Instantiate(menuManager.instance.refObjects[data.deviceType], par, false) as GameObject).transform;
+            if (!tryGetPreviewPrefab(data.deviceType, out GameObject previewPrefab)) continue;
+
+            Transform t = (Instantiate(previewPrefab, par, false) as GameObject).transform;
             t.localPosition = data.position;
             t.localRotation = data.rotation;
             t.localScale = data.scale;
@@ -136,6 +144,54 @@ public class SaveLoadInterface : MonoBehaviour
 
         ClearSynthSetList();
         return (v != 0);
+    }
+
+    bool tryGetPreviewPrefab(string deviceType, out GameObject previewPrefab)
+    {
+        if (menuManager.instance != null && menuManager.instance.refObjects != null && menuManager.instance.refObjects.TryGetValue(deviceType, out previewPrefab))
+        {
+            return true;
+        }
+
+        if (OSLDeviceRegistry.TryGet(deviceType, out OSLDeviceRegistration registration))
+        {
+            if (!registration.IsAvailable)
+            {
+                Debug.LogWarning("OpenSoundLab: Skipping preview for unavailable device type " + registration.deviceId + " (" + registration.Access.availability + ").");
+                previewPrefab = null;
+                return false;
+            }
+
+            Debug.LogWarning("OpenSoundLab: Skipping preview for device type " + registration.deviceId + " because no preview object is registered.");
+            previewPrefab = null;
+            return false;
+        }
+
+        Debug.LogWarning("OpenSoundLab: Skipping preview for missing device type " + deviceType + ".");
+        previewPrefab = null;
+        return false;
+    }
+
+    bool tryGetInstrumentPrefab(string deviceType, out GameObject prefab)
+    {
+        if (instrumentPrefabs.TryGetValue(deviceType, out prefab) && prefab != null) return true;
+
+        if (OSLDeviceRegistry.TryGet(deviceType, out OSLDeviceRegistration registration) && !registration.IsAvailable)
+        {
+            prefab = null;
+            Debug.LogWarning("OpenSoundLab: Skipping unavailable device type " + registration.deviceId + " (" + registration.Access.availability + "). Stage 8.5 will preserve it as a ghost.");
+            return false;
+        }
+
+        prefab = OSLDeviceRegistry.GetPrefab(deviceType);
+        if (prefab != null)
+        {
+            instrumentPrefabs[deviceType] = prefab;
+            return true;
+        }
+
+        Debug.LogWarning("OpenSoundLab: Skipping missing device type " + deviceType + ". Install or enable its addon to load it.");
+        return false;
     }
 
     public void StartNewPatch()
@@ -167,19 +223,13 @@ public class SaveLoadInterface : MonoBehaviour
 
     string normalizeDeviceTypeName(string deviceType)
     {
-        if (deviceType == "Artefact") return DeviceType.Artifact; // legacy alias, remove when old Artefact saves are dropped
-        if (deviceType == "SamplerOne") return DeviceType.Sampler; // legacy alias, remove when old SamplerOne saves are dropped
-        if (deviceType == "XyloRoll") return DeviceType.Xylophone; // legacy alias, remove when old XyloRoll saves are dropped
-        if (deviceType == "Freeverb") return DeviceType.Reverb; // legacy alias, remove when old Freeverb saves are dropped
-        if (deviceType == "SequencerCV") return DeviceType.Sequencer; // legacy alias, remove when old saves are dropped
-        if (deviceType == "ControlCube") return DeviceType.Controller; // legacy alias, remove when old saves are dropped
-        if (deviceType == "DC") return DeviceType.Knob; // legacy alias, remove when old saves are dropped
-        if (deviceType == "Mixer") return DeviceType.MixerTwo; // legacy alias, remove when old saves are dropped
-        if (deviceType == "MultiMix") return DeviceType.MixerOne; // legacy alias, remove when old saves are dropped
-        if (deviceType == "MultiSplit") return DeviceType.Splitter; // legacy alias, remove when old saves are dropped
-        if (deviceType == "TouchPad") return DeviceType.Button; // legacy alias, remove when old saves are dropped
-        if (deviceType == "Phase") return DeviceType.PhaseGenerator; // legacy alias, remove when old saves are dropped.
-        if (deviceType == "Clock") return DeviceType.PhaseToClockDivider; // legacy alias, remove when old saves are dropped.
+        if (OSLDeviceRegistry.TryNormalizeDeviceId(deviceType, out string normalizedDeviceId)) return normalizedDeviceId;
+        return deviceType;
+    }
+
+    string getCanonicalDeviceIdForSave(string deviceType)
+    {
+        if (OSLDeviceRegistry.TryGetCanonicalDeviceId(deviceType, out string canonicalDeviceId)) return canonicalDeviceId;
         return deviceType;
     }
 
@@ -187,6 +237,8 @@ public class SaveLoadInterface : MonoBehaviour
     {
         SystemData s = new SystemData();
         s.version = masterControl.versionNumber;
+        s.saveSchema = "OSL-XML-1";
+        s.deviceIdentityFormat = "canonical";
         s.binauralMode = (int)masterControl.instance.BinauralSetting;
         s.wireSetting = (int)masterControl.instance.WireSetting;
         synthSet.SystemList.Add(s);
@@ -218,7 +270,9 @@ public class SaveLoadInterface : MonoBehaviour
         foreach (deviceInterface d in devices)
         {
             if (d is tutorialsDeviceInterface) continue; // exclude Tutorials from saves
-            synthSet.InstrumentList.Add(d.GetData());
+            InstrumentData data = d.GetData();
+            data.deviceType = getCanonicalDeviceIdForSave(data.deviceType);
+            synthSet.InstrumentList.Add(data);
         }
 
         omniPlug[] plugs = FindObjectsOfType(typeof(omniPlug)) as omniPlug[];
@@ -309,23 +363,10 @@ public class SaveLoadInterface : MonoBehaviour
             InstrumentData data = g.GetComponent<deviceInterface>().GetData();
 
             string normalizedType = normalizeDeviceTypeName(data.deviceType);
-            GameObject g2 = Instantiate(instrumentPrefabs[normalizedType], Vector3.zero, Quaternion.identity) as GameObject;
+            if (!tryGetInstrumentPrefab(normalizedType, out GameObject prefab)) return null;
+            GameObject g2 = Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
             deviceInterface device = g2.GetComponent<deviceInterface>();
             device.Load(data, true);
-
-            // set volume to zero to avoid surprisingly loud sounds
-            if (device is oscillatorDeviceInterface)
-            {
-                oscillatorDeviceInterface osc = (oscillatorDeviceInterface)device;
-                osc.ampDial.setPercent(0f);
-            }
-
-            // set volume to zero to avoid surprisingly loud sounds
-            if (device is samplerTwoDeviceInterface)
-            {
-                samplerTwoDeviceInterface sampler = (samplerTwoDeviceInterface)device;
-                sampler.volumeDial.setPercent(0f);
-            }
 
             g2.transform.position = g.transform.position;
             g2.transform.rotation = g.transform.rotation;
@@ -346,105 +387,4 @@ public class SaveLoadInterface : MonoBehaviour
         return null;
     }
 
-}
-
-
-[XmlInclude(typeof(DCData))]
-[XmlInclude(typeof(KnobData))]
-[XmlInclude(typeof(TutorialsData))]
-[XmlInclude(typeof(PolarizerData))]
-[XmlInclude(typeof(ArtifactData))]
-[XmlInclude(typeof(ArtifactDataLegacy))]
-[XmlInclude(typeof(CompressorData))]
-[XmlInclude(typeof(FreeverbData))] // legacy alias, remove when old Freeverb saves are dropped
-[XmlInclude(typeof(DelayData))]
-[XmlInclude(typeof(ScopeData))]
-[XmlInclude(typeof(QuantizerData))]
-
-[XmlInclude(typeof(ADData))]
-[XmlInclude(typeof(SequencerData))]
-[XmlInclude(typeof(SequencerCVData))] // legacy alias, remove when old saves are dropped
-[XmlInclude(typeof(SampleHoldData))]
-
-
-[XmlInclude(typeof(GlideData))]
-[XmlInclude(typeof(GainData))]
-
-[XmlInclude(typeof(OscillatorData))]
-[XmlInclude(typeof(SpeakerData))]
-[XmlInclude(typeof(CameraData))]
-[XmlInclude(typeof(ControllerData))]
-[XmlInclude(typeof(ControlCubeData))]
-[XmlInclude(typeof(DrumData))]
-[XmlInclude(typeof(NoiseData))]
-[XmlInclude(typeof(FilterData))]
-[XmlInclude(typeof(MaracaData))]
-[XmlInclude(typeof(MicrophoneData))]
-[XmlInclude(typeof(ButtonData))]
-[XmlInclude(typeof(TouchPadData))]
-[XmlInclude(typeof(vcaData))]
-[XmlInclude(typeof(ReverbData))]
-[XmlInclude(typeof(TapeGroupData))]
-[XmlInclude(typeof(MixerTwoData))]
-[XmlInclude(typeof(MixerData))]
-[XmlInclude(typeof(MultipleData))]
-
-[XmlInclude(typeof(LooperData))]
-[XmlInclude(typeof(RecorderData))]
-[XmlInclude(typeof(SamplerTwoData))]
-[XmlInclude(typeof(SamplerData))]
-[XmlInclude(typeof(SamplerOneData))] // legacy alias, remove when old SamplerOne saves are dropped
-[XmlInclude(typeof(KeyboardData))]
-[XmlInclude(typeof(XylophoneData))]
-[XmlInclude(typeof(XyloRollData))]
-[XmlInclude(typeof(AirhornData))]
-[XmlInclude(typeof(PanoData))]
-[XmlInclude(typeof(MIDIinData))]
-[XmlInclude(typeof(MIDIoutData))]
-[XmlInclude(typeof(TimelineData))]
-[XmlInclude(typeof(ADSRData))]
-[XmlInclude(typeof(PhaseGeneratorData))]
-[XmlInclude(typeof(PhaseDataLegacy))] // legacy alias, remove when old saves are dropped.
-[XmlInclude(typeof(PhaseToClockDividerData))]
-[XmlInclude(typeof(ClockData))] // legacy alias, remove when old saves are dropped.
-[XmlInclude(typeof(FilterTwoData))]
-[XmlInclude(typeof(FilterThreeData))]
-
-
-
-
-public class InstrumentData
-{
-    public int ID;
-    public string deviceType;
-    public Vector3 position;
-    public Vector3 scale = Vector3.one;
-    public Quaternion rotation;
-}
-
-public class SystemData
-{
-    public int wireSetting;
-    public int binauralMode;
-    public float version;
-}
-
-
-public class JackData : InstrumentData
-{
-    public int connected;
-    public int homePort;
-    public Vector3[] jackPath;
-    public Color cordColor;
-    public int signalID;
-    public int signalClass;
-}
-
-public class PlugData : InstrumentData
-{
-    public bool outputPlug;
-    public int connected;
-    public int otherPlug;
-    public Vector3[] plugPath;
-    public Color cordColor;
 }

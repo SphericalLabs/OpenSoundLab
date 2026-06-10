@@ -1,0 +1,23 @@
+{
+    "name": "OpenSoundLab.Editor",
+    "rootNamespace": "",
+    "references": [
+        "OpenSoundLab.Foundation",
+        "OpenSoundLab.Runtime",
+        "OpenSoundLab.DeviceRegistry",
+        "Mirror",
+        "UtpTransport",
+        "MetaXrSimulator.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

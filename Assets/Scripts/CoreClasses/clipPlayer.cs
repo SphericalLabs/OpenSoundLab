@@ -96,7 +96,7 @@ public class clipPlayer : signalGenerator
         }
     }
 
-    void OnDestroy()
+    protected virtual void OnDestroy()
     {
         freePlaybackFilters();
     }

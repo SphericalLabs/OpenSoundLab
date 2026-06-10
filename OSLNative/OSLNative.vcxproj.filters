@@ -15,140 +15,126 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Core\Abi\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Biquad.cpp">
+    <ClCompile Include="Core\Shared\Buffers\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Filter.cpp">
+    <ClCompile Include="Core\Shared\Math\*.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Compressor.cpp">
+    <ClCompile Include="Core\Shared\Math\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Delay.cpp">
+    <ClCompile Include="Core\Devices\ClipPlayer\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RingBuffer.cpp">
+    <ClCompile Include="Core\Devices\Drum\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util.c">
+    <ClCompile Include="Core\Devices\Envelope\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FreeVerb\freeverb\components\allpass.cpp">
+    <ClCompile Include="Core\Devices\Filter\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FreeVerb\freeverb\components\comb.cpp">
+    <ClCompile Include="Core\Devices\FilterTwo\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FreeVerb\freeverb\components\revmodel.cpp">
+    <ClCompile Include="Core\Devices\Keyboard\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MasterBusRecorder\AudioPluginUtil.cpp">
+    <ClCompile Include="Core\Devices\LinkPhaseGenerator\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MasterBusRecorder\MasterBusRecorder.cpp">
+    <ClCompile Include="Core\Devices\Maraca\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CRingBuffer.cpp">
+    <ClCompile Include="Core\Devices\Noise\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="resample.cpp">
+    <ClCompile Include="Core\Devices\Oscillator\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Artefact.cpp">
+    <ClCompile Include="Core\Devices\Utilities\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Freeverb.cpp">
+    <ClCompile Include="Core\Devices\Xylophone\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FilterTwo.cpp">
+    <ClCompile Include="Core\External\FreeVerb\dfx-library\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FilterThree.cpp">
-    <ClCompile Include="Oscillator.cpp">
+    <ClCompile Include="Core\External\FreeVerb\freeverb\components\*.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\External\UnityAudioPlugin\*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h">
+    <ClInclude Include="Core\Abi\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Biquad.h">
+    <ClInclude Include="Core\Shared\Buffers\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Filter.h">
+    <ClInclude Include="Core\Shared\Buffers\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Compressor.h">
+    <ClInclude Include="Core\Shared\Math\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Delay.h">
+    <ClInclude Include="Core\Devices\ClipPlayer\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RingBuffer.h">
+    <ClInclude Include="Core\Devices\Drum\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util.h">
+    <ClInclude Include="Core\Devices\Envelope\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeVerb\freeverb\components\allpass.hpp">
+    <ClInclude Include="Core\Devices\Filter\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeVerb\freeverb\components\comb.hpp">
+    <ClInclude Include="Core\Devices\FilterTwo\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeVerb\freeverb\components\revmodel.hpp">
+    <ClInclude Include="Core\Devices\Keyboard\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeVerb\freeverb\components\tuning.h">
+    <ClInclude Include="Core\Devices\Maraca\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeVerb\dfx-library\dfxsmoothedvalue.h">
+    <ClInclude Include="Core\Devices\Noise\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeVerb\dfx-library\dfxsmoothedvalue.hpp">
+    <ClInclude Include="Core\Devices\Oscillator\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeVerb\dfx-library\idfxsmoothedvalue.h">
+    <ClInclude Include="Core\Devices\Utilities\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MasterBusRecorder\PluginList.h">
+    <ClInclude Include="Core\Devices\Xylophone\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MasterBusRecorder\AudioPluginUtil.h">
+    <ClInclude Include="Core\External\FreeVerb\**\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MasterBusRecorder\AudioPluginInterface.h">
+    <ClInclude Include="Core\External\FreeVerb\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CRingBuffer.hpp">
+    <ClInclude Include="Core\External\link\include\ableton\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lookup_tables.h">
+    <ClInclude Include="Core\External\link\modules\asio-standalone\asio\include\**\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resample.h">
+    <ClInclude Include="Core\External\pcg-cpp\include\*.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resample_tables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Artefact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Freeverb.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pcg-cpp\include\pcg_random.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FilterTwo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FilterThree.h">
-    <ClInclude Include="Oscillator.h">
+    <ClInclude Include="Core\External\UnityAudioPlugin\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

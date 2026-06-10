@@ -1,264 +1,128 @@
-using UnityEngine;
 using UnityEditor;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Mirror;
-using UnityEditor.Compilation;
-using UnityEditorInternal;
+using UnityEngine;
 
-[InitializeOnLoad]
 public class DeviceWizard : EditorWindow
 {
-    static DeviceWizard()
-    {
-        // This runs after every compilation
-        EditorApplication.delayCall += CheckForPendingDevice;
-    }
+    DeviceScaffoldTargetKind targetKind = DeviceScaffoldTargetKind.Core;
+    string makerDomain = "com.company.osl";
+    string collectionLocalId = "collection";
+    string localId = "";
+    string displayName = "";
+    DeviceCategory category = DeviceCategory.SoundGenerator;
+    int order = 1;
+    bool showInMenu = true;
+    string tags = "";
+    Vector2 scroll;
 
-    private static void CheckForPendingDevice()
-    {
-        if (EditorPrefs.GetBool("OSL_PendingDevice", false))
-        {
-            string name = EditorPrefs.GetString("OSL_DeviceName");
-            string interfaceName = EditorPrefs.GetString("OSL_InterfaceName");
-            string generatorName = EditorPrefs.GetString("OSL_GeneratorName");
-
-            FinalizePrefabs(name, interfaceName, generatorName);
-
-            EditorPrefs.SetBool("OSL_PendingDevice", false);
-            Debug.Log($"<color=green>OSL Device Wizard: Successfully finalized {name} prefabs after compilation.</color>");
-        }
-    }
-
-    private static System.Type GetTypeByName(string name)
-    {
-        if (string.IsNullOrEmpty(name)) return null;
-        var type = System.Type.GetType(name + ",Assembly-CSharp");
-        if (type != null) return type;
-
-        foreach (var assembly in System.AppDomain.CurrentDomain.GetAssemblies())
-        {
-            type = assembly.GetType(name);
-            if (type != null) return type;
-        }
-        return null;
-    }
-    private string deviceName = "";
-    private DeviceCategory category = DeviceCategory.WaveGenerator;
-    private bool includeSignalGenerator = true;
-
-    [MenuItem("OpenSoundLab/Devices/Create")]
+    [MenuItem("OpenSoundLab/Devices/Create Device")]
     public static void ShowWindow()
     {
-        GetWindow<DeviceWizard>("OSL Device Wizard");
+        GetWindow<DeviceWizard>("OSL Device Entry");
     }
 
-    private void OnGUI()
+    void OnGUI()
     {
-        GUILayout.Label("New Device Settings", EditorStyles.boldLabel);
-        deviceName = EditorGUILayout.TextField("Device Name", deviceName);
-        category = (DeviceCategory)EditorGUILayout.EnumPopup("Category", category);
-        includeSignalGenerator = EditorGUILayout.Toggle("Include Signal Generator", includeSignalGenerator);
+        scroll = EditorGUILayout.BeginScrollView(scroll);
 
-        if (GUILayout.Button("Create Device"))
+        EditorGUILayout.HelpBox("Creates a registry-backed device scaffold. Devices are appended to collection manifests and assets are written into collection-local Scripts and Resources folders.", MessageType.Info);
+
+        EditorGUILayout.LabelField(Content("Identity", "Choose whether this is a built-in core device or an add-on/local collection device."), EditorStyles.boldLabel);
+        targetKind = (DeviceScaffoldTargetKind)EditorGUILayout.EnumPopup(Content("Target Kind", "Core writes into the category collection under Assets/OSLDevices/Core. Addon writes into a stable collection-id folder under Assets/OSLDevices/Addons."), targetKind);
+
+        using (new EditorGUI.DisabledScope(targetKind == DeviceScaffoldTargetKind.Core))
         {
-            if (string.IsNullOrEmpty(deviceName))
-            {
-                EditorUtility.DisplayDialog("Error", "Please enter a device name.", "OK");
-                return;
-            }
-            CreateDevice();
-        }
-    }
+            string domainValue = targetKind == DeviceScaffoldTargetKind.Core ? OSLDeviceIdentityCompatibility.CoreDomain : makerDomain;
+            domainValue = EditorGUILayout.TextField(Content("Maker Domain", "Reverse-DNS maker domain. Add-on collection ids append .addons.<collection>."), domainValue);
+            if (targetKind == DeviceScaffoldTargetKind.Addon) makerDomain = domainValue;
 
-    private void CreateDevice()
-    {
-        string interfaceName = deviceName.ToLower() + "DeviceInterface";
-        string dataName = deviceName + "Data";
-        string generatorName = deviceName.ToLower() + "SignalGenerator";
-
-        // 1. Create Script
-        string scriptPath = CreateScripts(deviceName, interfaceName, dataName, generatorName);
-
-        // 2. Inject into DeviceType
-        InjectIntoDeviceType(deviceName, category);
-
-        // 3. Inject into SaveLoadInterface
-        InjectIntoSaveLoad(dataName);
-
-        // 4. Register pending device for post-compilation prefab setup
-        EditorPrefs.SetString("OSL_DeviceName", deviceName);
-        EditorPrefs.SetString("OSL_InterfaceName", interfaceName);
-        EditorPrefs.SetString("OSL_GeneratorName", includeSignalGenerator ? generatorName : "");
-        EditorPrefs.SetBool("OSL_PendingDevice", true);
-
-        AssetDatabase.Refresh();
-        Debug.Log($"Created infrastructure for {deviceName}. Waiting for compilation to finalize prefabs...");
-
-        EditorUtility.DisplayDialog("Step 1 Complete", $"Infrastructure for {deviceName} created.\n\nUnity is now compiling. The prefabs will be automatically finalized and populated once compilation finishes.", "OK");
-    }
-
-    private string CreateScripts(string name, string interfaceName, string dataName, string generatorName)
-    {
-        string folderPath = $"Assets/Scripts/{name}";
-        if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
-
-        // Interface Template
-        string interfaceTemplate = $@"using UnityEngine;
-using System.Collections;
-using System.Xml.Serialization;
-
-public class {interfaceName} : deviceInterface
-{{
-    {(includeSignalGenerator ? $"private {generatorName} signal;" : "")}
-
-    public override void Awake()
-    {{
-        base.Awake();
-        {(includeSignalGenerator ? $"signal = GetComponent<{generatorName}>();" : "")}
-    }}
-
-    public override InstrumentData GetData()
-    {{
-        {dataName} data = new {dataName}
-        {{
-            deviceType = DeviceType.{name}
-        }};
-        GetTransformData(data);
-        return data;
-    }}
-
-    public override void Load(InstrumentData d, bool copyMode)
-    {{
-        {dataName} data = d as {dataName};
-        base.Load(data, copyMode);
-    }}
-}}
-
-[XmlType(""{dataName}"")]
-public class {dataName} : InstrumentData
-{{
-}}
-";
-        File.WriteAllText(Path.Combine(folderPath, interfaceName + ".cs"), interfaceTemplate);
-
-        // Generator Template
-        if (includeSignalGenerator)
-        {
-            string generatorTemplate = $@"using UnityEngine;
-using System.Collections;
-
-public class {generatorName} : signalGenerator
-{{
-    public override void processBufferImpl(float[] buffer, double dspTime, int channels)
-    {{
-        // TODO: Implement signal processing logic
-    }}
-}}
-";
-            File.WriteAllText(Path.Combine(folderPath, generatorName + ".cs"), generatorTemplate);
+            string collectionValue = targetKind == DeviceScaffoldTargetKind.Core ? OSLDeviceIdentityCompatibility.GetCoreCollectionLocalId(category) : collectionLocalId;
+            collectionValue = EditorGUILayout.TextField(Content("Collection ID", "Local collection segment appended after core or addons."), collectionValue);
+            if (targetKind == DeviceScaffoldTargetKind.Addon) collectionLocalId = collectionValue;
         }
 
-        return folderPath;
+        localId = EditorGUILayout.TextField(Content("Local ID", "Stable device ID inside the collection, for example GranularCloud."), localId);
+        displayName = EditorGUILayout.TextField(Content("Display Name", "Human-readable menu label. Leave blank to use the local ID."), displayName);
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField(Content("Menu", "Menu placement and visibility."), EditorStyles.boldLabel);
+        category = (DeviceCategory)EditorGUILayout.EnumPopup(Content("Category", "Existing menu category where the device appears. For Core, this also selects the owning collection."), category);
+        order = EditorGUILayout.IntField(Content("Order", "Sort order within the category. Lower numbers appear earlier."), order);
+        showInMenu = EditorGUILayout.Toggle(Content("Show In Menu", "Enable for normal user-facing devices. Disable for hidden/internal devices that should still load from patches."), showInMenu);
+        tags = EditorGUILayout.TextField(Content("Tags", "Optional comma-separated grouping labels for future collection/search UI."), tags);
+
+        DrawPreview();
+
+        EditorGUILayout.Space();
+        using (new EditorGUI.DisabledScope(!CanCreate()))
+        {
+            if (GUILayout.Button(Content("Create Device", "Create scripts, prefabs, manifest entry, registry metadata and pending Unity compile finalization."))) CreateDeviceScaffold();
+        }
+
+        EditorGUILayout.EndScrollView();
     }
 
-    private static void FinalizePrefabs(string name, string interfaceName, string generatorName)
+    void DrawPreview()
     {
-        string prefabFolder = "Assets/Resources/Prefabs";
-        string menuFolder = "Assets/Resources/MenuPrefabs";
-        string templatePath = "Assets/Resources/Prefabs/Template.prefab";
+        DeviceScaffoldPlan plan = DeviceScaffoldPlanner.Build(BuildRequest());
+        if (string.IsNullOrWhiteSpace(plan.localId)) return;
 
-        if (!Directory.Exists(prefabFolder)) Directory.CreateDirectory(prefabFolder);
-        if (!Directory.Exists(menuFolder)) Directory.CreateDirectory(menuFolder);
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField(Content("Generated Values", "These values are derived from the fields above."), EditorStyles.boldLabel);
+        EditorGUILayout.SelectableLabel("Collection: " + plan.fullCollectionId, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        EditorGUILayout.SelectableLabel("Canonical Device ID: " + plan.canonicalDeviceId, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        EditorGUILayout.SelectableLabel("Namespace: " + plan.namespaceName, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        EditorGUILayout.SelectableLabel("Device Interface: " + plan.interfaceClassName, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        EditorGUILayout.SelectableLabel("Signal Generator: " + plan.signalClassName, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        EditorGUILayout.SelectableLabel("Data Type: " + plan.dataTypeName, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
 
-        string basePrefabPath = Path.Combine(prefabFolder, name + ".prefab");
-        string menuPrefabPath = Path.Combine(menuFolder, name + "_Menu.prefab");
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField(Content("Generated Assets", "Files and folders that will be created. Existing device files are not overwritten."), EditorStyles.boldLabel);
+        EditorGUILayout.SelectableLabel(plan.scriptFolder, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        EditorGUILayout.SelectableLabel(plan.runtimePrefabPath, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        if (showInMenu) EditorGUILayout.SelectableLabel(plan.menuPrefabPath, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+        if (showInMenu) EditorGUILayout.SelectableLabel(plan.symbolPath, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+    }
 
-        // 1. Copy Template to base path
-        if (!AssetDatabase.CopyAsset(templatePath, basePrefabPath))
+    bool CanCreate()
+    {
+        return !string.IsNullOrWhiteSpace(localId);
+    }
+
+    void CreateDeviceScaffold()
+    {
+        DeviceScaffoldPlan plan = DeviceScaffoldPlanner.Build(BuildRequest());
+        string error = DeviceScaffoldValidator.Validate(plan);
+        if (!string.IsNullOrWhiteSpace(error))
         {
-            Debug.LogError($"Failed to copy template from {templatePath} to {basePrefabPath}");
+            EditorUtility.DisplayDialog("Cannot Create Device", error, "OK");
             return;
         }
 
-        // 2. Modify the copied prefab
-        GameObject baseObj = PrefabUtility.LoadPrefabContents(basePrefabPath);
-        if (baseObj != null)
-        {
-            baseObj.name = name;
-
-            System.Type interfaceType = GetTypeByName(interfaceName);
-            System.Type generatorType = GetTypeByName(generatorName);
-
-            Component interfaceComp = null;
-            Component generatorComp = null;
-
-            if (generatorType != null) generatorComp = baseObj.AddComponent(generatorType);
-            if (interfaceType != null) interfaceComp = baseObj.AddComponent(interfaceType);
-            else Debug.LogError($"Could not find type {interfaceName}. Make sure it compiled correctly.");
-
-            // Move to Top
-            if (interfaceComp != null) MoveToTop(interfaceComp);
-            if (generatorComp != null) MoveToTop(generatorComp);
-
-            PrefabUtility.SaveAsPrefabAsset(baseObj, basePrefabPath);
-            PrefabUtility.UnloadPrefabContents(baseObj);
-        }
-
-        // 3. Create Menu copy
-        AssetDatabase.CopyAsset(basePrefabPath, menuPrefabPath);
-
-        AssetDatabase.Refresh();
+        DeviceScaffoldWriter.Write(plan);
+        EditorUtility.DisplayDialog(
+            "Device Scaffold Created",
+            "Created " + plan.localId + ". Unity will compile the generated scripts, then the wizard will add the generated components to the prefab and run collection validation.",
+            "OK");
     }
 
-    private static void MoveToTop(Component comp)
+    DeviceScaffoldRequest BuildRequest()
     {
-        if (comp == null) return;
-        // ComponentUtility does not have a "MoveToTop", so we loop MoveComponentUp
-        // Transform is always 0, so we stop before it (or try until it fails)
-        for (int i = 0; i < 20; i++) // Arbitrary limit, usually enough
+        return new DeviceScaffoldRequest
         {
-            if (!ComponentUtility.MoveComponentUp(comp)) break;
-        }
+            targetKind = targetKind,
+            makerDomain = makerDomain,
+            collectionLocalId = collectionLocalId,
+            localId = localId,
+            displayName = displayName,
+            category = category,
+            order = order,
+            showInMenu = showInMenu,
+            tags = tags
+        };
     }
 
-    private void InjectIntoDeviceType(string name, DeviceCategory cat)
+    static GUIContent Content(string text, string tooltip)
     {
-        string path = "Assets/Scripts/Menu/menuItem.cs";
-        string content = File.ReadAllText(path);
-
-        // Find the category marker, e.g., "// WaveGenerator"
-        string marker = $"// {cat.ToString()}";
-        string newField = $"    public static readonly DeviceType {name} = new DeviceType(\"{name}\", DeviceCategory.{cat}, 1);";
-
-        if (content.Contains(newField)) return;
-
-        // Insert after the marker
-        int index = content.IndexOf(marker);
-        if (index != -1)
-        {
-            int nextLine = content.IndexOf('\n', index) + 1;
-            content = content.Insert(nextLine, newField + "\n");
-            File.WriteAllText(path, content);
-        }
-    }
-
-    private void InjectIntoSaveLoad(string dataName)
-    {
-        string path = "Assets/Scripts/CoreClasses/SaveLoadInterface.cs";
-        string content = File.ReadAllText(path);
-
-        string newInclude = $"[XmlInclude(typeof({dataName}))]";
-        if (content.Contains(newInclude)) return;
-
-        // Find the last XmlInclude and add after it
-        int lastInclude = content.LastIndexOf("[XmlInclude");
-        if (lastInclude != -1)
-        {
-            int nextLine = content.IndexOf('\n', lastInclude) + 1;
-            content = content.Insert(nextLine, newInclude + "\n");
-            File.WriteAllText(path, content);
-        }
+        return new GUIContent(text, tooltip);
     }
 }

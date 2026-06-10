@@ -1,11 +1,15 @@
 #!/bin/sh
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 NDK_PATH="$HOME/android-ndk-r26b/build/ndk-build.cmd"
 echo ""
 echo "Compiling native code..."
 
+cd "$SCRIPT_DIR"
+
 $NDK_PATH NDK_PROJECT_PATH=. NDK_APPLICATION_MK=./Application.mk $*
-mv libs/arm64-v8a/libOSLNative.so ../Assets/OSLNative/arm64/Release/libOSLNative.so
+mv libs/arm64-v8a/libOSLNative.so ../Assets/Plugins/OSLNative/arm64/Release/libOSLNative.so
+"$SCRIPT_DIR/Build/restore_plugin_meta_templates.sh" "arm64/Release/libOSLNative.so.meta"
 
 echo ""
 echo "Cleaning up / removing build folders..."  #optional..

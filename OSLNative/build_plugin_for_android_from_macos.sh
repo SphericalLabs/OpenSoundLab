@@ -24,7 +24,7 @@ APP_MK="${BUILD_DIR}/Application.mk"
 
 # Output/destination paths (relative to BUILD_DIR)
 OUTPUT_SO_REL="libs/arm64-v8a/libOSLNative.so"
-DEST_SO_REL="../Assets/OSLNative/arm64/Release/libOSLNative.so"
+DEST_SO_REL="../Assets/Plugins/OSLNative/arm64/Release/libOSLNative.so"
 
 # --- Helpers --------------------------------------------------------------
 
@@ -260,6 +260,7 @@ build_with_ndk() {
     mkdir -p "$(dirname "${DEST_SO}")"
     mv "${OUTPUT_SO}" "${DEST_SO}"
     log "Moved $(basename "${OUTPUT_SO}") -> ${DEST_SO}"
+    "${SCRIPT_DIR}/Build/restore_plugin_meta_templates.sh" "arm64/Release/libOSLNative.so.meta"
   else
     echo "Build finished but ${OUTPUT_SO} was not found. Check ndk-build output above."
     exit 1

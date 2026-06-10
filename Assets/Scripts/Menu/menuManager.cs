@@ -64,10 +64,12 @@ public class menuManager : MonoBehaviour
     void Awake()
     {
         instance = this;
+        OSLDeviceRegistry.GetAll();
         refObjects = new Dictionary<string, GameObject>();
         _audioSource = GetComponent<AudioSource>();
         loadMenu();
         loadNonMenuItems();
+        cacheLegacyRefObjectAliases();
         loaded = true;
         Activate(false, transform);
 
@@ -93,7 +95,8 @@ public class menuManager : MonoBehaviour
         GameObject temp = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
         temp.transform.parent = rootNode.transform;
         menuItem m = temp.GetComponent<menuItem>();
-        refObjects[DeviceType.TapeGroup] = m.Setup(DeviceType.TapeGroup);
+        GameObject refObject = m.Setup(DeviceType.Get("io.sphericals.osl.core.various.TapeGroup"));
+        if (refObject != null) refObjects[DeviceType.Get("io.sphericals.osl.core.various.TapeGroup")] = refObject;
         temp.SetActive(false);
 
         //temp = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
@@ -130,30 +133,23 @@ public class menuManager : MonoBehaviour
 
             y = 0;
 
-            foreach (DeviceType devType in DeviceType.GetAllByCategory(category))
+            foreach (OSLDeviceRegistration registration in OSLDeviceRegistry.GetAllByCategory(category))
             {
-                // skip incompatible devices
-                if (Application.platform == RuntimePlatform.Android)
-                {
-                    if (devType == DeviceType.Camera) continue;
-                }
-
-                if (devType == DeviceType.MIDIIN) continue;
-                if (devType == DeviceType.MIDIOUT) continue;
-                if (devType == DeviceType.Airhorn) continue;
-
-                if (devType == DeviceType.Maracas) continue;
-                if (devType == DeviceType.Timeline) continue;
-
-                if (devType == DeviceType.Camera) continue; // skip for windows, too, throws error otherwise
-                if (devType == DeviceType.Pano) continue;
-                if (devType == DeviceType.TapeGroup) continue;
+                if (registration == null || !registration.showInMenu || !registration.IsAvailable) continue;
 
                 GameObject tmpObj = Instantiate(item, Vector3.zero, Quaternion.identity) as GameObject;
                 tmpObj.transform.parent = rootNode.transform;
                 menuItems.Add(tmpObj);
                 menuItem m = tmpObj.GetComponent<menuItem>();
-                refObjects[devType] = m.Setup(devType);
+                GameObject refObject = m.Setup(registration);
+                if (refObject == null)
+                {
+                    menuItems.Remove(tmpObj);
+                    Destroy(tmpObj);
+                    continue;
+                }
+
+                cacheRefObject(registration, refObject);
                 menuItemScripts.Add(m);
 
 
@@ -173,10 +169,6 @@ public class menuManager : MonoBehaviour
 
         }
 
-
-        refObjects["XyloRoll"] = refObjects[DeviceType.Xylophone]; // legacy alias, remove when old XyloRoll saves are dropped
-        refObjects["Freeverb"] = refObjects[DeviceType.Reverb]; // legacy alias, remove when old Freeverb saves are dropped
-
         performanceNode.transform.localPosition = new Vector3(0.329f, 0.012f - 0.12f + 0.10f, 0.107f);
         performanceNode.transform.rotation = Quaternion.Euler(-0.529f, -40.157f, -0.7460001f);
 
@@ -185,6 +177,32 @@ public class menuManager : MonoBehaviour
 
         recorderNode.transform.localPosition = new Vector3(0.344f, -0.001f, 0.171f);
         recorderNode.transform.rotation = Quaternion.Euler(-0.422f, -40.013f, -0.576f);
+    }
+
+    void cacheRefObject(OSLDeviceRegistration registration, GameObject refObject)
+    {
+        if (registration == null || refObject == null) return;
+
+        if (!string.IsNullOrWhiteSpace(registration.deviceId)) refObjects[registration.deviceId] = refObject;
+        if (!string.IsNullOrWhiteSpace(registration.deviceLocalId)) refObjects[registration.deviceLocalId] = refObject;
+        if (!string.IsNullOrWhiteSpace(registration.canonicalDeviceId)) refObjects[registration.canonicalDeviceId] = refObject;
+        if (registration.deviceType != null) refObjects[registration.deviceType] = refObject;
+    }
+
+    void cacheLegacyRefObjectAliases()
+    {
+        foreach (OSLDeviceRegistration registration in OSLDeviceRegistry.GetAll())
+        {
+            if (registration == null || registration.legacyDeviceIds == null) continue;
+            if (!refObjects.TryGetValue(registration.deviceId, out GameObject refObject) &&
+                !refObjects.TryGetValue(registration.canonicalDeviceId, out refObject)) continue;
+
+            for (int i = 0; i < registration.legacyDeviceIds.Length; ++i)
+            {
+                string legacyDeviceId = registration.legacyDeviceIds[i];
+                if (!string.IsNullOrWhiteSpace(legacyDeviceId)) refObjects[legacyDeviceId] = refObject;
+            }
+        }
     }
 
     public void SelectAudio()

@@ -54,10 +54,10 @@ public class exampleManager : MonoBehaviour
             items.Add(g.GetComponent<exampleItem>());
         }
 
-        items[0].Setup(this, DeviceType.Drum, "basicDrumExample", "Basic\nDrums");
-        items[1].Setup(this, DeviceType.Tapes, "basicSamplerExample", "Basic\nSampler");
-        items[2].Setup(this, DeviceType.Oscillator, "basicOscillatorExample", "Basic\nSynthesizer");
-        items[3].Setup(this, DeviceType.Timeline, "basicSequencerExample", "Basic\nSequencer");
+        items[0].Setup(this, DeviceType.Get("io.sphericals.osl.core.interface.Drum"), "basicDrumExample", "Basic\nDrums");
+        items[1].Setup(this, DeviceType.Get("io.sphericals.osl.core.various.Tapes"), "basicSamplerExample", "Basic\nSampler");
+        items[2].Setup(this, DeviceType.Get("io.sphericals.osl.core.soundgenerator.Oscillator"), "basicOscillatorExample", "Basic\nSynthesizer");
+        items[3].Setup(this, DeviceType.Get("io.sphericals.osl.core.modulationgenerator.Timeline"), "basicSequencerExample", "Basic\nSequencer");
 
         for (int i = 0; i < 6; i++)
         {
@@ -68,12 +68,12 @@ public class exampleManager : MonoBehaviour
             items.Add(g.GetComponent<exampleItem>());
         }
 
-        items[4].Setup(this, DeviceType.Mixer, "mixerExample", "Mixer");
-        items[5].Setup(this, DeviceType.Controller, "cubeExample", "Controller");
-        items[6].Setup(this, DeviceType.Maracas, "maracaExample", "Maraca");
-        items[7].Setup(this, DeviceType.Filter, "filterExample", "Filter");
-        items[8].Setup(this, DeviceType.Drum, "complexDrumExample", "Drumkit");
-        items[9].Setup(this, DeviceType.Camera, "camAndMicExample", "Camera\n+ Mic");
+        items[4].Setup(this, DeviceType.Get("io.sphericals.osl.core.mixing.MixerTwo"), "mixerExample", "Mixer");
+        items[5].Setup(this, DeviceType.Get("io.sphericals.osl.core.interface.Controller"), "cubeExample", "Controller");
+        items[6].Setup(this, DeviceType.Get("io.sphericals.osl.core.soundgenerator.Maracas"), "maracaExample", "Maraca");
+        items[7].Setup(this, DeviceType.Get("io.sphericals.osl.core.soundprocessor.Filter"), "filterExample", "Filter");
+        items[8].Setup(this, DeviceType.Get("io.sphericals.osl.core.interface.Drum"), "complexDrumExample", "Drumkit");
+        items[9].Setup(this, DeviceType.Get("io.sphericals.osl.core.various.Camera"), "camAndMicExample", "Camera\n+ Mic");
     }
 
     void Start()

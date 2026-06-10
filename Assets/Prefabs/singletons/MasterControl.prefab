@@ -103,6 +103,7 @@ MonoBehaviour:
   depthManager: {fileID: 0}
   leftManip: {fileID: 0}
   rightManip: {fileID: 0}
+  hrtfSubjectIndex: 5
   tooltipsOn: 1
   examplesOn: 1
   dialUsed: 0
@@ -117,8 +118,11 @@ MonoBehaviour:
   onDisplayChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  onHrtfChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   BinauralSetting: 0
-  WireSetting: 1
+  WireSetting: 2
   DisplaySetting: 0
 --- !u!82 &82000010201573614
 AudioSource:

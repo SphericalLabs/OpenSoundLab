@@ -34,16 +34,16 @@
 
 #include <iostream>
 #include <stdio.h>
-#include "Compressor.h"
+#include "../../Addons/io.sphericals.osl.addons.soundprocessor/Native/Devices/Compressor/Compressor.h"
 #include <string.h>
 #include <stdlib.h>
 #include "StereoVerb.h"
 #include "RingBuffer.h"
-#include "Delay.h"
+#include "../../Addons/io.sphericals.osl.addons.soundprocessor/Native/Devices/Delay/Delay.h"
 #include "CompressedRingBuffer.h"
 #include "CRingBuffer.hpp"
-#include "resample.h"
-#include "Artefact.h"
+#include "Resample.h"
+#include "../../Addons/io.sphericals.osl.addons.soundprocessor/Native/Devices/Artifact/Artifact.h"
 
 #define VECTORSIZE 512
 #define ITERATIONS 100000
@@ -833,7 +833,7 @@ int main(int argc, const char* argv[]) {
 
     // createResampleTable();
 
-    // Artefact_Process(NULL, 0, 0, 0);
+    // Artifact_Process(NULL, 0, 0, 0);
 
     printv("Bye, World!\n");
     return 0;

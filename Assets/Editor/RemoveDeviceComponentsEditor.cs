@@ -34,11 +34,8 @@ using UnityEngine;
 
 public class RemoveDeviceComponentsEditorWindow : EditorWindow
 {
-    private const string prefabsFolder = "Assets/Resources/Prefabs";
-    private const string menuPrefabsFolder = "Assets/Resources/MenuPrefabs";
-    private const string defaultMaterialPath = "Assets/Materials/uncategorized/InstrumentSelectMat.mat";
-
     private string[] prefabPaths = new string[0];
+    private string[] menuPrefabPaths = new string[0];
     private string[] prefabNames = new string[0];
     private int selectedIndex = 0;
     private bool searchInChildren = true;
@@ -54,7 +51,7 @@ public class RemoveDeviceComponentsEditorWindow : EditorWindow
     {
         if (newMaterial == null)
         {
-            newMaterial = AssetDatabase.LoadAssetAtPath<Material>(defaultMaterialPath);
+            newMaterial = OSLMenuPrefabVariantUtility.LoadDefaultMaterial();
         }
         refreshPrefabs();
     }
@@ -64,7 +61,7 @@ public class RemoveDeviceComponentsEditorWindow : EditorWindow
         GUILayout.Label("Create Menu Variant", EditorStyles.boldLabel);
         if (prefabNames.Length == 0)
         {
-            EditorGUILayout.HelpBox("No prefabs found in Assets/Resources/Prefabs.", MessageType.Info);
+            EditorGUILayout.HelpBox("No enabled, menu-visible device prefabs were found in the OSL device manifests.", MessageType.Info);
             if (GUILayout.Button("Refresh Prefab List")) refreshPrefabs();
             return;
         }
@@ -84,15 +81,30 @@ public class RemoveDeviceComponentsEditorWindow : EditorWindow
 
     private void refreshPrefabs()
     {
-        string[] guids = AssetDatabase.FindAssets("t:Prefab", new[] { prefabsFolder });
-        prefabPaths = guids
-            .Select(AssetDatabase.GUIDToAssetPath)
-            .Where(path => !path.EndsWith("_Menu.prefab"))
-            .OrderBy(path => Path.GetFileNameWithoutExtension(path))
-            .ToArray();
-        prefabNames = prefabPaths
-            .Select(path => Path.GetFileNameWithoutExtension(path))
-            .ToArray();
+        OSLDeviceRegistry.Refresh();
+
+        List<string> sourcePaths = new List<string>();
+        List<string> destinationPaths = new List<string>();
+        List<string> names = new List<string>();
+
+        List<OSLDeviceRegistration> registrations = OSLDeviceRegistry.GetAll(true);
+        for (int i = 0; i < registrations.Count; ++i)
+        {
+            OSLDeviceRegistration registration = registrations[i];
+            if (registration == null || !registration.enabled || !registration.showInMenu) continue;
+
+            GameObject prefab = registration.LoadPrefab();
+            string prefabPath = AssetDatabase.GetAssetPath(prefab);
+            if (string.IsNullOrWhiteSpace(prefabPath)) continue;
+
+            sourcePaths.Add(prefabPath);
+            destinationPaths.Add(getMenuPrefabPath(registration, prefabPath));
+            names.Add(registration.displayName + " (" + registration.deviceId + ")");
+        }
+
+        prefabPaths = sourcePaths.ToArray();
+        menuPrefabPaths = destinationPaths.ToArray();
+        prefabNames = names.ToArray();
 
         if (selectedIndex >= prefabPaths.Length) selectedIndex = 0;
         Repaint();
@@ -103,21 +115,12 @@ public class RemoveDeviceComponentsEditorWindow : EditorWindow
         if (prefabPaths.Length == 0) return;
 
         string sourcePath = prefabPaths[selectedIndex];
-        if (!Directory.Exists(menuPrefabsFolder)) Directory.CreateDirectory(menuPrefabsFolder);
-
-        GameObject sourceAsset = AssetDatabase.LoadAssetAtPath<GameObject>(sourcePath);
-        if (sourceAsset == null)
-        {
-            Debug.LogError($"Could not load prefab at {sourcePath}");
-            return;
-        }
-
-        string menuPath = Path.Combine(menuPrefabsFolder, sourceAsset.name + "_Menu.prefab");
+        string menuPath = menuPrefabPaths[selectedIndex];
         if (File.Exists(menuPath))
         {
             bool overwrite = EditorUtility.DisplayDialog(
                 "Menu Prefab Exists",
-                $"{sourceAsset.name}_Menu.prefab already exists. Overwrite?",
+                Path.GetFileName(menuPath) + " already exists. Overwrite?",
                 "Overwrite",
                 "Cancel");
             if (!overwrite)
@@ -126,31 +129,32 @@ public class RemoveDeviceComponentsEditorWindow : EditorWindow
             }
         }
 
-        GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(sourceAsset);
-        if (instance == null)
-        {
-            Debug.LogError($"Could not instantiate prefab at {sourcePath}");
-            return;
-        }
-
-        removeComponentsFromPrefab(instance, searchInChildren, newMaterial);
-        PrefabUtility.SaveAsPrefabAsset(instance, menuPath);
-        DestroyImmediate(instance);
+        OSLMenuPrefabVariantUtility.CreateFromPrefab(sourcePath, menuPath, searchInChildren, newMaterial);
 
         AssetDatabase.Refresh();
         EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<GameObject>(menuPath));
     }
 
-    private void removeComponentsFromPrefab(GameObject target, bool searchChildren, Material replacement)
+    private string getMenuPrefabPath(OSLDeviceRegistration registration, string prefabPath)
     {
-        GameObject toolObject = new GameObject("RemoveDeviceComponents_Temp");
-        toolObject.hideFlags = HideFlags.HideAndDontSave;
-        RemoveDeviceComponents tool = toolObject.AddComponent<RemoveDeviceComponents>();
-        tool.searchInChildren = searchChildren;
-        tool.newMaterial = replacement;
-        tool.targets = new[] { target };
-        tool.RemoveComponents();
-        DestroyImmediate(toolObject);
+        string resourceRoot = getResourceRoot(prefabPath);
+        if (!string.IsNullOrWhiteSpace(resourceRoot) && !string.IsNullOrWhiteSpace(registration.menuPrefabResourcePath))
+        {
+            return resourceRoot + "/" + registration.menuPrefabResourcePath + ".prefab";
+        }
+
+        string folder = Path.GetDirectoryName(prefabPath);
+        if (string.IsNullOrWhiteSpace(folder)) folder = "Assets";
+        string prefabName = Path.GetFileNameWithoutExtension(prefabPath);
+        return folder.Replace("/Prefabs", "/MenuPrefabs") + "/" + prefabName + "_Menu.prefab";
+    }
+
+    private string getResourceRoot(string prefabPath)
+    {
+        string normalizedPath = prefabPath.Replace('\\', '/');
+        int resourcesIndex = normalizedPath.IndexOf("/Resources/", System.StringComparison.Ordinal);
+        if (resourcesIndex < 0) return "";
+        return normalizedPath.Substring(0, resourcesIndex + "/Resources".Length);
     }
 }
 

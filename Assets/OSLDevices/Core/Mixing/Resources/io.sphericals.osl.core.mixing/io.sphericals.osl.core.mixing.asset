@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.mixing
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.mixing
+  resourceSlug: io.sphericals.osl.core.mixing
+  displayName: Mixing
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols: []
+  devices:
+  - deviceLocalId: Splitter
+    canonicalDeviceId: io.sphericals.osl.core.mixing.Splitter
+    displayName: Splitter
+    category: 2
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.mixing/Prefabs/Splitter
+    menuPrefabResourcePath: io.sphericals.osl.core.mixing/MenuPrefabs/Splitter_Menu
+    symbolResourcePath: io.sphericals.osl.core.mixing/Textures/SplitterSymbol
+    dataTypeName: MultipleData
+    legacyDeviceIds:
+    - MultiSplit
+    - io.sphericals.opensoundlab.mixing.Splitter
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0.0118, y: 0.0065, z: 0.0093}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 0.47, y: 0.47, z: 0.47}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: MixerOne
+    canonicalDeviceId: io.sphericals.osl.core.mixing.MixerOne
+    displayName: "Mixer I"
+    category: 2
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.mixing/Prefabs/MixerOne
+    menuPrefabResourcePath: io.sphericals.osl.core.mixing/MenuPrefabs/MixerOne_Menu
+    symbolResourcePath: io.sphericals.osl.core.mixing/Textures/MixerOneSymbol
+    dataTypeName: MultipleData
+    legacyDeviceIds:
+    - MultiMix
+    - io.sphericals.opensoundlab.mixing.MixerOne
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0.0118, y: 0.0065, z: 0.0093}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 0.47, y: 0.47, z: 0.47}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: MixerTwo
+    canonicalDeviceId: io.sphericals.osl.core.mixing.MixerTwo
+    displayName: "Mixer II"
+    category: 2
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.mixing/Prefabs/MixerTwo
+    menuPrefabResourcePath: io.sphericals.osl.core.mixing/MenuPrefabs/MixerTwo_Menu
+    symbolResourcePath: io.sphericals.osl.core.mixing/Textures/MixerTwoSymbol
+    dataTypeName: MixerTwoData
+    legacyDeviceIds:
+    - Mixer
+    - io.sphericals.opensoundlab.mixing.MixerTwo
+    legacyDataTypeNames:
+    - MixerData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0.014, y: 0, z: 0}
+    previewRotationOffset: {x: 60, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 90, y: 0, z: 0}
+  - deviceLocalId: Gain
+    canonicalDeviceId: io.sphericals.osl.core.mixing.Gain
+    displayName: "Gain / Mute"
+    category: 2
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.mixing/Prefabs/Gain
+    menuPrefabResourcePath: io.sphericals.osl.core.mixing/MenuPrefabs/Gain_Menu
+    symbolResourcePath: io.sphericals.osl.core.mixing/Textures/GainSymbol
+    dataTypeName: GainData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.mixing.Gain
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

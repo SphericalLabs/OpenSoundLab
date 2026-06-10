@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OSLNativeSoundProcessorNativeDir>$(MSBuildThisFileDirectory)Native\</OSLNativeSoundProcessorNativeDir>
+    <OSLNativeAddonIncludeDirectories>$(OSLNativeSoundProcessorNativeDir)Devices\Artifact;$(OSLNativeSoundProcessorNativeDir)Devices\Compressor;$(OSLNativeSoundProcessorNativeDir)Devices\Delay;$(OSLNativeSoundProcessorNativeDir)Devices\Reverb;$(OSLNativeAddonIncludeDirectories)</OSLNativeAddonIncludeDirectories>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="$(OSLNativeSoundProcessorNativeDir)Devices\Artifact\*.cpp" />
+    <ClCompile Include="$(OSLNativeSoundProcessorNativeDir)Devices\Compressor\*.cpp" />
+    <ClCompile Include="$(OSLNativeSoundProcessorNativeDir)Devices\Delay\*.cpp" />
+    <ClCompile Include="$(OSLNativeSoundProcessorNativeDir)Devices\Reverb\*.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(OSLNativeSoundProcessorNativeDir)Devices\Artifact\*.h" />
+    <ClInclude Include="$(OSLNativeSoundProcessorNativeDir)Devices\Compressor\*.h" />
+    <ClInclude Include="$(OSLNativeSoundProcessorNativeDir)Devices\Delay\*.h" />
+    <ClInclude Include="$(OSLNativeSoundProcessorNativeDir)Devices\Reverb\*.h" />
+  </ItemGroup>
+</Project>

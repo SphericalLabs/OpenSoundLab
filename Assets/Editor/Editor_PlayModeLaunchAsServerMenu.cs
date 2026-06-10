@@ -4,7 +4,7 @@ using UnityEngine;
 [InitializeOnLoad]
 public static class Editor_PlayModeLaunchAsServerMenu
 {
-    const string launchAsServerMenuPath = "OpenSoundLab/Play Mode/Launch as Server";
+    const string launchAsServerMenuPath = "OpenSoundLab/Play Mode/Make Server Discoverable";
     const string launchAsServerPrefKey = "OpenSoundLab.PlayMode.LaunchAsServer";
     const int launchAsServerDefaultValue = 1;
 
@@ -13,7 +13,7 @@ public static class Editor_PlayModeLaunchAsServerMenu
         Menu.SetChecked(launchAsServerMenuPath, isLaunchAsServerEnabled());
     }
 
-    [MenuItem(launchAsServerMenuPath, false, 5)]
+    [MenuItem(launchAsServerMenuPath, false, 7)]
     public static void ToggleLaunchAsServer()
     {
         bool enabled = !isLaunchAsServerEnabled();
@@ -22,7 +22,7 @@ public static class Editor_PlayModeLaunchAsServerMenu
         Menu.SetChecked(launchAsServerMenuPath, enabled);
     }
 
-    [MenuItem(launchAsServerMenuPath, true, 5)]
+    [MenuItem(launchAsServerMenuPath, true, 7)]
     public static bool ToggleLaunchAsServerValidate()
     {
         Menu.SetChecked(launchAsServerMenuPath, isLaunchAsServerEnabled());

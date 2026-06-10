@@ -1,0 +1,183 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.interface
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.interface
+  resourceSlug: io.sphericals.osl.core.interface
+  displayName: Interface
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols: []
+  devices:
+  - deviceLocalId: Controller
+    canonicalDeviceId: io.sphericals.osl.core.interface.Controller
+    displayName: Controller
+    category: 1
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.interface/Prefabs/Controller
+    menuPrefabResourcePath: io.sphericals.osl.core.interface/MenuPrefabs/Controller_Menu
+    symbolResourcePath: io.sphericals.osl.core.interface/Textures/ControllerSymbol
+    dataTypeName: ControllerData
+    legacyDeviceIds:
+    - ControlCube
+    - io.sphericals.opensoundlab.interface.Controller
+    legacyDataTypeNames:
+    - ControlCubeData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: -0.01, z: 0.004}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: -0.15}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Keyboard
+    canonicalDeviceId: io.sphericals.osl.core.interface.Keyboard
+    displayName: Keyboard
+    category: 1
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.interface/Prefabs/Keyboard
+    menuPrefabResourcePath: io.sphericals.osl.core.interface/MenuPrefabs/Keyboard_Menu
+    symbolResourcePath: io.sphericals.osl.core.interface/Textures/KeyboardSymbol
+    dataTypeName: KeyboardData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.interface.Keyboard
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0.013, y: 0, z: 0.006}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 0.08, y: 0.08, z: 0.08}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 90, y: 0, z: 0}
+  - deviceLocalId: Drum
+    canonicalDeviceId: io.sphericals.osl.core.interface.Drum
+    displayName: Drum
+    category: 1
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.interface/Prefabs/Drum
+    menuPrefabResourcePath: io.sphericals.osl.core.interface/MenuPrefabs/Drum_Menu
+    symbolResourcePath: io.sphericals.osl.core.interface/Textures/DrumSymbol
+    dataTypeName: DrumData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.interface.Drum
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0.006}
+    previewRotationOffset: {x: 40, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 90, y: 0, z: 0}
+  - deviceLocalId: Xylophone
+    canonicalDeviceId: io.sphericals.osl.core.interface.Xylophone
+    displayName: Xylophone
+    category: 1
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.interface/Prefabs/Xylophone
+    menuPrefabResourcePath: io.sphericals.osl.core.interface/MenuPrefabs/Xylophone_Menu
+    symbolResourcePath: io.sphericals.osl.core.interface/Textures/XylophoneSymbol
+    dataTypeName: XylophoneData
+    legacyDeviceIds:
+    - XyloRoll
+    - io.sphericals.opensoundlab.interface.Xylophone
+    legacyDataTypeNames:
+    - XyloRollData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0.0239, y: 0, z: 0}
+    previewRotationOffset: {x: 34, y: 0, z: 0}
+    previewScale: {x: 0.087, y: 0.087, z: 0.087}
+    spawnPositionOffset: {x: 0.15, y: 0, z: -0.05}
+    spawnRotationOffset: {x: 90, y: 0, z: 0}
+  - deviceLocalId: MIDIIN
+    canonicalDeviceId: io.sphericals.osl.core.interface.MIDIIN
+    displayName: "MIDI In"
+    category: 1
+    tags: []
+    order: 5
+    enabled: 1
+    showInMenu: 0
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.interface/Prefabs/MIDIIN
+    menuPrefabResourcePath: io.sphericals.osl.core.interface/MenuPrefabs/MIDIIN_Menu
+    symbolResourcePath:
+    dataTypeName: MIDIinData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.interface.MIDIIN
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: MIDIOUT
+    canonicalDeviceId: io.sphericals.osl.core.interface.MIDIOUT
+    displayName: "MIDI Out"
+    category: 1
+    tags: []
+    order: 6
+    enabled: 1
+    showInMenu: 0
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.interface/Prefabs/MIDIOUT
+    menuPrefabResourcePath: io.sphericals.osl.core.interface/MenuPrefabs/MIDIOUT_Menu
+    symbolResourcePath:
+    dataTypeName: MIDIoutData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.interface.MIDIOUT
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 USAGE="Usage: ./build_all_from_macos.sh [android|windows|macos|all]"
 
-TARGET=$1
+TARGET="${1:-}"
 
 if [ -z "$TARGET" ]; then
     echo "$USAGE"

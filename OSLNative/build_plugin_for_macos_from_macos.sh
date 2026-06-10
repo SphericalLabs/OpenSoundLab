@@ -1,91 +1,157 @@
 #!/bin/bash
 
-# Configuration
+set -euo pipefail
+shopt -s nullglob
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_PATH="${SCRIPT_DIR}/Xcode/OSLNative.xcodeproj"
-CONFIGURATION="Release"
-MODULE_CACHE_PATH=""
+OUTPUT_DIR="${SCRIPT_DIR}/../Assets/Plugins/OSLNative/macos/Release"
+OUTPUT_FILE="${OUTPUT_DIR}/libOSLNative.dylib"
+MACOS_DEPLOYMENT_TARGET="${OSL_NATIVE_MACOS_DEPLOYMENT_TARGET:-11.5}"
+MACOS_ARCHS="${OSL_NATIVE_MACOS_ARCHS:-arm64}"
+MACOS_SDKROOT="${OSL_NATIVE_MACOS_SDKROOT:-}"
+ENABLE_FAST_MATH="${OSL_NATIVE_FAST_MATH:-0}"
+ENABLE_LTO="${OSL_NATIVE_LTO:-1}"
+ENABLE_STRIP="${OSL_NATIVE_STRIP:-1}"
+ENABLE_CODESIGN="${OSL_NATIVE_CODESIGN:-1}"
+
+cd "$SCRIPT_DIR"
+
+source "$SCRIPT_DIR/Build/native_sources.sh"
+osl_native_print_source_summary
+
+INCLUDES=()
+for includeDir in "${OSL_NATIVE_INCLUDE_DIRS[@]}"; do
+    INCLUDES+=("-I${includeDir}")
+done
+
+DEFINES=(
+    -DTEST=1
+    -DNDEBUG
+    -DDEBUG=0
+    -DCoreAudio_Debug=0
+)
+
+ARCH_FLAGS=()
+for arch in $MACOS_ARCHS; do
+    ARCH_FLAGS+=("-arch" "$arch")
+done
+
+COMMON_FLAGS=(
+    "${ARCH_FLAGS[@]}"
+    -O3
+    -g0
+    -fPIC
+    -fstrict-aliasing
+    -fno-math-errno
+    -ffp-contract=fast
+    -fvisibility=hidden
+    -fvisibility-inlines-hidden
+    "-mmacosx-version-min=${MACOS_DEPLOYMENT_TARGET}"
+    -Wno-braced-scalar-init
+    -Wno-implicit-const-int-float-conversion
+)
+
+if [ "$ENABLE_LTO" = "1" ]; then
+    COMMON_FLAGS+=(-flto=thin)
+fi
+
+if [ "$ENABLE_FAST_MATH" = "1" ]; then
+    COMMON_FLAGS+=(-ffast-math)
+fi
+
+if [ -z "$MACOS_SDKROOT" ] && command -v xcrun >/dev/null 2>&1; then
+    MACOS_SDKROOT="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
+fi
+
+if [ -n "$MACOS_SDKROOT" ]; then
+    COMMON_FLAGS+=(-isysroot "$MACOS_SDKROOT")
+fi
+
+C_FLAGS=(
+    "${COMMON_FLAGS[@]}"
+    -std=gnu99
+)
+
+CXX_FLAGS=(
+    "${COMMON_FLAGS[@]}"
+    -std=c++17
+    -fvisibility-inlines-hidden
+)
+
+LINK_FLAGS=(
+    -dynamiclib
+    -Wl,-dead_strip
+    -Wl,-dead_strip_dylibs
+    -framework
+    Accelerate
+)
 
 echo "Build macOS Plugin from macOS..."
 
-resolve_developer_dir() {
-    if [ -n "$DEVELOPER_DIR" ] && [ -x "$DEVELOPER_DIR/usr/bin/xcodebuild" ]; then
-        echo "$DEVELOPER_DIR"
-        return 0
-    fi
+CLANG="$(xcrun --find clang 2>/dev/null || command -v clang || true)"
+CLANGXX="$(xcrun --find clang++ 2>/dev/null || command -v clang++ || true)"
+STRIP_BIN="$(xcrun --find strip 2>/dev/null || command -v strip || true)"
 
-    local selected_dir
-    selected_dir="$(xcode-select -p 2>/dev/null)"
-    if [ -n "$selected_dir" ] && [[ "$selected_dir" != *"/CommandLineTools"* ]] && [ -x "$selected_dir/usr/bin/xcodebuild" ]; then
-        echo "$selected_dir"
-        return 0
-    fi
-
-    local xcode_app
-    for xcode_app in /Applications/Xcode*.app; do
-        if [ -d "$xcode_app/Contents/Developer" ]; then
-            echo "$xcode_app/Contents/Developer"
-            return 0
-        fi
-    done
-
-    xcode_app=$(mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'" | grep ".app$" | head -n 1)
-    if [ -d "$xcode_app/Contents/Developer" ]; then
-        echo "$xcode_app/Contents/Developer"
-        return 0
-    fi
-
-    return 1
-}
-
-# Check requirements
-if ! command -v xcodebuild &> /dev/null; then
-    echo "Error: xcodebuild could not be found."
+if [ -z "$CLANG" ]; then
+    echo "Error: clang could not be found."
     exit 1
 fi
 
-if ! DEVELOPER_DIR="$(resolve_developer_dir)"; then
-    echo "Error: Could not locate a usable Xcode developer directory."
-    echo "Please run 'sudo xcode-select -s /path/to/Xcode.app/Contents/Developer' or set DEVELOPER_DIR."
-    exit 1
-fi
-export DEVELOPER_DIR
-echo "Using developer directory: $DEVELOPER_DIR"
-
-MODULE_CACHE_PATH="$(mktemp -d "${TMPDIR:-/tmp}/osl_module_cache.XXXXXX")"
-cleanup() {
-    if [ -n "$MODULE_CACHE_PATH" ] && [ -d "$MODULE_CACHE_PATH" ]; then
-        rm -rf "$MODULE_CACHE_PATH"
-    fi
-}
-trap cleanup EXIT
-
-echo "Building Xcode project..."
-xcodebuild -project "$PROJECT_PATH" -alltargets -configuration "$CONFIGURATION" \
-    CLANG_MODULE_CACHE_PATH="$MODULE_CACHE_PATH"
-
-# We will check if the build succeeded.
-if [ $? -ne 0 ]; then
-    echo "Error: macOS build failed."
+if [ -z "$CLANGXX" ]; then
+    echo "Error: clang++ could not be found."
     exit 1
 fi
 
-# Move artifact to Assets
-OUTPUT_FILE="${SCRIPT_DIR}/Xcode/build/Release/libOSLNative.dylib"
-DEST_FILE="${SCRIPT_DIR}/../Assets/OSLNative/macos/Release/libOSLNative.dylib"
+mkdir -p "$OUTPUT_DIR"
+OBJECT_DIR="$SCRIPT_DIR/Build/obj/macos"
+mkdir -p "$OBJECT_DIR"
+
+OBJECTS=()
+for sourceFile in "${OSL_NATIVE_SOURCES[@]}"; do
+    objectFile="$OBJECT_DIR/${sourceFile//\//_}.o"
+    OBJECTS+=("$objectFile")
+
+    case "$sourceFile" in
+        *.c)
+            "$CLANG" -c "$sourceFile" "${INCLUDES[@]}" "${DEFINES[@]}" "${C_FLAGS[@]}" -o "$objectFile"
+            ;;
+        *)
+            "$CLANGXX" -c "$sourceFile" "${INCLUDES[@]}" "${DEFINES[@]}" "${CXX_FLAGS[@]}" -o "$objectFile"
+            ;;
+    esac
+done
+
+echo "Linking..."
+"$CLANGXX" \
+    "${OBJECTS[@]}" \
+    "${COMMON_FLAGS[@]}" \
+    "${LINK_FLAGS[@]}" \
+    -o "$OUTPUT_FILE"
 
 if [ -f "$OUTPUT_FILE" ]; then
-    mkdir -p "$(dirname "$DEST_FILE")"
-    mv "$OUTPUT_FILE" "$DEST_FILE"
-    echo "Success: Moved $OUTPUT_FILE -> $DEST_FILE"
+    if [ "$ENABLE_STRIP" = "1" ]; then
+        if [ -n "$STRIP_BIN" ]; then
+            echo "Stripping local/debug symbols..."
+            "$STRIP_BIN" -S -x "$OUTPUT_FILE"
+        else
+            echo "Warning: strip could not be found; leaving symbols unstripped."
+        fi
+    fi
+
+    if [ "$ENABLE_CODESIGN" = "1" ]; then
+        if command -v codesign >/dev/null 2>&1; then
+            echo "Ad-hoc code signing..."
+            codesign --force --timestamp=none --sign - "$OUTPUT_FILE"
+        else
+            echo "Warning: codesign could not be found; leaving dylib unsigned."
+        fi
+    fi
+
+    echo "Success: Created $OUTPUT_FILE"
+    "$SCRIPT_DIR/Build/restore_plugin_meta_templates.sh" "macos/Release/libOSLNative.dylib.meta"
 else
-    echo "Error: Build finished but output file not found at $OUTPUT_FILE"
+    echo "Error: Build finished but output file was not created."
     exit 1
 fi
-
-# Note: Xcode usually handles the output placement based on project settings.
-# Assuming formatting/copying to Assets is handled by the project build phases or default Xcode behavior.
-# If not, we might need to add a copy step here similar to other scripts,
-# but usually for Unity plugins it's set in Xcode's "Build Locations" or a post-build script.
 
 echo "Success: macOS build completed."

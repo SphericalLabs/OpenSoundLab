@@ -1,0 +1,13 @@
+[submodule "OpenResonance"]
+	path = OpenResonance
+	url = ../OpenResonance.git
+[submodule "AprilTag"]
+	path = OSLNative/Core/External/AprilTag
+	url = ../apriltag.git
+[submodule "AbletonLink"]
+	path = OSLNative/Core/External/link
+	url = ../AbletonLink.git
+[submodule "OpenSoundLabPaidAddons"]
+	path = Packages/io.sphericals.osl.addons.paid
+	url = ../OpenSoundLab-Addons.git
+	update = none # this is only accessible for Spherical devs

@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.rhythm
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.rhythm
+  resourceSlug: io.sphericals.osl.core.rhythm
+  displayName: Rhythm
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols:
+  - LinkPhaseGenerator_Create
+  - LinkPhaseGenerator_Destroy
+  - LinkPhaseGenerator_SetEnabled
+  - LinkPhaseGenerator_IsEnabled
+  - LinkPhaseGenerator_NumPeers
+  - LinkPhaseGenerator_GetTempo
+  - LinkPhaseGenerator_SetTempo
+  - LinkPhaseGenerator_IsPlaying
+  - LinkPhaseGenerator_SetIsPlaying
+  - LinkPhaseGenerator_SetIsPlayingQuantized
+  - LinkPhaseGenerator_RequestBeatZero
+  - LinkPhaseGenerator_GetAudioState
+  devices:
+  - deviceLocalId: PhaseGenerator
+    canonicalDeviceId: io.sphericals.osl.core.rhythm.PhaseGenerator
+    displayName: "Phase\nGenerator"
+    category: 7
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.rhythm/Prefabs/PhaseGenerator
+    menuPrefabResourcePath: io.sphericals.osl.core.rhythm/MenuPrefabs/PhaseGenerator_Menu
+    symbolResourcePath: io.sphericals.osl.core.rhythm/Textures/PhaseGeneratorSymbol
+    dataTypeName: PhaseGeneratorData
+    legacyDeviceIds:
+    - Phase
+    - io.sphericals.opensoundlab.rhythm.PhaseGenerator
+    legacyDataTypeNames:
+    - PhaseDataLegacy
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: PhaseToClockDivider
+    canonicalDeviceId: io.sphericals.osl.core.rhythm.PhaseToClockDivider
+    displayName: "Phase-to-Clock\nDivider"
+    category: 7
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.rhythm/Prefabs/PhaseToClockDivider
+    menuPrefabResourcePath: io.sphericals.osl.core.rhythm/MenuPrefabs/PhaseToClockDivider_Menu
+    symbolResourcePath: io.sphericals.osl.core.rhythm/Textures/PhaseToClockDividerSymbol
+    dataTypeName: PhaseToClockDividerData
+    legacyDeviceIds:
+    - Clock
+    - io.sphericals.opensoundlab.rhythm.PhaseToClockDivider
+    legacyDataTypeNames:
+    - ClockData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Sequencer
+    canonicalDeviceId: io.sphericals.osl.core.rhythm.Sequencer
+    displayName: Sequencer
+    category: 7
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.rhythm/Prefabs/Sequencer
+    menuPrefabResourcePath: io.sphericals.osl.core.rhythm/MenuPrefabs/Sequencer_Menu
+    symbolResourcePath: io.sphericals.osl.core.rhythm/Textures/SequencerSymbol
+    dataTypeName: SequencerData
+    legacyDeviceIds:
+    - SequencerCV
+    - io.sphericals.opensoundlab.rhythm.Sequencer
+    legacyDataTypeNames:
+    - SequencerCVData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0.01, y: 0.0057, z: 0.0101}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 0.25, y: 0.25, z: 0.25}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: LinkPhaseGenerator
+    canonicalDeviceId: io.sphericals.osl.core.rhythm.LinkPhaseGenerator
+    displayName: "Link\nPhase Generator"
+    category: 7
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.rhythm/Prefabs/LinkPhaseGenerator
+    menuPrefabResourcePath: io.sphericals.osl.core.rhythm/MenuPrefabs/LinkPhaseGenerator_Menu
+    symbolResourcePath: io.sphericals.osl.core.rhythm/Textures/LinkPhaseGeneratorSymbol
+    dataTypeName: LinkPhaseGeneratorData
+    legacyDeviceIds:
+    - io.sphericals.osl.addons.paid.sequencing.LinkPhaseGenerator
+    legacyDataTypeNames:
+    - OpenSoundLab.Addons.LinkPhaseGenerator.LinkPhaseGeneratorData
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

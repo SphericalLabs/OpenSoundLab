@@ -1,0 +1,205 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d15e9cf5dc9472589f44b286195bbfb, type: 3}
+  m_Name: io.sphericals.osl.core.various
+  m_EditorClassIdentifier:
+  vendorId: io.sphericals
+  collectionId: io.sphericals.osl.core.various
+  resourceSlug: io.sphericals.osl.core.various
+  displayName: Various
+  description:
+  source: 0
+  enabled: 1
+  nativeSymbols: []
+  devices:
+  - deviceLocalId: Scope
+    canonicalDeviceId: io.sphericals.osl.core.various.Scope
+    displayName: Scope
+    category: 0
+    tags: []
+    order: 1
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.various/Prefabs/Scope
+    menuPrefabResourcePath: io.sphericals.osl.core.various/MenuPrefabs/Scope_Menu
+    symbolResourcePath: io.sphericals.osl.core.various/Textures/ScopeSymbol
+    dataTypeName: ScopeData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.various.Scope
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: TapeGroup
+    canonicalDeviceId: io.sphericals.osl.core.various.TapeGroup
+    displayName: TapeGroup
+    category: 0
+    tags: []
+    order: 2
+    enabled: 1
+    showInMenu: 0
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.various/Prefabs/TapeGroup
+    menuPrefabResourcePath: io.sphericals.osl.core.various/MenuPrefabs/TapeGroup_Menu
+    symbolResourcePath:
+    dataTypeName: TapeGroupData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.various.TapeGroup
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Speaker
+    canonicalDeviceId: io.sphericals.osl.core.various.Speaker
+    displayName: Speaker
+    category: 0
+    tags: []
+    order: 3
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.various/Prefabs/Speaker
+    menuPrefabResourcePath: io.sphericals.osl.core.various/MenuPrefabs/Speaker_Menu
+    symbolResourcePath: io.sphericals.osl.core.various/Textures/SpeakerSymbol
+    dataTypeName: SpeakerData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.various.Speaker
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Tutorials
+    canonicalDeviceId: io.sphericals.osl.core.various.Tutorials
+    displayName: Tutorials
+    category: 0
+    tags: []
+    order: 4
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.various/Prefabs/Tutorials
+    menuPrefabResourcePath: io.sphericals.osl.core.various/MenuPrefabs/Tutorials_Menu
+    symbolResourcePath: io.sphericals.osl.core.various/Textures/TutorialsSymbol
+    dataTypeName: TutorialsData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.various.Tutorials
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: -0.0121, z: -0.0005}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Camera
+    canonicalDeviceId: io.sphericals.osl.core.various.Camera
+    displayName: Camera
+    category: 0
+    tags: []
+    order: 5
+    enabled: 1
+    showInMenu: 0
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.various/Prefabs/Camera
+    menuPrefabResourcePath: io.sphericals.osl.core.various/MenuPrefabs/Camera_Menu
+    symbolResourcePath:
+    dataTypeName: CameraData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.various.Camera
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 90, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}
+  - deviceLocalId: Tapes
+    canonicalDeviceId: io.sphericals.osl.core.various.Tapes
+    displayName: Tapes
+    category: 0
+    tags: []
+    order: 6
+    enabled: 1
+    showInMenu: 1
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.various/Prefabs/Tapes
+    menuPrefabResourcePath: io.sphericals.osl.core.various/MenuPrefabs/Tapes_Menu
+    symbolResourcePath: io.sphericals.osl.core.various/Textures/TapesSymbol
+    dataTypeName: InstrumentData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.various.Tapes
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0.1, y: 0.02, z: 0.15}
+    spawnRotationOffset: {x: 0, y: 180, z: 0}
+  - deviceLocalId: Pano
+    canonicalDeviceId: io.sphericals.osl.core.various.Pano
+    displayName: Pano
+    category: 0
+    tags: []
+    order: 7
+    enabled: 1
+    showInMenu: 0
+    productInfo:
+      isPurchasable: 0
+      requiresEntitlement: 0
+      storeSku:
+      storeSkus: []
+    prefabResourcePath: io.sphericals.osl.core.various/Prefabs/Pano
+    menuPrefabResourcePath: io.sphericals.osl.core.various/MenuPrefabs/Pano_Menu
+    symbolResourcePath:
+    dataTypeName: PanoData
+    legacyDeviceIds:
+    - io.sphericals.opensoundlab.various.Pano
+    legacyDataTypeNames: []
+    legacyXmlRootNames: []
+    previewPositionOffset: {x: 0, y: 0, z: 0}
+    previewRotationOffset: {x: 0, y: 0, z: 0}
+    previewScale: {x: 1, y: 1, z: 1}
+    spawnPositionOffset: {x: 0, y: 0, z: 0}
+    spawnRotationOffset: {x: 0, y: 0, z: 0}

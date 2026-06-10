@@ -72,7 +72,7 @@ Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980
 - Quantizer: Featuring Sem, Maj, Min, HMaj, HMin, PMaj, PMin, Oct scales and root key, octave dials
 - Gain: 36db gain module
 - Polarity: Convert between unipolar and bipolar signals
-- Artefact: Jitter, bit crush, downsample and noise
+- Artifact: Jitter, bit crush, downsample and noise
 - Compressor: Dynamics processor with attack, release, threshold, ratio, bypass, gain and sidechaining
 - DC: Bipolar signal generator
 - Glide: Slope limiter
