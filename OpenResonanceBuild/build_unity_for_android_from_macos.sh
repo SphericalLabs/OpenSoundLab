@@ -35,4 +35,4 @@ or_cmake_configure_and_install "android-$ANDROID_ABI" \
     -DRA_UNITY_ENABLE_REVERB_BAKING:BOOL=OFF \
     -DRA_UNITY_ENABLE_SOUNDFIELD_RECORDING:BOOL=ON
 
-or_maybe_install_unity_assets "android-$ANDROID_ABI"
+or_maybe_generate_unity_package "android-$ANDROID_ABI"

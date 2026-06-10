@@ -48,19 +48,19 @@ esac
 if [ "${OPEN_RESONANCE_SKIP_INSTALL:-0}" != "1" ]; then
     case "$TARGET" in
         macos)
-            "$SCRIPT_DIR/install_unity_assets.sh" macos-x86_64 macos-arm64
+            "$SCRIPT_DIR/install_unity_package.sh" macos-x86_64 macos-arm64
             ;;
         android)
-            "$SCRIPT_DIR/install_unity_assets.sh" android-arm64-v8a
+            "$SCRIPT_DIR/install_unity_package.sh" android-arm64-v8a
             ;;
         ios)
-            "$SCRIPT_DIR/install_unity_assets.sh" ios-os64
+            "$SCRIPT_DIR/install_unity_package.sh" ios-os64
             ;;
         macos-android)
-            "$SCRIPT_DIR/install_unity_assets.sh" macos-x86_64 macos-arm64 android-arm64-v8a
+            "$SCRIPT_DIR/install_unity_package.sh" macos-x86_64 macos-arm64 android-arm64-v8a
             ;;
         all)
-            "$SCRIPT_DIR/install_unity_assets.sh" macos-x86_64 macos-arm64 android-arm64-v8a ios-os64
+            "$SCRIPT_DIR/install_unity_package.sh" macos-x86_64 macos-arm64 android-arm64-v8a ios-os64
             ;;
     esac
 fi

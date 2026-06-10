@@ -2,7 +2,8 @@
 
 This folder contains OpenSoundLab-side build scripts for the `OpenResonance`
 submodule. The scripts build the OpenResonance Unity plugin, stage the upstream
-CMake install output and install the Unity-facing assets into OpenSoundLab.
+CMake install output and generate the Unity-facing local package used by
+OpenSoundLab.
 
 The build chain is separate from `OSLNative`. Running OSLNative builds will not
 build OpenResonance.
@@ -16,7 +17,8 @@ git submodule update --init --recursive OpenResonance
 ./OpenResonanceBuild/build_all_from_macos.sh all
 ```
 
-This builds and installs the macOS-covered OpenResonance Unity targets:
+This builds the macOS-covered OpenResonance Unity targets and regenerates the
+local Unity package:
 
 - macOS `x86_64` with Embree-backed reverb baking enabled
 - macOS `arm64` with Embree-backed reverb baking disabled
@@ -31,17 +33,16 @@ If you want macOS and Android only, without requiring the iOS/Xcode setup:
 ./OpenResonanceBuild/build_all_from_macos.sh macos-android
 ```
 
-To install only the Unity C# assets, prefabs, resources and plugin layout without
-building native binaries:
+To regenerate only the Unity package from existing staged native binaries:
 
 ```bash
-./OpenResonanceBuild/install_unity_assets.sh
+./OpenResonanceBuild/install_unity_package.sh
 ```
 
-To install only specific staged native targets:
+To include only specific staged native targets:
 
 ```bash
-./OpenResonanceBuild/install_unity_assets.sh macos-x86_64 macos-arm64
+./OpenResonanceBuild/install_unity_package.sh macos-x86_64 macos-arm64
 ```
 
 ## Layout
@@ -52,29 +53,31 @@ OpenResonanceBuild/
   build_unity_for_macos_from_macos.sh
   build_unity_for_android_from_macos.sh
   build_unity_for_ios_from_macos.sh
-  install_unity_assets.sh
+  install_unity_package.sh
   restore_plugin_meta_templates.sh
   PluginMetaTemplates/
 ```
 
-Generated build and staging output goes to:
+Generated package, build and staging output goes to:
 
 ```text
 OpenResonanceBuild/Build/
+OpenResonanceBuild/Package/
 OpenResonanceBuild/Staging/
 ```
 
-The generated Unity install goes to:
+`Packages/manifest.json` statically references the generated package:
 
 ```text
-Assets/ResonanceAudio/
+io.sphericals.openresonance -> file:../OpenResonanceBuild/Package
 ```
 
-Those generated paths are ignored by Git.
+Those generated paths are ignored by Git. Build or regenerate OpenResonance
+before opening Unity so the local package exists.
 
-## What Gets Installed
+## What Gets Packaged
 
-`install_unity_assets.sh` copies the upstream ResonanceAudio Unity assets from:
+`install_unity_package.sh` copies the upstream ResonanceAudio Unity assets from:
 
 ```text
 OpenResonance/platforms/unity/UnityIntegration/Assets/ResonanceAudio
@@ -83,16 +86,26 @@ OpenResonance/platforms/unity/UnityIntegration/Assets/ResonanceAudio
 to:
 
 ```text
-Assets/ResonanceAudio
+OpenResonanceBuild/Package
 ```
+
+It generates `OpenResonanceBuild/Package/package.json`, adds runtime/editor
+assembly definitions for UPM compilation, overlays native plugins from
+`OpenResonanceBuild/Staging` and restores OpenSoundLab's plugin import metadata
+from `PluginMetaTemplates`.
 
 It excludes `Demos`, `Resources/ResonanceAudioMixer.mixer` and upstream
 `ProjectSettings`. OpenSoundLab's own `ProjectSettings/AudioManager.asset`
 already selects `Resonance Audio` as the spatializer and ambisonic decoder.
 
-The asset copy uses `rsync --delete`, so `Assets/ResonanceAudio` is treated as a
-generated mirror of the upstream Unity assets, with demos and the upstream mixer
-excluded. Do not keep manual local edits in that folder.
+The package asset copy uses `rsync --delete`, so
+`OpenResonanceBuild/Package` is treated as a generated mirror of the upstream
+Unity assets plus package metadata, with demos and the upstream mixer excluded.
+Do not keep manual local edits in that folder.
+
+Older builds may leave a generated `Assets/ResonanceAudio` folder behind. Remove
+that legacy folder before opening Unity; otherwise Unity imports duplicate
+ResonanceAudio scripts and native plugins.
 
 ## macOS
 
@@ -187,7 +200,7 @@ OPEN_RESONANCE_CMAKE_POLICY_VERSION_MINIMUM=3.5
 ```
 
 Use `OPEN_RESONANCE_SKIP_INSTALL=1` when you only want to build and stage
-artifacts without touching `Assets/ResonanceAudio`.
+artifacts without regenerating `OpenResonanceBuild/Package`.
 
 The policy minimum and CMP0074 default are passed to upstream dependency
 configure steps so old third-party projects such as Embree v2 still configure

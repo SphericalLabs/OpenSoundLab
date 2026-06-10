@@ -50,4 +50,4 @@ case "$TARGET" in
         ;;
 esac
 
-or_maybe_install_unity_assets "${BUILT_TARGETS[@]}"
+or_maybe_generate_unity_package "${BUILT_TARGETS[@]}"

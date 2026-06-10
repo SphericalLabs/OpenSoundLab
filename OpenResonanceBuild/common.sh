@@ -215,10 +215,10 @@ or_cmake_configure_and_install() {
     cmake --build "$build_dir" --config "$OR_PROFILE" --target install
 }
 
-or_maybe_install_unity_assets() {
+or_maybe_generate_unity_package() {
     if [ "${OPEN_RESONANCE_SKIP_INSTALL:-0}" = "1" ]; then
         return
     fi
 
-    "$OR_BUILD_DIR/install_unity_assets.sh" "$@"
+    "$OR_BUILD_DIR/install_unity_package.sh" "$@"
 }

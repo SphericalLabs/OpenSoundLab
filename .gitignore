@@ -150,8 +150,9 @@ Temporary Items
 !/Assets/Plugins/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib
 !/Assets/Plugins/OSLNative/macos/arm64 x86_64/Release/libOSLNative.dylib.meta
 
-# OpenResonance generated Unity install and build outputs
+# OpenResonance generated Unity package, legacy install and build outputs
 /OpenResonanceBuild/Build/
+/OpenResonanceBuild/Package/
 /OpenResonanceBuild/Staging/
 /Assets/ResonanceAudio/
 /Assets/ResonanceAudio.meta

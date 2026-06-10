@@ -22,4 +22,4 @@ or_cmake_configure_and_install "ios-os64" \
     -DRA_UNITY_ENABLE_REVERB_BAKING:BOOL=OFF \
     -DRA_UNITY_ENABLE_SOUNDFIELD_RECORDING:BOOL=ON
 
-or_maybe_install_unity_assets "ios-os64"
+or_maybe_generate_unity_package "ios-os64"

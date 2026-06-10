@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 TEMPLATE_DIR="$OR_BUILD_DIR/PluginMetaTemplates"
-PLUGIN_DIR="$OR_PROJECT_DIR/Assets/ResonanceAudio/Plugins"
+PLUGIN_DIR="$OR_BUILD_DIR/Package/Plugins"
 
 restore_meta() {
     local relative_path="$1"
