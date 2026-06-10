@@ -38,6 +38,7 @@ public class SampleHoldSignalGenerator : signalGenerator
     float[] incomingBuffer = new float[] { 0f, 0f };
     float lastTrig = -1f;
     float holdVal = 0f;
+    int holdRevision = 0;
 
     [DllImport("OSLNative")]
     public static extern void SetArrayToSingleValue(float[] a, int length, float val);
@@ -75,6 +76,7 @@ public class SampleHoldSignalGenerator : signalGenerator
                     if (isRisingEdge(trigBuffer[n], lastTrig))
                     {
                         buffer[n] = buffer[n + 1] = holdVal = incomingBuffer[n]; // left only
+                        holdRevision++;
                     }
                     else
                     {
@@ -86,5 +88,24 @@ public class SampleHoldSignalGenerator : signalGenerator
             }
         }
         recursionCheckPost();
+    }
+
+    public int getHoldRevision()
+    {
+        return holdRevision;
+    }
+
+    public void captureNetworkState(out float currentHoldValue, out bool triggerHigh, out int revision)
+    {
+        currentHoldValue = holdVal;
+        triggerHigh = lastTrig > 0f;
+        revision = holdRevision;
+    }
+
+    public void applyNetworkState(float currentHoldValue, bool triggerHigh, int revision)
+    {
+        holdVal = currentHoldValue;
+        lastTrig = triggerHigh ? 1f : -1f;
+        if (revision > holdRevision) holdRevision = revision;
     }
 }

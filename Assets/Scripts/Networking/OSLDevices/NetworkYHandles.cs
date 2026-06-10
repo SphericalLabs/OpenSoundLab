@@ -55,7 +55,7 @@ public class NetworkYHandles : NetworkBehaviour
         {
             int index = i;
             yHandles[i].onHandleChangedEvent.AddListener(delegate { UpdateHandleValue(index); });
-            yHandles[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            yHandles[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
         }
     }
 
@@ -97,6 +97,11 @@ public class NetworkYHandles : NetworkBehaviour
 
     public void UpdateHandleValue(int index)
     {
+        SendHandleValue(index);
+    }
+
+    void SendHandleValue(int index)
+    {
         Debug.Log($"Update xHandle value of index: {index} to value: {yHandles[index].transform.localPosition.x}");
         if (isServer)
         {
@@ -121,6 +126,12 @@ public class NetworkYHandles : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        SendHandleValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

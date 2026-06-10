@@ -25,11 +25,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using UnityEngine.Events;
 
 public class samplerLoad : MonoBehaviour
@@ -47,9 +46,25 @@ public class samplerLoad : MonoBehaviour
     Material deckMat;
     Color deckLight;
 
-    public float[] clipSamples;
+    [NonSerialized] public float[] clipSamples;
+    public int generatedLayerCount = 3;
+    public int clipReadFramesPerChunk = 16384;
+    public int layerBuildFramesPerChunk = 8192;
+    public float wavetableSampleSeconds = 1f;
+    public int wavetableAdditionalLayers = 4;
+    public float extraShortSampleSeconds = 2.5f;
+    public float shortSampleSeconds = 5f;
+    public float mediumSampleSeconds = 20f;
+    public int extraShortAdditionalLayers = 3;
+    public int shortAdditionalLayers = 2;
+    public int mediumAdditionalLayers = 1;
+    public int longAdditionalLayers = 0;
+    [NonSerialized] public float loadingProgress = 0f;
+    [NonSerialized] public SamplerLoadStage loadingStage = SamplerLoadStage.Idle;
 
-    GCHandle m_ClipHandle;
+    SampleLayerBank sampleLayerBank;
+    SamplerBackgroundLoadJob activeLoadJob;
+    int activeLoadRequestId = 0;
 
     public UnityEvent onLoadTapeEvents;
     public UnityEvent onUnloadTapeEvents;
@@ -125,20 +140,11 @@ public class samplerLoad : MonoBehaviour
         if (currentTape == t)
         {
             currentTape = null;
-            if (_streamRoutine != null)
-            {
-                if (loaderObject != null) Destroy(loaderObject);
-                StopCoroutine(_streamRoutine);
-            }
+            cancelActiveLoad();
 
             if (miniSpeaker != null) miniSpeaker.updateSecondary(false);
 
-            // unallocate memory
-            if (m_ClipHandle.IsAllocated)
-            {
-                m_ClipHandle.Free();
-            }
-            for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
+            clearLoadedSampleState();
 
             if (updateEvent)
             {
@@ -149,59 +155,85 @@ public class samplerLoad : MonoBehaviour
 
     public void LoadClip(string path)
     {
-
         string fullpath = sampleManager.instance.parseFilename(path);
-
         if (!File.Exists(fullpath))
         {
             return;
         }
 
-        if (_streamRoutine != null)
-        {
-            if (loaderObject != null) Destroy(loaderObject);
-            StopCoroutine(_streamRoutine);
-        }
+        cancelActiveLoad();
+        clearLoadedSampleState();
 
-        _streamRoutine = StartCoroutine(streamRoutine(fullpath));
+        activeLoadRequestId++;
+        int requestId = activeLoadRequestId;
+        activeLoadJob = new SamplerBackgroundLoadJob(fullpath, generatedLayerCount, clipReadFramesPerChunk,
+            layerBuildFramesPerChunk, wavetableSampleSeconds, extraShortSampleSeconds, shortSampleSeconds,
+            mediumSampleSeconds, wavetableAdditionalLayers, extraShortAdditionalLayers, shortAdditionalLayers,
+            mediumAdditionalLayers, longAdditionalLayers);
+        activeLoadJob.Start();
+        _streamRoutine = StartCoroutine(streamRoutine(activeLoadJob, requestId));
     }
 
     GameObject loaderObject;
     Coroutine _streamRoutine;
-    IEnumerator streamRoutine(string fullpath)
+    IEnumerator streamRoutine(SamplerBackgroundLoadJob job, int requestId)
     {
-        AudioClip c = RuntimeAudioClipLoader.Manager.Load(fullpath, false, true, true);
-
         loaderObject = Instantiate(loadingPrefab, transform, false) as GameObject;
         loaderObject.transform.localPosition = new Vector3(-.05f, .013f, 0.061f);
         loaderObject.transform.localRotation = Quaternion.Euler(0, 180, 0);
         loaderObject.transform.localScale = Vector3.one * .1f;
 
-        while (RuntimeAudioClipLoader.Manager.GetAudioClipLoadState(c) != AudioDataLoadState.Loaded)
+        bool baseBankPublished = false;
+        while (requestId == activeLoadRequestId && activeLoadJob == job)
         {
+            loadingProgress = job.Progress;
+            loadingStage = job.Stage;
+
+            if (job.TryConsumeRaw(out float[] rawSamples, out int rawChannels, out int rawFrames, out int rawSampleRate))
+            {
+                clipSamples = rawSamples;
+                applySampleBank(new float[][] { rawSamples }, rawChannels, false);
+                baseBankPublished = true;
+            }
+
+            if (job.TryConsumeLayers(out float[][] layers, out int layerChannels))
+            {
+                clipSamples = layers[0];
+                applySampleBank(layers, layerChannels, baseBankPublished);
+            }
+
+            if (job.Completed)
+            {
+                if (job.Failed && job.Error != null)
+                {
+                    Debug.LogException(job.Error, this);
+                }
+                break;
+            }
+
             yield return null;
         }
-        if (loaderObject != null) Destroy(loaderObject);
 
+        if (requestId == activeLoadRequestId)
+        {
+            activeLoadJob = null;
+            loadingProgress = job.Progress;
+            loadingStage = job.Stage;
+        }
 
-        for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
+        if (loaderObject != null)
+        {
+            Destroy(loaderObject);
+            loaderObject = null;
+        }
 
-        while (c.loadState != AudioDataLoadState.Loaded) yield return null;
-
-        clipSamples = new float[c.samples * c.channels];
-        c.GetData(clipSamples, 0);
-
-        //allocate the memory
-        m_ClipHandle = GCHandle.Alloc(clipSamples, GCHandleType.Pinned);
-        for (int i = 0; i < players.Length; i++) players[i].LoadSamples(clipSamples, m_ClipHandle, c.channels);
+        _streamRoutine = null;
     }
 
     void OnDestroy()
     {
-        if (m_ClipHandle.IsAllocated)
-        {
-            m_ClipHandle.Free();
-        }
+        cancelActiveLoad();
+        clearLoadedSampleState();
     }
 
     public string[] queuedSample = new string[] { "", "" };
@@ -269,5 +301,63 @@ public class samplerLoad : MonoBehaviour
         deckOutline.gameObject.SetActive(false);
     }
 
+    void cancelActiveLoad()
+    {
+        activeLoadRequestId++;
+
+        if (activeLoadJob != null)
+        {
+            activeLoadJob.Cancel();
+            activeLoadJob = null;
+        }
+
+        if (_streamRoutine != null)
+        {
+            StopCoroutine(_streamRoutine);
+            _streamRoutine = null;
+        }
+
+        if (loaderObject != null)
+        {
+            Destroy(loaderObject);
+            loaderObject = null;
+        }
+
+        loadingProgress = 0f;
+        loadingStage = SamplerLoadStage.Idle;
+    }
+
+    void clearLoadedSampleState()
+    {
+        for (int i = 0; i < players.Length; i++) players[i].UnloadClip();
+
+        if (sampleLayerBank != null)
+        {
+            sampleLayerBank.Release();
+            sampleLayerBank = null;
+        }
+
+        clipSamples = null;
+    }
+
+    void applySampleBank(float[][] layers, int channels, bool preservePlaybackState)
+    {
+        if (layers == null || layers.Length == 0 || layers[0] == null || layers[0].Length == 0)
+        {
+            return;
+        }
+
+        SampleLayerBank oldBank = sampleLayerBank;
+        sampleLayerBank = new SampleLayerBank(layers, channels);
+        for (int i = 0; i < players.Length; i++)
+        {
+            players[i].LoadSamples(sampleLayerBank, preservePlaybackState);
+        }
+
+        if (oldBank != null && oldBank != sampleLayerBank)
+        {
+            oldBank.Release();
+        }
+    }
 
 }

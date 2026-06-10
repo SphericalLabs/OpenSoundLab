@@ -355,6 +355,11 @@ public class manipulator : MonoBehaviour
 
         if (selectedObject != null)
         {
+            if (on && WorldDragController.Instance != null && WorldDragController.Instance.ShouldBlockModuleGrab(selectedObject))
+            {
+                return;
+            }
+
             if (selectedObject.stickyGrip && selectedObject.curState == manipObject.manipState.grabbed)
             {
                 if (on) Grab(!on);

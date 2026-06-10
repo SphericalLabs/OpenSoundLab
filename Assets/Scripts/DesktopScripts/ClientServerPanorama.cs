@@ -4,8 +4,11 @@ using System.Runtime.InteropServices;
 
 public class ClientServerPanorama : MonoBehaviour
 {
+    public const string editorSplitAudioPrefKey = "OpenSoundLab.PlayMode.SplitAudioServerLClientR";
+    public const int editorSplitAudioDefaultValue = 0;
+
     [Header("Platform Settings")]
-    public bool activeInEditor = true;
+    public bool activeInEditor = false;
     public bool activeInMac = true;
     public bool activeInWindows = true;
     public bool activeInLinux = true;
@@ -26,9 +29,13 @@ public class ClientServerPanorama : MonoBehaviour
     bool hasLoggedMissingEntryPoint;
     bool hasLoggedNotReady;
     bool hasLoggedMismatch;
+    bool hasAppliedPan;
+    bool hasCenteredPan;
 
     private void Awake()
     {
+        ensureEditorSplitAudioPreferenceInitialized();
+
         if (transform.parent == null)
         {
             DontDestroyOnLoad(gameObject);
@@ -41,9 +48,14 @@ public class ClientServerPanorama : MonoBehaviour
 
     void Update()
     {
-        if (!ShouldRun()) return;
+        if (!ShouldRun())
+        {
+            resetPanIfNeeded();
+            return;
+        }
 
         float pan = NetworkServer.active ? serverPan : clientPan;
+        hasCenteredPan = false;
         try
         {
             if (!MasterBusRecorder_IsReady())
@@ -57,6 +69,7 @@ public class ClientServerPanorama : MonoBehaviour
             }
 
             MasterBusRecorder_SetPanorama(pan);
+            hasAppliedPan = true;
 
             if (!hasLoggedMismatch)
             {
@@ -78,9 +91,14 @@ public class ClientServerPanorama : MonoBehaviour
         }
     }
 
+    void OnDisable()
+    {
+        resetPanIfNeeded();
+    }
+
     bool ShouldRun()
     {
-        if (Application.isEditor) return activeInEditor;
+        if (Application.isEditor) return IsEditorSplitAudioEnabled();
 
         switch (Application.platform)
         {
@@ -93,5 +111,41 @@ public class ClientServerPanorama : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    void resetPanIfNeeded()
+    {
+        if (hasCenteredPan && !hasAppliedPan) return;
+
+        try
+        {
+            if (!MasterBusRecorder_IsReady()) return;
+            MasterBusRecorder_SetPanorama(0f);
+            hasAppliedPan = false;
+            hasCenteredPan = true;
+        }
+        catch (System.EntryPointNotFoundException)
+        {
+            if (!hasLoggedMissingEntryPoint)
+            {
+                Debug.LogWarning("ClientServerPanorama: OSLNative entry points missing. Check plugin import settings and rebuild.", this);
+                hasLoggedMissingEntryPoint = true;
+            }
+        }
+    }
+
+    public static bool IsEditorSplitAudioEnabled()
+    {
+        ensureEditorSplitAudioPreferenceInitialized();
+        return PlayerPrefs.GetInt(editorSplitAudioPrefKey, editorSplitAudioDefaultValue) == 1;
+    }
+
+    static void ensureEditorSplitAudioPreferenceInitialized()
+    {
+        if (!Application.isEditor) return;
+        if (PlayerPrefs.HasKey(editorSplitAudioPrefKey)) return;
+
+        PlayerPrefs.SetInt(editorSplitAudioPrefKey, editorSplitAudioDefaultValue);
+        PlayerPrefs.Save();
     }
 }

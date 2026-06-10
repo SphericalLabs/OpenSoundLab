@@ -8,6 +8,7 @@ using Unity.Networking.Transport.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Burst;
+using Unity.Networking.Transport.Utilities;
 
 namespace Utp
 {
@@ -15,7 +16,7 @@ namespace Utp
 	#region Jobs
 
 	/// <summary>
-	/// Job used to update connections. 
+	/// Job used to update connections.
 	/// </summary>
 	[BurstCompile]
 	struct ServerUpdateConnectionsJob : IJob
@@ -95,11 +96,13 @@ namespace Utp
 	}
 
 	/// <summary>
-	/// Job to query incoming events for all connections. 
+	/// Job to query incoming events for all connections.
 	/// </summary>
 	[BurstCompile]
 	struct ServerUpdateJob : IJobParallelForDefer
 	{
+		private const int CHANNEL_PREFIX_BYTES = 1;
+
 		/// <summary>
 		/// Used to bind, listen, and send data to connections.
 		/// </summary>
@@ -126,14 +129,36 @@ namespace Utp
 			{
 				if (netEvent == NetworkEvent.Type.Data)
 				{
+					if (stream.Length <= CHANNEL_PREFIX_BYTES)
+					{
+						continue;
+					}
+
 					NativeArray<byte> nativeMessage = new NativeArray<byte>(stream.Length, Allocator.Temp);
 					stream.ReadBytes(nativeMessage);
+
+					int payloadLength = stream.Length - CHANNEL_PREFIX_BYTES;
+					byte channelId = nativeMessage[0];
+					UnsafeList<byte> eventData = default;
+					byte eventType = (byte)UtpConnectionEventType.OnReceivedData;
+
+					if (payloadLength > 0)
+					{
+						eventData = new UnsafeList<byte>(payloadLength, Allocator.Persistent);
+						unsafe
+						{
+							byte* ptr = (byte*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(nativeMessage);
+							eventData.AddRange(ptr + CHANNEL_PREFIX_BYTES, payloadLength);
+						}
+					}
 
 					//Set up connection event
 					UtpConnectionEvent connectionEvent = new UtpConnectionEvent()
 					{
-						eventType = (byte)UtpConnectionEventType.OnReceivedData,
-						eventData = GetFixedList(nativeMessage),
+						eventType = eventType,
+						eventData = eventData,
+						channelId = channelId,
+						payloadLength = payloadLength,
 						connectionId = connections[index].GetHashCode()
 					};
 
@@ -155,25 +180,6 @@ namespace Utp
 			}
 		}
 
-		/// <summary>
-		/// Convert unmanaged native array to 4096 Byte list. Uses unsafe code.
-		/// </summary>
-		/// <param name="data">The data to convert.</param>
-		/// <returns>An unmanaged fixed list of data.</returns>
-		public FixedList4096Bytes<byte> GetFixedList(NativeArray<byte> data)
-		{
-			FixedList4096Bytes<byte> retVal = new FixedList4096Bytes<byte>();
-
-			if (data.Length > 0)
-			{
-				unsafe
-				{
-					retVal.AddRange(NativeArrayUnsafeUtility.GetUnsafePtr(data), data.Length);
-				}
-			}
-
-			return retVal;
-		}
 	}
 
 	[BurstCompile]
@@ -217,10 +223,12 @@ namespace Utp
 	#endregion
 
 	/// <summary>
-	/// A listen server for Mirror using UTP. 
+	/// A listen server for Mirror using UTP.
 	/// </summary>
 	public class UtpServer : UtpEntity
 	{
+		private const int CHANNEL_PREFIX_BYTES = 1;
+
 		/// <summary>
 		/// Invokes when a client has connected to the server.
 		/// </summary>
@@ -229,7 +237,7 @@ namespace Utp
 		/// <summary>
 		/// Invokes when data has been received by a third party.
 		/// </summary>
-		public Action<int, ArraySegment<byte>> OnReceivedData;
+		public Action<int, ArraySegment<byte>, int> OnReceivedData;
 
 		/// <summary>
 		/// Invokes when a client has disconnected.
@@ -244,7 +252,7 @@ namespace Utp
 		/// <summary>
 		/// The number of pipelines tracked in the header size array.
 		/// </summary>
-		private const int NUM_PIPELINES = 2;
+		private const int NUM_PIPELINES = 3;
 
 		/// <summary>
 		/// The driver's max header size for UTP transport.
@@ -267,7 +275,7 @@ namespace Utp
 		/// <param name="OnReceivedData">Action that is invoked when receiving data.</param>
 		/// <param name="OnDisconnected">Action that is invoked when disconnected.</param>
 		/// <param name="timeoutInMilliseconds">The response timeout in miliseconds.</param>
-		public UtpServer(Action<int> OnConnected, Action<int, ArraySegment<byte>> OnReceivedData, Action<int> OnDisconnected, int timeoutInMilliseconds)
+		public UtpServer(Action<int> OnConnected, Action<int, ArraySegment<byte>, int> OnReceivedData, Action<int> OnDisconnected, int timeoutInMilliseconds)
 			: this(timeoutInMilliseconds)
 		{
 			this.OnConnected = OnConnected;
@@ -289,9 +297,10 @@ namespace Utp
 				return;
 			}
 
-			//Instantiate network settings
+			// Keep one configured settings instance so direct and relay modes honor the same timeout.
 			var settings = new NetworkSettings();
 			settings.WithNetworkConfigParameters(disconnectTimeoutMS: timeoutInMilliseconds);
+			settings.WithFragmentationStageParameters(payloadCapacity: UtpTransport.FragmentedPayloadCapacity);
 
 			//Create IPV4 endpoint
 			NetworkEndPoint endpoint = NetworkEndPoint.AnyIpv4;
@@ -301,37 +310,29 @@ namespace Utp
 			{
 				//Instantiate relay network data
 				RelayServerData relayServerData = RelayUtils.HostRelayData(allocation, RelayServerEndpoint.NetworkOptions.Udp);
-				RelayNetworkParameter relayNetworkParameter = new RelayNetworkParameter { ServerData = relayServerData };
-				NetworkSettings networkSettings = new NetworkSettings();
 
 				//Initialize relay network
-				RelayParameterExtensions.WithRelayParameters(ref networkSettings, ref relayServerData);
-
-				//Instantiate network driver
-				driver = NetworkDriver.Create(networkSettings);
-			}
-			else
-			{
-				//Initialize network settings
-				NetworkSettings networkSettings = new NetworkSettings();
-
-				//Instantiate network driver
-				driver = NetworkDriver.Create(networkSettings);
-				endpoint.Port = port;
+				RelayParameterExtensions.WithRelayParameters(ref settings, ref relayServerData);
 			}
 
 			//Initialize connections list & event queue
 			connections = new NativeList<Unity.Networking.Transport.NetworkConnection>(16, Allocator.Persistent);
 			connectionsEventsQueue = new NativeQueue<UtpConnectionEvent>(Allocator.Persistent);
 
+			//Instantiate network driver
+			driver = NetworkDriver.Create(settings);
+			endpoint.Port = port;
+
 			//Create network pipelines
-			reliablePipeline = driver.CreatePipeline(typeof(ReliableSequencedPipelineStage));
-			unreliablePipeline = driver.CreatePipeline(typeof(UnreliableSequencedPipelineStage));
+			reliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(ReliableSequencedPipelineStage));
+			unreliablePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage), typeof(UnreliableSequencedPipelineStage));
+			voicePipeline = driver.CreatePipeline(typeof(FragmentationPipelineStage));
 
 			int bindReturnCode = driver.Bind(endpoint);
 			if (!driver.Bound)
 			{
 				UtpLog.Error($"Unable to start server, failed to bind the specified port {endpoint.Port}. {nameof(NetworkDriver.Bind)}() returned {bindReturnCode}.");
+				Stop();
 				return;
 			}
 
@@ -339,6 +340,7 @@ namespace Utp
 			if (!driver.Listening)
 			{
 				UtpLog.Error($"Unable to start server, failed to listen. {nameof(NetworkDriver.Listen)} returned {listenReturnCode}.");
+				Stop();
 				return;
 			}
 
@@ -400,6 +402,13 @@ namespace Utp
 			//Dispose of event queue
 			if (connectionsEventsQueue.IsCreated)
 			{
+				while (connectionsEventsQueue.TryDequeue(out UtpConnectionEvent connectionEvent))
+				{
+					if (connectionEvent.eventData.IsCreated)
+					{
+						connectionEvent.eventData.Dispose();
+					}
+				}
 				connectionsEventsQueue.Dispose();
 			}
 
@@ -457,11 +466,11 @@ namespace Utp
 			if (TryGetConnection(connectionId, out Unity.Networking.Transport.NetworkConnection connection))
 			{
 				//Get pipeline for job
-				NetworkPipeline pipeline = channelId == Channels.Reliable ? reliablePipeline : unreliablePipeline;
+				NetworkPipeline pipeline = GetPipeline(channelId);
 
-				//Convert ArraySegment to NativeArray for burst compile
-				NativeArray<byte> segmentArray = new NativeArray<byte>(segment.Count, Allocator.Persistent);
-				NativeArray<byte>.Copy(segment.Array, segment.Offset, segmentArray, 0, segment.Count);
+				NativeArray<byte> segmentArray = new NativeArray<byte>(segment.Count + CHANNEL_PREFIX_BYTES, Allocator.Persistent);
+				segmentArray[0] = (byte)channelId;
+				NativeArray<byte>.Copy(segment.Array, segment.Offset, segmentArray, CHANNEL_PREFIX_BYTES, segment.Count);
 
 				// Create a new job
 				var job = new ClientSendJob
@@ -501,7 +510,7 @@ namespace Utp
 		{
 			if (IsNetworkDriverInitialized())
 			{
-				return driverMaxHeaderSize[channelId];
+				return driverMaxHeaderSize[GetPipelineIndex(channelId)];
 			}
 
 			return 0;
@@ -520,11 +529,11 @@ namespace Utp
 
 			//Process the events in the event list
 			UtpConnectionEvent connectionEvent;
-			while (connectionsEventsQueue.TryDequeue(out connectionEvent))
+			while (connectionsEventsQueue.IsCreated && connectionsEventsQueue.TryDequeue(out connectionEvent))
 			{
 				switch (connectionEvent.eventType)
 				{
-					//Connect action 
+					//Connect action
 					case ((byte)UtpConnectionEventType.OnConnected):
 						{
 							OnConnected?.Invoke(connectionEvent.connectionId);
@@ -534,7 +543,13 @@ namespace Utp
 					//Receive data action
 					case ((byte)UtpConnectionEventType.OnReceivedData):
 						{
-							OnReceivedData?.Invoke(connectionEvent.connectionId, new ArraySegment<byte>(connectionEvent.eventData.ToArray()));
+							byte[] payload = new byte[connectionEvent.payloadLength];
+							for (int i = 0; i < connectionEvent.payloadLength; i++)
+							{
+								payload[i] = connectionEvent.eventData[i];
+							}
+							if (connectionEvent.eventData.IsCreated) connectionEvent.eventData.Dispose();
+							OnReceivedData?.Invoke(connectionEvent.connectionId, new ArraySegment<byte>(payload, 0, connectionEvent.payloadLength), connectionEvent.channelId);
 							break;
 						}
 
@@ -544,6 +559,8 @@ namespace Utp
 							OnDisconnected?.Invoke(connectionEvent.connectionId);
 							break;
 						}
+
+
 
 					//Invalid action
 					default:
@@ -606,11 +623,11 @@ namespace Utp
 			//If driver is active, cache its max header size for UTP transport
 			if (isInitialized)
 			{
-				driverMaxHeaderSize[Channels.Reliable] = driver.MaxHeaderSize(reliablePipeline);
-				driverMaxHeaderSize[Channels.Unreliable] = driver.MaxHeaderSize(unreliablePipeline);
+				driverMaxHeaderSize[GetPipelineIndex(Channels.Reliable)] = driver.MaxHeaderSize(reliablePipeline);
+				driverMaxHeaderSize[GetPipelineIndex(Channels.Unreliable)] = driver.MaxHeaderSize(unreliablePipeline);
+				driverMaxHeaderSize[GetPipelineIndex(UtpTransport.VoiceChannel)] = driver.MaxHeaderSize(voicePipeline);
 			}
 
 		}
 	}
 }
-

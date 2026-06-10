@@ -110,6 +110,7 @@ public class handle : manipObject
             }
 
             if (manipulatorObj.parent == masterObj.parent) posRotUpdate();
+            syncGrabbedFollowPoints();
         }
         else
         {
@@ -143,6 +144,11 @@ public class handle : manipObject
         }
         else
         {
+            if (otherHandle.curState == manipState.grabbed)
+            {
+                finalizeTwoHandTransform();
+            }
+
             manipulatorObj = null;
             manipulatorObjScript = null;
             if (selected) setState(manipState.selected);
@@ -229,6 +235,42 @@ public class handle : manipObject
         scaling = true;
         float dist = Vector3.Distance(otherHandle.manipulatorObj.position, manipulatorObj.position);
         masterObj.localScale = initScale * (dist / initDistance);
+    }
+
+    void finalizeTwoHandTransform()
+    {
+        if (manipulatorObj == null || otherHandle.manipulatorObj == null) return;
+
+        handle scaleHandle = ID == 1 ? this : otherHandle;
+
+        // Sample the final controller distance before this hand clears its references.
+        scaleHandle.scaleUpdate();
+
+        if (manipulatorObj.parent == masterObj.parent)
+        {
+            posRotUpdate();
+        }
+
+        syncGrabbedFollowPoints();
+    }
+
+    void syncGrabbedFollowPoints()
+    {
+        if (followType != FollowType.Follow) return;
+
+        // Two-hand scaling changes the module transform, so the one-hand follow anchor
+        // has to move with it. Otherwise the remaining hand snaps the module back to the
+        // old anchor as soon as the second hand lets go.
+        syncManipulatorFollowPoint(manipulatorObjScript);
+        syncManipulatorFollowPoint(otherHandle.manipulatorObjScript);
+    }
+
+    void syncManipulatorFollowPoint(manipulator manip)
+    {
+        if (manip == null || manip.wasGazeBased) return;
+
+        manip.GrabbedFollowPointTransform.position = masterObj.position;
+        manip.GrabbedFollowPointTransform.rotation = masterObj.rotation;
     }
 
     void OnCollisionEnter(Collision coll)

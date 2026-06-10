@@ -35,10 +35,13 @@ using System.Reflection;
 
 public class SaveLoadInterface : MonoBehaviour
 {
+    const float patchLoadSettleSeconds = 0.6f;
+
     xmlSaveLoad synthSet;
     public GameObject plugPrefab;
     public static SaveLoadInterface instance;
     Dictionary<string, GameObject> instrumentPrefabs;
+    int patchLoadSequence;
 
     void Awake()
     {
@@ -69,37 +72,51 @@ public class SaveLoadInterface : MonoBehaviour
 
     public void Load(string filename, bool tutorial = false)
     {
+        preparePatchAnchorForPersistence();
         synthSet = xmlSaveLoad.LoadFromFile(filename);
         masterControl.instance.currentScene = filename;
+        int loadSequence = ++patchLoadSequence;
 
-        float v = systemLoad(synthSet.SystemList[0]);
-        bool usedLegacyLoad = false;
-
-        if (v == 0)
+        updatePatchAudioMute(true);
+        try
         {
-            xmlUpdate _xmlUpdate = new xmlUpdate();
-            List<InstrumentData> dataB = _xmlUpdate.UpdateFile(filename);
-            foreach (InstrumentData dB in dataB)
+            float v = systemLoad(synthSet.SystemList[0]);
+            bool usedLegacyLoad = false;
+
+            if (v == 0)
             {
-                dB.deviceType = normalizeDeviceTypeName(dB.deviceType);
-                GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
-                g.GetComponent<deviceInterface>().Load(dB, false);
-                //Debug.Log("load data");
+                xmlUpdate _xmlUpdate = new xmlUpdate();
+                List<InstrumentData> dataB = _xmlUpdate.UpdateFile(filename);
+                foreach (InstrumentData dB in dataB)
+                {
+                    dB.deviceType = normalizeDeviceTypeName(dB.deviceType);
+                    GameObject g = Instantiate(instrumentPrefabs[dB.deviceType], Vector3.zero, Quaternion.identity) as GameObject;
+                    g.GetComponent<deviceInterface>().Load(dB, false);
+                    //Debug.Log("load data");
+                    NetworkServer.Spawn(g);
+                }
+                usedLegacyLoad = dataB.Count > 0;
+            }
+            Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
+            int c = synthSet.InstrumentList.Count;
+            for (int i = 0; i < c && !usedLegacyLoad; i++)
+            {
+                synthSet.InstrumentList[c - 1 - i].deviceType = normalizeDeviceTypeName(synthSet.InstrumentList[c - 1 - i].deviceType);
+                GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;
+                g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i], false);
                 NetworkServer.Spawn(g);
             }
-            usedLegacyLoad = dataB.Count > 0;
-        }
-        Transform patchAnchor = GameObject.Find("PatchAnchor").transform;
-        int c = synthSet.InstrumentList.Count;
-        for (int i = 0; i < c && !usedLegacyLoad; i++)
-        {
-            synthSet.InstrumentList[c - 1 - i].deviceType = normalizeDeviceTypeName(synthSet.InstrumentList[c - 1 - i].deviceType);
-            GameObject g = Instantiate(instrumentPrefabs[synthSet.InstrumentList[c - 1 - i].deviceType], patchAnchor) as GameObject;
-            g.GetComponent<deviceInterface>().Load(synthSet.InstrumentList[c - 1 - i], false);
-            NetworkServer.Spawn(g);
-        }
 
-        StartCoroutine(LoadPlugs());
+            StartCoroutine(LoadPlugs(loadSequence));
+        }
+        catch
+        {
+            if (loadSequence == patchLoadSequence)
+            {
+                updatePatchAudioMute(false);
+            }
+            throw;
+        }
     }
 
     public bool PreviewLoad(string filename, Transform par)
@@ -129,6 +146,8 @@ public class SaveLoadInterface : MonoBehaviour
 
     public void ClearInstruments()
     {
+        preparePatchAnchorForPersistence();
+
         GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("instrument");
         for (int i = 0; i < gameObjects.Length; i++)
         {
@@ -189,6 +208,7 @@ public class SaveLoadInterface : MonoBehaviour
     public void Save(string filename)
     {
         masterControl.instance.currentScene = filename;
+        preparePatchAnchorForPersistence();
 
         if (synthSet == null) synthSet = new xmlSaveLoad();
         ClearSynthSetList();
@@ -210,7 +230,17 @@ public class SaveLoadInterface : MonoBehaviour
         synthSet.SaveToFile(filename);
     }
 
-    IEnumerator LoadPlugs()
+    void preparePatchAnchorForPersistence()
+    {
+        if (WorldDragController.Instance != null)
+        {
+            // World drag temporarily stores transform on PatchAnchor. Normalize
+            // that first so save/load/new patch operate on baked child transforms.
+            WorldDragController.Instance.PrepareForPersistence();
+        }
+    }
+
+    IEnumerator LoadPlugs(int loadSequence)
     {
         Debug.Log("Load Plugs");
         yield return new WaitForEndOfFrame();
@@ -252,6 +282,23 @@ public class SaveLoadInterface : MonoBehaviour
         }
 
         ClearSynthSetList();
+        yield return new WaitForSecondsRealtime(patchLoadSettleSeconds);
+
+        if (loadSequence == patchLoadSequence)
+        {
+            updatePatchAudioMute(false);
+        }
+    }
+
+    void updatePatchAudioMute(bool muted)
+    {
+        if (NetworkServer.active && NetworkMasterControl.Instance != null)
+        {
+            NetworkMasterControl.Instance.SetPatchAudioMuted(muted);
+            return;
+        }
+
+        speaker.SetPatchLoadMuted(muted);
     }
 
     public GameObject Copy(GameObject g, manipulator m)
@@ -282,9 +329,7 @@ public class SaveLoadInterface : MonoBehaviour
 
             g2.transform.position = g.transform.position;
             g2.transform.rotation = g.transform.rotation;
-            g2.transform.localScale = g.transform.localScale;
-
-            Vector3 v = g.transform.localScale;
+            Vector3 v = g.transform.lossyScale;
             if (v.x < 0) v.x *= -1; // needs mirroring if dragged while copying, because left controller was always mirrored and this copies down to the duplicate
             g2.transform.localScale = v;
 
@@ -362,6 +407,8 @@ public class SaveLoadInterface : MonoBehaviour
 [XmlInclude(typeof(PhaseDataLegacy))] // legacy alias, remove when old saves are dropped.
 [XmlInclude(typeof(PhaseToClockDividerData))]
 [XmlInclude(typeof(ClockData))] // legacy alias, remove when old saves are dropped.
+[XmlInclude(typeof(FilterTwoData))]
+[XmlInclude(typeof(FilterThreeData))]
 
 
 

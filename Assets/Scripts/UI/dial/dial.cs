@@ -55,6 +55,8 @@ public class dial : manipObject
     public float realRot = 0f;
     public float prevShakeRot = 0f;
     public float fineMult = 15f;
+    public float minProjectedControllerAxis = 0.15f;
+    public float maxControllerAngleDelta = 45f;
 
     public bool isNotched = false;
     public bool isBipolar = false;
@@ -183,6 +185,8 @@ public class dial : manipObject
     }
 
     dialColor newDialColor;
+    enum controllerAxis { up, right, forward }
+    controllerAxis activeControllerAxis = controllerAxis.up;
 
     void updatePercent(bool invokeEvent = false)
     {
@@ -228,7 +232,7 @@ public class dial : manipObject
     }
 
 
-    // begin grab, this sets the entry rotation via deltaRot
+    // begin grab, this anchors the current controller angle for delta tracking
     public override void setState(manipState state)
     {
         curState = state;
@@ -246,11 +250,7 @@ public class dial : manipObject
             //  _dialCheckRoutine = StartCoroutine(dialCheckRoutine());
             //}
 
-            Vector2 temp = dialCoordinates(manipulatorObj.up);
-            controllerRot = Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x);
-
-            rotAtBeginningOfGrab = controllerRot - curRot;
-            lastControllerRot = (controllerRot - rotAtBeginningOfGrab) * speedUp; // update relative values here so that it doesnt jump on first grab
+            beginGrabRotation();
 
         }
         else if (curState == manipState.selected)
@@ -269,27 +269,26 @@ public class dial : manipObject
     {
         if (manipulatorObj == null) return; // sometimes is null, since implemented eye-control
 
-        Vector2 temp = dialCoordinates(manipulatorObj.up);
-        controllerRot = (Vector2.Angle(temp, Vector2.up) * Mathf.Sign(temp.x) - rotAtBeginningOfGrab) * speedUp;
-
-
-        if (OSLInput.getInstance().isSidePressed(manipulatorObjScript.controllerIndex))
+        if (!tryGetControllerAngle(activeControllerAxis, out controllerRot))
         {
-            curRot += (controllerRot - lastControllerRot) / fineMult;
-        }
-        else
-        {
-            curRot += controllerRot - lastControllerRot;
+            if (!trySelectControllerAxis()) return;
+            if (!tryGetControllerAngle(activeControllerAxis, out controllerRot)) return;
+
+            // Re-anchor when the tracked controller axis becomes ambiguous instead of jumping the dial.
+            lastControllerRot = controllerRot;
+            return;
         }
 
-
+        float controllerDelta = Mathf.DeltaAngle(lastControllerRot, controllerRot) * speedUp;
+        controllerDelta = Mathf.Clamp(controllerDelta, -maxControllerAngleDelta, maxControllerAngleDelta);
         lastControllerRot = controllerRot;
 
-        curRot = Mathf.Clamp(curRot, -150f, 150f);
+        if (manipulatorObjScript != null && OSLInput.getInstance().isSidePressed(manipulatorObjScript.controllerIndex))
+        {
+            controllerDelta /= fineMult;
+        }
 
-        // catch naughty fliparounds, use realRot as lastRot
-        if (realRot == -150f && curRot > 0f) return;
-        if (realRot == 150f && curRot < 0f) return;
+        curRot = Mathf.Clamp(curRot + controllerDelta, -150f, 150f);
 
 
         realRot = curRot; // for percent storing and viz
@@ -314,13 +313,84 @@ public class dial : manipObject
     }
 
 
+    void beginGrabRotation()
+    {
+        if (!trySelectControllerAxis())
+        {
+            rotAtBeginningOfGrab = 0f;
+            controllerRot = 0f;
+            lastControllerRot = 0f;
+            return;
+        }
+
+        if (!tryGetControllerAngle(activeControllerAxis, out controllerRot))
+        {
+            rotAtBeginningOfGrab = 0f;
+            controllerRot = 0f;
+            lastControllerRot = 0f;
+            return;
+        }
+
+        rotAtBeginningOfGrab = controllerRot;
+        lastControllerRot = controllerRot;
+    }
+
+    bool trySelectControllerAxis()
+    {
+        float bestMagnitude = 0f;
+        controllerAxis bestAxis = activeControllerAxis;
+
+        updateBestControllerAxis(controllerAxis.up, ref bestAxis, ref bestMagnitude);
+        updateBestControllerAxis(controllerAxis.right, ref bestAxis, ref bestMagnitude);
+        updateBestControllerAxis(controllerAxis.forward, ref bestAxis, ref bestMagnitude);
+
+        if (bestMagnitude < minProjectedControllerAxis) return false;
+
+        activeControllerAxis = bestAxis;
+        return true;
+    }
+
+    void updateBestControllerAxis(controllerAxis axis, ref controllerAxis bestAxis, ref float bestMagnitude)
+    {
+        float magnitude = getProjectedAxisMagnitude(axis);
+        if (magnitude <= bestMagnitude) return;
+
+        bestAxis = axis;
+        bestMagnitude = magnitude;
+    }
+
+    float getProjectedAxisMagnitude(controllerAxis axis)
+    {
+        return dialCoordinates(getControllerAxis(axis)).magnitude;
+    }
+
+    bool tryGetControllerAngle(controllerAxis axis, out float angle)
+    {
+        Vector2 temp = dialCoordinates(getControllerAxis(axis));
+        if (temp.magnitude < minProjectedControllerAxis)
+        {
+            angle = 0f;
+            return false;
+        }
+
+        angle = Mathf.Atan2(temp.x, temp.y) * Mathf.Rad2Deg;
+        return true;
+    }
+
+    Vector3 getControllerAxis(controllerAxis axis)
+    {
+        if (axis == controllerAxis.right) return manipulatorObj.right;
+        if (axis == controllerAxis.forward) return manipulatorObj.forward;
+        return manipulatorObj.up;
+    }
+
     Vector2 dialCoordinates(Vector3 vec)
     {
         Vector3 flat = transform.parent.InverseTransformDirection(Vector3.ProjectOnPlane(vec, transform.parent.up));
         return new Vector2(flat.x, flat.z);
     }
 
-    float speedUp = 1.4f;
+    float speedUp = 1.82f;
     int turnCount = 0;
 
 
@@ -352,5 +422,3 @@ public class dial : manipObject
     //  yield return null;
     //}
 }
-
-

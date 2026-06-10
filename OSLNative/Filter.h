@@ -26,18 +26,18 @@
 // limitations under the License.
 #pragma once
 
-// #include <string.h> // for memset
+// Filter is the character lowpass in OSL.
+// It is derived from the classic Paul Kellett / Stilson-Smith-style Moog ladder approximation:
+// saturated, resonant, and intended to stay unapologetically lowpass-only.
 
 struct FilterData {
     float f, p, q;            // filter coefficients
     float b0, b1, b2, b3, b4; // filter buffers (beware denormals!)
-    bool LP;
 };
 
 extern "C" {
-typedef void (*LoggerFuncPtr)(int level, const char*); // Unity Delegate
-
-OSL_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffFrequency,
-                                 float lastCutoffFrequency, bool freqGen, float filterBuffer[],
-                                 float resonance /*, LoggerFuncPtr logger*/);
+OSL_API void processStereoFilter(float buffer[], int length, FilterData* mfL, FilterData* mfR, float cutoffPercent,
+                                 float lastCutoffPercent, float minCutoffHz, float maxCutoffHz,
+                                 float modulationOctaveRange, float filterBuffer[], float resonance, float sampleRate,
+                                 bool queueExcitation);
 }

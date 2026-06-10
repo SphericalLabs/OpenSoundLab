@@ -142,7 +142,7 @@ namespace Utp
         public IEnumerator OnReceivedData_ClientSendsDataToServer_CallbackIsInvoked()
         {
             bool callbackWasInvoked = false;
-            _server.OnReceivedData += (connectionId, segment) => { callbackWasInvoked = true; };
+            _server.OnReceivedData += (connectionId, segment, channelId) => { callbackWasInvoked = true; };
             _server.Start(7777);
             _client.Connect("localhost", 7777);
             yield return new WaitForClientAndServerToConnect(client: _client, server: _server, timeoutInSeconds: 30f);

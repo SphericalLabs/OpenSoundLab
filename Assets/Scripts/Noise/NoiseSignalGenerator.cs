@@ -42,8 +42,6 @@ public class NoiseSignalGenerator : signalGenerator
     float curSample = -1.0f;
     float lastSample = 0.0f;
 
-    int noiseStep = 0; // count how many samples have been calculated with thise noiseGen already, used for syncing with other clients
-    //int seed = 0; // select a specific noise pattern
     IntPtr noiseProcessorPointer; // used in OSLNative
     private readonly object lockObject = new object();
 
@@ -67,26 +65,30 @@ public class NoiseSignalGenerator : signalGenerator
 
     public int GetSeed()
     {
-        return GetCurrentSeed(noiseProcessorPointer);
+        lock (lockObject)
+        {
+            return GetCurrentSeed(noiseProcessorPointer);
+        }
     }
 
     // Instance method to get the current step
     public int GetStep()
     {
-        return GetCurrentStep(noiseProcessorPointer);
+        lock (lockObject)
+        {
+            return GetCurrentStep(noiseProcessorPointer);
+        }
     }
 
 
     public bool updated = false;
 
-    //public int NoiseStep { get => noiseStep; set => noiseStep = value; }
-    //public int Seed { get => seed; set => seed = value; }
-
     public void updatePercent(float per)
     {
-        if (sampleRatePercent == per) return;
-        sampleRatePercent = per;
-        speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
+        lock (lockObject)
+        {
+            setRatePercent(per);
+        }
     }
 
     public override void Awake()
@@ -107,7 +109,6 @@ public class NoiseSignalGenerator : signalGenerator
         lock (lockObject)
         {
             NoiseProcessBuffer(noiseProcessorPointer, buffer, buffer.Length, channels, sampleRatePercent, ref lastSample, ref counter, speedFrames, ref updated);
-            noiseStep += buffer.Length;
         }
     }
 
@@ -118,5 +119,36 @@ public class NoiseSignalGenerator : signalGenerator
             Debug.Log($"Sync noise signal{seed},{steps}");
             SyncNoiseProcessor(noiseProcessorPointer, seed, steps);
         }
+    }
+
+    public void captureNetworkState(out int seed, out int step, out float currentSample, out int currentCounter, out float ratePercent)
+    {
+        lock (lockObject)
+        {
+            seed = GetCurrentSeed(noiseProcessorPointer);
+            step = GetCurrentStep(noiseProcessorPointer);
+            currentSample = lastSample;
+            currentCounter = counter;
+            ratePercent = sampleRatePercent;
+        }
+    }
+
+    public void applyNetworkState(int seed, int step, float currentSample, int currentCounter, float ratePercent)
+    {
+        lock (lockObject)
+        {
+            setRatePercent(ratePercent);
+            SyncNoiseProcessor(noiseProcessorPointer, seed, step);
+            lastSample = currentSample;
+            counter = Mathf.Max(0, currentCounter);
+            updated = false;
+        }
+    }
+
+    void setRatePercent(float per)
+    {
+        if (sampleRatePercent == per) return;
+        sampleRatePercent = per;
+        speedFrames = Mathf.RoundToInt(maxLength * Mathf.Pow(Mathf.Clamp01(1f - per / 0.95f), 4));
     }
 }

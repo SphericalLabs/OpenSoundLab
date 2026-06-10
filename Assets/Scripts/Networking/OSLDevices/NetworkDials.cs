@@ -62,7 +62,7 @@ public class NetworkDials : NetworkBehaviour
         {
             int index = i;
             dials[i].onPercentChangedEvent.AddListener(delegate { UpdateDialValue(index); });
-            dials[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            dials[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
             if (dials[i].DialFeedback == null)
             {
                 dials[i].DialFeedback = dials[i].transform.parent.Find("glowDisk").GetComponent<glowDisk>();
@@ -109,6 +109,11 @@ public class NetworkDials : NetworkBehaviour
 
     public void UpdateDialValue(int index)
     {
+        SendDialValue(index);
+    }
+
+    void SendDialValue(int index)
+    {
         //Debug.Log($"Update dial value of index: {index} to value: {dials[index].percent}");
         if (isServer)
         {
@@ -133,6 +138,12 @@ public class NetworkDials : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        SendDialValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

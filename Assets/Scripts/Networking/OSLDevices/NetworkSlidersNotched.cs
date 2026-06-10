@@ -56,7 +56,7 @@ public class NetworkSlidersNotched : NetworkBehaviour
         {
             int index = i;
             sliders[i].onPercentChangedEvent.AddListener(delegate { UpdateSliderValue(index); });
-            sliders[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            sliders[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
         }
     }
 
@@ -98,6 +98,11 @@ public class NetworkSlidersNotched : NetworkBehaviour
 
     public void UpdateSliderValue(int index)
     {
+        SendSliderValue(index);
+    }
+
+    void SendSliderValue(int index)
+    {
         if (isServer)
         {
             sliderValues[index] = sliders[index].percent;
@@ -122,6 +127,12 @@ public class NetworkSlidersNotched : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        SendSliderValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

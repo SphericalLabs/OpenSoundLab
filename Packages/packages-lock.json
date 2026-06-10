@@ -1,5 +1,35 @@
 {
   "dependencies": {
+    "com.adrenak.brw": {
+      "version": "file:com.adrenak.brw",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.adrenak.concentus-unity": {
+      "version": "1.0.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://registry.npmjs.org"
+    },
+    "com.adrenak.unimic": {
+      "version": "3.4.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://registry.npmjs.org"
+    },
+    "com.adrenak.univoice": {
+      "version": "file:com.adrenak.univoice",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.adrenak.brw": "1.2.0",
+        "com.adrenak.unimic": "3.4.0",
+        "com.adrenak.concentus-unity": "1.0.1"
+      }
+    },
     "com.meta.xr.depthapi.urp": {
       "version": "https://github.com/oculus-samples/Unity-DepthAPI.git?path=/Packages/com.meta.xr.depthapi.urp",
       "depth": 0,

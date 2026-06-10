@@ -34,6 +34,8 @@ using UnityEngine;
 
 public class NetworkMasterControl : NetworkBehaviour
 {
+    public static NetworkMasterControl Instance;
+
     [SyncVar(hook = nameof(OnWireSettingChanged))]
     public WireMode WireSetting;
 
@@ -42,6 +44,11 @@ public class NetworkMasterControl : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnBinauralSettingChanged))]
     public BinauralMode BinauralSetting;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
 
     void OnWireSettingChanged(WireMode oldValue, WireMode newValue)
@@ -81,6 +88,11 @@ public class NetworkMasterControl : NetworkBehaviour
 
     private void OnDestroy()
     {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+
         masterControl.instance.onBinauralChangedEvent.RemoveListener(UpdateBinaural);
         masterControl.instance.onWireChangedEvent.RemoveListener(UpdateWire);
         masterControl.instance.onDisplayChangedEvent.RemoveListener(UpdateDisplay);
@@ -163,6 +175,27 @@ public class NetworkMasterControl : NetworkBehaviour
     {
         DisplaySetting = mode;
         masterControl.instance.updateDisplaySetting((int)mode);
+    }
+
+    public void SetPatchAudioMuted(bool muted)
+    {
+        speaker.SetPatchLoadMuted(muted);
+
+        if (isServer)
+        {
+            RpcSetPatchAudioMuted(muted);
+        }
+    }
+
+    [ClientRpc]
+    void RpcSetPatchAudioMuted(bool muted)
+    {
+        if (isServer)
+        {
+            return;
+        }
+
+        speaker.SetPatchLoadMuted(muted);
     }
 
     //// cooldown time measurements

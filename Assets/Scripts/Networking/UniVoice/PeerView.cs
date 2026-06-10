@@ -79,9 +79,14 @@ namespace Adrenak.UniVoice.Samples
                 OnOutgoingModified?.Invoke(value));
         }
 
-        public void SetPeerID(short id)
+        public void SetPeerID(int id)
         {
             idText.text = id.ToString();
+        }
+
+        public void SetPeerID(short id)
+        {
+            SetPeerID((int)id);
         }
 
         public void DisplaySpectrum(float[] spectrum)

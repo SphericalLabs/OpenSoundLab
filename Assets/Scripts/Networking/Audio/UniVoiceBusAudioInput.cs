@@ -25,33 +25,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Adrenak.UniVoice;
 using System;
+using Adrenak.UniVoice;
+using UnityEngine;
+using UniVoiceUtils = Adrenak.UniVoice.Utils;
 
 public class UniVoiceBusAudioInput : IAudioInput
 {
-    public event Action<int, float[]> OnSegmentReady;
-
-    public int Frequency => UniVoiceMasterBusRecorder.Instance.Frequency;
-
-    public int ChannelCount => UniVoiceMasterBusRecorder.Instance.ChannelCount;
-
-    public int SegmentRate { get; private set; }
+    public event Action<AudioFrame> OnFrameReady;
 
     public UniVoiceBusAudioInput(int segmentRate = 10)
     {
-        SegmentRate = segmentRate;
-        UniVoiceMasterBusRecorder.Instance.StartRec(SegmentRate);
+        UniVoiceMasterBusRecorder.Instance.StartRec(segmentRate);
         Debug.unityLogger.Log("UniVoiceBusAudioInput started recording");
         UniVoiceMasterBusRecorder.Instance.OnSegmentReady += MasterBus_OnSegmentReady;
     }
 
     void MasterBus_OnSegmentReady(int segmentIndex, float[] samples)
     {
-        OnSegmentReady?.Invoke(segmentIndex, samples);
+        OnFrameReady?.Invoke(new AudioFrame
+        {
+            timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            frequency = UniVoiceMasterBusRecorder.Instance.Frequency,
+            channelCount = UniVoiceMasterBusRecorder.Instance.ChannelCount,
+            samples = UniVoiceUtils.Bytes.FloatsToBytes(samples)
+        });
     }
 
     public void Dispose()

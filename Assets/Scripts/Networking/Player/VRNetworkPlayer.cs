@@ -27,10 +27,10 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using System.IO;
 using Mirror;
-using Unity.Collections.LowLevel.Unsafe;
 
 [System.Serializable]
 public class ManipulatorVisual
@@ -87,6 +87,13 @@ public class VRNetworkPlayer : NetworkBehaviour
     [Header("Network Jack")]
     public NetworkPlayerPlugHand leftNetworkPlugHand;
     public NetworkPlayerPlugHand rightNetworkPlugHand;
+
+    Coroutine patchLoadCoroutine;
+    int nextPatchUploadId = 1;
+    int pendingPatchUploadId = -1;
+    string pendingPatchFileName;
+    byte[] pendingCompressedPatchUpload;
+    int pendingPatchUploadOffset;
 
 
     public override void OnStartLocalPlayer()
@@ -231,6 +238,11 @@ public class VRNetworkPlayer : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdGetObjectAuthority(NetworkIdentity item)
     {
+        if (WorldDragController.Instance != null && WorldDragController.Instance.ShouldBlockModuleGrab(item))
+        {
+            return;
+        }
+
         if (item.connectionToClient != null)
             item.RemoveClientAuthority();
         item.AssignClientAuthority(connectionToClient);
@@ -460,12 +472,12 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
         if (networkVoiceManager != null)
         {
-            var audioOutput = networkVoiceManager.GetSourceOutput((short)voiceChatAgentID);
-            if (audioOutput != null)
+            var audioSource = networkVoiceManager.GetSourceOutput(voiceChatAgentID);
+            if (audioSource != null)
             {
                 moveVoiceChatObject = true;
-                voiceOverTransform = audioOutput.transform;
-                audioOutput.audioSource.spatialBlend = 1f;
+                voiceOverTransform = audioSource.transform;
+                audioSource.spatialBlend = 1f;
                 //Debug.Log($"found voicechat output object {gameObject.name}");
             }
         }
@@ -475,22 +487,78 @@ public class VRNetworkPlayer : NetworkBehaviour
 
     #region PlayMode Patch Menu Commands
 
+    const float networkedLoadDelaySeconds = 0.3f;
+
+    public bool RequestLoadPatchFromLocalFile(string path)
+    {
+        if (!isLocalPlayer)
+        {
+            Debug.LogError("Cannot upload patch: RequestLoadPatchFromLocalFile must be called on the local player.");
+            return false;
+        }
+
+        if (!NetworkClient.isConnected)
+        {
+            Debug.LogError("Cannot upload patch: Mirror client is not connected.");
+            return false;
+        }
+
+        if (!NetworkPatchTransferUtility.TryPreparePatchUpload(path, out string patchFileName, out byte[] compressedPatch, out string error))
+        {
+            Debug.LogError(error);
+            return false;
+        }
+
+        int chunkSize = NetworkPatchTransferUtility.GetPatchUploadChunkBytes();
+        if (chunkSize <= 0)
+        {
+            Debug.LogError("Cannot upload patch: reliable chunk size is not available.");
+            return false;
+        }
+
+        if (nextPatchUploadId == int.MaxValue)
+        {
+            nextPatchUploadId = 1;
+        }
+
+        int uploadId = nextPatchUploadId++;
+        CmdBeginCompressedPatchUpload(uploadId, patchFileName, compressedPatch.Length);
+
+        for (int offset = 0; offset < compressedPatch.Length; offset += chunkSize)
+        {
+            int chunkLength = Mathf.Min(chunkSize, compressedPatch.Length - offset);
+            byte[] chunk = new byte[chunkLength];
+            Buffer.BlockCopy(compressedPatch, offset, chunk, 0, chunkLength);
+            CmdAppendCompressedPatchChunk(uploadId, chunk);
+        }
+
+        CmdFinishCompressedPatchUpload(uploadId);
+        if (masterControl.instance != null)
+        {
+            masterControl.instance.currentScene = path;
+        }
+        Debug.Log($"Requested Server to Load Patch from {path}");
+        return true;
+    }
+
     [Command(requiresAuthority = false)]
     public void CmdLoadLastPlayModePatch()
     {
-        if (SaveLoadInterface.instance != null)
+        if (SaveLoadInterface.instance == null)
         {
-            string path = GetPlayModePatchPath();
-            if (File.Exists(path))
-            {
-                SaveLoadInterface.instance.Load(path);
-                Debug.Log($"Loaded LastPlayModePatch from {path} via Client Request");
-            }
-            else
-            {
-                Debug.LogWarning($"LastPlayModePatch not found at {path}");
-            }
+            Debug.LogError("Cannot load LastPlayModePatch: SaveLoadInterface is not available.");
+            return;
         }
+
+        string path = GetPlayModePatchPath();
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning($"LastPlayModePatch not found at {path}");
+            return;
+        }
+
+        BeginServerPatchLoad(path);
+        Debug.Log($"Queued LastPlayModePatch load from {path} via Client Request");
     }
 
     [Command(requiresAuthority = false)]
@@ -515,6 +583,95 @@ public class VRNetworkPlayer : NetworkBehaviour
         }
     }
 
+    [Command(requiresAuthority = false)]
+    void CmdBeginCompressedPatchUpload(int uploadId, string patchFileName, int totalBytes)
+    {
+        if (SaveLoadInterface.instance == null)
+        {
+            Debug.LogError("Cannot load uploaded patch: SaveLoadInterface is not available.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (uploadId <= 0)
+        {
+            Debug.LogError($"Cannot begin patch upload: invalid upload id {uploadId}.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (totalBytes <= 0 || totalBytes > NetworkPatchTransferUtility.GetMaxBufferedPatchBytes())
+        {
+            Debug.LogError($"Cannot begin patch upload {patchFileName}: invalid compressed size {totalBytes} bytes.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        pendingPatchUploadId = uploadId;
+        pendingPatchFileName = patchFileName;
+        pendingCompressedPatchUpload = new byte[totalBytes];
+        pendingPatchUploadOffset = 0;
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdAppendCompressedPatchChunk(int uploadId, byte[] chunk)
+    {
+        if (pendingCompressedPatchUpload == null || uploadId != pendingPatchUploadId)
+        {
+            Debug.LogError($"Cannot append patch chunk: no active upload for id {uploadId}.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (chunk == null || chunk.Length == 0)
+        {
+            Debug.LogError($"Cannot append patch chunk: upload {uploadId} sent an empty chunk.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (pendingPatchUploadOffset + chunk.Length > pendingCompressedPatchUpload.Length)
+        {
+            Debug.LogError($"Cannot append patch chunk: upload {uploadId} exceeds announced size.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        Buffer.BlockCopy(chunk, 0, pendingCompressedPatchUpload, pendingPatchUploadOffset, chunk.Length);
+        pendingPatchUploadOffset += chunk.Length;
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdFinishCompressedPatchUpload(int uploadId)
+    {
+        if (pendingCompressedPatchUpload == null || uploadId != pendingPatchUploadId)
+        {
+            Debug.LogError($"Cannot finish patch upload: no active upload for id {uploadId}.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        if (pendingPatchUploadOffset != pendingCompressedPatchUpload.Length)
+        {
+            Debug.LogError($"Cannot finish patch upload {pendingPatchFileName}: received {pendingPatchUploadOffset} of {pendingCompressedPatchUpload.Length} bytes.");
+            clearPendingPatchUpload();
+            return;
+        }
+
+        byte[] compressedPatch = pendingCompressedPatchUpload;
+        string patchFileName = pendingPatchFileName;
+        clearPendingPatchUpload();
+
+        if (!NetworkPatchTransferUtility.TryWriteUploadedPatch(compressedPatch, patchFileName, netId, out string patchPath, out string error))
+        {
+            Debug.LogError(error);
+            return;
+        }
+
+        BeginServerPatchLoad(patchPath);
+        Debug.Log($"Queued uploaded patch {patchFileName} via Client Request");
+    }
+
     private string GetPlayModePatchPath()
     {
         string baseDir = (masterControl.instance != null) ? masterControl.instance.SaveDir : null;
@@ -532,6 +689,59 @@ public class VRNetworkPlayer : NetworkBehaviour
         {
             Directory.CreateDirectory(dir);
         }
+    }
+
+    void BeginServerPatchLoad(string path)
+    {
+        if (!isServer)
+        {
+            Debug.LogError("Cannot begin server patch load: this player is not running on the server.");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        {
+            Debug.LogError($"Cannot begin server patch load: patch file not found at {path}");
+            return;
+        }
+
+        if (patchLoadCoroutine != null)
+        {
+            StopCoroutine(patchLoadCoroutine);
+        }
+
+        patchLoadCoroutine = StartCoroutine(loadPatchAfterClear(path));
+    }
+
+    IEnumerator loadPatchAfterClear(string path)
+    {
+        if (SaveLoadInterface.instance == null)
+        {
+            Debug.LogError("Cannot load patch after clear: SaveLoadInterface is not available.");
+            patchLoadCoroutine = null;
+            yield break;
+        }
+
+        SaveLoadInterface.instance.ClearInstruments();
+        yield return new WaitForSecondsRealtime(networkedLoadDelaySeconds);
+
+        if (SaveLoadInterface.instance == null)
+        {
+            Debug.LogError("Cannot finish patch load: SaveLoadInterface is not available.");
+            patchLoadCoroutine = null;
+            yield break;
+        }
+
+        SaveLoadInterface.instance.Load(path);
+        patchLoadCoroutine = null;
+    }
+
+    void clearPendingPatchUpload()
+    {
+        pendingPatchUploadId = -1;
+        pendingPatchFileName = null;
+        pendingCompressedPatchUpload = null;
+        pendingPatchUploadOffset = 0;
     }
 
     #endregion

@@ -144,6 +144,11 @@ public partial class OSLInput
         return Patcher.GripLeft.ReadValue<float>() >= 0.1f && Patcher.GripRight.ReadValue<float>() >= 0.1f;
     }
 
+    public bool didAnySideReleaseThisFrame()
+    {
+        return Patcher.GripLeft.WasReleasedThisFrame() || Patcher.GripRight.WasReleasedThisFrame();
+    }
+
     public bool isSecondaryPressed(int controllerIndex)
     {
         if (controllerIndex == 0)

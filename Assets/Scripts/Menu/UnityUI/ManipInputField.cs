@@ -38,6 +38,12 @@ public class ManipInputField : ManipUiObject
     protected override void Start()
     {
         inputField = GetComponent<TMP_InputField>();
+        inputField.customCaretColor = true;
+        inputField.caretColor = Color.white;
+
+        // The MRTK keyboard sometimes re-selects TMP input fields with the caret at 0,
+        // which makes subsequent key presses insert at the front and flips the typed string.
+        inputField.onSelect.AddListener(onInputSelected);
         base.Start();
     }
 
@@ -45,5 +51,39 @@ public class ManipInputField : ManipUiObject
     {
         base.OnGrab();
         inputField.Select();
+        moveCaretToEnd();
+        StartCoroutine(moveCaretToEndNextFrame());
+    }
+
+    private void OnDestroy()
+    {
+        if (inputField != null)
+        {
+            inputField.onSelect.RemoveListener(onInputSelected);
+        }
+    }
+
+    private void onInputSelected(string value)
+    {
+        moveCaretToEnd();
+        StartCoroutine(moveCaretToEndNextFrame());
+    }
+
+    private IEnumerator moveCaretToEndNextFrame()
+    {
+        // TMP/MRTK can reset the caret again after the initial select callback, so we
+        // force one more update on the next frame to keep typing appended at the end.
+        // Otherwise the resulting string is flipped
+        yield return null;
+        moveCaretToEnd();
+    }
+
+    private void moveCaretToEnd()
+    {
+        int end = inputField.text.Length;
+        inputField.caretPosition = end;
+        inputField.selectionAnchorPosition = end;
+        inputField.selectionFocusPosition = end;
+        inputField.MoveTextEnd(false);
     }
 }

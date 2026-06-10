@@ -55,7 +55,7 @@ public class NetworkSlidersUneven : NetworkBehaviour
         {
             int index = i;
             sliders[i].onPercentChangedEvent.AddListener(delegate { UpdateSliderValue(index); });
-            sliders[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            sliders[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
         }
     }
 
@@ -97,6 +97,11 @@ public class NetworkSlidersUneven : NetworkBehaviour
 
     public void UpdateSliderValue(int index)
     {
+        SendSliderValue(index);
+    }
+
+    void SendSliderValue(int index)
+    {
         Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
         if (isServer)
         {
@@ -121,6 +126,12 @@ public class NetworkSlidersUneven : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        SendSliderValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

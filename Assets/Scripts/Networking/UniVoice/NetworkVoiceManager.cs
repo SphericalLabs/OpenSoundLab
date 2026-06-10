@@ -26,8 +26,6 @@
 // limitations under the License.
 
 using System.Linq;
-using System.Net.Sockets;
-using System.Net;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -35,9 +33,10 @@ using UnityEngine.UI;
 using TMPro;
 
 using Adrenak.UniVoice;
-using Adrenak.UniVoice.MirrorNetwork;
-using Adrenak.UniVoice.UniMicInput;
-using Adrenak.UniVoice.AudioSourceOutput;
+using Adrenak.UniVoice.Filters;
+using Adrenak.UniVoice.Inputs;
+using Adrenak.UniVoice.Outputs;
+using Adrenak.UniMic;
 
 using UnityEngine.Android;
 using System.Collections;
@@ -45,7 +44,25 @@ using Adrenak.UniVoice.Samples;
 
 public class NetworkVoiceManager : MonoBehaviour
 {
-    ChatroomAgent agent;
+    const int microphoneFrameDurationMs = 20;
+    const int opusBitrate = 32000;
+    const int opusResamplerQuality = 3;
+    const int opusEncoderComplexity = 5;
+    const int jitterStartupFrames = 1;
+    const int jitterMaxBufferedFrames = 3;
+    const int jitterReorderWindowMs = 40;
+    const float outputTargetLatencySec = 0.15f;
+    const float outputFrameLifetimeSec = 0.25f;
+    const float outputStartSafetyMarginSec = 0.01f;
+
+    IAudioServer<int> audioServer;
+    IAudioClient<int> audioClient;
+    ClientSession<int> clientSession;
+    JitterBufferedAudioClient jitterBufferedAudioClient;
+
+    bool requestedMicrophonePermission;
+    bool microphoneInputReady;
+    float nextMicrophoneCheckTime;
 
     [Header("UI")]
 
@@ -56,132 +73,158 @@ public class NetworkVoiceManager : MonoBehaviour
     public Toggle muteSelfToggle;
     public Toggle muteOthersToggle;
 
-    Dictionary<short, PeerView> peerViews = new Dictionary<short, PeerView>();
-
-    private void Awake()
-    {
-        // Quit univoice immediately since any call to Unity microphone will fry the app
-        if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) Destroy(this);
-    }
+    Dictionary<int, PeerView> peerViews = new Dictionary<int, PeerView>();
 
     IEnumerator Start()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        Mic.Init();
+
+        // Relay host/client startup is triggered very early in this scene. UniVoice needs to
+        // subscribe to Mirror transport callbacks before those connections happen, otherwise the
+        // chatroom never sees peers join even though gameplay networking is already connected.
+        InitializeVoice();
+        InitializeMenu();
 
 #if UNITY_ANDROID
-        while (!Permission.HasUserAuthorizedPermission("android.permission.RECORD_AUDIO"))
+        if (!Permission.HasUserAuthorizedPermission("android.permission.RECORD_AUDIO"))
         {
+            requestedMicrophonePermission = true;
             Permission.RequestUserPermission("android.permission.RECORD_AUDIO");
-            yield return new WaitForSeconds(1);
         }
 #endif
-        yield return null;
-        yield return new WaitForSeconds(1);
 
-        InitializeAgent();
-        InitializeMenu();
+        TryEnableMicrophoneInput();
+        yield return null;
     }
 
-
-    void InitializeAgent()
+    void OnDestroy()
     {
+        clientSession?.Dispose();
+        audioServer?.Dispose();
+    }
 
-        //foreach (var device in Microphone.devices)
-        //{
-        //    int min, max = 0;
-        //    Microphone.GetDeviceCaps(device, out min, out max);
-        //    Debug.Log("Name: " + device + "min freq: " + min + "max freq: " + max);
-        //}
-
-        // Microphone reports 16000 as min and max on Quest 3, does not start if 24000 is set, but is starting properly with 8000 or 48000 (in MicrophoneSignalGenerator), so probably integer divisions and multiples are supported by Unity
-
-        agent = new ChatroomAgent(
-            new UniVoiceMirrorNetwork(),
-            new UniVoiceUniMicInput(0, 16000, 10), // last parameter sets segment length in milliseconds
-            new UniVoiceAudioSourceOutput.Factory(25, 50) // minSegCount: target fill up when buffer ran empty, maxSegCount: threshold when skipping occurs, skip target will be center of minSegCount and maxSegCount in order to debounce that threshold
+    void InitializeVoice()
+    {
+        audioServer = new OslMirrorAudioServer();
+        jitterBufferedAudioClient = new JitterBufferedAudioClient(
+            new OslMirrorAudioClient(),
+            jitterStartupFrames,
+            jitterMaxBufferedFrames,
+            jitterReorderWindowMs
         );
-        agent.Network.OnCreatedChatroom += () =>
+        audioClient = jitterBufferedAudioClient;
+        clientSession = new ClientSession<int>(
+            audioClient,
+            new EmptyAudioInput(),
+            new StreamedAudioSourceOutput.Factory()
+        );
+
+        clientSession.InputFilters.Add(new ConcentusEncodeFilter(
+            ConcentusFrequencies.Frequency_16000,
+            opusResamplerQuality,
+            opusEncoderComplexity,
+            opusBitrate
+        ));
+        clientSession.AddOutputFilter<ConcentusDecodeFilter>(() => new ConcentusDecodeFilter());
+
+        audioServer.OnServerStart += () =>
         {
-            ShowMessage(agent.Network.OwnID != -1 ? $"Chatroom created!\nYou are Peer ID {agent.Network.OwnID}" : "");
+            ShowMessage("Chatroom created!");
         };
 
-        agent.Network.OnChatroomCreationFailed += ex =>
-        {
-            ShowMessage("Chatroom creation failed");
-        };
-
-        agent.Network.OnClosedChatroom += () =>
+        audioServer.OnServerStop += () =>
         {
             ShowMessage("You closed the chatroom! All peers have been kicked");
         };
 
-        agent.Network.OnJoinedChatroom += id =>
+        audioClient.OnJoined += (id, peerIds) =>
         {
             ShowMessage("Joined chatroom ");
             ShowMessage("You are Peer ID " + id);
         };
 
-        agent.Network.OnChatroomJoinFailed += ex =>
-        {
-            ShowMessage(ex);
-        };
-
-        agent.Network.OnLeftChatroom += () =>
+        audioClient.OnLeft += () =>
         {
             ShowMessage("You left the chatroom");
         };
 
-        agent.Network.OnPeerJoinedChatroom += id =>
+        audioClient.OnPeerJoined += id =>
         {
             var view = Instantiate(peerViewTemplate, peerViewContainer);
-            view.IncomingAudio = !agent.PeerSettings[id].muteThem;
-            view.OutgoingAudio = !agent.PeerSettings[id].muteSelf;
+            view.IncomingAudio = !audioClient.YourVoiceSettings.mutedPeers.Contains(id);
+            view.OutgoingAudio = !audioClient.YourVoiceSettings.deafenedPeers.Contains(id);
 
             view.OnIncomingModified += value =>
-                agent.PeerSettings[id].muteThem = !value;
+            {
+                audioClient.YourVoiceSettings.SetMute(id, !value);
+                audioClient.SubmitVoiceSettings();
+                ApplyPeerIncomingAudio(id, value);
+            };
 
             view.OnOutgoingModified += value =>
-                agent.PeerSettings[id].muteSelf = !value;
+            {
+                audioClient.YourVoiceSettings.SetDeaf(id, !value);
+                audioClient.SubmitVoiceSettings();
+            };
 
             peerViews.Add(id, view);
             view.SetPeerID(id);
+            ConfigurePeerOutput(id);
+            ApplyPeerIncomingAudio(id, view.IncomingAudio);
         };
 
-        agent.Network.OnPeerLeftChatroom += id =>
+        audioClient.OnPeerLeft += id =>
         {
-            var peerViewInstance = peerViews[id];
+            if (!peerViews.TryGetValue(id, out var peerViewInstance)) return;
             Destroy(peerViewInstance.gameObject);
             peerViews.Remove(id);
         };
 
-        agent.MuteOthers = false;
-        agent.MuteSelf = false;
+        audioClient.YourVoiceSettings.muteAll = false;
+        audioClient.YourVoiceSettings.deafenAll = false;
+        ApplyGlobalAudioSettings();
     }
 
 
     void InitializeMenu()
     {
-        muteSelfToggle.SetIsOnWithoutNotify(agent.MuteSelf);
-        muteSelfToggle.onValueChanged.AddListener(value =>
-            agent.MuteSelf = value);
+        muteSelfToggle.SetIsOnWithoutNotify(audioClient != null && audioClient.YourVoiceSettings.deafenAll);
+        muteSelfToggle.onValueChanged.AddListener(value => {
+            if (audioClient == null) return;
+            audioClient.YourVoiceSettings.deafenAll = value;
+            audioClient.SubmitVoiceSettings();
+            ApplyGlobalAudioSettings();
+        });
 
-        muteOthersToggle.SetIsOnWithoutNotify(agent.MuteOthers);
-        muteOthersToggle.onValueChanged.AddListener(value =>
-            agent.MuteOthers = value);
+        muteOthersToggle.SetIsOnWithoutNotify(audioClient != null && audioClient.YourVoiceSettings.muteAll);
+        muteOthersToggle.onValueChanged.AddListener(value => {
+            if (audioClient == null) return;
+            audioClient.YourVoiceSettings.muteAll = value;
+            audioClient.SubmitVoiceSettings();
+            ApplyGlobalAudioSettings();
+        });
     }
 
-    public short GetAgentID()
+    public int GetAgentID()
     {
-        if (agent != null)
-            return agent.Network.OwnID;
+        if (audioClient != null)
+            return audioClient.ID;
         return -1;
     }
 
     void Update()
     {
-        if (agent == null || agent.PeerOutputs == null || !displaySpectrum) return;
+        jitterBufferedAudioClient?.Tick();
 
-        foreach (var output in agent.PeerOutputs)
+        if (!microphoneInputReady && Time.unscaledTime >= nextMicrophoneCheckTime)
+        {
+            TryEnableMicrophoneInput();
+        }
+
+        if (clientSession == null || clientSession.PeerOutputs == null || !displaySpectrum) return;
+
+        foreach (var output in clientSession.PeerOutputs)
         {
             if (peerViews.ContainsKey(output.Key))
             {
@@ -203,18 +246,20 @@ public class NetworkVoiceManager : MonoBehaviour
                 var sampleRate = AudioSettings.outputSampleRate;
                 var frequencyResolution = sampleRate / 2 / size;
 
-                var audioSource = (output.Value as UniVoiceAudioSourceOutput).audioSource;
+                var audioSource = GetSourceOutput(output.Key);
+                if (audioSource == null) continue;
                 var spectrumData = new float[size];
                 audioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
 
                 var indices = Enumerable.Range(0, size - 1).ToList();
                 var minVocalFrequencyIndex = indices.Min(x => (Mathf.Abs(x * frequencyResolution - minVocalFrequency), x)).x;
                 var maxVocalFrequencyIndex = indices.Min(x => (Mathf.Abs(x * frequencyResolution - maxVocalFrequency), x)).x;
-                var indexRange = maxVocalFrequencyIndex - minVocalFrequency;
+                var indexRange = maxVocalFrequencyIndex - minVocalFrequencyIndex;
+                if (indexRange <= 0) continue;
 
                 spectrumData = spectrumData.Select(x => 1000 * x)
                     .ToList()
-                    .GetRange(minVocalFrequency, indexRange)
+                    .GetRange(minVocalFrequencyIndex, indexRange)
                     .ToArray();
                 peerViews[output.Key].DisplaySpectrum(spectrumData);
             }
@@ -224,15 +269,71 @@ public class NetworkVoiceManager : MonoBehaviour
     void ShowMessage(object obj)
     {
         Debug.Log("<color=blue>" + obj + "</color>");
-        menuMessage.text = obj.ToString();
+        if (menuMessage != null)
+            menuMessage.text = obj.ToString();
     }
 
-    public UniVoiceAudioSourceOutput GetSourceOutput(short id)
+    void TryEnableMicrophoneInput()
     {
-        if (agent.PeerOutputs.ContainsKey(id) && agent.PeerOutputs.TryGetValue(id, out IAudioOutput audioOutput) && audioOutput is UniVoiceAudioSourceOutput)
+        nextMicrophoneCheckTime = Time.unscaledTime + 1f;
+        if (clientSession == null || microphoneInputReady) return;
+
+#if UNITY_ANDROID
+        if (!Permission.HasUserAuthorizedPermission("android.permission.RECORD_AUDIO"))
         {
-            return audioOutput as UniVoiceAudioSourceOutput;
+            if (!requestedMicrophonePermission)
+            {
+                requestedMicrophonePermission = true;
+                Permission.RequestUserPermission("android.permission.RECORD_AUDIO");
+            }
+            return;
         }
+#endif
+
+        if (Mic.AvailableDevices.Count == 0) return;
+
+        var mic = Mic.AvailableDevices[0];
+        mic.StartRecording(microphoneFrameDurationMs);
+        clientSession.Input = new MonotonicUniMicInput(mic);
+        microphoneInputReady = true;
+    }
+
+    void ApplyGlobalAudioSettings()
+    {
+        if (clientSession == null || audioClient == null) return;
+        clientSession.InputEnabled = !audioClient.YourVoiceSettings.deafenAll;
+        clientSession.OutputsEnabled = !audioClient.YourVoiceSettings.muteAll;
+    }
+
+    void ApplyPeerIncomingAudio(int id, bool allowIncomingAudio)
+    {
+        var audioSource = GetSourceOutput(id);
+        if (audioSource != null)
+            audioSource.mute = !allowIncomingAudio;
+    }
+
+    void ConfigurePeerOutput(int id)
+    {
+        if (clientSession == null || clientSession.PeerOutputs == null) return;
+        if (!clientSession.PeerOutputs.TryGetValue(id, out var audioOutput)) return;
+        if (audioOutput is not StreamedAudioSourceOutput streamedOutput) return;
+
+        streamedOutput.Stream.TargetLatency = outputTargetLatencySec;
+        streamedOutput.Stream.FrameLifetime = outputFrameLifetimeSec;
+        streamedOutput.Stream.StartSafetyMarginSec = outputStartSafetyMarginSec;
+    }
+
+    public AudioSource GetSourceOutput(int id)
+    {
+        if (clientSession == null || clientSession.PeerOutputs == null) return null;
+        if (!clientSession.PeerOutputs.TryGetValue(id, out var audioOutput)) return null;
+        if (audioOutput is StreamedAudioSourceOutput streamedOutput)
+            return streamedOutput.Stream.UnityAudioSource;
         return null;
+    }
+
+    public AudioSource GetSourceOutput(short id)
+    {
+        return GetSourceOutput((int)id);
     }
 }

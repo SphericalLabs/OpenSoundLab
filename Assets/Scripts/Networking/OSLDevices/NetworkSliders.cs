@@ -61,7 +61,7 @@ public class NetworkSliders : NetworkBehaviour
         {
             int index = i;
             sliders[i].PercentChanged.AddListener(delegate { OnPercentChanged(index); }); // passing the method to be called, as a lambda delegate in order to also pass the index
-            sliders[i].onEndGrabEvents.AddListener(delegate { UpdateLastGrabedTime(index); });
+            sliders[i].onEndGrabEvents.AddListener(delegate { HandleEndGrab(index); });
         }
     }
 
@@ -115,6 +115,11 @@ public class NetworkSliders : NetworkBehaviour
     // client and server
     public void OnPercentChanged(int index) // called from the sliders' onPercentChangedEvent
     {
+        SendSliderValue(index);
+    }
+
+    void SendSliderValue(int index)
+    {
         Debug.Log($"Update dial value of index: {index} to value: {sliders[index].percent}");
         if (isServer)
         {
@@ -141,6 +146,12 @@ public class NetworkSliders : NetworkBehaviour
         {
             lastGrabedTimes[index] = Time.time;
         }
+    }
+
+    public void HandleEndGrab(int index)
+    {
+        UpdateLastGrabedTime(index);
+        SendSliderValue(index);
     }
 
     private bool IsEndGrabCooldownOver(int index)

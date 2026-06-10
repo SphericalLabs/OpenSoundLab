@@ -1,4 +1,5 @@
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Utp
 {
@@ -25,7 +26,17 @@ namespace Utp
         /// <summary>
         /// Event data, only used for OnReceived event.
         /// </summary>
-        public FixedList4096Bytes<byte> eventData;
+        public UnsafeList<byte> eventData;
+
+        /// <summary>
+        /// Mirror channel restored from the transport payload prefix.
+        /// </summary>
+        public byte channelId;
+
+        /// <summary>
+        /// Payload size before being copied into eventData.
+        /// </summary>
+        public int payloadLength;
 
         /// <summary>
         /// The connection ID of the connection corresponding to this event.

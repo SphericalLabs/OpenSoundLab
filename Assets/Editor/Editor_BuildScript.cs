@@ -35,9 +35,12 @@ public class Editor_BuildScript
     [MenuItem("Build/Build All")]
     public static void BuildAll()
     {
-        BuildWindowsServer();
-        BuildLinuxServer();
-        BuildWindowsClient();
+        Editor_OSLNativeBuild.RunBuildBatch(() =>
+        {
+            BuildWindowsServer();
+            BuildLinuxServer();
+            BuildWindowsClient();
+        });
     }
 
     [MenuItem("Build/Build Server (Windows)")]
