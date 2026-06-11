@@ -116,6 +116,13 @@ public class AprilTagColocationController : MonoBehaviour
             yield break;
         }
 
+        if (Application.isEditor)
+        {
+            Debug.LogWarning("AprilTag colocation needs the headset passthrough camera and is not available in the editor.", this);
+            calibrationRunning = false;
+            yield break;
+        }
+
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (!PassthroughCameraAccess.IsSupported)
         {
