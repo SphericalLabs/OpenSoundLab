@@ -240,6 +240,7 @@ GameObject:
   - component: {fileID: 417776}
   - component: {fileID: 11406176}
   - component: {fileID: 8299576}
+  - component: {fileID: 1822925975084282916}
   - component: {fileID: 11456868}
   - component: {fileID: 7299321990339784797}
   - component: {fileID: -5267730309457235104}
@@ -289,6 +290,9 @@ MonoBehaviour:
   index: 0
   _phase: 0
   useNativeIfAvailable: 1
+  previousLastSample: 0
+  vizSample: 0
+  vizTriggerLatched: 0
   volume: 1
   incoming: {fileID: 0}
   monoMode: 1
@@ -390,6 +394,29 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &1822925975084282916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 139084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef5e1719799ca4f9b9f5db81449517ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bypassRoomEffects: 0
+  directivityAlpha: 0
+  directivitySharpness: 1
+  listenerDirectivityAlpha: 0
+  listenerDirectivitySharpness: 1
+  gainDb: 0
+  nearFieldEffectEnabled: 0
+  nearFieldEffectGain: 1
+  occlusionEnabled: 0
+  occlusionIntensity: 1
+  quality: 2
 --- !u!114 &11456868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -729,7 +756,6 @@ MonoBehaviour:
   plugged: 0
   plugPrefab: {fileID: 1000010648697418, guid: 2664f6715c83ce24bb11012df24af070, type: 3}
   plugRep: {fileID: 1000012277526938}
-  ID: -1
   signal: {fileID: 0}
   homesignal: {fileID: 0}
   far: {fileID: 0}
