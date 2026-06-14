@@ -41,9 +41,11 @@ public class handle : manipObject
     Material mat;
     public GameObject matTarg;
     public int ID = 0;
+    public Renderer[] extraHighlightRenderers;
 
     Material highlightMat;
     Material highlightGrabbedMat;
+    Material[] extraHighlightMaterials;
 
 
     Vector3 initialOffset;
@@ -82,6 +84,7 @@ public class handle : manipObject
         if (ID == 1) mat = otherHandle.GetComponent<Renderer>().sharedMaterial;
         highlightMat = Resources.Load("Materials/Highlight") as Material;
         highlightGrabbedMat = Resources.Load("Materials/HighlightGrabbed") as Material;
+        cacheExtraHighlightMaterials();
 
         if (ID == 1) ensureMeshColliderUsesOtherHandleMesh();
     }
@@ -369,30 +372,30 @@ public class handle : manipObject
         {
             if (curState == manipState.none)
             {
-                if (otherHandle.curState == manipState.none) GetComponent<Renderer>().sharedMaterial = mat;
+                if (otherHandle.curState == manipState.none) restoreHighlightMaterials();
             }
             if (curState == manipState.selected)
             {
-                GetComponent<Renderer>().sharedMaterial = highlightMat;
+                setHighlightMaterials(highlightMat);
             }
             if (curState == manipState.grabbed)
             {
-                GetComponent<Renderer>().sharedMaterial = highlightGrabbedMat;
+                setHighlightMaterials(highlightGrabbedMat);
             }
         }
         else
         {
             if (curState == manipState.none)
             {
-                if (otherHandle.curState == manipState.none) otherHandle.GetComponent<Renderer>().sharedMaterial = mat;
+                if (otherHandle.curState == manipState.none) otherHandle.restoreHighlightMaterials();
             }
             if (curState == manipState.selected)
             {
-                otherHandle.GetComponent<Renderer>().sharedMaterial = highlightMat;
+                otherHandle.setHighlightMaterials(highlightMat);
             }
             if (curState == manipState.grabbed)
             {
-                otherHandle.GetComponent<Renderer>().sharedMaterial = highlightGrabbedMat;
+                otherHandle.setHighlightMaterials(highlightGrabbedMat);
             }
         }
         if (curState == manipState.grabbed && !manipulatorObjScript.wasGazeBased)
@@ -413,6 +416,48 @@ public class handle : manipObject
         if (curState == manipState.grabbed && manipulatorObjScript.wasGazeBased)
         {
             gazeBasedPosRotStart();
+        }
+    }
+
+    void cacheExtraHighlightMaterials()
+    {
+        if (extraHighlightRenderers == null) return;
+
+        extraHighlightMaterials = new Material[extraHighlightRenderers.Length];
+        for (int i = 0; i < extraHighlightRenderers.Length; i++)
+        {
+            if (extraHighlightRenderers[i] != null) extraHighlightMaterials[i] = extraHighlightRenderers[i].sharedMaterial;
+        }
+    }
+
+    void setHighlightMaterials(Material material)
+    {
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null) renderer.sharedMaterial = material;
+
+        if (extraHighlightRenderers == null) return;
+        for (int i = 0; i < extraHighlightRenderers.Length; i++)
+        {
+            if (extraHighlightRenderers[i] != null) extraHighlightRenderers[i].sharedMaterial = material;
+        }
+    }
+
+    void restoreHighlightMaterials()
+    {
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null) renderer.sharedMaterial = mat;
+
+        if (extraHighlightRenderers == null) return;
+        for (int i = 0; i < extraHighlightRenderers.Length; i++)
+        {
+            if (extraHighlightRenderers[i] == null) continue;
+
+            Material originalMaterial = mat;
+            if (extraHighlightMaterials != null && i < extraHighlightMaterials.Length && extraHighlightMaterials[i] != null)
+            {
+                originalMaterial = extraHighlightMaterials[i];
+            }
+            extraHighlightRenderers[i].sharedMaterial = originalMaterial;
         }
     }
 
