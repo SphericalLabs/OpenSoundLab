@@ -71,31 +71,31 @@ You can run it via PowerShell, Terminal or Meta Quest Developer Hub (MQDH). You 
 
 ## Creating new devices
 
-Please note that these instructions are still very rudimentary and might not be enough for you to create new devices. Better documentation will follow.
+> **Outdated — these instructions will be updated soon.** OpenSoundLab now has a new system for structuring and registering devices: manifest-based collections that are discovered and normalized at runtime by `OSLDeviceRegistry`, instead of hardcoded prefab folders, `DeviceType` enums, spawnable-prefab lists and `[XmlInclude]` registrations. The steps below no longer reflect how devices are created and are struck through pending a rewrite. In the meantime, see [Assets/OSLDevices/README.md](../Assets/OSLDevices/README.md) and the `OpenSoundLab/Devices/Create Device` wizard.
 
-### Setup the prefabs
+### ~~Setup the prefabs~~
 
-*   Add your Prefab "YourDevice" to Resources/Prefabs, or duplicate a similar one
-*   Add or copy yourDeviceInterface.cs and yourSignalGenerator.cs in a new folder at /Assets/Scripts/YourDevice
-*   Add YourDeviceType to MenuItem.DeviceType and give it a label and category index
-*   Add yourDeviceInterface.cs and yourSignalGenerator.cs to your Prefab, or replace old scripts if the prefab was duplicated
-*   Add handle scripts, if not copied
-*   Also create a Prefab Variant of the Prefab in MenuPrefabs
-    *   Remove all scripts on the Prefab Variant
-    *   Define appearance in the menu
-    *   TODO: reactivate the auto stripping script?
-        *   Add Menu Variant to RemoveDeviceComponents.cs in RemoveDeviceComponents
+*   ~~Add your Prefab "YourDevice" to Resources/Prefabs, or duplicate a similar one~~
+*   ~~Add or copy yourDeviceInterface.cs and yourSignalGenerator.cs in a new folder at /Assets/Scripts/YourDevice~~
+*   ~~Add YourDeviceType to MenuItem.DeviceType and give it a label and category index~~
+*   ~~Add yourDeviceInterface.cs and yourSignalGenerator.cs to your Prefab, or replace old scripts if the prefab was duplicated~~
+*   ~~Add handle scripts, if not copied~~
+*   ~~Also create a Prefab Variant of the Prefab in MenuPrefabs~~
+    *   ~~Remove all scripts on the Prefab Variant~~
+    *   ~~Define appearance in the menu~~
+    *   ~~TODO: reactivate the auto stripping script?~~
+        *   ~~Add Menu Variant to RemoveDeviceComponents.cs in RemoveDeviceComponents~~
 
-### Sync device for multi-user
+### ~~Sync device for multi-user~~
 
-*   Required for spawning from menu: add to Registered Spawnable Prefabs in both LocalNetworkManager and OslRelayNetworkManager in NetworkManager, i.e. in both oslLocalNetworkScene and oslRelayNetworkScene. Do not press "Populate Spawnable Prefabs", since that adds too much undesired stuff.
-*   Add NetworkIdentity, NetworkAuthority, NetworkTransform and whatever else you want to sync on the network, if not copied
+*   ~~Required for spawning from menu: add to Registered Spawnable Prefabs in both LocalNetworkManager and OslRelayNetworkManager in NetworkManager, i.e. in both oslLocalNetworkScene and oslRelayNetworkScene. Do not press "Populate Spawnable Prefabs", since that adds too much undesired stuff.~~
+*   ~~Add NetworkIdentity, NetworkAuthority, NetworkTransform and whatever else you want to sync on the network, if not copied~~
 
-### Make your device copyable and savable
+### ~~Make your device copyable and savable~~
 
-*   Define YourData in yourDeviceInterface.cs, implement GetData() and Load(InstrumentData d)
-*   Add YourData and YourDeviceType to xmlUpdate.cs. That is two separate switch statements, add them to both.
-*   Add [XmlInclude(typeof(YourData))] to SaveLoadInterface.cs
+*   ~~Define YourData in yourDeviceInterface.cs, implement GetData() and Load(InstrumentData d)~~
+*   ~~Add YourData and YourDeviceType to xmlUpdate.cs. That is two separate switch statements, add them to both.~~
+*   ~~Add [XmlInclude(typeof(YourData))] to SaveLoadInterface.cs~~
 
 ## Request integration in official repo and builds
 

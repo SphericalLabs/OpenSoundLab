@@ -112,16 +112,6 @@ The generated plugins are written under `Assets/Plugins/OSLNative`. If a script 
 *   Open the project for the first time; this might take some time
 *   Unity might ask you to restart when done importing. Click Restart Editor
 
-## Startup Wizards and Development Builds
-
-A Unity Development Build does not automatically skip the startup flows.
-
-The requirements wizard is controlled by the `requirements_consent_v1` PlayerPrefs key and the headset permissions for storage, scene depth access and microphone access. It appears until the required consent and permissions are complete.
-
-Tutorial startup is controlled by the `showTutorialsOnStartup` PlayerPrefs key. Tutorials are suppressed in the Unity Editor and standalone desktop builds, but can open on Android builds when that key is enabled.
-
-In the Unity Editor, use OpenSoundLab > PlayerPrefs > Show Requirements Wizard and OpenSoundLab > PlayerPrefs > Show Tutorials On Startup to toggle the editor-side test settings. PlayerPrefs on the headset are separate, so clear or change them on the device when testing first-run behavior.
-
 ## Build and Run on Quest
 
 *   Make sure that developer mode is enabled on the headset
@@ -133,3 +123,13 @@ In the Unity Editor, use OpenSoundLab > PlayerPrefs > Show Requirements Wizard a
 *   Put on the headset and check if the app was installed correctly
 *   If you already had OpenSoundLab installed from the Meta Quest Store you might have to uninstall the app first
 *   Please note that tutorial videos are not included in the repository, so your build will not include them
+
+## Startup Wizards and Development Builds
+
+A Unity Development Build does not automatically skip the startup flows.
+
+The requirements wizard is controlled by the `requirements_consent_v1` PlayerPrefs key and the headset permissions for storage, scene depth access and microphone access. It appears until the required consent and permissions are complete.
+
+Tutorial startup is controlled by the `showTutorialsOnStartup` PlayerPrefs key. Tutorials are suppressed in the Unity Editor and standalone desktop builds, but can open on Android builds when that key is enabled.
+
+In the Unity Editor, use OpenSoundLab > PlayerPrefs > Show Requirements Wizard and OpenSoundLab > PlayerPrefs > Show Tutorials On Startup to toggle the editor-side test settings. PlayerPrefs on the headset are separate, so clear or change them on the device when testing first-run behavior.

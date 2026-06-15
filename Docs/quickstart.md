@@ -12,8 +12,10 @@
 *   Fine-tune dials: hold grab button before tuning a dial and let go only after exiting that dial
 *   Move patch: hold both grab buttons outside of objects and drag the patch
 *   Reset dial knob: press B or Y while in dial to reset to default value
-*   Left joystick pressed: flip through straight, visualized and hidden cable modes
-*   Right joystick pressed: flip through binaural spatialization modes
+*   Left joystick short press: select the previous HRTF subject
+*   Left joystick long press: flip through straight, visualized and hidden cable modes
+*   Right joystick short press: select the next HRTF subject
+*   Right joystick long press: flip through binaural spatialization modes
 *   Both joysticks inward: set background to white
 *   Both joysticks outward: set background to passthrough
 *   Both joysticks up: disable depth occlusion (virtual objects are always drawn on top of the passthrough)
@@ -24,7 +26,8 @@
 *   There are two spatialization modes:
     *   Speaker: signals appear to come from connected Speaker objects
     *   All: every object with a mini-speaker will be spatialized
-*   Spatialization modes can be cycled through by pressing the right joystick
+*   HRTF subjects can be cycled through with short joystick presses: left for previous and right for next
+*   Spatialization modes can be cycled through by long pressing the right joystick
 
 ## General remarks
 
