@@ -14,7 +14,7 @@ This repository is work-in-progress. Please always link to this repository if yo
 
 ### Installation
 
-OpenSoundLab is now available in the [Meta Quest app store](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/). We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub.
+OpenSoundLab is now available in the [Meta Quest app store](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/). We won't publish new apk binaries here from now on. You can obtain the app binary through the Meta Quest store or build it yourself from this source-available repository under the [OSLLv1 license](LICENSE-OSLLv1.md). Read the license first and make sure you understand it before using, modifying or redistributing the code.
 
 ### Build instructions
 
@@ -75,9 +75,9 @@ Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980
 
 ### FAQ
 
-**Q: There are already so many sound and music apps for VR, why should I consider OpenSoundLab?**
+**Q: There are already several sound and music apps for VR, why should I consider OpenSoundLab?**
 
-**A:** First of all, OpenSoundLab is among the very few sound apps for XR that are open-source and can thus be adapted, expanded and repaired as needed for your creative or academic needs. Apart from that, the vision for OpenSoundLab is to offer a "mixed-reality first" experience that blends effortlessly in your physical surrounding instead of teleporting you to a fancy (or goofy) virtual environment. Instead of gamification, expansive modular sound work is at the center of OpenSoundLab. OSL is also one of the few modular sound apps that allow you to collaborate with others or host virtual concerts, etc. In combination with the very low latency LAN mode and the shared space colocation functionality it contributes to the idea of a hybrid studio environment in a way that most other apps don't. OpenSoundLab has a rather reduced set of features or devices, but we want to get the user experience right in order to make sure that you flow in spatial way that other apps, or screen-based workflows or physical gear can not achieve. This goes in line with a "modular spirit" that puts creative improvisation from atomic modules at the core.
+**A:** First of all, OpenSoundLab is among the very few source-available sound apps for XR and can thus be adapted, expanded and repaired as needed for your creative or academic needs. Apart from that, the vision for OpenSoundLab is to offer a "mixed-reality first" experience that blends effortlessly in your physical surrounding instead of teleporting you to a fancy (or goofy) virtual environment. Instead of gamification, expansive modular sound work is at the center of OpenSoundLab. OSL is also one of the few modular sound apps that allow you to collaborate with others or host virtual concerts, etc. In combination with the very low latency LAN mode and the shared space colocation functionality it contributes to the idea of a hybrid studio environment in a way that most other apps don't. OpenSoundLab has a rather reduced set of features or devices, but we want to get the user experience right in order to make sure that you flow in spatial way that other apps, or screen-based workflows or physical gear can not achieve. This goes in line with a "modular spirit" that puts creative improvisation from atomic modules at the core.
 
 **Q: Does the OSLLv1 allow me to make my own app and publish it to an app store such as for Meta Quest or Apple Vision?**
 
