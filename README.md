@@ -2,7 +2,7 @@
 
 ![OSL Logo](https://github.com/SphericalLabs/OpenSoundLab/blob/master/Assets/Textures/SplashScreens/CoverArt-Landscape-3-OSL.png?raw=true)
 
-[[Trailer](https://youtu.be/HYn9THRtBvs)] [[Research](https://zenodo.org/records/15304366)] [[Newsletter](http://eepurl.com/h-9PsD)] [[Discord](https://discord.gg/Jrmg5na3Ru)] [[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)] [[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)] [[Developer](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM)]
+\[[Download](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/)\] \[[Trailer](https://www.youtube.com/watch?v=Q8GUHLsC1QI)\] \[[Paper](https://www.cambridge.org/core/journals/organised-sound/article/modular-observers-opensoundlab-and-patchworld-as-case-studies-for-emerging-practices-of-modular-synthesis-in-extended-realities/78178E780CB182CAD92F7987346222FC#article)\] \[[Newsletter](http://eepurl.com/h-9PsD)\] \[[Discord](https://discord.gg/Jrmg5na3Ru)\] \[[Quickstart](Docs/quickstart.md)\] \[[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)\] \[[Developer](Docs/developer-notes.md)\]
 
 OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed-reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
 
@@ -10,95 +10,68 @@ OSL is a fork of Logan Olson's magnificent [SoundStage VR](https://github.com/go
 
 The project received generous funding by an educational grant of the University of Applied Sciences and Arts Northwestern Switzerland ([IDCE FHNW](https://www.fhnw.ch/en/about-fhnw/schools/academy-of-art-and-design/institute-digital-communication-environments)) and was further developed in the context of the SNSF Spark research project "Emerging Practices in Modular Synthesis: Towards a Virtual Ethnography for Mixed Realities".
 
-This repository is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep other users in sync with our ongoing development. 
+This repository is work-in-progress. Please always link to this repository if you fork, deploy or otherwise redistribute it, in order to keep other users in sync with our ongoing development.
 
 ### Installation
-OpenSoundLab will be available at Meta Quest's Early Access soon. We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub. 
+
+OpenSoundLab is now available in the [Meta Quest app store](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/). We won't publish new apk binaries here from now on, but OpenSoundLab is open-source under the OSLLv1 license, so you can modify and build the app from the code here at GitHub.
 
 ### Build instructions
-* Clone the repository and check out the desired tag manually. Please note that the Releases page is outdated.
-```
-git clone https://github.com/SphericalLabs/OpenSoundLab
-cd OpenSoundLab
-git fetch --tags
-git tags
-```
-```
-git checkout DESIRED_TAG
-```
-* Install Unity Hub and register with Unity: https://unity.com/download
-* In Unity Hub click Installs > Install Editor > Archive > Download Archive and install Unity v2022.3.62f3
-* Add the downloaded repository (the folder containing Assets, OSLNative, etc.) to the Unity Hub: Projects > Add Project from Disk (click the triangle for that)
-* Click the editor version of the added repository and select Unity v2022.3.62f3 for Android
-* Open the project for the first time, this might take some time
-* Unity might ask you to restart when done importing, click Restart Editor
-* Build the native OSLNative plugins once before exporting: in Unity click OpenSoundLab > OSLNative > Rebuild. Alternatively enable OpenSoundLab > OSLNative > Rebuild on Build so Unity runs the native rebuild automatically before player builds.
-* On macOS, the OSLNative rebuild can build Android, Windows and macOS plugins. Install full Xcode, Homebrew and `mingw-w64` (`brew install mingw-w64`) first. The Android script can install the required Android command-line packages and NDK through Homebrew if they are missing.
-* On Windows, the OSLNative rebuild can build Windows and Android plugins. Install Visual Studio 2022 or Visual Studio Build Tools with the C++ workload, and install Android SDK/NDK r26b (`26.1.10909125`) through Android Studio or Unity's Android tooling. The Windows script looks for the SDK through `ANDROID_HOME`, `ANDROID_SDK_ROOT` or `ANDROID_NDK_ROOT`.
-* Make sure that the developer mode is activated on the headset
-* Connect your Meta Quest headset via USB
-* If connected for the first time, put on the headset and accept the connection to the computer
-* If you want to use Unity Relay, you have to set up a Unity Project ID and add that in Project Settings > Services
-* In Unity, click File > Build Settings
-* Check if your headset is listed at "Run Device"
-* Click Build and Run, set a destination for apk and wait for the build to complete
-* Put on the headset and check if the app was installed correctly
-* If you already had OpenSoundLab installed from the App Store you might have to deinstall the app first
-* Please note that the Tutorial videos are not included in the repository and thus your build
+
+See [Docs/build-instructions.md](Docs/build-instructions.md) for build instructions.
 
 ### Developer Notes
-See the [Developer Notes](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM) for instructions on how to add new devices and more. These instructions are still work in progress.
+
+See the [Developer Notes](Docs/developer-notes.md) for instructions on how to add new devices and more. These instructions are still work in progress.
 
 ### Mailing list
+
 Please subscribe to our [newsletter](http://eepurl.com/h-9PsD) in order to get updates about new releases.
 
 ### Discord
+
 Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980) on Discord in order to stay up-to-date, receive/offer support, present your experiments and get to know other OSL users.
 
+### Selected features
 
-### Changes in comparison to SoundStage VR
+##### Mixed reality & collaboration
 
-#### New features
-- Multi-user (LAN or Internet) via Mirror, Unity Relay and UniVoice
-- Mixed-reality passthrough without Guardian
-- Shared space colocation for local multi-user
-- Master bus recorder in 48kHz, 24bit, WAV
-- Master bus overload warning
-- AD: Two stage envelope generator with lin/exp control and CV modulation
-- Delay: A highly flexible delay line, buffer can range from 1ms to 12.5s, CV modulation
-- Reverb: Classic Freeverb stereo reverb with CV modulation
-- Scope: Oscilloscope / spectral analyser with trigger on rise
-- Added 1V/Oct tracking scheme for Oscillator, Keyboard, Sampler, etc.
-- Quantizer: Featuring Sem, Maj, Min, HMaj, HMin, PMaj, PMin, Oct scales and root key, octave dials
-- Gain: 36db gain module
-- Polarity: Convert between unipolar and bipolar signals
-- Artifact: Jitter, bit crush, downsample and noise
-- Compressor: Dynamics processor with attack, release, threshold, ratio, bypass, gain and sidechaining
-- DC: Bipolar signal generator
-- Glide: Slope limiter
-- S&H: Sample-and-hold module
-- Tutorials: Player console for video tutorials
-- VCA: Added amplifier with modulation and ring modulation
-- Added performance menu to adjust framerate, resolution, foveated rendering and CPU/GPU levels
-- Added nudging for tempo sync with other clocks
-- Added navigation by dragging and scaling the complete patch
+*   Mixed-reality passthrough without Guardian
+*   Real-world depth occlusion via the Meta Depth API, so virtual modules are hidden behind physical objects in passthrough
+*   Shared space colocation for local multi-user
+*   Multi-user (LAN or Internet) via Mirror, Unity Relay and UniVoice
+*   The patch is easily draggable and scalable
 
-#### Improved features
-- Redesigned look-and-feel and new pictograms
-- CVSequencer: Added CV sequencing and both dials and modulation inputs for volume and pitch
-- Filter: tracks at audio rate, allows more extreme resonances and modulations
-- Oscillator: Added linear through-zero FM, reset, PWM and triangle
-- Sampler: Added linear interpolation, linear through-zero FM, modulation for loop in/out, windowing
-- Optimized rendering performance for Meta Quest
-- Dynamic resolution scaling (including eye-tracked foveated rendering on Quest Pro)
-- Switched to ARM64 and recent versions of Unity, Oculus SDK and Vulkan
-- Improved performance of waveform displays by rendering them on the GPU
-- TouchPad: Added latched mode
-- Keyboard: Added CV and Gate outputs
+##### Sound modules
 
-#### Removed features
-- Removed default samples
-- Disabled timeline and MIDI for Xylophone and Keyboard until fixed
+*   Oscillator: Antialiased oscillator with TZ FM, AM/RM, LFO mode, sync and PWM
+*   FilterTwo: Clean, fully modulatable multimode filter (LP/BP/HP/notch) with a wide modulation range
+*   AD: Two stage envelope generator with lin/exp control and CV modulation
+*   VCA: Added amplifier with modulation and ring modulation
+*   Delay: A highly flexible delay line, buffer can range from 1ms to 12.5s, CV modulation
+*   Reverb: Classic Freeverb stereo reverb with CV modulation
+*   Compressor: Dynamics processor with attack, release, threshold, ratio, bypass, gain and sidechaining
+*   Artifact: Jitter, bit crush, downsample and noise
+*   SampleHold: Sample-and-hold module
+
+##### Sequencing & timing
+
+*   Sequencer: Flexible sequencer for triggers and CV
+*   PhaseGenerator and PhaseToClockDivider: a phase-accurate, resettable clock system with tempo nudging that drives the Sequencer in either phase or clock mode
+*   Quantizer: Featuring Sem, Maj, Min, HMaj, HMin, PMaj, PMin, Oct scales and root key, octave dials
+*   Eurorack-inspired 1V/Oct tracking scheme
+
+##### Monitoring & control
+
+*   Scope: Oscilloscope / spectral analyser with trigger on rise
+*   Controller: record and replay gestural motion paths (hue-cycling trails)
+*   Cables visualize the live signal flowing through them, with brightness scaling to signal level
+
+##### Recording & learning
+
+*   Master bus recorder in 48kHz, 24bit, WAV
+*   Tutorials: Player console for video tutorials
+
 
 ### FAQ
 
@@ -131,39 +104,52 @@ Join the [OpenSoundLab channel](https://discord.com/channels/1020228980583976980
 **A:** Sure, feel free to reach out and discuss your idea.
 
 ### Project Team for OpenSoundLab
+
 ###### LEAD
+
 Ludwig Zeller
 
 ###### MULTI-USER
+
 Chris Elvis Leisi, Christoph Müller
 
 ###### DSP
+
 Hannes Barfuss, Ludwig Zeller
 
 ###### MENU SYMBOLS
-Iman Khoshniataram 
+
+Iman Khoshniataram  
 (The menu symbols of OpenSoundLab are licensed as [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/))
 
 ###### TESTING & CONSULTING
+
 Anselm Bauer
 
 ###### SPONSORING
+
 IDCE FHNW
 
-
 ### Original Credits for SoundStage VR
+
 ###### CREATED BY
+
 Logan Olson
 
 ###### SOUND DESIGNER (SAMPLES)
+
 Reek Havok
 
 ###### PROGRAMMING CONSULTANT
+
 Giray Ozil
 
 ###### MUSIC CONSULTANT
+
 Ron Fish
 
 ### Other Credits
-###### INITIAL QUEST PORT 
+
+###### INITIAL QUEST PORT
+
 James Surine
