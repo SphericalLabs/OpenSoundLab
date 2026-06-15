@@ -12,10 +12,12 @@
 *   Fine-tune dials: hold grab button before tuning a dial and let go only after exiting that dial
 *   Move patch: hold both grab buttons outside of objects and drag the patch
 *   Reset dial knob: press B or Y while in dial to reset to default value
-*   Left joystick pressed: flip through ~~curved~~, straight and hidden cable modes
+*   Left joystick pressed: flip through straight, visualized and hidden cable modes
 *   Right joystick pressed: flip through binaural spatialization modes
 *   Both joysticks inward: set background to white
 *   Both joysticks outward: set background to passthrough
+*   Both joysticks up: disable depth occlusion (virtual objects are always drawn on top of the passthrough)
+*   Both joysticks down: enable depth occlusion (real-world geometry hides virtual objects; requires a depth-capable headset such as Quest 3)
 
 ## Binaural spatialization
 
@@ -27,7 +29,7 @@
 ## General remarks
 
 *   Master bus overload: if you overdrive the master output a warning will be shown
-*   Record master bus: open menu and press the record button on the metronome
+*   Record master bus: open menu and press the record button
     *   Recordings will appear in the `Samples/Sessions` folder
     *   Use ADB or SideQuest to copy the recordings to your computer
 *   Please note that some modulation-oriented objects do not have built-in speakers and can therefore only be heard if connected to a mini-speaker further down the signal chain. For example, the Glide and AD modules do not have built-in speakers. Be aware that such DC signals can easily overload your audio bus.

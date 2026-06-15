@@ -21,8 +21,8 @@ These notes collect app usage, Unity development and device integration notes fo
 ### Setup Quest Link
 
 *   Quest Link only works on x64 Windows systems
-*   Download the Oculus app
-*   Log into the Oculus app with your Meta user
+*   Download the Meta Quest Link app
+*   Log into the Meta Quest Link app with your Meta user
 *   Connect your Meta Quest headset
 
 ### Quest Link not working
@@ -31,12 +31,12 @@ These notes collect app usage, Unity development and device integration notes fo
 *   Make sure that only one headset is connected to the PC
 *   Try Air Link. It is usually more robust when Wi-Fi is good.
     *   Please note: cable link will not work if Air Link is active.
-*   Oculus Software > Settings > Beta > Restart Quest Link
-*   Oculus Debug Tool > Restart Oculus Service
-*   Kill all Oculus-related processes in Task Manager
-*   Oculus Tool must show "Device Setup" and "USB Test" when clicking a headset
+*   Meta Quest Link > Settings > Beta > Restart Quest Link
+*   Meta Quest Debug Tool > Restart Meta service
+*   Kill all Meta-related processes in Task Manager
+*   Meta Quest Developer Hub must show "Device Setup" and "USB Test" when clicking a headset
     *   If not, restart the PC
-*   Try reinstalling the Link driver on your computer. You can find the installable Oculus driver file at `c:\Program Files\Oculus\Support\oculus-drivers\oculus-driver.exe`.
+*   Try reinstalling the Link driver on your computer. You can find the installable Meta driver file at `c:\Program Files\Oculus\Support\oculus-drivers\oculus-driver.exe`.
 *   If connection issues persist, follow these steps for purging rotten configs: https://www.reddit.com/r/OculusQuest/comments/uv5clc/completely_remove_all_oculus_software/
 
 ### Quest Link performance tuning
@@ -71,11 +71,11 @@ You can run it via PowerShell, Terminal or Meta Quest Developer Hub (MQDH). You 
 
 ## Creating new devices
 
-Please note that these instructions are still very rudimentary and might not be enough for you to create new devices. Better documentation will be published later in 2025.
+Please note that these instructions are still very rudimentary and might not be enough for you to create new devices. Better documentation will follow.
 
 ### Setup the prefabs
 
-*   Add your Prefab "YourDevice" to Resources/Prefab, or duplicate a similar one
+*   Add your Prefab "YourDevice" to Resources/Prefabs, or duplicate a similar one
 *   Add or copy yourDeviceInterface.cs and yourSignalGenerator.cs in a new folder at /Assets/Scripts/YourDevice
 *   Add YourDeviceType to MenuItem.DeviceType and give it a label and category index
 *   Add yourDeviceInterface.cs and yourSignalGenerator.cs to your Prefab, or replace old scripts if the prefab was duplicated
@@ -88,7 +88,7 @@ Please note that these instructions are still very rudimentary and might not be 
 
 ### Sync device for multi-user
 
-*   Required for spawning from menu: add to Registered Spawnable Prefabs in both LocalNetworkManager and RelayNetworkManager in NetworkManager, i.e. in both oslLocalNetworkScene and oslRelayNetworkScene. Do not press "Populate Spawnable Prefabs", since that adds too much undesired stuff.
+*   Required for spawning from menu: add to Registered Spawnable Prefabs in both LocalNetworkManager and OslRelayNetworkManager in NetworkManager, i.e. in both oslLocalNetworkScene and oslRelayNetworkScene. Do not press "Populate Spawnable Prefabs", since that adds too much undesired stuff.
 *   Add NetworkIdentity, NetworkAuthority, NetworkTransform and whatever else you want to sync on the network, if not copied
 
 ### Make your device copyable and savable
@@ -99,25 +99,11 @@ Please note that these instructions are still very rudimentary and might not be 
 
 ## Request integration in official repo and builds
 
-### Official way
-
 *   Fork the main repository before coding on GitHub
 *   Clone your fork to local
 *   Create a feature branch for your developments
 *   Push to your own fork on GitHub
 *   Create and send a pull request for your commits
-
-### Simple way
-
-*   Clone the repository from the official repository
-*   Work on your commits. This can be on the master branch.
-*   In the root folder of the repository call:
-
-```bash
-git format-patch origin/main -o ../patches/
-```
-
-*   Send patch files to ludwig.zeller@fhnw.ch
 
 ## Useful ADB Commands
 
