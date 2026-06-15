@@ -2,7 +2,7 @@
 
 ![OSL Logo](https://github.com/SphericalLabs/OpenSoundLab/blob/master/Assets/Textures/SplashScreens/CoverArt-Landscape-3-OSL.png?raw=true)
 
-\[[Download](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/)\] \[[Trailer](https://www.youtube.com/watch?v=Q8GUHLsC1QI)\] \[[Paper](https://www.cambridge.org/core/journals/organised-sound/article/modular-observers-opensoundlab-and-patchworld-as-case-studies-for-emerging-practices-of-modular-synthesis-in-extended-realities/78178E780CB182CAD92F7987346222FC#article)\] \[[Newsletter](http://eepurl.com/h-9PsD)\] \[[Discord](https://discord.gg/Jrmg5na3Ru)\] \[[Quickstart](https://docs.google.com/document/d/1c9vt-wW-JnW9davSZ76r35cd4dE6xtnyzHEhdrbueOE/edit?usp=sharing)\] \[[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)\] \[[Developer](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM)\]
+\[[Download](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/)\] \[[Trailer](https://www.youtube.com/watch?v=Q8GUHLsC1QI)\] \[[Paper](https://www.cambridge.org/core/journals/organised-sound/article/modular-observers-opensoundlab-and-patchworld-as-case-studies-for-emerging-practices-of-modular-synthesis-in-extended-realities/78178E780CB182CAD92F7987346222FC#article)\] \[[Newsletter](http://eepurl.com/h-9PsD)\] \[[Discord](https://discord.gg/Jrmg5na3Ru)\] \[[Quickstart](Docs/quickstart.md)\] \[[Tutorials](https://www.youtube.com/playlist?list=PLSnuTstoP7nDSK8XqfTnln1v3dH0jACu7)\] \[[Developer](Docs/developer-notes.md)\]
 
 OpenSoundLab (OSL) makes modular sound patching three dimensional in a mixed-reality experience using Meta Quest's passthrough mode. Patch simple or complex sounds at home, in your studio or in the field. Learn the foundations of creative sound work through video tutorials that are placed right within your patch.
 
@@ -18,30 +18,11 @@ OpenSoundLab is now available in the [Meta Quest app store](https://www.meta.com
 
 ### Build instructions
 
-*   Clone the repository and check out the desired tag manually. Please note that the Releases page is outdated.
-*   Install Unity Hub and register with Unity: https://unity.com/download
-*   In Unity Hub click Installs > Install Editor > Archive > Download Archive and install Unity v2022.3.62f3
-*   Add the downloaded repository (the folder containing Assets, OSLNative, etc.) to the Unity Hub: Projects > Add Project from Disk (click the triangle for that)
-*   Click the editor version of the added repository and select Unity v2022.3.62f3 for Android
-*   Open the project for the first time, this might take some time
-*   Unity might ask you to restart when done importing, click Restart Editor
-*   Build the native OSLNative plugins once before exporting: in Unity click OpenSoundLab > OSLNative > Rebuild. Alternatively enable OpenSoundLab > OSLNative > Rebuild on Build so Unity runs the native rebuild automatically before player builds.
-*   On macOS, the OSLNative rebuild can build Android, Windows and macOS plugins. Install full Xcode, Homebrew and `mingw-w64` (`brew install mingw-w64`) first. The Android script can install the required Android command-line packages and NDK through Homebrew if they are missing.
-*   On Windows, the OSLNative rebuild can build Windows and Android plugins. Install Visual Studio 2022 or Visual Studio Build Tools with the C++ workload, and install Android SDK/NDK r26b (`26.1.10909125`) through Android Studio or Unity's Android tooling. The Windows script looks for the SDK through `ANDROID_HOME`, `ANDROID_SDK_ROOT` or `ANDROID_NDK_ROOT`.
-*   Make sure that the developer mode is activated on the headset
-*   Connect your Meta Quest headset via USB
-*   If connected for the first time, put on the headset and accept the connection to the computer
-*   If you want to use Unity Relay, you have to set up a Unity Project ID and add that in Project Settings > Services
-*   In Unity, click File > Build Settings
-*   Check if your headset is listed at "Run Device"
-*   Click Build and Run, set a destination for apk and wait for the build to complete
-*   Put on the headset and check if the app was installed correctly
-*   If you already had OpenSoundLab installed from the App Store you might have to deinstall the app first
-*   Please note that the Tutorial videos are not included in the repository and thus your build
+See [Docs/build-instructions.md](Docs/build-instructions.md) for build instructions.
 
 ### Developer Notes
 
-See the [Developer Notes](https://docs.google.com/document/d/1_EpWIVUfs2bxpx9QFacNEzsJZoaBOB2l7ooHdbXBrBM) for instructions on how to add new devices and more. These instructions are still work in progress.
+See the [Developer Notes](Docs/developer-notes.md) for instructions on how to add new devices and more. These instructions are still work in progress.
 
 ### Mailing list
 
@@ -172,14 +153,3 @@ Ron Fish
 ###### INITIAL QUEST PORT
 
 James Surine
-
-```
-git checkout DESIRED_TAG
-```
-
-```
-git clone https://github.com/SphericalLabs/OpenSoundLab
-cd OpenSoundLab
-git fetch --tags
-git tags
-```
