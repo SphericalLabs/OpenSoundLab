@@ -82,7 +82,7 @@ MonoBehaviour:
     displayName: Mic
     category: 6
     tags: []
-    order: 3
+    order: 5
     enabled: 1
     showInMenu: 1
     productInfo:
@@ -109,7 +109,7 @@ MonoBehaviour:
     displayName: Recorder
     category: 6
     tags: []
-    order: 4
+    order: 7
     enabled: 1
     showInMenu: 1
     productInfo:
@@ -136,7 +136,7 @@ MonoBehaviour:
     displayName: Looper
     category: 6
     tags: []
-    order: 5
+    order: 8
     enabled: 1
     showInMenu: 1
     productInfo:
@@ -163,7 +163,7 @@ MonoBehaviour:
     displayName: Airhorn
     category: 6
     tags: []
-    order: 6
+    order: 9
     enabled: 1
     showInMenu: 0
     productInfo:
