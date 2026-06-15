@@ -1,6 +1,6 @@
 # Build Instructions
 
-OpenSoundLab is open-source under the [OSLLv1 license](../LICENSE-OSLLv1.md), so you can modify and build the app from the code at GitHub. Please note that the Releases page is outdated. You can obtain the app binary through the [Meta Quest Store](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/) or build it yourself, following the OSLLv1 license agreement. Read the license first and make sure you understand it.
+OpenSoundLab is source-available under the [OSLLv1 license](../LICENSE-OSLLv1.md), so you can modify and build the app from the code at GitHub. Please note that the Releases page is outdated. You can obtain the app binary through the [Meta Quest Store](https://www.meta.com/en-gb/experiences/opensoundlab/5190305347733325/) or build it yourself, following the OSLLv1 license agreement. Read the license first and make sure you understand it.
 
 ## Build Scope and Difficulty
 
