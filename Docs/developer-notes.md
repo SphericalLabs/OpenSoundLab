@@ -57,18 +57,6 @@ These notes collect app usage, Unity development and device integration notes fo
 *   Do a full build export. Running in Editor or patching a build is not enough. This will overwrite the zips in Assets/StreamingAssets.
 *   These zips are deployed to standalone builds, but they are only actually decompressed into your player preference folder if your OpenSoundLab/OpenMultiLab folder does not exist when opening the app. For example, this happens when it has been deleted by hand or by uninstalling the app first. Only then are the default files written to the headset player preference folder.
 
-### XML patch files not readable
-
-*   This seems to occur when copying XML patch save files via SideQuest
-*   Even though they are readable to the group `ext_data_rw`, they apparently also need to be writable for the group
-*   This command fixes this:
-
-```bash
-adb shell "chmod 777 /sdcard/Android/data/io.sphericals.OpenMultiLab/files/OpenSoundLab/Saves/*.xml"
-```
-
-You can run it via PowerShell, Terminal or Meta Quest Developer Hub (MQDH). You can use Chocolatey on Windows or Homebrew on macOS to install ADB system-wide as a package.
-
 ## Creating new devices
 
 > **Outdated — these instructions will be updated soon.** OpenSoundLab now has a new system for structuring and registering devices: manifest-based collections that are discovered and normalized at runtime by `OSLDeviceRegistry`, instead of hardcoded prefab folders, `DeviceType` enums, spawnable-prefab lists and `[XmlInclude]` registrations. The steps below no longer reflect how devices are created and are struck through pending a rewrite. In the meantime, see [Assets/OSLDevices/README.md](../Assets/OSLDevices/README.md) and the `OpenSoundLab/Devices/Create Device` wizard.
@@ -106,6 +94,8 @@ You can run it via PowerShell, Terminal or Meta Quest Developer Hub (MQDH). You 
 *   Create and send a pull request for your commits
 
 ## Useful ADB Commands
+
+You can run adb commands via PowerShell, Terminal or Meta Quest Developer Hub (MQDH). You can use Chocolatey on Windows or Homebrew on macOS to install ADB system-wide as a package.
 
 ### General cheatsheet
 
