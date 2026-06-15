@@ -87,6 +87,8 @@ public class masterControl : MonoBehaviour
     public GameObject CameraRig;
     public EnvironmentDepthManager depthManager;
     public manipulator leftManip, rightManip;
+    public float leftThumbstickWireHoldSeconds = 0.25f;
+    public float rightThumbstickBinauralHoldSeconds = 0.25f;
     public int hrtfSubjectIndex = 5;
     string[] hrtfSubjectIds = new string[0];
     string[] hrtfSubjectNames = new string[0];
@@ -280,12 +282,54 @@ public class masterControl : MonoBehaviour
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch))
         {
-            previousHrtfSubject();
+            leftThumbstickPressedTime = Time.unscaledTime;
+            leftThumbstickLongPressHandled = false;
+        }
+
+        bool leftThumbstickHeld = OVRInput.Get(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch);
+        if (leftThumbstickHeld && leftThumbstickPressedTime >= 0f && !leftThumbstickLongPressHandled)
+        {
+            if (Time.unscaledTime - leftThumbstickPressedTime >= leftThumbstickWireHoldSeconds)
+            {
+                nextWireSetting();
+                leftThumbstickLongPressHandled = true;
+            }
+        }
+
+        if (OVRInput.GetUp(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.LTouch) && leftThumbstickPressedTime >= 0f)
+        {
+            if (!leftThumbstickLongPressHandled)
+            {
+                previousHrtfSubject();
+            }
+
+            leftThumbstickPressedTime = -1f;
         }
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
         {
-            nextHrtfSubject();
+            rightThumbstickPressedTime = Time.unscaledTime;
+            rightThumbstickLongPressHandled = false;
+        }
+
+        bool rightThumbstickHeld = OVRInput.Get(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch);
+        if (rightThumbstickHeld && rightThumbstickPressedTime >= 0f && !rightThumbstickLongPressHandled)
+        {
+            if (Time.unscaledTime - rightThumbstickPressedTime >= rightThumbstickBinauralHoldSeconds)
+            {
+                nextBinauralSetting();
+                rightThumbstickLongPressHandled = true;
+            }
+        }
+
+        if (OVRInput.GetUp(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch) && rightThumbstickPressedTime >= 0f)
+        {
+            if (!rightThumbstickLongPressHandled)
+            {
+                nextHrtfSubject();
+            }
+
+            rightThumbstickPressedTime = -1f;
         }
 
         refreshHrtfSubjectLabel();
@@ -636,6 +680,10 @@ public class masterControl : MonoBehaviour
     public Transform patchAnchor;
 
     Vector2 leftStick, rightStick;
+    float leftThumbstickPressedTime = -1f;
+    bool leftThumbstickLongPressHandled;
+    float rightThumbstickPressedTime = -1f;
+    bool rightThumbstickLongPressHandled;
 
 
     public void openRecordings()
@@ -890,7 +938,7 @@ public class masterControl : MonoBehaviour
 
     public void updateBinauralSetting(int num)
     {
-        BinauralMode nextSetting = BinauralMode.Speaker;
+        BinauralMode nextSetting = (BinauralMode)num;
         bool changed = BinauralSetting != nextSetting;
         BinauralSetting = nextSetting;
 
@@ -902,7 +950,8 @@ public class masterControl : MonoBehaviour
         embeddedSpeaker[] embeddedSpeakers = FindObjectsOfType<embeddedSpeaker>();
         for (int i = 0; i < embeddedSpeakers.Length; i++)
         {
-            embeddedSpeakers[i].audio.spatialize = false;
+            if (BinauralSetting == BinauralMode.All) embeddedSpeakers[i].audio.spatialize = true;
+            else embeddedSpeakers[i].audio.spatialize = false;
         }
 
         if (changed)
@@ -918,7 +967,8 @@ public class masterControl : MonoBehaviour
 
     public void updateWireSetting(int num)
     {
-        WireMode nextSetting = WireMode.Visualized;
+        WireMode nextSetting = (WireMode)num;
+        if (nextSetting == WireMode.Curved) nextSetting = WireMode.Straight;
         bool changed = WireSetting != nextSetting;
         WireSetting = nextSetting;
 
@@ -936,13 +986,16 @@ public class masterControl : MonoBehaviour
 
     public void nextWireSetting()
     {
-        updateWireSetting((int)WireMode.Visualized);
+        if (WireSetting == WireMode.Straight) updateWireSetting((int)WireMode.Invisible);
+        else if (WireSetting == WireMode.Invisible) updateWireSetting((int)WireMode.Visualized);
+        else updateWireSetting((int)WireMode.Straight);
     }
 
 
     public void nextBinauralSetting()
     {
-        updateBinauralSetting((int)BinauralMode.Speaker);
+        int totalModes = System.Enum.GetNames(typeof(BinauralMode)).Length;
+        updateBinauralSetting(((int)BinauralSetting + 1) % totalModes);
     }
 
 
