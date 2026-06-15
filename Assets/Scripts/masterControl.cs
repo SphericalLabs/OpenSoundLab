@@ -90,6 +90,7 @@ public class masterControl : MonoBehaviour
     public float leftThumbstickWireHoldSeconds = 0.25f;
     public float rightThumbstickBinauralHoldSeconds = 0.25f;
     public int hrtfSubjectIndex = 5;
+    const string hrtfSubjectPlayerPrefsKey = "hrtfSubjectId";
     string[] hrtfSubjectIds = new string[0];
     string[] hrtfSubjectNames = new string[0];
     string currentHrtfSubjectId = "";
@@ -254,7 +255,7 @@ public class masterControl : MonoBehaviour
 
         updateBinauralSetting((int)BinauralMode.Speaker);
         updateWireSetting((int)WireMode.Visualized);
-        refreshHrtfSubjectLabel();
+        loadHrtfSubjectPreference();
 
         if (!PlayerPrefs.HasKey("showTutorialsOnStartup"))
         {
@@ -771,10 +772,38 @@ public class masterControl : MonoBehaviour
             Debug.LogWarning("masterControl: selected HRTF subject " + currentHrtfSubjectId + " but the native renderer did not accept it.", this);
         }
 
-        if (changed && onHrtfChangedEvent != null)
+        if (changed)
         {
-            onHrtfChangedEvent.Invoke();
+            saveHrtfSubjectPreference(currentHrtfSubjectId);
+            if (onHrtfChangedEvent != null)
+            {
+                onHrtfChangedEvent.Invoke();
+            }
         }
+    }
+
+    void loadHrtfSubjectPreference()
+    {
+        if (!PlayerPrefs.HasKey(hrtfSubjectPlayerPrefsKey))
+        {
+            refreshHrtfSubjectLabel();
+            return;
+        }
+
+        string subjectId = PlayerPrefs.GetString(hrtfSubjectPlayerPrefsKey);
+        if (string.IsNullOrEmpty(subjectId))
+        {
+            refreshHrtfSubjectLabel();
+            return;
+        }
+
+        updateHrtfSubjectId(subjectId);
+    }
+
+    void saveHrtfSubjectPreference(string subjectId)
+    {
+        PlayerPrefs.SetString(hrtfSubjectPlayerPrefsKey, subjectId);
+        PlayerPrefs.Save();
     }
 
     int getHrtfSubjectIndex(string subjectId)

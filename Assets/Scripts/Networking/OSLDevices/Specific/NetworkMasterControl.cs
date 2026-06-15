@@ -45,11 +45,6 @@ public class NetworkMasterControl : NetworkBehaviour
     [SyncVar(hook = nameof(OnBinauralSettingChanged))]
     public BinauralMode BinauralSetting;
 
-    [SyncVar(hook = nameof(OnHrtfSubjectIdChanged))]
-    public string HrtfSubjectId = "H5";
-
-    bool suppressHrtfSubjectUpdate;
-
     void Awake()
     {
         Instance = this;
@@ -79,22 +74,6 @@ public class NetworkMasterControl : NetworkBehaviour
         //}
     }
 
-    void OnHrtfSubjectIdChanged(string oldValue, string newValue)
-    {
-        if (!string.IsNullOrEmpty(newValue))
-        {
-            suppressHrtfSubjectUpdate = true;
-            try
-            {
-                masterControl.instance.updateHrtfSubjectId(newValue);
-            }
-            finally
-            {
-                suppressHrtfSubjectUpdate = false;
-            }
-        }
-    }
-
     void Start()
     {
         masterControl.instance.onBinauralChangedEvent.AddListener(UpdateBinaural);
@@ -105,8 +84,6 @@ public class NetworkMasterControl : NetworkBehaviour
 
         masterControl.instance.onDisplayChangedEvent.AddListener(UpdateDisplay);
         //masterControl.instance.onDisplayChangedEvent.AddListener(delegate { lastDisplayTime = Time.time; });
-
-        masterControl.instance.onHrtfChangedEvent.AddListener(UpdateHrtfSubject);
     }
 
     private void OnDestroy()
@@ -119,7 +96,6 @@ public class NetworkMasterControl : NetworkBehaviour
         masterControl.instance.onBinauralChangedEvent.RemoveListener(UpdateBinaural);
         masterControl.instance.onWireChangedEvent.RemoveListener(UpdateWire);
         masterControl.instance.onDisplayChangedEvent.RemoveListener(UpdateDisplay);
-        masterControl.instance.onHrtfChangedEvent.RemoveListener(UpdateHrtfSubject);
     }
 
     public override void OnStartClient()
@@ -129,7 +105,6 @@ public class NetworkMasterControl : NetworkBehaviour
         OnDisplaySettingChanged(masterControl.instance.DisplaySetting, DisplaySetting);
         OnBinauralSettingChanged(masterControl.instance.BinauralSetting, BinauralSetting);
         OnWireSettingChanged(masterControl.instance.WireSetting, WireSetting);
-        OnHrtfSubjectIdChanged(masterControl.instance.getHrtfSubjectId(), HrtfSubjectId);
     }
 
 
@@ -157,39 +132,6 @@ public class NetworkMasterControl : NetworkBehaviour
         BinauralSetting = mode;
         masterControl.instance.updateBinauralSetting((int)mode);
     }
-
-    void UpdateHrtfSubject()
-    {
-        if (suppressHrtfSubjectUpdate)
-        {
-            return;
-        }
-
-        string subjectId = masterControl.instance.getHrtfSubjectId();
-        Debug.Log($"Update HrtfSubjectId: {subjectId}");
-        if (string.IsNullOrEmpty(subjectId))
-        {
-            return;
-        }
-
-        if (isServer)
-        {
-            HrtfSubjectId = subjectId;
-        }
-        else
-        {
-            CmdHrtfSubjectUpdate(subjectId);
-        }
-    }
-
-    [Command(requiresAuthority = false)]
-    public void CmdHrtfSubjectUpdate(string subjectId)
-    {
-        HrtfSubjectId = subjectId;
-        masterControl.instance.updateHrtfSubjectId(subjectId);
-    }
-
-
 
     void UpdateWire()
     {
