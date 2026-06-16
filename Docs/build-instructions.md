@@ -33,12 +33,6 @@ git submodule update --init --recursive OpenResonance OSLNative/Core/External/Ap
 
 The private paid add-ons submodule is not required for the public build. Initialize it separately only if you have access to the private add-ons repository.
 
-## App Name and Package ID
-
-The source project, documentation and codebase are OpenSoundLab, but homegrown developer builds use `OpenMultiLab` as the product name and `io.sphericals.OpenMultiLab` as the Android application ID.
-
-Keep the OpenMultiLab ID for development and sideloaded Quest builds. The OpenSoundLab app identity is reserved for official signed builds. Android treats builds with the same package ID as the same app, so a sideloaded build signed by Unity's local debug key can fail to install over an official build signed with the official key. Keeping `io.sphericals.OpenMultiLab` lets the local build install separately. If Unity or ADB still reports an install/update conflict, uninstall the conflicting app from the headset first.
-
 ## Platform Prerequisites
 
 On macOS:
@@ -123,6 +117,12 @@ The generated plugins are written under `Assets/Plugins/OSLNative`. If a script 
 *   Put on the headset and check if the app was installed correctly
 *   If you already had OpenSoundLab installed from the Meta Quest Store you might have to uninstall the app first
 *   Please note that tutorial videos are not included in the repository, so your build will not include them
+
+## App Name and Package ID
+
+The source project, documentation and codebase are OpenSoundLab, but homegrown developer builds use `OpenMultiLab` as the product name and `io.sphericals.OpenMultiLab` as the Android application ID.
+
+Keep the OpenMultiLab ID for development and sideloaded Quest builds. The OpenSoundLab app identity is reserved for official signed builds. Android treats builds with the same package ID as the same app, so a sideloaded build signed by Unity's local debug key can fail to install over an official build signed with the official key. Keeping `io.sphericals.OpenMultiLab` lets the local build install separately. If Unity or ADB still reports an install/update conflict, uninstall the conflicting app from the headset first.
 
 ## Startup Wizards and Development Builds
 
