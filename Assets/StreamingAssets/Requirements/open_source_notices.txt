@@ -38,6 +38,21 @@ Freeverb
 - © 2000 “Jezar at Dreampoint”
 - Freely distributed; keep original notice intact.
 
+OpenResonance (Apache License 2.0)
+- Copyright 2017-2018 Google Inc. and contributors
+- OpenSoundLab integration modifications copyright © 2026 Martin Rumori and Ludwig Zeller
+- Source: https://github.com/resonance-audio/resonance-audio
+- OpenSoundLab ships a generated Unity package and native audiopluginresonanceaudio plugin built from OpenResonance.
+
+OpenResonance bundled components
+- Eigen (MPL 2.0 and compatible third-party notices)
+- PFFFT/FFTPACK (BSD-style notices)
+- SADIE HRTF database (Apache License 2.0)
+- libOgg and libVorbis (BSD-style Xiph.org Foundation licenses)
+- Embree (Apache License 2.0, desktop reverb-baking builds)
+- Unity NativeAudioPlugins (MIT License)
+- Full notice paths and license files are listed in LICENSE-Libs.md and the generated OpenResonance package.
+
 Unity NativeAudioPlugins (MIT License)
 - © 2014 Unity Technologies
 - Source: https://github.com/Unity-Technologies/NativeAudioPlugin

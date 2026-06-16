@@ -188,6 +188,56 @@ The current host-side `OSLNative` build uses code from:
 *   `OSLNative/plaits`
 *   a reduced host-side subset of `OSLNative/stmlib`
 
+## OpenResonance
+
+OpenResonance is used for the Resonance Audio Unity spatializer integration.
+OpenSoundLab includes it as the `OpenResonance` submodule and generates the
+Unity-facing package at `OpenResonanceBuild/Package`.
+
+The OpenResonance source code is licensed under the Apache License, Version 2.0.
+The upstream license and submodule notice files are included at:
+
+*   `OpenResonance/LICENSE`
+*   `OpenResonance/NOTICE`
+*   `OpenResonance/THIRD_PARTY_NOTICES.md`
+
+OpenResonance source files preserve their original copyright and license
+headers, including Google Inc. copyright notices on the upstream Resonance
+Audio code.
+
+OpenSoundLab integration modifications to OpenResonance are copyright © 2026
+Martin Rumori and Ludwig Zeller.
+
+The generated OpenSoundLab package may include native plugin binaries built from
+OpenResonance and bundled third-party code or data. The relevant upstream notice
+files are:
+
+*   Eigen, primarily Mozilla Public License 2.0 with compatible third-party
+    notices: `OpenResonance/third_party/eigen/LICENSE`,
+    `OpenResonance/third_party/eigen/COPYING.README`,
+    `OpenResonance/third_party/eigen/COPYING.MPL2`,
+    `OpenResonance/third_party/eigen/COPYING.BSD`,
+    `OpenResonance/third_party/eigen/COPYING.APACHE` and
+    `OpenResonance/third_party/eigen/COPYING.MINPACK`
+*   PFFFT and FFTPACK, BSD-style license terms preserved in the source headers:
+    `OpenResonance/third_party/pffft/pffft.h` and
+    `OpenResonance/third_party/pffft/pffft.c`
+*   SADIE HRTF database, Apache License 2.0:
+    `OpenResonance/third_party/SADIE_hrtf_database/LICENSE`
+*   libOgg, BSD-style Xiph.org Foundation license:
+    `OpenResonance/third_party/ogg/COPYING`
+*   libVorbis, BSD-style Xiph.org Foundation license:
+    `OpenResonance/third_party/vorbis/COPYING`
+*   Embree, Apache License 2.0, used by desktop reverb-baking builds:
+    `OpenResonance/third_party/embree/LICENSE.txt`
+*   Unity NativeAudioPlugins, MIT License:
+    `OpenResonance/third_party/nativeaudioplugins/LICENSE`
+
+The generated package also writes `OpenResonanceBuild/Package/LICENSE`,
+`OpenResonanceBuild/Package/NOTICE` and
+`OpenResonanceBuild/Package/THIRD_PARTY_NOTICES.md` when
+`OpenResonanceBuild/install_unity_package.sh` is run.
+
 ## Unity NativeAudioPlugins
 
 The MIT License (MIT)
