@@ -150,7 +150,7 @@ adb tcpip 5555; \
 sleep 1; \
 adb connect $ip:5555; \
 sleep 1; \
-scrcpy --select-tcpip -b 16M --crop=2064:2208:0:0 --angle=19
+scrcpy --select-tcpip -b 16M --video-buffer=100 --crop=2064:2208:0:0 --angle=19 --no-audio 
 ```
 
 *   You can also do these steps separately:
